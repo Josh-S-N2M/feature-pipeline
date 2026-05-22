@@ -1,0 +1,57 @@
+# Line-ending normalization for cross-platform consistency.
+# Goal: stop noisy LF/CRLF diffs while keeping checkouts safe on Mac/Linux/Windows.
+# Reference: https://git-scm.com/docs/gitattributes
+#
+# Strategy:
+#   - Everything is stored in the repository with LF.
+#   - `eol=lf` / `eol=crlf` force the working-tree ending regardless of the
+#     contributor's `core.autocrlf` setting, so behavior is deterministic.
+#   - Windows-only scripts keep CRLF because some interpreters require it.
+#   - Binary files are never passed through text normalization.
+
+# Default: auto-detect text vs binary; text is stored as LF and checked out as LF.
+* text=auto eol=lf
+
+# --- Windows-only scripts: must keep CRLF to run correctly ---
+*.ps1   text eol=crlf
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# --- Source files: LF ---
+*.sh    text eol=lf
+*.py    text eol=lf
+*.js    text eol=lf
+*.jsx   text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.css   text eol=lf
+*.html  text eol=lf
+
+# --- Config and docs: LF ---
+*.json     text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.md       text eol=lf
+*.txt      text eol=lf
+*.toml     text eol=lf
+*.ini      text eol=lf
+*.cfg      text eol=lf
+*.xml      text eol=lf
+*.example  text eol=lf
+Dockerfile text eol=lf
+
+# --- Binary assets: never normalize as text ---
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.pdf   binary
+*.zip   binary
+*.gz    binary
+*.tar   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary

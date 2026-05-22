@@ -22,16 +22,18 @@
     },
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"
-    }
+    },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
   },
 
-  "onCreateCommand": "npm install -g @anthropic-ai/claude-code && claude --version && python3 --version && node --version && gh --version",
+  "onCreateCommand": "claude --version && python3 --version && node --version && gh --version",
 
   "forwardPorts": [],
 
   "customizations": {
     "vscode": {
       "extensions": [
+        "anthropic.claude-code",
         "ms-python.python",
         "ms-python.vscode-pylance",
         "redhat.vscode-yaml",
