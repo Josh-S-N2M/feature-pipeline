@@ -1,0 +1,100 @@
+{
+  "claims": [
+    {
+      "id": "C-0001",
+      "text": "The synthesis pipeline operates as six sequential phases: Extractor, Grapher, Critic, Framer, Substrate, Synthesizer.",
+      "source_uri": "output/constraint-aware-synthesis.md",
+      "source_type": "internal_audit",
+      "source_provenance": "internal",
+      "assumed_substrate": "claude_code",
+      "date": "2026-04-30",
+      "entities": [],
+      "confidence": "high",
+      "notes": null
+    },
+    {
+      "id": "C-0002",
+      "text": "Each phase agent runs in an isolated context window via the Task tool.",
+      "source_uri": "output/constraint-aware-synthesis.md",
+      "source_type": "internal_audit",
+      "source_provenance": "internal",
+      "assumed_substrate": "claude_code",
+      "date": "2026-04-30",
+      "entities": [],
+      "confidence": "high",
+      "notes": null
+    },
+    {
+      "id": "C-0003",
+      "text": "Phase agents communicate exclusively through JSON artifacts in the working directory.",
+      "source_uri": "output/constraint-aware-synthesis.md",
+      "source_type": "internal_audit",
+      "source_provenance": "internal",
+      "assumed_substrate": "claude_code",
+      "date": "2026-04-30",
+      "entities": [],
+      "confidence": "high",
+      "notes": null
+    },
+    {
+      "id": "C-0004",
+      "text": "The orchestrator never passes raw source text through context to sub-agents.",
+      "source_uri": "output/constraint-aware-synthesis.md",
+      "source_type": "internal_audit",
+      "source_provenance": "internal",
+      "assumed_substrate": "claude_code",
+      "date": "2026-04-30",
+      "entities": [],
+      "confidence": "high",
+      "notes": "Recursion-safety implication"
+    },
+    {
+      "id": "C-0005",
+      "text": "Knowledge skills carry curated taxonomies and rubrics; sub-agent memories accumulate runtime observations.",
+      "source_uri": "output/ai-research-synthesis-report.md",
+      "source_type": "internal_audit",
+      "source_provenance": "internal",
+      "assumed_substrate": "claude_code",
+      "date": "2026-04-25",
+      "entities": [],
+      "confidence": "high",
+      "notes": null
+    },
+    {
+      "id": "C-0006",
+      "text": "When unsure whether a learning belongs in a knowledge skill or sub-agent memory, default to memory and promote after three reinforcements.",
+      "source_uri": "output/ai-research-synthesis-report.md",
+      "source_type": "internal_audit",
+      "source_provenance": "internal",
+      "assumed_substrate": "claude_code",
+      "date": "2026-04-25",
+      "entities": [],
+      "confidence": "medium",
+      "notes": "Routing rule per Design \u00a74.6.2"
+    },
+    {
+      "id": "C-0007",
+      "text": "The substrate registry is reviewed every 90 days to prevent staleness.",
+      "source_uri": "output/ai-research-synthesis-report.md",
+      "source_type": "internal_audit",
+      "source_provenance": "internal",
+      "assumed_substrate": "claude_code",
+      "date": "2026-04-25",
+      "entities": [],
+      "confidence": "high",
+      "notes": null
+    },
+    {
+      "id": "C-0008",
+      "text": "Hooks beyond SessionStart are probe-pending and have in-skill validator fallbacks.",
+      "source_uri": "output/constraint-aware-synthesis.md",
+      "source_type": "internal_audit",
+      "source_provenance": "internal",
+      "assumed_substrate": "claude_code",
+      "date": "2026-04-30",
+      "entities": [],
+      "confidence": "high",
+      "notes": null
+    }
+  ]
+}

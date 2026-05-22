@@ -1,0 +1,87 @@
+# Deploy to AWS using OIDC (no long-lived access keys).
+#
+# Prerequisites (one-time, in your AWS account):
+# 1. Create an OIDC identity provider in IAM:
+#    URL: https://token.actions.githubusercontent.com
+#    Audience: sts.amazonaws.com
+# 2. Create an IAM role 'github-deploy' with a trust policy that allows this
+#    repo (and ideally a specific environment) to assume it. Example trust:
+#
+#    {
+#      "Version": "2012-10-17",
+#      "Statement": [{
+#        "Effect": "Allow",
+#        "Principal": { "Federated": "arn:aws:iam::ACCOUNT:oidc-provider/token.actions.githubusercontent.com" },
+#        "Action": "sts:AssumeRoleWithWebIdentity",
+#        "Condition": {
+#          "StringEquals": {
+#            "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+#          },
+#          "StringLike": {
+#            "token.actions.githubusercontent.com:sub": "repo:OWNER/REPO:environment:production"
+#          }
+#        }
+#      }]
+#    }
+# 3. Configure repo Settings → Environments → 'production' with required reviewers.
+
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # request OIDC token
+  contents: read
+
+concurrency:
+  group: deploy-aws-production
+  cancel-in-progress: false   # never cancel a deploy mid-flight
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://example.com
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build artifacts
+        run: |
+          # Replace with your build steps
+          npm ci
+          npm run build
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4  # TODO: SHA pin
+        with:
+          role-to-assume: arn:aws:iam::ACCOUNT_ID:role/github-deploy
+          role-session-name: gh-${{ github.run_id }}-${{ github.run_attempt }}
+          aws-region: us-east-1
+
+      - name: Verify identity
+        run: aws sts get-caller-identity
+
+      - name: Sync to S3
+        run: aws s3 sync ./dist s3://my-prod-bucket/ --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "$DISTRIBUTION_ID" \
+            --paths '/*'
+        env:
+          DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+
+      - name: Tag deployment in CloudWatch
+        run: |
+          aws cloudwatch put-metric-data \
+            --namespace Deployments \
+            --metric-name DeploymentCount \
+            --value 1 \
+            --dimensions App=mywebapp,Environment=production

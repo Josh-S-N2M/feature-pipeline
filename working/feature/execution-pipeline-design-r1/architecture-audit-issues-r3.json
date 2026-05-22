@@ -1,0 +1,193 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-execution-pipeline-design-r1-round-3",
+  "feature_slug": "execution-pipeline-design-r1",
+  "stage": "Architecture Audit",
+  "generated": "2026-05-22T19:30:00Z",
+  "generated_by": "claude (acting as review-architecture-auditor; claude.ai simulation; cycle 3 triggered by user-identified gap in cycle 2)",
+  "target": "working/feature/execution-pipeline-design-r1/blueprint-v2.md",
+  "blueprint_version": "2.0.0",
+  "audited_artifact": "blueprint-v2.md",
+  "audited_at": "2026-05-22T19:30:00Z",
+  "agent_invocation": "claude.ai simulation; cycle 3 audit re-opens blueprint-v2 with an additional check (canonical agent-frontmatter pattern verification) that cycle 1 and cycle 2 audits missed. Trigger: user (Josh) caught the gap by asking 'have we defined KB skills they will have for each [new agent]?' The audit procedure deficiency is itself an INFO-level finding in this round (I-AA-310).",
+  "code_graph_used": "none",
+  "audit_method": "Re-audit of blueprint-v2 against canonical agent-frontmatter pattern (per existing-agents inspection: all 31 planning-side agents declare model/effort/tools/skills/memory in agent-file frontmatter). Cross-check against cc-design.md (which provided detailed per-agent specs in its per-layer design but were under-transcribed into the integrated Blueprint).",
+  "checks_performed": [
+    "canonical_agent_frontmatter_pattern_check",
+    "per_agent_spec_fidelity_to_cc_design",
+    "skill_binding_convention_consistency",
+    "tool_binding_completeness",
+    "memory_directive_presence"
+  ],
+  "checks_added_this_round": [
+    "canonical_agent_frontmatter_pattern_check (NEW in cycle 3; should have been in cycles 1+2)"
+  ],
+  "inputs_read": {
+    "blueprint_path": "working/feature/execution-pipeline-design-r1/blueprint-v2.md (2292 lines)",
+    "cc_design_path": "working/feature/execution-pipeline-design-r1/cc-design.md (the per-layer design that under-transcribed into Blueprint)",
+    "existing_agents_sample": [".claude/agents/finalize-reconciler.md", ".claude/agents/design-composer.md", ".claude/agents/design-claude-code.md", ".claude/agents/shared-document-reviewer.md", ".claude/agents/plan-author.md", ".claude/agents/finalize-task-decomposer.md"],
+    "prior_audits": ["architecture-audit-issues.json (r1)", "architecture-audit-issues-r2.json (r2)"]
+  },
+  "issues": [
+    {
+      "id": "I-AA-301",
+      "severity": "MAJOR",
+      "category": "blueprint_under_transcribes_per_layer_design",
+      "summary": "Blueprint v2 'Skills bound' prose lossy-summarizes cc-design.md's detailed agent-frontmatter specifications; full canonical YAML frontmatter blocks not in Blueprint",
+      "evidence": [
+        {"artifact": "working/feature/execution-pipeline-design-r1/cc-design.md", "section": "Subagent patterns (lines 167-347)", "quote_paraphrase": "Provides explicit per-agent specs: Tools (with brackets), Skills (with brackets), Memory, Reasoning configuration (model/effort). All 5 new agents fully specified."},
+        {"artifact": "working/feature/execution-pipeline-design-r1/blueprint-v2.md", "section": "Main Components (lines 836-895)", "quote_paraphrase": "Provides prose-form 'Skills bound:' entries that summarize only the skill set (and even that lossily — see I-AA-302); no Tools list, no Memory directive, no YAML frontmatter block matching the canonical agent-file pattern."},
+        {"artifact": ".claude/agents/finalize-reconciler.md", "section": "frontmatter lines 1-9", "quote_paraphrase": "Canonical pattern: name, description, model, effort, tools, skills, memory all declared. Blueprint should provide this content for new agents at integration-stage grade."}
+      ],
+      "impact": "The Plan stage authors agent definition files. Without complete agent-frontmatter specifications in the Blueprint, the Plan author either (a) reads cc-design.md directly (defeating the Blueprint's role as integration substrate and risking Plan misinterpretation of per-layer details), or (b) invents the frontmatter from prose (introducing the 'improvised on each run' anti-pattern this feature is designed to eliminate). This is the precise failure mode FR-7 was authored to prevent — pipeline runs missing structured outputs because Blueprint was incomplete.",
+      "recommended_resolution": "Add an 'Agent Frontmatter Specifications' subsection to the Main Components section (or as a sibling subsection). Provide a literal YAML frontmatter block per new agent, transcribed from cc-design.md's specifications, in the canonical format. The five new agents each get a YAML block; the modified `shared-document-reviewer` doesn't need a new block (frontmatter unchanged; only body content updated)."
+    },
+    {
+      "id": "I-AA-302",
+      "severity": "MAJOR",
+      "category": "blueprint_skills_bound_contradicts_per_layer_design",
+      "summary": "Blueprint v2 'Skills bound' prose contradicts cc-design.md for every one of the 5 new agents",
+      "evidence": [
+        {"artifact": "blueprint-v2.md vs cc-design.md", "section": "execute-orchestrator", "quote_paraphrase": "Blueprint: 'auditing-shared (for log_state_transition.py, validate_pipeline_frontmatter.py access); KB-documentation-criteria'. cc-design: '[KB-cc-platform, KB-cc-design, recipe-feature-pipeline, auditing-shared, KB-review-disciplines]'. Blueprint omits KB-cc-platform, KB-cc-design, recipe-feature-pipeline, KB-review-disciplines."},
+        {"artifact": "blueprint-v2.md vs cc-design.md", "section": "execute-task-code-producer", "quote_paraphrase": "Blueprint: 'ai-development-guide; plus task-domain-specific'. cc-design: '[ai-development-guide, KB-cc-design] plus task-spec-declared'. Blueprint omits KB-cc-design."},
+        {"artifact": "blueprint-v2.md vs cc-design.md", "section": "execute-task-quality-handler", "quote_paraphrase": "Blueprint: 'ai-development-guide; auditing-shared'. cc-design: '[ai-development-guide, KB-cc-design, auditing-shared]'. Blueprint omits KB-cc-design."},
+        {"artifact": "blueprint-v2.md vs cc-design.md", "section": "execute-phase-quality-reviewer", "quote_paraphrase": "Blueprint: 'auditing-shared; KB-review-disciplines'. cc-design: '[KB-cc-design, KB-review-disciplines, auditing-shared]'. Blueprint omits KB-cc-design."},
+        {"artifact": "blueprint-v2.md vs cc-design.md", "section": "execute-finalize-reconciler", "quote_paraphrase": "Blueprint: 'None directly bound; consumes phase-quality-report data structure'. cc-design: '[KB-cc-design, KB-review-disciplines, auditing-shared]'. Blueprint declares NONE; cc-design specifies three KBs."}
+      ],
+      "impact": "Five direct contradictions between the integrated Blueprint and the approved per-layer design. The design-composer's role is integration + arbitration; if the composer departed from cc-design's specs, the departure needs an explicit rationale in the Blueprint. None is provided — the Blueprint v2 'Skills bound' prose appears to be a lossy summary rather than an intentional override. The execute-finalize-reconciler 'None directly bound' is the most consequential single contradiction because cc-design has it bound to 3 KBs and the agent class precedent (planning-side finalize-reconciler has 2 KBs) makes 'None' clearly wrong.",
+      "recommended_resolution": "Adopt cc-design.md's specifications verbatim in blueprint-v3 (the per-layer design has reviewer_verdict=approved and was the substrate the Blueprint should integrate, not override). Frame the v3 update as 'restore cc-design.md's agent specifications to the Blueprint' rather than 'new specifications.'"
+    },
+    {
+      "id": "I-AA-303",
+      "severity": "MAJOR",
+      "category": "blueprint_missing_tools_specifications",
+      "summary": "Blueprint v2 does not specify `tools:` field for any of the 5 new agents in agent-frontmatter form",
+      "evidence": [
+        {"artifact": "blueprint-v2.md Main Components section", "section": "all 5 new agents", "quote_paraphrase": "No agent has a Tools entry in agent-frontmatter list form (e.g., '[Read, Glob, Grep, Write, Bash(python3:*), TaskCreate, TaskUpdate]'). Tool invocations appear in narrative prose only."},
+        {"artifact": "cc-design.md", "section": "Subagent patterns", "quote_paraphrase": "Each of the 5 agents has explicit Tools list per cc-design: execute-orchestrator '[Read, Glob, Grep, Bash, Task, TaskUpdate]'; code-producer '[Read, Glob, Grep, Write, Edit, Bash]'; quality-handler '[Read, Glob, Grep, Bash]'; phase-quality-reviewer '[Read, Glob, Grep, Bash, Write]'; execute-finalize-reconciler '[Read, Glob, Grep, Task, Write]'."},
+        {"artifact": "existing agents", "section": ".claude/agents/*.md", "quote_paraphrase": "Every existing agent's `tools:` field is declared as a YAML list in the agent file frontmatter. The Blueprint specification at integration grade should provide this content."}
+      ],
+      "impact": "Same as I-AA-301 — Plan-stage authoring is under-substrated. Plan author has to either read cc-design directly (substrate-passthrough antipattern) or invent.",
+      "recommended_resolution": "Include the cc-design Tools list in each agent's frontmatter spec in blueprint-v3."
+    },
+    {
+      "id": "I-AA-304",
+      "severity": "MAJOR",
+      "category": "blueprint_missing_memory_directive",
+      "summary": "Blueprint v2 does not specify `memory:` directive for any of the 5 new agents",
+      "evidence": [
+        {"artifact": "blueprint-v2.md Main Components", "section": "all 5 new agents", "quote_paraphrase": "No Memory entry in any agent's specification."},
+        {"artifact": "cc-design.md", "section": "Subagent patterns", "quote_paraphrase": "Specifies: orchestrator 'memory: project'; code-producer 'memory: none'; quality-handler 'memory: none'; phase-quality-reviewer 'memory: none'; execute-finalize-reconciler 'memory: project'."},
+        {"artifact": "existing agents", "section": "frontmatter", "quote_paraphrase": "Every existing agent declares 'memory: project'. The value 'memory: none' is not used by any existing agent — its validity as a Claude Code platform directive is unverified."}
+      ],
+      "impact": "Without `memory:` directive, the Plan author defaults to some implicit value (or omits the field). Also: cc-design's introduction of 'memory: none' is a divergence from existing convention that warrants explicit acknowledgment.",
+      "recommended_resolution": "Include `memory:` in each agent's frontmatter spec in blueprint-v3. Adopt cc-design's value choices but flag 'memory: none' as a new value requiring platform-validity verification in a Gate 4 open question (I-AA-308)."
+    },
+    {
+      "id": "I-AA-305",
+      "severity": "MINOR",
+      "category": "tool_naming_inconsistency",
+      "summary": "cc-design specifies 'Task' tool (for delegation); existing agents use 'TaskCreate' and 'TaskUpdate'",
+      "evidence": [
+        {"artifact": "cc-design.md", "section": "execute-orchestrator + execute-finalize-reconciler", "quote_paraphrase": "Tools lists include 'Task' as a tool name (e.g., '[Read, Glob, Grep, Bash, Task, TaskUpdate]')."},
+        {"artifact": "existing agents", "section": "frontmatter", "quote_paraphrase": "All existing agents that delegate use 'TaskCreate' (e.g., finalize-reconciler tools: '[Read, Glob, Grep, Write, TaskCreate, TaskUpdate]')."}
+      ],
+      "impact": "Naming inconsistency may cause Plan-author confusion or runtime tool-name mismatch when agent files are authored.",
+      "recommended_resolution": "Reconcile in blueprint-v3: use 'TaskCreate' (matches existing precedent) for both execute-orchestrator and execute-finalize-reconciler. Flag the 'Task' framing in cc-design as a pre-existing inconsistency to clean up at the next per-layer design revision."
+    },
+    {
+      "id": "I-AA-306",
+      "severity": "MINOR",
+      "category": "tool_validity_question",
+      "summary": "cc-design specifies 'Edit' tool for execute-task-code-producer; no existing agent declares 'Edit'",
+      "evidence": [
+        {"artifact": "cc-design.md", "section": "execute-task-code-producer", "quote_paraphrase": "Tools: '[Read, Glob, Grep, Write, Edit, Bash]'."},
+        {"artifact": "existing agents", "section": ".claude/agents/*.md", "quote_paraphrase": "Zero existing agents declare 'Edit' in their tools list."}
+      ],
+      "impact": "'Edit' may be a valid Claude Code tool name for str_replace-style edits (distinct from full-file Write), but its absence from all existing agent declarations is conspicuous. The Plan author needs to know whether 'Edit' is platform-valid or whether 'Write' alone suffices.",
+      "recommended_resolution": "Include 'Edit' in blueprint-v3's code-producer frontmatter spec per cc-design, but flag for Gate 4 verification as part of I-AA-308 (platform-directive validity questions)."
+    },
+    {
+      "id": "I-AA-307",
+      "severity": "MINOR",
+      "category": "skill_binding_convention_evolution",
+      "summary": "cc-design binds 'auditing-shared' as a Skill in 4 of 5 new agents; no existing agent binds 'auditing-shared' in `skills:`",
+      "evidence": [
+        {"artifact": "cc-design.md", "section": "all execute-* agents that invoke audit scripts", "quote_paraphrase": "Skills lists include 'auditing-shared' (e.g., quality-handler skills: '[ai-development-guide, KB-cc-design, auditing-shared]')."},
+        {"artifact": "existing agents", "section": "frontmatter", "quote_paraphrase": "Zero existing agents declare 'auditing-shared' or any auditing-* skill in their `skills:` field. shared-document-reviewer invokes auditing-shared scripts via Bash but declares only KB-* skills in `skills:`."},
+        {"artifact": ".claude/skills/auditing-shared/SKILL.md", "section": "frontmatter line 3", "quote_paraphrase": "'user-invocable: false; loaded by the audit-module skills via subprocess dispatch.' The skill self-describes as loaded by other SKILLS via subprocess dispatch, not by AGENTS via `skills:` binding."},
+        {"artifact": "this audit", "section": "interpretation", "quote_paraphrase": "Two readings: (a) cc-design is establishing a new convention (agents can bind auditing-shared in `skills:` to load its SKILL.md as context); (b) cc-design is conflating two surfaces (loaded-as-context vs invoked-via-Bash). Either is defensible if surfaced."}
+      ],
+      "impact": "If reading (a) is correct, the new convention is fine and just needs explicit acknowledgment. If (b), the Blueprint should drop `auditing-shared` from `skills:` and rely on Bash invocation alone.",
+      "recommended_resolution": "Adopt cc-design's binding (reading a) in blueprint-v3 — `auditing-shared` listed in `skills:` for the 4 new agents that invoke its scripts. Add a brief note in the Agent Frontmatter Specifications subsection explaining the convention extension (this is the first project-side instance of a non-KB skill being bound; documents the precedent for future agents)."
+    },
+    {
+      "id": "I-AA-308",
+      "severity": "INFO",
+      "category": "gate_4_open_questions",
+      "summary": "Platform-directive validity questions for Gate 4 verification",
+      "evidence": [
+        {"artifact": "this audit findings I-AA-304, I-AA-306, I-AA-307", "section": "cumulative", "quote_paraphrase": "Three new patterns introduced by cc-design vs existing precedent: (a) 'memory: none' as a value; (b) 'Edit' as a tool name; (c) non-KB skill binding ('auditing-shared' in `skills:`)."}
+      ],
+      "impact": "These are platform-mechanism questions that may be answerable by the Claude Code documentation but cannot be verified within this audit's claude.ai simulation scope. The audit's INFO-level surfacing is so Gate 4 reviewers can verify against current Claude Code documentation before agent files are authored.",
+      "recommended_resolution": "At Gate 4, verify against current Claude Code documentation: (a) is 'memory: none' a valid directive? (b) is 'Edit' a valid tool name? (c) does the platform support non-KB skills in `skills:` binding? If any answer is no, blueprint-v3 needs revision."
+    },
+    {
+      "id": "I-AA-309",
+      "severity": "INFO",
+      "category": "round_2_findings_carry_forward",
+      "summary": "Cycle 2 INFO findings still apply (claude.ai simulation, code-graph absence, rationale-brief absence)",
+      "evidence": [
+        {"artifact": "architecture-audit-issues.json (round 1)", "section": "I-AA-008, I-AA-009, I-AA-010", "quote_paraphrase": "Three INFO findings deferred per reconciliation-log-cycle1.md."},
+        {"artifact": "architecture-audit-issues-r2.json (round 2)", "section": "I-AA-201", "quote_paraphrase": "Persistent simulation context tracking."}
+      ],
+      "impact": "No new content; carrying forward for visibility.",
+      "recommended_resolution": "Same as prior cycles; deferred."
+    },
+    {
+      "id": "I-AA-310",
+      "severity": "INFO",
+      "category": "audit_procedure_deficiency",
+      "summary": "Cycles 1 and 2 audits did not include canonical-agent-frontmatter-pattern check; user (Josh) caught the gap, prompting cycle 3 audit",
+      "evidence": [
+        {"artifact": "architecture-audit-issues.json (r1)", "section": "checks_performed", "quote_paraphrase": "['brief_honor_L3', 'blast_radius_structural_only', 'synthesis_claim_verification', 'cross_section_consistency', 'new_adr_well_formedness'] — no agent-frontmatter pattern check."},
+        {"artifact": "architecture-audit-issues-r2.json (r2)", "section": "checks_performed", "quote_paraphrase": "['round_1_finding_resolution_verification', 'v2_introduced_content_well_formedness', 'cross_section_consistency_re_check', 'new_adr_text_correction_verification', 'supersession_discipline_compliance'] — no agent-frontmatter pattern check."},
+        {"artifact": "user feedback", "section": "post-cycle-2", "quote_paraphrase": "'For all these new agents. Have we defined a KB skills they will have for each?' — direct catch of audit-procedure deficiency."}
+      ],
+      "impact": "The canonical-agent-frontmatter-pattern check should be a standard Architecture Audit Phase 5 cross-section consistency check (verify Blueprint provides Plan-stage-ready agent specifications for any new agents the feature introduces). It's not currently in KB-review-disciplines/SKILL.md (or wherever the audit-procedure spec lives). This is an audit-procedure improvement candidate.",
+      "recommended_resolution": "Add the check to the audit procedure in a follow-on feature: 'For any new sub-agents the Blueprint introduces, verify the Blueprint provides agent-frontmatter specifications (model, effort, tools, skills, memory) at integration grade, not only prose-form summaries.' Not in this feature's scope; INFO-level only."
+    }
+  ],
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 4,
+    "MINOR": 3,
+    "INFO": 3
+  },
+  "verdict": "conditional_pass",
+  "verdict_rationale": "Per severity rules: 0 BLOCKER, 4 MAJOR → conditional_pass. finalize-reconciler should dispatch revisions to design-composer for blueprint-v3. The fix is mechanical (transcribe cc-design.md specifications into blueprint-v3 with agent-frontmatter YAML blocks). No architectural rework. cc-design.md is reviewer_verdict=approved and serves as the substrate; the Blueprint just under-transcribed it. Cycle 3 audit also retracts cycle 2's pass verdict given the missed findings.",
+  "retraction_of_cycle_2": {
+    "rationale": "Cycle 2 audit (architecture-audit-issues-r2.json) returned verdict 'pass' but did not perform the canonical-agent-frontmatter-pattern check. The pass verdict was therefore premature. This cycle 3 audit, with the additional check, surfaces 4 MAJOR + 3 MINOR findings that should have been visible in cycle 2.",
+    "audit_authority_note": "The retraction is post-hoc but discloses the deficiency rather than absorbing it silently (per ADR-0029 + ADR-0033)."
+  },
+  "scope_deviation_surfacing": {
+    "rationale": "Per ADR-0029 + ADR-0033, this audit's deviations surfaced explicitly.",
+    "deviations": [
+      {
+        "deviation": "Cycle 2 pass verdict retracted post-hoc due to audit-procedure deficiency",
+        "where_should_have_surfaced": "verdict_rationale + retraction_of_cycle_2 fields above",
+        "resolution_path": "Cycle 3 finding I-AA-310 documents the audit-procedure improvement candidate"
+      },
+      {
+        "deviation": "User-triggered audit re-open (rather than agent-initiated)",
+        "where_should_have_surfaced": "agent_invocation field above",
+        "resolution_path": "Cycle 3 finding I-AA-310 captures this as a procedural deficiency; the audit-procedure should not require user prompting to catch agent-frontmatter gaps"
+      },
+      {
+        "deviation": "Claude.ai simulation continues across now-3 audit rounds; persistent",
+        "where_should_have_surfaced": "agent_invocation field; cumulative with prior rounds",
+        "resolution_path": "Carries forward to Gate 4 as I-AA-309"
+      }
+    ]
+  }
+}

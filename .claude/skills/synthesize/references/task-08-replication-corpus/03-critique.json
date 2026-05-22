@@ -1,0 +1,808 @@
+{
+  "critiques": [
+    {
+      "claim_id": "C-0001",
+      "verification_questions": [
+        "Does the source assert the pipeline has these six phases by name?",
+        "Are the phase names verbatim?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 synthesis-pipeline-technical-design.md line 19: 'Realize the six-phase synthesis pipeline (Extractor \u2192 Grapher \u2192 Critic \u2192 Decision Framer \u2192 Constraint/Substrate \u2192 Synthesizer)'",
+        "Yes \u2014 phase names match verbatim including the Decision Framer / Constraint/Substrate hyphenation"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0002",
+      "verification_questions": [
+        "Is the out-of-scope statement explicit in the source?",
+        "Are the alternative substrates named exactly?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a72 Out of Scope explicitly lists 'Long-running, deterministic, multi-tenant production execution'",
+        "Yes \u2014 LangGraph, Temporal, Step Functions all named verbatim in source"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0003",
+      "verification_questions": [
+        "Does source state deterministic replay is out of scope?",
+        "Is the rationale (non-determinism) stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a72 explicitly states deterministic replay is out of scope",
+        "Yes \u2014 source: 'Claude Code is non-deterministic \u2014 re-runs use the same prompts but produce variant text'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0004",
+      "verification_questions": [
+        "Is the slash command described as thin?",
+        "Are the two arguments (topic slug, --resume run-id) both mentioned?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.1 source: 'Thin user-facing trigger. Holds no logic.'",
+        "Yes \u2014 source: 'Capture an optional topic slug or `--resume <run-id>` argument'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0005",
+      "verification_questions": [
+        "Is tell-microsoft-joke.md cited as the precedent?",
+        "Is the file-system path stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 line 75: 'Pattern matches `tell-microsoft-joke.md` at `/mnt/user-config/.claude/commands/`'",
+        "Yes \u2014 path stated verbatim in source"
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Confidence medium because validated locally per source's \u2705 marking, but the path claim depends on the local-tenant config being canonical Claude Code"
+    },
+    {
+      "claim_id": "C-0006",
+      "verification_questions": [
+        "Is the run-id format specified verbatim?",
+        "Is the purpose (working-directory key) stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.2 step 1: '<topic-slug>-<YYYYMMDD-HHMMSS>'",
+        "Yes \u2014 'Used as the working-directory key'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0007",
+      "verification_questions": [
+        "Is the Glob pattern stated verbatim?",
+        "Is the recursion-safety exclusion stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.2 step 2: 'Glob output/**/*.md for prior research reports'",
+        "Yes \u2014 'Skip any path matching output/synthesis-*/'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0008",
+      "verification_questions": [
+        "Is 'required AskUserQuestion interrupt' stated verbatim?",
+        "Are exactly three questions described?",
+        "Are the three question topics named?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 line 103 verbatim: 'Required `AskUserQuestion` interrupt before Phase 1'",
+        "Yes \u2014 'Three concurrent questions (single card)'",
+        "Yes \u2014 Input set, Target substrate, Hard constraints"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Triple verification ran clean"
+    },
+    {
+      "claim_id": "C-0009",
+      "verification_questions": [
+        "Is cancellation-on-empty stated?",
+        "Is the no-defaults rule stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 source: 'Cancellation handling: if the user dismisses the card (empty answers), the orchestrator acknowledges and exits'",
+        "Yes \u2014 'does not proceed with assumed defaults'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0010",
+      "verification_questions": [
+        "Is the manifest path stated verbatim?",
+        "Is 'every downstream phase reads it' stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 '00-manifest.json' verbatim at the path 'working/synthesis/<run-id>/'",
+        "Yes \u2014 'durable record of what the user agreed to; every downstream phase reads it'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0011",
+      "verification_questions": [
+        "Does the source state agents receive paths not contents?",
+        "Is the rationale (context budget) stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.2 step 6: 'passing only the run-id and the previous-phase artifact path (not the contents \u2014 agents read files themselves'",
+        "Yes \u2014 'this preserves context budget'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0012",
+      "verification_questions": [
+        "Is checkpoint.json the resume input?",
+        "Is 'manifest is not re-confirmed on resume' stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.2 step 7: 'On --resume <run-id>, read this file and skip to the next phase'",
+        "Yes \u2014 'The manifest is not re-confirmed on resume.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0013",
+      "verification_questions": [
+        "Is 'at most one' Critic-driven retry stated?",
+        "Is 'at most one' Substrate-driven retry stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.2 step 8: 'Allow at most one Critic-driven retry of Extractor'",
+        "Yes \u2014 'and at most one Substrate-driven retry of Framer'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0014",
+      "verification_questions": [
+        "Is the agent placement path stated?",
+        "Is the path validated locally or only documented?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 '/mnt/user-config/.claude/agents/<name>.md' stated",
+        "DOCUMENTED ONLY \u2014 source explicitly marks this with \u26a0\ufe0f 'Documented, not locally verified \u2014 relies on Claude Code documentation. Confirm before implementation.'"
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Source itself flags this as not-locally-verified. Consequential single-sourced claim \u2014 Synthesizer should surface this in Limitations or treat as a known risk per Design \u00a76 'three honest gaps'"
+    },
+    {
+      "claim_id": "C-0015",
+      "verification_questions": [
+        "Is the synth-extractor tool allowlist stated?",
+        "Are the 5 tools listed correctly?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.3 row 1 of phase agents table",
+        "Yes \u2014 Read, Glob, Grep, Write, TaskUpdate (5 tools verbatim)"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0016",
+      "verification_questions": [
+        "Is the synthesizer's tool allowlist stated?",
+        "Is the 'cannot fetch sources' constraint stated as a principle?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.3 row 6: 'Read, Write, TaskUpdate'",
+        "Yes \u2014 \u00a74.3 'Tool allowlist principle' line: 'Synthesizer cannot fetch sources'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0017",
+      "verification_questions": [
+        "Is version-pinning the registry header stated?",
+        "Is the example version string given?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.4 'version-pin the registry header'",
+        "Yes \u2014 example given: 'version: 2026-04-30.1'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0018",
+      "verification_questions": [
+        "Does the source state the staleness threshold default?",
+        "Is the value 90 days stated verbatim?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 line 158: 'refuses to emit recommendations if the registry is older than a configurable staleness threshold'",
+        "Yes \u2014 '(default 90 days)' verbatim"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-confirmed at line 303 (PreToolUse hook entry references same 90-day rule)"
+    },
+    {
+      "claim_id": "C-0019",
+      "verification_questions": [
+        "Is 'output/**/*.md minus output/synthesis-*/**' stated as the input scan?",
+        "Is 'hard rule' stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.5 'Input recursion safety' section verbatim: 'output/**/*.md minus output/synthesis-*/**'",
+        "Yes \u2014 'This is a hard rule'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0020",
+      "verification_questions": [
+        "Are 'two memory tiers' explicitly named?",
+        "Is the orchestrator-vs-sub-agent distinction stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.6 opening: 'This pipeline uses two memory tiers'",
+        "Yes \u2014 'main-agent (orchestrator) memory' and 'per-sub-agent memory' both named"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0021",
+      "verification_questions": [
+        "Does the source state sub-agents lack a native auto-loaded memory file?",
+        "Is this marked as proposal vs. validated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.6.2: 'Sub-agents do not have a native, automatically-loaded memory file'",
+        "Marked \ud83d\udd36 Engineering proposal in source \u2014 'Claude Code's documented memory system (MEMORY.md + .memories/) is main-agent oriented'"
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Source marks this \ud83d\udd36 (engineering proposal \u2014 no precedent). Consequential single-sourced claim about substrate capability boundaries"
+    },
+    {
+      "claim_id": "C-0022",
+      "verification_questions": [
+        "Does the source state knowledge skills are loaded only when read?",
+        "Does the source state the agent can choose subset references?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.12 table 'Context cost' row: 'Loaded only when the agent reads it'",
+        "Yes \u2014 'and the agent can choose to load only the references it needs for this task'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0023",
+      "verification_questions": [
+        "Is the 'curated taxonomies vs. accumulated learnings' split stated?",
+        "Is the temporal stability distinction (rarely change vs accumulate) explicit?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.12 'Composition with sub-agent memory': 'knowledge skills hold taxonomies and rubrics that rarely change; sub-agent memories hold learnings that accumulate over runs'",
+        "Yes \u2014 verbatim from source"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0024",
+      "verification_questions": [
+        "Is the 3-step authoring order explicit?",
+        "Is 'do not pre-populate' stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a74.12 'Recommended authoring order' enumerates 1. knowledge skills first, 2. agent definitions, 3. let memories accumulate",
+        "Yes \u2014 '3. Let sub-agent memories accumulate organically through real runs; do not pre-populate them.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0025",
+      "verification_questions": [
+        "Is assumed_substrate field defined in claim schema?",
+        "Is its purpose (cross-substrate detection) stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a75.1 Claim schema: 'assumed_substrate: langgraph | aws | azure | claude_code | platform_neutral | unknown'",
+        "Yes \u2014 '[the field] lets the Substrate agent automatically detect when an external claim assumes a different substrate than the team uses'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0026",
+      "verification_questions": [
+        "Are the four verdict values listed exactly?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a75.3 Critique schema: 'verdict: verified | unverifiable | contradicted | single_sourced'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0027",
+      "verification_questions": [
+        "Are the four blast_radius values listed exactly?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 \u00a75.4 DecisionFrame: 'blast_radius: component | service | tenant | org'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0028",
+      "verification_questions": [
+        "Is the Standards Identification Gate stated as Required?",
+        "Is 'before any investigation' the timing?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 line 31 verbatim: '### Standards Identification Gate\u3010Required\u3011'",
+        "Yes \u2014 line 33: 'Must be performed before any investigation'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0029",
+      "verification_questions": [
+        "Are 'Explicit' and 'Implicit' the two classifications?",
+        "Are their definitions stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 line 36-37: 'Classify each: **Explicit** (documented) or **Implicit** (observed pattern only)'",
+        "Yes \u2014 definitions verbatim"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0030",
+      "verification_questions": [
+        "Is user confirmation required for implicit standards?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 section 'Record in Design Doc' final bullet: 'Implicit standards require user confirmation before design proceeds'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0031",
+      "verification_questions": [
+        "Are quality assurance mechanisms recorded with adopted/noted status?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 section 'Record in Design Doc' bullet 2: 'List quality assurance mechanisms in \"Quality Assurance Mechanisms\" section with adopted/noted status'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0032",
+      "verification_questions": [
+        "Is Existing Code Investigation a precondition to Design Doc creation?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 '### Existing Code Investigation\u3010Required\u3011' / 'Must be performed before Design Doc creation'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0033",
+      "verification_questions": [
+        "Is the 3-keyword search criterion stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 '3. Similar Functionality Search and Decision' subsection: 'Search existing code for keywords related to planned functionality / Look for implementations with same domain, responsibilities, or configuration patterns'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0034",
+      "verification_questions": [
+        "Does the decision rule say 'use existing' when similar is found?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Decision and action: Similar functionality found \u2192 Use existing implementation'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0035",
+      "verification_questions": [
+        "Is the technical-debt \u2192 ADR rule stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Similar functionality is technical debt \u2192 Create ADR improvement proposal before implementation'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0036",
+      "verification_questions": [
+        "Is 'Existing Codebase Analysis' the section name?",
+        "Is 'always' the inclusion qualifier?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Always include investigation results in \"## Existing Codebase Analysis\" section'",
+        "Yes \u2014 'always' verbatim"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0037",
+      "verification_questions": [
+        "Is 'single mechanism that binds existing-behavior facts' stated verbatim?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 line 102 verbatim: 'The Fact Disposition Table is the single mechanism that binds existing-behavior facts to the design.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Strong claim \u2014 'single mechanism' is exclusive. Verified verbatim"
+    },
+    {
+      "claim_id": "C-0038",
+      "verification_questions": [
+        "Are exactly four dispositions listed?",
+        "Are they preserve / transform / remove / out-of-scope?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 Disposition column: 'One of: preserve / transform / remove / out-of-scope'",
+        "Yes \u2014 verbatim"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0039",
+      "verification_questions": [
+        "Is the all-criteria-pass rule for reuse stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Decision Rule: All criteria satisfied \u2192 Reuse existing'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0040",
+      "verification_questions": [
+        "Is the 3+ failures rule for new structure stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Decision Rule: 3+ criteria fail \u2192 New structure justified'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0041",
+      "verification_questions": [
+        "Is the Agreement Checklist labelled as required at design-doc creation start?",
+        "Is it marked Most Important?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 '### Agreement Checklist\u3010Most Important\u3011' / 'Must be performed at the beginning of Design Doc creation'",
+        "Yes \u2014 explicit Most Important marker"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0042",
+      "verification_questions": [
+        "Is 'Phase 1-4 of implementation-approach skill' stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Approach Selection Criteria: Execute Phase 1-4 of implementation-approach skill to select strategy'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0043",
+      "verification_questions": [
+        "Is the Vertical Slice definition stated as 'feature unit, minimal external dependencies, early value delivery'?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 verbatim: '**Vertical Slice**: Complete by feature unit, minimal external dependencies, early value delivery'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-source bridge entity (E-0003 Vertical Slice) \u2014 synthesis-pipeline-technical-design.md uses Vertical Slice (per its \u00a711 implementation order) but does not extract this definitional claim. Trivially-single-sourced because the definition is a meta-skill rule"
+    },
+    {
+      "claim_id": "C-0044",
+      "verification_questions": [
+        "Is the Horizontal Slice definition stated as 'layer, common foundation, technical consistency priority'?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 verbatim: '**Horizontal Slice**: Implementation by layer, important common foundation, technical consistency priority'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0045",
+      "verification_questions": [
+        "Are the three minimum elements (target comparison, method, observable success indicator) listed?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Output must include at least: target comparison (what vs what), method (how), observable success indicator'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0046",
+      "verification_questions": [
+        "Is the early-verification-point definition stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Define early verification point: what is the first thing to verify, and how, to confirm the approach is correct before scaling'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "This claim is the source of THIS run's existence \u2014 task-08 IS the early verification point per \u00a77.4 of synthesis-pipeline-technical-design.md. Cross-source bridge"
+    },
+    {
+      "claim_id": "C-0047",
+      "verification_questions": [
+        "Is the 'output comparison of at least one representative case' rule stated for replacements/modifications?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'For replacements/modifications, the early verification point must be an output comparison of at least one representative case'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0048",
+      "verification_questions": [
+        "Is 'decisions, rationale, principled guidelines' stated as ADR contents?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 '## ADR Responsibility Boundaries / Include in ADR: Decisions, rationale, principled guidelines'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0049",
+      "verification_questions": [
+        "Is 'schedules, implementation procedures, specific code' the exclusion list for ADRs?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Exclude from ADR: Schedules, implementation procedures, specific code'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0050",
+      "verification_questions": [
+        "Is 'minimum 3 options' stated as ADR option count?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 line 298: 'Problem background and evaluation of multiple options (minimum 3 options)'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-source bridge: synthesis-pipeline-technical-design.md \u00a75.5 SubstrateMapping schema enforces three options per architectural decision. The 'minimum 3 options' rule for ADRs and the 'three-option enumeration' rule for SubstrateMapping are conceptually aligned but not the same claim"
+    },
+    {
+      "claim_id": "C-0051",
+      "verification_questions": [
+        "Are architecture and data flow diagrams mandatory?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 '## Diagram Creation' section: 'Design Doc: Architecture diagram and data flow diagram are mandatory'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0052",
+      "verification_questions": [
+        "Are AC required to be testable, user-observable, integration/E2E-oriented, and CI-isolatable?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Acceptance criteria written in testable format (user-observable behaviors, integration/E2E oriented, CI-isolatable)'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    },
+    {
+      "claim_id": "C-0053",
+      "verification_questions": [
+        "Are the three required output-comparison elements (input, expected output fields/format, diff method) stated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 'Define concrete output comparison method \u2014 specify identical input, expected output fields/format, and how to diff'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": null
+    }
+  ]
+}

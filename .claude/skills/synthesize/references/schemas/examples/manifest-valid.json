@@ -1,0 +1,30 @@
+{
+  "run_id": "claude-code-synthesis-20260430-141500",
+  "topic": "claude-code-synthesis",
+  "started_at": "2026-04-30T14:15:00Z",
+  "inputs": {
+    "discovered": [
+      "output/ai-research-synthesis-report.md",
+      "output/constraint-aware-synthesis.md"
+    ],
+    "confirmed": [
+      "output/ai-research-synthesis-report.md",
+      "output/constraint-aware-synthesis.md"
+    ],
+    "excluded": [],
+    "added_from_input": []
+  },
+  "constraints": {
+    "target_substrate": "claude_code",
+    "scope": "narrow",
+    "audience_depth": "engineering",
+    "hard_constraints": [
+      "compliance:SOC2"
+    ],
+    "additional_notes": null
+  },
+  "params": {
+    "include_adrs": true,
+    "max_iterations": 2
+  }
+}

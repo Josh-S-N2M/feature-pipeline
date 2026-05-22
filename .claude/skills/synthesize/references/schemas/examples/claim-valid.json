@@ -1,0 +1,12 @@
+{
+  "id": "C-0001",
+  "text": "The synthesis pipeline operates entirely on Claude Code primitives without external orchestration frameworks.",
+  "source_uri": "output/constraint-aware-synthesis.md",
+  "source_type": "internal_audit",
+  "source_provenance": "internal",
+  "assumed_substrate": "claude_code",
+  "date": "2026-04-30",
+  "entities": [],
+  "confidence": "high",
+  "notes": null
+}

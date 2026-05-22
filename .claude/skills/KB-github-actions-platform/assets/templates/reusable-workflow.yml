@@ -1,0 +1,125 @@
+# Reusable workflow + caller example.
+#
+# This file demonstrates BOTH:
+# - A reusable workflow (the 'workflow_call' block defines its interface).
+# - How a caller invokes it (the 'caller-example' job below shows the shape
+#   you'd put in a separate workflow file).
+#
+# In real use, split these into two files:
+#   .github/workflows/build-test.yml   (this reusable workflow)
+#   .github/workflows/ci.yml           (the caller)
+#
+# The reusable workflow can also live in a different repo:
+#   uses: my-org/shared/.github/workflows/build-test.yml@v1.2.3
+
+name: Build and Test (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version to use
+        type: string
+        default: '22'
+      run-tests:
+        description: Whether to run the test suite
+        type: boolean
+        default: true
+      coverage-threshold:
+        description: Minimum coverage percentage to require
+        type: number
+        default: 80
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+    outputs:
+      version:
+        description: The package version that was built
+        value: ${{ jobs.build.outputs.version }}
+      artifact-name:
+        description: Name of the uploaded build artifact
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      artifact-name: build-${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - run: npm ci
+
+      - id: version
+        run: echo "version=$(node -p 'require(\"./package.json\").version')" >> "$GITHUB_OUTPUT"
+
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: dist/
+          retention-days: 7
+
+  test:
+    if: ${{ inputs.run-tests }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test -- --coverage --coverageThreshold='{"global":{"lines":${{ inputs.coverage-threshold }}}}'
+
+      - if: env.CODECOV_TOKEN != ''
+        uses: codecov/codecov-action@v5  # TODO: SHA pin
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+# ─────────────────────────────────────────────────────────────────
+# Caller example (put this in a SEPARATE workflow file, e.g. ci.yml):
+# ─────────────────────────────────────────────────────────────────
+#
+# name: CI
+# on:
+#   push: { branches: [main] }
+#   pull_request:
+#
+# jobs:
+#   build-and-test:
+#     uses: ./.github/workflows/build-test.yml
+#     # or: uses: my-org/shared-workflows/.github/workflows/build-test.yml@v1.2.3
+#     with:
+#       node-version: '22'
+#       run-tests: true
+#       coverage-threshold: 85
+#     secrets:
+#       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#     # alternatively, pass all of the caller's secrets through:
+#     # secrets: inherit
+#
+#   downstream:
+#     needs: build-and-test
+#     runs-on: ubuntu-latest
+#     steps:
+#       - run: echo "Built version ${{ needs.build-and-test.outputs.version }}"
+#       - uses: actions/download-artifact@v5
+#         with: { name: '${{ needs.build-and-test.outputs.artifact-name }}' }
+#       - run: ls -la

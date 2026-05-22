@@ -1,0 +1,28 @@
+{
+  "run_id": "golden-corpus-20260430-150000",
+  "topic": "golden-corpus",
+  "started_at": "2026-04-30T15:00:00Z",
+  "inputs": {
+    "discovered": [
+      "output/ai-research-synthesis-report.md",
+      "output/constraint-aware-synthesis.md"
+    ],
+    "confirmed": [
+      "output/ai-research-synthesis-report.md",
+      "output/constraint-aware-synthesis.md"
+    ],
+    "excluded": [],
+    "added_from_input": []
+  },
+  "constraints": {
+    "target_substrate": "claude_code",
+    "scope": "narrow",
+    "audience_depth": "engineering",
+    "hard_constraints": [],
+    "additional_notes": "Golden-corpus reference run for Layer C smoke testing per Design \u00a77.4 + task-08."
+  },
+  "params": {
+    "include_adrs": true,
+    "max_iterations": 2
+  }
+}

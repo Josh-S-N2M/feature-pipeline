@@ -1,0 +1,91 @@
+{
+  "project_root": "/home/claude/work",
+  "verdict": {
+    "score": 93,
+    "verdict": "PASS-WITH-MINOR-FIXES",
+    "per_dimension_scores": {
+      "1": 8,
+      "2": 10,
+      "3": 10,
+      "4": 5,
+      "5": 10,
+      "6": 10,
+      "7": 10,
+      "8": 10,
+      "9": 10,
+      "10": 10
+    },
+    "deductions_by_severity": {
+      "BLOCKER": 0,
+      "MAJOR": 1,
+      "MINOR": 1,
+      "NIT": 0,
+      "INFO": 0
+    },
+    "security_block": false,
+    "human_review_required": false,
+    "human_review_count": 0,
+    "cross_file_score": 100.0,
+    "project_score": 93
+  },
+  "report_path": "/tmp/post-sibling-orphan.md",
+  "primitives_audited": {
+    "skills": 38,
+    "context_files": 0,
+    "subagents": 31,
+    "subagent_memory_dirs": 0,
+    "hooks_configs": 0,
+    "hook_scripts": 0,
+    "settings_files": 0,
+    "output_styles": 0,
+    "mcp_configs": 0
+  },
+  "finding_counts": {
+    "skills": 1,
+    "context_files": 0,
+    "subagents": 1,
+    "hooks": 0,
+    "settings": 0,
+    "mcp": 0
+  },
+  "cross_file_findings": 0,
+  "json_path": "/tmp/post-sibling-orphan.json"
+}
+settings": 0,
+      "mcp": 0
+    },
+    "cross_file_findings": 0
+  },
+  "per_primitive": {
+    "skills": [
+      {
+        "severity": "MINOR",
+        "what": "references/disciplines/discovery-planning.md is 139 lines but has no recognized table-of-contents heading near the top.",
+        "fix": "Add a heading like `## Contents`, `## Table of contents`, `## In this file`, `## On this page`, or `## Sections` listing the file's sections. The property is navigable-index-near-the-top, not a specific heading string.",
+        "marker_decision": "NO_MARKER",
+        "final_severity": "MINOR",
+        "marker_note": "Location did not include file:line; marker triage skipped.",
+        "audited_by": "auditing-skills",
+        "primitive": "KB-documentation-criteria",
+        "dimension": 1
+      }
+    ],
+    "context_files": [],
+    "subagents": [
+      {
+        "dimension": 4,
+        "severity": "MAJOR",
+        "what": "Body references tools ['Bash'] not in declared `tools:` list.",
+        "fix": "Add the tools to `tools:` (with scoping) or remove the body references.",
+        "location": "/home/claude/work/.claude/agents/review-cross-artifact-auditor.md",
+        "where": "/home/claude/work/.claude/agents/review-cross-artifact-auditor.md",
+        "audited_by": "auditing-subagents",
+        "primitive": "review-cross-artifact-auditor.md"
+      }
+    ],
+    "hooks": [],
+    "settings": [],
+    "mcp": []
+  },
+  "cross_file": []
+}

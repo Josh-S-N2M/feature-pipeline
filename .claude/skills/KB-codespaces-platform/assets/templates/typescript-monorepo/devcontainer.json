@@ -1,0 +1,89 @@
+// TypeScript monorepo devcontainer (pnpm + turbo style).
+// Copy to .devcontainer/devcontainer.json at the monorepo root.
+// Assumes:
+//   - pnpm workspaces (adjust for npm/yarn workspaces)
+//   - Turbo (adjust if using nx, lerna, or none)
+//   - Multiple apps each on their own port (web, api, etc.)
+{
+  "name": "ts-monorepo",
+
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "node",
+      "configureZshAsDefaultShell": true
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+    // pnpm is installable via corepack (already in Node 22) -- see postCreateCommand below.
+    // For tools that don't have features and you want every developer to have:
+    // "ghcr.io/devcontainers-contrib/features/turborepo-npm:1": {}
+  },
+
+  // Forward every port the workspace's apps listen on. Add more as the monorepo grows.
+  "forwardPorts": [3000, 3001, 4000, 5432],
+  "portsAttributes": {
+    "3000": { "label": "web", "onAutoForward": "notify" },
+    "3001": { "label": "docs", "onAutoForward": "silent" },
+    "4000": { "label": "api", "onAutoForward": "notify" },
+    "5432": { "label": "postgres", "onAutoForward": "ignore" }
+  },
+
+  // Activate corepack-managed pnpm version. Keeps pnpm version in sync with package.json's
+  // packageManager field across every developer.
+  "onCreateCommand": "corepack enable && corepack prepare pnpm@latest --activate",
+
+  // Install dependencies -- content-dependent, cached in prebuild.
+  // --frozen-lockfile fails fast if pnpm-lock.yaml drifts.
+  "updateContentCommand": "pnpm install --frozen-lockfile",
+
+  // Optional: run codegen and build shared packages once on first attach.
+  // Uses object form so commands run in parallel.
+  "postCreateCommand": {
+    "build-shared": "pnpm --filter './packages/*' build",
+    "prepare-husky": "pnpm dlx husky install || true"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "EditorConfig.EditorConfig",
+        "GitHub.vscode-pull-request-github",
+        "Vue.volar",
+        "bradlc.vscode-tailwindcss"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "eslint.workingDirectories": [{ "mode": "auto" }],
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "typescript.enablePromptUseWorkspaceTsdk": true,
+        "search.exclude": {
+          "**/node_modules": true,
+          "**/dist": true,
+          "**/.turbo": true,
+          "**/.next": true
+        }
+      }
+    },
+    "codespaces": {
+      // Land the user in the most-edited app. Adjust to your monorepo's main entry point.
+      "openFiles": ["apps/web/src/app/page.tsx", "README.md"]
+    }
+  },
+
+  "remoteUser": "node",
+
+  // Monorepos need more RAM and disk for parallel builds.
+  "hostRequirements": {
+    "cpus": 8,
+    "memory": "16gb",
+    "storage": "64gb"
+  }
+
+  // If your monorepo also runs services (db, redis, etc.) for local dev,
+  // switch to docker-compose template and run them as sidecars rather than
+  // inside the dev container.
+}

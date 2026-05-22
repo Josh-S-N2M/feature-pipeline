@@ -1,0 +1,28 @@
+{
+  "run_id": "task-08-replication-20260501-021500",
+  "topic": "task-08-replication",
+  "started_at": "2026-05-01T02:15:00Z",
+  "inputs": {
+    "discovered": [
+      "/mnt/user-data/uploads/technical-designer.md",
+      "/mnt/user-data/uploads/synthesis-pipeline-technical-design.md",
+      "/mnt/user-data/uploads/Document-Reviewer.md",
+      "/mnt/user-data/uploads/work-planner.md",
+      "/mnt/user-data/uploads/task-decomposer.md"
+    ],
+    "confirmed": [
+      "/mnt/user-data/uploads/technical-designer.md",
+      "/mnt/user-data/uploads/synthesis-pipeline-technical-design.md"
+    ],
+    "excluded": [],
+    "added_from_input": []
+  },
+  "constraints": {
+    "target_substrate": "claude_code",
+    "scope": "narrow",
+    "audience_depth": "engineering",
+    "hard_constraints": [],
+    "additional_notes": "Real-corpus task-08 replication — partial-overlap requirement met by both being internal_audit docs about technical-design discipline."
+  },
+  "params": {"include_adrs": true, "max_iterations": 2}
+}

@@ -1,0 +1,224 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "audit-findings-remediation-r1",
+  "generated": "2026-05-21T18:05:00Z",
+  "generated_by": "claude (acting as discovery-codebase-researcher)",
+  "derived_from": "working/feature/audit-findings-remediation-r1/research-plan.md",
+  "research_plan_version": "1.1.0",
+
+  "touch_points": [
+    {
+      "path": ".claude/skills/auditing-cc-configs/scripts/pedagogical_marker_check.py",
+      "role": "marker-triage-canonical",
+      "purpose": "Called by triage_with_judge.py during top-level audit pipeline",
+      "loc": 452,
+      "in_scope_for": ["FR-7-b", "FR-12-a"]
+    },
+    {
+      "path": ".claude/skills/auditing-skills/scripts/pedagogical_marker_check.py",
+      "role": "marker-triage-duplicate",
+      "purpose": "Called by audit_skill.py during per-skill audit dispatch",
+      "loc": 452,
+      "in_scope_for": ["FR-7-b", "FR-12-a"],
+      "divergence_from_canonical": "18 lines (3 comment differences; 1 defensive backward-compat for `location`/`where` field name)"
+    },
+    {
+      "path": ".claude/skills/auditing-subagents/scripts/pedagogical_marker_check.py",
+      "role": "marker-triage-duplicate",
+      "purpose": "Called by audit_subagent.py during per-subagent audit dispatch",
+      "loc": 452,
+      "in_scope_for": ["FR-7-b", "FR-12-a"],
+      "divergence_from_canonical": "18 lines (similar to skills copy; lacks the `location`/`where` backward-compat)"
+    },
+    {
+      "path": ".claude/skills/auditing-cc-configs/scripts/cross_file_checks.py",
+      "role": "x9-emission-site",
+      "purpose": "Contains check_X9_subagent_skills_security_block at line 622 — self-documented as STUB",
+      "in_scope_for": ["FR-6-Stream-2"]
+    },
+    {
+      "path": ".claude/skills/auditing-cc-configs/scripts/audit_project.py",
+      "role": "top-level-audit-dispatcher",
+      "purpose": "Already imports subprocess + dispatches to audit_skill.py / audit_subagent.py. Has the recursive-audit capability X9 needs.",
+      "in_scope_for": ["FR-6-Stream-2"]
+    },
+    {
+      "path": ".claude/skills/auditing-subagents/scripts/analyze_subagent.py",
+      "role": "sa2-regex-site",
+      "purpose": "TRIGGER_PATTERNS at line ~30 — the 5-pattern regex tested against descriptions for SA-2",
+      "in_scope_for": ["FR-4-b"]
+    },
+    {
+      "path": ".claude/skills/auditing-subagents/scripts/scan_subagent_body.py",
+      "role": "bypass-approval-regex-site",
+      "purpose": "Regex `\\b(ignore|bypass|skip|override)\\b.{0,30}(approval|prompt|permission|safety|check)\\b` at line 38 — fires on negative instructions ('You do NOT skip the permission policy')",
+      "in_scope_for": ["FR-5-b"]
+    },
+    {
+      "path": ".claude/agents/shared-document-reviewer.md",
+      "role": "validator-extension-point",
+      "purpose": "Extensible via doc_type taxonomy (PRD, ADR, DesignDoc, IntentClarification, Plan, DeliverableArchive); clean fit for PedagogicalMarkerJustification doc_type",
+      "in_scope_for": ["FR-7-b enforcement-location decision"]
+    },
+    {
+      "path": ".claude/skills/auditing-cc-configs/references/pedagogical-marker-spec.md",
+      "role": "current-marker-spec",
+      "purpose": "Documents both frontmatter and fence-wrap marker forms + anti-laundering rules. Mechanism α extends.",
+      "in_scope_for": ["FR-7-a"]
+    },
+    {
+      "path": ".claude/skills/synthesize/SKILL.md",
+      "role": "active-skill-target-of-broken-links",
+      "purpose": "ACTIVE skill (synth-synthesizer orchestrator); broken links FROM this skill are real defects",
+      "in_scope_for": ["FR-3 Category C"]
+    },
+    {
+      "path": ".claude/skills/report-composition-knowledge/SKILL.md",
+      "role": "active-skill-target-of-broken-links",
+      "purpose": "ACTIVE skill (loaded by synth-synthesizer); broken links FROM this skill are real defects",
+      "in_scope_for": ["FR-3 Category C"]
+    }
+  ],
+
+  "blast_radius": {
+    "pedagogical_marker_check_dependents": {
+      "auditing-cc-configs/scripts/pedagogical_marker_check.py": ["triage_with_judge.py", "tests/test_phase0.py"],
+      "auditing-skills/scripts/pedagogical_marker_check.py": ["audit_skill.py"],
+      "auditing-subagents/scripts/pedagogical_marker_check.py": ["audit_subagent.py", "scan_memory_secrets.py (via X9-related path)"]
+    },
+    "subagents_preloading_skills_x9_fanout": {
+      "note": "X9 fires for every subagent that declares 'skills:' frontmatter. Count: 29 of 30 sub-agents",
+      "implication_for_fr_6_stream_1": "29 verification records required if FR-6 Stream 1 enumerated per-agent; if deduplicated to per-skill, count is the unique-skill set across all 29 (likely 6-10 distinct preloaded skills)"
+    },
+    "audit_invocations": {
+      "primary": "Manual: python3 .claude/skills/auditing-cc-configs/scripts/audit_project.py .",
+      "no_ci_hook": "No CI workflow invokes the audit per project convention; this means presentation improvements (FR-10) only affect manual readers"
+    }
+  },
+
+  "convention_findings": [
+    {
+      "convention": "agent-tools-declaration-syntax",
+      "observation": "Project agents use both comma-separated (`tools: A, B, C`) and YAML flow-sequence (`tools: [A, B, C]`) forms. Both parse correctly post-v4.5.0 parser fix.",
+      "preferred": "comma-separated (matches 23 of 30 existing agents)"
+    },
+    {
+      "convention": "kb-spec-file-location",
+      "observation": "Existing specs live in `.claude/skills/KB-documentation-criteria/references/` (e.g., deliverable-archive-spec.md, pedagogical-marker-spec.md — NOTE: marker spec actually lives in auditing-cc-configs/references/, not KB-documentation-criteria as PRD assumed). Cross-cutting specs belong in KB-documentation-criteria.",
+      "implication_for_fr_7_a": "New marker-justification spec lives in KB-documentation-criteria/references/; existing pedagogical-marker-spec.md (in auditing-cc-configs/) may need a forward-pointer to the new spec OR could move."
+    },
+    {
+      "convention": "subagent-description-style",
+      "observation": "Project's existing 30-agent descriptions use phrasings like 'At the X stage, …' / 'during per-layer Design' / 'One invocation per …' — these are clearly delegation triggers but do NOT match the SA-2 regex's 5 patterns ('use when', 'when reviewing', 'delegate', 'called when', 'invoke when')."
+    },
+    {
+      "convention": "duplicate-script-pattern",
+      "observation": "Pattern of duplicating Python scripts across audit skill modules exists for multiple files, not just pedagogical_marker_check.py. scan_memory_secrets.py is identical across auditing-context-files/ and auditing-subagents/."
+    }
+  ],
+
+  "findings": [
+    {
+      "id": "F-001",
+      "in_addressed": ["IN-002", "IN-013"],
+      "summary": "Three pedagogical_marker_check.py copies, not two as PRD assumed",
+      "detail": "Files differ by 18-28 lines pairwise; mostly comment formatting + one defensive `location`/`where` field-name backward-compat in auditing-skills copy. All three are invoked by distinct audit dispatchers (triage_with_judge / audit_skill / audit_subagent). Three near-duplicates is structurally fragile for FR-7-b's uniform-enforcement requirement.",
+      "scope_deviation": true,
+      "resolution": "Surfaced 2026-05-21T17:45; resolved via PRD v1.1.0 amendment per ADR-0029 path (a) — FR-7-b tightened to require uniform enforcement; new FR-12 added for deduplication"
+    },
+    {
+      "id": "F-002",
+      "in_addressed": ["IN-003"],
+      "summary": "Existing pedagogical markers inventory",
+      "detail": "9+ files declare `pedagogical_sections:` frontmatter: auditing-cc-configs SKILL.md, all 5 auditing-* SKILL.md files, KB-general-coding-principles SKILL.md, KB-visual-design's anti-slop.md (via HTML-tag form, NOT frontmatter), and others. `audit-example` fence wraps appear in 10+ files. The `<pedagogical-example>` HTML-tag form is unique to KB-visual-design/references/anti-slop.md + type-color-space.md.",
+      "scope_deviation": false,
+      "resolution": "FR-8 retroactive-upgrade scope is larger than originally framed (PRD intent named anti-slop.md as the example; real scope includes all 9+ files). NOT a scope deviation per ADR-0029 because FR-8 explicitly says 'All markers in the project at feature-end' — the wording always covered the full set; only the size estimate was off."
+    },
+    {
+      "id": "F-003",
+      "in_addressed": ["IN-005"],
+      "summary": "X9 finding is a self-documented STUB",
+      "detail": "check_X9_subagent_skills_security_block at cross_file_checks.py:622 explicitly says 'Requires running auditing-skills against each referenced skill — expensive. Stub for now: emit INFO when a subagent has a skills: list, suggesting review.' FR-6 Stream 2 is the long-overdue replacement of this stub with the real recursive check.",
+      "scope_deviation": false,
+      "resolution": "Aligns with PRD's framing; just confirms intent"
+    },
+    {
+      "id": "F-004",
+      "in_addressed": ["IN-006"],
+      "summary": "Recursive-audit capability already exists in audit_project.py",
+      "detail": "audit_project.py:26 imports subprocess; lines 35-37 reference audit_skill.py and audit_subagent.py paths; lines 51+ uses subprocess.run with timeout. The dispatch capability X9 Stream 2 needs is already present — wire the recursive call rather than build from scratch.",
+      "scope_deviation": false,
+      "resolution": "FR-6 Stream 2 effort smaller than estimated; this is good news for the Plan stage"
+    },
+    {
+      "id": "F-005",
+      "in_addressed": ["IN-007"],
+      "summary": "SA-2 regex is over-narrow vs project's description-writing style",
+      "detail": "Tested TRIGGER_PATTERNS regex (\\buse\\s+(?:when|for)\\b, \\bwhen\\s+\\w+ing\\b, \\bdelegate\\b, \\bcalled?\\s+when\\b, \\binvoke\\s+when\\b) against 10 of 29 flagged descriptions. Zero matches. All 10 descriptions DO communicate when-to-invoke ('At the X stage…', 'during per-layer Design', 'One invocation per …', 'Use at pipeline start') — none use the literal phrases the regex demands. Regex over-narrowness, not description quality. Tighter regex covering project conventions would fix 27-29 findings with one edit.",
+      "scope_deviation": false,
+      "resolution": "Carries to Plan stage's U-2 decision; codebase evidence supports option (ii) — tighten regex. The 1-2 descriptions that may genuinely need rewriting are an edge case."
+    },
+    {
+      "id": "F-006",
+      "in_addressed": ["IN-008"],
+      "summary": "synthesize and report-composition-knowledge are ACTIVE skills",
+      "detail": "Both have current SKILL.md files (mtime May 19-20 2026) and are referenced by active agents (synth-synthesizer is one of the 30 pipeline agents; synthesize is user-invocable). Category C broken-link findings inside these skills are real defects in active content, not artifacts of deprecated skills.",
+      "scope_deviation": false,
+      "resolution": "PRD's Category C disposition (real fix) is correct; no scope shift. OQ-002's hypothesized 'these skills might be deprecated' is disproved."
+    },
+    {
+      "id": "F-007",
+      "in_addressed": ["IN-009"],
+      "summary": "Category E bypass-approval BLOCKERs are auditor false positives",
+      "detail": "All 3 'Body instructs subagent to bypass approval/safety prompts' BLOCKERs fire on NEGATIVE instructions: 'You do NOT skip the permission policy', 'You do NOT skip the convergence check'. The auditor regex \\b(ignore|bypass|skip|override)\\b.{0,30}(approval|prompt|permission|safety|check)\\b does not recognize negation; it matches the verb+noun pair regardless of preceding 'NOT'. These are guardrails, not bypasses.",
+      "scope_deviation": true,
+      "resolution": "Surfaced 2026-05-21T17:55; SURFACING NOTE — this changes Category E's character: 3 of 6 are AUDITOR defects, not agent defects. PRD AC-FR-5-b (BLOCKER finding rate → 0) is satisfiable by either (i) reword negative instructions (less clear) OR (ii) tighten auditor regex to handle negation (better). Plan stage decision. The 3 wildcard-shell findings remain genuine agent defects."
+    },
+    {
+      "id": "F-008",
+      "in_addressed": ["IN-011"],
+      "summary": "Audit report structure already groups by file + severity",
+      "detail": "Report is 451 lines, ## headers for Inventory/Summary/Skills/Subagents/Cross-file/How-to-read, ### headers per file. Severity grouping within file via [BLOCKER]/[MAJOR]/[MINOR] tags. Presentation is adequate; FR-10 P2 work would be modest if pursued (add root-cause grouping above file grouping; add summary table of count-per-root-cause-category).",
+      "scope_deviation": false,
+      "resolution": "Plan stage decides whether FR-10 P2 work is included"
+    },
+    {
+      "id": "F-009",
+      "in_addressed": ["IN-012"],
+      "summary": "shared-document-reviewer's doc_type taxonomy is cleanly extensible",
+      "detail": "Existing doc_types: PRD, ADR, UISpec, DesignDoc, IntentClarification, Plan, DeliverableArchive. Adding PedagogicalMarkerJustification follows the same extension pattern used in v4.5.0 (DeliverableArchive). FR-7-b enforcement could live in shared-document-reviewer OR remain in pedagogical_marker_check.py — both viable; per-layer Design picks.",
+      "scope_deviation": false,
+      "resolution": "Clean fit either way"
+    }
+  ],
+
+  "scope_deviations_surfaced": [
+    {
+      "id": "SD-001",
+      "from_finding": "F-001",
+      "summary": "PRD assumed 2 pedagogical_marker_check.py copies; reality is 3",
+      "surfaced_at": "2026-05-21T17:45:00Z",
+      "resolved_at": "2026-05-21T17:55:00Z",
+      "resolution_path": "(a) PRD amendment",
+      "outcome": "PRD v1.1.0 — FR-7-b tightened, FR-12 added"
+    },
+    {
+      "id": "SD-002",
+      "from_finding": "F-007",
+      "summary": "Category E bypass-approval BLOCKERs are auditor false positives (negative-instruction misreading), not agent defects as PRD categorized",
+      "surfaced_at": "2026-05-21T18:05:00Z",
+      "resolved_at": "2026-05-21T18:15:00Z",
+      "resolution_path": "(a) PRD amendment",
+      "outcome": "PRD v1.2.0 — FR-5 split into wildcard-shell agent defects (genuine, AC-FR-5-c real fix) + bypass-approval auditor false positives (AC-FR-5-b satisfiable via AC-FR-5-d auditor regex fix). Honors intent constraint 3: fix the auditor; improve, don't suppress."
+    }
+  ],
+
+  "summary": {
+    "information_needs_resolved": 10,
+    "information_needs_total": 10,
+    "note": "9 codebase-topic IN-NNN + 1 IN-013 (added in research-plan v1.1.0). All 9 codebase needs resolved via direct file inspection. IN-010 was designer-general-knowledge disposition — handled in per-layer design.",
+    "scope_deviations_total": 2,
+    "scope_deviations_resolved": 2,
+    "scope_deviations_pending": 0
+  }
+}

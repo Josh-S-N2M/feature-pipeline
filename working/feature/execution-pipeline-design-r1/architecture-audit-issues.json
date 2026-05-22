@@ -1,0 +1,215 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-execution-pipeline-design-r1-round-1",
+  "feature_slug": "execution-pipeline-design-r1",
+  "stage": "Architecture Audit",
+  "generated": "2026-05-22T17:30:00Z",
+  "generated_by": "claude (acting as review-architecture-auditor; claude.ai simulation — see agent_invocation note)",
+  "target": "working/feature/execution-pipeline-design-r1/blueprint-v1.md",
+  "blueprint_version": "1.0.0",
+  "audited_artifact": "blueprint-v1.md",
+  "audited_at": "2026-05-22T17:30:00Z",
+  "agent_invocation": "claude.ai simulation; not a Claude Code subagent dispatch. The review-architecture-auditor agent definition is a Claude Code subagent (frontmatter: model: opus, effort: xhigh, tools: [Read, Glob, Grep, Bash(...), Write, TaskCreate, TaskUpdate], memory: project). This session manually walked the agent's Phase 1-6 procedure in claude.ai with bash+grep+view tools; the output JSON conforms to the documented schema but the invocation context differs. A Claude Code re-audit with full tool surface is the authoritative pass.",
+  "code_graph_used": "none",
+  "code_graph_note": "Neither GitNexus nor codebase-memory-mcp were available in the claude.ai environment. Phase 3 blast-radius analysis was performed by manual structural comparison of Blueprint Change Impact Map against codebase-analysis.md catalogued surfaces. No reverse-dependency edges were queried. The 23-item Change Impact Map appears comprehensive against the codebase-analysis-cataloged surfaces (agents dir, skills dir, settings.json, ADRs dir), but live reverse-dependency analysis is the part of Phase 3 that was NOT executed.",
+  "audit_method": "Manual walk of review-architecture-auditor Phase 1-6 procedure in claude.ai. Phase 3 (blast-radius) degraded to structural-only review without code-graph queries; all other phases executed per spec.",
+  "checks_performed": [
+    "brief_honor_L3",
+    "blast_radius_structural_only",
+    "synthesis_claim_verification",
+    "cross_section_consistency",
+    "new_adr_well_formedness"
+  ],
+  "checks_skipped": [
+    "blast_radius_code_graph_queries"
+  ],
+  "inputs_read": {
+    "blueprint_path": "working/feature/execution-pipeline-design-r1/blueprint-v1.md (2257 lines)",
+    "synthesis_path": "working/feature/execution-pipeline-design-r1/synthesis.md",
+    "codebase_analysis_path": "working/feature/execution-pipeline-design-r1/codebase-analysis.md",
+    "cc_design_path": "working/feature/execution-pipeline-design-r1/cc-design.md",
+    "prd_path": "working/feature/execution-pipeline-design-r1/prd-v1.1.0.md",
+    "new_adrs_dir": ["adrs/ADR-0032-conventions-canonicalization.md", "adrs/ADR-0033-adr-0029-execution-extension.md", "adrs/ADR-0034-prd-mis-credit-cleanup.md"],
+    "inherited_adrs_consulted": ["ADR-0005", "ADR-0006", "ADR-0013", "ADR-0016", "ADR-0017", "ADR-0021", "ADR-0028", "ADR-0029", "ADR-0030", "ADR-0031"],
+    "rationale_brief_path": "NOT FOUND in working/feature/execution-pipeline-design-r1/ — see issue I-AA-008",
+    "prior_audit_path": "n/a (first audit round)"
+  },
+  "issues": [
+    {
+      "id": "I-AA-001",
+      "severity": "MAJOR",
+      "category": "cross_section_consistency",
+      "summary": "Blueprint internally inconsistent about execution-phase artifact template count (5 vs 7); Change Impact Map omits 2 of 5 AC-FR-7-c floor items",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "Change Impact Map (line 584)", "quote_paraphrase": "Lists 5 templates: per-task-execution-result, phase-quality-report, quality-reconciliation-log, state-transitions-log-entry-schema, pipeline-run-summary. Does NOT include frontmatter-validation-report or execution-reconciliation-log."},
+        {"artifact": "blueprint-v1.md", "section": "AC traceability (line 1973)", "quote_paraphrase": "Claims '5 execution-phase artifact templates (the FR-7-c floor: per-task-execution-result, phase-quality-report, quality-reconciliation-log, frontmatter-validation-report, execution-reconciliation-log) plus 2 beyond floor (state-transitions-log-entry-schema, pipeline-run-summary)' — i.e., 7 templates total."},
+        {"artifact": "adrs/ADR-0032-conventions-canonicalization.md", "section": "Change 5 (line 134)", "quote_paraphrase": "Says '5 execution-phase artifact types listed in FR-7-c floor plus the 2 introduced beyond the floor' = 7 total."},
+        {"artifact": "adrs/ADR-0033-adr-0029-execution-extension.md", "section": "Context lines 27-31", "quote_paraphrase": "Enumerates 5 execution-phase artifacts (same as Change Impact Map; missing frontmatter-validation-report and execution-reconciliation-log)."},
+        {"artifact": "prd-v1.1.0.md", "section": "AC-FR-7-c (line 264)", "quote_paraphrase": "Names 5 floor items: per-task execution log; phase-quality report; quality-reconciliation log (per cycle); frontmatter-validation report; execution-reconciliation log."}
+      ],
+      "impact": "The Change Impact Map is the actionable artifact for Plan-stage task generation. A Plan author following the Map alone will create 5 template tasks and miss 2 floor items, leaving the feature out of conformance with AC-FR-7-c. This is precisely the 'missing artifacts at packaging time' failure mode the feature was designed to eliminate.",
+      "recommended_resolution": "Reconcile the count in one direction: either (a) treat frontmatter-validation-report and execution-reconciliation-log as scope (add them to the Change Impact Map and ADR-0033's enumeration), or (b) document explicit dispositions for the two missing items (e.g., 'frontmatter-validation-report' = JSON output of validate_pipeline_frontmatter.py, no template required because not a pair-pattern artifact; 'execution-reconciliation-log' = same as quality-reconciliation-log under a different name). Whichever direction is chosen, all four documents (Change Impact Map, AC traceability at line 1973, ADR-0032 Change 5, ADR-0033 Context enumeration) must agree."
+    },
+    {
+      "id": "I-AA-002",
+      "severity": "MAJOR",
+      "category": "new_adr_factual_claim_unsupported",
+      "summary": "ADR-0034 makes a factual claim about ADR-0021's content that is not supported by ADR-0021's actual text",
+      "evidence": [
+        {"artifact": "adrs/ADR-0034-prd-mis-credit-cleanup.md", "section": "Context (line 24) and Decision (line 32)", "quote_paraphrase": "Says 'ADR-0021 inherits and applies the cap (referencing it in the planning-phase architecture context); ADR-0017 defines it.' Decision: 'ADR-0021 inherits and applies the cap in the planning-phase architecture context; ADR-0017 defines it.'"},
+        {"artifact": "adrs/ADR-0021-discovery-phase-architecture.md", "section": "full text", "quote_paraphrase": "grep for '4-cycle' / '4 cycle' / 'cycle cap' / 'reconciliation cap' in ADR-0021 returns zero matches. The only cap referenced in ADR-0021 is the ≤6 parallel external-research cap (line 85, attributed to ADR-0006) — unrelated to the 4-cycle reconciliation cap."},
+        {"artifact": "adrs/ADR-0017-document-reviewer-integration.md", "section": "line 155", "quote_paraphrase": "States 'Iteration cap: 4 cycles (matching the pipeline's broader fixed-point iteration discipline from blueprint v3 §3.7).' This is the only ADR text that names '4 cycles' explicitly."},
+        {"artifact": "prd-v1.1.0.md", "section": "Dependencies (line 434), Glossary (line 519), FR-10 (line 290), AC-FR-6-e (line 256)", "quote_paraphrase": "Multiple repetitions of the unsupported credit to ADR-0021 as canonical home for the planning-side reconciliation budget. This is the documentary mis-credit ADR-0034 is meant to correct."}
+      ],
+      "impact": "ADR-0034 is the corrective document; future readers will follow it to understand the canonical ownership of the 4-cycle cap. The corrective document itself contains an attribution error about ADR-0021's actual content. Operationally the decision (cite ADR-0017 going forward) is correct, but the factual framing 'ADR-0021 inherits and applies' is not grounded in ADR-0021's text and risks propagating a different misunderstanding (i.e., that ADR-0021 contains material on the cap, when it doesn't).",
+      "recommended_resolution": "Revise ADR-0034's Context and Decision sections to drop the 'ADR-0021 inherits and applies the cap' framing. Suggested replacement: 'The actual canonical home is ADR-0017, which introduces the 4-cycle reconciliation cap as part of the document-reviewer flow. ADR-0021 (discovery-phase architecture) does NOT in fact reference or apply this cap — its appearance in PRD v1.1.0 Dependencies as the canonical home is an attribution error that this ADR corrects.' Note also that ADR-0017's own text traces the cap further back to 'blueprint v3 §3.7' (line 155), which is the deepest provenance available — worth a one-sentence footnote for completeness but not strictly required for the corrective purpose."
+    },
+    {
+      "id": "I-AA-003",
+      "severity": "MINOR",
+      "category": "cross_section_consistency",
+      "summary": "Fact Disposition Table IN-009 row text says '5 inherited ADRs' but parenthetical lists 6 ADR IDs",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "Fact Disposition Table IN-009 (line 472)", "quote_paraphrase": "Says '5 inherited ADRs (0017, 0021, 0028, 0029, 0030, 0031)'. The parenthetical enumerates 6 IDs."},
+        {"artifact": "blueprint-v1.md", "section": "Prerequisite ADRs (lines 164-178)", "quote_paraphrase": "Lists 8 ADRs (adds 0013 + 0016 as template/process ADRs)."},
+        {"artifact": "prd-v1.1.0.md", "section": "Dependencies line 434", "quote_paraphrase": "Names only 4 ADRs (0021, 0029, 0030, 0031)."}
+      ],
+      "impact": "Counting errors compound when downstream artifacts cite 'the inherited ADR set.' Each individual count is defensible (depending on what 'inherited' means in each context), but the IN-009 prose's '5' vs '6 IDs' is a straightforward arithmetic mismatch.",
+      "recommended_resolution": "Decide what set 'inherited' refers to in IN-009 disposition and update the prose count to match the parenthetical (likely change '5 inherited ADRs' to '6 inherited ADRs' since 0017 is genuinely inherited even though it wasn't in the PRD Dependencies — its substantive content drives the 4-cycle cap symmetric extension in D-12)."
+    },
+    {
+      "id": "I-AA-004",
+      "severity": "MINOR",
+      "category": "cross_section_consistency",
+      "summary": "Fact Disposition Table summary line undercounts out-of-scope INs and miscounts transforms",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "Fact Disposition Table summary (line 483)", "quote_paraphrase": "Says '14 INs preserved; 5 transformed; 1 N/A (IN-013); 1 out-of-scope for modification (IN-010 prior archive).'"},
+        {"artifact": "blueprint-v1.md", "section": "Fact Disposition Table rows", "quote_paraphrase": "Actual disposition rows: 4 transform (IN-002, IN-004, IN-008, IN-012); 2 out-of-scope-for-modification (IN-010, IN-011); 1 N/A (IN-013); 10 preserve. Sum = 17 ✓ (matches total INs)."}
+      ],
+      "impact": "Cosmetic; doesn't drive bad downstream decisions, but signals weak self-checking discipline in a feature whose stated purpose is mechanical discipline enforcement.",
+      "recommended_resolution": "Update the summary line to: '10 INs preserved; 4 transformed; 1 N/A (IN-013); 2 out-of-scope for modification (IN-010, IN-011).' Or, if the original framing intended to count preserve+enhance as both, restate: '14 INs preserved-in-substance (10 unchanged + 4 transformed); 1 N/A; 2 out-of-scope-for-modification.'"
+    },
+    {
+      "id": "I-AA-005",
+      "severity": "MINOR",
+      "category": "contract_clarity",
+      "summary": "Contract 4 dispatch matrix scope_deviations row has dynamic dispatch target ('the agent whose deviation was unsurfaced') without a procedure for identifying that agent",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "Contract 4 Dispatch taxonomy (line 1097)", "quote_paraphrase": "Row: 'scope_deviations (ADR-0033 addition) | scope-deviation-scan | the agent whose deviation was unsurfaced | deviation context + scope-deviation finding'. The dispatch target is dynamic; no procedure given for resolving it to a concrete agent."}
+      ],
+      "impact": "execute-finalize-reconciler needs to dispatch findings to a concrete agent. 'The agent whose deviation was unsurfaced' is the answer but requires a deterministic resolution procedure (e.g., inspect surfacing-location chain: if the deviation should have been in per-task-execution-result, the responsible agent is the code-producer or quality-handler whose return contract was supposed to include the scope_deviations field). Without this procedure, runtime dispatch becomes ambiguous.",
+      "recommended_resolution": "Add to the dispatch-matrix surrounding prose (or to ADR-0033) the resolution procedure: 'For scope_deviations findings, the reconciler resolves dispatch target by walking the surfacing-location chain — the artifact where the deviation should have surfaced names the agent in its authoring-frontmatter; that agent is the dispatch target. Fallback: if the surfacing-location chain is ambiguous, escalate to user per AC-FR-10-c.'"
+    },
+    {
+      "id": "I-AA-006",
+      "severity": "MINOR",
+      "category": "stale_open_options",
+      "summary": "Blueprint Prerequisite ADRs table ADR-0017 row contains stale 'OR' framing for ADR-0034/ADR-0032 disposition",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "Prerequisite ADRs ADR-0017 row (line 173)", "quote_paraphrase": "Says 'PRD prose correction pending ADR-0034 OR ADR-0032 housekeeping'."},
+        {"artifact": "adrs/ADR-0034-prd-mis-credit-cleanup.md", "section": "cc-design.md pre-declaration (line 64)", "quote_paraphrase": "References the Blueprint Batch 4 decision (option 1 — 2 separate ADRs), confirming both ADR-0032 and ADR-0034 were authored."}
+      ],
+      "impact": "Cosmetic; the prose still says 'OR' as if the choice were open, but the choice was made (both stand alone). Future readers might wonder if the cleanup is still pending some integration.",
+      "recommended_resolution": "Replace 'pending ADR-0034 OR ADR-0032 housekeeping' with 'closed in ADR-0034 (stand-alone, per Blueprint Batch 4 decision; ADR-0032 covers separate housekeeping per its Change 1-5 scope).'"
+    },
+    {
+      "id": "I-AA-007",
+      "severity": "MINOR",
+      "category": "label_consistency",
+      "summary": "Contract 4 header labeled '6-row matrix' but rendered table has 8 rows",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "Contract 4 header (line 1084)", "quote_paraphrase": "Header: 'Contract 4: Dispatch taxonomy (D-14 6-row matrix)'. Table has 8 rows: tests, audits/cc, audits/gha, audits/codespaces, validator, discipline, stub, scope_deviations."},
+        {"artifact": "blueprint-v1.md", "section": "Contract 4 rows", "quote_paraphrase": "'stub' is marked as a D-2d addition; 'scope_deviations' is marked as ADR-0033 addition. Base D-14 count of 6 holds only if audit-domain rows are collapsed to 1."}
+      ],
+      "impact": "Cosmetic; 'D-14 6-row matrix' preserves the original D-14 framing while the table shows the evolved state with 2 additions and audit-domain expanded to 3 rows. A reader counting rows will find 8, not 6.",
+      "recommended_resolution": "Either revise header to 'D-14 6-row base + 2 additions (stub per D-2d, scope_deviations per ADR-0033)' or revise to '8-row matrix (D-14 base 6 + 2 additions)'. Keep the historical D-14 base count visible."
+    },
+    {
+      "id": "I-AA-008",
+      "severity": "INFO",
+      "category": "input_completeness",
+      "summary": "Documented auditor input 'rationale_brief_path' not present in feature working directory",
+      "evidence": [
+        {"artifact": ".claude/agents/review-architecture-auditor.md", "section": "Inputs (line 28)", "quote_paraphrase": "Lists 'rationale_brief_path — the rationale brief listing inherited ADRs + applicable KB paths' as a documented input."},
+        {"artifact": "working/feature/execution-pipeline-design-r1/", "section": "directory listing", "quote_paraphrase": "Contains: blueprint-v1.md, cc-dependencies.json, cc-design.md, codebase-analysis.md, intent-clarification.md, prd-v1.1.0.md, prd-v1.md, research-plan.md, synthesis.md. No rationale-brief file."},
+        {"artifact": "adrs-migrated/ADR-0009-rationale-brief-discipline.md", "section": "present", "quote_paraphrase": "The rationale-brief discipline ADR exists (migrated); the brief itself is not in the feature directory."}
+      ],
+      "impact": "Either (a) the rationale brief is produced under a different filename / location not discovered by this audit, (b) this feature's stage flow folded the rationale-brief responsibilities into another artifact (Blueprint's Prerequisite ADRs section + cc-design's references), or (c) the brief was simply not produced. Option (b) is the most plausible reading given the Blueprint's substantial Prerequisite ADRs section. This is not a defect of the Blueprint per se; it's a question about input completeness against the documented audit-stage input contract.",
+      "recommended_resolution": "Clarify in finalize-reconciler context whether the rationale-brief artifact is required for this feature's flow. If it is, surface as a discovery-stage gap; if it's been functionally merged into the Blueprint's Prerequisite ADRs section, update the auditor agent input contract to reflect that for single-layer Claude-Code-only features."
+    },
+    {
+      "id": "I-AA-009",
+      "severity": "INFO",
+      "category": "deferred_mechanical_enforcement",
+      "summary": "ADR-0033 articulates execution-side audit-stage enforcement requirement; mechanical enforcement script deferred to follow-on feature",
+      "evidence": [
+        {"artifact": "adrs/ADR-0033-adr-0029-execution-extension.md", "section": "Negative consequences (line 103)", "quote_paraphrase": "Acknowledges 'Without the candidate follow-on script, the scan is performed by agent prompts which is less mechanical than the ADR-0030 substrate would prefer. The discipline-5 mechanical-enforcement model (D-15) is the eventual target; this ADR articulates the requirement without yet shipping the enforcement script.'"}
+      ],
+      "impact": "Honest deferral; acceptable for v1 scope. The discipline is articulated in agent prompts (execute-phase-quality-reviewer and execute-finalize-reconciler MUST scan inputs for unsurfaced deviations); a future scan_unsurfaced_deviations.py script would make it mechanical per the D-15 substrate. Worth tracking in the deferred-items list.",
+      "recommended_resolution": "Blueprint Future Extensibility section or Plan-stage deferred-items list should include 'scan_unsurfaced_deviations.py — mechanical enforcement of ADR-0033 audit-stage scan responsibility; defer to follow-on feature per D-15 systematic discipline-enforcement roadmap.'"
+    },
+    {
+      "id": "I-AA-010",
+      "severity": "INFO",
+      "category": "audit_scope_disclosure",
+      "summary": "Phase 3 blast-radius analysis was degraded; live reverse-dependency queries not performed",
+      "evidence": [
+        {"artifact": "this audit", "section": "code_graph_used field", "quote_paraphrase": "Set to 'none'. Manual structural review only against Change Impact Map vs codebase-analysis.md surface enumeration."}
+      ],
+      "impact": "The manual structural review found the Change Impact Map's 23 file operations comprehensive against codebase-analysis-catalogued surfaces (agents dir, skills dir, settings.json, ADRs). No reverse-dependency edges were queried — so undeclared imports/calls into the touched files from elsewhere in the codebase were not surfaced. The most likely impact zones (since the feature touches `.claude/` and `adrs/` only) are limited; product-layer surfaces are not in scope.",
+      "recommended_resolution": "If the orchestrator dispatches a Claude Code re-audit per the conditional_pass path, the GitNexus blast-radius queries (per the agent procedure Phase 3) will provide the authoritative confirmation. This audit's conditional_pass verdict does not depend on the blast-radius result; the MAJOR findings are cross-section-consistency issues that the code graph would not catch."
+    }
+  ],
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 2,
+    "MINOR": 5,
+    "INFO": 3
+  },
+  "verdict": "conditional_pass",
+  "verdict_rationale": "Per the documented severity rules: 0 BLOCKER, 2 MAJOR → conditional_pass. finalize-reconciler may dispatch revisions for I-AA-001 and I-AA-002, or surface to user with rationale to defer. Both MAJOR issues are localized text revisions (no architectural rework); estimated revision effort is small. The 5 MINOR findings cluster around cosmetic counting/labeling inconsistencies and would naturally be addressed in the same revision pass. The 3 INFO findings do not require action but should be visible to the orchestrator: I-AA-008 (rationale-brief input contract clarification), I-AA-009 (ADR-0033 deferred mechanical enforcement), I-AA-010 (this audit's degraded blast-radius scope).",
+  "scope_deviation_surfacing": {
+    "rationale": "Per ADR-0029 + ADR-0033 (proposed; honored prospectively), this audit's deviations are surfaced here rather than absorbed silently.",
+    "deviations": [
+      {
+        "deviation": "Claude Code subagent dispatch substituted by claude.ai manual simulation",
+        "where_should_have_surfaced": "audit invocation context; surfaced here in agent_invocation field and via this scope_deviation_surfacing section",
+        "resolution_path": "Claude Code re-audit recommended at next-cycle audit pass to obtain authoritative result with full tool surface"
+      },
+      {
+        "deviation": "GitNexus / codebase-memory-mcp Phase 3 queries not executed",
+        "where_should_have_surfaced": "code_graph_used field; surfaced there and again here for cross-stage discoverability",
+        "resolution_path": "Live blast-radius queries deferred to Claude Code re-audit"
+      },
+      {
+        "deviation": "rationale_brief input not present in feature working directory (per agent input contract)",
+        "where_should_have_surfaced": "filed as INFO finding I-AA-008",
+        "resolution_path": "Process-discipline clarification — see I-AA-008 recommended_resolution"
+      }
+    ]
+  },
+  "watchlist_cross_check": {
+    "purpose": "The handoff CONTINUE_PROMPT included a 7-item watchlist of 'items the Architecture Auditor should look at carefully.' Per the auditor agent's documented input contract, this watchlist is NOT in the agent's input set — it is orchestrator-side context. This block records the comparison between this audit's independent scan and the watchlist as a discipline check: did the independent scan catch what the watchlist anticipated? Did it find anything the watchlist missed?",
+    "watchlist_items": [
+      {"item": "D-13 5th-dimension addition (scope_deviations) — well-grounded?", "audit_finding": "No defect. ADR-0033 + Contract 2 inline rationale (line 1043) ties the addition to ADR-0029's no-silent-absorption principle. The 5th dimension is justified independently of finding-domain. Well-grounded."},
+      {"item": "AC-FR-7-d floor expansion (2 artifacts beyond floor) — editorial expansion within AC-FR-7-d permission", "audit_finding": "Caught I-AA-001 — a different and more serious issue than the watchlist anticipated. The expansion is permitted by AC-FR-7-d, but the Blueprint is internally inconsistent about which artifacts are templated (3 floor + 2 beyond in Change Impact Map and ADR-0033; 5 floor + 2 beyond in line 1973 and ADR-0032 Change 5). The expansion is not the problem; the floor coverage is."},
+      {"item": "ADR-0034 novel pattern — bounding correct?", "audit_finding": "Caught I-AA-002 — different from what the watchlist anticipated. The bounding text (Risk of over-application section) is good and correctly distinguishes documentary attribution corrections from normative-content corrections. The defect is upstream: ADR-0034's own factual claim about ADR-0021's content is not supported by ADR-0021's text. The pattern is sound; the application of the pattern in this specific case contains a factual error."},
+      {"item": "State machine invariant #10 (cycle counter / log equivalence) — operationally feasible?", "audit_finding": "No defect. Single-process consistency check at gate boundaries — feasible. The validator (FR-6) performs the check; mismatch surfaces as BLOCKER. Well-specified."},
+      {"item": "ADR-0033 mechanical enforcement gap — acceptable for v1 or block?", "audit_finding": "Acceptable. Surfaced as I-AA-009 (INFO). ADR-0033 explicitly acknowledges the deferral. Honest deferral, not a defect."},
+      {"item": "doc_type immutability (invariant #7) — verify no edge cases", "audit_finding": "No defect found. The invariant states doc_type is set at authoring time. ADR-0032 maps each doc_type to a fixed vocabulary; status changes within a doc_type's vocabulary, doc_type itself does not. Edge case (wrong doc_type at authoring) caught by FR-6 validator."},
+      {"item": "5th-dimension dispatch (Contract 4 scope_deviations row) — dispatch target well-defined?", "audit_finding": "Caught I-AA-005 (MINOR). The dispatch target 'the agent whose deviation was unsurfaced' is dynamic without a deterministic resolution procedure. The watchlist anticipated this; audit confirms and recommends adding a concrete inspection procedure."}
+    ],
+    "items_caught_by_independent_scan_not_in_watchlist": [
+      "I-AA-003 (IN-009 counting error: 5 vs 6 IDs)",
+      "I-AA-004 (Fact Disposition Table summary undercounts out-of-scope INs and miscounts transforms)",
+      "I-AA-006 (stale 'OR' framing in Prerequisite ADRs ADR-0017 row)",
+      "I-AA-007 (Contract 4 header '6-row matrix' vs 8 rendered rows)",
+      "I-AA-008 (rationale_brief input contract gap)"
+    ],
+    "items_in_watchlist_independent_scan_rated_lower_severity_than_watchlist_framing_suggested": [
+      "D-13 5th-dimension addition (watchlist framed as substantive concern; audit finds no defect)",
+      "AC-FR-7-d floor expansion-per-se (watchlist framed as concern about the expansion; audit finds the expansion is fine, but uncovered a separate inconsistency under the same heading)"
+    ],
+    "interpretation": "The independent scan reproduced 1 of the watchlist's 7 anticipated concerns at the same severity level (Contract 4 dispatch ambiguity → I-AA-005). It elevated 2 watchlist concerns into MAJOR findings via routes the watchlist did not name (I-AA-001 from FR-7-d expansion territory; I-AA-002 from ADR-0034 novel-pattern territory). It rated 3 watchlist concerns as no-defect (D-13 5th dim; state-machine invariant #10; doc_type immutability) and 1 as INFO-deferred (ADR-0033 mechanical enforcement). And it caught 5 issues the watchlist did not anticipate. This pattern is consistent with the auditor's independent-pass mandate — the watchlist served as orchestrator-side awareness for escalation routing, not as audit input."
+  }
+}

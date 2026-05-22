@@ -1,0 +1,89 @@
+# Claude Code in CI: run via Google Vertex AI instead of the direct Anthropic API.
+#
+# Use this when you need data residency on GCP, want consolidated GCP billing,
+# or already have a Vertex workload.
+#
+# Prerequisites:
+# 1. In your GCP project, enable: IAM Credentials API, STS API, Vertex AI API.
+# 2. Create a custom GitHub App and store APP_ID + APP_PRIVATE_KEY as repo secrets.
+# 3. Configure Workload Identity Federation:
+#    - Create a Workload Identity Pool (e.g. 'github-actions').
+#    - Add a GitHub OIDC provider:
+#        Issuer:           https://token.actions.githubusercontent.com
+#        Attribute mapping: google.subject = assertion.sub,
+#                           attribute.repository = assertion.repository
+#        Attribute condition: assertion.repository == 'OWNER/REPO'
+#    - Create a service account with role roles/aiplatform.user (Vertex AI User).
+#    - Bind the workload identity pool to impersonate the service account scoped
+#      to your repo (principalSet://.../attribute.repository/OWNER/REPO).
+# 4. Store as repo secrets:
+#    - GCP_WORKLOAD_IDENTITY_PROVIDER (full provider resource name)
+#    - GCP_SERVICE_ACCOUNT (service account email)
+
+name: Claude Code (Vertex AI)
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write       # required for GCP WIF
+
+concurrency:
+  group: claude-vertex-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  claude:
+    if: |
+      (
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
+      ) &&
+      (
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association) ||
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2  # TODO: SHA pin
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Authenticate to GCP via WIF
+        id: auth
+        uses: google-github-actions/auth@v2  # TODO: SHA pin
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - uses: anthropics/claude-code-action@v1  # TODO: SHA pin
+        with:
+          github_token: ${{ steps.app-token.outputs.token }}
+          use_vertex: "true"
+          # Vertex model IDs include a date suffix; check the Vertex Model Garden for current IDs.
+          claude_args: |
+            --model claude-sonnet-4-5@20250929
+            --max-turns 10
+        env:
+          ANTHROPIC_VERTEX_PROJECT_ID: ${{ steps.auth.outputs.project_id }}
+          # Region for the Vertex endpoint Claude will hit.
+          # Common Claude regions: us-east5, europe-west1.
+          CLOUD_ML_REGION: us-east5
+          VERTEX_REGION_CLAUDE_4_5_SONNET: us-east5

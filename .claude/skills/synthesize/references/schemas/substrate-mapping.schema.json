@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "substrate-mapping.schema.json",
+  "title": "Substrate Mapping",
+  "description": "Output of synth-substrate. Three-option enumeration per architectural decision per Design \u00a75.5.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "registry_version",
+    "mappings"
+  ],
+  "properties": {
+    "registry_version": {
+      "type": "string"
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "decision_id",
+          "options",
+          "recommended_option",
+          "rationale"
+        ],
+        "properties": {
+          "decision_id": {
+            "type": "string",
+            "pattern": "^D-\\d{4}$"
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "native",
+              "adapter",
+              "substrate_change"
+            ],
+            "properties": {
+              "native": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "description",
+                  "loss_summary",
+                  "viable",
+                  "cost",
+                  "viable_explanation"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "loss_summary": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "static_typing",
+                        "cycle_declaration",
+                        "replay_determinism",
+                        "latency",
+                        "cost_model",
+                        "pattern_fidelity"
+                      ]
+                    }
+                  },
+                  "viable": {
+                    "type": "boolean"
+                  },
+                  "cost": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "effort_weeks",
+                      "runtime_overhead",
+                      "maintenance_burden",
+                      "irreversibility_cost"
+                    ],
+                    "properties": {
+                      "effort_weeks": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "runtime_overhead": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "minor",
+                          "significant",
+                          "n/a"
+                        ]
+                      },
+                      "maintenance_burden": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "minor",
+                          "significant",
+                          "n/a"
+                        ]
+                      },
+                      "irreversibility_cost": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "minor",
+                          "significant",
+                          "n/a"
+                        ]
+                      }
+                    }
+                  },
+                  "viable_explanation": {
+                    "type": "string"
+                  }
+                }
+              },
+              "adapter": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "description",
+                  "loss_summary",
+                  "viable",
+                  "cost",
+                  "viable_explanation"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "loss_summary": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "static_typing",
+                        "cycle_declaration",
+                        "replay_determinism",
+                        "latency",
+                        "cost_model",
+                        "pattern_fidelity"
+                      ]
+                    }
+                  },
+                  "viable": {
+                    "type": "boolean"
+                  },
+                  "cost": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "effort_weeks",
+                      "runtime_overhead",
+                      "maintenance_burden",
+                      "irreversibility_cost"
+                    ],
+                    "properties": {
+                      "effort_weeks": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "runtime_overhead": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "minor",
+                          "significant",
+                          "n/a"
+                        ]
+                      },
+                      "maintenance_burden": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "minor",
+                          "significant",
+                          "n/a"
+                        ]
+                      },
+                      "irreversibility_cost": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "minor",
+                          "significant",
+                          "n/a"
+                        ]
+                      }
+                    }
+                  },
+                  "viable_explanation": {
+                    "type": "string"
+                  }
+                }
+              },
+              "substrate_change": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "description",
+                  "loss_summary",
+                  "viable",
+                  "cost",
+                  "viable_explanation"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "loss_summary": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "static_typing",
+                        "cycle_declaration",
+                        "replay_determinism",
+                        "latency",
+                        "cost_model",
+                        "pattern_fidelity"
+                      ]
+                    }
+                  },
+                  "viable": {
+                    "type": "boolean"
+                  },
+                  "cost": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "effort_weeks",
+                      "runtime_overhead",
+                      "maintenance_burden",
+                      "irreversibility_cost"
+                    ],
+                    "properties": {
+                      "effort_weeks": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "runtime_overhead": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "minor",
+                          "significant",
+                          "n/a"
+                        ]
+                      },
+                      "maintenance_burden": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "minor",
+                          "significant",
+                          "n/a"
+                        ]
+                      },
+                      "irreversibility_cost": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "minor",
+                          "significant",
+                          "n/a"
+                        ]
+                      }
+                    }
+                  },
+                  "viable_explanation": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "recommended_option": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "native",
+              "adapter",
+              "substrate_change",
+              null
+            ]
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

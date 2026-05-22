@@ -1,0 +1,127 @@
+# Claude Code in CI: run via Microsoft Foundry instead of the direct Anthropic API.
+#
+# Use this when you need data residency on Azure, want consolidated Azure billing,
+# or already have a Foundry workload with Entra ID-based access controls.
+#
+# Prerequisites:
+# 1. In Microsoft Foundry, deploy the Claude models you want to use
+#    (Sonnet 4.6, Opus 4.7, Haiku 4.5, etc.). Note the deployment names —
+#    these become the values for ANTHROPIC_DEFAULT_*_MODEL env vars below.
+#    Foundry Claude is currently available in East US 2 and Sweden Central.
+# 2. Choose an auth method:
+#    - API key (simpler): generate a key from the Foundry portal; store as
+#      AZURE_FOUNDRY_API_KEY repo secret.
+#    - Entra ID via federated credential (preferred; no static secret):
+#      a. Create an Azure AD app registration.
+#      b. Add a federated credential with:
+#         Issuer:  https://token.actions.githubusercontent.com
+#         Subject: repo:OWNER/REPO:ref:refs/heads/main (or :environment:production, etc.)
+#         Audience: api://AzureADTokenExchange
+#      c. Grant the app's service principal the 'Cognitive Services User' role
+#         on the Foundry resource.
+#      d. Store AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID as repo secrets.
+# 3. Store AZURE_FOUNDRY_RESOURCE (the resource name, e.g. 'my-foundry-prod')
+#    as a repo secret.
+# 4. (Optional but recommended) Create a custom GitHub App and store APP_ID +
+#    APP_PRIVATE_KEY as repo secrets so Claude's commits trigger downstream CI.
+#
+# This template uses Entra ID. For the API-key variant, see the comments at the
+# bottom of the file.
+
+name: Claude Code (Microsoft Foundry)
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write       # required for Entra ID federated credential
+
+concurrency:
+  group: claude-foundry-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  claude:
+    if: |
+      (
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'issues' && contains(github.event.issue.body, '@claude'))
+      ) &&
+      (
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association) ||
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2  # TODO: SHA pin
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Azure login (federated credential / OIDC)
+        uses: azure/login@v2  # TODO: SHA pin
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: anthropics/claude-code-action@v1  # TODO: SHA pin
+        with:
+          github_token: ${{ steps.app-token.outputs.token }}
+          claude_args: |
+            --max-turns 10
+        env:
+          # Tell Claude Code to talk to Foundry instead of api.anthropic.com.
+          CLAUDE_CODE_USE_FOUNDRY: "1"
+
+          # Your Foundry resource name (NOT the full URL). Claude Code constructs
+          # the URL as https://{resource}.services.ai.azure.com/anthropic
+          # If you need a custom URL (private endpoint, etc.) set ANTHROPIC_FOUNDRY_BASE_URL instead.
+          ANTHROPIC_FOUNDRY_RESOURCE: ${{ secrets.AZURE_FOUNDRY_RESOURCE }}
+
+          # No ANTHROPIC_FOUNDRY_API_KEY: the Azure SDK default credential chain
+          # picks up the federated credential from azure/login above.
+
+          # Pin model deployment names to whatever you actually deployed in Foundry.
+          # If unset, model aliases (sonnet/opus/haiku) resolve to Anthropic's defaults,
+          # which may not match your deployments. Without ANTHROPIC_DEFAULT_OPUS_MODEL,
+          # the 'opus' alias resolves to Opus 4.6 — set it to claude-opus-4-7 for the latest.
+          ANTHROPIC_DEFAULT_SONNET_MODEL: claude-sonnet-4-6
+          ANTHROPIC_DEFAULT_OPUS_MODEL: claude-opus-4-7
+          ANTHROPIC_DEFAULT_HAIKU_MODEL: claude-haiku-4-5
+
+# ─────────────────────────────────────────────────────────────────
+# API-key variant (simpler, less secure)
+# ─────────────────────────────────────────────────────────────────
+#
+# Replace the azure/login step + env block above with just:
+#
+#   - uses: anthropics/claude-code-action@v1
+#     with:
+#       github_token: ${{ steps.app-token.outputs.token }}
+#       claude_args: --max-turns 10
+#     env:
+#       CLAUDE_CODE_USE_FOUNDRY: "1"
+#       ANTHROPIC_FOUNDRY_RESOURCE: ${{ secrets.AZURE_FOUNDRY_RESOURCE }}
+#       ANTHROPIC_FOUNDRY_API_KEY: ${{ secrets.AZURE_FOUNDRY_API_KEY }}
+#       ANTHROPIC_DEFAULT_SONNET_MODEL: claude-sonnet-4-6
+#       ANTHROPIC_DEFAULT_OPUS_MODEL: claude-opus-4-7
+#       ANTHROPIC_DEFAULT_HAIKU_MODEL: claude-haiku-4-5
+#
+# Drop `id-token: write` from permissions: in this variant.

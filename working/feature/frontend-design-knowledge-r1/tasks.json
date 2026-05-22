@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "frontend-design-knowledge-r1-20260520-220000",
+  "feature_slug": "frontend-design-knowledge-r1",
+  "derived_from": {
+    "plan": "plan-v1.md@1.0.0",
+    "blueprint": "blueprint-v1.md@1.0.0",
+    "acceptance_tests": "acceptance-tests.md@1.0.0",
+    "phase_validators": "phase-validators.md@1.0.0"
+  },
+  "generated": "2026-05-21T01:10:00Z",
+  "generated_by": "finalize-task-decomposer",
+  "task_count_total": 33,
+  "task_count_by_phase": {"0": 4, "1": 7, "2": 18, "3": 4, "4": 4, "5": 2, "6": 4, "7": 5},
+  "tasks": [
+    {"id": "T-0-1", "phase": 0, "name": "Verify .claude/ directories exist and writable", "type": "verify", "depends_on": [], "artifact": ".claude/skills/, .claude/agents/", "effort": "trivial", "parallelizable_with": ["T-0-2", "T-0-3", "T-0-4"], "ac_coverage": []},
+    {"id": "T-0-2", "phase": 0, "name": "Run baseline cc-audit", "type": "audit", "depends_on": ["T-0-1"], "artifact": "/tmp/audit-baseline.md", "effort": "small", "parallelizable_with": [], "ac_coverage": ["AC-FR-5-b precursor"]},
+    {"id": "T-0-3", "phase": 0, "name": "Confirm Anthropic upstream skill readable", "type": "verify", "depends_on": [], "artifact": "/mnt/skills/public/frontend-design/SKILL.md", "effort": "trivial", "parallelizable_with": ["T-0-1", "T-0-4"], "ac_coverage": ["AC-FR-1-a precursor"]},
+    {"id": "T-0-4", "phase": 0, "name": "Snapshot KB-frontend-design content", "type": "snapshot", "depends_on": ["T-0-1"], "artifact": ".claude/skills/KB-frontend-design/ (git stash)", "effort": "trivial", "parallelizable_with": [], "ac_coverage": ["AC-FR-7-a precursor"]},
+
+    {"id": "T-1-1", "phase": 1, "name": "Create KB-storybook-platform/SKILL.md with frontmatter", "type": "author", "depends_on": ["T-0-1"], "artifact": ".claude/skills/KB-storybook-platform/SKILL.md", "effort": "medium", "parallelizable_with": [], "ac_coverage": ["AC-FR-3-a", "AC-FR-3-b"]},
+    {"id": "T-1-2", "phase": 1, "name": "Author KB-storybook-platform/SKILL.md ## Contents + index prose", "type": "author", "depends_on": ["T-1-1"], "artifact": ".claude/skills/KB-storybook-platform/SKILL.md", "effort": "medium", "parallelizable_with": [], "ac_coverage": ["AC-FR-3-c"]},
+    {"id": "T-1-3", "phase": 1, "name": "Author references/story-format.md (CSF3 + CSF Factories)", "type": "author", "depends_on": ["T-1-2"], "artifact": ".claude/skills/KB-storybook-platform/references/story-format.md", "effort": "large", "parallelizable_with": ["T-1-4", "T-1-5", "T-1-6", "T-1-7"], "ac_coverage": ["AC-FR-1-f", "AC-FR-2-b"]},
+    {"id": "T-1-4", "phase": 1, "name": "Author references/addons.md", "type": "author", "depends_on": ["T-1-2"], "artifact": ".claude/skills/KB-storybook-platform/references/addons.md", "effort": "large", "parallelizable_with": ["T-1-3", "T-1-5", "T-1-6", "T-1-7"], "ac_coverage": ["AC-FR-1-f"]},
+    {"id": "T-1-5", "phase": 1, "name": "Author references/docs.md (MDX + Doc Blocks)", "type": "author", "depends_on": ["T-1-2"], "artifact": ".claude/skills/KB-storybook-platform/references/docs.md", "effort": "medium", "parallelizable_with": ["T-1-3", "T-1-4", "T-1-6", "T-1-7"], "ac_coverage": ["AC-FR-1-f"]},
+    {"id": "T-1-6", "phase": 1, "name": "Author references/testing.md (Chromatic + test-runner + Vitest)", "type": "author", "depends_on": ["T-1-2"], "artifact": ".claude/skills/KB-storybook-platform/references/testing.md", "effort": "large", "parallelizable_with": ["T-1-3", "T-1-4", "T-1-5", "T-1-7"], "ac_coverage": ["AC-FR-1-f"]},
+    {"id": "T-1-7", "phase": 1, "name": "Author references/composition.md (refs; multi-package)", "type": "author", "depends_on": ["T-1-2"], "artifact": ".claude/skills/KB-storybook-platform/references/composition.md", "effort": "small", "parallelizable_with": ["T-1-3", "T-1-4", "T-1-5", "T-1-6"], "ac_coverage": ["AC-FR-1-f"]},
+
+    {"id": "T-2-1", "phase": 2, "name": "Create KB-ux-design/SKILL.md", "type": "author", "depends_on": ["T-1-2"], "artifact": ".claude/skills/KB-ux-design/SKILL.md", "effort": "small", "parallelizable_with": ["T-2-5", "T-2-10", "T-2-14"], "ac_coverage": ["AC-FR-3-a", "AC-FR-3-b", "AC-FR-3-c"]},
+    {"id": "T-2-2", "phase": 2, "name": "Author KB-ux-design/references/principles.md (Nielsen's 10)", "type": "author", "depends_on": ["T-2-1"], "artifact": ".claude/skills/KB-ux-design/references/principles.md", "effort": "medium", "parallelizable_with": ["T-2-3", "T-2-4", "T-2-6", "T-2-7", "T-2-8", "T-2-9", "T-2-11", "T-2-12", "T-2-13", "T-2-15", "T-2-16", "T-2-17"], "ac_coverage": ["AC-FR-1-b"]},
+    {"id": "T-2-3", "phase": 2, "name": "Author KB-ux-design/references/journey-and-ia.md", "type": "author", "depends_on": ["T-2-1"], "artifact": ".claude/skills/KB-ux-design/references/journey-and-ia.md", "effort": "medium", "parallelizable_with": ["T-2-2", "T-2-4"], "ac_coverage": ["AC-FR-1-b"]},
+    {"id": "T-2-4", "phase": 2, "name": "Author KB-ux-design/references/accessibility-as-flow.md", "type": "author", "depends_on": ["T-2-1"], "artifact": ".claude/skills/KB-ux-design/references/accessibility-as-flow.md", "effort": "medium", "parallelizable_with": ["T-2-2", "T-2-3"], "ac_coverage": ["AC-FR-1-b"]},
+
+    {"id": "T-2-5", "phase": 2, "name": "Create KB-visual-design/SKILL.md", "type": "author", "depends_on": ["T-1-2"], "artifact": ".claude/skills/KB-visual-design/SKILL.md", "effort": "small", "parallelizable_with": ["T-2-1", "T-2-10", "T-2-14"], "ac_coverage": ["AC-FR-3-a", "AC-FR-3-b", "AC-FR-3-c"]},
+    {"id": "T-2-6", "phase": 2, "name": "Author references/type-color-space.md", "type": "author", "depends_on": ["T-2-5"], "artifact": ".claude/skills/KB-visual-design/references/type-color-space.md", "effort": "medium", "parallelizable_with": ["T-2-7", "T-2-8", "T-2-9"], "ac_coverage": ["AC-FR-1-c"]},
+    {"id": "T-2-7", "phase": 2, "name": "Author references/motion.md", "type": "author", "depends_on": ["T-2-5"], "artifact": ".claude/skills/KB-visual-design/references/motion.md", "effort": "medium", "parallelizable_with": ["T-2-6", "T-2-8", "T-2-9"], "ac_coverage": ["AC-FR-1-c"]},
+    {"id": "T-2-8", "phase": 2, "name": "Author references/responsive.md", "type": "author", "depends_on": ["T-2-5"], "artifact": ".claude/skills/KB-visual-design/references/responsive.md", "effort": "small", "parallelizable_with": ["T-2-6", "T-2-7", "T-2-9"], "ac_coverage": ["AC-FR-1-c"]},
+    {"id": "T-2-9", "phase": 2, "name": "Author references/anti-slop.md (cites Anthropic upstream)", "type": "author", "depends_on": ["T-2-5", "T-0-3"], "artifact": ".claude/skills/KB-visual-design/references/anti-slop.md", "effort": "medium", "parallelizable_with": ["T-2-6", "T-2-7", "T-2-8"], "ac_coverage": ["AC-FR-1-a"]},
+
+    {"id": "T-2-10", "phase": 2, "name": "Create KB-design-system-design/SKILL.md", "type": "author", "depends_on": ["T-1-2"], "artifact": ".claude/skills/KB-design-system-design/SKILL.md", "effort": "small", "parallelizable_with": ["T-2-1", "T-2-5", "T-2-14"], "ac_coverage": ["AC-FR-3-a", "AC-FR-3-b", "AC-FR-3-c"]},
+    {"id": "T-2-11", "phase": 2, "name": "Author references/tokens.md (three-tier model)", "type": "author", "depends_on": ["T-2-10"], "artifact": ".claude/skills/KB-design-system-design/references/tokens.md", "effort": "medium", "parallelizable_with": ["T-2-12", "T-2-13"], "ac_coverage": ["AC-FR-1-d"]},
+    {"id": "T-2-12", "phase": 2, "name": "Author references/theming.md", "type": "author", "depends_on": ["T-2-10"], "artifact": ".claude/skills/KB-design-system-design/references/theming.md", "effort": "small", "parallelizable_with": ["T-2-11", "T-2-13"], "ac_coverage": ["AC-FR-1-d"]},
+    {"id": "T-2-13", "phase": 2, "name": "Author references/governance.md (semver discipline)", "type": "author", "depends_on": ["T-2-10"], "artifact": ".claude/skills/KB-design-system-design/references/governance.md", "effort": "small", "parallelizable_with": ["T-2-11", "T-2-12"], "ac_coverage": ["AC-FR-1-d"]},
+
+    {"id": "T-2-14", "phase": 2, "name": "Create KB-component-architecture-design/SKILL.md", "type": "author", "depends_on": ["T-1-2"], "artifact": ".claude/skills/KB-component-architecture-design/SKILL.md", "effort": "small", "parallelizable_with": ["T-2-1", "T-2-5", "T-2-10"], "ac_coverage": ["AC-FR-3-a", "AC-FR-3-b", "AC-FR-3-c"]},
+    {"id": "T-2-15", "phase": 2, "name": "Author references/atomic-design.md (Frost's 5 tiers)", "type": "author", "depends_on": ["T-2-14"], "artifact": ".claude/skills/KB-component-architecture-design/references/atomic-design.md", "effort": "small", "parallelizable_with": ["T-2-16", "T-2-17"], "ac_coverage": ["AC-FR-1-e"]},
+    {"id": "T-2-16", "phase": 2, "name": "Author references/headless-libraries.md (Radix/React Aria/etc)", "type": "author", "depends_on": ["T-2-14"], "artifact": ".claude/skills/KB-component-architecture-design/references/headless-libraries.md", "effort": "medium", "parallelizable_with": ["T-2-15", "T-2-17"], "ac_coverage": ["AC-FR-1-e"]},
+    {"id": "T-2-17", "phase": 2, "name": "Author references/patterns.md (compound/slot/polymorphic/etc)", "type": "author", "depends_on": ["T-2-14"], "artifact": ".claude/skills/KB-component-architecture-design/references/patterns.md", "effort": "medium", "parallelizable_with": ["T-2-15", "T-2-16"], "ac_coverage": ["AC-FR-1-e"]},
+
+    {"id": "T-2-18", "phase": 2, "name": "Cross-reference each KB in ## Related KBs sections", "type": "author", "depends_on": ["T-2-2", "T-2-3", "T-2-4", "T-2-6", "T-2-7", "T-2-8", "T-2-9", "T-2-11", "T-2-12", "T-2-13", "T-2-15", "T-2-16", "T-2-17"], "artifact": "4 new design KBs (all SKILL.md and selected reference files)", "effort": "small", "parallelizable_with": [], "ac_coverage": []},
+
+    {"id": "T-3-1", "phase": 3, "name": "Apply pedagogical markers to anti-slop.md (heavy density)", "type": "edit", "depends_on": ["T-2-9"], "artifact": ".claude/skills/KB-visual-design/references/anti-slop.md", "effort": "small", "parallelizable_with": ["T-3-2", "T-3-3"], "ac_coverage": ["AC-FR-5-a"]},
+    {"id": "T-3-2", "phase": 3, "name": "Apply markers to KB-visual-design SKILL.md + type-color-space.md (medium density)", "type": "edit", "depends_on": ["T-2-5", "T-2-6"], "artifact": ".claude/skills/KB-visual-design/SKILL.md + references/type-color-space.md", "effort": "small", "parallelizable_with": ["T-3-1", "T-3-3"], "ac_coverage": ["AC-FR-5-a"]},
+    {"id": "T-3-3", "phase": 3, "name": "Spot-check other new KBs for marker needs (low density)", "type": "verify", "depends_on": ["T-2-18"], "artifact": "all 5 new KBs", "effort": "trivial", "parallelizable_with": ["T-3-1", "T-3-2"], "ac_coverage": ["AC-FR-5-a"]},
+    {"id": "T-3-4", "phase": 3, "name": "Run partial cc-audit scoped to new KB directories", "type": "audit", "depends_on": ["T-3-1", "T-3-2", "T-3-3"], "artifact": "/tmp/audit-phase3.md", "effort": "small", "parallelizable_with": [], "ac_coverage": ["AC-FR-5-a"]},
+
+    {"id": "T-4-1", "phase": 4, "name": "Edit design-frontend.md frontmatter skills: list (4 → 8)", "type": "edit", "depends_on": ["T-2-18"], "artifact": ".claude/agents/design-frontend.md", "effort": "trivial", "parallelizable_with": ["T-4-3"], "ac_coverage": ["AC-FR-4-a"]},
+    {"id": "T-4-2", "phase": 4, "name": "Add KB-storybook-platform model-invocation paragraph to design-frontend.md body", "type": "edit", "depends_on": ["T-4-1"], "artifact": ".claude/agents/design-frontend.md", "effort": "trivial", "parallelizable_with": ["T-4-4"], "ac_coverage": ["AC-FR-1-f", "AC-FR-4-a"]},
+    {"id": "T-4-3", "phase": 4, "name": "Edit design-composer.md frontmatter skills: list (add 4 new design KBs)", "type": "edit", "depends_on": ["T-2-18"], "artifact": ".claude/agents/design-composer.md", "effort": "trivial", "parallelizable_with": ["T-4-1"], "ac_coverage": ["AC-FR-4-b"]},
+    {"id": "T-4-4", "phase": 4, "name": "Add KB-storybook-platform model-invocation paragraph to design-composer.md body", "type": "edit", "depends_on": ["T-4-3"], "artifact": ".claude/agents/design-composer.md", "effort": "trivial", "parallelizable_with": ["T-4-2"], "ac_coverage": ["AC-FR-1-f", "AC-FR-4-b"]},
+
+    {"id": "T-5-1", "phase": 5, "name": "Update KB-frontend-design SKILL.md frontmatter description", "type": "edit", "depends_on": ["T-2-18"], "artifact": ".claude/skills/KB-frontend-design/SKILL.md", "effort": "trivial", "parallelizable_with": [], "ac_coverage": []},
+    {"id": "T-5-2", "phase": 5, "name": "Verify references/ untouched via git diff", "type": "verify", "depends_on": ["T-5-1"], "artifact": ".claude/skills/KB-frontend-design/references/", "effort": "trivial", "parallelizable_with": [], "ac_coverage": ["AC-FR-7-a"]},
+
+    {"id": "T-6-1", "phase": 6, "name": "Run full cc-audit", "type": "audit", "depends_on": ["T-4-2", "T-4-4", "T-5-2"], "artifact": "/tmp/audit-final.md", "effort": "small", "parallelizable_with": [], "ac_coverage": ["AC-FR-5-b"]},
+    {"id": "T-6-2", "phase": 6, "name": "Compare against baseline; triage any new violations", "type": "verify", "depends_on": ["T-6-1"], "artifact": "diff between /tmp/audit-baseline.md and /tmp/audit-final.md", "effort": "small", "parallelizable_with": [], "ac_coverage": ["AC-FR-5-b"]},
+    {"id": "T-6-3", "phase": 6, "name": "If unresolvable: route to Reconciliation (per ADR-0021)", "type": "conditional", "depends_on": ["T-6-2"], "artifact": "reconciliation cycle (conditional)", "effort": "variable", "parallelizable_with": [], "ac_coverage": []},
+    {"id": "T-6-4", "phase": 6, "name": "Re-run audit after any fixes; iterate until clean", "type": "audit", "depends_on": ["T-6-2"], "artifact": "/tmp/audit-final.md (updated)", "effort": "variable", "parallelizable_with": [], "ac_coverage": ["AC-FR-5-b"]},
+
+    {"id": "T-7-1", "phase": 7, "name": "Stage all changes (git add .claude/)", "type": "commit-prep", "depends_on": ["T-6-4"], "artifact": ".git staging area", "effort": "trivial", "parallelizable_with": [], "ac_coverage": []},
+    {"id": "T-7-2", "phase": 7, "name": "Commit with structured message", "type": "commit", "depends_on": ["T-7-1"], "artifact": ".git history", "effort": "trivial", "parallelizable_with": [], "ac_coverage": []},
+    {"id": "T-7-3", "phase": 7, "name": "Rebuild project zip at v4.4.0", "type": "package", "depends_on": ["T-7-2"], "artifact": "feature-pipeline-round-3-v4.4.0.zip", "effort": "small", "parallelizable_with": ["T-7-4"], "ac_coverage": []},
+    {"id": "T-7-4", "phase": 7, "name": "Update HANDOFF-v4.4.0.md and CONTINUE_PROMPT", "type": "author", "depends_on": ["T-7-2"], "artifact": "HANDOFF-v4.4.0.md + CONTINUE_PROMPT", "effort": "small", "parallelizable_with": ["T-7-3"], "ac_coverage": []},
+    {"id": "T-7-5", "phase": 7, "name": "Final Approval Gate (user) — voice / overall sign-off", "type": "gate", "depends_on": ["T-7-3", "T-7-4"], "artifact": "Gate 6 user decision", "effort": "variable", "parallelizable_with": [], "ac_coverage": ["AC-FR-6-a", "AC-FR-5-c", "AC-FR-8-a"]}
+  ],
+  "parallelization_summary": {
+    "phase_1_max_parallelism": 5,
+    "phase_2_max_parallelism": 13,
+    "phase_3_max_parallelism": 3,
+    "phase_4_max_parallelism": 2,
+    "critical_path": "T-0-1 → T-0-2 → T-1-1 → T-1-2 → T-2-1/5/10/14 (parallel) → T-2-x content (parallel) → T-2-18 → T-3-x → T-4-x → T-5-x → T-6-1 → T-6-2 → T-6-4 → T-7-1 → T-7-2 → T-7-3 + T-7-4 → T-7-5",
+    "estimated_critical_path_effort": "8-12 hours single-instance (matching Plan estimate)"
+  },
+  "ac_coverage_summary": {
+    "total_acs": 19,
+    "acs_with_task_coverage": 19,
+    "orphan_acs": 0,
+    "tasks_with_no_ac": "T-0-1, T-0-4, T-2-18, T-3-3 (audit/verify/snapshot/cross-ref helpers), T-5-1 (docstring metadata; no direct AC coverage), T-6-3 (conditional reconciliation), T-7-1, T-7-2, T-7-3, T-7-4 (commit/package/handoff infrastructure)"
+  }
+}

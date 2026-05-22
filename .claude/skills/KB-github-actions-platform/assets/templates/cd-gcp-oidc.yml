@@ -1,0 +1,74 @@
+# Deploy to GCP using Workload Identity Federation (no service account keys).
+#
+# Prerequisites (one-time, in GCP):
+# 1. Create a Workload Identity Pool (e.g. 'github-actions').
+# 2. Add a Workload Identity Provider in the pool:
+#    - Issuer URI: https://token.actions.githubusercontent.com
+#    - Attribute mapping:
+#        google.subject       = assertion.sub
+#        attribute.repository = assertion.repository
+#        attribute.ref        = assertion.ref
+#        attribute.environment = assertion.environment
+#    - Attribute condition (CRITICAL — without this, any GitHub repo could
+#      impersonate your service account):
+#        assertion.repository == 'OWNER/REPO'
+# 3. Create a service account with the required GCP IAM roles for your deploy.
+# 4. Grant the workload identity pool permission to impersonate the service
+#    account, scoped to your repo:
+#
+#    gcloud iam service-accounts add-iam-policy-binding deployer@PROJECT.iam.gserviceaccount.com \
+#      --role=roles/iam.workloadIdentityUser \
+#      --member="principalSet://iam.googleapis.com/projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-actions/attribute.repository/OWNER/REPO"
+#
+# 5. Configure repo Settings → Environments → 'production' with required reviewers.
+
+name: Deploy to GCP
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-gcp-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://my-service.example.com
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Authenticate to GCP
+        id: auth
+        uses: google-github-actions/auth@v2  # TODO: SHA pin
+        with:
+          workload_identity_provider: projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-actions/providers/github
+          service_account: deployer@PROJECT.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2  # TODO: SHA pin
+
+      - run: gcloud info
+
+      # Example: deploy a container to Cloud Run
+      - name: Build and push image
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker build -t us-central1-docker.pkg.dev/PROJECT/my-repo/my-service:${{ github.sha }} .
+          docker push us-central1-docker.pkg.dev/PROJECT/my-repo/my-service:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy my-service \
+            --image us-central1-docker.pkg.dev/PROJECT/my-repo/my-service:${{ github.sha }} \
+            --region us-central1 \
+            --platform managed \
+            --allow-unauthenticated

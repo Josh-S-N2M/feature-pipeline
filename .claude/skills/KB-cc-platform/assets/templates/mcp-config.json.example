@@ -1,0 +1,82 @@
+{
+  "$comment": "Place this file at the project root as `.mcp.json` (committed, team-shared). Servers are scoped: local > project > user. ${VAR_NAME} expands environment variables at startup so secrets stay out of the file. Add servers via `claude mcp add` or by editing this file directly.",
+
+  "mcpServers": {
+    "$comment_stdio": "stdio is the most common transport — runs a local process, talks over stdin/stdout. Used for npm-published servers and local scripts.",
+
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "${DATABASE_URL}"
+      ]
+    },
+
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${HOME}/projects/shared-data"
+      ]
+    },
+
+    "$comment_local_script": "stdio works for local scripts too — point `command` at any executable and `args` to its arguments. Useful for in-house tools.",
+
+    "internal-tools": {
+      "command": "${CLAUDE_PROJECT_DIR}/.claude/mcp-servers/internal/dist/server.js",
+      "args": [],
+      "env": {
+        "INTERNAL_API_BASE": "https://api.internal.example.com",
+        "INTERNAL_API_TOKEN": "${INTERNAL_API_TOKEN}"
+      }
+    },
+
+    "$comment_http": "HTTP transport for hosted servers. Use `type: http` with `url` and optional `headers`.",
+
+    "stripe": {
+      "type": "http",
+      "url": "https://mcp.stripe.com",
+      "headers": {
+        "Authorization": "Bearer ${STRIPE_API_KEY}"
+      }
+    },
+
+    "$comment_sse": "SSE (Server-Sent Events) for streaming-friendly hosted servers. Same shape as HTTP, with `type: sse`.",
+
+    "internal-events": {
+      "type": "sse",
+      "url": "https://events.internal.example.com/mcp/sse",
+      "headers": {
+        "Authorization": "Bearer ${INTERNAL_API_TOKEN}"
+      }
+    }
+  },
+
+  "$comment_permissions": "Pair this file with permissions in settings.json. Tools surface as mcp__<server>__<tool>. Allow whole servers (e.g. \"mcp__github\") or individual tools (\"mcp__github__create_issue\").",
+
+  "$example_settings_json_permissions": {
+    "permissions": {
+      "allow": [
+        "mcp__github__list_issues",
+        "mcp__github__get_pull_request",
+        "mcp__github__create_issue",
+        "mcp__postgres__query",
+        "mcp__filesystem"
+      ],
+      "deny": [
+        "mcp__github__delete_repo",
+        "mcp__postgres__execute"
+      ]
+    }
+  }
+}

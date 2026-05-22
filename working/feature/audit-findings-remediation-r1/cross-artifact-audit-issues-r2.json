@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "cross-artifact-audit-findings-remediation-r1-r2",
+  "round_number": 2,
+  "terminal": false,
+  "audited_artifacts": [
+    "blueprint-v1.md",
+    "plan-v1.1.0.md",
+    "acceptance-tests.md",
+    "phase-validators.md"
+  ],
+  "audited_at": "2026-05-21T21:05:00Z",
+  "audited_by": "claude (acting as review-cross-artifact-auditor, continuation session, round 2)",
+  "diff_mode": true,
+  "diff_mode_details": {
+    "blueprint": "unchanged from round 1 (still v1.0.0); treated as already-audited per agent procedure",
+    "plan": "plan-v1.md → plan-v1.1.0.md; diff focused on frontmatter, P1.3 Contents block, P1.4 steps + Verification line, P4.2 amendment instruction, P6.6 heading, Update history",
+    "acceptance_tests": "unchanged from round 1; treated as already-audited",
+    "phase_validators": "unchanged from round 1; treated as already-audited",
+    "scope_sweep_reflex_applied": "Round 1 caught one instance of stage-number discipline violation (P6.6) but did not sweep for the full violation class. Round 2 applies the lesson: when a discipline-violation class is identified, sweep ALL instances across audited artifacts even when the artifacts themselves are unchanged in diff."
+  },
+  "checks_performed": [
+    "round_1_issues_convergence_check",
+    "supersession_internal_consistency",
+    "supersession_downstream_consistency",
+    "discipline_violation_class_full_sweep",
+    "blueprint_plan_post_supersession",
+    "blueprint_tests_post_supersession",
+    "blueprint_validators_post_supersession",
+    "plan_tests_post_supersession",
+    "plan_validators_post_supersession"
+  ],
+  "round_1_issues_convergence": [
+    {
+      "issue_id": "I-CA-001",
+      "round_1_severity": "MAJOR",
+      "status": "RESOLVED",
+      "evidence": "plan-v1.1.0.md line 350 reads `### P6.6 — Deliverable packaging (added as a new stage in v4.5.0+)`. Stage numbers removed; historical-context phrase preserved."
+    },
+    {
+      "issue_id": "I-CA-002",
+      "round_1_severity": "MAJOR",
+      "status": "RESOLVED",
+      "evidence": "plan-v1.1.0.md P1.4 now has step 4 = `Capture intermediate audit: python3 ... > /tmp/post-dedup-audit.json` between the helper-authoring step and the wiring step. Existing steps 4-6 renumbered to 5-7. Verification line rewritten to: `Step 4's intermediate audit + the baseline audit (from P0.1) together verify AC-FR-12-c behavior equivalence on the real corpus (AT-030, PV-1.C5). Fixture-based negative tests after step 7 verify the new rejection behavior (AT-021 sub-tests).` This satisfies AT-030 + PV-1.C4/C5's intermediate-state requirement and resolves the AC-FR-12-c verification path."
+    },
+    {
+      "issue_id": "I-CA-003",
+      "round_1_severity": "MINOR",
+      "status": "RESOLVED",
+      "evidence": "plan-v1.1.0.md P1.3 SKILL.md Contents block now lists only `scripts/pedagogical_marker_check.py` + a note that `scripts/scan_memory_secrets.py` will be added in P4.2. plan-v1.1.0.md P4.2 now has the amendment instruction (`Then amend auditing-shared/SKILL.md Contents listing... add a new bullet`). Temporal authoring inconsistency resolved."
+    }
+  ],
+  "issues": [
+    {
+      "id": "I-CA-004",
+      "severity": "MAJOR",
+      "category": "discipline_violation_class_full_sweep_residual",
+      "summary": "Stage-number discipline violation class (same as I-CA-001) has 11 residual instances across the 4 audited artifacts that round 1's audit failed to surface. Round 1 caught only the named instance the user first pointed at (P6.6 heading); the audit should have swept the violation class. This finding consolidates all residual instances as a single MAJOR for one-cycle reconciliation across multiple sub-agents.",
+      "evidence": [
+        {
+          "artifact": "blueprint-v1.md",
+          "instances": [
+            {"line": 115, "quote": "**FR-11 P3 (Stage 13 retroactive)**: AC-FR-11-a (optional memo if executed)"},
+            {"line": 208, "quote": "**Deferred to Stage 9 (Plan Authoring)** per ADR-0023"},
+            {"line": 283, "quote": "FR-11 P3 Stage 13 retroactive run against v4.4.x archives (Plan stage decides)"}
+          ],
+          "count": 3
+        },
+        {
+          "artifact": "plan-v1.1.0.md",
+          "instances": [
+            {"line": 326, "quote": "Stage 12 (Cross-Artifact Audit) reviews all artifacts for consistency."},
+            {"line": 333, "quote": "If Cross-Artifact Audit finds issues, Stage 13 finalize-reconciler dispatches fixes; cycle until convergence"},
+            {"line": 337, "quote": "Stage 14 `finalize-task-decomposer` produces `tasks.json` for any granular work items that survive reconciliation."},
+            {"line": 421, "quote": "FR-11 P3 (Stage 13 retroactive run against v4.4.x archives) is included. Default: NOT included"}
+          ],
+          "count": 4,
+          "note": "Lines 326/333/337 are in §Phase 6 / P6.3, P6.4, P6.5 bodies. Line 421 is in §Open Items / OI-5. These were unchanged in the plan-v1.0.0 → plan-v1.1.0 supersession; cycle 1 only addressed the named instance (P6.6 heading)."
+        },
+        {
+          "artifact": "acceptance-tests.md",
+          "instances": [
+            {"line": 333, "quote": "### AT-027 — FR-11-a: Retroactive Stage 13 memo (CONDITIONAL)"}
+          ],
+          "count": 1
+        },
+        {
+          "artifact": "phase-validators.md",
+          "instances": [
+            {"line": 182, "quote": "**PV-6.C6 — Cross-Artifact Audit verdict is PASS or PASS-after-reconciliation.** Stage 12 output exists"},
+            {"line": 184, "quote": "**PV-6.C8 — `tasks.json` produced if reconciliation surfaced granular work.** Plan §P6.5 — Stage 13 produces `tasks.json`"},
+            {"line": 266, "quote": "For Cross-Artifact Audit (Stage 12, Plan §P6.3), the auditor reviews ALL feature artifacts"}
+          ],
+          "count": 3
+        }
+      ],
+      "total_instances": 11,
+      "discipline_violated": "recipe-feature-pipeline SKILL.md discipline 5 (no pipeline-stage references by number; stage taxonomy is by name only); codified in ADR-0028; scope confirmed by user 2026-05-21 to extend to feature-internal artifacts",
+      "round_1_audit_blind_spot_analysis": "Round 1 of this Cross-Artifact Audit identified the violation class via the user's pointing at one instance (P6.6 heading), then issued I-CA-001 scoped only to that instance. The audit framework's check categories include 'cross-artifact consistency' but don't include an explicit 'discipline-violation-class sweep' step. The auditor (acting as me) should have applied the reflex: once a discipline-violation class is identified, sweep the audited corpus for all instances of that class. Round 2 applies this reflex. Recommended follow-on: a discipline-update to the review-cross-artifact-auditor agent procedure to add an explicit sweep step.",
+      "recommended_resolution": "Cycle-2 reconciliation dispatches to 4 sub-agents: (a) design-composer to author blueprint-v1.1.0.md fixing the 3 blueprint instances (rewrite to use stage names: 'retroactive Plan Authoring run', 'Deferred to Plan Authoring per ADR-0023', etc.); (b) plan-author to author plan-v1.2.0.md fixing the 4 residual plan instances; (c) test-acceptance-author to author acceptance-tests-v1.1.0.md fixing AT-027 heading; (d) test-phase-validator-author to author phase-validators-v1.1.0.md fixing the 3 PV-6 instances. Round 3 audit verifies convergence.",
+      "severity_rationale": "MAJOR (same as I-CA-001): each instance is the same discipline violation. Consolidated as one MAJOR rather than 11 separate MAJORs because they share root cause, fix pattern, and reconciliation-cycle dispatch. The total severity-weight contribution is 3 (weight as one MAJOR) reflecting one issue-class, not 33 (weight as 11 MAJORs)."
+    }
+  ],
+  "informational_observations": [
+    {
+      "id": "OBS-CA-INFO-003",
+      "summary": "plan-v1.1.0.md's new P4.2 SKILL.md amendment instruction is procedurally clean but is not gated by any existing Phase Validator criterion. PV-4.C3 checks scan_memory_secrets.py dedup but not the SKILL.md amendment specifically. If the executor forgets the amendment, no PV catches it directly (though the project-wide audit at PV-6 / final audit would surface the inconsistency between SKILL.md and actual file system). Could be tightened in phase-validators-v1.1.0.md if cycle 2 supersedes it; otherwise acceptable.",
+      "non_action": "Not surfaced as an issue. Optional enhancement during cycle 2 if phase-validators is being superseded anyway."
+    },
+    {
+      "id": "OBS-CA-INFO-004",
+      "summary": "The meta-files authored during this session (observations.md, reconciliation-log-cycle1.md) also contain stage-number references (3 + 1 instances respectively). These are NOT in the cross-artifact-audit's 4-artifact corpus per agent spec, so they are NOT formally surfaced as audit issues. However, they ARE in scope for the same discipline (per user-confirmed cross-tree scope). Recommended housekeeping: fix in same cycle-2 work pass as the formal audit issues; non-blocking for audit convergence verdict."
+    }
+  ],
+  "convergence": {
+    "verdict": "converging",
+    "prior_issue_count": 3,
+    "current_issue_count": 1,
+    "delta": -2,
+    "persistent_issues": [],
+    "severity_weighted_prior": 7,
+    "severity_weighted_current": 3,
+    "severity_weighted_delta": -4,
+    "weights_used": {"BLOCKER": 10, "MAJOR": 3, "MINOR": 1, "INFO": 0},
+    "convergence_notes": "Both deltas decreasing; persistent-issue count = 0. Round-1 issues all RESOLVED. New issue is a previously-latent finding surfaced by round-2's broader scope sweep, not an issue the supersession introduced. Per the agent's classification: 'SURFACED PREVIOUSLY-LATENT issue (was always there; audit caught it later).'"
+  },
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 1,
+    "MINOR": 0,
+    "INFO": 2
+  },
+  "verdict": "conditional_pass",
+  "verdict_rationale": "0 BLOCKER + 1 MAJOR → conditional_pass. Reconciliation cycle 2 required. Cycle budget: 1 of 4 audit-rounds used through round 1; this is round 2 of 4. After cycle 2 reconciliation, round 3 audit verifies. Hard cap at round 4.",
+  "next_step": "finalize-reconciler dispatches cycle 2 with 4 sub-dispatches (design-composer for blueprint; plan-author for plan; test-acceptance-author for acceptance-tests; test-phase-validator-author for phase-validators) plus housekeeping fix-pass for meta-files (observations.md + reconciliation-log-cycle1.md). After cycle 2, run Cross-Artifact Audit round 3 (diff mode) to verify convergence."
+}

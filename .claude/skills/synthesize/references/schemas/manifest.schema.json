@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "manifest.schema.json",
+  "title": "Synthesis Run Manifest",
+  "description": "Written by orchestrator immediately after the Confirmation Gate. Read-only thereafter (invariant 3 of Design §7.1).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id", "topic", "started_at", "inputs", "constraints", "params"],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+-[0-9]{8}-[0-9]{6}$",
+      "description": "<topic-slug>-<YYYYMMDD-HHMMSS>"
+    },
+    "topic": { "type": "string", "minLength": 1 },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["discovered", "confirmed"],
+      "properties": {
+        "discovered": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "All paths returned by output/**/*.md glob (with output/synthesis-*/ excluded)"
+        },
+        "confirmed": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Subset the user confirmed via Confirmation Gate. At least one source required."
+        },
+        "excluded": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "added_from_input": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Files added by user from input/ via gate's 'Other' answer"
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_substrate", "scope", "audience_depth"],
+      "properties": {
+        "target_substrate": {
+          "type": "string",
+          "enum": ["claude_code", "microsoft_azure", "m365", "multi_substrate", "other"],
+          "description": "Selects which substrate-registry file the Substrate phase loads"
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["narrow", "broad", "exploratory"]
+        },
+        "audience_depth": {
+          "type": "string",
+          "enum": ["executive", "engineering", "mixed"]
+        },
+        "hard_constraints": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Examples: 'compliance:SOC2', 'vendor-locked:microsoft', 'budget:no-net-new-services'"
+        },
+        "additional_notes": {
+          "type": ["string", "null"],
+          "default": null
+        }
+      }
+    },
+    "params": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["include_adrs", "max_iterations"],
+      "properties": {
+        "include_adrs": { "type": "boolean", "default": true },
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "default": 2,
+          "description": "Orchestrator-only field per Design §4.13. Caps Critic-driven Extractor retry and Substrate-driven Framer retry."
+        }
+      }
+    }
+  }
+}

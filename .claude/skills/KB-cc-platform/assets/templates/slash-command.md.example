@@ -1,0 +1,72 @@
+<!--
+Place this file at .claude/commands/<name>.md (project) or ~/.claude/commands/<name>.md (user).
+
+Single-file slash commands are the older mechanism. They still work and are still
+documented, but new work should be skills (.claude/skills/<name>/SKILL.md), since
+skills can bundle supporting files (templates, scripts, reference docs) alongside
+the prompt.
+
+If a skill and a command share a name, the skill wins.
+
+Reach for a single-file command when the workflow is small enough that bundling
+isn't worth it and you want the lowest-friction setup. The file you're reading
+demonstrates the patterns: frontmatter, $ARGUMENTS, !`bash` injection.
+
+Below is a real example: .claude/commands/fix-issue.md
+
+Usage:
+  /fix-issue 1234
+  /fix-issue 1234 --no-tests
+-->
+
+---
+description: Investigate and fix a GitHub issue. Triggered by the user with /fix-issue <number> [flags].
+argument-hint: <issue-number> [flags]
+allowed-tools: Read, Edit, Write, Glob, Grep, Bash
+model: opus
+---
+
+# Fix issue $0
+
+## Issue details
+
+!`gh issue view $0`
+
+## Recent activity in the repository
+
+!`git log --oneline -20`
+
+## Current branch and status
+
+!`git status --short && git rev-parse --abbrev-ref HEAD`
+
+## Task
+
+Investigate the issue above and produce a fix. Follow this sequence:
+
+1. **Understand the issue.** Read the body, comments, and any linked code references. Identify what is broken and what the expected behavior should be.
+
+2. **Explore the relevant code.** Locate the code involved using `Grep` and `Read`. Trace the call graph until you understand the root cause — not just the surface symptom.
+
+3. **Plan the fix.** Write a brief plan describing:
+   - The root cause
+   - The fix approach
+   - Any edge cases that need handling
+   - Files that will change
+   - Whether tests need to be added or updated
+
+4. **Implement.** Apply the fix. Keep changes minimal and focused on the root cause; resist the urge to refactor unrelated code.
+
+5. **Add or update tests.** Unless `$ARGUMENTS` contains `--no-tests`, write a test that fails before the fix and passes after. Run the full test suite to confirm nothing else broke.
+
+6. **Summarize.** Report:
+   - Root cause (one sentence)
+   - What you changed (bulleted list of files with one-line descriptions)
+   - Test added/updated
+   - Any follow-up work the maintainers should consider
+
+## Notes
+
+- Branch off `main`. The branch name should be `fix/issue-$0-<short-description>`.
+- Commit messages follow conventional commits: `fix: <short description> (#$0)`.
+- Do not push or open a PR — leave that to the user.

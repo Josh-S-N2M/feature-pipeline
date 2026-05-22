@@ -1,0 +1,58 @@
+// Multi-service devcontainer using Docker Compose.
+// Use when local dev needs sidecar services (Postgres, Redis, etc.) alongside the app.
+//
+// Layout in .devcontainer/:
+//   devcontainer.json       (this file)
+//   docker-compose.yml      (services definition)
+//   Dockerfile              (the "app" service's image -- optional if using a stock image)
+{
+  "name": "compose-stack",
+
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+  // Bring up sidecars alongside the app service.
+  "runServices": ["app", "db", "redis"],
+
+  // Stop ALL services when the codespace stops, not just `app`.
+  "shutdownAction": "stopCompose",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "node"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "forwardPorts": [3000, 5432, 6379],
+  "portsAttributes": {
+    "3000": { "label": "App", "onAutoForward": "notify" },
+    "5432": { "label": "Postgres", "onAutoForward": "ignore" },
+    "6379": { "label": "Redis", "onAutoForward": "ignore" }
+  },
+
+  "updateContentCommand": "npm ci",
+
+  // Wait for db to be ready, then run migrations. `wait-on` or pg_isready works.
+  "postCreateCommand": "until pg_isready -h db -U postgres; do sleep 1; done && npm run db:migrate",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "Prisma.prisma",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+
+  "remoteUser": "node",
+
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  }
+}

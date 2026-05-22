@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "entity-graph.schema.json",
+  "title": "Entity Graph",
+  "description": "Output of synth-grapher. Entities + edges with claim back-pointers per Design \u00a75.2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entities",
+    "edges"
+  ],
+  "properties": {
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "type",
+          "claims"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^E-\\d{4}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "pattern",
+              "service",
+              "control",
+              "standard",
+              "finding",
+              "tool",
+              "role"
+            ]
+          },
+          "canonical_uri": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "claims": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^C-\\d{4}$"
+            }
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from",
+          "to",
+          "relation",
+          "claim_ids"
+        ],
+        "properties": {
+          "from": {
+            "type": "string",
+            "pattern": "^E-\\d{4}$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^E-\\d{4}$"
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "implements",
+              "requires",
+              "conflicts_with",
+              "supersedes",
+              "instance_of"
+            ]
+          },
+          "claim_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^C-\\d{4}$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

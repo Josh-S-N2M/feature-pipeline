@@ -1,0 +1,88 @@
+# PR automation: labeling, stale issue handling, dependency review.
+#
+# Demonstrates safe use of pull_request_target (which gives full token+secrets
+# access on PRs from forks). Notice that NONE of these steps run code from the
+# PR's checkout — they operate on PR metadata via the GitHub API.
+
+name: PR Automation
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+
+  # Stale automation runs on a schedule, not per-PR.
+  schedule:
+    - cron: '0 8 * * 1-5'   # weekdays 08:00 UTC
+
+permissions:
+  # Each job overrides this to declare its own minimal scopes.
+  contents: read
+
+jobs:
+  # ── Auto-label PRs based on changed paths ────────────────────────
+  label:
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@v5  # TODO: SHA pin
+        # Reads .github/labeler.yml, which maps glob patterns to label names.
+        # The action only reads PR metadata via the API; it doesn't run PR code.
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          sync-labels: true
+
+  # ── Validate PR title format (semantic, e.g. "feat: ...") ────────
+  title-check:
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5  # TODO: SHA pin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Dependency review: block PRs that introduce vulnerable deps ──
+  dependency-review:
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        # Safe here: dependency-review-action reads dependency manifests but
+        # does not execute them. We do NOT run npm install / pip install.
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - uses: actions/dependency-review-action@v4  # TODO: SHA pin
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
+
+  # ── Close stale PRs/issues ───────────────────────────────────────
+  stale:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v9  # TODO: SHA pin
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 30
+          days-before-close: 7
+          stale-issue-message: |
+            This issue has been inactive for 30 days. It will be closed in 7 days
+            unless someone comments. To keep it open, just leave a comment.
+          stale-pr-message: |
+            This PR has been inactive for 30 days. It will be closed in 7 days
+            unless someone comments or pushes a commit.
+          exempt-issue-labels: 'pinned,security'
+          exempt-pr-labels: 'pinned,WIP'

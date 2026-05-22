@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0.0",
+  "dispatch_id": "reconciliation-dispatch-execution-pipeline-design-r1-cycle2",
+  "feature_slug": "execution-pipeline-design-r1",
+  "stage": "Architecture Audit Reconciliation",
+  "cycle": 2,
+  "budget_used_so_far": 2,
+  "budget_remaining": 2,
+  "budget_cap_reference": "ADR-0017 (4-cycle cap; symmetric per ADR-0034 ↔ D-12)",
+  "generated": "2026-05-22T19:35:00Z",
+  "generated_by": "claude (acting as finalize-reconciler; claude.ai simulation)",
+  "agent_invocation_simulation": true,
+  "source_audit": "working/feature/execution-pipeline-design-r1/architecture-audit-issues-r3.json",
+  "source_audit_verdict": "conditional_pass",
+  "predecessor_dispatch": "working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle1.json",
+  "dispatches": [
+    {
+      "dispatch_target": "design-composer",
+      "dispatch_target_invocation": "claude.ai simulation; not actual subagent dispatch",
+      "revision_context_payload": {
+        "blueprint_predecessor": "working/feature/execution-pipeline-design-r1/blueprint-v2.md",
+        "blueprint_predecessor_status": "draft (will be marked superseded upon blueprint-v3 creation)",
+        "addressing_issues": ["I-AA-301", "I-AA-302", "I-AA-303", "I-AA-304", "I-AA-305", "I-AA-306", "I-AA-307"],
+        "primary_substrate": "working/feature/execution-pipeline-design-r1/cc-design.md (reviewer_verdict=approved; under-transcribed in blueprint-v2)",
+        "directive_summary": "Author blueprint-v3.md that adds an 'Agent Frontmatter Specifications' subsection providing literal YAML frontmatter blocks for all 5 new agents (execute-orchestrator, execute-task-code-producer, execute-task-quality-handler, execute-phase-quality-reviewer, execute-finalize-reconciler), transcribed faithfully from cc-design.md.",
+        "per_agent_specifications": {
+          "execute-orchestrator": {
+            "from_cc_design": {
+              "tools": "[Read, Glob, Grep, Bash, Task, TaskUpdate]",
+              "skills": "[KB-cc-platform, KB-cc-design, recipe-feature-pipeline, auditing-shared, KB-review-disciplines]",
+              "memory": "project",
+              "model": "opus",
+              "effort": "high"
+            },
+            "blueprint_v3_adjustments": {
+              "tools": "Use TaskCreate (not Task) to match existing-agent precedent (per I-AA-305). Also add Write — orchestrator owns pipeline-run-summary.json output per Blueprint v2 line 840, even though cc-design omitted Write. Flag in INFO if cc-design's omission was intentional (script writes the summary).",
+              "skills": "Adopt cc-design specification verbatim",
+              "memory": "Adopt cc-design (project)",
+              "model_effort": "Adopt cc-design (opus / high)"
+            }
+          },
+          "execute-task-code-producer": {
+            "from_cc_design": {
+              "tools": "[Read, Glob, Grep, Write, Edit, Bash]",
+              "skills": "[ai-development-guide, KB-cc-design] + task-spec-declared",
+              "memory": "none",
+              "model": "sonnet",
+              "effort": "medium"
+            },
+            "blueprint_v3_adjustments": {
+              "tools": "Adopt cc-design verbatim. Flag 'Edit' for Gate 4 platform-validity verification (I-AA-306 / I-AA-308).",
+              "skills": "Adopt cc-design verbatim. The 'plus task-spec-declared' pattern means per-task spawning with task-spec-supplied additional skills; documented in the Agent Frontmatter Specifications subsection.",
+              "memory": "Adopt cc-design (none). Flag for Gate 4 platform-validity verification (I-AA-308).",
+              "model_effort": "Adopt cc-design (sonnet / medium)"
+            }
+          },
+          "execute-task-quality-handler": {
+            "from_cc_design": {
+              "tools": "[Read, Glob, Grep, Bash]",
+              "skills": "[ai-development-guide, KB-cc-design, auditing-shared]",
+              "memory": "none",
+              "model": "sonnet",
+              "effort": "medium"
+            },
+            "blueprint_v3_adjustments": {
+              "tools": "Adopt cc-design verbatim (note: cc-design specifies Bash without restriction; existing convention is Bash(python3:*) for script-only invocation; flag for Gate 4).",
+              "skills": "Adopt cc-design verbatim",
+              "memory": "Adopt cc-design (none); flag for Gate 4 per I-AA-308",
+              "model_effort": "Adopt cc-design (sonnet / medium); note Q-CC-1 opus-escalation possibility"
+            }
+          },
+          "execute-phase-quality-reviewer": {
+            "from_cc_design": {
+              "tools": "[Read, Glob, Grep, Bash, Write]",
+              "skills": "[KB-cc-design, KB-review-disciplines, auditing-shared]",
+              "memory": "none",
+              "model": "opus",
+              "effort": "high"
+            },
+            "blueprint_v3_adjustments": {
+              "tools": "Adopt cc-design verbatim",
+              "skills": "Adopt cc-design verbatim",
+              "memory": "Adopt cc-design (none); flag for Gate 4 per I-AA-308",
+              "model_effort": "Adopt cc-design (opus / high)"
+            }
+          },
+          "execute-finalize-reconciler": {
+            "from_cc_design": {
+              "tools": "[Read, Glob, Grep, Task, Write]",
+              "skills": "[KB-cc-design, KB-review-disciplines, auditing-shared]",
+              "memory": "project",
+              "model": "opus",
+              "effort": "high"
+            },
+            "blueprint_v3_adjustments": {
+              "tools": "Use TaskCreate + TaskUpdate (not Task) to match existing-agent precedent (per I-AA-305)",
+              "skills": "Adopt cc-design verbatim",
+              "memory": "Adopt cc-design (project)",
+              "model_effort": "Adopt cc-design (opus / high)"
+            }
+          }
+        },
+        "auditing_shared_skill_binding_note": "Add a brief paragraph in the Agent Frontmatter Specifications subsection explaining that this feature establishes a new convention: agents can bind 'auditing-shared' in their `skills:` field to load the SKILL.md as context (in addition to invoking its scripts via Bash). Per I-AA-307, this is a deliberate extension of existing precedent.",
+        "gate_4_open_questions_to_surface_in_blueprint_v3": [
+          "Is 'memory: none' a valid Claude Code platform directive value? (cc-design uses it for 3 agents; no existing agent declares this value)",
+          "Is 'Edit' a valid Claude Code tool name? (cc-design specifies it for code-producer; no existing agent declares it)",
+          "Does the platform support non-KB skills in `skills:` binding? (cc-design binds 'auditing-shared' which is a non-KB skill; no existing agent has this pattern)"
+        ],
+        "supersede_blueprint_v2": "Yes. Update blueprint-v2.md frontmatter only (per ADR-0005): status: draft → superseded; add superseded_by: blueprint-v3.md; superseded_at: ISO timestamp; superseded_reason: 'Cycle 2 reconciliation: agent-frontmatter specifications added per audit r3 findings.'",
+        "version_increment": "2.0.0 → 3.0.0 (substrate addition, not minor correction)",
+        "update_history_entry_required": true,
+        "update_history_must_acknowledge": [
+          "Cycle 2 audit pass verdict retracted post-hoc",
+          "User (Josh) caught the gap that cycles 1+2 audits missed",
+          "Cycle 3 audit re-opened with canonical-agent-frontmatter-pattern check"
+        ]
+      },
+      "expected_outputs": [
+        "working/feature/execution-pipeline-design-r1/blueprint-v3.md (new)",
+        "working/feature/execution-pipeline-design-r1/blueprint-v2.md (frontmatter only updated to superseded)"
+      ],
+      "expected_completion_signal": "design-composer returns blueprint-v3.md authored + blueprint-v2.md superseded; cycle 4 architecture-audit verification pass expected to converge cleanly given all changes are mechanical transcription from cc-design.md"
+    }
+  ],
+  "deferred_findings": [
+    {
+      "id": "I-AA-308",
+      "severity": "INFO",
+      "disposition": "deferred_to_gate_4",
+      "rationale": "Platform-directive validity questions require verification against current Claude Code platform docs, which is outside the audit's claude.ai simulation scope. Gate 4 reviewers can verify."
+    },
+    {
+      "id": "I-AA-309",
+      "severity": "INFO",
+      "disposition": "carry_forward",
+      "rationale": "Persistent simulation context; cumulative tracking across all cycles."
+    },
+    {
+      "id": "I-AA-310",
+      "severity": "INFO",
+      "disposition": "out_of_scope",
+      "rationale": "Audit-procedure improvement (adding canonical-agent-frontmatter-pattern check to KB-review-disciplines or equivalent) is a follow-on feature concern, not in this feature's PRD scope."
+    }
+  ],
+  "scope_deviation_surfacing": {
+    "deviations": [
+      {"deviation": "User-triggered reconciliation cycle", "surfaced": true, "absorbed_silently": false},
+      {"deviation": "Claude.ai simulation cumulative", "surfaced": true, "absorbed_silently": false},
+      {"deviation": "Cycle budget tracking: 2 of 4 used", "surfaced": true, "absorbed_silently": false}
+    ]
+  }
+}

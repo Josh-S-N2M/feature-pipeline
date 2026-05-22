@@ -1,0 +1,140 @@
+# Terraform IaC pipeline.
+#
+# - On PRs: validate, plan, comment plan on PR.
+# - On merge to main: apply, gated by environment 'terraform-prod'
+#   (configure required reviewers in repo Settings → Environments).
+#
+# Cloud auth uses OIDC. Set up two IAM roles (or equivalents in Azure/GCP):
+# - terraform-readonly: assumed for plan; read-only IAM permissions
+# - terraform-apply:    assumed for apply; write permissions
+# Both trust the GitHub OIDC provider scoped to this repo.
+#
+# Substitute `terraform` with `tofu` for OpenTofu (and use opentofu/setup-opentofu).
+
+name: Terraform
+
+on:
+  push:
+    branches: [main]
+    paths: ['terraform/**']
+  pull_request:
+    paths: ['terraform/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+defaults:
+  run:
+    working-directory: ./terraform
+    shell: bash
+
+env:
+  TF_VERSION: '1.10.0'
+  AWS_REGION: us-east-1
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: hashicorp/setup-terraform@v3  # TODO: SHA pin
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - run: terraform fmt -check -recursive
+
+      - run: terraform init -backend=false
+
+      - run: terraform validate
+
+  plan:
+    name: Plan
+    if: github.event_name == 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: terraform-readonly
+    concurrency:
+      group: terraform-plan-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: aws-actions/configure-aws-credentials@v4  # TODO: SHA pin
+        with:
+          role-to-assume: arn:aws:iam::ACCOUNT_ID:role/terraform-readonly
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3  # TODO: SHA pin
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - run: terraform init
+
+      - id: plan
+        run: |
+          set +e
+          terraform plan -no-color -out=tfplan 2>&1 | tee plan.txt
+          echo "exitcode=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Comment plan on PR
+        uses: actions/github-script@v8  # TODO: SHA pin
+        with:
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync('terraform/plan.txt', 'utf8');
+            const truncated = plan.length > 60000
+              ? plan.slice(0, 60000) + '\n\n…(truncated; see workflow run for full plan)'
+              : plan;
+            const body = [
+              '### Terraform Plan',
+              '',
+              '<details><summary>Show plan</summary>',
+              '',
+              '```hcl',
+              truncated,
+              '```',
+              '',
+              '</details>',
+            ].join('\n');
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });
+
+      - if: steps.plan.outputs.exitcode != '0'
+        run: exit 1
+
+  apply:
+    name: Apply
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: terraform-prod
+    concurrency:
+      group: terraform-apply
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: aws-actions/configure-aws-credentials@v4  # TODO: SHA pin
+        with:
+          role-to-assume: arn:aws:iam::ACCOUNT_ID:role/terraform-apply
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3  # TODO: SHA pin
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - run: terraform init
+
+      - run: terraform apply -auto-approve

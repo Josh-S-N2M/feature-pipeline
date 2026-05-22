@@ -1,0 +1,516 @@
+{
+  "entities": [
+    {
+      "id": "E-0001",
+      "name": "Design Doc",
+      "type": "standard",
+      "canonical_uri": null,
+      "aliases": ["design document"],
+      "claims": ["C-0031", "C-0032", "C-0036", "C-0041", "C-0051"]
+    },
+    {
+      "id": "E-0002",
+      "name": "Architecture Decision Record",
+      "type": "standard",
+      "canonical_uri": null,
+      "aliases": ["ADR"],
+      "claims": ["C-0035", "C-0048", "C-0049", "C-0050"]
+    },
+    {
+      "id": "E-0003",
+      "name": "Vertical Slice",
+      "type": "pattern",
+      "canonical_uri": null,
+      "aliases": ["vertical slice approach", "feature-driven"],
+      "claims": ["C-0043"]
+    },
+    {
+      "id": "E-0004",
+      "name": "Horizontal Slice",
+      "type": "pattern",
+      "canonical_uri": null,
+      "aliases": ["horizontal slice approach", "foundation-driven"],
+      "claims": ["C-0044"]
+    },
+    {
+      "id": "E-0005",
+      "name": "Standards Identification Gate",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0028", "C-0029", "C-0030"]
+    },
+    {
+      "id": "E-0006",
+      "name": "Quality Assurance Mechanism record",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": ["QA mechanism with adopted/noted status"],
+      "claims": ["C-0031"]
+    },
+    {
+      "id": "E-0007",
+      "name": "Existing Code Investigation",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0032", "C-0033", "C-0034", "C-0035", "C-0036"]
+    },
+    {
+      "id": "E-0008",
+      "name": "Fact Disposition Table",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0037", "C-0038"]
+    },
+    {
+      "id": "E-0009",
+      "name": "Reuse-vs-new assessment",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": ["reuse-vs-new decision rule"],
+      "claims": ["C-0039", "C-0040"]
+    },
+    {
+      "id": "E-0010",
+      "name": "Agreement Checklist",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0041"]
+    },
+    {
+      "id": "E-0011",
+      "name": "Implementation approach selection",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": ["implementation-approach skill"],
+      "claims": ["C-0042"]
+    },
+    {
+      "id": "E-0012",
+      "name": "Verification Strategy",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0045", "C-0046", "C-0047"]
+    },
+    {
+      "id": "E-0013",
+      "name": "Early verification point",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0046", "C-0047"]
+    },
+    {
+      "id": "E-0014",
+      "name": "Output comparison method",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0047", "C-0053"]
+    },
+    {
+      "id": "E-0015",
+      "name": "Acceptance criteria",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": ["AC"],
+      "claims": ["C-0052"]
+    },
+    {
+      "id": "E-0016",
+      "name": "Architecture and data flow diagrams",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0051"]
+    },
+    {
+      "id": "E-0017",
+      "name": "Six-phase synthesis pipeline",
+      "type": "pattern",
+      "canonical_uri": null,
+      "aliases": ["constraint-aware research synthesis pipeline"],
+      "claims": ["C-0001"]
+    },
+    {
+      "id": "E-0018",
+      "name": "Claude Code",
+      "type": "service",
+      "canonical_uri": null,
+      "aliases": ["Claude Code substrate", "the substrate"],
+      "claims": ["C-0001", "C-0003"]
+    },
+    {
+      "id": "E-0019",
+      "name": "LangGraph",
+      "type": "service",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0002"]
+    },
+    {
+      "id": "E-0020",
+      "name": "Temporal",
+      "type": "service",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0002"]
+    },
+    {
+      "id": "E-0021",
+      "name": "AWS Step Functions",
+      "type": "service",
+      "canonical_uri": null,
+      "aliases": ["Step Functions"],
+      "claims": ["C-0002"]
+    },
+    {
+      "id": "E-0022",
+      "name": "/synthesize slash command",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": ["commands/synthesize.md"],
+      "claims": ["C-0004", "C-0005"]
+    },
+    {
+      "id": "E-0023",
+      "name": "tell-microsoft-joke.md",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0005"]
+    },
+    {
+      "id": "E-0024",
+      "name": "Synthesize orchestrator skill",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": ["skills/synthesize/SKILL.md", "the orchestrator"],
+      "claims": ["C-0006", "C-0007", "C-0009", "C-0010", "C-0011", "C-0012"]
+    },
+    {
+      "id": "E-0025",
+      "name": "AskUserQuestion",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0008"]
+    },
+    {
+      "id": "E-0026",
+      "name": "Confirmation Gate",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0008", "C-0009"]
+    },
+    {
+      "id": "E-0027",
+      "name": "00-manifest.json",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": ["the manifest"],
+      "claims": ["C-0010"]
+    },
+    {
+      "id": "E-0028",
+      "name": "Task tool",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0011"]
+    },
+    {
+      "id": "E-0029",
+      "name": "checkpoint.json",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0012"]
+    },
+    {
+      "id": "E-0030",
+      "name": "Bounded retry",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": ["max_iterations cap"],
+      "claims": ["C-0013"]
+    },
+    {
+      "id": "E-0031",
+      "name": "synth-extractor",
+      "type": "role",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0015"]
+    },
+    {
+      "id": "E-0032",
+      "name": "synth-synthesizer",
+      "type": "role",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0016"]
+    },
+    {
+      "id": "E-0033",
+      "name": "Substrate registry",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0017", "C-0018"]
+    },
+    {
+      "id": "E-0034",
+      "name": "90-day staleness threshold",
+      "type": "finding",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0018"]
+    },
+    {
+      "id": "E-0035",
+      "name": "Recursion safety hard rule",
+      "type": "control",
+      "canonical_uri": null,
+      "aliases": ["output/synthesis-*/ exclusion"],
+      "claims": ["C-0007", "C-0019"]
+    },
+    {
+      "id": "E-0036",
+      "name": "Two memory tiers",
+      "type": "pattern",
+      "canonical_uri": null,
+      "aliases": ["main-agent + sub-agent memory"],
+      "claims": ["C-0020"]
+    },
+    {
+      "id": "E-0037",
+      "name": "MEMORY.md",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0020"]
+    },
+    {
+      "id": "E-0038",
+      "name": "Sub-agent memory",
+      "type": "pattern",
+      "canonical_uri": null,
+      "aliases": [".memories/agents/<name>/"],
+      "claims": ["C-0020", "C-0021"]
+    },
+    {
+      "id": "E-0039",
+      "name": "Knowledge skills",
+      "type": "pattern",
+      "canonical_uri": null,
+      "aliases": ["knowledge skill"],
+      "claims": ["C-0022", "C-0023", "C-0024"]
+    },
+    {
+      "id": "E-0040",
+      "name": "assumed_substrate field",
+      "type": "tool",
+      "canonical_uri": null,
+      "aliases": [],
+      "claims": ["C-0025"]
+    },
+    {
+      "id": "E-0041",
+      "name": "Critic verdict enum",
+      "type": "standard",
+      "canonical_uri": null,
+      "aliases": ["verified/unverifiable/contradicted/single_sourced"],
+      "claims": ["C-0026"]
+    },
+    {
+      "id": "E-0042",
+      "name": "blast_radius enum",
+      "type": "standard",
+      "canonical_uri": null,
+      "aliases": ["component/service/tenant/org"],
+      "claims": ["C-0027"]
+    }
+  ],
+  "edges": [
+    {
+      "from": "E-0017",
+      "to": "E-0018",
+      "relation": "instance_of",
+      "claim_ids": ["C-0001"]
+    },
+    {
+      "from": "E-0017",
+      "to": "E-0019",
+      "relation": "conflicts_with",
+      "claim_ids": ["C-0002"]
+    },
+    {
+      "from": "E-0017",
+      "to": "E-0020",
+      "relation": "conflicts_with",
+      "claim_ids": ["C-0002"]
+    },
+    {
+      "from": "E-0017",
+      "to": "E-0021",
+      "relation": "conflicts_with",
+      "claim_ids": ["C-0002"]
+    },
+    {
+      "from": "E-0022",
+      "to": "E-0023",
+      "relation": "instance_of",
+      "claim_ids": ["C-0005"]
+    },
+    {
+      "from": "E-0022",
+      "to": "E-0024",
+      "relation": "requires",
+      "claim_ids": ["C-0004"]
+    },
+    {
+      "from": "E-0024",
+      "to": "E-0026",
+      "relation": "implements",
+      "claim_ids": ["C-0008"]
+    },
+    {
+      "from": "E-0026",
+      "to": "E-0025",
+      "relation": "implements",
+      "claim_ids": ["C-0008"]
+    },
+    {
+      "from": "E-0024",
+      "to": "E-0027",
+      "relation": "requires",
+      "claim_ids": ["C-0010"]
+    },
+    {
+      "from": "E-0024",
+      "to": "E-0028",
+      "relation": "requires",
+      "claim_ids": ["C-0011"]
+    },
+    {
+      "from": "E-0024",
+      "to": "E-0029",
+      "relation": "requires",
+      "claim_ids": ["C-0012"]
+    },
+    {
+      "from": "E-0024",
+      "to": "E-0030",
+      "relation": "implements",
+      "claim_ids": ["C-0013"]
+    },
+    {
+      "from": "E-0024",
+      "to": "E-0035",
+      "relation": "implements",
+      "claim_ids": ["C-0007", "C-0019"]
+    },
+    {
+      "from": "E-0033",
+      "to": "E-0034",
+      "relation": "requires",
+      "claim_ids": ["C-0018"]
+    },
+    {
+      "from": "E-0036",
+      "to": "E-0037",
+      "relation": "implements",
+      "claim_ids": ["C-0020"]
+    },
+    {
+      "from": "E-0036",
+      "to": "E-0038",
+      "relation": "implements",
+      "claim_ids": ["C-0020"]
+    },
+    {
+      "from": "E-0039",
+      "to": "E-0038",
+      "relation": "conflicts_with",
+      "claim_ids": ["C-0023"]
+    },
+    {
+      "from": "E-0001",
+      "to": "E-0005",
+      "relation": "requires",
+      "claim_ids": ["C-0028"]
+    },
+    {
+      "from": "E-0001",
+      "to": "E-0007",
+      "relation": "requires",
+      "claim_ids": ["C-0032"]
+    },
+    {
+      "from": "E-0001",
+      "to": "E-0010",
+      "relation": "requires",
+      "claim_ids": ["C-0041"]
+    },
+    {
+      "from": "E-0001",
+      "to": "E-0012",
+      "relation": "requires",
+      "claim_ids": ["C-0045"]
+    },
+    {
+      "from": "E-0001",
+      "to": "E-0016",
+      "relation": "requires",
+      "claim_ids": ["C-0051"]
+    },
+    {
+      "from": "E-0007",
+      "to": "E-0008",
+      "relation": "requires",
+      "claim_ids": ["C-0037"]
+    },
+    {
+      "from": "E-0007",
+      "to": "E-0009",
+      "relation": "requires",
+      "claim_ids": ["C-0039", "C-0040"]
+    },
+    {
+      "from": "E-0011",
+      "to": "E-0003",
+      "relation": "instance_of",
+      "claim_ids": ["C-0043"]
+    },
+    {
+      "from": "E-0011",
+      "to": "E-0004",
+      "relation": "instance_of",
+      "claim_ids": ["C-0044"]
+    },
+    {
+      "from": "E-0012",
+      "to": "E-0013",
+      "relation": "requires",
+      "claim_ids": ["C-0046"]
+    },
+    {
+      "from": "E-0013",
+      "to": "E-0014",
+      "relation": "requires",
+      "claim_ids": ["C-0047"]
+    },
+    {
+      "from": "E-0002",
+      "to": "E-0007",
+      "relation": "requires",
+      "claim_ids": ["C-0035"]
+    }
+  ]
+}

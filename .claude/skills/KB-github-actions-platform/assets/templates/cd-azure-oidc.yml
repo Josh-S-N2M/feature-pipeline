@@ -1,0 +1,64 @@
+# Deploy to Azure using OIDC (federated credential, no client secret).
+#
+# Prerequisites (one-time, in Azure):
+# 1. Create an Azure AD app registration. Note the Application (client) ID,
+#    Directory (tenant) ID, and the subscription ID where you'll deploy.
+# 2. Add a federated credential to the app:
+#    - Federation issuer: https://token.actions.githubusercontent.com
+#    - Subject identifier: repo:OWNER/REPO:environment:production
+#                          (or :ref:refs/heads/main, etc.)
+#    - Audience: api://AzureADTokenExchange
+# 3. Assign the app's service principal RBAC roles on your Azure resources
+#    (Contributor on a resource group, etc.).
+# 4. Store AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID as
+#    environment-scoped secrets/variables (these are not literally secret;
+#    GitHub treats them as such by convention).
+# 5. Configure repo Settings → Environments → 'production' with required reviewers.
+
+name: Deploy to Azure
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-azure-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://my-app.azurewebsites.net
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build artifacts
+        run: |
+          # Replace with your build
+          npm ci && npm run build
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2  # TODO: SHA pin
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Verify
+        run: az account show
+
+      - name: Deploy to App Service
+        run: |
+          az webapp deploy \
+            --resource-group my-rg \
+            --name my-app \
+            --src-path ./dist \
+            --type static

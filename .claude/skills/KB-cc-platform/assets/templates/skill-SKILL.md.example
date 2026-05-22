@@ -1,0 +1,146 @@
+<!--
+Place this in .claude/skills/<skill-name>/SKILL.md
+
+Two flavors of skill:
+  - Reference skill: provides knowledge Claude loads when relevant.
+    Description determines auto-invocation.
+  - Action skill: workflow the user triggers with /<name>.
+    Use disable-model-invocation: true for actions with side effects.
+
+Below are two examples separated by `===`.
+-->
+
+=== EXAMPLE 1: Action skill — /security-review (.claude/skills/security-review/SKILL.md) ===
+
+---
+description: Reviews code changes for security vulnerabilities, authentication gaps, injection risks, and secrets. Triggered by the user with /security-review <branch-or-path>.
+disable-model-invocation: true
+argument-hint: <branch-or-path>
+allowed-tools: Read, Grep, Glob, Bash
+---
+
+# Security review
+
+## Diff to review
+
+!`git diff $ARGUMENTS`
+
+## Project context
+
+!`cat README.md 2>/dev/null | head -50`
+
+## Task
+
+Audit the changes above for security issues. Read `checklist.md` in this skill directory for the full review checklist; the headlines are:
+
+1. **Injection vulnerabilities** — SQL, NoSQL, XSS, command injection, path traversal
+2. **Authentication and authorization** — missing auth checks, broken access controls, session handling, token validation
+3. **Secrets** — hard-coded credentials, API keys, tokens accidentally committed
+4. **Input validation** — missing validation, unsafe deserialization, type confusion
+5. **Cryptography** — weak algorithms, hard-coded keys, missing encryption for sensitive data
+6. **Dependencies** — known-vulnerable packages, untrusted sources
+
+For each finding, include:
+
+- **Severity**: critical | high | medium | low
+- **Location**: file path and line number
+- **Description**: what the issue is and why it matters
+- **Remediation**: specific fix with code snippet where useful
+
+Group findings by severity (critical first). If there are no findings in a severity, omit that section. End with a summary of the most important fix to apply first.
+
+If you find anything critical, halt the review and surface it before continuing the rest.
+
+
+=== EXAMPLE 2: Reference skill — API style guide (.claude/skills/api-style-guide/SKILL.md) ===
+
+---
+description: API design conventions for this project. Use this skill whenever working on routes under src/api/, designing new endpoints, modifying existing ones, or reviewing API code.
+---
+
+# API style guide
+
+This skill documents the conventions every API route in this project follows. When designing or modifying endpoints, apply these patterns.
+
+## Response envelope
+
+Every endpoint returns one of two shapes:
+
+```ts
+type SuccessResponse<T> = { data: T };
+type ErrorResponse = { error: string; code: string; details?: unknown };
+```
+
+- HTTP 2xx → `SuccessResponse`
+- HTTP 4xx/5xx → `ErrorResponse`
+- Never throw across the route boundary; wrap in `withErrorHandler`
+
+## Endpoint structure
+
+Standard handler shape (Hono):
+
+```ts
+import { Hono } from "hono";
+import { z } from "zod";
+import { withAuth, withErrorHandler, withRateLimit } from "@/api/middleware";
+
+const BodySchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(100),
+});
+
+export const route = new Hono().post(
+  "/users",
+  withRateLimit({ rpm: 60 }),
+  withAuth(),
+  withErrorHandler(async (c) => {
+    const body = BodySchema.parse(await c.req.json());
+    const user = await createUser(body);
+    return c.json({ data: user }, 201);
+  })
+);
+```
+
+## Error codes
+
+Use these codes (defined in `src/api/errors.ts`):
+
+| Code | HTTP | Meaning |
+|---|---|---|
+| `VALIDATION` | 400 | Input failed schema validation |
+| `UNAUTHENTICATED` | 401 | Missing or invalid credentials |
+| `FORBIDDEN` | 403 | Authenticated but not allowed |
+| `NOT_FOUND` | 404 | Resource does not exist |
+| `CONFLICT` | 409 | State conflict (e.g. duplicate email) |
+| `RATE_LIMITED` | 429 | Too many requests |
+| `INTERNAL` | 500 | Unexpected error |
+
+## Naming
+
+- Routes: kebab-case (`/users/:id/api-keys`)
+- Path params: camelCase (`:userId`)
+- Body fields: camelCase
+- Avoid verbs in resource paths; use HTTP method semantically (`POST /users`, not `POST /create-user`)
+
+## Versioning
+
+- All routes are mounted under `/api/v1`
+- Breaking changes go in a new version directory; do not break v1
+- Deprecated endpoints stay live for at least 6 months with `Deprecation` header
+
+## Authentication
+
+- Every route under `/api/` requires `withAuth()` middleware
+- Public routes use `withAuth({ optional: true })` if they want to know the user when present
+- Tokens carry `userId` and `scopes`; check scopes in the handler
+
+## Rate limiting
+
+- Default: 60 req/min per IP
+- Auth endpoints: 10 req/min per IP
+- Internal endpoints: no limit (verify with `withInternalAuth()`)
+
+## See also
+
+- `examples/` directory for full reference handlers
+- `openapi.md` for the OpenAPI spec template

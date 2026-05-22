@@ -1,0 +1,90 @@
+# Substance keywords — controlled list for pedagogical-marker justifications (mechanism α, rule 3).
+# Extension procedure: see pedagogical-marker-justification-spec.md §7.
+# Each entry should be matched case-insensitively against the justification text.
+# Lines starting with # are comments; blank lines ignored.
+
+# --- Content-type references (rule 3a) ---
+credential
+credentials
+secret
+secrets
+api key
+token
+password
+url
+link
+broken
+malformed
+exfiltration
+exfiltrating
+injection
+prompt-injection
+prompt injection
+payload
+anti-pattern
+anti-patterns
+antipattern
+bad config
+malicious
+vulnerable
+unsafe
+dangerous
+exploit
+attack
+poisoning
+xss
+sql injection
+
+# --- Document-role references (rule 3b) ---
+reference catalog
+catalog
+training fixture
+training data
+training corpus
+audit fixture
+test fixture
+test corpus
+regression test
+negative example
+negative-example
+illustration of
+intentional
+intentionally broken
+intentionally bad
+deliberately
+fixture
+corpus
+
+# --- Auditor-check references (rule 3c) ---
+scanner
+auditor
+detects
+de-2
+de-1
+de-3
+m1
+m2
+m3
+m4
+m5
+x-1
+x-2
+x-3
+x-4
+x-5
+x-6
+x-7
+x-8
+x-9
+x9
+sa-1
+sa-2
+sa-3
+finding-id
+finding id
+
+# --- Document-as-source references (less common but valid) ---
+example of
+examples of
+shows what
+demonstrates how

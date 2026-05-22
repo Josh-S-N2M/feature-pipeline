@@ -1,0 +1,84 @@
+# Publish to npm with provenance attestation via OIDC.
+#
+# Triggers on a published GitHub release. Builds, then publishes with
+# --provenance for a Sigstore-backed supply-chain attestation.
+#
+# Prerequisites:
+# - Set NPM_TOKEN as a repo or environment secret (Automation token from npmjs.com).
+#   For full Trusted Publishing (no token), configure on npmjs.com → package
+#   settings → Trusted publishers, then remove NODE_AUTH_TOKEN below.
+# - package.json has correct "name", "version", "main"/"exports", etc.
+
+name: Release to npm
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to release (e.g. v1.2.3)'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  id-token: write    # required for npm provenance
+
+concurrency:
+  group: release-npm
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: npm-publish
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify package version matches tag
+        env:
+          REF_NAME: ${{ inputs.tag || github.ref_name }}
+        run: |
+          tag="${REF_NAME#v}"
+          pkg_version=$(node -p "require('./package.json').version")
+          if [ "$tag" != "$pkg_version" ]; then
+            echo "::error::Tag ($tag) does not match package.json version ($pkg_version)"
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Summary
+        env:
+          PKG_NAME: ${{ github.event.repository.name }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          name=$(node -p "require('./package.json').name")
+          {
+            echo "## Published"
+            echo ""
+            echo "- Package: [\`$name@$version\`](https://www.npmjs.com/package/$name/v/$version)"
+            echo "- Provenance: ✅"
+          } >> "$GITHUB_STEP_SUMMARY"

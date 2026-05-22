@@ -1,0 +1,72 @@
+// TypeScript / Node single-repo devcontainer.
+// Copy to .devcontainer/devcontainer.json and adjust:
+//   - "image" tag to match your Node major (the example uses Node 22)
+//   - "forwardPorts" to your app's actual ports
+//   - "postCreateCommand" / "updateContentCommand" to match your package manager
+//   - VS Code extensions to your team's standards
+{
+  "name": "typescript-app",
+
+  // Pinned to a major version of the dev container script + Node 22 + Debian Bookworm.
+  // Avoid :latest. Bump the Node major deliberately.
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "node",
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+    // Add only as needed:
+    // "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    // "ghcr.io/devcontainers/features/aws-cli:1": {}
+  },
+
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "App",
+      "onAutoForward": "notify",
+      "visibility": "private"
+    }
+  },
+
+  // Content-dependent install -- cached in prebuild AND re-runs when package files change.
+  // Replace with "pnpm install --frozen-lockfile" or "yarn install --immutable" if applicable.
+  "updateContentCommand": "npm ci",
+
+  // Anything that needs secrets, network calls beyond the registry, or DinD goes here.
+  // Empty by default; leave commented if not needed.
+  // "postCreateCommand": "",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "EditorConfig.EditorConfig",
+        "GitHub.vscode-pull-request-github"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+        "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+        "typescript.tsdk": "node_modules/typescript/lib"
+      }
+    },
+    "codespaces": {
+      "openFiles": ["README.md"]
+    }
+  },
+
+  "remoteUser": "node",
+
+  // Filter out machines too small to be useful for typical TS dev.
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  }
+}

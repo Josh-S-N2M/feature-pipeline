@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "cross-artifact-audit-findings-remediation-r1-r1",
+  "round_number": 1,
+  "terminal": false,
+  "audited_artifacts": [
+    "blueprint-v1.md",
+    "plan-v1.md",
+    "acceptance-tests.md",
+    "phase-validators.md"
+  ],
+  "audited_at": "2026-05-21T20:35:00Z",
+  "audited_by": "claude (acting as review-cross-artifact-auditor, continuation session)",
+  "diff_mode": false,
+  "diff_mode_rationale": "First round; no prior Blueprint version. All 4 artifacts read in full.",
+  "checks_performed": [
+    "blueprint_plan",
+    "blueprint_tests",
+    "blueprint_validators",
+    "plan_tests",
+    "plan_validators",
+    "synthesis_flagged_checks_provisioned"
+  ],
+  "synthesis_flagged_checks_summary": {
+    "fr5_not_rewording_only": "PROVISIONED — AT-015 + PV-2.C1/C3 + Blueprint §Verification Strategy all check for the negation-aware regex path; cosmetic-only fix would fail multiple gates",
+    "fr12_single_canonical": "PROVISIONED — AT-028 + AT-029 + PV-4.C1/C2 + Blueprint §Test Boundaries FR-12 row",
+    "marker_justifications_substance_not_count": "PROVISIONED — AT-003 (sample inspection) + AT-007 + PV-4.C7 (sample-check 5 random markers vs. ADR-0030 D-3 substance rules)"
+  },
+  "issues": [
+    {
+      "id": "I-CA-001",
+      "severity": "MAJOR",
+      "category": "plan_internal_discipline_violation",
+      "summary": "plan-v1.md P6.6 references pipeline stages by number ('Stage 15 — Stage 13 in v4.5.0+ numbering'), violating the recipe-feature-pipeline SKILL.md discipline 5 (no pipeline-stage references by number; stage taxonomy is by name only; codified in ADR-0028).",
+      "evidence": [
+        {"artifact": "plan-v1.md", "section": "Phase 6 / P6.6 Deliverable packaging", "line": 339, "quote": "P6.6 — Deliverable packaging (Stage 15 — Stage 13 in v4.5.0+ numbering)"},
+        {"artifact": "recipe-feature-pipeline/SKILL.md", "section": "discipline 5", "quote": "No pipeline-stage references by number. Stage taxonomy is by name only (Intent Clarification, PRD Authoring, etc.); filenames are semantic. Per the v4.3.1 surgery."},
+        {"artifact": "observations.md", "section": "OBS-PLAN-001", "note": "User has explicitly acknowledged this finding (2026-05-21 post-Gate-5 review) with disposition 'address later'. Cross-Artifact Audit MUST surface independently per ADR-0029."}
+      ],
+      "root_cause_summary": "Plan-author attempted to bridge old (pre-v4.4) and current numbering for reader-disambiguation; intent was clarity, vehicle (numbers) was the violation. See observations.md OBS-PLAN-001 for full root-cause analysis.",
+      "recommended_resolution": "Reconciliation supersedes plan-v1.md → plan-v1.1.0.md per ADR-0005 with P6.6 heading rewritten as: 'P6.6 — Deliverable packaging (added as a new stage in v4.5.0+)' — preserving the historical-context value without numbers. Body content unchanged.",
+      "severity_rationale": "MAJOR not BLOCKER: feature execution can proceed without this fix; the discipline violation is in a planning artifact, not in shipped code. MAJOR not MINOR: discipline is explicitly codified in ADR-0028; silent allowance would be a precedent against the discipline."
+    },
+    {
+      "id": "I-CA-002",
+      "severity": "MAJOR",
+      "category": "plan_test_validator_mechanism_mismatch",
+      "summary": "AT-030 (FR-12-c behavior equivalence) and PV-1.C4/C5 require an intermediate-state real-repo audit capture (`/tmp/post-dedup-audit.json`) taken at the post-dedup / pre-mechanism-α-wiring moment. Plan P1.4 does not produce this capture: its sub-steps 1-6 bundle dedup + the mechanism-α justification_valid helper + the wiring of that helper + the input-schema parser changes + the fence-parser changes — all into a single phase whose stated verification is 'pre/post-fix audit on a FIXTURE (NOT the real repo yet)'. The verification AC-FR-12-c reads 'audit output ... for every input the existing audit corpus exercises' which is the real-corpus reading; fixture-only verification does not satisfy it; AT-030 and PV-1 both interpret correctly; Plan P1.4 does not.",
+      "evidence": [
+        {"artifact": "plan-v1.md", "section": "Phase 1 / P1.4", "lines": "143-160", "quote": "Verification: pre/post-fix audit on a fixture (NOT the real repo yet)"},
+        {"artifact": "acceptance-tests.md", "section": "AT-030", "quote": "After FR-12 is applied but BEFORE FR-7 mechanism-α rejection logic is wired (intermediate state), capture `/tmp/post-dedup-audit.json`. (Plan P1.4's verification step is the natural moment.)"},
+        {"artifact": "phase-validators.md", "section": "PV-1.C4", "quote": "`/tmp/post-dedup-audit.json` exists, captured at the post-P1.4-pre-FR-7-wiring moment"},
+        {"artifact": "prd-v1.md", "section": "AC-FR-12-c", "quote": "Verified by running the audit before and after deduplication and confirming finding-line equality"}
+      ],
+      "secondary_complication": "Plan P1.4 step 5 also changes the input-schema parser (from bare-list to structured-dict form). Existing markers in the repo are in bare-list form. After step 5 applies, the audit's reading of those markers changes — independent of mechanism-α wiring (step 4). So 'modulo mechanism-α findings' alone is insufficient for behavior equivalence; the comparison must also bracket the schema-form change. The cleanest moment for the intermediate capture is between current step 3 (helper authored but not wired, parser unchanged) and step 4 (wiring + parser changes follow).",
+      "recommended_resolution": "Reconciliation supersedes plan-v1.md → plan-v1.1.0.md with Plan P1.4 amended: (a) insert new step '3.5: Capture intermediate audit — `python3 .claude/skills/auditing-cc-configs/scripts/audit_project.py . --json > /tmp/post-dedup-audit.json`. This captures the post-dedup / pre-mechanism-α / pre-schema-change state for AT-030 + PV-1.C5.' (b) Update the Verification line to: 'pre/post-fix audit on the real repo at step 3.5 confirms behavior equivalence (AC-FR-12-c, AT-030); fixture-based negative test after step 6 confirms new rejection behavior (AT-021).' Alternative resolution: rewrite AT-030 + PV-1.C4/C5 to compare the FINAL audit filtered for both mechanism-α findings AND schema-form-derived deltas — but this is brittle and changes acceptance-tests.md substantively.",
+      "severity_rationale": "MAJOR not BLOCKER: the AC is satisfiable with either resolution; not unfixable. MAJOR not MINOR: as currently written, AT-030 cannot be executed (the artifact it needs isn't produced), so the AC verification path is broken."
+    },
+    {
+      "id": "I-CA-003",
+      "severity": "MINOR",
+      "category": "plan_internal_temporal_inconsistency",
+      "summary": "Plan P1.3's auditing-shared SKILL.md content listing names two canonical scripts (`pedagogical_marker_check.py` AND `scan_memory_secrets.py`). The first is created in Plan P1.4 (same phase, consistent). The second is created in Plan P4.2 (three phases later). SKILL.md authored at P1.3 will list a file that doesn't yet exist in the file system until P4.2 — a temporal inconsistency between the documented contents and the actual contents.",
+      "evidence": [
+        {"artifact": "plan-v1.md", "section": "Phase 1 / P1.3", "lines": "125-141", "quote": "## Contents\\n- `scripts/pedagogical_marker_check.py` — canonical pedagogical-marker triage with mechanism-α enforcement (per ADR-0030)\\n- `scripts/scan_memory_secrets.py` — canonical memory-secrets scan"},
+        {"artifact": "plan-v1.md", "section": "Phase 4 / P4.2", "lines": "241-243", "quote": "Create canonical at `auditing-shared/scripts/scan_memory_secrets.py` (identical to either prior copy). Replace `auditing-context-files/scripts/scan_memory_secrets.py` + `auditing-subagents/scripts/scan_memory_secrets.py` per P4.1 pattern."}
+      ],
+      "recommended_resolution": "Two options for reconciliation: (a) Move scan_memory_secrets.py creation into Phase 1 (renumber P1.5 or P1.4-extended), so SKILL.md's content listing is accurate when authored. (b) Author SKILL.md at P1.3 with only the `pedagogical_marker_check.py` entry; amend SKILL.md in P4.2 to add `scan_memory_secrets.py` to the Contents list. Option (a) is cleaner (one phase, two related canonicals); option (b) preserves the existing phase ordering. Plan-author / reconciler chooses.",
+      "severity_rationale": "MINOR: the inconsistency is in documentation timing, not in functional outcome. End-state is correct; only the intermediate-state SKILL.md briefly describes a file that doesn't exist yet."
+    }
+  ],
+  "informational_observations": [
+    {
+      "id": "OBS-CA-INFO-001",
+      "summary": "AT-026 (FR-10-a) references plan-v1.md OI-4 by line number ('line 409'). If reconciliation supersedes plan-v1.md (likely given I-CA-001 + I-CA-002), the line number may shift. Not a defect now; just brittle.",
+      "non_action": "Acceptable as authored. Cross-Artifact Audit notes for future-author awareness; no resolution required."
+    },
+    {
+      "id": "OBS-CA-INFO-002",
+      "summary": "plan-v1.md §Acceptance Test Cross-Reference (line 374) reads 'authored by test-acceptance-author in parallel with this Plan per ADR-0021'. Read as a statement of the orchestration pattern (which IS correct per ADR-0021), this is accurate. If read as a temporal claim about THIS specific run (where acceptance-tests.md v1.0.0 was authored in a later session than plan-v1.md v1.0.0), it's misleading. Either reading is defensible; the pattern-statement reading is the intended one.",
+      "non_action": "Acceptable as authored under the pattern-statement reading."
+    }
+  ],
+  "convergence": {
+    "verdict": "first_round",
+    "prior_issue_count": null,
+    "current_issue_count": 3,
+    "persistent_issues": [],
+    "severity_weighted_delta": null,
+    "severity_weighted_current": 7,
+    "weights_used": {"BLOCKER": 10, "MAJOR": 3, "MINOR": 1, "INFO": 0}
+  },
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 2,
+    "MINOR": 1,
+    "INFO": 2
+  },
+  "verdict": "conditional_pass",
+  "verdict_rationale": "0 BLOCKER + 2 MAJOR + 1 MINOR → conditional_pass per severity rules (any MAJOR with no BLOCKER → conditional_pass). Reconciliation cycle required; finalize-reconciler should be dispatched.",
+  "next_step": "finalize-reconciler dispatches to address I-CA-001, I-CA-002, I-CA-003. I-CA-001 + I-CA-002 likely converge into a single plan-v1.1.0.md supersession (per ADR-0005 append-only). I-CA-003 may co-locate in same supersession or be deferred per reconciler's call. After reconciliation, re-run Cross-Artifact Audit round 2 in diff mode."
+}

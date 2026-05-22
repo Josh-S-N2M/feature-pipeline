@@ -1,0 +1,51 @@
+// Custom-Dockerfile devcontainer.
+// Use when the default image + features can't satisfy the project -- typically:
+//   - System packages not packaged as features
+//   - Custom CA bundle / corporate cert pinning
+//   - Internal CLIs distributed only via tarball / .deb
+//   - Specific compiler toolchain versions
+//
+// Place Dockerfile next to this devcontainer.json (in .devcontainer/).
+{
+  "name": "custom-dockerfile",
+
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "..",
+    // Pass through args to Dockerfile if you parameterize. Don't pass secrets here.
+    "args": {
+      "NODE_VERSION": "22"
+    }
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "vscode"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "App", "onAutoForward": "notify" }
+  },
+
+  "updateContentCommand": "npm ci",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+
+  "remoteUser": "vscode",
+
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "frontend-design-knowledge-r1-20260520-220000",
+  "scanned_at": "2026-05-20T23:05:00Z",
+  "feature_slug": "frontend-design-knowledge-r1",
+  "extraction_method": "direct-filesystem-grep",
+  "focusAreas": [
+    {
+      "fact_id": "FA-001",
+      "area_name": "Existing KB-frontend-design content shape",
+      "description": "The KB this run extends or restructures. 3 files: SKILL.md (139 lines), principles.md (141 lines, zero code blocks), patterns-and-anti-patterns.md (220 lines, 2 code blocks).",
+      "files": [".claude/skills/KB-frontend-design/SKILL.md", ".claude/skills/KB-frontend-design/references/principles.md", ".claude/skills/KB-frontend-design/references/patterns-and-anti-patterns.md"],
+      "evidence": "principles.md covers 8 principles: (1) Separate server state from client state; (2) Colocate, then lift; (3) Accessibility is a baseline, not a feature; (4) Performance budgets are concrete numbers; (5) Progressive enhancement; (6) Error boundaries scoped to recovery; (7) Type the contract; (8) Choose the framework's grain. SKILL.md docstring explicitly states 'no platform partner KB (frontend platforms vary widely: React, Vue, Svelte, SwiftUI, Jetpack Compose).'",
+      "relevance_to_feature": "Sets the baseline content the new KBs must extend without duplicating; sets the voice and prose-style precedent; explicitly rejects the paired-platform shape — the per-layer Design stage must justify any deviation.",
+      "current_behavior": "Covers backend-of-the-frontend material (state, perf, errors, typing, framework grain) and accessibility-as-baseline. Does NOT cover anti-slop, UX flow, UI/visual specifics, design-system architecture, atomic/headless/compound/slot component patterns, or Storybook. Code-block density: 0.8 / 100 lines (lowest of any KB in the project)."
+    },
+    {
+      "fact_id": "FA-002",
+      "area_name": "Platform-KB pattern reference (voice/depth bar)",
+      "description": "Three existing platform KBs: KB-cc-platform (9 files, 2624 lines), KB-github-actions-platform (20 files, 6719 lines), KB-codespaces-platform (11 files, 2052 lines). Voice is senior-engineer-handbook per the PRD's AC-FR-6-a target.",
+      "files": [".claude/skills/KB-cc-platform/SKILL.md", ".claude/skills/KB-cc-platform/references/extensions.md", ".claude/skills/KB-cc-platform/references/configuration.md", ".claude/skills/KB-cc-platform/references/architecture.md", ".claude/skills/KB-github-actions-platform/SKILL.md", ".claude/skills/KB-codespaces-platform/SKILL.md"],
+      "evidence": "KB-cc-platform SKILL.md frontmatter: 'name: kb-cc-platform; description: Platform knowledge for Claude Code — Anthropic's agentic CLI ... covers configuration, architecture, and extension mechanisms ... Pairs with KB-cc-design which adds the design discipline (when to choose which primitive). This KB is the PLATFORM half: facts, syntax, configuration, and lookup chains.' Code-block density: 2.2 / 100 lines.",
+      "relevance_to_feature": "Template for KB-storybook-platform structure (SKILL.md + references/ with topical splits); template for voice; documents the design/platform pairing semantics relevant to whether storybook-platform needs a sibling design KB (it does not — design discipline for Storybook is the consumer's responsibility, not Storybook's).",
+      "current_behavior": "Each platform KB has 8-20 reference files organized topically (architecture, extensions, configuration, workflows, integrations). SKILL.md is the index/router; references carry deep content. Code-block density 2.2-4.1 / 100 lines — platform-KB content uses code where syntax is the knowledge."
+    },
+    {
+      "fact_id": "FA-003",
+      "area_name": "Pedagogical-marker-spec format and current application",
+      "description": "Spec lives at .claude/skills/auditing-cc-configs/references/pedagogical-marker-spec.md. The 3 grep hits on 'disable-model-invocation' in KB-cc-design/KB-cc-platform/KB-github-actions-platform are pedagogical body content (explaining when to use the field) — verified clean of the actual frontmatter setting.",
+      "files": [".claude/skills/auditing-cc-configs/references/pedagogical-marker-spec.md", ".claude/skills/KB-cc-design/references/patterns-and-anti-patterns.md", ".claude/skills/KB-cc-platform/references/extensions.md"],
+      "evidence": "grep -nE '^disable-model-invocation:' .claude/skills/*/SKILL.md → no results (frontmatter clean across all 32 skills). Body references in KB-cc-design at line 92 ('skills with disable-model-invocation: true cost zero context until invoked') and patterns-and-anti-patterns.md at line 126 (in a YAML example block) are valid pedagogical content.",
+      "relevance_to_feature": "The audit machinery's Step 4 verification correctly disposes of regex matches on pedagogical content when markers are applied. AC-FR-5-a/AC-FR-5-b require new anti-slop content (which will mention 'don't do this' aesthetics by name) to carry the same markers.",
+      "current_behavior": "The prior-session fix for 6 *-knowledge skills with disable-model-invocation: true blocking preload held. The pattern of allowing pedagogical references to forbidden patterns in body content (with markers) is established."
+    },
+    {
+      "fact_id": "FA-004",
+      "area_name": "Sub-agents that currently preload KB-frontend-design",
+      "description": "Two sub-agent files reference KB-frontend-design in their skills: frontmatter (per AC-FR-4 blast-radius).",
+      "files": [".claude/agents/design-frontend.md", ".claude/agents/design-composer.md"],
+      "evidence": "design-frontend.md frontmatter: 'skills: [KB-frontend-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]'. design-composer.md also includes KB-frontend-design (one of multiple per-layer design KBs it integrates).",
+      "relevance_to_feature": "FR-4-a edits design-frontend.md's skills list; FR-4-b conditionally edits design-composer.md. Blast-radius is bounded to these 2 files. No other agent file or KB SKILL.md prose references KB-frontend-design except KB-api-design/KB-documentation-criteria/KB-frontend-design itself (which are cross-references, not preload dependencies).",
+      "current_behavior": "design-frontend preloads KB-frontend-design to author the Frontend Design subsection of the Blueprint. design-composer preloads it (along with the 8 other per-layer design KBs) to integrate across layers."
+    },
+    {
+      "fact_id": "FA-005",
+      "area_name": "KB structural and frontmatter conventions",
+      "description": "Codified across KB-cc-design's patterns-and-anti-patterns.md (the canonical KB-authoring discipline) and verified by codebase inspection.",
+      "files": [".claude/skills/KB-cc-design/references/patterns-and-anti-patterns.md", ".claude/skills/KB-documentation-criteria/references/shared-conventions.md"],
+      "evidence": "Convention: SKILL.md frontmatter has name (kebab-case matching directory; KB- prefix per ADR-0019), description (multiline YAML, 6-12 lines, explains when the KB is loaded), allowed-tools (typically Read/Grep/Glob; platform KBs may add Edit/Write/WebFetch). references/ holds H2-organized deep content. Each SKILL.md and each reference file leads with '## Contents' checklist. Design KBs document 'When this KB is loaded' subsection.",
+      "relevance_to_feature": "Sets the structural template for KB-storybook-platform and any new design-side KBs. No structural surprises expected for new content authoring.",
+      "current_behavior": "All 17 existing KBs conform to this convention. The 3 platform KBs (cc, github-actions, codespaces) each have the design/platform-pairing language. The convention is mature and well-policed by auditing-skills checks."
+    },
+    {
+      "fact_id": "FA-006",
+      "area_name": "Anthropic's official frontend-design skill (external authoritative reference)",
+      "description": "The skill at /mnt/skills/public/frontend-design/SKILL.md is Anthropic's canonical anti-slop discipline. Single SKILL.md, ~40 lines, with the LICENSE.txt sibling. Discovered during external research for T-001.",
+      "files": ["/mnt/skills/public/frontend-design/SKILL.md"],
+      "evidence": "Skill names explicit anti-slop signatures: 'NEVER use generic AI-generated aesthetics like overused font families (Inter, Roboto, Arial, system fonts), cliched color schemes (particularly purple gradients on white backgrounds), predictable layouts and component patterns, and cookie-cutter design that lacks context-specific character.' Names five aesthetic dimensions: Typography, Color & Theme, Motion, Spatial Composition, Backgrounds & Visual Details.",
+      "relevance_to_feature": "This is the most authoritative possible source for T-001's anti-slop discipline. The new KB content can cite this skill directly. Note: it is at /mnt/skills/public/, not inside the project's .claude/skills/ — it is read-only and version-managed by Anthropic.",
+      "current_behavior": "Available at preload to any Claude session via /mnt/skills/public/frontend-design/. Treated as external authoritative knowledge — does not become part of this project's .claude/skills/ but is cited by the new KB content."
+    }
+  ],
+  "dataTransformationPipelines": [],
+  "dependencies": {
+    "external_services": [],
+    "internal_modules": [
+      {"name": "KB-frontend-design", "files": [".claude/skills/KB-frontend-design/"], "stability": "stable"},
+      {"name": "KB-cc-platform (voice bar reference)", "files": [".claude/skills/KB-cc-platform/"], "stability": "stable"},
+      {"name": "KB-github-actions-platform (pattern reference)", "files": [".claude/skills/KB-github-actions-platform/"], "stability": "stable"},
+      {"name": "KB-codespaces-platform (pattern reference)", "files": [".claude/skills/KB-codespaces-platform/"], "stability": "stable"},
+      {"name": "auditing-cc-configs", "files": [".claude/skills/auditing-cc-configs/"], "stability": "stable"},
+      {"name": "design-frontend agent", "files": [".claude/agents/design-frontend.md"], "stability": "stable"},
+      {"name": "design-composer agent", "files": [".claude/agents/design-composer.md"], "stability": "stable"}
+    ]
+  },
+  "scope_observations": {
+    "layers_in_scope_evidence": {
+      "frontend": "N/A — Frontend layer out of scope per PRD. The feature is about authoring knowledge content, not building UI.",
+      "backend": "N/A — feature does not touch Backend.",
+      "api": "N/A — feature does not touch API.",
+      "query": "N/A — feature does not touch Query / Data Access.",
+      "database": "N/A — feature does not touch Database.",
+      "cicd": "N/A — feature does not touch CI/CD.",
+      "iac": "N/A — feature does not touch IaC.",
+      "codespaces": "N/A — feature does not touch Codespaces.",
+      "claude-code-fs": "Sole layer in scope. Touch points: .claude/skills/KB-frontend-design/, .claude/skills/KB-storybook-platform/ (new), possible new sibling KBs (per-layer Design decides A vs B), .claude/agents/design-frontend.md, .claude/agents/design-composer.md."
+    }
+  },
+  "potential_blast_radius_hints": [
+    {
+      "symbol_or_file": ".claude/agents/design-frontend.md (skills frontmatter)",
+      "callers_count": 0,
+      "callees_count": 1,
+      "risk_class_estimate": "low"
+    },
+    {
+      "symbol_or_file": ".claude/agents/design-composer.md (skills frontmatter)",
+      "callers_count": 0,
+      "callees_count": 1,
+      "risk_class_estimate": "low"
+    },
+    {
+      "symbol_or_file": ".claude/skills/KB-frontend-design/ (content restructure under Option B)",
+      "callers_count": 2,
+      "callees_count": 0,
+      "risk_class_estimate": "medium"
+    },
+    {
+      "symbol_or_file": ".claude/skills/KB-storybook-platform/ (new)",
+      "callers_count": 0,
+      "callees_count": 0,
+      "risk_class_estimate": "low"
+    }
+  ]
+}

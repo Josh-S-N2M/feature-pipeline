@@ -1,0 +1,482 @@
+[
+  {
+    "agent": "intake-intent-clarifier.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "intake-intent-clarifier.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "discovery-external-researcher.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-database.md",
+    "skill": "KB-database-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-database.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-database.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-database.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "synth-substrate.md",
+    "skill": "substrate-translation-knowledge",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "finalize-deliverable-packager.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "finalize-deliverable-packager.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-api.md",
+    "skill": "KB-api-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-api.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-api.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-api.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-query.md",
+    "skill": "KB-query-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-query.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-query.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-query.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "synth-critic.md",
+    "skill": "verification-knowledge",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-claude-code.md",
+    "skill": "KB-cc-platform",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-claude-code.md",
+    "skill": "KB-cc-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-claude-code.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-claude-code.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-claude-code.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "synth-grapher.md",
+    "skill": "entity-graph-knowledge",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "synth-synthesizer.md",
+    "skill": "report-composition-knowledge",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "test-acceptance-author.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "test-acceptance-author.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "test-acceptance-author.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "review-architecture-auditor.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "review-architecture-auditor.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "intake-prd-author.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "intake-prd-author.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "intake-prd-author.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "synth-extractor.md",
+    "skill": "claim-extraction-knowledge",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-frontend.md",
+    "skill": "KB-frontend-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-frontend.md",
+    "skill": "KB-ux-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-frontend.md",
+    "skill": "KB-visual-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-frontend.md",
+    "skill": "KB-design-system-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-frontend.md",
+    "skill": "KB-component-architecture-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-frontend.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-frontend.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-frontend.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-cicd.md",
+    "skill": "KB-github-actions-platform",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-cicd.md",
+    "skill": "KB-github-actions-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-cicd.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-cicd.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-cicd.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "discovery-plan-author.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "discovery-plan-author.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-iac.md",
+    "skill": "KB-iac-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-iac.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-iac.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-iac.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "discovery-codebase-researcher.md",
+    "skill": "KB-codebase-research",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "synth-framer.md",
+    "skill": "decision-framing-knowledge",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "test-phase-validator-author.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "test-phase-validator-author.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "test-phase-validator-author.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "plan-author.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "plan-author.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "plan-author.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-codespaces.md",
+    "skill": "KB-codespaces-platform",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-codespaces.md",
+    "skill": "KB-codespaces-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-codespaces.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-codespaces.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-codespaces.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "review-cross-artifact-auditor.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "review-cross-artifact-auditor.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "finalize-reconciler.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "finalize-reconciler.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "finalize-task-decomposer.md",
+    "skill": "KB-task-decomposition",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "finalize-task-decomposer.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-frontend-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-ux-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-visual-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-design-system-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-component-architecture-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-backend-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-api-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-query-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-database-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-iac-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-cc-platform",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-cc-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-github-actions-platform",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-github-actions-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-codespaces-platform",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-composer.md",
+    "skill": "KB-codespaces-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-backend.md",
+    "skill": "KB-backend-design",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-backend.md",
+    "skill": "KB-documentation-criteria",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-backend.md",
+    "skill": "KB-general-coding-principles",
+    "verdict": "PASS"
+  },
+  {
+    "agent": "design-backend.md",
+    "skill": "KB-review-disciplines",
+    "verdict": "PASS"
+  }
+]

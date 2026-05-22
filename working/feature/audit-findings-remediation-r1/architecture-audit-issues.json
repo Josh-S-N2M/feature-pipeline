@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "audit-findings-remediation-r1",
+  "stage": "Architecture Audit",
+  "generated": "2026-05-21T19:05:00Z",
+  "generated_by": "claude (acting as review-architecture-auditor)",
+  "target": "working/feature/audit-findings-remediation-r1/blueprint-v1.md",
+  "blueprint_version": "1.0.0",
+  "audit_method": "Substantive cross-check against synthesis claims, codebase facts (codebase-analysis.json), inherited ADRs, and ADR-0029 unsurfaced-deviation check",
+
+  "checks_performed": [
+    {
+      "check_id": "AA-1",
+      "name": "Blueprint honors all PRD ACs",
+      "method": "Enumerate AC-FR-N-x from PRD v1.2.0; confirm Blueprint Test Boundaries section maps each to a verification surface",
+      "result": "PASS",
+      "evidence": "Test Boundaries table covers FR-1 through FR-12 with named test locations. AC-FR-10-a (Plan decides), AC-FR-11-a (optional memo) correctly deferred to Plan."
+    },
+    {
+      "check_id": "AA-2",
+      "name": "Blueprint honors synthesis decisions D-1 through D-8",
+      "method": "Each D-N from synthesis.md must surface in Blueprint Design section OR be explicitly deferred",
+      "result": "PASS",
+      "evidence": "D-1 (mechanism α syntax) → Blueprint §Design + ADR-0030; D-2 (enforcement location) → Blueprint Q-CC-2 resolution; D-3 (validity rules) → ADR-0030; D-4 (SA-2 regex) → Blueprint + Plan-deferred; D-5 (negation-aware regex) → Blueprint Security; D-6 (X9 wire-recursive) → Blueprint §Design; D-7 (auditing-shared) → ADR-0031; D-8 (categorization protocol) → Blueprint + cc-design"
+    },
+    {
+      "check_id": "AA-3",
+      "name": "Blueprint honors codebase facts from Discovery",
+      "method": "Check Blueprint references match codebase-analysis.json findings (F-001 through F-009)",
+      "result": "PASS",
+      "evidence": "Blueprint Background correctly cites SD-001 (3 copies) + SD-002 (auditor false positives) + their resolutions. F-004 (recursive-audit capability exists) honored in D-6 implementation note."
+    },
+    {
+      "check_id": "AA-4",
+      "name": "Blueprint honors inherited ADRs",
+      "method": "Cross-check against ADR-0021 (Discovery), ADR-0023 (Plan owns sequencing), ADR-0029 (no-silent-scope-changes), ADR-0030/0031 (this feature)",
+      "result": "PASS",
+      "evidence": "Implementation Plan explicitly deferred to Stage 9 per ADR-0023. ADR-0029 surfacings (SD-001, SD-002) properly recorded. ADR-0030 + ADR-0031 logical dependencies correctly captured (FR-12 prerequisite for FR-7-b uniform enforcement)."
+    },
+    {
+      "check_id": "AA-5",
+      "name": "No decision contradictions",
+      "method": "Scan Blueprint Design + Q-CC-N resolutions + Alternatives sections for internal contradictions",
+      "result": "PASS",
+      "evidence": "All Q-CC-N resolutions consistent with chosen options + rejected alternatives. ADR-0030 'no grandfathering' consistent with FR-8 wording. ADR-0031 'subprocess pattern unchanged' consistent with cc-design D-7 implementation note."
+    },
+    {
+      "check_id": "AA-6",
+      "name": "Open-item handling per ADR-0021",
+      "method": "PRD Undetermined Items (U-1 through U-4) — confirm resolution or carry-forward in Blueprint",
+      "result": "PASS",
+      "evidence": "U-1 (FR-6 single vs multiple checks) → resolved D-6 (single replacement); U-2 (SA-2 rewrite vs regex) → resolved D-4 (both — primary regex + secondary audit); U-3 (release version) → deferred to Plan (handoff); U-4 (verification record location) → resolved (U4-a, feature dir)"
+    },
+    {
+      "check_id": "AA-7",
+      "name": "Brief-honor — re-surfaced verified issues",
+      "method": "Check whether any synthesis-surfaced issues for Cross-Artifact Audit (synthesis §Surfaced for cross-artifact audit) have been silently absorbed in Blueprint",
+      "result": "PASS",
+      "evidence": "All 3 cross-artifact items (D-5 reword-only failure mode, FR-12 single canonical, sample-check justifications) explicitly carried forward in Blueprint Verification Strategy"
+    },
+    {
+      "check_id": "AA-8 (NEW per ADR-0029)",
+      "name": "Unsurfaced scope deviations in upstream artifacts",
+      "method": "Scan codebase-analysis.json, synthesis.md, cc-design.md for findings that materially expand/contract/reinterpret PRD scope but don't appear in their stage's surfacing section",
+      "result": "PASS with 1 observation",
+      "evidence": "F-002 (existing markers in 9+ files, not just anti-slop.md as PRD framed) was correctly classified as 'not scope deviation' because FR-8 wording always covered 'all markers'. Confirmed no other unsurfaced deviations.",
+      "observation": "Synthesis introduced a meta-note about scale-appropriate synthesis (light fan-in vs full synth-* chain) and self-classified as 'no scope deviation'. This is correct — the recipe doesn't prescribe depth — but the meta-note signals a potential future ADR (recipe scale-appropriateness). Not a deviation; just worth recording for future."
+    },
+    {
+      "check_id": "AA-9",
+      "name": "Risk coverage completeness",
+      "method": "Compare Risks table against synthesis-flagged risks + per-layer-design-flagged risks",
+      "result": "PASS",
+      "evidence": "All synthesis surfacings present; all cc-design risks present; the 'Cross-Artifact Audit doesn't catch rewording-only failure' risk is meta-correct (Architecture Audit can flag if it sees that pattern; Cross-Artifact Audit is the real catch point)"
+    },
+    {
+      "check_id": "AA-10",
+      "name": "Implementation surface completeness",
+      "method": "Cross-check cc-design Implementation Surface table against PRD FRs — every FR has at least one file action; every named file action contributes to at least one FR",
+      "result": "PASS",
+      "evidence": "FR-1 → DG-7 file actions; FR-2 → DG-7; FR-3 → DG-5; FR-4 → DG-3 F-3-1; FR-5 → DG-3 F-3-2 + DG-4; FR-6 → DG-3 F-3-3 + DG-8; FR-7 → DG-1 F-1-1 + DG-2 F-2-3 + DG-4 F-4-3; FR-8 → DG-6; FR-9 → DG-1 F-1-2; FR-12 → DG-2. All FRs covered."
+    },
+    {
+      "check_id": "AA-11",
+      "name": "Security analysis sufficient for the scope",
+      "method": "Blueprint Security Considerations covers (a) mechanism α as security boundary, (b) anti-laundering preservation, (c) bypass-approval regex non-permissive, (d) X9 recursion bounded",
+      "result": "PASS",
+      "evidence": "All four addressed substantively. Bounded-recursion analysis correctly notes skills don't have skills: lists; subagents do. Anti-laundering preservation correctly notes existing rules still fire."
+    },
+    {
+      "check_id": "AA-12",
+      "name": "Test boundaries adequate for FR coverage",
+      "method": "Each FR has at least one test surface; negative tests present where AC requires (FR-4-b, FR-5-d, FR-7-c)",
+      "result": "PASS",
+      "evidence": "Negative-test fixtures named for FR-7, FR-4, FR-5, FR-6. Per-audit-module negative test (FR-7-c) explicit. AC-FR-7-d (sample-check, not just count) flagged in Verification Strategy."
+    }
+  ],
+
+  "issues": [],
+
+  "soft_observations": [
+    {
+      "id": "OBS-1",
+      "severity": "INFO",
+      "topic": "Scale-appropriate synthesis pattern",
+      "what": "Synthesis stage produced a lightweight fan-in (not the full 6-agent synth-* chain) appropriate to the feature's research surface (1 external + 1 codebase analysis). Self-noted in synthesis.md as 'no scope deviation' because the recipe doesn't prescribe depth.",
+      "implication": "If a future feature run hits the same scale-mismatch (recipe specifies synth-* chain; reality has small research surface), an ADR codifying 'scale-appropriate synthesis' would be worth authoring. Out of scope for this feature.",
+      "action": "None this feature. Future-ADR candidate."
+    },
+    {
+      "id": "OBS-2",
+      "severity": "INFO",
+      "topic": "auditing-shared SKILL.md will be loaded by audit dispatch context",
+      "what": "ADR-0031 notes that SKILL.md will be loaded if Claude scans the skill registry; correctly notes the SKILL.md must be small + clearly marked as utility module.",
+      "implication": "Per-layer Design's SKILL.md authoring task should keep the file tightly scoped (≤30 lines) and use unambiguous 'not directly invocable' language to prevent confusion in agent contexts.",
+      "action": "Plan stage / per-layer Design author the SKILL.md with this constraint in mind."
+    },
+    {
+      "id": "OBS-3",
+      "severity": "INFO",
+      "topic": "D-3 substance-keyword list extensibility process is in spec, not ADR",
+      "what": "Q-CC-6 resolution puts the extension procedure in the mechanism-α spec rather than requiring an ADR per extension. This is correct (extensions are minor) but the spec must clearly establish the extension protocol (who reviews, what evidence is needed).",
+      "implication": "FR-7-a spec authoring must include an explicit 'Extending the keyword list' subsection. Per-layer Design should pre-stage this; Plan stage tasks it.",
+      "action": "FR-7-a spec authoring task includes Extension Procedure subsection."
+    }
+  ],
+
+  "summary": {
+    "checks_performed": 12,
+    "checks_passed": 12,
+    "checks_failed": 0,
+    "issues_blocker": 0,
+    "issues_major": 0,
+    "issues_minor": 0,
+    "soft_observations": 3,
+    "scope_deviations_surfaced_this_stage": 0,
+    "unsurfaced_deviations_in_upstream_artifacts": 0,
+    "verdict": "PASS",
+    "advance_to_next_stage": "Yes — Stage 9 Plan Authoring"
+  },
+
+  "notes": [
+    "All 12 checks passed; 3 informational observations recorded for downstream stages.",
+    "Per ADR-0029 (new check AA-8): no unsurfaced scope deviations found in upstream artifacts. SD-001 + SD-002 are the only deviations from PRD original scope; both were surfaced and resolved via PRD amendments.",
+    "The Blueprint is substantively sound. ADR-0030 (mechanism α) and ADR-0031 (auditing-shared) are well-grounded in T-001 evidence and codebase-analysis findings.",
+    "Plan stage inherits: 28-item dependency graph; D-4 / D-5 / D-7 implementation-detail decisions; U-3 release-version question; 3 informational observations (OBS-1/2/3)."
+  ]
+}

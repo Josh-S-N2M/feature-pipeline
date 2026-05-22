@@ -1,0 +1,129 @@
+{
+  // ─────────────────────────────────────────────────────────────────────
+  // devcontainer.json for the feature-pipeline repo
+  // Authored 2026-05-22 as an adjacent deliverable to execution-pipeline-design-r1.
+  // NOT part of that feature's PRD scope; provided separately for Josh's
+  // GitHub Codespaces setup when shifting from claude.ai to Claude Code.
+  //
+  // This is a STARTER. Customize freely. Choices flagged "decision:" below
+  // are the points most likely to warrant your preference.
+  // ─────────────────────────────────────────────────────────────────────
+
+  "name": "feature-pipeline (claude-code-native)",
+
+  // decision: base image
+  // Using the Microsoft-published universal Python image at 3.11.
+  // The pipeline's auditing-shared scripts use `#!/usr/bin/env python3` —
+  // no pinned version detected in the repo, so 3.11 is a reasonable default
+  // (current LTS-equivalent; well-supported by tooling).
+  // Alternative: mcr.microsoft.com/devcontainers/universal:2 if you want
+  // a multi-language image with Python + Node + Ruby + Go pre-installed.
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bookworm",
+
+  // decision: features
+  // - node:lts — Claude Code installs via npm; needs Node runtime.
+  // - github-cli — gh is used heavily for repo operations + PR workflows.
+  // - common-utils — includes git, curl, wget, sudo, bash completion.
+  //   `installZsh: true` only if you prefer zsh; default false to keep bash.
+  // - ripgrep is NOT in common-utils; installed via postCreate below.
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": false,
+      "configureZshAsDefaultShell": false,
+      "installOhMyZsh": false,
+      "upgradePackages": true,
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    }
+  },
+
+  // decision: VS Code extensions
+  // Conservative set. Add/remove freely.
+  // - ms-python.python + ms-python.vscode-pylance — Python language support
+  // - redhat.vscode-yaml — agent frontmatter + audit JSON authoring
+  // - yzhang.markdown-all-in-one — Blueprint authoring; TOC generation
+  // - DavidAnson.vscode-markdownlint — keeps markdown clean
+  // - eamodio.gitlens — git history visualization
+  // - github.vscode-pull-request-github — PR review in editor
+  // - tamasfe.even-better-toml — if you add TOML configs later
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "redhat.vscode-yaml",
+        "yzhang.markdown-all-in-one",
+        "DavidAnson.vscode-markdownlint",
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        // Set defaults Josh has used in prior work; adjust per preference.
+        "python.defaultInterpreterPath": "/usr/local/bin/python3",
+        "editor.formatOnSave": false,
+        "editor.rulers": [100],
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "markdown.extension.toc.levels": "2..4",
+        "yaml.schemas": {
+          // Hook agent/skill frontmatter validation if you publish schemas.
+        }
+      }
+    }
+  },
+
+  // decision: post-create commands
+  // - Install Claude Code globally via npm (the canonical install path).
+  // - Install ripgrep + jq + bat via apt (agents use rg via Bash; jq for
+  //   audit JSON inspection; bat is a nicer cat for terminal viewing).
+  // - Verify Python 3.11 + Node availability.
+  // If your repo grows a requirements.txt, add `pip install -r requirements.txt`.
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y ripgrep jq bat && sudo ln -sf /usr/bin/batcat /usr/local/bin/bat && npm install -g @anthropic-ai/claude-code && claude-code --version && python3 --version && node --version && gh --version",
+
+  // decision: post-attach behavior
+  // No-op default. Add `claude-code` here if you want it to launch on
+  // every attach — though typically you'd invoke it manually per session.
+  // "postAttachCommand": "",
+
+  // decision: forwarded ports
+  // No services exposed by default. The pipeline is filesystem-driven;
+  // no HTTP servers. Add ports here if you start running Shopify Hydrogen
+  // (typically 3000) or other dev servers in the same Codespace.
+  "forwardPorts": [],
+
+  // decision: mounts
+  // Default workspace mount. No additional mounts needed for this repo.
+  // If you want to share Claude Code config across Codespaces sessions,
+  // mount ~/.config/claude-code from a persistent volume — but persistence
+  // across rebuilds is a Codespaces account-level concern.
+
+  // decision: remoteUser
+  // Use the non-root `vscode` user (Microsoft devcontainers convention).
+  // Sudo is available for the apt commands in postCreateCommand.
+  "remoteUser": "vscode",
+
+  // decision: container env vars
+  // Empty by default. Add ANTHROPIC_API_KEY here ONLY if you understand
+  // the security implications of baking it into the devcontainer config
+  // (typically NO — pass via Codespaces secrets instead).
+  "containerEnv": {
+    "EDITOR": "code --wait",
+    "PAGER": "less -R"
+  },
+
+  // decision: workspace folder
+  // Default. Adjust if you have a non-standard repo layout.
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+  // decision: misc
+  "overrideCommand": false,
+  "shutdownAction": "stopContainer"
+}

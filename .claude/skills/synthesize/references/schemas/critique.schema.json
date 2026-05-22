@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "critique.schema.json",
+  "title": "Critique",
+  "description": "Output of synth-critic. CoVe results + dissent + constraint flagging per Design \u00a75.3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "critiques"
+  ],
+  "properties": {
+    "critiques": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "claim_id",
+          "verification_questions",
+          "verification_answers",
+          "verdict",
+          "confidence",
+          "dissent_evidence",
+          "violates_constraint",
+          "notes"
+        ],
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "pattern": "^C-\\d{4}$"
+          },
+          "verification_questions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "verification_answers": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "unverifiable",
+              "contradicted",
+              "single_sourced"
+            ]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "dissent_evidence": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "violates_constraint": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

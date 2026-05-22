@@ -1,0 +1,18 @@
+{
+  "run_id": "missing-timestamp",
+  "topic": "test",
+  "started_at": "not a real ISO date",
+  "inputs": {
+    "discovered": [],
+    "confirmed": []
+  },
+  "constraints": {
+    "target_substrate": "claude_code",
+    "scope": "narrow",
+    "audience_depth": "engineering"
+  },
+  "params": {
+    "include_adrs": true,
+    "max_iterations": 2
+  }
+}

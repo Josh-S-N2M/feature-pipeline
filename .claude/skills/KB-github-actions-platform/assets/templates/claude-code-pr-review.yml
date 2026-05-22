@@ -1,0 +1,74 @@
+# Claude Code in CI: automatic code review on every PR.
+#
+# Runs Claude in automation mode (no @claude trigger needed) on each PR,
+# posting findings as review comments.
+#
+# Prerequisites:
+# 1. Install the @claude GitHub App (or a custom app).
+# 2. Add ANTHROPIC_API_KEY to repo secrets.
+# 3. (Optional) Add a CLAUDE.md to the repo root with review criteria.
+#
+# Fork-PR safety: this workflow uses `pull_request` (NOT `pull_request_target`),
+# so PRs from forks run without secrets. The workflow simply doesn't run for
+# forks, which is the safe default. To enable Claude review on fork PRs, see
+# references/claude-code-cicd.md § Security: fork PR safety for the
+# label-gated pull_request_target pattern.
+
+name: Claude PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read           # Claude reads code; doesn't modify in this workflow
+  pull-requests: write     # post review comments
+  issues: write            # PR comments use the issue-comment API
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    # Skip drafts and dependabot
+    if: |
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0   # need full history to compute the diff against base
+
+      - name: Run Claude review
+        uses: anthropics/claude-code-action@v1  # TODO: SHA pin
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            You are reviewing a pull request. Analyze the diff between the PR
+            branch and the base branch, then post review comments.
+
+            Focus on:
+            - Correctness bugs (off-by-one, null deref, race conditions, etc.)
+            - Security issues (injection, auth bypass, secret leakage, unsafe deserialization)
+            - Test coverage gaps for new behavior
+            - API/contract changes that aren't reflected in docs or types
+            - Violations of rules in CLAUDE.md (if present at repo root)
+
+            Skip:
+            - Style/formatting (covered by linters)
+            - Subjective taste calls
+
+            For each finding, post a single review comment on the relevant line
+            with severity tag: [BLOCKER], [MAJOR], or [MINOR]. If there are no
+            substantive findings, post one summary comment saying so.
+
+            Be concise. No preamble. No restating what the PR does.
+          # Restrict tools to read + comment; no shell, no edits.
+          # Adjust if your review process needs Claude to also run tests etc.
+          claude_args: |
+            --max-turns 5
+            --model claude-sonnet-4-6
+            --allowedTools "Read,Grep,Glob,Bash(git diff:*),Bash(git log:*),mcp__github__create_pull_request_review,mcp__github__create_pull_request_review_comment,mcp__github__create_issue_comment"

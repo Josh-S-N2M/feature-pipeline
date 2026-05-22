@@ -1,0 +1,269 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "execution-pipeline-design-r1",
+  "layer": "claude-code",
+  "generated": "2026-05-22T05:30:00Z",
+  "generated_by": "design-cc (design-claude-code agent; single invocation per pipeline run)",
+
+  "depends_on": {
+    "other_layers": [],
+    "mcp_servers": [],
+    "external_services": [],
+    "comment": "Single-layer feature (Claude Code only). No CI/CD, MCP, or external service dependencies. Execution pipeline runs entirely in local Claude Code session."
+  },
+
+  "provides_to": {
+    "cicd": [],
+    "other_layers": [],
+    "comment": "Pipeline is internal tooling for this project. No cross-layer provision; no plugin packaging (per Principle 7). All artifacts ship as direct .claude/ commits."
+  },
+
+  "internal_dependencies": {
+    "new_subagents": [
+      {
+        "name": "execute-orchestrator",
+        "filename": "execute-orchestrator.md",
+        "path": ".claude/agents/",
+        "model": "opus",
+        "effort": "high",
+        "depends_on_components": [
+          "tasks.json (existing planning-side output)",
+          "execute-task-code-producer",
+          "execute-task-quality-handler",
+          "execute-phase-quality-reviewer",
+          "execute-finalize-reconciler",
+          "auditing-shared skill family",
+          "recipe-feature-pipeline skill"
+        ]
+      },
+      {
+        "name": "execute-phase-quality-reviewer",
+        "filename": "execute-phase-quality-reviewer.md",
+        "path": ".claude/agents/",
+        "model": "opus",
+        "effort": "high",
+        "depends_on_components": [
+          "auditing-shared skill",
+          "run_phase_checks.py",
+          "KB-review-disciplines"
+        ]
+      },
+      {
+        "name": "execute-finalize-reconciler",
+        "filename": "execute-finalize-reconciler.md",
+        "path": ".claude/agents/",
+        "model": "opus",
+        "effort": "high",
+        "depends_on_components": [
+          "auditing-shared skill",
+          "KB-review-disciplines",
+          "KB-cc-design"
+        ]
+      },
+      {
+        "name": "execute-task-code-producer",
+        "filename": "execute-task-code-producer.md",
+        "path": ".claude/agents/",
+        "model": "sonnet",
+        "effort": "medium",
+        "depends_on_components": [
+          "ai-development-guide skill (must be installed first)",
+          "KB-cc-design"
+        ]
+      },
+      {
+        "name": "execute-task-quality-handler",
+        "filename": "execute-task-quality-handler.md",
+        "path": ".claude/agents/",
+        "model": "sonnet",
+        "effort": "medium",
+        "depends_on_components": [
+          "ai-development-guide skill (must be installed first)",
+          "auditing-shared skill",
+          "detect_stubs.py"
+        ]
+      }
+    ],
+
+    "modified_subagents": [
+      {
+        "name": "shared-document-reviewer",
+        "modification": "Extend doc_type taxonomy to include execution-phase artifacts (Synthesis, CodebaseAnalysis, PhaseQualityReport, PerTaskExecutionLog, QualityReconciliationLog, StateTransitionsLog).",
+        "depends_on": ["ADR-A authoring (per Open items)"]
+      }
+    ],
+
+    "new_skills": [
+      {
+        "name": "ai-development-guide",
+        "path": ".claude/skills/ai-development-guide/",
+        "source": "/mnt/user-data/uploads/SKILL__2_.md",
+        "install_action": "copy + verify frontmatter name field",
+        "consumed_by": ["execute-task-code-producer", "execute-task-quality-handler"]
+      },
+      {
+        "name": "auditing-github-actions",
+        "path": ".claude/skills/auditing-github-actions/",
+        "source": ".claude/skills/KB-github-actions-platform/scripts/audit_workflow.py (currently misplaced) + .claude/skills/KB-github-actions-platform/scripts/action_versions.md",
+        "install_action": "git mv (preserve history) + author SKILL.md",
+        "consumed_by": ["run_phase_checks.py"]
+      },
+      {
+        "name": "auditing-codespaces",
+        "path": ".claude/skills/auditing-codespaces/",
+        "source": "(none — stub creation)",
+        "install_action": "author SKILL.md + stub scripts/audit_codespaces.py",
+        "consumed_by": ["run_phase_checks.py"]
+      }
+    ],
+
+    "new_scripts": [
+      {
+        "path": ".claude/skills/auditing-shared/scripts/detect_stubs.py",
+        "purpose": "Pattern-based incomplete-implementation detection across languages",
+        "callers": ["execute-task-quality-handler"],
+        "depends_on": []
+      },
+      {
+        "path": ".claude/skills/auditing-shared/scripts/run_phase_checks.py",
+        "purpose": "Thin coordinator fanning out to audit/test/validator entry points; aggregates findings",
+        "callers": ["execute-orchestrator"],
+        "depends_on": ["auditing-cc-configs", "auditing-github-actions", "auditing-codespaces", "validate_pipeline_frontmatter.py", "check_pipeline_discipline.py"]
+      },
+      {
+        "path": ".claude/skills/auditing-shared/scripts/log_state_transition.py",
+        "purpose": "Append JSONL transition record to feature's state-transitions.log",
+        "callers": ["execute-orchestrator"],
+        "depends_on": []
+      },
+      {
+        "path": ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py",
+        "purpose": "Frontmatter validator per FR-6; scans against per-doc-type spec in shared-conventions.md",
+        "callers": ["run_phase_checks.py"],
+        "depends_on": ["shared-conventions.md updates per ADR-A"]
+      },
+      {
+        "path": ".claude/skills/auditing-shared/scripts/check_pipeline_discipline.py",
+        "purpose": "Discipline-5 enforcement (v1 worked example for D-15 broader scope)",
+        "callers": ["run_phase_checks.py"],
+        "depends_on": []
+      },
+      {
+        "path": ".claude/skills/auditing-github-actions/scripts/audit_workflow.py",
+        "purpose": "GHA workflow audit (extracted from KB-github-actions-platform; canonical location per FR-8)",
+        "callers": ["run_phase_checks.py"],
+        "depends_on": ["auditing-github-actions skill creation"]
+      },
+      {
+        "path": ".claude/skills/auditing-codespaces/scripts/audit_codespaces.py",
+        "purpose": "Codespaces audit stub per AC-FR-8-b; v1 returns empty findings",
+        "callers": ["run_phase_checks.py"],
+        "depends_on": ["auditing-codespaces skill creation"]
+      }
+    ],
+
+    "modified_files": [
+      {
+        "path": ".claude/skills/KB-documentation-criteria/references/shared-conventions.md",
+        "modification": "Add 4 archive-practice fields (intent_user_token, gate_passed, reviewer_verdict, approved_at); extend doc_type taxonomy; per-doc-type state vocabulary",
+        "blocked_by": ["ADR-A authoring (Blueprint-stage; per Open items)"]
+      }
+    ],
+
+    "new_adrs_required": [
+      {
+        "id": "ADR-A",
+        "title": "Convention canonicalization + per-doc-type state vocabulary",
+        "pairs": ["D-4", "D-18"],
+        "ownership": "Blueprint-stage (designers don't author ADRs per FR-5)"
+      },
+      {
+        "id": "ADR-B",
+        "title": "ADR-0029 execution-phase extension",
+        "pairs": ["D-7"],
+        "ownership": "Blueprint-stage"
+      },
+      {
+        "id": "ADR-C",
+        "title": "PRD v1.1.0 mis-credit cleanup (ADR-0017 vs ADR-0021 4-cycle-cap canonical home)",
+        "pairs": [],
+        "ownership": "Blueprint-stage or housekeeping at Plan time",
+        "note": "Could fold into ADR-A as housekeeping"
+      }
+    ],
+
+    "permission_policy_changes": {
+      "settings_json_allow_extensions": [
+        "Bash(python3 .claude/skills/auditing-shared/scripts/run_phase_checks.py:*)",
+        "Bash(python3 .claude/skills/auditing-shared/scripts/detect_stubs.py:*)",
+        "Bash(python3 .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py:*)",
+        "Bash(python3 .claude/skills/auditing-shared/scripts/check_pipeline_discipline.py:*)",
+        "Bash(python3 .claude/skills/auditing-shared/scripts/log_state_transition.py:*)",
+        "Bash(python3 .claude/skills/auditing-cc-configs/scripts/*:*)",
+        "Bash(python3 .claude/skills/auditing-github-actions/scripts/*:*)",
+        "Bash(python3 .claude/skills/auditing-codespaces/scripts/*:*)"
+      ],
+      "test_runner_allows": "project-specific; authored at Plan-stage per language stack"
+    }
+  },
+
+  "blueprint_decisions_resolved": {
+    "total": 21,
+    "decisions": [
+      {"id": "D-1", "pass": 3, "status": "RESOLVED"},
+      {"id": "D-2a", "pass": 2, "status": "RESOLVED"},
+      {"id": "D-2b", "pass": 2, "status": "RESOLVED"},
+      {"id": "D-2c", "pass": 2, "status": "RESOLVED"},
+      {"id": "D-2d", "pass": 2, "status": "RESOLVED"},
+      {"id": "D-3", "pass": 3, "status": "RESOLVED with refinement"},
+      {"id": "D-4", "pass": 5, "status": "RESOLVED"},
+      {"id": "D-5", "pass": 5, "status": "RESOLVED"},
+      {"id": "D-6", "pass": 1, "status": "RESOLVED"},
+      {"id": "D-7", "pass": 5, "status": "RESOLVED"},
+      {"id": "D-8", "pass": 1, "status": "RESOLVED"},
+      {"id": "D-9", "pass": 1, "status": "RESOLVED with refinement"},
+      {"id": "D-10", "pass": "1-4", "status": "RESOLVED (incremental)"},
+      {"id": "D-11", "pass": 2, "status": "RESOLVED"},
+      {"id": "D-12", "pass": 4, "status": "RESOLVED"},
+      {"id": "D-13", "pass": 3, "status": "RESOLVED with reframing"},
+      {"id": "D-14", "pass": 4, "status": "RESOLVED"},
+      {"id": "D-15", "pass": 5, "status": "RESOLVED (v1 scope; broader inventory in Open items)"},
+      {"id": "D-16", "pass": 4, "status": "RESOLVED with disambiguation"},
+      {"id": "D-17", "pass": 3, "status": "RESOLVED"},
+      {"id": "D-18", "pass": 5, "status": "RESOLVED"}
+    ]
+  },
+
+  "architectural_questions_for_composer": [
+    "Q-CC-1: Quality-handler model/effort allocation (sonnet/medium default; opus alternative?)",
+    "Q-CC-2: detect_stubs.py path-awareness (scan test files or skip?)",
+    "Q-CC-3: Severity-weighted audit-counter aggregation (v1 deferred; ship in v1?)",
+    "Q-CC-4: auditing-codespaces stub semantics (declare stub:true or transparent?)",
+    "Q-CC-5: Platform-hooks vs application-hooks (FR-5 terminology disambiguation strategy)"
+  ],
+
+  "fr_coverage": {
+    "comment": "All 13 PRD FRs covered. See Acceptance criteria contribution section in cc-design.md for the FR → design-element mapping table.",
+    "frs_covered": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+  },
+
+  "synthesis_substrate_refinements": [
+    {"id": "ref-1", "decision": "D-9", "pass": 1, "type": "role-split", "summary": "Two roles (phase-quality aggregator + extended shared-document-reviewer), not modes of one role"},
+    {"id": "ref-2", "decision": "D-3", "pass": 3, "type": "third-option", "summary": "Thin coordinator at auditing-shared (third option emerged from substrate; not in synthesis's two-option framing)"},
+    {"id": "ref-3", "decision": "D-13", "pass": 3, "type": "reframing", "summary": "Dimensional verdict structure, not numeric scoring"},
+    {"id": "ref-4", "decision": "D-16", "pass": 4, "type": "disambiguation", "summary": "Application-level hooks, not Claude Code platform hooks"}
+  ],
+
+  "summary": {
+    "new_subagents": 5,
+    "modified_subagents": 1,
+    "new_skills": 3,
+    "new_scripts": 7,
+    "modified_files": 1,
+    "new_adrs_required": 3,
+    "total_cc_artifacts": 16,
+    "blueprint_decisions_resolved": 21,
+    "architectural_questions_surfaced": 5,
+    "synthesis_substrate_refinements": 4
+  }
+}

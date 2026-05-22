@@ -1,0 +1,67 @@
+# Claude Code in CI: scheduled triage of newly opened issues.
+#
+# Runs daily, reviews issues opened in the last 24 hours that lack labels,
+# and applies appropriate labels + asks clarifying questions if needed.
+#
+# Prerequisites:
+# 1. Install the @claude GitHub App.
+# 2. Add ANTHROPIC_API_KEY to repo secrets.
+# 3. Make sure the labels you want Claude to apply already exist in the repo
+#    (Issues → Labels).
+# 4. (Optional) Document your label taxonomy in CLAUDE.md or the workflow prompt.
+
+name: Claude Issue Triage
+
+on:
+  schedule:
+    - cron: '0 9 * * 1-5'   # weekdays at 09:00 UTC
+  workflow_dispatch:        # allow manual run from Actions tab
+    inputs:
+      lookback_hours:
+        description: How many hours back to look for untriaged issues
+        type: number
+        default: 24
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+# Only one triage run at a time.
+concurrency:
+  group: claude-triage
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run Claude triage
+        uses: anthropics/claude-code-action@v1  # TODO: SHA pin
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Triage recently opened, unlabeled issues in this repository.
+
+            Steps:
+            1. List issues opened in the last ${{ inputs.lookback_hours || 24 }} hours that have no labels.
+               Use the GitHub CLI: gh issue list --state open --label "" --limit 50 --json number,title,body,createdAt
+            2. For each issue:
+               a. Read the issue body.
+               b. Determine the type: bug, feature-request, question, documentation, security, or duplicate.
+               c. Apply the appropriate label.
+               d. If the issue lacks reproduction steps (for bugs) or acceptance criteria (for features),
+                  post a comment asking for the missing information. Be polite and specific about what's needed.
+               e. If the issue is clearly a duplicate of an existing issue, label it `duplicate` and link the original.
+            3. At the end, post a single summary comment on a fresh internal issue (or skip if none): how many
+               were triaged, how many needed clarification, how many were duplicates.
+
+            Skip issues from bots (dependabot, renovate, etc.).
+            Use Haiku (faster + cheaper) for label classification; this is high-volume routine work.
+          claude_args: |
+            --max-turns 15
+            --model claude-haiku-4-5
+            --allowedTools "Read,Bash(gh issue:*),Bash(gh label:*),mcp__github__add_labels_to_issue,mcp__github__create_issue_comment"

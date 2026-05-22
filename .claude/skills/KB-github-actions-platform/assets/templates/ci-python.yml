@@ -1,0 +1,101 @@
+# Python CI workflow using uv (fast Python package manager from Astral).
+#
+# Runs ruff (lint + format check), mypy, and pytest across a matrix of Python versions.
+# For pip/poetry-based projects, see references/recipe-python.md.
+#
+# Customize:
+# - Python version matrix (line: matrix.python)
+# - Lint/format/typecheck/test commands
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+
+      # Pin setup-uv to a specific commit SHA — uv version controlled separately
+      # via .python-version or pyproject.toml's [tool.uv] block.
+      - uses: astral-sh/setup-uv@v6  # TODO: replace with full SHA pin
+        with:
+          enable-cache: true
+
+      - run: uv sync --all-extras --dev
+
+      - name: Ruff lint
+        run: uv run ruff check --output-format=github .
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+  typecheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v6  # TODO: SHA pin
+        with:
+          enable-cache: true
+
+      - run: uv sync --all-extras --dev
+
+      - name: Restore mypy cache
+        uses: actions/cache@v4
+        with:
+          path: .mypy_cache
+          key: ${{ runner.os }}-mypy-${{ hashFiles('**/pyproject.toml', 'uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mypy-
+
+      - run: uv run mypy src/
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10', '3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v6  # TODO: SHA pin
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python }}
+
+      - run: uv sync --all-extras --dev
+
+      - name: Run tests
+        run: |
+          uv run pytest \
+            --cov=src \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --junit-xml=junit-${{ matrix.python }}.xml \
+            -n auto
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-py${{ matrix.python }}
+          path: |
+            junit-${{ matrix.python }}.xml
+            coverage.xml
+          retention-days: 7

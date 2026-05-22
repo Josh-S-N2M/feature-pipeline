@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "claim.schema.json",
+  "title": "Claim",
+  "description": "Output of synth-extractor. One claim = one assertion; verbatim or close-paraphrase from source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "text", "source_uri", "source_type", "source_provenance", "assumed_substrate", "date", "entities", "confidence", "notes"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^C-\\d{4}$",
+      "description": "Globally unique within a run. Renumbered by orchestrator merge step if necessary."
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Verbatim or close-paraphrase of the source assertion. One assertion per claim."
+    },
+    "source_uri": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Path to the source file. MUST appear in manifest.inputs.confirmed (recursion-safety invariant 7)."
+    },
+    "source_type": {
+      "type": "string",
+      "enum": ["vendor_whitepaper", "academic", "regulator", "internal_audit", "community_blog", "api_doc", "telemetry_summary"],
+      "description": "Drawn from claim-extraction-knowledge taxonomy"
+    },
+    "source_provenance": {
+      "type": "string",
+      "enum": ["vendor", "independent", "regulator", "academic_peer_reviewed", "academic_preprint", "community", "internal"],
+      "description": "Authorship context. NOT redundant with source_type — a regulator filing about a vendor product is source_type=vendor_whitepaper, source_provenance=vendor (the vendor authored it for regulatory purposes)."
+    },
+    "assumed_substrate": {
+      "type": "string",
+      "enum": ["claude_code", "microsoft_azure", "m365", "langgraph", "kubernetes", "generic", "unknown"],
+      "description": "What substrate the claim implicitly assumes. Substrate phase uses this to flag pattern-vs-substrate mismatches."
+    },
+    "date": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "Source publication date. REQUIRED when extractable; explicitly null otherwise. Per Design §7.4 success criterion 3."
+    },
+    "entities": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Empty at extraction time; populated by Grapher (synth-grapher writes back-pointers, not Extractor)."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "Extractor's self-rated confidence in the claim's faithfulness to source"
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "Free-form annotation; nullable. Per Design §7.4 success criterion 3."
+    }
+  }
+}

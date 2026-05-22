@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "frontend-design-knowledge-r1",
+  "layer": "claude-code",
+  "generated": "2026-05-20T23:45:00Z",
+  "generated_by": "design-cc",
+  "depends_on": {
+    "other_layers": [],
+    "mcp_servers": [],
+    "external_services": []
+  },
+  "provides_to": {
+    "cicd": [],
+    "other_layers": [],
+    "comment": "CC is the sole activated layer for this feature. No cross-layer provision or dependency. The new KBs and modified sub-agents are consumed entirely within the .claude/ pipeline at design-time, not at runtime by other layers."
+  },
+  "internal_dependencies": {
+    "new_skills": [
+      "KB-ux-design",
+      "KB-visual-design",
+      "KB-design-system-design",
+      "KB-component-architecture-design",
+      "KB-storybook-platform"
+    ],
+    "modified_agents": [
+      "design-frontend.md",
+      "design-composer.md"
+    ],
+    "modified_skills_docstring_only": [
+      "KB-frontend-design"
+    ],
+    "external_authoritative_references": [
+      "/mnt/skills/public/frontend-design/SKILL.md (Anthropic-managed; cited from KB-visual-design/references/anti-slop.md)"
+    ]
+  }
+}

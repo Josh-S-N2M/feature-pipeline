@@ -1,0 +1,61 @@
+# Project conventions
+
+<!--
+Place this file at the project root as `CLAUDE.md` (committed) or `.claude/CLAUDE.md`.
+For personal-only overrides on this project, use `CLAUDE.local.md` and gitignore it.
+
+Aim to keep this under 200 lines. Longer files load fully but adherence drops.
+When this grows past 200 lines, split into:
+- .claude/rules/<topic>.md for topical guidance (optionally `paths:`-gated)
+- .claude/skills/<name>/SKILL.md for reference material loaded on-demand
+-->
+
+## Stack
+
+- Language: TypeScript with strict mode
+- Framework: React 19 (functional components only)
+- State: Zustand for client state, TanStack Query for server state
+- Testing: Vitest + Testing Library
+- Build: Vite
+- Package manager: pnpm (do not use npm or yarn — lockfile is pnpm-lock.yaml)
+
+## Commands
+
+- Install: `pnpm install`
+- Dev server: `pnpm dev` (port 3001)
+- Build: `pnpm build`
+- Test: `pnpm test` (single run) or `pnpm test:watch`
+- Lint: `pnpm lint`
+- Typecheck: `pnpm typecheck`
+- Format: `pnpm format`
+
+## Project structure
+
+- `src/api/` — backend route handlers (Hono)
+- `src/components/` — React components, colocated with their tests
+- `src/hooks/` — custom React hooks
+- `src/lib/` — pure utilities, no React imports
+- `src/server/` — server-only code, do not import from client modules
+
+## Conventions
+
+- Named exports only, never default exports
+- Tests live next to source: `foo.ts` → `foo.test.ts`
+- All API routes return `{ data: T } | { error: string }` — never throw across the route boundary
+- Use `import type { ... }` for type-only imports to keep the bundle clean
+- Prefer composition over inheritance
+- No `any` — use `unknown` and narrow
+
+## Workflow
+
+- Run tests before committing
+- Run typecheck and lint before opening a PR
+- Commit messages follow conventional commits (feat/fix/chore/docs/refactor)
+- One logical change per PR; keep PRs reviewable
+
+## Never
+
+- Modify files in `dist/` or `node_modules/` directly
+- Commit `.env` files or anything in `secrets/`
+- Use `console.log` in production code (use the `logger` from `src/lib/log.ts`)
+- Disable tests to make a build pass — fix the test or the code

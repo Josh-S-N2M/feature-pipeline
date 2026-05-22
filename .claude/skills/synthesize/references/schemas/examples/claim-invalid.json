@@ -1,0 +1,12 @@
+{
+  "id": "no-prefix",
+  "text": "",
+  "source_uri": "",
+  "source_type": "blog",
+  "source_provenance": "vendor",
+  "assumed_substrate": "claude_code",
+  "date": "tomorrow",
+  "entities": [],
+  "confidence": "very high",
+  "notes": null
+}

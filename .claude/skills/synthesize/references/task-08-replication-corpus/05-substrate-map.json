@@ -1,0 +1,145 @@
+{
+  "registry_version": "2026-04-30.1",
+  "mappings": [
+    {
+      "decision_id": "D-0001",
+      "options": {
+        "native": {
+          "description": "Build the pipeline using only Claude Code primitives: orchestrator skill, sub-agents via Task tool, file-system-as-state, hooks for QA, AskUserQuestion for the gate.",
+          "loss_summary": ["pattern_fidelity", "cycle_declaration", "replay_determinism"],
+          "viable": true,
+          "cost": {"effort_weeks": 4, "runtime_overhead": "minor", "maintenance_burden": "minor", "irreversibility_cost": "minor"},
+          "viable_explanation": "Direct realization. Per substrate registry, every needed primitive is present. Loss: framework-level supervisor abstractions are simulated rather than declared (cycle counters in orchestrator); deterministic replay is acknowledged out-of-scope per C-0003."
+        },
+        "adapter": {
+          "description": "Use Claude Code as the LLM provider but wrap with an external Python orchestrator that handles cycle declaration, typed state, and deterministic replay outside the substrate.",
+          "loss_summary": ["latency", "cost_model", "pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 12, "runtime_overhead": "significant", "maintenance_burden": "significant", "irreversibility_cost": "significant"},
+          "viable_explanation": "Bypasses Claude Code's native primitives — loses MEMORY.md, .memories/, hooks, AskUserQuestion. Net cost greater than native AND substrate_change. Not viable as a middle ground."
+        },
+        "substrate_change": {
+          "description": "Adopt LangGraph (or Temporal, or AWS Step Functions) for orchestration, keeping Claude as the LLM. Recovers cycle declaration, typed state, and deterministic replay.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 16, "runtime_overhead": "minor", "maintenance_burden": "minor", "irreversibility_cost": "significant"},
+          "viable_explanation": "Recovers all explicitly out-of-scope properties. High switching cost. Worth it ONLY if multiple decisions push this direction; in this corpus, only D-0001 itself does."
+        }
+      },
+      "recommended_option": "native",
+      "rationale": "Native is lossless enough for the design's stated goals (C-0001) and acknowledges its losses transparently (C-0002 explicitly out-of-scope; C-0003 acknowledged). Substrate change cost (16 weeks) is grossly disproportionate to the marginal gains for this single-pipeline use case. The corpus pre-justifies native — this enumeration confirms the choice rather than challenging it."
+    },
+    {
+      "decision_id": "D-0002",
+      "options": {
+        "native": {
+          "description": "Two-tier memory: orchestrator uses MEMORY.md (substrate-native); per-sub-agent memory layered on top of file system at .memories/agents/<name>/ with READMEs encoding the read protocol and routing rule.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": true,
+          "cost": {"effort_weeks": 1, "runtime_overhead": "none", "maintenance_burden": "minor", "irreversibility_cost": "minor"},
+          "viable_explanation": "Engineering proposal (🔶 in source). Sub-agents do not have a native auto-loaded memory file (C-0021), so the proposal layers convention on top of the file system. Knowledge skills (C-0022) handle curated content; sub-agent memories handle accumulated runtime observations (C-0023). Loss: pattern fidelity is partial — the convention requires agent discipline rather than substrate enforcement."
+        },
+        "adapter": {
+          "description": "Single-tier MEMORY.md for the orchestrator; sub-agents receive their relevant memory slices through the orchestrator's prompt at task start.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "minor", "maintenance_burden": "minor", "irreversibility_cost": "none"},
+          "viable_explanation": "Lower implementation cost. Loss: orchestrator must curate and pass memory slices, growing its context budget by O(num_agents × per-agent-memory-size). Acceptable for small pipelines; degrades at scale."
+        },
+        "substrate_change": {
+          "description": "Switch to a framework with native multi-tier memory (e.g., LangGraph state with TypedDict per-node fields).",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 16, "runtime_overhead": "minor", "maintenance_burden": "minor", "irreversibility_cost": "significant"},
+          "viable_explanation": "Substrate-level memory tiers exist in framework alternatives. Cost is the full substrate migration — disproportionate for this single concern."
+        }
+      },
+      "recommended_option": "native",
+      "rationale": "Native carries the engineering-proposal flag (🔶), but the alternative (adapter) only differs in WHERE memory lives, not in conceptual approach. The two-tier convention from the source IS the substrate-idiomatic way to satisfy the requirement; rejecting it requires rejecting the synthesis-pipeline design, not refining it. Single-sourced caveat: Synthesizer should surface this in Limitations (C-0021's 🔶 marker)."
+    },
+    {
+      "decision_id": "D-0003",
+      "options": {
+        "native": {
+          "description": "Vertical-slice early verification gate: orchestrator + Extractor + claim-extraction-knowledge run end-to-end on a 2-document corpus before any other phase is added. Six §7.4 success criteria are the falsifiable acceptance target.",
+          "loss_summary": ["replay_determinism"],
+          "viable": true,
+          "cost": {"effort_weeks": 2, "runtime_overhead": "none", "maintenance_burden": "minor", "irreversibility_cost": "minor"},
+          "viable_explanation": "Both source documents converge on this discipline. The output comparison method (C-0053) is the binding mechanism; reference artifacts captured per §7.4 criterion 6 are the smoke-run baseline. Loss: bit-exact replay is impossible (Claude Code is non-deterministic per C-0003); ±10% tolerance per §7.2 Layer C is the substitute."
+        },
+        "adapter": {
+          "description": "Phase-by-phase incremental verification: each phase agent ships with its own integration test against synthetic upstream artifacts, no end-to-end gate.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 8, "runtime_overhead": "minor", "maintenance_burden": "significant", "irreversibility_cost": "minor"},
+          "viable_explanation": "Per-phase tests catch interface violations but cannot demonstrate substrate-level invariants (e.g., the recursion-safety + per-source-isolation interaction). Per the source, substrate-level mismatches are the failure mode the early-verification gate is designed to catch. Adapter would let those slip past until acceptance."
+        },
+        "substrate_change": {
+          "description": "Use a framework with built-in verification hooks (LangGraph's state-validation, Temporal's deterministic replay).",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 16, "runtime_overhead": "minor", "maintenance_burden": "minor", "irreversibility_cost": "significant"},
+          "viable_explanation": "Substrate-built verification eliminates ±10% tolerance need. Cost is full substrate migration — and this single decision does not justify it."
+        }
+      },
+      "recommended_option": "native",
+      "rationale": "Native is the explicitly recommended path in BOTH source documents (cross-source bridge). The §7.4 vertical-slice gate is a real, falsifiable mechanism — this very run is its instance. Adapter is non-viable because per-phase isolation cannot reveal substrate-level integration failures."
+    },
+    {
+      "decision_id": "D-0004",
+      "options": {
+        "native": {
+          "description": "Hard rule with defense-in-depth: orchestrator's input glob excludes output/synthesis-*/** AND each sub-agent's body includes a secondary `output/synthesis-*/` prefix check on source paths.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "none", "maintenance_burden": "none", "irreversibility_cost": "none"},
+          "viable_explanation": "Cheap, simple, both checks are deterministic file-ops. Per substrate registry, Glob and string-prefix checks are native primitives."
+        },
+        "adapter": {
+          "description": "Soft rule via naming convention: prefix `synthesis-` is documented but not enforced; rely on agents to follow convention.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 0, "runtime_overhead": "none", "maintenance_burden": "minor", "irreversibility_cost": "significant"},
+          "viable_explanation": "If an agent or future code path forgets the convention, claim corpus pollutes itself silently — irrecoverable corruption per the source's 'every re-run would ingest its own prior output and degrade signal' (§4.5). High irreversibility makes this non-viable despite zero implementation cost."
+        },
+        "substrate_change": {
+          "description": "n/a — recursion safety is an architectural concern within Claude Code's file-system model and does not require substrate change.",
+          "loss_summary": [],
+          "viable": false,
+          "cost": {"effort_weeks": 0, "runtime_overhead": "n/a", "maintenance_burden": "n/a", "irreversibility_cost": "n/a"},
+          "viable_explanation": "n/a — substrate change does not address this concern."
+        }
+      },
+      "recommended_option": "native",
+      "rationale": "Hard rule with defense-in-depth is the corpus's explicit recommendation (C-0019 'This is a hard rule'). Adapter is non-viable because the failure mode is silent corruption — irreversible by the time it's noticed."
+    },
+    {
+      "decision_id": "D-0005",
+      "options": {
+        "native": {
+          "description": "Required AskUserQuestion gate at orchestrator step 3 with three concurrent questions on a single card. Cancellation is dismissal-with-empty-answers; orchestrator exits cleanly without allocating run-id.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "minor", "maintenance_burden": "minor", "irreversibility_cost": "minor"},
+          "viable_explanation": "AskUserQuestion is a documented Claude Code primitive (per substrate registry §2). Native realization is direct. Loss: scripted invocation needs a bypass flag (out of scope for this design — the corpus does not address it)."
+        },
+        "adapter": {
+          "description": "Configuration file read at orchestrator start with prompt-on-missing for unspecified fields.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": true,
+          "cost": {"effort_weeks": 1, "runtime_overhead": "none", "maintenance_burden": "minor", "irreversibility_cost": "minor"},
+          "viable_explanation": "Allows scripted invocation. Loss: user contract is split (some answers from file, some from prompt) — confusing UX. Cancellation semantics become unclear (does an empty config file mean cancel, or use defaults?)."
+        },
+        "substrate_change": {
+          "description": "n/a — confirmation gate is application-level, not substrate-level.",
+          "loss_summary": [],
+          "viable": false,
+          "cost": {"effort_weeks": 0, "runtime_overhead": "n/a", "maintenance_burden": "n/a", "irreversibility_cost": "n/a"},
+          "viable_explanation": "n/a — confirmation gates are an application-level concern within any substrate."
+        }
+      },
+      "recommended_option": "native",
+      "rationale": "Native is corpus-recommended (C-0008, C-0009). Adapter is viable but introduces UX ambiguity around cancellation that the corpus explicitly resolves (C-0009 — empty answers exit cleanly). Adapter would re-open a settled question."
+    }
+  ]
+}

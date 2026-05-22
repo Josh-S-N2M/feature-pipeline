@@ -1,0 +1,100 @@
+# Deploy to Netlify with PR previews and production deploys on main.
+#
+# Prerequisites:
+# 1. Create a Netlify personal access token (User settings → Applications →
+#    Personal access tokens). Store as repo secret NETLIFY_AUTH_TOKEN.
+# 2. Find the Site API ID (Netlify Site settings → Site information). Store as
+#    repo secret NETLIFY_SITE_ID.
+# 3. (Optional) Configure repo Settings → Environments → 'production' with
+#    required reviewers if you want a manual gate before prod deploys.
+
+name: Deploy to Netlify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write   # for PR comments with preview URL
+
+concurrency:
+  group: netlify-${{ github.head_ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+      url: ${{ steps.deploy.outputs.deploy_url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Deploy
+        id: deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          IS_PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          if [ "$IS_PRODUCTION" = "true" ]; then
+            npx --yes netlify-cli deploy \
+              --dir=dist \
+              --prod \
+              --message "Deploy ${COMMIT_SHA}" \
+              --json > deploy.json
+          else
+            npx --yes netlify-cli deploy \
+              --dir=dist \
+              --alias "deploy-preview-${PR_NUMBER}" \
+              --message "Preview ${COMMIT_SHA}" \
+              --json > deploy.json
+          fi
+          deploy_url=$(jq -r '.deploy_url' deploy.json)
+          echo "deploy_url=$deploy_url" >> "$GITHUB_OUTPUT"
+          echo "Deployed to: $deploy_url"
+
+      - name: Comment preview URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v8  # TODO: SHA pin
+        env:
+          DEPLOY_URL: ${{ steps.deploy.outputs.deploy_url }}
+        with:
+          script: |
+            const url = process.env.DEPLOY_URL;
+            const body = `🚀 Preview deployed: ${url}`;
+            const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            const existing = comments.find(c => c.user.type === 'Bot' && c.body.startsWith('🚀 Preview deployed'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body,
+              });
+            }

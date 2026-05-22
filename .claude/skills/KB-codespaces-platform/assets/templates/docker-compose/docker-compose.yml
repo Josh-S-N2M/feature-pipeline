@@ -1,0 +1,42 @@
+# docker-compose.yml — sidecar services for the dev container.
+# Place in .devcontainer/ alongside devcontainer.json.
+
+services:
+  app:
+    # Use a custom Dockerfile for the app dev environment, or swap for an `image` ref.
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    # Mount the repo into the container. Use cached consistency on macOS hosts;
+    # cached/delegated has no effect in Codespaces but doesn't hurt.
+    volumes:
+      - ..:/workspaces/${localWorkspaceFolderBasename:-repo}:cached
+    # Keep the container running so the dev container can attach to it.
+    command: sleep infinity
+    # Reachable from VS Code Server and forwarded ports.
+    network_mode: service:db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/app
+      REDIS_URL: redis://localhost:6379
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    # Persist data across rebuilds via a named volume.
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    network_mode: service:db
+
+volumes:
+  postgres-data:

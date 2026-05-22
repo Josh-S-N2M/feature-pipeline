@@ -1,0 +1,87 @@
+{
+  "decisions": [
+    {
+      "id": "D-0001",
+      "title": "Substrate choice: Claude Code primitives vs. orchestration-framework alternative",
+      "context": "The pipeline must run somewhere. The corpus explicitly names three out-of-scope alternatives (LangGraph, Temporal, AWS Step Functions) and grounds the design entirely in Claude Code primitives. This decision sets the boundary for every downstream design choice.",
+      "claim_cluster_ids": ["C-0001", "C-0002", "C-0003"],
+      "class": "architectural",
+      "reversibility": "one_way",
+      "blast_radius": "tenant",
+      "wardley_stage": "product",
+      "rice": {"reach": 200, "impact": 3.0, "confidence": 0.8, "effort": 16},
+      "options_summary": ["Claude Code primitives only", "Hybrid (Claude Code + external orchestrator)", "Orchestration framework (LangGraph/Temporal)"],
+      "risks": [
+        "Loss of declared cycles (mitigated by orchestrator-side counters per C-0013)",
+        "Loss of deterministic replay (acknowledged out-of-scope in C-0003)",
+        "Dependence on tenant-specific primitives (e.g., Task tool, AskUserQuestion)"
+      ]
+    },
+    {
+      "id": "D-0002",
+      "title": "Memory architecture: two-tier (orchestrator + per-sub-agent) vs. single-tier MEMORY.md",
+      "context": "Sub-agents run in isolated contexts and have no native auto-loaded memory file (C-0021 — flagged 🔶 engineering proposal in source). The pipeline either accepts no per-agent persistence (single tier) or layers a convention on top of the file system (two tier). The two-tier proposal is the source's most consequential single-sourced claim — it has no precedent.",
+      "claim_cluster_ids": ["C-0020", "C-0021", "C-0022", "C-0023", "C-0024"],
+      "class": "architectural",
+      "reversibility": "two_way",
+      "blast_radius": "service",
+      "wardley_stage": "custom",
+      "rice": {"reach": 100, "impact": 2.0, "confidence": 0.5, "effort": 6},
+      "options_summary": ["Two-tier (engineering proposal)", "Single-tier (MEMORY.md only)", "No persistent memory across runs"],
+      "risks": [
+        "Engineering proposal — no substrate-validated precedent (C-0021 flagged 🔶)",
+        "Single-sourced claim — RICE confidence calibrated to 0.5 (vendor-only provenance equivalent)",
+        "Sub-agent memory files may accumulate stale entries without periodic pruning discipline (C-0024 mitigates with 'do not pre-populate' rule)"
+      ]
+    },
+    {
+      "id": "D-0003",
+      "title": "Verification regime: vertical-slice early verification gate vs. end-to-end-only acceptance",
+      "context": "Both source documents converge on the early-verification-point discipline (cross-source bridge at E-0012). The technical-designer source defines it abstractly; the synthesis-pipeline-technical-design source applies it concretely as the §7.4 vertical-slice gate (the very work this run replicates). This is the strongest cross-source signal in the corpus.",
+      "claim_cluster_ids": ["C-0045", "C-0046", "C-0047", "C-0053"],
+      "class": "architectural",
+      "reversibility": "one_way",
+      "blast_radius": "tenant",
+      "wardley_stage": "product",
+      "rice": {"reach": 200, "impact": 3.0, "confidence": 0.8, "effort": 4},
+      "options_summary": ["Vertical-slice early gate (recommended by both sources)", "Phase-by-phase incremental verification", "End-to-end acceptance only"],
+      "risks": [
+        "If the gate passes but the substrate later fails, the gate gave false confidence",
+        "Gate failure forces design re-revision — high cost, but catches substrate mismatch early",
+        "Output comparison method is the binding mechanism — without a captured reference, the gate is unverifiable on later runs (mitigation: capture reference artifacts per §7.4 criterion 6)"
+      ]
+    },
+    {
+      "id": "D-0004",
+      "title": "Recursion safety: hard rule (orchestrator + agent both check) vs. soft convention",
+      "context": "The pipeline reads `output/**/*.md` and writes to `output/synthesis-<topic>/`. Without rigid exclusion, every re-run ingests its own prior output. The corpus states this is a hard rule (C-0019), enforced both at the orchestrator's input scan and at the sub-agent's secondary check (defense in depth).",
+      "claim_cluster_ids": ["C-0007", "C-0019"],
+      "class": "architectural",
+      "reversibility": "one_way",
+      "blast_radius": "tenant",
+      "wardley_stage": "commodity",
+      "rice": {"reach": 200, "impact": 2.0, "confidence": 0.8, "effort": 1},
+      "options_summary": ["Hard rule with defense-in-depth (orchestrator + agent both check)", "Hard rule at orchestrator only", "Soft rule with naming convention"],
+      "risks": [
+        "If exclusion logic regresses, claim corpus pollutes itself silently",
+        "Defense-in-depth doubles verification cost (acceptable — both checks are cheap globs)"
+      ]
+    },
+    {
+      "id": "D-0005",
+      "title": "User confirmation: required AskUserQuestion gate vs. assumed defaults vs. configuration file",
+      "context": "Three concurrent constraints (input set, target substrate, hard constraints) need confirmation before the pipeline runs. The corpus mandates an AskUserQuestion gate as a required interrupt with explicit cancellation handling (C-0008, C-0009). This shapes the pipeline's contract with the user.",
+      "claim_cluster_ids": ["C-0008", "C-0009"],
+      "class": "architectural",
+      "reversibility": "one_way",
+      "blast_radius": "tenant",
+      "wardley_stage": "product",
+      "rice": {"reach": 200, "impact": 1.5, "confidence": 0.8, "effort": 1},
+      "options_summary": ["Required AskUserQuestion gate (corpus recommendation)", "Configuration file with prompt-on-missing", "Assumed defaults with --override"],
+      "risks": [
+        "AskUserQuestion adds an interrupt to every run; users running scripted pipelines need a flag to bypass (out of scope for this design)",
+        "Cancellation handling must be explicit (C-0009 — empty answers exit cleanly without allocating run-id)"
+      ]
+    }
+  ]
+}

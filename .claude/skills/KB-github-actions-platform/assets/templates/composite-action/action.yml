@@ -1,0 +1,62 @@
+# Composite action skeleton.
+#
+# Save this file as: .github/actions/<action-name>/action.yml
+# Then call from any workflow in the same repo with:
+#   - uses: ./.github/actions/<action-name>
+#     with: { ... }
+#
+# Composite actions bundle multiple steps as a single reusable unit. For
+# multi-job logic, use a reusable workflow (workflow_call) instead.
+# See references/reusable-workflows-and-actions.md for the decision tree.
+
+name: Setup Project
+description: Checkout, install Node.js, install dependencies with caching.
+
+# Inputs are accessed inside the action as ${{ inputs.<name> }}.
+inputs:
+  node-version:
+    description: Node.js version to install
+    required: false
+    default: '22'
+
+  install-cmd:
+    description: Command to install dependencies
+    required: false
+    default: 'npm ci'
+
+  working-directory:
+    description: Working directory for the install command
+    required: false
+    default: '.'
+
+# Outputs surface as ${{ steps.<step-id>.outputs.<name> }} in the calling workflow.
+outputs:
+  cache-hit:
+    description: Whether the dependency cache was hit
+    value: ${{ steps.setup-node.outputs.cache-hit }}
+
+  node-version:
+    description: The Node.js version that was actually installed
+    value: ${{ steps.setup-node.outputs.node-version }}
+
+runs:
+  using: composite
+  steps:
+    - id: setup-node
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      # Composite-action steps need explicit shell: — they don't inherit
+      # the calling job's defaults.run.shell.
+      run: ${{ inputs.install-cmd }}
+
+    - name: Print summary
+      shell: bash
+      run: |
+        echo "Installed Node.js ${{ steps.setup-node.outputs.node-version }}"
+        echo "Cache hit: ${{ steps.setup-node.outputs.cache-hit }}"

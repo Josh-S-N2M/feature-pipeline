@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "decision-frame.schema.json",
+  "title": "Decision Frame",
+  "description": "Output of synth-framer per Design \u00a75.4.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decisions"
+  ],
+  "properties": {
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "context",
+          "claim_cluster_ids",
+          "class",
+          "reversibility",
+          "blast_radius",
+          "wardley_stage",
+          "rice",
+          "options_summary",
+          "risks"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^D-\\d{4}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "context": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claim_cluster_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^C-\\d{4}$"
+            }
+          },
+          "class": {
+            "type": "string",
+            "enum": [
+              "architectural",
+              "implementation",
+              "operational"
+            ]
+          },
+          "reversibility": {
+            "type": "string",
+            "enum": [
+              "one_way",
+              "two_way"
+            ]
+          },
+          "blast_radius": {
+            "type": "string",
+            "enum": [
+              "component",
+              "service",
+              "tenant",
+              "org"
+            ]
+          },
+          "wardley_stage": {
+            "type": "string",
+            "enum": [
+              "genesis",
+              "custom",
+              "product",
+              "commodity"
+            ]
+          },
+          "rice": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reach",
+              "impact",
+              "confidence",
+              "effort"
+            ],
+            "properties": {
+              "reach": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "impact": {
+                "type": "number",
+                "minimum": 0
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "effort": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          },
+          "options_summary": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "risks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

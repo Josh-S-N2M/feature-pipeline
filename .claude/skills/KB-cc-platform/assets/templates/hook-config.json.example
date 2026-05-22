@@ -1,0 +1,143 @@
+{
+  "$comment": "Hook configurations live inside settings.json under the `hooks` key. This file shows the shape; copy the `hooks` block into .claude/settings.json or ~/.claude/settings.json. Hooks merge across all settings scopes — every registered hook fires for matching events.",
+
+  "hooks": {
+    "$comment_PreToolUse": "Fires before any tool call. Can deny, allow, ask, or modify input.",
+
+    "PreToolUse": [
+      {
+        "$comment": "Block dangerous rm commands targeting paths outside the project",
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(rm *)",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/block-dangerous-rm.sh"
+          }
+        ]
+      },
+      {
+        "$comment": "Auto-approve read-only tools without prompting",
+        "matcher": "Read|Glob|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"allow\",\"permissionDecisionReason\":\"Read-only tool auto-approved\"}}'"
+          }
+        ]
+      },
+      {
+        "$comment": "HTTP hook example — call out to a centralized policy service",
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "http",
+            "url": "https://policy.internal.example.com/claude-code/pre-tool",
+            "headers": {
+              "Authorization": "Bearer ${POLICY_SERVICE_TOKEN}"
+            }
+          }
+        ]
+      }
+    ],
+
+    "$comment_PostToolUse": "Fires after a successful tool call. Cannot deny (already happened); useful for side effects.",
+
+    "PostToolUse": [
+      {
+        "$comment": "Auto-format files after Claude edits or writes them",
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | xargs -r pnpm prettier --write --log-level warn"
+          }
+        ]
+      },
+      {
+        "$comment": "Log all tool use to a file for auditing",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -c '{ts: now, event: \"tool_use\", tool: .tool_name, input: .tool_input}' >> ${CLAUDE_PROJECT_DIR}/.claude/audit.log"
+          }
+        ]
+      }
+    ],
+
+    "$comment_UserPromptSubmit": "Fires when the user sends a prompt. Useful for injecting context.",
+
+    "UserPromptSubmit": [
+      {
+        "$comment": "Inject the current git status into every prompt for context",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"Current git status:\\n'$(git status --short | sed 's/\"/\\\\\"/g; s/\\n/\\\\n/g')'\"}}'"
+          }
+        ]
+      }
+    ],
+
+    "$comment_Stop": "Fires when the agent loop ends a turn. Useful for verification.",
+
+    "Stop": [
+      {
+        "$comment": "Run typecheck after every turn to catch regressions",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm typecheck > /dev/null 2>&1 || echo '{\"hookSpecificOutput\":{\"additionalContext\":\"Warning: typecheck is failing on the current state.\"}}'"
+          }
+        ]
+      }
+    ],
+
+    "$comment_SessionStart": "Fires when a session boots. Useful for setup.",
+
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p ${CLAUDE_PROJECT_DIR}/.claude/scratch"
+          }
+        ]
+      }
+    ],
+
+    "$comment_Notification": "Fires when Claude needs user attention.",
+
+    "Notification": [
+      {
+        "$comment": "Forward notifications to a desktop notifier",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.message' | xargs -I {} osascript -e 'display notification \"{}\" with title \"Claude Code\"'"
+          }
+        ]
+      }
+    ]
+  },
+
+  "$example_block_dangerous_rm_sh": "Below is an example block-dangerous-rm.sh referenced above. Save it to .claude/hooks/block-dangerous-rm.sh and chmod +x.",
+  "$example_script": [
+    "#!/usr/bin/env bash",
+    "set -euo pipefail",
+    "input=$(cat)",
+    "cmd=$(echo \"$input\" | jq -r '.tool_input.command')",
+    "",
+    "# Block rm targeting anything outside the project directory or with -rf on the project root",
+    "if echo \"$cmd\" | grep -qE 'rm[[:space:]].*-rf?[[:space:]]+/' ||",
+    "   echo \"$cmd\" | grep -qE 'rm[[:space:]].*-rf?[[:space:]]+~' ||",
+    "   echo \"$cmd\" | grep -qE 'rm[[:space:]].*-rf?[[:space:]]+\\$HOME' ||",
+    "   echo \"$cmd\" | grep -qE 'rm[[:space:]].*-rf?[[:space:]]+\\.\\.'; then",
+    "  jq -n '{hookSpecificOutput: {hookEventName: \"PreToolUse\", permissionDecision: \"deny\", permissionDecisionReason: \"Refusing rm against system or parent directories\"}}'",
+    "  exit 0",
+    "fi",
+    "",
+    "# Allow",
+    "echo '{}'"
+  ]
+}

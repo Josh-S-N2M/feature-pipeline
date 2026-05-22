@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "cross-artifact-audit-findings-remediation-r1-r3",
+  "round_number": 3,
+  "terminal": false,
+  "audited_artifacts": [
+    "blueprint-v1.1.0.md",
+    "plan-v1.2.0.md",
+    "acceptance-tests-v1.1.0.md",
+    "phase-validators-v1.1.0.md"
+  ],
+  "audited_at": "2026-05-21T21:25:00Z",
+  "audited_by": "claude (acting as review-cross-artifact-auditor, continuation session, round 3)",
+  "diff_mode": true,
+  "diff_mode_details": {
+    "blueprint": "blueprint-v1.md → blueprint-v1.1.0.md; diff focused on frontmatter (version bump + supersedes + supersession_addresses) and 3 stage-number → stage-name body edits at original lines 115, 208, 283 + appended Update History entry",
+    "plan": "plan-v1.1.0.md → plan-v1.2.0.md; diff focused on frontmatter (version bump + prior_versions list + supersedes + supersession_addresses) and 4 stage-number → stage-name body edits + appended Update History entry",
+    "acceptance_tests": "acceptance-tests.md → acceptance-tests-v1.1.0.md; diff focused on frontmatter + AT-027 heading rewording + 2 stale plan-v1.md body references (AT-026 step 2, AT-027 step 2) → version-agnostic phrasing + appended Update History entry",
+    "phase_validators": "phase-validators.md → phase-validators-v1.1.0.md; diff focused on frontmatter + 3 stage-number → stage-name body edits + 2 stale plan-v1.md body references (Posture paragraph, PV-6.C10) → version-agnostic phrasing + appended Update History entry",
+    "scope_sweep_reflex_applied": "Per OBS-AUDIT-BLIND-001 lesson from round 2: discipline-violation-class sweep applied. Verified across all 4 audited artifacts via grep -nE 'Stage [0-9]+'. All remaining matches are quotes-of-violations in change logs / update histories / supersession addresses fields — legitimate documentation pattern (the violation text MUST appear in change-tracking artifacts to specify what was fixed). Distinguished from fresh violations by context: inside backticks, inside quote marks, inside before→after specifications, inside Update History entries describing what was rewritten."
+  },
+  "checks_performed": [
+    "round_2_issues_convergence_check",
+    "supersession_internal_consistency",
+    "supersession_cross_reference_consistency",
+    "discipline_violation_class_full_sweep_redo",
+    "stale_version_reference_sweep",
+    "blueprint_plan_post_supersession",
+    "blueprint_tests_post_supersession",
+    "blueprint_validators_post_supersession",
+    "plan_tests_post_supersession",
+    "plan_validators_post_supersession"
+  ],
+  "round_2_issues_convergence": [
+    {
+      "issue_id": "I-CA-004",
+      "round_2_severity": "MAJOR",
+      "status": "RESOLVED",
+      "evidence_per_artifact": {
+        "blueprint-v1.1.0.md": "Lines 115/208/283 rewritten: 'Deliverable Packaging retroactive', 'Deferred to Plan Authoring', 'Deliverable Packaging retroactive run'. Verified clean via grep.",
+        "plan-v1.2.0.md": "Lines (in v1.1.0 numbering) 326/333/337/421 rewritten: 'Cross-Artifact Audit reviews...', 'finalize-reconciler dispatches...', '`finalize-task-decomposer` produces...', 'Deliverable Packaging retroactive run...'. Verified clean via grep.",
+        "acceptance-tests-v1.1.0.md": "AT-027 heading: 'Retroactive Deliverable Packaging memo'. Verified clean via grep.",
+        "phase-validators-v1.1.0.md": "PV-6.C6: 'Cross-Artifact Audit output exists'. PV-6.C8: 'Plan §P6.5 — Task Decomposition produces tasks.json'. Runbook line 266: 'For Cross-Artifact Audit (Plan §P6.3)'. Verified clean via grep."
+      },
+      "residual_stage_number_matches_classified": [
+        {"artifact": "blueprint-v1.1.0.md", "line": 369, "context": "Update History entry describing the supersession's edits; quotes the before→after text", "classification": "quote-of-violation-in-change-log (legitimate)"},
+        {"artifact": "plan-v1.2.0.md", "lines": "Update History rows", "context": "Same pattern: change-log entries describe what was rewritten", "classification": "quote-of-violation-in-change-log (legitimate)"},
+        {"artifact": "acceptance-tests-v1.1.0.md", "line": 458, "context": "Update History entry describing AT-027 rewording", "classification": "quote-of-violation-in-change-log (legitimate)"},
+        {"artifact": "phase-validators-v1.1.0.md", "line": 278, "context": "Update History entry describing the 3 rewordings", "classification": "quote-of-violation-in-change-log (legitimate)"}
+      ]
+    }
+  ],
+  "issues": [],
+  "informational_observations": [
+    {
+      "id": "OBS-CA-INFO-005",
+      "summary": "Cycle 2 expanded scope mid-cycle. The cycle-2 dispatch brief (per reconciliation-log-cycle2.md) targeted only the 11 stage-number violations from I-CA-004. However, during the pre-round-3 sanity sweep, 4 stale `plan-v1.md` body references were discovered in acceptance-tests-v1.1.0.md and phase-validators-v1.1.0.md (derivative defects from the supersession of plan-v1.md → plan-v1.2.0.md). Rather than triggering an additional reconciliation cycle, these were fixed in-place under the still-draft v1.1.0 supersessions, with the expanded scope documented in each artifact's Update History entry. This is a procedural deviation from the strict 'audit-finds-then-reconciliation-fixes' discipline; the rationale was that the stale references were derivative consequences of cycle-2's own supersession work (not independent defects).",
+      "non_action": "Acceptable as authored. Cycle-2 scope expansion is documented; provenance trail is complete; round-3 audit verified clean. Consider for follow-on improvement: explicit guidance in the reconciler agent procedure for handling derivative defects discovered during supersession authoring."
+    },
+    {
+      "id": "OBS-CA-INFO-006",
+      "summary": "Three observations.md entries (OBS-PLAN-001, OBS-CA-001, OBS-CA-002) contain references to original `plan-v1.md` for historical accuracy (describing what was observed at the moment of observation). These are NOT stale references requiring fix — they are historical-context references, similar to how the Blueprint references plan-v1.md as its prior version in the `supersedes` field. No action required."
+    }
+  ],
+  "convergence": {
+    "verdict": "converged",
+    "prior_issue_count": 1,
+    "current_issue_count": 0,
+    "delta": -1,
+    "persistent_issues": [],
+    "severity_weighted_prior": 3,
+    "severity_weighted_current": 0,
+    "severity_weighted_delta": -3,
+    "weights_used": {"BLOCKER": 10, "MAJOR": 3, "MINOR": 1, "INFO": 0},
+    "convergence_notes": "Zero issues this round. Convergence achieved. Total reconciliation cycles used: 2 of 4. Total audit rounds used: 3 of 4. Cross-Artifact Audit concludes."
+  },
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 0,
+    "INFO": 2
+  },
+  "verdict": "pass",
+  "verdict_rationale": "0 BLOCKER + 0 MAJOR + 0 MINOR → pass. All round-1 + round-2 issues RESOLVED. Two informational observations recorded for follow-on consideration; neither blocks. Cross-Artifact Audit converged in 3 rounds (well within ADR-0021's 4-round hard cap). Stage 12 (Cross-Artifact Audit + Reconciliation) complete.",
+  "next_step": "Advance to Stage 13 (Task Decomposition) per recipe pipeline. finalize-task-decomposer produces `tasks.json` from `cc-dependencies.json` for any granular work surviving reconciliation. After Stage 13: Stage 14 (Deliverable Packaging) → Gate 6 (Final Approval)."
+}

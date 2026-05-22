@@ -1,0 +1,300 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "audit-findings-remediation-r1",
+  "layer": "claude-code",
+  "generated": "2026-05-21T18:35:00Z",
+
+  "dependency_groups": [
+    {
+      "id": "DG-1-foundation",
+      "description": "Foundation work that everything else depends on",
+      "items": [
+        {
+          "id": "F-1-1",
+          "path": ".claude/skills/KB-documentation-criteria/references/pedagogical-marker-justification-spec.md",
+          "action": "create",
+          "fr_coverage": ["FR-7-a"],
+          "depends_on": [],
+          "blocks": ["F-2-1", "F-3-1", "F-4-1", "F-7-1"]
+        },
+        {
+          "id": "F-1-2",
+          "path": ".claude/skills/KB-documentation-criteria/references/disciplines/finding-categorization.md",
+          "action": "create",
+          "fr_coverage": ["FR-9"],
+          "depends_on": ["F-1-1"],
+          "blocks": []
+        },
+        {
+          "id": "F-1-3",
+          "path": ".claude/skills/auditing-cc-configs/references/pedagogical-marker-spec.md",
+          "action": "edit (add forward-pointer)",
+          "fr_coverage": ["FR-7-a"],
+          "depends_on": ["F-1-1"],
+          "blocks": []
+        }
+      ]
+    },
+    {
+      "id": "DG-2-deduplication",
+      "description": "FR-12 deduplication — prerequisite for FR-7-b uniform enforcement",
+      "items": [
+        {
+          "id": "F-2-1",
+          "path": ".claude/skills/auditing-shared/",
+          "action": "create module",
+          "fr_coverage": ["FR-12-a"],
+          "depends_on": ["F-1-1"],
+          "blocks": ["F-2-2", "F-2-3", "F-2-4", "F-2-5", "F-2-6"]
+        },
+        {
+          "id": "F-2-2",
+          "path": ".claude/skills/auditing-shared/SKILL.md",
+          "action": "create",
+          "fr_coverage": ["FR-12-a"],
+          "depends_on": ["F-2-1"],
+          "blocks": []
+        },
+        {
+          "id": "F-2-3",
+          "path": ".claude/skills/auditing-shared/scripts/pedagogical_marker_check.py",
+          "action": "create canonical (union of 3 copies + mechanism-α enforcement)",
+          "fr_coverage": ["FR-7-b", "FR-12-a", "FR-12-d"],
+          "depends_on": ["F-1-1", "F-2-1"],
+          "blocks": ["F-2-4", "F-2-5", "F-2-6", "F-7-1", "F-8-1", "F-8-2", "F-8-3"]
+        },
+        {
+          "id": "F-2-4",
+          "path": ".claude/skills/auditing-cc-configs/scripts/pedagogical_marker_check.py",
+          "action": "delete or replace with shim",
+          "fr_coverage": ["FR-12-b"],
+          "depends_on": ["F-2-3"],
+          "blocks": []
+        },
+        {
+          "id": "F-2-5",
+          "path": ".claude/skills/auditing-skills/scripts/pedagogical_marker_check.py",
+          "action": "delete or replace with shim",
+          "fr_coverage": ["FR-12-b"],
+          "depends_on": ["F-2-3"],
+          "blocks": []
+        },
+        {
+          "id": "F-2-6",
+          "path": ".claude/skills/auditing-subagents/scripts/pedagogical_marker_check.py",
+          "action": "delete or replace with shim",
+          "fr_coverage": ["FR-12-b"],
+          "depends_on": ["F-2-3"],
+          "blocks": []
+        },
+        {
+          "id": "F-2-7",
+          "path": ".claude/skills/auditing-shared/scripts/scan_memory_secrets.py",
+          "action": "create canonical (per AC-FR-12-e)",
+          "fr_coverage": ["FR-12-e"],
+          "depends_on": ["F-2-1"],
+          "blocks": ["F-2-8", "F-2-9"]
+        },
+        {
+          "id": "F-2-8",
+          "path": ".claude/skills/auditing-context-files/scripts/scan_memory_secrets.py",
+          "action": "delete or replace with shim",
+          "fr_coverage": ["FR-12-e"],
+          "depends_on": ["F-2-7"],
+          "blocks": []
+        },
+        {
+          "id": "F-2-9",
+          "path": ".claude/skills/auditing-subagents/scripts/scan_memory_secrets.py",
+          "action": "delete or replace with shim",
+          "fr_coverage": ["FR-12-e"],
+          "depends_on": ["F-2-7"],
+          "blocks": []
+        }
+      ]
+    },
+    {
+      "id": "DG-3-auditor-improvements",
+      "description": "Auditor regex + check improvements (Categories D, E-bypass, F)",
+      "items": [
+        {
+          "id": "F-3-1",
+          "path": ".claude/skills/auditing-subagents/scripts/analyze_subagent.py",
+          "action": "edit — tighten SA-2 TRIGGER_PATTERNS (D-4)",
+          "fr_coverage": ["FR-4-a", "FR-4-b"],
+          "depends_on": [],
+          "blocks": []
+        },
+        {
+          "id": "F-3-2",
+          "path": ".claude/skills/auditing-subagents/scripts/scan_subagent_body.py",
+          "action": "edit — negation-aware bypass-approval regex (D-5)",
+          "fr_coverage": ["FR-5-b", "FR-5-d"],
+          "depends_on": [],
+          "blocks": []
+        },
+        {
+          "id": "F-3-3",
+          "path": ".claude/skills/auditing-cc-configs/scripts/cross_file_checks.py",
+          "action": "edit — replace X9 stub with recursive check (D-6)",
+          "fr_coverage": ["FR-6-Stream-2", "FR-6-a", "FR-6-c"],
+          "depends_on": [],
+          "blocks": []
+        }
+      ]
+    },
+    {
+      "id": "DG-4-agent-genuine-defects",
+      "description": "Category E wildcard-shell genuine defects (3 agents)",
+      "items": [
+        {
+          "id": "F-4-1",
+          "path": ".claude/agents/discovery-codebase-researcher.md",
+          "action": "edit — scope Bash tool",
+          "fr_coverage": ["FR-5-a", "FR-5-c"],
+          "depends_on": [],
+          "blocks": []
+        },
+        {
+          "id": "F-4-2",
+          "path": ".claude/agents/review-architecture-auditor.md",
+          "action": "edit — scope Bash tool",
+          "fr_coverage": ["FR-5-a", "FR-5-c"],
+          "depends_on": [],
+          "blocks": []
+        },
+        {
+          "id": "F-4-3",
+          "path": ".claude/agents/shared-document-reviewer.md",
+          "action": "edit — scope Bash tool + (per D-2) add PedagogicalMarkerJustification doc_type",
+          "fr_coverage": ["FR-5-a", "FR-5-c", "FR-7-b-secondary"],
+          "depends_on": ["F-1-1"],
+          "blocks": []
+        }
+      ]
+    },
+    {
+      "id": "DG-5-genuinely-stale-links",
+      "description": "Category C real-fix dispositions (18 broken-link BLOCKERs)",
+      "items": [
+        {
+          "id": "F-5-1",
+          "path": ".claude/skills/synthesize/references/* (11 affected files; per-file disposition)",
+          "action": "edit — repair/delete/reauthor per AC-FR-3-b",
+          "fr_coverage": ["FR-3-a", "FR-3-b"],
+          "depends_on": [],
+          "blocks": []
+        },
+        {
+          "id": "F-5-2",
+          "path": ".claude/skills/report-composition-knowledge/* (7 affected files; per-file disposition)",
+          "action": "edit — repair/delete/reauthor per AC-FR-3-b",
+          "fr_coverage": ["FR-3-a", "FR-3-b"],
+          "depends_on": [],
+          "blocks": []
+        }
+      ]
+    },
+    {
+      "id": "DG-6-retroactive-markers",
+      "description": "FR-8 — upgrade existing markers to new mechanism-α discipline",
+      "items": [
+        {
+          "id": "F-6-1",
+          "path": "9 KB SKILL.md files with existing pedagogical_sections frontmatter",
+          "action": "edit — upgrade bare-list to structured form with justifications",
+          "fr_coverage": ["FR-8-a"],
+          "depends_on": ["F-1-1", "F-2-3"],
+          "blocks": []
+        },
+        {
+          "id": "F-6-2",
+          "path": "10+ KB reference files with existing audit-example fences",
+          "action": "edit — add `-- justification` to each fence",
+          "fr_coverage": ["FR-8-a"],
+          "depends_on": ["F-1-1", "F-2-3"],
+          "blocks": []
+        },
+        {
+          "id": "F-6-3",
+          "path": "KB-visual-design/references/anti-slop.md + type-color-space.md",
+          "action": "edit — convert <pedagogical-example> HTML form to canonical fence form + justification",
+          "fr_coverage": ["FR-8-a"],
+          "depends_on": ["F-1-1", "F-2-3"],
+          "blocks": []
+        }
+      ]
+    },
+    {
+      "id": "DG-7-new-markers",
+      "description": "Categories A+B — add new markers + justifications to 32+ KB files",
+      "items": [
+        {
+          "id": "F-7-1",
+          "path": "KB-cc-platform files (17 broken-link + 9 pipe-to-shell + 8 credential-ref + 2 modifies-CLAUDE.md findings)",
+          "action": "edit — add structured pedagogical_sections + audit-example fences with justifications",
+          "fr_coverage": ["FR-1-a", "FR-1-b", "FR-2-a", "FR-2-b", "FR-1-c", "FR-2-c"],
+          "depends_on": ["F-1-1", "F-2-3"],
+          "blocks": []
+        },
+        {
+          "id": "F-7-2",
+          "path": "KB-github-actions-platform files (6 broken-link + 3 credential-env-var + 2 prompt-injection + 4 base64 findings)",
+          "action": "edit — same as F-7-1",
+          "fr_coverage": ["FR-1-a", "FR-1-b", "FR-2-a", "FR-2-c"],
+          "depends_on": ["F-1-1", "F-2-3"],
+          "blocks": []
+        },
+        {
+          "id": "F-7-3",
+          "path": "KB-codespaces-platform + KB-codespaces-design files (4 broken-link + 3 shell-startup findings)",
+          "action": "edit — same as F-7-1",
+          "fr_coverage": ["FR-1-a", "FR-1-b", "FR-2-a", "FR-2-c"],
+          "depends_on": ["F-1-1", "F-2-3"],
+          "blocks": []
+        },
+        {
+          "id": "F-7-4",
+          "path": "KB-documentation-criteria + KB-cc-design files (3 + 2 broken-link findings)",
+          "action": "edit — same as F-7-1",
+          "fr_coverage": ["FR-2-a", "FR-2-c"],
+          "depends_on": ["F-1-1", "F-2-3"],
+          "blocks": []
+        }
+      ]
+    },
+    {
+      "id": "DG-8-verification-records",
+      "description": "FR-6 Stream 1 — per-(agent,skill) verification records",
+      "items": [
+        {
+          "id": "F-8-1",
+          "path": "working/feature/audit-findings-remediation-r1/x9-verification/<agent>-<skill>.md (×N pairs)",
+          "action": "create — one record per (agent,skill) pair from current 29 X9 findings",
+          "fr_coverage": ["FR-6-Stream-1", "FR-6-b"],
+          "depends_on": ["F-3-3"],
+          "blocks": []
+        }
+      ]
+    }
+  ],
+
+  "blocking_relationships_summary": {
+    "longest_critical_path": "F-1-1 (mechanism-α spec) → F-2-1 (auditing-shared module) → F-2-3 (canonical pedagogical_marker_check) → F-6-1/F-7-1 (marker upgrades + new markers)",
+    "parallel_opportunities": [
+      "DG-3 auditor improvements (F-3-1, F-3-2, F-3-3) — independent of each other and of DG-2",
+      "DG-4 agent genuine defects (F-4-1, F-4-2) independent; F-4-3 depends on F-1-1 only",
+      "DG-5 stale-link real fixes — independent of everything",
+      "DG-6 retroactive markers — must follow DG-2 + F-1-1",
+      "DG-7 new markers — must follow DG-2 + F-1-1; can run parallel with DG-6"
+    ]
+  },
+
+  "summary": {
+    "dependency_groups": 8,
+    "total_items": 28,
+    "items_with_no_dependencies": 8,
+    "items_blocked_only_by_foundation": 4,
+    "longest_chain_length": 4
+  }
+}

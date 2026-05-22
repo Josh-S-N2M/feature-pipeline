@@ -1,0 +1,93 @@
+// Infrastructure-as-Code devcontainer.
+// Configured for Terraform with multi-cloud CLI access. Adjust:
+//   - Drop cloud CLIs you don't need (each adds startup time)
+//   - Add CDKTF/Pulumi features if using TS-based IaC instead of pure HCL
+//   - Configure backend creds via Codespaces secrets (NOT in this file)
+//
+// Codespaces secrets to set (at user/repo/org level):
+//   AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION
+//   - or - use AWS SSO via `aws sso login` after starting
+//   ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID  (Azure SP)
+//   GOOGLE_APPLICATION_CREDENTIALS  (path; mount file via separate flow)
+//   TF_CLOUD_TOKEN  (if using Terraform Cloud)
+{
+  "name": "iac-terraform",
+
+  // Plain Debian Bookworm -- let features add what's needed. Smaller than the universal image.
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "vscode",
+      "configureZshAsDefaultShell": true
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "latest",
+      "tflint": "latest",
+      "terragrunt": "latest"
+    },
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/gcloud:1": {},
+    // For TS-based IaC (CDKTF, Pulumi):
+    "ghcr.io/devcontainers/features/node:1": { "version": "22" },
+    "ghcr.io/devcontainers-contrib/features/pre-commit:2": {}
+  },
+
+  "overrideFeatureInstallOrder": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/node",
+    "ghcr.io/devcontainers/features/terraform",
+    "ghcr.io/devcontainers/features/aws-cli",
+    "ghcr.io/devcontainers/features/azure-cli",
+    "ghcr.io/devcontainers/features/gcloud",
+    "ghcr.io/devcontainers/features/github-cli"
+  ],
+
+  // No app ports for an IaC project. Add if running tflint server or a docs site.
+  "forwardPorts": [],
+
+  // Cached in prebuild -- runs once at create.
+  "onCreateCommand": "pre-commit install --install-hooks || true",
+
+  // Cached in prebuild AND re-runs on lockfile change. Useful if you have a Node-based
+  // tooling layer (e.g. CDKTF synth scripts).
+  "updateContentCommand": "if [ -f package.json ]; then npm ci; fi",
+
+  // Initialize Terraform on attach so `plan`/`apply` works immediately. Comment out if
+  // your repo has many root modules (don't init all of them automatically).
+  "postAttachCommand": "if [ -f main.tf ]; then terraform init -backend=false || true; fi",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "HashiCorp.terraform",
+        "HashiCorp.HCL",
+        "ms-azuretools.vscode-bicep",
+        "redhat.vscode-yaml",
+        "GitHub.vscode-pull-request-github"
+      ],
+      "settings": {
+        "[terraform]": {
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "HashiCorp.terraform",
+          "editor.tabSize": 2
+        },
+        "[terraform-vars]": {
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "HashiCorp.terraform"
+        },
+        "files.associations": { "*.tfvars": "terraform" }
+      }
+    }
+  },
+
+  "remoteUser": "vscode",
+
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  }
+}
