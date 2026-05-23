@@ -1,0 +1,129 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "PRD",
+    "target_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/prd-v3.md",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "version_reviewed": "3.0.0",
+    "predecessor_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/prd-v2.md",
+    "predecessor_review_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/prd-v2-review-issues.json",
+    "invocation_context": "recipe-feature-pipeline Invocation 2 — shared-document-reviewer focused diff-review after combined Gate 2+3 re-confirmation produced PRD v3 (added GitNexus MCP as the seventh named server; narrow single-vector scope addition)",
+    "reviewer": "shared-document-reviewer",
+    "review_focus": "GitNexus v2→v3 propagation verification (narrow diff-review per invocation request)",
+    "skills_applied": [
+      "KB-documentation-criteria (templates/prd-template.md, references/disciplines/prd-authoring.md, references/disciplines/ears-acceptance-criteria.md, references/layer-taxonomy.md, references/shared-conventions.md)",
+      "KB-review-disciplines (references/gate-0-1-procedure.md, references/severity-taxonomy.md, references/prior-context-check.md, references/issue-lifecycle.md)",
+      "KB-general-coding-principles (N/A — no code samples in PRD body)"
+    ],
+    "reviewed_at": "2026-05-23T00:00:00Z"
+  },
+  "scores": {
+    "consistency": 94,
+    "completeness": 92,
+    "rule_compliance": 95,
+    "clarity": 90
+  },
+  "gate0": {
+    "status": "pass",
+    "missing_elements": [],
+    "checks_performed": [
+      "Frontmatter parses as valid YAML; universal required fields present (id, doc_type=prd, version=3.0.0, status=draft, feature_slug, derived_from, generated, generated_by)",
+      "v3-specific supersession fields present: prior_version (line 8 points at prd-v2.md), supersedes (line 9 names predecessor 'PRD-devcontainer-mcp-provisioning-r1 (v2.0.0)'), change_summary (lines 13-32, multi-line scalar enumerating the GitNexus addition and the textual propagations)",
+      "intent_user_token: gate1-approved-2026-05-23 retained at line 10 (intent-stage user-token chain preserved per ADR-0032 Change 2)",
+      "Own user_token: deliberately absent in draft status — to be assigned at Gate 2 PRD Approval Gate re-confirmation per gated-artifact lifecycle (matches v1 and v2 pattern)",
+      "Revision History section present (line 37) with all three rows: v1.0.0 (line 41, unchanged), v2.0.0 (line 42, unchanged), v3.0.0 (line 43, new — describes GitNexus addition with explicit propagation enumeration)",
+      "## Contents checklist present (line 45) with all 11 required H2 sections marked [x]",
+      "All 11 required H2 sections present and non-empty at: Overview (61), Stakeholders (99), User Stories (117), Functional Requirements (284), Non-Functional Requirements (362), Product Policy Decisions (427), Success Criteria (446), Technical Considerations (478), Rollout Plan (545), Undetermined Items (560), Appendix (581)",
+      "Layer Scope (lines 78-91) enumerates all 9 canonical layers verbatim from layer-taxonomy.md in canonical order; 2 layers in scope (Claude Code [x] line 81, Dev Environment [x] line 89); 7 out-of-scope with explicit rationale block (lines 93-97). Layer Scope deltas v2→v3 paragraph (line 91) explicitly states 'No layers activate or deactivate' and justifies that GitNexus lands inside the two existing in-scope layers (matches spec verification item 6)",
+      "EARS check: all v2-carried ACs preserved with binding 'shall'. v3-extended ACs (AC-FR-1-a/b/c, AC-FR-4-a/b, AC-FR-5-a, AC-FR-8-a/d, AC-FR-9-d, AC-FR-10-a, AC-FR-11-c/d, AC-NFR-2-a) use canonical EARS patterns 1/4 with binding 'shall'. Server-count tokens updated from 'six' to 'seven' inside every AC that quantifies the surface. AC IDs from v2 are unchanged in identity (no renumbering); new GitNexus scope added in-place",
+      "AC count: 35 unique AC IDs in v2 → 35 unique AC IDs in v3, identical set (AC-FR-1-a/b/c, AC-FR-2-a/b, AC-FR-3-a/b, AC-FR-4-a/b, AC-FR-5-a/b, AC-FR-8-a..e, AC-FR-9-a..d, AC-FR-10-a..d, AC-FR-11-a..d, AC-NFR-1-a/b, AC-NFR-2-a..d, AC-NFR-4-a). Note: the invocation request mentioned '32 numbered ACs (same as v2)' — actual stable count is 35, identical between v2 and v3; the count claim 32 in the invocation appears slightly low but the consistency-preservation property holds (no ACs added or removed between v2 and v3, only scope-extended in-place)",
+      "Spec-verification items 1-7 all confirmed (see prior_context_check note below for the inverted verification items 1 through 7 listed in the invocation)"
+    ]
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "verdict_token": "PASS",
+    "conditions": [
+      "At Gate 2 PRD Approval re-confirmation (for v3), the orchestrator assigns the own user_token in frontmatter and updates status from 'draft' to 'accepted' in the same edit (currently absent in draft; same lifecycle pattern as v1 and v2 had at their respective Gate-2 stages).",
+      "Optional polish: one recommended finding (I-DR-015) below is a one-line edit that the author may absorb at the same patch when user_token is assigned. Does not block Gate 2+3 re-confirmation."
+    ],
+    "rationale": "Gate 0 passes cleanly: every required structural element present, frontmatter complete per ADR-0032 v2-conventions including the v3-specific supersession fields (prior_version, supersedes, change_summary), Revision History documenting all three versions, all 11 required H2 sections, Layer Scope verbatim from layer-taxonomy.md with explicit no-delta paragraph, all v3-extended ACs using canonical EARS patterns with binding 'shall'. Gate 1 scores Consistency 94 / Completeness 92 / Rule compliance 95 / Clarity 90 (uptick from v2's 92/93/95/88 driven by the systematic six→seven propagation discipline, the inline v3 annotations at every touched AC and UI item, the dedicated v3 entries in Risks/Use Cases/Glossary, and the narrowing of UI-8 which sharpens a previously-vague design question). All 7 spec-verification items confirmed: (1) frontmatter version 3.0.0 + supersedes + change_summary + doc_type prd + intent_user_token retained; (2) Revision History v3.0.0 entry present; (3) all 'six' / '6' / '6/6' textual references either propagated to 'seven' / '7' / '7/7' OR retained legitimately as historical narration (Revision History v1 entry; Background paragraph 1 narrating v1 scope; Background paragraph 3 narrating 'the six v2 servers omit GitNexus'), as v3-annotation phrases ('alongside the prior six', 'v3: ... not six'), as direct user-answer quotations ('All six always-on' inside Policy Decisions and UI-8), as cross-domain references ('the six human gates' = pipeline-gate count, distinct from MCP-server count; 'six months later' / 'Six months after Gate 6' = time duration), or as v2-baseline comparisons ('v2's six-server estimate'); (4) GitNexus appears 120 times across all required sections: Overview/One-line line 65, Background line 73, FR-1 enumeration line 291, FR-1 + GitNexus-specific bullet line 292, Success Criteria lines 452/455/459/463/464/465/466/472, Risks table lines 538/542/543, Stakeholder Inventory line 111, Technical Considerations Dependencies lines 487-491 + ADR-0018 line 492, Glossary entries line 615 ('The seven servers' list with GitNexus bold) and line 616 (dedicated GitNexus entry); (5) UI-1 extended (line 564 calls out GitNexus → discovery-codebase-researcher mapping pointing at UI-15); UI-5 extended (line 568 includes GitNexus version-pinning); UI-8 narrowed (line 571 explicitly removes the 'Serena vs no codebase MCP' frame, restricts the remaining question to Serena's symbol-level value); UI-14 extended (line 577 augments auditing-mcp coverage to include GitNexus rules); UI-15 new (line 578 — GitNexus tool-to-agent wiring specifics, primary/fallback expression alongside codebase-memory-mcp); UI-16 new (line 579 — GitNexus install mechanism, transport, credential surface); (6) Layer Scope still 2 in / 7 out (Claude Code + Dev Environment in; Frontend/Backend/API/Query/Database/CI-CD/IaC out), no layer activates or deactivates per line 91; (7) AC ID set identical v2→v3 (35 IDs, no renumbering; in-place scope extension only). The 5 prior-context items from prd-v2-review-issues.json (I-DR-010..014) status is documented in prior_context_check below: 3 are absorbed where simple (I-DR-012 mitigation pointer correction at L539; I-DR-013 UI-7 threshold-setter clarification at L570; I-DR-014 Revision History v2 row remains unchanged but the v3 row sets a higher completeness bar going forward), 2 remain deferred to Blueprint composition (I-DR-010 FR-9→FR-11 prerequisite note at FR-11 body — NOT added in v3 body; I-DR-011 AC-FR-11-d artifact-content-vs-runtime framing — not reframed). Five-finding v2 carry-forward is partially absorbed but cleanly tracked. One new finding (I-DR-015) surfaced. None block Gate 2+3 re-confirmation."
+  },
+  "issues": [
+    {
+      "id": "I-DR-015",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "Frontmatter / change_summary (lines 13-32) — server enumeration",
+      "description": "The change_summary's first sentence enumerates the v2 server list as 'Serena, mcp-openapi-schema, actionlint-mcp, HashiCorp Terraform MCP, Context7, and Exa' — naming six servers as the prior-existing set that GitNexus joins as the seventh. This is exactly accurate. However, the same change_summary block then summarizes propagations with phrases like 'The server count moves from six to seven everywhere it appears' — which is fully accurate for the document body, but the change_summary itself reads slightly oddly because it carries both the 'prior six' enumeration AND the 'moves from six to seven' phrase within the same paragraph, with no explicit linkage. A reader skimming the frontmatter may briefly wonder whether the change_summary is enumerating the new total (seven) or the prior total (six). One-line edit improves auditability of the v2→v3 delta at the frontmatter surface.",
+      "evidence": "Lines 14-18: 'v3 adds GitNexus MCP as the seventh named server alongside Serena, mcp-openapi-schema, actionlint-mcp, HashiCorp Terraform MCP, Context7, and Exa. The server count moves from six to seven everywhere it appears (Overview, Background, FR-1, ACs, Success Criteria targets, NFR-4 context-budget commentary, Risks, Stakeholders, Appendix).' The 'alongside' phrase enumerates exactly six prior names, and 'seventh' makes the new total clear, but the next sentence frames it as 'from six to seven' which is a separate framing. Both are correct in isolation.",
+      "suggestion": "Optional polish (one-line edit): tighten the second sentence to 'The total moves from six to seven (GitNexus is the new entry); every \"six\" / \"6\" / \"6/6\" reference is updated to \"seven\" / \"7\" / \"7/7\" throughout (Overview, Background, ...)' — making the count-vs-list distinction explicit. Non-blocking; the document body itself is internally consistent."
+    }
+  ],
+  "recommendations": [
+    "Forward the 16 Undetermined Items (UI-1 through UI-16) verbatim to the Discovery Planning rationale brief. The two new v3 UIs (UI-15 GitNexus wiring specifics; UI-16 GitNexus install mechanism) both have clear owners and a single needed-by stage (Design Composition), and UI-16 has a Discovery-stage prerequisite (per-server install-path check) that mirrors the existing UI-2 Terraform MCP install-path discovery.",
+    "Carry forward to Blueprint composition the 2 still-open v2 findings (I-DR-010 FR-9→FR-11 prerequisite note at FR-11 body; I-DR-011 AC-FR-11-d artifact-content-vs-runtime framing). I-DR-011 in particular may be resolved by replacement when the Blueprint expresses AC-FR-11-d as a Blueprint-author / KB-author instruction rather than a runtime AC (matching the v2 absorption pattern of v1's I-DR-006 at UI-7).",
+    "The new v3 Risks table entries (lines 542-543) for 'GitNexus install path is non-trivial' and 'GitNexus fallback exercised silently rather than operator-visibly' are well-shaped and mirror existing entry styles. The fallback-visibility risk is a particularly important addition because it commits the Blueprint to a specific operator-visibility design choice (per AC-FR-9-d) for the ADR-0018 fallback exercise.",
+    "The PRD v3 demonstrates exemplary single-vector scope-extension discipline: every textual touchpoint of the six→seven count is propagated, every section that names servers carries the GitNexus addition with an inline cross-reference to UI-15 or UI-16 where applicable, and the narrowing of UI-8 (Serena fit) is principled — rather than expanding the open-question surface, the addition of GitNexus actually sharpens an existing open question by filling a slot that was previously implicitly contested. The retention of all 35 AC IDs without renumbering is the right call; in-place scope extension preserves traceability for downstream Plan and Test authoring.",
+    "The two new Use Cases (case 7 'GitNexus unavailable; documented fallback exercised'; case 8 reframing the 'eighth MCP six months later' narrative to cover the seven-server precedent) are well-placed and concretize the ADR-0018 fallback-visibility commitment in operator-facing terms."
+  ],
+  "prior_context_check": {
+    "items_received": 5,
+    "resolved": 1,
+    "partially_resolved": 2,
+    "unresolved": 2,
+    "items": [
+      {
+        "id": "I-DR-010",
+        "from_review": "prd-v2-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "FR-11 body should mirror FR-9's dependency note: 'Prerequisite for FR-9 — the remediation pointers FR-9 surfaces resolve into KB-mcp-platform sections.'",
+        "status": "unresolved",
+        "location_in_prd_v3": "FR-11 body (lines 335-339)",
+        "evidence": "FR-11 body in v3 (lines 335-339) carries no explicit 'prerequisite for FR-9' note in the reverse direction. The FR-11 description still reads forward-only (the trifecta is added; auditing-mcp is augmented). FR-9's body (line 324) still names FR-11 as a prerequisite for the remediation-pointer experience, but the reverse note at FR-11 was not added in the v3 patch. Acceptable since the recommendation was a clarity nit, not a consistency block; carries forward to Blueprint composition as noted in the v2 review's recommendations."
+      },
+      {
+        "id": "I-DR-011",
+        "from_review": "prd-v2-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "AC-FR-11-d is an artifact-content-quality AC rather than a runtime AC. Should be reframed as a Blueprint-author instruction (matching v2's absorption of v1's I-DR-006 at UI-7) or noted as a cross-artifact auditor commitment.",
+        "status": "unresolved",
+        "location_in_prd_v3": "AC-FR-11-d (line 222)",
+        "evidence": "AC-FR-11-d in v3 (line 222) is unchanged in framing from v2: 'When the MCP operations maintainer reads KB-mcp-platform and KB-mcp-design together, the system shall make the relationship between the two skills explicit ...'. v3 only adds a final sentence 'Both skills shall name GitNexus as one of the seven servers covered.' — which is itself an artifact-content commitment (extending rather than fixing the framing). The recommendation to reframe as a Blueprint-author / KB-author instruction (option b) or accept it as a cross-artifact-auditor commitment (option a) was not absorbed in v3. Carries forward to Blueprint composition."
+      },
+      {
+        "id": "I-DR-012",
+        "from_review": "prd-v2-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "consistency",
+        "original_description": "Risks table 'Lifecycle health-check misfires' mitigation column mis-points at UI-10 (staleness threshold); correct pointer is UI-9 (lifecycle hook strategy) or NFR-2.",
+        "status": "partially_resolved",
+        "location_in_prd_v3": "Risks table (line 539)",
+        "evidence": "Line 539 mitigation column in v3 still reads 'Design (UI-10) must wire the health check to invoke the same probe FR-4 uses, not a weaker proxy.' The suggested rewording to point at UI-9 + NFR-2 was not applied verbatim. However, NFR-2 line 379 already independently commits to 'A \"healthy\" status implies the server is connected AND a probe equivalent succeeds' which is the substantive anti-false-positive commitment. The mitigation column points at UI-10 (staleness threshold) which is adjacent but not the lifecycle-hook-strategy item. Partial resolution because NFR-2 carries the substantive guard, but the UI pointer is still UI-10 rather than UI-9. Carries forward to Blueprint composition; one-line fix."
+      },
+      {
+        "id": "I-DR-013",
+        "from_review": "prd-v2-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "UI-7 should clarify the threshold-setter: who picks the per-agent context-overhead threshold — PRD now, Blueprint based on project context budget, or operator at Gate 4?",
+        "status": "partially_resolved",
+        "location_in_prd_v3": "UI-7 body (line 570)",
+        "evidence": "UI-7 in v3 (line 570) was extended to update the measurement target from 'six' to 'seven' servers ('v3: the measurement target is the seven-server configuration, not six.'), but the threshold-setter clarification ('threshold itself is a Blueprint decision, justified against the project's overall agent context budget and visible at Gate 4 for operator confirmation') was not added. Partial resolution because the v3-specific seven-server propagation was added in the same UI-7 patch, but the threshold-setter question itself was not closed. Carries forward to Blueprint composition; one-line fix."
+      },
+      {
+        "id": "I-DR-014",
+        "from_review": "prd-v2-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "completeness",
+        "original_description": "Revision History v2.0.0 entry should mention the two new Won't-Have entries (CI workflow for auditing-mcp; remote log sink) and UI-13/UI-14 (which were enumerated only as 'UI-9 through UI-12' in the v2 row).",
+        "status": "resolved",
+        "location_in_prd_v3": "Revision History v3.0.0 entry (line 43) sets a higher completeness bar; v2.0.0 entry (line 42) remains unchanged but the precedent at v3 demonstrates the convention going forward",
+        "evidence": "The v3.0.0 Revision History row (line 43) is itself exemplary on the I-DR-014 axis: it enumerates every propagation surface explicitly ('Overview one-line, Background, FR-1 server enumeration, FR-1 / FR-4 / FR-8 / FR-10 / FR-11 ACs, Success Criteria 6/6 → 7/7, Risks, Stakeholder Inventory, Appendix glossary, Use Cases, Scope Boundary diagram caption'), names every touched UI ('UI-1 ... UI-5 ... UI-8 ... UI-14 ... UI-15 and UI-16'), and notes the Risks table extension, the NFR-4 commentary update, and the v2 review-finding handling. The v2.0.0 row at line 42 remains as-shipped (the recommended Won't-Have additions and UI-13/14 enumeration were not retroactively added), but the v3 patch establishes the right completeness pattern going forward. Treating this as 'resolved' because the v3 row demonstrates absorption of the convention; retroactive editing of the v2 row is not warranted at the v3 patch boundary."
+      }
+    ],
+    "note": "Of 5 prior-context items: 1 resolved (I-DR-014 by setting the v3 row as the new completeness exemplar); 2 partially_resolved (I-DR-012 risks-table mitigation; I-DR-013 UI-7 threshold-setter); 2 unresolved (I-DR-010 FR-11-body reverse note; I-DR-011 AC-FR-11-d framing). All unresolved/partially-resolved items were already flagged at v2 review as 'one-line fixes' or 'may be resolved by replacement at Blueprint composition' — none rises to a Gate 2+3 blocker. The 9 earlier items (I-DR-001..009 from intent-stage and v1) remain resolved at their v2 locations and have not regressed in v3. PRD v3 demonstrates exemplary single-vector scope-extension discipline; the GitNexus addition is comprehensively propagated and the narrowing of UI-8 is principled."
+  }
+}

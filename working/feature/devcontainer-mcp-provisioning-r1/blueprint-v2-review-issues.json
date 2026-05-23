@@ -1,0 +1,204 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "review_scope": "diff-review (v1 → v2)",
+    "doc_type": "DesignDoc",
+    "doc_subtype": "Blueprint",
+    "target_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/blueprint-v2.md",
+    "predecessor_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/blueprint-v1.md",
+    "prior_review_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/blueprint-v1-review-issues.json",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "version": "2.0.0",
+    "reviewer": "shared-document-reviewer",
+    "invocation_context": "Diff-review confirming v1 → v2 fixes for 3 blocking + 3 recommended findings",
+    "kb_loaded": [
+      "KB-documentation-criteria",
+      "KB-general-coding-principles",
+      "KB-review-disciplines"
+    ],
+    "reviewed_at": "2026-05-23T00:00:00Z",
+    "inputs_consulted": [
+      "blueprint-v2.md (full read)",
+      "blueprint-v1-review-issues.json (6 prior items)",
+      "adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md line 143 (companion edit target)"
+    ]
+  },
+  "scope_note": "This is a FOCUSED diff-review per the user's request. Gate 0 structural existence and Gate 1 substantive quality were fully exercised in the v1 review; this review verifies the 6 v1 findings are absorbed and checks for any regression introduced by the diff. New issues are reported only when introduced by the v2 changes.",
+  "scores": {
+    "consistency": 93,
+    "completeness": 92,
+    "rule_compliance": 92,
+    "clarity": 88
+  },
+  "gate0": {
+    "status": "pass",
+    "checks": {
+      "frontmatter_version_bumped": "pass — version 1.0.0 → 2.0.0",
+      "frontmatter_status": "pass — status: draft (correct for newly-emitted artifact awaiting Gate 4)",
+      "frontmatter_supersedes_predecessor_present": "pass — supersedes: blueprint-v1.md; predecessor: full path",
+      "frontmatter_change_summary_present": "pass — multi-line change_summary names all 6 v1 findings",
+      "all_15_template_sections_present": "pass — Contents checklist still enumerates all 15 sections; spot-check of section headings confirms presence",
+      "section_count_preserved": "pass — Update History line 1249 explicitly notes 'Section count remains 15'",
+      "update_history_entry_added": "pass — 2.0.0 row appended; lists all 6 fixes with cross-references"
+    },
+    "missing_elements": []
+  },
+  "v1_findings_resolution_check": {
+    "I-DR-BP-001": {
+      "v1_severity": "important",
+      "v1_category": "consistency",
+      "v2_status": "resolved",
+      "evidence": [
+        "Line 112 (Design Summary blast_radius.runtime): '8 agents gain new mcp__ tool entries; the 28 untouched agents preserve C-0445'",
+        "Line 118 (Design Summary main_constraints): 'C-0445 zero-mcp__ invariant on the 28 non-consumer agents'",
+        "Line 172 (Agreement Checklist Scope): '8 of 36 .claude/agents/*.md files'",
+        "Line 191 (Agreement Checklist Non-Scope): 'Preserve C-0445 zero-mcp__ invariant for the 28 non-consumer agents'",
+        "Line 275 (AC-CC-3): 'inspects the 28 non-consumer agent files'",
+        "Line 388 (Fact Disposition row C-0445): 'preserve (for 28 of 36) ... 8 consumer agents total ... union with the consumer-mapping = 8 unique'",
+        "Line 459 (Change Impact Map No Ripple Effect): 'The 28 non-consumer agents tools: arrays are NOT modified'",
+        "Line 472 (Interface Change Matrix): '8 of 36 agents gain mcp__<server>__<tool> entries; 28 preserved'",
+        "Line 508 (Architecture Overview ASCII): '(28 agents preserved zero-mcp__)'",
+        "Line 607 (Component #2 description): 'Preserve zero-mcp__ for 28 non-consumers'",
+        "Line 708 (State Invariants): '28 of 36 agents always have zero mcp__ entries (C-0445)'",
+        "Line 778 (Sub-Agents intro): 'modifies 8 of 36 existing agents tools: allowlists ... 8 unique touched agents with 28 untouched'",
+        "Line 994 (Implementation Plan step 7): '8 of 36 .claude/agents/*.md edits'",
+        "Negative confirmation: grep for residual '7 of 36', '29 untouched', '29 non-consumer' in non-historical lines returns zero matches"
+      ],
+      "edits_made": "13 of 13 reviewer-flagged locations propagated. Reviewer's original list of 12 + Implementation Path Mapping (an additional v1 location not enumerated explicitly in I-DR-BP-001 conditions) all updated."
+    },
+    "I-DR-BP-002": {
+      "v1_severity": "important",
+      "v1_category": "consistency",
+      "v2_status": "resolved",
+      "evidence": [
+        "ADR-0037 line 143 now reads: 'The first postStart run appends eight `readiness_probe` records (one per registered server in `.mcp.json`, including the codebase-memory-mcp ADR-0007 fallback per Blueprint AC-X-2).'",
+        "Cross-reference to AC-X-2 added per reviewer suggestion",
+        "Blueprint Contract Definitions section line 651 explicitly cross-references the companion edit: 'Companion edit: ADR-0037 Implementation Guidance line 143 updated in this Blueprint version from seven readiness_probe records to eight readiness_probe records per reviewer I-DR-BP-002.'"
+      ],
+      "edits_made": "1 of 1 — exactly the suggested edit applied, including AC-X-2 cross-reference."
+    },
+    "I-DR-BP-003": {
+      "v1_severity": "recommended",
+      "v1_category": "completeness",
+      "v2_status": "resolved",
+      "evidence": [
+        "New subsection at lines 730–736 titled 'Per-layer Review Findings — Absorbed Recommended-Severity Items (resolves reviewer I-DR-BP-003)' under §Claude Code / Project Filesystem Design.",
+        "I-DR-003: 'placeholder convention unified at plan-author time per D-11 verify-at-execution discipline; canonical placeholder form is <PIN_TBD> across .mcp.json and versions.env'",
+        "I-DR-005: 'KB-mcp-platform pedagogical_sections justifications will be tightened during skill authoring (Stage 9 plan task) to match the KB-github-actions-platform precedent'",
+        "I-DR-006: 'KB-mcp-platform/assets/templates/.mcp.json.example uses .json (matching project convention); design-time sketches that need inline comments may use jsonc fences with a caption disclaimer'"
+      ],
+      "edits_made": "All three CC recommended-severity items explicitly addressed per the reviewer's suggested wording."
+    },
+    "I-DR-BP-004": {
+      "v1_severity": "recommended",
+      "v1_category": "clarity",
+      "v2_status": "resolved",
+      "evidence": [
+        "Sub-Agents table at line 783 now has a single design-cicd row: '| design-cicd | mcp__actionlint-mcp__lint_workflow, mcp__actionlint-mcp__check_all_workflows, mcp__serena__* | C-0144 + ADR-0040 |'",
+        "Table now contains exactly 8 rows for 8 unique touched agents (design-api, design-cicd, design-iac, discovery-external-researcher, discovery-codebase-researcher, review-architecture-auditor, design-cc, design-codespaces)",
+        "Resolution-note parenthetical removed; the table is self-documenting per the reviewer's suggestion."
+      ],
+      "edits_made": "Exactly the suggested consolidation applied."
+    },
+    "I-DR-BP-005": {
+      "v1_severity": "recommended",
+      "v1_category": "completeness",
+      "v2_status": "resolved",
+      "evidence": [
+        "Line 330 (AC-NFR-2-a): 'When git grep runs over the repo at any commit, the system shall not surface any literal credential value (no secret values committed) — enforced by AC-CC-4 grep + augmented auditing-mcp OP-6 / OP-9 / OP-10 + ADR-0039 redact-at-source posture.' (PRD-inherited; enumerated per reviewer I-DR-BP-005.)",
+        "Line 331 (AC-NFR-2-c): 'When the augmented auditing-mcp runs end-to-end at Gate 6, the system shall report zero BLOCKER findings — same bar as AC-CC-5 / AC-FR-11-c; the bar's gating semantics are OI-3.'",
+        "Line 332 (AC-NFR-2-d): 'When postStart or any in-product fallback-detection code-site writes to mcp-events.jsonl, the system shall apply the redaction filter (env-block allowlist + HTTP-headers allowlist from .mcp.json) before write — per ADR-0039 redact-at-source SSOT; default-fail-closed if allowlist is empty.'",
+        "All three are formally placed under 'Cross-Layer / Operational ACs' (the reviewer's preferred option (a))."
+      ],
+      "edits_made": "Reviewer's preferred option (a) (self-contained enumeration) applied."
+    },
+    "I-DR-BP-006": {
+      "v1_severity": "recommended",
+      "v1_category": "feasibility",
+      "v2_status": "resolved",
+      "evidence": [
+        "Line 142 (Background and Context, ADR-0033 prerequisite entry): 'Also: ADR-0040's design-codespaces Serena entry is forward-looking on this stub becoming real (see OI-6 / Known Unknown in ADR-0040 Decision Details).'",
+        "Line 128 (Design Summary unknowns): 'Whether design-codespaces's ADR-0040 Serena allowlist entry actually fires within 90 days post-ship — depends on whether auditing-codespaces ADR-0033 stub is filled (see OI-6)'",
+        "Line 420 (Fact Disposition row C-0499): 'design-codespaces's ADR-0040 Serena entry is forward-looking on this stub becoming real (see OI-6)'",
+        "Line 789 (Sub-Agents design-codespaces row): 'ADR-0040 (touches auditing-codespaces/scripts/ if/when ADR-0033 stub becomes real; forward-looking — see OI-6)'",
+        "Line 1154 (Future Extensibility): 'design-codespaces's ADR-0040 Serena entry is forward-looking on this stub-fill (OI-6)'",
+        "Line 1202 (Risks table row): 'design-codespaces's Serena entry sits unused if ADR-0033 auditing-codespaces stub remains unfilled ... kill-criterion: if no Serena tool invocation from design-codespaces for >90 days post-ship and stub still unfilled, an additive ADR may remove the entry'",
+        "Line 1242 (Open Items OI-6): 'OI-6 (NEW in v2; surfaces reviewer I-DR-BP-006): ADR-0040 design-codespaces forward-looking dependency on ADR-0033 stub-filling ... If the auditing-codespaces stub remains unfilled for >90 days post-ship AND design-codespaces fires zero Serena tool invocations in that window, an additive amendment ADR may remove the entry. Not blocking Gate 4; tracked as a known unknown.'"
+      ],
+      "edits_made": "Reviewer's option (b) (Known Unknown / Open Item) applied, plus cross-references at 6 additional locations for traceability."
+    }
+  },
+  "prior_context_check": {
+    "items_received": 6,
+    "resolved": 6,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [
+      {"id": "I-DR-BP-001", "status": "resolved", "location": "13+ propagation sites across blueprint-v2.md", "evidence": "All v1-flagged locations updated to 8/28; grep for residual 7/29 returns only historical/reference matches."},
+      {"id": "I-DR-BP-002", "status": "resolved", "location": "ADR-0037 line 143 + blueprint-v2.md line 651", "evidence": "'eight readiness_probe records' with AC-X-2 cross-reference."},
+      {"id": "I-DR-BP-003", "status": "resolved", "location": "blueprint-v2.md lines 730–736", "evidence": "New 'Per-layer Review Findings — Absorbed Recommended-Severity Items' subsection addresses all three CC items."},
+      {"id": "I-DR-BP-004", "status": "resolved", "location": "blueprint-v2.md line 783", "evidence": "Sub-Agents table design-cicd consolidated to single row; 8 rows for 8 unique agents."},
+      {"id": "I-DR-BP-005", "status": "resolved", "location": "blueprint-v2.md lines 330–332", "evidence": "AC-NFR-2-a/c/d enumerated as PRD-inherited entries under Cross-Layer / Operational ACs."},
+      {"id": "I-DR-BP-006", "status": "resolved", "location": "blueprint-v2.md lines 128, 142, 420, 789, 1154, 1202, 1242", "evidence": "Forward-looking dependency documented as Known Unknown (OI-6) + Risk-table row + 5 additional cross-reference touchpoints."}
+    ]
+  },
+  "regression_check": {
+    "status": "clean",
+    "notes": [
+      "Section count preserved at 15 (Update History affirms).",
+      "Frontmatter integrity: version 2.0.0, status draft, predecessor + supersedes recorded per shared-conventions.",
+      "No new ADRs authored in v2 (ADR-0037 line 143 is the only ADR edit; ADRs-0038/0039/0040/0041 unchanged).",
+      "Fact Disposition Table coverage of codebase_analysis focusAreas: unchanged (v1 had full coverage; v2 only edits the C-0445 row rationale text and the C-0499 row rationale text to note the OI-6 forward-looking dependency).",
+      "All 16 prior-context items from prior-stage reviews (cc-design + codespaces-design) remain resolved/partially_resolved/unresolved with the same dispositions as v1; the v2 changes did not regress any of them.",
+      "EARS keyword discipline preserved on the three newly-enumerated AC-NFR-2-a/c/d clauses ('When ... shall' form).",
+      "Code blocks (Design Summary YAML, Change Impact Map YAML, Architecture Overview ASCII, Data Flow pseudo-code, State Transitions YAML) — content unchanged from v1 except in-place 7→8 and 29→28 substitutions; all 10-dimension scores carry forward (no new fabricated APIs, no credentials, no fabricated dependencies).",
+      "ADR-0037 line 143 cross-references Blueprint AC-X-2 explicitly per reviewer suggestion — strengthens internal consistency."
+    ]
+  },
+  "new_issues_introduced_by_v2": [
+    {
+      "id": "I-DR-BP-V2-001",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "blueprint-v2.md line 388 (Fact Disposition Table, row C-0445)",
+      "description": "The C-0445 row rationale phrases the 8-unique-agent math as: '8 consumer agents total (3 from base consumer-mapping — review-architecture-auditor, design-cicd, discovery-codebase-researcher — overlap with the 5-agent ADR-0040 Serena allowlist; the other 5 are non-overlapping). ADR-0040 narrows Serena to a 5-agent allowlist; union with the consumer-mapping = 8 unique.' The '3 from base consumer-mapping overlap with Serena' phrasing is correct (the 3 named agents are in BOTH sets). However, the parallel phrasing 'the other 5 are non-overlapping' is mildly confusing — it actually refers to '5 = 3 base-only + 2 Serena-only', i.e. the union members that are NOT in the overlap. Two cleaner alternative phrasings exist in the SAME document (lines 778 and 996): '5 Serena consumers; 3 of those 5 overlap with the 7-agent base consumer-mapping; the remaining 2 (design-cc, design-codespaces) are net-new — total touched = 8 unique.' That second phrasing is unambiguous; line 388 is reachable but invites a re-derivation.",
+      "suggestion": "Optional cosmetic edit: replace line 388's rationale with the cleaner phrasing already used at lines 778 and 996 — '5 Serena consumers per ADR-0040; 3 of those 5 (review-architecture-auditor, design-cicd, discovery-codebase-researcher) overlap with the 7-agent base consumer-mapping; the remaining 2 (design-cc, design-codespaces) are net-new — union = 8 unique consumer agents'. Non-blocking; arithmetic is correct as-is."
+    }
+  ],
+  "verdict": {
+    "decision": "approved",
+    "conditions": [],
+    "rationale": "All 6 v1 findings (3 important consistency findings I-DR-BP-001/002/003 + 3 recommended findings I-DR-BP-004/005/006) are fully resolved. The 7→8 / 29→28 propagation is comprehensive (13 reviewer-flagged sites + the additional Implementation Path Mapping site = full coverage); negative grep confirms no residual stale figures in live document text. ADR-0037 line 143 is edited per the reviewer's exact suggestion, including the AC-X-2 cross-reference. The three CC recommended-severity items (I-DR-003/005/006) are now explicitly addressed under §Claude Code / Project Filesystem Design with named dispositions. The Sub-Agents table design-cicd row is consolidated to one row, bringing the row count into agreement with the 8-unique-agent total. AC-NFR-2-a/c/d are enumerated under Cross-Layer / Operational ACs per the reviewer's preferred option. ADR-0040's design-codespaces forward-looking dependency on ADR-0033 stub-filling is documented across 7 surfaces (OI-6, Background and Context, Design Summary unknowns, Fact Disposition C-0499 row, Sub-Agents table row, Future Extensibility, Risks table). Frontmatter version bumped to 2.0.0; supersedes/predecessor recorded; status: draft preserved for Gate 4 disposition. Section count preserved at 15. No regression introduced. One new RECOMMENDED-severity cosmetic issue (I-DR-BP-V2-001) is surfaced — the C-0445 row's phrasing is slightly less clear than the equivalent statements at lines 778 and 996 — but this is non-blocking; the arithmetic is correct and consistent across all three sites. v2 is ready for Gate 4 user approval.",
+    "downstream_handoff": {
+      "next_invocation": "Architecture Audit (Stage 8) — review-architecture-auditor",
+      "ready_inputs": ["blueprint-v2.md", "synthesis.md", "codebase-analysis.json", "rationale-brief"],
+      "outstanding_open_items_for_user_at_gate_4": ["OI-1", "OI-2", "OI-3", "OI-4", "OI-5", "OI-6"]
+    }
+  },
+  "issues": [
+    {
+      "id": "I-DR-BP-V2-001",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "blueprint-v2.md line 388 — Fact Disposition Table row C-0445 rationale column",
+      "description": "Mild rationale-phrasing inconsistency in the 8-unique-agent breakdown. The phrasing '3 from base consumer-mapping ... overlap with the 5-agent ADR-0040 Serena allowlist; the other 5 are non-overlapping' is arithmetically correct (3 overlap + 5 non-overlap = 8) but reads awkwardly because 'non-overlapping' here means union members NOT in the overlap intersection (3 base-only + 2 Serena-only = 5). Two other locations in the SAME document (lines 778 and 996) use a cleaner phrasing: '5 Serena consumers; 3 of those 5 overlap with the 7-agent base; the remaining 2 are net-new — total = 8 unique'.",
+      "suggestion": "Optional cosmetic edit: align line 388's rationale phrasing with the cleaner formulation already in use at lines 778 and 996. Suggested text: 'Least-privilege per cc-design Principle 5; 5 Serena consumers per ADR-0040; 3 of those 5 (review-architecture-auditor, design-cicd, discovery-codebase-researcher) overlap with the 7-agent base consumer-mapping; the remaining 2 (design-cc, design-codespaces) are net-new — union = 8 unique consumer agents; 36 − 8 = 28 untouched preserve C-0445.' Non-blocking; the arithmetic and reader-resolvable meaning are correct as-is."
+    }
+  ],
+  "checks_performed": {
+    "gate0_structural": "pass — frontmatter complete (version, status, supersedes, predecessor, change_summary); all 15 sections present; Update History entry added for 2.0.0",
+    "gate1_consistency": "pass — 8/28 counts propagated consistently across 13+ sites; ADR-0037 ↔ Blueprint reconciled; negative grep on stale 7/29 figures returns only historical references",
+    "gate1_completeness": "pass — all 6 v1 findings absorbed; new OI-6 row added; AC-NFR-2-a/c/d enumerated; recommended cc-design items I-DR-003/005/006 explicitly dispositioned",
+    "gate1_rule_compliance": "pass — frontmatter conforms to shared-conventions; EARS form preserved on new ACs; ADR-0036 single-location placement honored",
+    "gate1_clarity": "pass with I-DR-BP-V2-001 (recommended-severity cosmetic phrasing nit in C-0445 row rationale); table-row counts match agent-count narrative",
+    "gate1_feasibility": "pass — design-codespaces forward-looking dependency explicitly bounded with 90-day kill criterion",
+    "regression_check": "clean — no Gate 0 element removed; no Fact Disposition focusArea dropped; no AC removed; no ADR content drift (ADR-0037 line 143 is the only ADR diff, and it is the requested fix)"
+  },
+  "recommendations": [
+    "READY FOR GATE 4: All 6 v1 findings resolved. Verdict: APPROVED. Blueprint v2 may proceed to Architecture Audit (Stage 8) and then to user Gate 4 approval.",
+    "OPTIONAL polish before Gate 4: align Fact Disposition row C-0445's rationale phrasing with the cleaner formulation used at lines 778 and 996 (see I-DR-BP-V2-001). Single-line edit; takes <2 min. Strictly cosmetic; arithmetic is correct.",
+    "FOR USER AT GATE 4: Six Open Items still require disposition — OI-1 (inventory convention, composer recommends accept AC-X-2 as-is), OI-2 (family-coordinator Path B, composer recommends keep), OI-3 (auditing-mcp Gate 6 hard-gate vs strongly-recommended — composer recommends hard-gate), OI-4 (per-agent context-overhead — plan-author measurement; not blocking), OI-5 (ADR-0007 content review post-relocation — follow-up; not blocking), OI-6 (NEW; ADR-0040 design-codespaces forward-looking on ADR-0033 stub — tracked as known unknown with 90-day kill criterion).",
+    "FOR ARCHITECTURE AUDIT (Stage 8): The brief-honor and CoVe checks for v2 should specifically verify (a) the C-0445 row rationale arithmetic ('5 Serena ∪ 7 base = 8 unique' with 3-agent overlap), (b) the ADR-0037 ↔ Blueprint cross-reference consistency on the 8-record postStart bootstrap, and (c) the OI-6 / ADR-0033 forward-looking dependency does not violate ADR-0040's narrowing rationale.",
+    "STRENGTHS: (1) Diff is minimal and surgical — every change traces to a specific v1 finding. (2) The 13-site propagation of 7→8 / 29→28 is exhaustive; reviewer's enumerated list was treated as the closed set. (3) The companion ADR-0037 edit was applied with cross-reference (not just a count change), strengthening internal consistency. (4) OI-6 was documented across 7 cross-reference sites, exceeding the reviewer's single-location requirement and establishing strong traceability for the forward-looking dependency. (5) Update History entry is exemplary — each of the 6 fixes is explicitly named and the 13 sites of I-DR-BP-001 propagation are enumerated, making future audit cheap."
+  ]
+}

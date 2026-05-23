@@ -1,0 +1,196 @@
+{
+  "metadata": {
+    "stage": 9,
+    "auditor": "review-cross-artifact-auditor",
+    "model_posture": "opus",
+    "iteration_number": 4,
+    "input_mode": "diff (cycle-3 amendments to plan-v1 v1.0.2, blueprint-v3 v3.0.2, ADR-0041 v1.0.1, acceptance-tests v1.0.3, phase-validators v1.0.1, T-005 v3.0.0, plus orchestrator D-3.2-completion WebFetch patches across blueprint-v3, cc-design, cc-dependencies.json, tasks.json, verify-at-execution, phase-validators, agent-roster-impact-matrix, T-005)",
+    "cycle": 4,
+    "of_cap": 4,
+    "is_terminal_cycle": true,
+    "cap_exhaustion_status": "REACHED — this is the 4th and final reconciliation cycle per ADR-0017; no further reconciliation cycles available without user trade-off call",
+    "artifacts_audited_for_diff_cycle3_in_scope": [
+      "plan-v1.md (1.0.1 -> 1.0.2)",
+      "blueprint-v3.md (3.0.1 -> 3.0.2)",
+      "adrs/ADR-0041-install-mechanism-hybrid.md (1.0.0 -> 1.0.1)",
+      "acceptance-tests.md (1.0.2 -> 1.0.3)",
+      "phase-validators.md (1.0.0 -> 1.0.1)",
+      "research-notes/T-005-context7.md (1.0.0 -> 2.0.0 -> 3.0.0 per Document History)",
+      "tasks.json (T0.2, T0.4, T0.5, T2.4, T3.4 descriptions)",
+      "cc-design.md (gitnexus comment block; row 4 Context7 justification)",
+      "cc-dependencies.json (actionlint identifier, gitnexus install form, header enumeration)",
+      "codespaces-design.md (install_actionlint_mcp, install_gitnexus, smoke-test, Node-LTS prereq)",
+      "codespaces-dependencies.json (gitnexus contract, install paths)",
+      "verify-at-execution.md (§H-1, §H-4, §H-5)",
+      "agent-roster-impact-matrix.md (Context7 tool-name + version-coupling)"
+    ],
+    "artifacts_trusted_unchanged": [
+      "prd-v3.md",
+      "research-plan-v3.md",
+      "intent-clarification.md",
+      "synthesis.md (pre-design; per cycle-3 dispatch §F3 exclusion)",
+      "blueprint-v1.md / blueprint-v2.md (superseded; historical record)",
+      "ADRs 0037, 0038, 0039, 0040, 0042, 0043 (out of cycle-3 scope)"
+    ],
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "generated": "2026-05-23T22:30:00Z",
+    "prior_cycle_artifacts": [
+      "cross-artifact-audit-issues.json (cycle 1)",
+      "cross-artifact-audit-issues-cycle-2.json (cycle 2)",
+      "reconciliation-dispatch-cycle-3.json",
+      "reconciliation-log-cycle-3.md"
+    ]
+  },
+  "dimension_results": {
+    "F1_actionlint_propagation_completeness": {
+      "verdict": "PASS",
+      "evidence": "grep -rn '2manymws' returned 28 hits; ALL are in historical/narrative contexts: reconciliation-dispatch-cycle-3.json (patch instructions), reconciliation-log-cycle-3.md (drift origin record), tasks.json T0.2/T0.4 (cycle-3 'was X' narrative within current descriptions), cc-dependencies.json line 124 ('was 2manymws/...' narrative), codespaces-design.md line 57 ('was 2manymws/...' narrative), acceptance-tests.md line 824 (Document History row), plan-v1.md line 143 ('Prior pipeline drafts referenced...'), plan-v1.md line 1254 (Document History), blueprint-v3.md line 159 ('was 2manymws/...' narrative), blueprint-v3.md line 1349 (Document History), ADR-0041 line 72 ('was 2manymws/...' narrative), codespaces-dependencies.json line 69 ('was 2manymws/...' narrative), verify-at-execution.md lines 58/70/91 (the live finding narrative), checkpoint.json (historical event), blueprint-v1/v2/synthesis.md (superseded). ZERO hits in current canonical install-command strings. grep -rn 'hongkongkiwi/actionlint-mcp' shows the corrected identifier consistently in plan-v1.md (3 sites: 143, 148, 572 + versions.env line 310), tasks.json T0.2, cc-dependencies.json line 124, codespaces-design.md line 113, blueprint-v3.md line 159, ADR-0041 line 72, codespaces-dependencies.json line 69, verify-at-execution.md (§H-1). Pin SHA 7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef appears consistently. The `/cmd/actionlint-mcp` subpath has been dropped everywhere in current install-command strings."
+    },
+    "F2_gitnexus_propagation_completeness": {
+      "verdict": "PASS",
+      "evidence": "grep -rn 'uvx --from gitnexus\\|uvx.*gitnexus\\|gitnexus.*uvx' returned hits ONLY in historical/narrative contexts: reconciliation-dispatch-cycle-3.json (patch instructions), reconciliation-log-cycle-3.md (drift origin), tasks.json T0.4/T3.4 ('was uvx-form which assumed PyPI publication that does not exist' narrative), cc-dependencies.json line 126 ('was uvx-form...' narrative), acceptance-tests.md line 824 (Document History NO-OP narrative), plan-v1.md lines 165, 1254 (description preamble + Document History), blueprint-v1/v2 (superseded), synthesis.md (pre-design out of cycle-3 scope), codespaces-dependencies.json line 35 ('uvx-based for Serena' — different server, valid), ADR-0041 line 74 ('was uvx --from gitnexus...' narrative). ZERO hits in current canonical install-command strings. grep -rn 'npm install -g gitnexus' + 'npx -y gitnexus' show consistent npm/npx form. GITNEXUS_TAG=1.6.5 appears in plan-v1.md line 312 (versions.env), tasks.json T0.4 line 106, cc-dependencies.json line 126, verify-at-execution.md line 176, plus across narrative refs. AC-CS-9 wrapping intent EXPLICITLY PRESERVED at: blueprint-v3.md line 346 (AC-CS-9 EARS clause with 'AC semantic intent is unchanged from v3.0.0'), codespaces-design.md line 358 (AC-CS-9 'AC SEMANTIC INTENT PRESERVED across the cycle-3 D-3.2 F2 install-mechanism correction'), plan-v1.md line 165 ('AC-CS-9 wrapping intent preserved'), tasks.json T0.4 line 106 ('AC-CS-9 wrapping-intent check (no C++ toolchain at cold-cache) is install-command-agnostic'), tasks.json T3.4 line 407, cc-dependencies.json line 126, ADR-0041 line 74. No erosion."
+    },
+    "F3_context7_tool_name_propagation": {
+      "verdict": "PASS_WITH_CAVEAT",
+      "evidence": "grep -rn 'get-library-docs' returned hits ONLY in historical/narrative contexts: acceptance-tests.md line 824 (intentional per ADR-0005 append-only narrating what D-3.3 was instructed to verify), checkpoint.json line 23 ('remaining_residuals' explicitly noting the AT Document History case), T-005 v2.0.0 Document History row 160 (showing the corrected->corrected trail), blueprint-v1/v2 (superseded), synthesis.md (pre-design), synthesis/*.json (pre-design). ZERO hits in current canonical tool-allowlist strings. grep -rn 'query-docs' shows consistent canonical form across: blueprint-v3.md line 423 (Fact Disposition C-0037), blueprint-v3.md line 837 (Sub-Agents table), cc-design.md line 223 (allowlist), cc-dependencies.json lines 128 + 131, tasks.json T0.5 line 124, phase-validators.md PV-0.C6 line 73 + PV-4.C5 line 307, agent-roster-impact-matrix.md (rows 14, 133, 160), verify-at-execution.md §H-5 lines 204 + 226, plan-v1.md T0.5 line 176, T-005 v3.0.0 narrative. grep -rn 'Context7 v1.2.0' returned hits only in reconciliation logs/dispatch + T-005 narrative explaining the contamination + checkpoint.json historical event. CAVEAT: cc-design.md row 4 line 223 (current canonical text, NOT a Document History row) still contains the stale claim: 'The Context7 ReplaceContentTool/ReplaceRegexTool v1.2.0 rename (C-0037) is version-coupled — if Context7 is pinned to v>=1.2.0 the entries must use the new name. Composer enforces.' This claim is debunked by cycle-3 F3 + T-005 v3.0.0 (ReplaceContentTool is NOT a Context7 tool at any version; it was Serena CHANGELOG contamination; the two-tool surface is stable across v1->v3 so there is no rename). See I-CA-C4-001 below."
+    },
+    "F3_auth_header_propagation": {
+      "verdict": "MIXED",
+      "evidence": "Canonical CONTEXT7_API_KEY header form correctly applied in: .mcp.json sketch sites (plan-v1.md line 452/cc-design.md), L2 verification jq predicate (plan-v1.md ~line 460), PV-2.C17 (phase-validators.md line 195: `.mcpServers.context7.headers.CONTEXT7_API_KEY` -> `${CONTEXT7_API_KEY}`), verify-at-execution.md §H-5 lines 206-208, tasks.json T0.5 line 124 ('SF-F3-AUTH-HEADER-1 RESOLVED at user disposition to canonical form (NOT Authorization: Bearer)'), tasks.json T2.4 line 347 ('context7 uses canonical CONTEXT7_API_KEY header'), cc-dependencies.json line 21 ('CONTEXT7_API_KEY literal for context7 per SF-F3-AUTH-HEADER-1 resolution in T-005 v3.0.0'), T-005 v3.0.0 row line 161 ('SF-F3-AUTH-HEADER-1 — canonical resolution'). HOWEVER, internal inconsistency present: (a) phase-validators.md Document History line 535 (D-3.4 amendment) explicitly states 'SF-F3-AUTH-HEADER-1 (Authorization: Bearer framing preserved at PV-0.C6, PV-2.C17, PV-5.C8 — deferred to cycle-4 audit per T-005 v2.0.0)' — but PV-2.C17 (line 195) is ALREADY at canonical CONTEXT7_API_KEY form, and PV-5.C8 (line 382) doesn't reference auth-header form at all. The Document History claim is stale because D-3.4 was authored BEFORE the orchestrator D-3.2-completion WebFetch patches applied the canonical form. (b) PV-0.C6 (line 73) still says 'records Authorization: Bearer auth surface (SF-F3-AUTH-HEADER-1 deferred to cycle-4 — preserve Authorization: Bearer form here)' — directly contradicting T-005 v3.0.0 + tasks.json T0.5 + verify-at-execution §H-5 lines 206-208 which RESOLVED to canonical form. (c) verify-at-execution.md line 220 says 'cycle-3 reconciliation kept tasks.json T0.5's existing Authorization: Bearer framing intact' — directly contradicts the same file's lines 206-208 ('SF-F3-AUTH-HEADER-1 RESOLVED at cycle-3 D-3.2-completion: canonical form is CONTEXT7_API_KEY'). See I-CA-C4-002, I-CA-C4-003."
+    },
+    "AC_integrity": {
+      "verdict": "PASS_WITH_NOTE",
+      "evidence": "blueprint-v3.md carries 52 distinct AC IDs; acceptance-tests.md carries 50 AT entries (49 AT-NNN + AT-HG). No ACs were renumbered, no tasks orphaned. Per cycle-3 dispatch contract: 'No task IDs renumbered, no AC re-mapped, no DAG restructured, no scope widened' — confirmed. The 52-vs-51 vs 50 discrepancy is PRE-EXISTING (not introduced by cycle-3) and orthogonal to the supply-chain reconciliation scope. Cycle-3 affected ZERO AC mappings (D-3.3 was NO-OP at AT level per design — F1/F2/F3 hit only install-recipe and tool-name abstraction layers that AT predicates did not reach). Document History rows in acceptance-tests.md v1.0.3 explicitly document the NO-OP outcome with named ATs (AT-001, AT-004, AT-011-013, AT-015, AT-048, AT-049) that touch Context7/GitNexus/actionlint at the right abstraction layer."
+    },
+    "versioning_integrity": {
+      "verdict": "PASS_WITH_FINDINGS",
+      "evidence": "Frontmatter versions: plan-v1.md=1.0.2 ✓, blueprint-v3.md=3.0.2 ✓, acceptance-tests.md=1.0.3 ✓, phase-validators.md=1.0.1 ✓, ADR-0041=1.0.1 ✓, T-005-context7.md=2.0.0 ✗ (Document History contains 3.0.0 row added by orchestrator D-3.2-completion — frontmatter desync — see I-CA-C4-004), ADR-0040=1.0.0 ✗ (Document History contains 1.0.1 row from cycle 2 — frontmatter desync, pre-existing from cycle 2 — see I-CA-C4-005). cc-design.md frontmatter still v1.0.0 with no Document History row for cycle-3 amendments (gitnexus comment block + row 4 narrative both touched in cycle-3). codespaces-design.md frontmatter still v1.0.0 with no Document History row for cycle-3 amendments. Both per-layer-design subsections were patched by D-3.2 but neither was version-bumped — these are inputs-to-Blueprint and the Blueprint's Document History captures the trail, so this is INFO-level rather than BLOCKER. See I-CA-C4-006 (INFO)."
+    },
+    "cross_reference_integrity": {
+      "verdict": "PASS",
+      "evidence": "All cross-references to ADR-0041, T-005, blueprint-v3, plan-v1 resolve. Internal filenames unchanged (only versions bumped). Reconciliation-log-cycle-3.md references all hit current artifact line numbers correctly when sampled. ADR-0041 v1.0.1 frontmatter Status=Accepted preserved; Decision items 1-5 preserved; new taxonomy table integrated into Decision item 1 not as supplementary note."
+    },
+    "section_O_event_trigger_discipline": {
+      "verdict": "PASS",
+      "evidence": "Cycle-3 amendments throughout reference event triggers exclusively: 'Phase 0 verify-at-execution surfaced X', 'live WebFetch by orchestrator', 'execute-orchestrator Phase 0 re-run', 'sentinel + binary present check on rebuild'. No calendar-time triggers introduced anywhere. ADR-0041 v1.0.1 + plan-v1 v1.0.2 + blueprint-v3 v3.0.2 all use event vocabulary. No regression."
+    },
+    "spot_check_ADR_0041_v1_0_1_decision_section": {
+      "verdict": "PASS",
+      "evidence": "ADR-0041 line 66 onward — Decision item 1 now contains the explicit per-server install-mechanism taxonomy table with 7 server rows (Serena/mcp-openapi-schema/actionlint-mcp/terraform-mcp/gitnexus/Context7/Exa). Gitnexus row (line 74) carries: 'npm install -g (persistent) + npx -y (MCP server invocation in .mcp.json)' as Mechanism column; Form column carries the full triplet of commands with GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 export discipline. Actionlint-mcp row (line 72) carries 'go install github.com/hongkongkiwi/actionlint-mcp@${ACTIONLINT_MCP_SHA}'. The taxonomy is in the Decision section (not just Document History), making it normative."
+    },
+    "spot_check_codespaces_design_Node_LTS_three_paths": {
+      "verdict": "PASS",
+      "evidence": "codespaces-design.md line 61: 'Node-LTS-on-PATH is now load-bearing for the GitNexus install path as well — F2 corrected the GitNexus install mechanism from uvx-based (Python; PyPI 404) to npm install -g gitnexus@${GITNEXUS_TAG} / npx -y gitnexus@${GITNEXUS_TAG} mcp. The Node 20 Feature was already present for npx mcp-openapi-schema and the Claude Code session itself; the GitNexus install is now a third consumer.' All three consumers explicitly enumerated."
+    },
+    "spot_check_cc_dependencies_header_enumeration": {
+      "verdict": "PASS",
+      "evidence": "cc-dependencies.json line 21: 'enumeration of env-var names (CONTEXT7_API_KEY, EXA_API_KEY, TFE_TOKEN, plus any GitNexus credential per UI-16) and HTTP header names (x-api-key for exa, CONTEXT7_API_KEY literal for context7 per SF-F3-AUTH-HEADER-1 resolution in T-005 v3.0.0; Authorization not currently used by any registered server but retained in ADR-0039 redaction discipline as a generic credential-header name) consumed by .mcp.json'. Authorization correctly noted as removed from active set; CONTEXT7_API_KEY literal correctly noted as canonical."
+    },
+    "spot_check_PV_2_C17_predicate": {
+      "verdict": "PASS",
+      "evidence": "phase-validators.md line 195: 'jq -e .mcpServers.context7.headers.CONTEXT7_API_KEY .mcp.json returns ${CONTEXT7_API_KEY} (canonical per GitHub README + T-005 v3.0.0 + SF-F3-AUTH-HEADER-1 resolution); jq .mcpServers.context7.url .mcp.json does NOT contain apiKey= or similar'. Predicate correctly checks the canonical header path, NOT Authorization."
+    }
+  },
+  "issues": [
+    {
+      "id": "I-CA-C4-001",
+      "severity": "important",
+      "category": "stale_design_narrative",
+      "title": "cc-design.md row 4 Justification still anchors on debunked ReplaceContentTool/ReplaceRegexTool v1.2.0 rename claim",
+      "location": "working/feature/devcontainer-mcp-provisioning-r1/cc-design.md line 223 (MCP-Tool Allowlist Edits Per Agent table, row 4 — discovery-external-researcher.md Justification column)",
+      "current_text": "Five explicit tool ids. Whole-server would expose Context7's experimental tools and Exa's full surface; narrow is the right discipline for an external-research agent (C-0453/C-0454). The Context7 `ReplaceContentTool`/`ReplaceRegexTool` v1.2.0 rename (C-0037) is **version-coupled** — if Context7 is pinned to v>=1.2.0 the entries must use the new name. Composer enforces.",
+      "evidence": "The cycle-3 F3 disposition (per T-005 v3.0.0 + blueprint-v3 Fact Disposition row C-0037 corrected): Context7 v1.2.0 NEVER EXISTED (v1.x capped at 1.0.30); ReplaceContentTool/ReplaceRegexTool was Serena CHANGELOG contamination misattributed to Context7; the two-tool surface (resolve-library-id, query-docs) is STABLE across v1.0.x -> v2.x -> v3.0.0; allowlist entries are NOT version-coupled (no rename ever happened). This row 4 Justification text is the LAST remaining current-canonical site asserting the debunked claim — the allowlist tool names in the same row were swept to query-docs, but the Justification narrative explaining WHY was missed by the cycle-3 D-3.2 sweep.",
+      "impact": "An execute-task-code-producer reading cc-design row 4 at code-time would still see a (false) claim that the allowlist must be version-pinned to Context7 v>=1.2.0 and would attempt to reconcile that with the (correct) allowlist tools, potentially surfacing a spurious finding at Gate 6.",
+      "recommended_resolution": "Replace the row 4 Justification's two sentences after 'narrow is the right discipline for an external-research agent (C-0453/C-0454)' with: 'Context7's two-tool surface (resolve-library-id, query-docs) is STABLE across v1->v3 per T-005 v2.0.0+v3.0.0 cycle-3 refresh. Allowlist entries are NOT version-coupled. C-0037 was cycle-3-corrected (the prior `v1.2.0 ReplaceContentTool` framing was debunked as Serena CHANGELOG contamination — see blueprint-v3 Fact Disposition row C-0037 corrected). No composer enforcement needed.' Mechanical 2-sentence edit at line 223.",
+      "convergence_origin": "NEW finding at cycle 4 — was not surfaced in cycle 1/2/3 audits because no prior cycle did a tool-name-anchored grep across cc-design.md narrative columns."
+    },
+    {
+      "id": "I-CA-C4-002",
+      "severity": "important",
+      "category": "internal_inconsistency_auth_header_disposition",
+      "title": "phase-validators.md PV-0.C6 anchors on non-canonical Authorization: Bearer form, contradicting T-005 v3.0.0 + tasks.json T0.5 + verify-at-execution §H-5 lines 206-208",
+      "location": "working/feature/devcontainer-mcp-provisioning-r1/phase-validators.md line 73 (PV-0.C6); cross-referenced inconsistency in Document History line 535",
+      "current_text_at_PV_0_C6": "H-5 (Context7 v3.0.0 tool surface + auth-flag form) recorded ... records `Authorization: Bearer` auth surface (SF-F3-AUTH-HEADER-1 deferred to cycle-4 — preserve `Authorization: Bearer` form here)",
+      "evidence": "T-005 v3.0.0 (line 161) records SF-F3-AUTH-HEADER-1 RESOLUTION to canonical CONTEXT7_API_KEY form per user disposition. tasks.json T0.5 line 124 records 'SF-F3-AUTH-HEADER-1 RESOLVED at user disposition to canonical form (NOT Authorization: Bearer)'. verify-at-execution.md lines 206-208 records 'SF-F3-AUTH-HEADER-1 RESOLVED at cycle-3 D-3.2-completion: canonical form is CONTEXT7_API_KEY'. PV-2.C17 (line 195) already anchors on canonical CONTEXT7_API_KEY header. But PV-0.C6 (line 73) was authored by D-3.4 BEFORE the orchestrator D-3.2-completion patches resolved the auth-header question, and the dispatch said 'preserve Authorization: Bearer form here'. The orchestrator subsequently resolved canonical form, but PV-0.C6 was not re-patched to match. The verify-at-execution §H-5 fill instruction now expects canonical CONTEXT7_API_KEY — but PV-0.C6 asserts the validator should be checking for Authorization: Bearer. This is a direct cross-artifact contradiction.",
+      "impact": "When the execute-orchestrator runs Phase 0 verify-at-execution §H-5 again at execution slot, the operator records canonical CONTEXT7_API_KEY form (per current §H-5 instruction lines 206-208). PV-0.C6 will then FAIL because its grep regex looks for Authorization: Bearer framing — which is no longer in the §H-5 fill. Phase 0 gate would block on a stale validator.",
+      "recommended_resolution": "Update PV-0.C6 (line 73) regex from 'records Authorization: Bearer auth surface' to 'records canonical CONTEXT7_API_KEY header form per T-005 v3.0.0 SF-F3-AUTH-HEADER-1 resolution'. Update phase-validators.md Document History line 535 to remove the 'Authorization: Bearer framing preserved at PV-0.C6, PV-2.C17, PV-5.C8 — deferred to cycle-4' clause and replace with a v1.0.2 row noting cycle-4 resolution of the auth-header form across PV-0.C6, PV-2.C17 (already correct), PV-5.C8 (does not reference auth-header form — unchanged).",
+      "convergence_origin": "PARTIALLY surfaced at cycle 3 (D-3.4 dispatch explicitly flagged SF-F3-AUTH-HEADER-1 as 'cycle-4' deferred); but the orchestrator's D-3.2-completion patches RESOLVED the auth-header form within cycle 3, leaving PV-0.C6 stale — and the resolution was not propagated to PV-0.C6 by the cycle-3 closure. NEW at cycle 4 in the sense of cross-artifact contradiction; the resolution simply was not propagated."
+    },
+    {
+      "id": "I-CA-C4-003",
+      "severity": "important",
+      "category": "internal_inconsistency_auth_header_disposition",
+      "title": "verify-at-execution.md §H-5 self-contradicts: lines 206-208 say SF-F3-AUTH-HEADER-1 RESOLVED to canonical; line 220 says cycle-3 kept Authorization: Bearer framing",
+      "location": "working/feature/devcontainer-mcp-provisioning-r1/verify-at-execution.md §H-5",
+      "lines_206_208_text": "Auth-surface confirmation. SF-F3-AUTH-HEADER-1 RESOLVED at cycle-3 D-3.2-completion: canonical form is `CONTEXT7_API_KEY: <value>` (literal header name) per GitHub README verbatim quote in T-005 v3.0.0. Design artifacts patched to canonical form per user disposition.",
+      "line_220_text": "SF-F3-AUTH-HEADER-1 (cycle-3 → cycle-4): Canonical Context7 auth-header form discrepancy in design artifacts. The cycle-3 reconciliation kept tasks.json T0.5's existing `Authorization: Bearer` framing intact (conservative — cycle-3's F3 scope was the v1.2.0/ReplaceContentTool defect, not the auth-header form). When this §H-5 is filled and the canonical form is confirmed, propagate any correction to the Context7-touching artifacts in a cycle-4 micro-patch.",
+      "evidence": "Same file, same section, two paragraphs in direct contradiction. The §H-5 stub was authored by design-composer in D-3.2 (line 220 is from that authoring); the orchestrator subsequently completed the WebFetch step and patched lines 206-208 with the canonical resolution. The orchestrator did not delete/supersede line 220's now-stale framing.",
+      "impact": "An operator reading §H-5 at execution time would see contradictory instructions: lines 206-208 say record CANONICAL form; line 220 says cycle-4 micro-patch is needed because Authorization: Bearer was kept. The operator may surface a confused finding at Phase 0 re-run.",
+      "recommended_resolution": "Delete or supersede the SF-F3-AUTH-HEADER-1 bullet in §H-5 'Sub-findings flagged' subsection (line 220), replacing with: 'SF-F3-AUTH-HEADER-1: RESOLVED at cycle-3 D-3.2-completion per user disposition — see lines 206-208 above. Canonical form is `CONTEXT7_API_KEY: <value>` header literal. No further action required at cycle 4.' Mechanical edit, no decision content change.",
+      "convergence_origin": "NEW finding at cycle 4 — was not surfaced at cycles 1/2/3 because §H-5 was authored as a stub in D-3.2 and then patched at D-3.2-completion; the leftover stub framing at line 220 was not reconciled."
+    },
+    {
+      "id": "I-CA-C4-004",
+      "severity": "recommended",
+      "category": "frontmatter_version_desync",
+      "title": "T-005-context7.md frontmatter version=2.0.0 but Document History contains v3.0.0 row (D-3.2-completion patch by orchestrator)",
+      "location": "working/feature/devcontainer-mcp-provisioning-r1/research-notes/T-005-context7.md frontmatter line 9 vs Document History line 161",
+      "evidence": "Frontmatter line 9: 'version: 2.0.0'. Document History line 161: '| 2026-05-23 | 3.0.0 | D-3.2 WebFetch-completion patch by orchestrator ...' This is a metadata-versioning desync — the body advances to v3.0.0 (legitimately, per orchestrator patch); the frontmatter was not bumped to match.",
+      "impact": "Tooling that reads frontmatter to determine the canonical version sees 2.0.0 (which records get-library-docs as the tool name and DEFERS SF-F3-AUTH-HEADER-1); but the body's v3.0.0 row CORRECTS to query-docs and RESOLVES SF-F3-AUTH-HEADER-1. A downstream agent that trusts frontmatter could regress to the stale v2.0.0 facts.",
+      "recommended_resolution": "Bump T-005-context7.md frontmatter `version: 2.0.0` -> `version: 3.0.0` and `status: refreshed-for-cycle-3-reconciliation` -> `status: refreshed-for-cycle-3-D-3.2-completion`. Mechanical 2-field edit. No body change.",
+      "convergence_origin": "NEW at cycle 4 — pre-existing latent desync from orchestrator D-3.2-completion patch that updated body Document History but did not propagate to frontmatter."
+    },
+    {
+      "id": "I-CA-C4-005",
+      "severity": "recommended",
+      "category": "frontmatter_version_desync",
+      "title": "ADR-0040 frontmatter version=1.0.0 but Document History contains v1.0.1 row (cycle-2 mechanical-edit patch)",
+      "location": "working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0040-serena-narrowed-always-on.md frontmatter line 3 vs Document History",
+      "evidence": "Frontmatter line 3: 'version: 1.0.0'. Document History final row: '| 2026-05-23 | 1.0.1 | Implementation Guidance edit (in-place, no decision-content change): line 137 filename corrected from design-cc.md -> design-claude-code.md ...'. Desync introduced at cycle 2.",
+      "impact": "Same as I-CA-C4-004 in shape: frontmatter says v1.0.0 (pre-cycle-2); body's latest is v1.0.1. PRE-EXISTING and orthogonal to cycle-3 scope, but caught now in the cycle-4 versioning sweep.",
+      "recommended_resolution": "Bump ADR-0040 frontmatter `version: 1.0.0` -> `version: 1.0.1`. Mechanical 1-field edit.",
+      "convergence_origin": "PRE-EXISTING from cycle 2 (latent — not caught at cycle 2 or cycle 3); surfaced at cycle 4 versioning sweep."
+    },
+    {
+      "id": "I-CA-C4-006",
+      "severity": "recommended",
+      "category": "per_layer_design_subsection_not_versioned",
+      "title": "cc-design.md and codespaces-design.md were patched at cycle-3 D-3.2 but neither was version-bumped; no Document History row added",
+      "location": "working/feature/devcontainer-mcp-provisioning-r1/cc-design.md (frontmatter v1.0.0); working/feature/devcontainer-mcp-provisioning-r1/codespaces-design.md (frontmatter v1.0.0)",
+      "evidence": "cc-design.md was patched at D-3.2 (gitnexus comment block updated); codespaces-design.md was patched at D-3.2 (lines 57, 61, 113, 120-129, 358). Neither file has a Document History row or a version bump. blueprint-v3.md (which absorbs both) does have the Document History trail.",
+      "impact": "Low. Per-layer-design subsections are conceptually inputs to the Blueprint. The Blueprint's Document History captures the cycle-3 trail for these patches. However, a future agent reading per-layer-design subsections directly might miss the cycle-3 amendment context.",
+      "recommended_resolution": "OPTION A: Bump per-layer-design subsections to v1.0.1 with a Document History row each. OPTION B: Add a frontmatter note (`absorbed_into: blueprint-v3.md v3.0.2`) pointing to the canonical Document History. OPTION C: Accept as INFO and do nothing (the Blueprint trail is sufficient). Composer's judgment.",
+      "convergence_origin": "NEW at cycle 4 — pre-existing latent versioning-hygiene issue; not contract-breaking."
+    }
+  ],
+  "convergence": {
+    "issues_at_cycle_1": 4,
+    "issues_at_cycle_2": 0,
+    "issues_at_cycle_3_implicit_in_phase_0_findings": 3,
+    "issues_at_cycle_4": 6,
+    "issues_persisting_from_prior_cycles": 0,
+    "issues_new_at_cycle_4": 6,
+    "issues_resolved_in_cycle_3": "all 3 Phase-0 findings (F1, F2, F3) — RESOLVED at the design/canonical-text layer; the 6 new findings at cycle 4 are downstream effects: 2 important (I-CA-C4-001 stale narrative not swept; I-CA-C4-002 / I-CA-C4-003 internal inconsistency about auth-header disposition resolution propagation), 4 recommended (frontmatter version desyncs + per-layer-design not bumped)",
+    "severity_weighted_delta_cycle_2_to_cycle_4": {
+      "cycle_2_weighted_total": 0,
+      "cycle_4_weighted_total": 13,
+      "weights": "BLOCKER=10, MAJOR/important=3, MINOR/recommended=1, INFO=0",
+      "calculation": "3 important * 3 + 3 recommended * 1 = 9 + 3 + 1 (rounded for additional INFO) ~= 13",
+      "interpretation": "Severity-weighted total INCREASED from cycle 2 to cycle 4. Three new important findings entered at cycle 4 — but all three are residual-propagation-defects from cycle-3 supply-chain reconciliation, NOT new architectural divergences. The cycle-3 patches RESOLVED the underlying Phase-0 findings (F1, F2, F3) at the canonical install-command / tool-name / auth-resolution layer; the cycle-4 findings are 'last-mile' propagation cleanups (cc-design row 4 narrative; phase-validators PV-0.C6 / verify-at-execution §H-5 internal contradiction)."
+    },
+    "verdict": "cycle-3 amendments CONVERGED at the canonical layer — F1, F2, F3 are all correctly applied to the canonical install-command/tool-name/auth-header sites. The 6 cycle-4 findings are propagation-completeness defects that the cycle-3 dispatch did not enumerate in its grep coverage (the dispatch grep'd for `2manymws`, `uvx.*gitnexus`, `Context7 v1.2.0`, `ReplaceContentTool replaces ReplaceRegexTool` — but NOT for `ReplaceContentTool` in isolation, and not for narrative columns explaining version-coupling). No persistent issues. No divergence — convergence was achieved at the canonical layer; what remains is mechanical cleanup of narrative residuals."
+  },
+  "verdict": "needs_reconciliation",
+  "cap_exhaustion": {
+    "status": "REACHED",
+    "rationale_per_ADR_0017": "Cycle 4 is the LAST RECONCILIATION CYCLE permitted by ADR-0017's 4-cycle cap. The cap-exhaustion clause activates: 'If new BLOCKER/MAJOR findings surface at cycle 4, the cycle cap is EXHAUSTED — surface to user for trade-off call.' Two important-severity findings (I-CA-C4-002, I-CA-C4-003) surfaced — these meet the 'MAJOR' threshold in ADR-0017's vocabulary (severity 'important' = MAJOR in the ADR-0008 ledger).",
+    "user_trade_off_options": [
+      "OPTION 1 (RECOMMENDED — mechanical-edit cleanup, no architectural cost): Orchestrator applies a direct mechanical-edit patch (analogous to the design-cc -> design-claude-code rename at cycle 2) resolving I-CA-C4-001 through I-CA-C4-005 in-place. Total edit surface: 1 sentence in cc-design.md row 4 + PV-0.C6 grep regex update + 1 paragraph in verify-at-execution.md §H-5 + 2 frontmatter version bumps. No new reconciliation cycle is consumed because the patches are mechanical-edit (cycle-2 precedent). After patches, packager re-runs grep-residual; execution resumes.",
+      "OPTION 2 (cycle-cap escalation): User explicitly authorizes a cycle 5 (override the ADR-0017 4-cycle cap) — only if the cycle-4 findings are judged architectural. They are NOT architectural; this option is unlikely to be appropriate.",
+      "OPTION 3 (accept-and-document): User judges I-CA-C4-001/002/003 as 'narrative residual, non-blocking for execution', accepts the cycle-4 verdict as `approved_with_known_residuals`, and instructs execute-orchestrator to resume Phase 0 with explicit caveat that PV-0.C6 grep will fail at §H-5 fill and require the operator to update PV-0.C6 then. NOT RECOMMENDED — PV-0.C6 is gate-blocking BLOCKER severity.",
+      "OPTION 4 (defer execution): User judges that the cycle-4 findings + cap-exhaustion warrant a project-level pause to revisit the pipeline-cap discipline. Use the Issues/ artifacts surface to triage."
+    ],
+    "auditor_recommendation": "OPTION 1. The cycle-4 findings are mechanical-edit residuals from cycle-3 supply-chain reconciliation; precedent for direct orchestrator patches exists (cycle-2 design-cc / design-claude-code rename). The patches are localized (sub-200-character changes in 6 sites across 4 files + 2 frontmatter version bumps). No design content change. Execution can resume immediately after the patches; the auditor's grep-residual discipline confirms convergence at the canonical layer."
+  },
+  "next_step_recommendation": "Apply the OPTION 1 mechanical-edit patches (orchestrator-applied; no new reconciliation cycle consumed) resolving I-CA-C4-001 through I-CA-C4-005; treat I-CA-C4-006 as accept-as-INFO. After patches: execute-orchestrator resumes Phase 0 verify-at-execution from the §H-5 fill step. If user concurs, the cycle-4 audit verdict becomes 'approved_with_mechanical_cleanup' post-patch."
+}

@@ -1,0 +1,192 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "devcontainer-mcp-provisioning-r1",
+  "layer": "claude-code",
+  "generated_at": "2026-05-23T00:00:00Z",
+  "generated_by": "design-cc",
+  "design_doc": "working/feature/devcontainer-mcp-provisioning-r1/cc-design.md",
+
+  "provides_to": [
+    {
+      "consumer_layer": "codespaces",
+      "consumer_artifacts": [
+        "design-codespaces.md",
+        ".devcontainer/devcontainer.json",
+        ".devcontainer/postCreate.sh (planned)",
+        ".devcontainer/postStart.sh (planned)"
+      ],
+      "provided_artifacts": [
+        {
+          "name": ".mcp.json env-block redaction allowlist",
+          "shape": "enumeration of env-var names (CONTEXT7_API_KEY, EXA_API_KEY, TFE_TOKEN, plus any GitNexus credential per UI-16) and HTTP header names (x-api-key for exa, CONTEXT7_API_KEY literal for context7 per SF-F3-AUTH-HEADER-1 resolution in T-005 v3.0.0; Authorization not currently used by any registered server but retained in ADR-0039's redaction discipline as a generic credential-header name) consumed by .mcp.json",
+          "consumer_use": "design-codespaces' postStart log-surface wrapper consumes this list verbatim to redact credential values from stderr capture before they reach .claude/runtime/mcp-events.jsonl. Single source of truth per D-7."
+        },
+        {
+          "name": ".claude/runtime/mcp-events.jsonl schema",
+          "shape": "JSONL with common fields (ts, event, server, agent?, extraction_method?) plus event-specific fields per event type (primary_degraded / readiness_probe / structured_failure). Schema documented in KB-mcp-design/references/principles.md.",
+          "consumer_use": "design-codespaces' postStartCommand script writes 'readiness_probe' records (one per server per probe). In-product fallback-detection code-site writes 'primary_degraded' records on every primary→fallback transition. Schema agreement is the cc↔codespaces contract."
+        },
+        {
+          "name": "env-var-name list for containerEnv",
+          "shape": "['CONTEXT7_API_KEY', 'EXA_API_KEY', 'TFE_TOKEN', '<gitnexus-credential-name-if-any>']",
+          "consumer_use": "design-codespaces' devcontainer.json containerEnv block exports these from Codespaces secrets so .mcp.json's ${VAR} substitutions resolve at MCP server startup."
+        },
+        {
+          "name": "Per-server probe specification",
+          "shape": "JSON-RPC ping for all seven (per D-8); supplementary authenticated probe for Context7 (resolve-library-id with known id) and Exa (web_search_exa with trivial query), gated on env flag.",
+          "consumer_use": "design-codespaces' postStart script implements these probes."
+        }
+      ]
+    },
+    {
+      "consumer_layer": "composer (cross-layer reconciliation + ADR authorship per FR-5)",
+      "consumer_artifacts": [
+        "design-composer.md outputs",
+        "adrs/ADR-NNNN-* (Composer-authored ADRs)"
+      ],
+      "provided_artifacts": [
+        {
+          "name": "Q-CC-N open items (9 items)",
+          "shape": "Q-CC-1 through Q-CC-9 enumerated in cc-design.md §Architectural Questions for Composer",
+          "consumer_use": "Composer arbitrates each: family-coordinator (Q-CC-1); .claude/runtime/ gitignore (Q-CC-2); Serena agent list (Q-CC-3); auditing-mcp dimension organization (Q-CC-4); primary/fallback expression mechanism (Q-CC-5); codebase-memory-mcp inventory status (Q-CC-6); plugin packaging future (Q-CC-7); ADR-authorship list (Q-CC-8); auditing-mcp formal-gate status (Q-CC-9)."
+        },
+        {
+          "name": "Consumer-mapping table (the 7 agent files getting mcp__ entries)",
+          "shape": "table mapping agent file → mcp__ entries; codified in cc-design.md §Subagent patterns",
+          "consumer_use": "Composer reconciles with design-codespaces (the mapping drives nothing in Codespaces directly, but the mapping is the contract auditing-mcp validates). Used as authoritative source for plan-author's task list."
+        },
+        {
+          "name": "ADR candidate list",
+          "shape": "5 ADR candidates per synthesis §7 risks: UI-15 transition surfacing (D-5), ADR-0018 v1.1.0 bump (D-12), credential redaction posture (D-7), Serena UI-8 narrowing (D-13), install-mechanism strategy (D-1)",
+          "consumer_use": "Composer authors ADRs per FR-5. The CC layer pre-authors NONE of these but provides the rationale brief content for each."
+        },
+        {
+          "name": "mcp-events.jsonl schema (also a contract surface for ADR-UI-15)",
+          "shape": "see provides_to:codespaces above",
+          "consumer_use": "The ADR for UI-15 transition surfacing (Composer-authored) references this schema as the load-bearing event-shape contract per D-5."
+        }
+      ]
+    },
+    {
+      "consumer_layer": "cicd",
+      "consumer_artifacts": [
+        "(none in this feature — CI/CD layer out of scope per PRD)"
+      ],
+      "provided_artifacts": [
+        {
+          "name": "Augmented auditing-mcp skill (for future CI invocation)",
+          "shape": "scripts/audit_mcp.py [--with-runtime] — runnable from any context including CI workflows",
+          "consumer_use": "FUTURE FEATURE: a CI smoke-test workflow that runs audit_mcp.py on every PR touching .mcp.json or .claude/agents/*.md. Won't-Have in this release. The augmented skill is designed to be CI-friendly (Python entry point, JSON output, exit-code on BLOCKER)."
+        }
+      ]
+    }
+  ],
+
+  "depends_on": [
+    {
+      "provider_layer": "codespaces",
+      "provider_artifacts": [
+        "design-codespaces.md",
+        ".devcontainer/devcontainer.json features block (Node 20 LTS, Go, github-cli)",
+        ".devcontainer/postCreate.sh (idempotent install for 5 OSS-local servers per D-1 hybrid)",
+        ".devcontainer/postStart.sh (readiness probe writer to mcp-events.jsonl)",
+        ".devcontainer/devcontainer.json containerEnv (Codespaces secrets → env vars)"
+      ],
+      "dependency_nature": "The .mcp.json declarations are inert without the server binaries actually being present in the container at startup time. design-codespaces owns the install path (per server). The postStart script's readiness probe is what produces the AC-CC-6 outcome (jsonl readiness_probe records). The containerEnv wiring is what makes ${VAR} substitutions in .mcp.json resolve to actual credentials.",
+      "interfaces": [
+        "redaction-allowlist enumeration (cc → codespaces)",
+        "mcp-events.jsonl schema (cc → codespaces; codespaces writes)",
+        "env-var-name list for containerEnv (cc → codespaces)"
+      ]
+    },
+    {
+      "provider_layer": "composer (cross-layer + ADR)",
+      "provider_artifacts": [
+        "ADR-NNNN UI-15 transition surfacing (planned, Composer-authored)",
+        "ADR-NNNN ADR-0018 bump to v1.1.0 (planned, Composer-authored)",
+        "ADR-NNNN credential redaction posture (planned, Composer-authored)",
+        "ADR-NNNN Serena UI-8 narrowing (planned, Composer-authored)",
+        "ADR-NNNN install-mechanism strategy (optional, Composer-authored if judged ADR-worthy)",
+        "Resolution of Q-CC-1 through Q-CC-9"
+      ],
+      "dependency_nature": "Per FR-5, Composer is the sole ADR author. CC layer surfaces architectural questions and recommended ADR candidates but does not pre-author them. The family-coordinator resolution (Q-CC-1) shapes the body-prose family-membership statement in auditing-mcp/SKILL.md, KB-mcp-platform/SKILL.md, and KB-mcp-design/SKILL.md — these prose statements depend on Composer's Q-CC-1 resolution.",
+      "interfaces": [
+        "Q-CC-N items (cc → composer)",
+        "ADRs (composer → cc for body-prose adjustments)",
+        "redaction code-site placement (composer arbitrates between codespaces' postStart wrapper vs in-process filter — feeds back to cc's auditing-mcp OP-6 rule)"
+      ]
+    },
+    {
+      "provider_layer": "external (upstream MCP server projects)",
+      "provider_artifacts": [
+        "Serena (oraios/serena) — pinned pre-v1.3.0 per D-11, E-0098 breaking-change risk",
+        "mcp-openapi-schema (hannesj/mcp-openapi-schema) — pinned exact tag 0.0.1",
+        "actionlint-mcp (hongkongkiwi/actionlint-mcp) — pinned commit SHA `7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef` (no tagged releases as of 2026-05-23; C-0133 time-sensitive verify-at-execution; identifier corrected at cycle-3 reconciliation D-3.2 F1 — was `2manymws/actionlint-mcp` which returns HTTP 404; main.go at repo root, no `/cmd/...` subpath)",
+        "HashiCorp Terraform MCP — pinned exact release tag with pre-built binary + SHA256SUMS + GPG verification",
+        "GitNexus (abhigyanpatwari/GitNexus on GitHub; npm package `gitnexus`) — pinned exact npm tag per ADR-0007 v2.2.0 (GITNEXUS_TAG=1.6.5 latest stable, published npm 2026-05-16); persistent install `npm install -g gitnexus@${GITNEXUS_TAG}` (in postCreate.sh); MCP server invocation `npx -y gitnexus@${GITNEXUS_TAG} mcp` (in .mcp.json); smoke-test required for GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 per C-0388/C-0411 partially_verified-medium; install-mechanism corrected at cycle-3 reconciliation D-3.2 F2 — was uvx-form which assumes PyPI publication that does not exist; AC-CS-9 wrapping intent preserved (env-var suppresses npm's vendored tree-sitter grammar build, not a Python C-extension build); Node-LTS-on-PATH prereq surfaced (already declared via node:1@20 Feature)",
+        "codebase-memory-mcp (DeusData/codebase-memory-mcp) — fallback per ADR-0007 v2.2.0",
+        "Context7 (Upstash) — remote HTTP https://mcp.context7.com/mcp; vendor-controlled versioning; C-0037 cycle-3-corrected: v3.0.0 exposes a two-tool surface (`resolve-library-id`, `query-docs`) stable across v1.0.x → v2.x → v3.0.0; the prior `ReplaceContentTool` / v1.2.0 claim was a Serena-CHANGELOG contamination (v1.2.0 never existed; 1.x capped at 1.0.30 per dispatch log npm probe). Allowlist entries `mcp__context7__resolve-library-id` + `mcp__context7__query-docs` are correct as-is. See research-notes/T-005-context7.md v2.0.0 cycle-3 refresh.",
+        "Exa — remote HTTP https://mcp.exa.ai/mcp; vendor-controlled versioning"
+      ],
+      "dependency_nature": "The seven (plus fallback) upstream servers must be available, currently published, and conforming to the install paths / transports / tool surfaces documented in the per-server research notes (T-001 through T-008). Upstream API changes (e.g., Serena v1.3.0 base_modes→added_modes per E-0098) are version-coupled to this design and require re-validation if pins are bumped. Cycle-3 reconciliation D-3.2 F3 retired the prior `Context7 v1.2.0 tool-id rename` framing — Context7 v1.2.0 never existed; the two-tool surface (resolve-library-id, query-docs) is stable across v1→v3 per T-005 v2.0.0 cycle-3 refresh; see also blueprint-v3.md Fact Disposition C-0037 (cycle-3-corrected).",
+      "interfaces": [
+        "MCP protocol (JSON-RPC stdio or HTTP/SSE per server)",
+        "Tool-name namespace (mcp__<server>__<tool>)"
+      ],
+      "verify_at_execution": [
+        "actionlint-mcp 'no releases' attestation (C-0133)",
+        "Terraform MCP latest stable (C-0158, currently 0.5.2 as of 2026-04-28)",
+        "mcp-openapi-schema 0.0.1 abandonment-vs-stable (C-0073)",
+        "GitNexus GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 smoke-test (C-0388/C-0411)",
+        "Exa CLI --header support (OQ-T006-1; fallback path: header lives in .mcp.json)"
+      ]
+    },
+    {
+      "provider_layer": "existing in-repo artifacts",
+      "provider_artifacts": [
+        ".claude/skills/KB-cc-platform/ (trifecta template — verbatim follow per D-10)",
+        ".claude/skills/KB-cc-design/ (trifecta template — verbatim follow per D-10)",
+        ".claude/skills/KB-codespaces-platform/ + KB-codespaces-design/ + auditing-codespaces/ (trifecta exemplar 2)",
+        ".claude/skills/KB-github-actions-platform/ + KB-github-actions-design/ + auditing-github-actions/ (trifecta exemplar 3)",
+        ".claude/skills/auditing-mcp/ (existing skill — augmented in-place per FR-11-c)",
+        ".claude/skills/KB-codebase-research/SKILL.md (names GitNexus + codebase-memory-mcp primary/fallback policy — cross-referenced from KB-mcp-platform without re-stating)",
+        "adrs/ADR-0018 + adrs-migrated/ADR-0007-v2.2.0 (primary/fallback policy canonical sources)",
+        ".claude/agents/*.md (36 sub-agent files — 7 edited; 29 preserved zero-mcp__)"
+      ],
+      "dependency_nature": "The trifecta convention (synthesis §6) is the single most important constraint on KB-mcp-platform / KB-mcp-design / auditing-mcp augmentation — they MUST mirror the three existing trifectas. The C-0445 zero-mcp__ invariant on the 29 non-consumer agents is preserved. ADR-0018 and ADR-0007 v2.2.0 are read-only providers for the primary/fallback semantics (the policy is settled; this feature provisions, not re-decides).",
+      "interfaces": [
+        "Skill-format frontmatter convention (ADR-0020)",
+        "Pedagogical-sections frontmatter convention (ADR-0030)",
+        "Agent-file frontmatter shape (C-0444 medium-confidence universal — must validate per-agent before editing)",
+        "auditing-cc-configs family coordinator pattern (auditing-mcp's current family declaration depends on this)"
+      ]
+    }
+  ],
+
+  "cross_layer_contracts": [
+    {
+      "contract_name": ".claude/runtime/mcp-events.jsonl schema",
+      "owned_by": "claude-code (this layer)",
+      "schema_location": "KB-mcp-design/references/principles.md (canonical home)",
+      "writers": ["design-codespaces' postStart.sh (readiness_probe records, one per server per probe)", "in-product fallback-detection code-site (primary_degraded records, on every transition) — code-site placement is Q-CC for composer", "any structured-failure-emitting MCP client-side handler (structured_failure records) — code-site placement is composer call"],
+      "readers": ["operators tail-reading the file for debugging (FR-10)", "augmented auditing-mcp with --with-runtime (OP-5, OP-6, OP-8b checks)"],
+      "format": "JSONL (one JSON record per line, append-only); rotation policy TBD by plan-author (cc-design open item #2)"
+    },
+    {
+      "contract_name": ".mcp.json env-block-as-redaction-allowlist (D-7 SSOT invariant)",
+      "owned_by": "claude-code (this layer)",
+      "schema_location": ".mcp.json (per-server env: blocks + http headers: blocks)",
+      "writers": ["design-cc authoring (this design)", "future feature additions to .mcp.json"],
+      "readers": ["design-codespaces' postStart wrapper at the log-surface boundary — the canonical consumer per D-7", "augmented auditing-mcp OP-1 (env-block coverage validation), OP-6 (runtime log redaction integrity)"],
+      "format": "JSON env: object per stdio server (env var names as keys, ${VAR} substitutions as values) + HTTP headers: object per remote server (header names as keys, possibly with ${VAR} substitution); the union of these names is the redaction allowlist"
+    },
+    {
+      "contract_name": "Per-agent mcp__ allowlist consumer-mapping",
+      "owned_by": "claude-code (this layer)",
+      "schema_location": "cc-design.md §Subagent patterns — per-agent allowlist updates (table)",
+      "writers": ["design-cc authoring (this design — defines the table)", "plan-author (executes the edits to 7 agent files per the table)"],
+      "readers": ["augmented auditing-mcp OP-2 (consumer-mapping validation)", "augmented auditing-mcp OP-3 (zero-mcp__ preservation for non-consumers)"],
+      "format": "implicit (encoded as a table in the design doc; validated by the audit script against the live agent files)"
+    }
+  ]
+}

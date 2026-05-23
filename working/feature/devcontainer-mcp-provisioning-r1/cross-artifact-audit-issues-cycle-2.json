@@ -1,0 +1,132 @@
+{
+  "metadata": {
+    "stage": 9,
+    "auditor": "review-cross-artifact-auditor",
+    "model_posture": "opus",
+    "iteration_number": 2,
+    "input_mode": "diff (acceptance-tests.md only; PRD v3 / Blueprint v3 / Plan v1 / phase-validators.md unchanged per dispatch + mtime confirmation)",
+    "cycle": 2,
+    "of_cap": 4,
+    "is_terminal_cycle": false,
+    "artifacts_audited_for_diff": [
+      "acceptance-tests.md (1.0.0 -> 1.0.1)"
+    ],
+    "artifacts_trusted_unchanged": [
+      "prd-v3.md",
+      "blueprint-v3.md",
+      "plan-v1.md",
+      "phase-validators.md"
+    ],
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "generated": "2026-05-23T17:15:00Z",
+    "prior_cycle_artifacts": [
+      "cross-artifact-audit-issues.json (cycle 1)",
+      "reconciliation-dispatch-cycle-1.json"
+    ],
+    "convergence": {
+      "issues_new": 0,
+      "issues_resurfaced": 0,
+      "issues_resolved": 4,
+      "issues_persisting": 0,
+      "signal": "converged"
+    }
+  },
+  "verdict": {
+    "decision": "approved",
+    "convergence_status": "converged",
+    "rationale": "All four cycle-1 findings resolved exactly per dispatch-cycle-1 specification. Zero new issues, zero resurfaced issues, zero persisting issues. The focused in-place amendment on acceptance-tests.md (v1.0.0 -> v1.0.1) reconciled the AT against Plan T3.4 + T4.3 + PV-4 + PV-5.C5 + the PA-OI-3 resolution chain without introducing semantics drift or upstream churn. Diff-mode verification confirms: (1) AT-016 install_complete enumeration matches Plan + PV; (2) all 7 op-script renames complete with zero residual op_NN_ references; (3) AT-043 phantom AC-NFR-4 label remapped at all three loci to PRD-NFR-4 / UI-7 / OI-4 with the methodology coverage preserved; (4) overview test-count phrasing clarified. Document History row v1.0.1 logs the amendment provenance. Pipeline ready to advance out of Stage 9 to Task Decomposition."
+  },
+  "issues": [],
+  "prior_context_check": {
+    "I-CA-001": {
+      "status": "resolved",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "line": 303, "quote": "`mcp-events.jsonl` contains **5 `install_complete` records** (one per OSS-local install: `serena`, `mcp-openapi-schema`, `actionlint-mcp`, `terraform-mcp`, `gitnexus`). The 2 HTTP-transport servers (`context7`, `exa`) have no `install_complete` record; their availability is exercised by the postCreate auth-probe (T3.2) and the postStart readiness_probe (T3.5). The consolidated stdout summary still covers all 7. Exit code 0 on success. Aligns with Plan T3.4 + PV-5.C5."},
+        {"artifact": "acceptance-tests.md", "line": 603, "quote": "(observable via lifecycle output + `mcp-events.jsonl` showing 5 `install_complete` records — one per OSS-local server — plus 7 `readiness_probe` records)"}
+      ],
+      "verification": "AT-016 now expects exactly 5 install_complete records, enumerates the 5 OSS-local servers by name, explicitly excludes context7+exa as no-install HTTP-transport, and cross-references Plan T3.4 + PV-5.C5. Companion fix at AT-039 line 603 is also internally consistent. Grep across all three artifacts (acceptance-tests.md, plan-v1.md, phase-validators.md) returns zero stale '7 install' or '6 install' references — total convergence on the install_complete count."
+    },
+    "I-CA-002": {
+      "status": "resolved",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "line": 507, "quote": "Run `python .claude/skills/auditing-mcp/scripts/audit_op6_runtime_log_redaction.py`"},
+        {"artifact": "acceptance-tests.md", "line": 631, "quote": "Run `python .claude/skills/auditing-mcp/scripts/audit_op9_url_credential_rejection.py`"},
+        {"artifact": "acceptance-tests.md", "line": 632, "quote": "Run `python .claude/skills/auditing-mcp/scripts/audit_op10_argv_leakage.py`"},
+        {"artifact": "acceptance-tests.md", "line": 738, "quote": "Run `python .claude/skills/auditing-mcp/scripts/audit_op2_consumer_mapping.py`"},
+        {"artifact": "acceptance-tests.md", "line": 739, "quote": "`audit_op3_zero_mcp_invariant.py` and `audit_op8_gitnexus.py`"},
+        {"artifact": "acceptance-tests.md", "line": 740, "quote": "`audit_op4_primary_fallback_prose.py`"}
+      ],
+      "verification": "All 7 op-script names match the Plan/PV canonical convention `audit_op<N>_<descriptor>.py`. Grep for `op_NN_` / `op_0[0-9]_` / `op_1[0-9]_` patterns in acceptance-tests.md returns zero matches — no half-renamed paths, no residual stragglers. The script naming convention is now uniform across acceptance-tests.md ↔ plan-v1.md T4.3 (lines 699-708) ↔ phase-validators.md PV-4 (lines 308, 313, 388-389)."
+    },
+    "I-CA-003": {
+      "status": "resolved",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "line": 82, "quote": "| PRD-NFR-4 / UI-7 / OI-4 | AT-043 | manual (measurement) | L2 |"},
+        {"artifact": "acceptance-tests.md", "line": 93, "quote": "Note: AT-043 maps to **PRD-NFR-4 / UI-7 / OI-4** rather than to a Blueprint AC ID. Blueprint v3 declares no Blueprint-AC equivalent of the PRD's NFR-4 ... The methodology is operationalized via Plan T4.7 + PV-4.C19/C20 + PV-5.C21 per PA-OI-3 (RESOLVED-METHODOLOGY-ALIGNED)."},
+        {"artifact": "acceptance-tests.md", "line": 651, "quote": "**Maps to AC:** PRD-NFR-4 / UI-7 / OI-4 (no Blueprint AC ID; methodology coverage via T4.7 + PV-4.C19+C20 + PV-5.C21 per PA-OI-3 RESOLVED-METHODOLOGY-ALIGNED)"}
+      ],
+      "verification": "The phantom `AC-NFR-4` literal has been removed at all three required loci (AC Coverage Matrix row, explanatory note, AT-043 §Maps to AC). The only remaining `AC-NFR-4` occurrence in acceptance-tests.md is the historical mention in the v1.0.1 Document History row, which correctly documents the fix — that occurrence is provenance, not a live label. AT-043 itself is preserved intact: the methodology coverage via T4.7 + PV-4.C19/C20 + PV-5.C21 remains real and necessary; only the AC label was corrected. The '51 of 51 Blueprint ACs covered' overview claim is preserved at line 93. PA-OI-3 RESOLVED-METHODOLOGY-ALIGNED status is consistent across the audit trail."
+    },
+    "I-CA-004": {
+      "status": "resolved",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "line": 91, "quote": "**Total: 50 unique test IDs (AT-001..AT-049 + AT-HG).** The shared AT-HG verifies the AC-CC-5 + AC-FR-11-c + AC-NFR-2-c triplet per the MINOR-V3-001 disposition adopted at Plan v1."}
+      ],
+      "verification": "Overview line 91 reads exactly per the recommended-resolution phrasing: 'Total: 50 unique test IDs (AT-001..AT-049 + AT-HG)' with the MINOR-V3-001 triplet provenance attached. AT-HG is properly framed as a unique test ID rather than ambiguously as a 'shared triplet test'. Phrasing is internally consistent with the AC Coverage Matrix (49 AT-NNN rows + 1 AT-HG-shared-across-3-ACs row + 1 AC-CS-8-shared-with-AT-039+AT-040 row, all referring to the 50 unique test IDs)."
+    }
+  },
+  "spot_checks_for_regression": {
+    "at_016_relationship_with_other_tests": "PASS — AT-039 (line 603) precondition independently references 'mcp-events.jsonl showing 5 install_complete records — one per OSS-local server — plus 7 readiness_probe records', which is internally consistent with AT-016's amended expected outcome. No other AT references the install_complete count.",
+    "op_script_rename_complete": "PASS — Zero residual `op_NN_` / `op_0[0-9]_` / `op_1[0-9]_` matches in acceptance-tests.md. All 7 commands at AT-032 (line 507), AT-041 (lines 631-632), AT-049 (lines 738-740) consistently use the `audit_op<N>_<descriptor>.py` canonical form with the `audit_` prefix.",
+    "ac_coverage_matrix_totals_preserved": "PASS — AC Coverage Matrix contains 53 rows (52 AC-* IDs + 1 PRD-NFR-4 hybrid row + 1 shared AC-CS-8-row). The pre-existing 51-vs-52 enumeration alignment was dispositioned in cycle 1 (check_1_ac_chain PASS, reviewer-verified count 51/51); this is unchanged in cycle 2 and is NOT a new finding. AT-043 retained in the matrix with corrected label.",
+    "document_history_frontmatter_integrity": "PASS — Frontmatter version field reads '1.0.1' (line 3), Document History table has v1.0.0 row (line 821) + v1.0.1 row (line 822). Both rows are well-formed table syntax. Provenance line in v1.0.1 row correctly cites reconciliation-dispatch-cycle-1.json and names all four resolved issue IDs.",
+    "no_upstream_artifact_churn": "PASS — mtime check confirms only acceptance-tests.md modified (May 23 17:07) since cycle 1 (later than plan-v1.md May 23 16:42, phase-validators.md May 23 16:54, blueprint-v3.md May 23 15:30, prd-v3.md May 23 04:23). Per dispatch contract: zero upstream churn confirmed."
+  },
+  "cross_check_results_cycle_2": {
+    "diff_audit_focus": "Per diff-mode discipline: full cross-check sweep was NOT re-run. Cycle-1 13-check sweep stands as authoritative for unchanged artifacts. Cycle-2 verified only that the four amendments correctly close the four findings without introducing new cross-artifact inconsistency in the immediate neighborhood of each change (AT-016, AT-032, AT-041, AT-043, AT-049, §Overview, §Document History). All neighborhoods verified clean.",
+    "trust_unchanged_artifacts": "Plan v1 (T3.4 + T4.3), PV-4, PV-5.C5, Blueprint v3 §Acceptance Criteria, PRD v3 NFR-4 unchanged since cycle 1 — their authoritative status on each amendment locus is preserved."
+  },
+  "pa_oi_status": {
+    "PA-OI-1": "RESOLVED (carried from cycle 1; unchanged)",
+    "PA-OI-2": "RESOLVED (carried from cycle 1; unchanged)",
+    "PA-OI-3": "RESOLVED METHODOLOGY-ALIGNED (carried from cycle 1; cycle-2 AT-043 label correction strengthens the alignment by removing the cosmetic phantom-AC label)",
+    "PA-OI-4": "RESOLVED (carried from cycle 1; unchanged)",
+    "PA-OI-5": "RESOLVED (carried from cycle 1; unchanged)"
+  },
+  "convergence": {
+    "verdict": "converged",
+    "prior_issue_count": 4,
+    "current_issue_count": 0,
+    "persistent_issues": [],
+    "severity_weighted_delta_calculation": {
+      "cycle_1_weighted": "0 BLOCKER*10 + 2 MAJOR*3 + 2 MINOR*1 + 0 INFO*0 = 8",
+      "cycle_2_weighted": "0 BLOCKER*10 + 0 MAJOR*3 + 0 MINOR*1 + 0 INFO*0 = 0",
+      "delta": -8,
+      "direction": "decreasing (converging)"
+    },
+    "issues_new": 0,
+    "issues_resurfaced": 0,
+    "issues_resolved": 4,
+    "issues_persisting": 0,
+    "convergence_failing": false,
+    "notes": "Mechanical, single-artifact amendment converged on the first re-audit pass. The dispatch's predicted 'cycle-2 should return pass with zero MAJOR and zero or one trivial MINOR' is realized as 0/0/0/0 — all four issues resolved without partial-fix or regression. Cycle 2 is terminal for this Stage 9 reconciliation loop; no cycle 3 needed."
+  },
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 0,
+    "INFO": 0,
+    "terminal": false,
+    "hard_capped": false,
+    "approved": true
+  },
+  "downstream_orchestrator_actions": [
+    "Mark Stage 9 (Cross-Artifact Audit) as approved.",
+    "Advance feature-pipeline to Task Decomposition stage.",
+    "Do not invoke finalize-reconciler for cycle 2 — no MAJOR/MINOR issues to dispatch.",
+    "Archive cycle-1 + cycle-2 cross-artifact-audit artifacts (cross-artifact-audit-issues.json, cross-artifact-audit-issues-cycle-2.json, reconciliation-dispatch-cycle-1.json, reconciliation-log-cycle-1.md) under the feature working directory as Stage-9 evidence."
+  ],
+  "verbatim_user_rationale_preservation": {
+    "verdict": "PRESERVED (unchanged from cycle 1; cycle-2 amendments touched no rationale-bearing prose). OI-1 (7 MCP / codebase-memory-mcp stall), OI-2 (auditing-mcp family graduation issue), OI-3 (hard-gate, MCPs can cause a lot of problems) all remain verbatim at their canonical sites (blueprint-v3.md, ADR-0042, ADR-0043, phase-validators.md PV-5.C-HARDGATE, Issues/proposal-auditing-family-graduation-review.md)."
+  }
+}

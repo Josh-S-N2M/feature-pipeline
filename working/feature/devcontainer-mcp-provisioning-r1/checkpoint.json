@@ -1,0 +1,104 @@
+{
+  "run_id": "devcontainer-mcp-provisioning-r1-20260523-000000",
+  "feature_slug": "devcontainer-mcp-provisioning-r1",
+  "started_at": "2026-05-22T20:45:00Z",
+  "current_stage": "execution_pipeline",
+  "stage_status": "cycle_3_complete_awaiting_user_disposition_on_cycle_4",
+  "next_action": "Cycle-3 reconciliation COMPLETE. All 3 Phase-0 findings (F1 actionlint, F2 GitNexus, F3 Context7) resolved across 4 dispatches (D-3.1..D-3.4) + D-3.2-completion WebFetch patches by orchestrator. SF-F3-AUTH-HEADER-1 resolved to canonical CONTEXT7_API_KEY header per user disposition. Awaiting user decision on cycle-4 (which would consume the 4th of ADR-0017's 4 reconciliation cycles): (i) run cross-artifact-audit cycle-4 + Phase-0 re-verify, then resume execution; (ii) skip cycle-4 audit and resume execution directly (cycle-3 patches grep-verified clean; mechanical scope; cycle-4 may produce no new findings); (iii) commit current state to git first (~30 design-side files uncommitted), then decide.",
+  "execution_pipeline_state_transitions": [
+    {"transition": "T0", "from": "INIT", "to": "pending", "timestamp": "2026-05-23T03:20:00Z", "trigger": "execution-pipeline-invocation; gate-6-approved at 2026-05-23T03:15:00Z; tasks.json + deliverable archive validated"},
+    {"transition": "T13", "from": "pending", "to": "TERMINATED", "timestamp": "2026-05-23T03:21:00Z", "trigger": "user-escalation-required: missing-dispatch-tool", "void": true, "void_reason": "false self-report; voided by user corrective brief at 2026-05-23T03:25:00Z"},
+    {"transition": "T0-prime", "from": "TERMINATED", "to": "pending", "timestamp": "2026-05-23T03:25:00Z", "trigger": "re-invocation after false-blocker void; single-agent-fallback mode elected (brief option c)"},
+    {"transition": "T1-batch", "from": "pending", "to": "per_task_active", "timestamp": "2026-05-23T03:26:00Z", "trigger": "Phase-0 parallel-frontier wave: T0.1..T0.10 begun by orchestrator in single-agent-fallback mode"},
+    {"transition": "T5", "from": "quality_active", "to": "escalated_stub", "timestamp": "2026-05-23T18:20:00Z", "trigger": "verify-at-execution surfaces 3 design defects: T0.2 propagation drift, T0.4 install-method category error, T0.5 version-not-found"},
+    {"transition": "T-cycle-3-reconciliation", "from": "escalated_stub", "to": "reconciliation_active", "timestamp": "2026-05-23T19:00:00Z", "trigger": "user disposition: Full finalize-reconciler dispatch for all 3 findings; cycle-3 begins"},
+    {"transition": "T-cycle-3-complete", "from": "reconciliation_active", "to": "cycle_3_complete", "timestamp": "2026-05-23T20:50:00Z", "trigger": "D-3.1..D-3.4 + D-3.2-completion all applied; SF-F3-AUTH-HEADER-1 resolved to canonical CONTEXT7_API_KEY per user; all 3 findings (F1, F2, F3) RESOLVED; 16 site corrections across 8 files for tool-name rename + auth-header canonical form"}
+  ],
+  "cycle_3_closure": {
+    "summary": "Phase 0 verify-at-execution caught 3 real design defects; cycle 3 reconciled all of them. The pipeline discipline worked as designed (the design pipeline shipped artifacts that turned out to be wrong on supply-chain anchors; the execution pipeline caught them before any code was written).",
+    "findings_resolved": ["F1 actionlint-mcp upstream rename", "F2 GitNexus uvx→npx install-method", "F3 Context7 v1.2.0 doesn't exist → v3.0.0 with tools resolve-library-id + query-docs"],
+    "sub_findings_resolved": ["SF-F3-RESIDUAL-1 (live WebFetch deferred — resolved by orchestrator)", "SF-F3-RESIDUAL-2 (Redis-backed session state — no design impact)", "SF-F3-AUTH-HEADER-1 (auth-header canonical form — resolved to CONTEXT7_API_KEY per user)"],
+    "files_modified_total": 11,
+    "sites_modified_total": 30,
+    "remaining_residuals": "acceptance-tests.md v1.0.3 Document History row retains a get-library-docs reference as historical narrative of what D-3.3 was instructed to verify; AT body has zero functional dependency on the tool name. This is intentional historical record per ADR-0005 append-only convention; no patch needed."
+  },
+  "phase_0_findings": [
+    {"task": "T0.1", "verdict": "PASS", "detail": "Terraform MCP v0.5.2 pinned with SHA256 + GPG fingerprint recorded"},
+    {"task": "T0.2", "verdict": "FINDING-PROPAGATION-DRIFT", "detail": "actionlint-mcp upstream: Plan/tasks.json/cc-dependencies say 2manymws/actionlint-mcp (HTTP 404); PRD-normative + research-plan say hongkongkiwi/actionlint-mcp (HTTP 200, functional). Pinned hongkongkiwi SHA 7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef as corrective. Plan/tasks.json/cc-dependencies need reconciliation patch."},
+    {"task": "T0.3", "verdict": "PASS", "detail": "mcp-openapi-schema 0.0.1 STALE_PACKAGE pin confirmed (unchanged since 2025-03-13)"},
+    {"task": "T0.4", "verdict": "FINDING-CATEGORY-ERROR", "detail": "GitNexus design says uvx (Python); package is npm-only. Env-var GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 still respected, but for npm install path not Python. cc-design line 140, plan-v1 §H-4, blueprint-v3 lines 161/855, tasks.json T0.4 all need correction. Latest stable: npm gitnexus@1.6.5 (2026-05-16)."},
+    {"task": "T0.5", "verdict": "FINDING-VERSION-NOT-FOUND", "detail": "Context7 design references v1.2.0 (ReplaceContentTool renamed from ReplaceRegexTool); npm @upstash/context7-mcp shows 1.x topped at 1.0.30 then jumped 2.x/3.x; current latest 3.0.0 published 2026-05-22T16:20Z (1 day before this execution). Tool naming + auth shape needs re-verification against v3.0.0."},
+    {"task": "T0.6", "verdict": "NOT-EXECUTED", "detail": "Halted at user-escalation"},
+    {"task": "T0.7", "verdict": "NOT-EXECUTED", "detail": "Halted at user-escalation"},
+    {"task": "T0.8", "verdict": "NOT-EXECUTED", "detail": "Local convention decision; uncontroversial"},
+    {"task": "T0.9", "verdict": "NOT-EXECUTED", "detail": "Local pin decision; uncontroversial"},
+    {"task": "T0.10", "verdict": "NOT-EXECUTED", "detail": "Local bootstrap; uncontroversial"}
+  ],
+  "execution_mode": "single-agent-fallback",
+  "execution_mode_rationale": "Brief option (c). The orchestrator self-executes per-task-code-producer + per-task-quality-handler responsibilities while preserving the state machine, cycle caps, and the state-transitions.log discipline.",
+  "execution_pipeline_cycle_counters": {"per_task": {}, "per_phase": {"Phase-0": 0, "Phase-1": 0, "Phase-2": 0, "Phase-3": 0, "Phase-4": 0, "Phase-5": 0}},
+  "gate_6_decision": {"verdict": "approved", "timestamp": "2026-05-23T03:15:00Z", "user_signal": "approved and proceeds execution pipeline", "waivers": ["PKG-BLOCKER-001 ADR canonical-location → follow-up adr-placement-mechanism-repair-r1"]},
+  "gate_history": [
+    {"gate": "intent_confirmation", "decision": "approved", "timestamp": "2026-05-23T00:05:00Z"},
+    {"gate": "prd_approval", "decision": "approved_v1_superseded_to_v3", "timestamp": "2026-05-23T00:15:00Z"},
+    {"gate": "research_plan_approval", "decision": "approved_v1_superseded_to_v3", "timestamp": "2026-05-23T00:25:00Z"},
+    {"gate": "prd_approval_v3+research_plan_v3", "decision": "approved", "timestamp": "2026-05-23T00:45:00Z"},
+    {"gate": "blueprint_approval_v3", "decision": "approved", "timestamp": "2026-05-23T01:30:00Z", "notes": "User resolved OI-1 (7 servers / drop codebase-memory-mcp), OI-2 (Path A — graduate auditing-mcp), OI-3 (hard gate). Composer authored blueprint-v3.md + ADR-0042 + ADR-0043; ADR-0037 edited in-place. Reviewer APPROVED at 89/93/93/94 (+1 across all axes vs v2). One MINOR (AC-FR-11-c inline qualifier asymmetry) deferred to plan-author phase. OI-2 follow-up Issue authored at Issues/proposal-auditing-family-graduation-review.md."},
+    {"gate": "plan_approval_v1", "decision": "approved", "timestamp": "2026-05-23T02:15:00Z", "notes": "Plan v1.0.0: 6 phases, 39 tasks, 51/51 Blueprint v3 ACs mapped, zero orphans, all risk rows use event triggers (§O posture honored throughout). Reviewer APPROVED 92/93/94/93. Two MINOR editorial findings (I-DR-PLAN-001 task count typo, I-DR-PLAN-002 disposition narrative) fixed inline. 5 PA-OI items (PA-OI-1..5) carry forward to review-cross-artifact-auditor."}
+  ],
+  "artifact_versions": {
+    "intent_clarification": 1,
+    "prd": 3,
+    "research_plan": 3,
+    "codebase_analysis": 1,
+    "synthesis": 1,
+    "cc_design": 1,
+    "codespaces_design": 1,
+    "blueprint": 3,
+    "agent_roster_impact_matrix": 1,
+    "adrs_authored_count": 7
+  },
+  "adrs_authored": ["ADR-0037", "ADR-0038", "ADR-0039", "ADR-0040", "ADR-0041", "ADR-0042", "ADR-0043"],
+  "reconciliation_cycles": {"blueprint": 2, "cross_artifact": 2, "prd_research_gate": 2},
+  "cross_artifact_audit": {"cycle_1": {"verdict": "needs_reconciliation", "findings": "0B/2MAJ/2MIN all in acceptance-tests.md"}, "cycle_2": {"verdict": "approved", "convergence_status": "converged", "findings": "0/0/0/0", "delta": -8}},
+  "architecture_audit": {"verdict": "approved_with_conditions", "findings": "0B/0MAJ/2important/3recommended/0NIT", "important_findings": ["I-AA-001 filename drift design-cc.md → design-claude-code.md", "I-AA-002 consumer-set math narrative (7-agent → 6-agent base)"], "reconciliation_cycle_2_disposition": "Fixed both per user choice; mechanical patch applied directly by orchestrator across blueprint-v3 (v3.0.1), ADR-0040 (1.0.1), plan-v1 (v1.0.1), tasks.json, agent-roster-impact-matrix.md. reconciliation-log-cycle-2.md authored. Cycle-2 auditor re-run NOT dispatched (mechanical edits; verified clean by grep; no value-add)."},
+  "deliverable_packaging": {"cycle_1": {"verdict": "needs_correction", "blockers": ["PKG-BLOCKER-001 ADR canonical-location (USER WAIVED — follow-up feature `adr-placement-mechanism-repair-r1`; see Issues/analysis-adr-placement-rootcause.md §9)", "PKG-BLOCKER-002 architecture-audit-issues.json missing (RESOLVED by retroactive review-architecture-auditor run)"]}, "cycle_2": {"verdict": "approved_with_conditions", "findings": ["PKG-MAJOR-003 acceptance-tests.md:155 AT-005 design-cc.md propagation gap"], "post_report_disposition": "PKG-MAJOR-003 patched inline by orchestrator (acceptance-tests v1.0.1 → v1.0.2); same mechanical-edit pattern as cycle-2 arch-audit fixes; grep-verified clean across all current text. reconciliation-log-cycle-2.md updated."}},
+  "activated_layers": ["cc", "codespaces"],
+  "extraction_method": "manual-grep-and-read",
+  "scope_class": "FULL",
+  "synthesis_stats": {"claims": 545, "graph_entities": 111, "graph_edges": 117, "critiques": 98, "decision_frames": 13},
+  "reviewer_invocations": {
+    "intent_clarification": {"verdict": "PASS"},
+    "prd_v3": {"verdict": "approved_with_conditions"},
+    "cc_design": {"verdict": "approved_with_conditions"},
+    "codespaces_design": {"verdict": "approved_with_conditions"},
+    "blueprint_v2": {"verdict": "APPROVED", "scores": {"consistency": 93, "completeness": 92, "rule_compliance": 92, "clarity": 88}},
+    "blueprint_v3": {"verdict": "APPROVED", "scores": {"consistency": 94, "completeness": 93, "rule_compliance": 93, "clarity": 89}, "delta_vs_v2": "+1/+1/+1/+1", "deferred_findings": ["MINOR-V3-001 — AC-FR-11-c missing inline hard-gate qualifier; cross-reference sites treat it as part of the AC-CC-5/AC-FR-11-c/AC-NFR-2-c hard-gate triplet but inline definition omits the qualifier (DISPOSITIONED at plan-v1 option (a) — PRD-inherited; AC-CC-5 + AC-NFR-2-c carry the qualifier)"]},
+    "plan_v1": {"verdict": "APPROVED", "scores": {"consistency": 92, "completeness": 93, "rule_compliance": 94, "clarity": 93}, "minor_findings_resolved_inline": ["I-DR-PLAN-001 (Update History 56 → 39 task count typo)", "I-DR-PLAN-002 (MINOR-V3-001 disposition narrative added T5.4 to task list)"], "carry_forward_to_cross_artifact_audit": ["PA-OI-1 (T5.1 contract consumption check)", "PA-OI-2 (T3.5 5-min postAttach staleness threshold judgment)", "PA-OI-3 (T4.7 NFR-4 alignment with acceptance tests)", "PA-OI-4 (AC-FR-11-c option-(a) cross-artifact robustness)", "PA-OI-5 (T4.3 auditing-mcp test-fixtures coverage)"]}
+  },
+  "plan_stats": {"phases": 6, "tasks": 39, "ac_coverage": "51/51 Blueprint v3 ACs mapped to ≥1 task; no orphans"},
+  "open_items": {
+    "closed_at_gate4_v3": ["OI-1 (7-server inventory)", "OI-2 (Path A graduation — ADR-0042)", "OI-3 (hard gate — ADR-0043)", "OI-7 (Q-3 closure)"],
+    "still_open": ["OI-4 (per-agent context-overhead measurement; plan-author owns)", "OI-5 (ADR-0007 content review post-relocation; follow-up)", "OI-6 (ADR-0040 design-codespaces forward-looking dependency on ADR-0033 stub-fill; >90-day post-ship review)"]
+  },
+  "q3_closure": {
+    "source": "codebase-analysis-report.md line 200",
+    "closure_artifact": "agent-roster-impact-matrix.md",
+    "verdicts": {"IN_CC_DESIGN": 8, "NEWLY_PROPOSED": 0, "EXPLICIT_NO": 28},
+    "synth_star_status": "active_not_deprecated",
+    "adr_0040_hedge": "tested_no_evidence_found",
+    "blueprint_v3_triggered": false,
+    "note": "Blueprint v3 was triggered by Gate-4 OI resolution, not by Q3 closure."
+  },
+  "systemic_followup": {
+    "track_b_meta_feature": "agent-roster-design-discipline-r1 (proposed; out-of-scope this feature)",
+    "track_b_recommendations": ["B1: mandatory agent-roster-impact-matrix artifact when Layer Scope touches Claude Code", "B3: skill-coverage check at Synthesis/Design"],
+    "auditing_family_review": {
+      "proposed_feature_slug": "auditing-family-structure-review-r1",
+      "issue_artifact": "Issues/proposal-auditing-family-graduation-review.md",
+      "trigger": "OI-2 Path A graduation precedent — user-flagged the question of whether auditing-codespaces / auditing-github-actions / auditing-hooks / others should also graduate",
+      "status": "proposed; out-of-scope this feature"
+    }
+  },
+  "params": {"max_external_research_topics": 8, "reconciliation_cap": 4}
+}

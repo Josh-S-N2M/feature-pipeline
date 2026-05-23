@@ -1,0 +1,328 @@
+{
+  "critiques": [
+    {
+      "claim_id": "C-0256",
+      "verification_questions": [
+        "Does the cited research note (T-006-exa.md) attribute the x-api-key header form to docs.exa.ai canonical docs?",
+        "Is the endpoint URL https://mcp.exa.ai/mcp shown alongside the header form?",
+        "Is the header form actually the canonical/recommended form per the cited vendor source?"
+      ],
+      "verification_answers": [
+        "Yes — F2 cites Exa Docs 'Web Search MCP' (https://exa.ai/docs/reference/exa-mcp) and quotes the headers block verbatim.",
+        "Yes — F2 explicitly states 'with the bare URL https://mcp.exa.ai/mcp as the endpoint. No query string is shown in this form.'",
+        "Yes — F2 confidence high, primary vendor documentation."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Vendor canonical-docs form; corroborated by direct quote in the research note."
+    },
+    {
+      "claim_id": "C-0257",
+      "verification_questions": [
+        "Is the exact string `\"headers\": { \"x-api-key\": \"YOUR_EXA_API_KEY\" }` quoted in the cited source?",
+        "Is the quote attributed to docs.exa.ai?"
+      ],
+      "verification_answers": [
+        "Yes — F2 quote (≤15 words) is verbatim: `\"headers\": { \"x-api-key\": \"YOUR_EXA_API_KEY\" }`",
+        "Yes — sourced from Exa Docs Web Search MCP reference page."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct verbatim quote; F2 of the research note."
+    },
+    {
+      "claim_id": "C-0259",
+      "verification_questions": [
+        "Does T-006-exa.md document an alternative auth form using the exaApiKey query parameter?",
+        "Is the source attributed to the exa-labs/exa-mcp-server GitHub README?",
+        "Is the tools= parameter combined with exaApiKey in the example?"
+      ],
+      "verification_answers": [
+        "Yes — F3 explicitly describes the URL query-parameter form.",
+        "Yes — source attribution: github.com/exa-labs/exa-mcp-server/blob/main/README.md.",
+        "Yes — verbatim example quote: `https://mcp.exa.ai/mcp?exaApiKey=YOUR_KEY&tools=web_search_exa`"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Confirms both wire-supported auth forms; together with C-0256 demonstrates the apparent vendor-source split."
+    },
+    {
+      "claim_id": "C-0266",
+      "verification_questions": [
+        "Does the DeepWiki source (cited via F4) state precedence among auth methods when multiple are present?",
+        "Is the query parameter named as the highest-priority credential in this precedence?",
+        "Does the research note flag this precedence claim as fragile / lower-confidence?"
+      ],
+      "verification_answers": [
+        "Yes — F4: 'The Exa MCP server's auth resolver accepts (in priority order): (1) exaApiKey query parameter, (2) Authorization: Bearer …, (3) EXA_API_KEY env var'.",
+        "Yes — query parameter is position 1 (wins) per F4.",
+        "Yes — claim marked confidence: medium; note in research note: 'precedence ordering is the most fragile claim and should be re-verified at integration time.'"
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "DeepWiki is a single auto-generated reference, not vendor-authored prose. Source itself flags fragility. Consequential for FR-4 probe design — claim should be re-verified before relying on it; recommended form (header-only) avoids the precedence question entirely."
+    },
+    {
+      "claim_id": "C-0279",
+      "verification_questions": [
+        "Does the research note's Executive summary/Synthesis recommend the x-api-key header form?",
+        "Are the rationales for choosing header over URL form articulated?"
+      ],
+      "verification_answers": [
+        "Yes — Synthesis: 'For this feature the deciding factors are: 1. Secret hygiene… 2. Canonical-docs alignment… 3. Probe testability for FR-4… Recommend hosted-HTTP unless network egress is constrained.'",
+        "Yes — four rationales: secret hygiene, canonical-docs alignment, probe testability, transport choice (hosted HTTP)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Recommendation cleanly grounded in vendor-canonical form and secret-hygiene best practice."
+    },
+    {
+      "claim_id": "C-0280",
+      "verification_questions": [
+        "Does the source explain why the header form keeps the secret out of URL logs?",
+        "Does the source identify specific URL-leakage surfaces (logs, ps listings, server access logs)?"
+      ],
+      "verification_answers": [
+        "Yes — F3 caveat: 'Query-parameter form leaks the key into URL logs (browser history, proxy logs, server access logs, MCP client config dumps).'",
+        "Yes — explicitly enumerates browser history, proxy logs, server access logs, MCP client config dumps."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Rationale matches general security hygiene principles (URL credentials are well-known anti-pattern, e.g., OWASP)."
+    },
+    {
+      "claim_id": "C-0284",
+      "verification_questions": [
+        "Does the research note's Synthesis section give a canonical install command?",
+        "Does the command use --transport http with x-api-key header and EXA_API_KEY env var?",
+        "Is OQ-T006-1 noted as an open question about --header support?"
+      ],
+      "verification_answers": [
+        "Yes — Synthesis section shows: `claude mcp add --transport http exa https://mcp.exa.ai/mcp --header \"x-api-key: ${EXA_API_KEY}\"`",
+        "Yes — exact form quoted verbatim.",
+        "Yes — OQ-T006-1 explicitly notes: 'Does claude mcp add --transport http accept --header (or equivalent) for injecting the x-api-key header at install time, or must the header live in a separate config file… Defer to the Claude Code CLI docs check in T-007 / Design.'"
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Marked medium confidence because the install command is a 'hypothesis' per the source — OQ-T006-1 deferred to Claude Code CLI docs validation. The header-injection syntax is unconfirmed; if Claude Code CLI requires .mcp.json config rather than --header flag, command would need adjustment."
+    },
+    {
+      "claim_id": "C-0203",
+      "verification_questions": [
+        "Does T-005-context7.md confirm https://mcp.context7.com/mcp as the remote HTTP endpoint?",
+        "Is the source attribution from the official Upstash repo?"
+      ],
+      "verification_answers": [
+        "Yes — F1: 'vendor-hosted remote HTTP endpoint (https://mcp.context7.com/mcp)'.",
+        "Yes — source: github.com/upstash/context7 (official), quote: 'Context7 MCP server URL https://mcp.context7.com/mcp'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Vendor-canonical endpoint URL; verified verbatim."
+    },
+    {
+      "claim_id": "C-0205",
+      "verification_questions": [
+        "Does the source confirm the same API key authenticates both stdio and remote HTTP transports?",
+        "Does the source specify --api-key flag and CONTEXT7_API_KEY env var as input methods?"
+      ],
+      "verification_answers": [
+        "Yes — F2: 'For the local server, supply via either the --api-key CLI flag or the CONTEXT7_API_KEY environment variable… For the remote HTTP endpoint, the same key is passed as the CONTEXT7_API_KEY request header.'",
+        "Yes — both input methods explicitly named; CLI flag wins if both set."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Source: Upstash README + npm registry corroboration. Note: research note advises against --api-key CLI flag form due to argv leakage (entity E-0094)."
+    },
+    {
+      "claim_id": "C-0208",
+      "verification_questions": [
+        "Does the research note recommend remote HTTP at https://mcp.context7.com/mcp for project-scoped always-on use?",
+        "Is the API key supplied as a header sourced from a Codespaces secret?",
+        "Is the header name CONTEXT7_API_KEY?"
+      ],
+      "verification_answers": [
+        "Yes — Acceptance-criteria check: 'Remote URL https://mcp.context7.com/mcp; header CONTEXT7_API_KEY.'",
+        "Yes — Synthesis: 'the canonical answer is CONTEXT7_API_KEY Codespaces secret. For remote HTTP, surface it as a header named CONTEXT7_API_KEY.'",
+        "Yes — header name is exactly CONTEXT7_API_KEY (same string as the env var name)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Header name reuses env var name — somewhat unusual but documented by Upstash. Cleanly resolves PRD UI-4."
+    },
+    {
+      "claim_id": "C-0062",
+      "verification_questions": [
+        "Does T-002-mcp-openapi-schema.md confirm StdioServerTransport import from @modelcontextprotocol/sdk?",
+        "Is this verified in actual source code (index.mjs)?",
+        "Is HTTP/SSE explicitly ruled out?"
+      ],
+      "verification_answers": [
+        "Yes — F-2: 'The index.mjs source imports StdioServerTransport from @modelcontextprotocol/sdk/server/stdio.js and connects the server to it as the sole transport.'",
+        "Yes — verbatim quote: `import { StdioServerTransport } from \"@modelcontextprotocol/sdk/server/stdio.js\";` from github.com/hannesj/mcp-openapi-schema/blob/master/index.mjs.",
+        "Yes — 'There is no HTTP/SSE option.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct source-code introspection; highest possible evidence quality for a transport claim."
+    },
+    {
+      "claim_id": "C-0063",
+      "verification_questions": [
+        "Does the source confirm no authentication is used by mcp-openapi-schema?",
+        "Is there evidence the server has no outbound HTTP / credential handling?"
+      ],
+      "verification_answers": [
+        "Yes — F-5: 'There is no outbound HTTP, no API-key handling, no auth flow.' Playbooks listing corroborates: 'No external API credentials needed.'",
+        "Yes — F-5 confidence: 'High — consistent with the read-only stdio architecture and the absence of any HTTP client dependency in package.json.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Local file read + stdio only; security posture is clean. Operator must still treat the spec file as in-scope data (caveat noted in source)."
+    },
+    {
+      "claim_id": "C-0143",
+      "verification_questions": [
+        "Does T-003-actionlint-mcp.md confirm stdio transport for actionlint-mcp?",
+        "Is the invocation pattern documented (e.g., direct binary launch with no transport flags)?"
+      ],
+      "verification_answers": [
+        "Yes — F5 title: 'Transport is stdio; tool surface is two tools; no authentication.'",
+        "Yes — F5 source: README + lobehub.com listing; stdio is the documented transport."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "F5 omitted from grep snippet (long matching line); inferred from acceptance-criteria check ('Transport recommendation Satisfied. stdio (F5).') and finding title."
+    },
+    {
+      "claim_id": "C-0144",
+      "verification_questions": [
+        "Does the source enumerate exactly two tools for actionlint-mcp?",
+        "Are the tool names lint_workflow and check_all_workflows?"
+      ],
+      "verification_answers": [
+        "Yes — acceptance-criteria check: 'Tool surface Satisfied. lint_workflow, check_all_workflows (F5).'",
+        "Yes — both names exactly as claimed."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Tool surface verified; matches PRD UI-3 expected resolution."
+    },
+    {
+      "claim_id": "C-0147",
+      "verification_questions": [
+        "Does the source confirm no authentication is required by actionlint-mcp?",
+        "Is the no-auth claim consistent with the local-only operation pattern?"
+      ],
+      "verification_answers": [
+        "Yes — F5 title includes 'no authentication' and acceptance-criteria check: 'Auth (likely none) Satisfied. No authentication required (F5).'",
+        "Yes — local stdio server reads local YAML files; no outbound network calls; matches the local stdio + no-auth pattern (E-0021)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Clean local-stdio no-auth posture."
+    },
+    {
+      "claim_id": "C-0290",
+      "verification_questions": [
+        "Does the MCP spec (cited 2025-03-26) define a JSON-RPC ping method?",
+        "Is the verbatim text 'receiver MUST respond promptly with an empty response' present in the cited spec?",
+        "Is the spec URL https://modelcontextprotocol.io/specification/2025-03-26/basic/utilities/ping correct?",
+        "Does the spec note that timeout MAY be treated as connection failure?"
+      ],
+      "verification_answers": [
+        "Yes — F1.1: 'MCP defines a JSON-RPC ping method that either side may invoke.'",
+        "Yes — verbatim quote in research note: 'The receiver MUST respond promptly with an empty response.'",
+        "Yes — source link as cited.",
+        "Yes — F1.1 paraphrases: 'timeout MAY be treated as connection failure.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Primary spec source; spec version 2025-03-26 is authoritative for stable release. (Spec 2025-06-18 also exists per F3.2 for logging — not contradictory; both are valid revisions of the protocol.)"
+    },
+    {
+      "claim_id": "C-0291",
+      "verification_questions": [
+        "Does the cited source claim ping is the only spec-canonical primitive that works uniformly across stdio and HTTP?",
+        "Is this claim supported by the spec definition (transport-agnostic JSON-RPC method)?"
+      ],
+      "verification_answers": [
+        "Yes — F1.1 explicit: 'This is the only spec-canonical health primitive that works uniformly across stdio and HTTP transports.'",
+        "Yes — F1.2 confirms by contrast: HTTP servers expose /health and /ready, but stdio has no HTTP surface, so ping is the substitute."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-transport uniformity claim is structurally correct (JSON-RPC method works on both transports by definition)."
+    },
+    {
+      "claim_id": "C-0301",
+      "verification_questions": [
+        "Does the cited Anthropic Claude Code MCP docs state stdio servers are not auto-reconnected?",
+        "Is the verbatim quote 'Stdio servers are local processes and are not reconnected automatically.' present in the source?",
+        "Does the source describe the failure mode (marked failed, recovered only by operator action)?"
+      ],
+      "verification_answers": [
+        "Yes — F2.1: 'Stdio MCP servers are explicitly not auto-reconnected.'",
+        "Yes — verbatim quote: 'Stdio servers are local processes and are not reconnected automatically.' Cited from code.claude.com/docs/en/mcp.",
+        "Yes — F2.1: 'when a stdio process dies, the server is marked failed and only operator action (e.g., a restart command) recovers it.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Primary product docs. Critical operational constraint for this feature — six of seven servers are stdio (per F2.1 caveat), so no-auto-reconnect applies to most of the surface. Drives need for FR-9 structured failure record."
+    },
+    {
+      "claim_id": "C-0302",
+      "verification_questions": [
+        "Does the source state initial-connect failures on HTTP/SSE retry up to three times?",
+        "Is the Claude Code version (v2.1.121) tied to this behavior?",
+        "Is the source the Anthropic Claude Code MCP docs?"
+      ],
+      "verification_answers": [
+        "Yes — F2.1: 'As of v2.1.121, initial-connect failures (5xx, connection refused, timeout) on HTTP/SSE retry up to three times.'",
+        "Yes — version explicitly v2.1.121.",
+        "Yes — same source URL as F2.1 (code.claude.com/docs/en/mcp)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Version-pinned behavior claim — future Claude Code versions may change retry count; design should not depend on exact value."
+    }
+  ]
+}

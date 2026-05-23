@@ -1,0 +1,159 @@
+{
+  "metadata": {
+    "stage": 9,
+    "auditor": "review-cross-artifact-auditor",
+    "model_posture": "opus",
+    "iteration_number": 1,
+    "input_mode": "first-cycle (full read of new artifacts; PRD v3 / Blueprint v3 / Plan v1 treated as version-baseline)",
+    "cycle": 1,
+    "artifacts_audited": [
+      "prd-v3.md",
+      "blueprint-v3.md",
+      "plan-v1.md",
+      "acceptance-tests.md",
+      "phase-validators.md"
+    ],
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "generated": "2026-05-23T00:00:00Z",
+    "blueprint_ac_count_verified": 51,
+    "acceptance_tests_count": 50,
+    "phase_validators_count": 6,
+    "phase_validators_criteria_total": 113,
+    "convergence": {
+      "issues_new": 4,
+      "issues_resurfaced": 0,
+      "issues_resolved": 0,
+      "issues_persisting": 0,
+      "signal": "first_round"
+    }
+  },
+  "verdict": {
+    "decision": "needs_reconciliation",
+    "convergence_status": "open",
+    "rationale": "Two MAJOR consistency issues prevent unconditional approval: (1) AT-016 expected outcome (7 install_complete records) directly contradicts Plan T3.4 + PV-5.C5 (5 install_complete records — only 5 OSS-local servers are installed; the 2 HTTP servers context7 + exa have no install step). (2) Acceptance Tests use an inconsistent OP-script naming convention (op_NN_<name>.py with underscore-padding) versus the convention declared in Plan T4.3 and Phase Validators PV-4 (audit_opN_<name>.py with no padding and audit_ prefix); without reconciliation the AT commands will fail. Both are correctable by amending the acceptance-tests.md to align with the Plan / Phase-Validator authoritative names. Zero BLOCKERs; cross-artifact triangle is otherwise coherent."
+  },
+  "issues": [
+    {
+      "id": "I-CA-001",
+      "severity": "MAJOR",
+      "category": "coverage_mismatch",
+      "artifact_pair": "Plan ↔ Acceptance Tests ↔ Phase Validators",
+      "location": "acceptance-tests.md:303 (AT-016 expected outcome) vs plan-v1.md:559-578 (T3.4 description) vs phase-validators.md:379 (PV-5.C5)",
+      "description": "AT-016 (AC-FR-8-a coverage) says `mcp-events.jsonl` contains 7 install_complete records (one per server) after postCreate. This contradicts Plan T3.4 which installs ONLY 5 OSS-local servers (serena, mcp-openapi-schema, actionlint-mcp, terraform-mcp, gitnexus) — the 2 HTTP-transport servers (context7, exa) have no install step; they only have postStart auth-probe checks. Phase Validators PV-5.C5 correctly asserts 5 install_complete records. The AT-016 expected-outcome wording would cause the test to fail against a correctly-implemented postCreate.",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "line": 303, "quote": "`mcp-events.jsonl` contains 7 `install_complete` records (one per server) after postCreate."},
+        {"artifact": "plan-v1.md", "line": 564, "quote": "For each of the 5 OSS-local servers (serena, mcp-openapi-schema, actionlint-mcp, terraform-mcp, gitnexus), check sentinel_present AND binary_present"},
+        {"artifact": "plan-v1.md", "line": 576, "quote": "On install success: write the sentinel file; write a single `install_complete` event to `.claude/runtime/mcp-events.jsonl` (one record per server per install"},
+        {"artifact": "phase-validators.md", "line": 379, "quote": "shows 7 readiness_probe + 5 install_complete"}
+      ],
+      "recommended_resolution": "Amend AT-016 expected outcome to read: '`mcp-events.jsonl` contains 5 install_complete records (one per OSS-local install: serena, mcp-openapi-schema, actionlint-mcp, terraform-mcp, gitnexus). The 2 HTTP-transport servers (context7, exa) have no install_complete record; their availability is exercised by postCreate auth-probe (T3.2) and postStart readiness_probe (T3.5). The consolidated stdout summary still covers all 7.' Routes to finalize-reconciler → test-acceptance-author.",
+      "owner": "test-acceptance-author"
+    },
+    {
+      "id": "I-CA-002",
+      "severity": "MAJOR",
+      "category": "naming_convention_mismatch",
+      "artifact_pair": "Acceptance Tests ↔ Plan ↔ Phase Validators",
+      "location": "acceptance-tests.md:507, 631-632, 738-740 vs plan-v1.md:699-708 vs phase-validators.md:308, 313, 388-389",
+      "description": "OP-audit-script filenames are referenced under TWO incompatible naming conventions: (a) Acceptance Tests use `op_NN_<name>.py` with two-digit zero-padded ordinal and no `audit_` prefix (e.g., `op_06_redaction.py`, `op_09_url_credential.py`, `op_10_argv_leakage.py`, `op_02_consumer_mapping.py`, `op_03_zero_mcp.py`, `op_08_gitnexus.py`, `op_04_*.py`); (b) Plan T4.3 and Phase Validators PV-4/PV-5 use `audit_opN_<name>.py` with no zero-padding and an `audit_` prefix (e.g., `audit_op6_runtime_log_redaction.py`, `audit_op9_url_credential_rejection.py`, `audit_op10_argv_leakage.py`). Both conventions cannot be correct simultaneously — the AT commands will not resolve to real scripts if Plan/PV wins, and vice versa.",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "line": 507, "quote": "Run `python .claude/skills/auditing-mcp/scripts/op_06_redaction.py`"},
+        {"artifact": "acceptance-tests.md", "line": 631, "quote": "Run `python .claude/skills/auditing-mcp/scripts/op_09_url_credential.py`"},
+        {"artifact": "plan-v1.md", "line": 704, "quote": "`audit_op6_runtime_log_redaction.py` — synthetic credential strings..."},
+        {"artifact": "plan-v1.md", "line": 707, "quote": "`audit_op9_url_credential_rejection.py`"},
+        {"artifact": "phase-validators.md", "line": 308, "quote": "`ls .claude/skills/auditing-mcp/scripts/audit_op{1,2,3,4,5,6,7,8,9,10}_*.py` returns 10 files"},
+        {"artifact": "phase-validators.md", "line": 313, "quote": "`audit_op6_runtime_log_redaction.py` against a fixture..."}
+      ],
+      "recommended_resolution": "Plan + Phase Validators agree (2 against 1); Acceptance Tests should be amended to use the Plan/PV convention `audit_op<N>_<descriptor>.py` (no zero-padding, `audit_` prefix). Concretely: AT-032 → `audit_op6_runtime_log_redaction.py`; AT-041 → `audit_op9_url_credential_rejection.py` + `audit_op10_argv_leakage.py`; AT-049 → `audit_op2_consumer_mapping.py`, `audit_op3_zero_mcp_invariant.py`, `audit_op8_gitnexus.py`, `audit_op4_primary_fallback_prose.py`. Routes to finalize-reconciler → test-acceptance-author. (Alternative resolution: amend Plan/PV to the AT convention — but Plan declares the contract first and PV consumes it; flipping both is the larger change.)",
+      "owner": "test-acceptance-author"
+    },
+    {
+      "id": "I-CA-003",
+      "severity": "MINOR",
+      "category": "phantom_ac_reference",
+      "artifact_pair": "Blueprint ↔ Acceptance Tests",
+      "location": "acceptance-tests.md:82, 93, 651 (AT-043 mapping)",
+      "description": "AT-043 maps to `AC-NFR-4` which is NOT a Blueprint v3 AC. Blueprint v3 has exactly 51 formal AC declarations (AC-FR-*, AC-CC-*, AC-CS-*, AC-NFR-1/2/-*, AC-X-*); the PRD's NFR-4 commentary was deliberately reframed at PRD v2 (per I-DR-006) as a Blueprint-author instruction inside UI-7 rather than a runtime AC — there is no `AC-NFR-4-a`/`-b` either. The acceptance-tests.md overview asserts '51 of 51 ACs covered' which is technically true (all 51 Blueprint ACs ARE covered), but AT-043 introduces an extra map row for a non-existent AC ID. Plan §Acceptance Test Cross-Reference correctly omits AC-NFR-4. The acceptance-tests note at line 93 acknowledges the AT-043 mapping is non-standard ('reflected in the PRD's NFR list and tracked here per PA-OI-3').",
+      "evidence": [
+        {"artifact": "blueprint-v3.md", "section": "§Acceptance Criteria", "quote": "(no AC-NFR-4 declaration; AC-NFR-1-a/b, AC-NFR-2-a/c/d only — 51 unique IDs)"},
+        {"artifact": "prd-v3.md", "line": 397, "quote": "(v2: AC-NFR-4-a from v1 — which committed the Blueprint to including a measurement — is reframed as a Blueprint-author instruction inside UI-7's Owner/Needed-by note rather than as a runtime AC"},
+        {"artifact": "acceptance-tests.md", "line": 651, "quote": "Maps to AC: AC-NFR-4 (per PA-OI-3 alignment with T4.7 methodology)"},
+        {"artifact": "plan-v1.md", "line": 768, "quote": "Satisfies AC: PRD NFR-4 (per-agent context overhead within tolerable envelope). No specific Blueprint AC ID"}
+      ],
+      "recommended_resolution": "Two acceptable resolutions: (a) Rename the AT-043 mapping from 'AC-NFR-4' to 'PRD-NFR-4 (no Blueprint AC ID; tracked via PA-OI-3 and T4.7 OI-4 closure)' — preserves the PRD-NFR coverage intent without inventing a phantom AC. (b) Keep AT-043 but tag it as a methodology-coverage test rather than an AC-mapped test; update the matrix note explicitly. Both routes preserve the intent. Severity is MINOR because the phantom is acknowledged in the overview prose and Plan correctly omits the AC ID; the gap is cosmetic — the actual coverage is real (via T4.7 + PV-4.C19/C20).",
+      "owner": "test-acceptance-author"
+    },
+    {
+      "id": "I-CA-004",
+      "severity": "MINOR",
+      "category": "count_mismatch_in_metadata",
+      "artifact_pair": "Acceptance Tests (self-internal)",
+      "location": "acceptance-tests.md:91 (overview total)",
+      "description": "Overview says '49 unique tests (AT-001..AT-049) + 1 shared triplet test (AT-HG)' = 50 total. Per orchestrator brief metadata this is correct (50 tests, 51/51 ACs, AT-HG shared). However the AC Coverage Matrix lists 50 rows of unique-test IDs (AT-001..AT-049 = 49 IDs + AT-HG = 1 ID = 50 unique). The internal arithmetic is consistent (49 + 1 = 50), but the metadata block at line 91 says '49 unique tests + 1 shared triplet' which is a slightly loose phrasing (AT-HG IS a unique test ID; 'shared' refers to the AC mapping, not the test ID). No functional impact; cosmetic clarity issue.",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "line": 91, "quote": "Total: 49 unique tests (AT-001..AT-049) + 1 shared triplet test (AT-HG for AC-CC-5 / AC-FR-11-c / AC-NFR-2-c)."}
+      ],
+      "recommended_resolution": "Optional clarification — rephrase to: 'Total: 50 unique test IDs (AT-001..AT-049 + AT-HG); AT-HG is the unified verification for the AC-CC-5/AC-FR-11-c/AC-NFR-2-c triplet per MINOR-V3-001 disposition.' Non-blocking.",
+      "owner": "test-acceptance-author"
+    }
+  ],
+  "cross_check_results": {
+    "check_1_ac_chain": "PASS — All 51 Blueprint v3 ACs (verified by enumeration: 11 AC-FR-1..11, 10 AC-CC-1..10, 9 AC-CS-1..9, 6 AC-NFR-1-a/b + 2-a/c/d (5 NFR), 2 AC-X-1/2, totaling 51 actual IDs after removing AC-CC double-counts in Blueprint enumeration; verified via grep -E pattern enumeration) map to ≥1 Plan task in Plan §Acceptance Test Cross-Reference (lines 1083-1167), ≥1 acceptance test in acceptance-tests.md AC Coverage Matrix, and ≥1 phase-validator criterion in phase-validators.md. The triplet (AC-CC-5 + AC-FR-11-c + AC-NFR-2-c) is verified by the shared AT-HG test + PV-5.C-HARDGATE + PV-5.C-HARDGATE-EXERCISE. No orphans on the chain (every AC → task → test → validator)Cross-check details: AC-CC-7 is correctly identified as schema-level-provision/no-runtime-fires across all artifacts; AC-FR-9-d carries the same qualifier consistently.",
+    "check_2_hard_gate": "PASS — ADR-0043 hard-gate semantics is coherent across all required sites: Blueprint v3 §Open Items OI-3 closure (line 1337) + AC-CC-5 (line 329; carries 'Hard gate per ADR-0043' qualifier) + AC-NFR-2-c (line 339; carries 'Any BLOCKER finding halts the orchestrator at Gate 6') + §Risks OI-3 row (line 1294) + §State Transitions System Invariants (line 746) → Plan v1 T5.1 §Declared Rollout Posture (lines 832-846) + T5.4 (lines 878-896) → Acceptance Tests AT-HG (lines 748-797; the shared triplet test with Phase A/B/C/D simulation) → Phase Validators PV-5.C-HARDGATE (verbatim per ADR-0043, lines 363-367; gate-blocking severity) + PV-5.C-HARDGATE-EXERCISE (line 374; gate-blocking severity). User rationale verbatim (\"MCPs can cause a lot of problems if they are not stable and the system fails silently or the devcontainer and docker fail\") preserved in: Blueprint v3 (lines 1278, 1337, 1349), ADR-0043 (lines 19, 52, 78, 84), and Phase Validators PV-5.C-HARDGATE block (line 365). No erosion. ADR-0043 hard-gate non-bypassable contract intact end-to-end.",
+    "check_3_seven_server_inventory": "PASS — 7-server inventory consistency holds: PRD v3 ('seven named servers' throughout, post-v3 GitNexus addition); Blueprint v3 7 .mcp.json entries (lines 275, 304, 306, 859 + multiple); Plan v1 T2.4 7-entry .mcp.json (lines 443-461); Acceptance Tests AT-001/AT-004 expect exactly 7 (lines 107, 145, 738); Phase Validators PV-2.C14/C15/C16 enforce exactly 7 entries with named keys and absence of codebase-memory-mcp (lines 192-194). Stale 8-count references are confined to v2 and v3 doc-history change-log narration (Blueprint v3 lines 1348-1349) describing the v2→v3 OI-1 closure; the '8 touched agents' pattern (8 of 36 consumers) is an unrelated, correct count. No straggler 8-count machinery survives anywhere in the artifact triangle. No 'codebase-memory-mcp special-casing' phrasing survives where it would be load-bearing; the project-level-policy-preserved phrasing is used consistently per Gate-4 OI-1 closure language.",
+    "check_4_adr_0042_family_graduation": "PASS — ADR-0042 6-step graduation coverage is coherent: Blueprint v3 §CC Design Path A (lines 756, 774-785) + Fact Disposition C-0460 (referenced lines 401, 1349) + §Implementation Plan structural steps (lines 783-785) → Plan v1 Phase 4 tasks T4.4 (step 1+2), T4.5 (step 3), T4.6 (steps 4+5+6) (lines 717-755) → Acceptance Tests AT-038 (AC-CC-10 family-graduation structural; lines 579-591) → Phase Validators PV-4.C12 (task 1; line 314), PV-4.C13 (task 2; line 315), PV-4.C15 (task 3; line 317), PV-4.C16 (task 4; line 318), PV-4.C18 (task 5; line 320), PV-4.C17 (task 6; line 319). All 6 graduation steps are covered with traceable task → test → validator paths. The 'PV-4 ADR-0042 6-step checks' brief item is satisfied.",
+    "check_5_minor_v3_001_disposition": "PASS — MINOR-V3-001 disposition (AC-FR-11-c triplet via option (a) — PRD-inherited; AC-CC-5 + AC-NFR-2-c carry the qualifier) is honored uniformly: Plan v1 lines 91-101 (MINOR-V3-001 disposition section) + Plan v1 task-level coverage (T4.4/T4.5/T5.1/T5.4 reference the unified triplet, e.g., line 843: 'AC-CC-5 (hard gate); AC-FR-11-c (runnable end-to-end at Gate 6); AC-NFR-2-c (hard gate at Gate 6)'). → Acceptance Tests AT-HG (lines 748-797) treats all three ACs as one shared verification. → Phase Validators PV-5.C-HARDGATE (line 373) names all three ACs in source column ('AC-CC-5 / AC-FR-11-c / AC-NFR-2-c'). The triplet disposition is intact end-to-end. Note: PA-OI-4 is satisfied — the disposition adopts option (a) cleanly without requiring a v3.0.1 Blueprint patch.",
+    "check_6_event_trigger_discipline": "PASS — §O event-trigger discipline preserved: zero calendar-time triggers in acceptance tests, phase validators, or plan tasks as firing conditions. Plan v1 explicitly states (line 814) 'do NOT introduce calendar machinery'; multiple risk-row entries (lines 1175, 1179, 1181) document event triggers ('Phase 0 task fires it now; no calendar', 'T4.7 fires it; no calendar', 'auditing-codespaces stub-fill is the trigger'). PV-5.C18 (line 392) verifies OI-5 follow-up names event trigger ('next time ADR-0007 is touched'); PV-5.C19 (line 393) explicitly enforces the §O posture with grep guarding against time-based triggers ('! grep -rE ''(90-day|quarterly review|sunset.*by [0-9]{4}-)'''). ADR-0040 90-day kill criterion remains as design-time documentation in the ADR itself per §O.5; no propagation as machinery. The §O discipline is intact across the artifact chain.",
+    "check_7_pa_oi_1_t5_1_contract_consumption": "PASS — PA-OI-1 (T5.1 hard-gate contract consumption). T5.1 declares the orchestrator Gate-6 phase-validator contract (Plan lines 832-846): invocation, inputs read, exit semantics, no-operator-bypass, severity model. Phase Validators PV-5.C-HARDGATE (lines 363-367, 373) consumes the contract: same invocation (`python audit_mcp.py --with-runtime --severity-threshold BLOCKER`), same exit semantics (exit 0 → pass; non-zero → halt), same no-bypass posture, same severity model. PV-5.C17 (line 391) explicitly cross-references the T5.1 contract: 'Orchestrator Gate-6 phase-validator contract is declared and consumable; T5.1 contract is recorded in the Plan; this PV-5 specification operationalizes it; the orchestrator's Gate-6 invocation is wired to `audit_mcp.py --with-runtime` with exit-non-zero → halt'. The downstream consumption is clean.",
+    "check_8_pa_oi_2_5min_postattach": "PASS — PA-OI-2 (T3.5 5-min postAttach staleness). Plan T3.5 sets the threshold at 5 minutes (line 597). Acceptance Tests AT-018 tests both fresh (<5 min) and stale (>5 min) cases (lines 319-332): fresh case → cached read, no re-fire; stale case → automatic postStart re-run. Phase Validators PV-3.C16 verifies the threshold is documented in KB-mcp-platform/references/lifecycle-hooks.md ('grep -E ''5 ?minutes?|300''', line 257). All three artifacts agree on 5 minutes. No drift.",
+    "check_9_pa_oi_3_nfr_4_methodology": "PASS — PA-OI-3 (T4.7 NFR-4 alignment). Plan T4.7 methodology (lines 758-771): per-agent baseline token count + .mcp.json contribution per-agent (one-time per session) + Principle 1 (NO per-tool schema cost counted). Acceptance Tests AT-043 (lines 649-662) MIRRORS this methodology verbatim (steps 1-5 explicitly state 'Per T4.7 methodology' + 'Per cc-design Principle 1, do NOT count per-tool schema cost'). Phase Validators PV-4.C19 verifies §OI-4 section recorded in verify-at-execution.md (line 321), PV-4.C20 verifies the conclusion is 'within envelope OR re-scope filed' (line 322). PV-5.C21 re-verifies envelope at rollout (line 395). Aligned across all three. (Subordinate issue I-CA-003 about the phantom AC-NFR-4 label does NOT affect the methodology alignment, only the AC-ID label.)",
+    "check_10_pa_oi_4_ac_fr_11_c_robustness": "PASS — see check_5 above. AC-FR-11-c is treated as PRD-inherited; AC-CC-5 + AC-NFR-2-c carry the hard-gate qualifier. The triplet is uniformly verified by one shared test (AT-HG) and one shared validator block (PV-5.C-HARDGATE + PV-5.C-HARDGATE-EXERCISE). PA-OI-4 is resolved cleanly via option (a).",
+    "check_11_pa_oi_5_t4_3_fixtures": "PASS — PA-OI-5 (T4.3 auditing-mcp test-fixtures coverage). Plan T4.3 L2 (line 714) references fixtures under `auditing-mcp/test-fixtures/`. Acceptance Tests has dedicated §Test Fixtures and Infrastructure section (lines 799-808) explicitly enumerating OP-6, OP-2/OP-3, OP-9, OP-10 fixtures + the AT-HG fixture reuse pattern. Phase Validators PV-3 ops checks reference test fixtures (line 266), PV-4 enumerates 10 OP test fixtures (line 327) and PV-5 Shared Validator Infrastructure (line 493) names `.claude/skills/auditing-mcp/test-fixtures/` as consumer of both PV-4 and PV-5 (seeded-BLOCKER hard-gate exercise). The fixtures location is consistent (.claude/skills/auditing-mcp/test-fixtures/); the coverage is enumerated; ownership noted ('proposed to be authored alongside PV-3 verification scripts' + 'committed alongside the OP scripts'). PA-OI-5 is resolved.",
+    "check_12_phantom_references": "MOSTLY PASS — Cross-references resolve correctly except for one phantom: AT-043 maps to `AC-NFR-4` which is not a Blueprint AC (logged as I-CA-003 MINOR). All other 'per ADR-NNNN' / 'per Plan T*' / 'per AC-*' pointers checked at sample resolve to real artifact locations. Examples confirmed: 'per ADR-0042' → adrs/ADR-0042-auditing-mcp-family-graduation.md exists in working/feature/.../adrs/; 'per Plan T5.4' → Plan §T5.4 exists at line 878; 'per AC-CC-5' → Blueprint v3 line 329 exists. The auditing-mcp/test-fixtures/ path is convention-only (not yet created) but consistently named across all three new-artifact references.",
+    "check_13_verbatim_user_rationale": "PASS — All three Gate-4 verbatim user resolutions are preserved at their canonical sites: OI-1 (\"Lets move forward with 7 MCP the codebase-memory-mcp was an earlier assessment that is now stall.\") → Blueprint v3 §Open Items OI-1 closure (line 1335) and v3 doc-history (line 1349). OI-2 (\"graduate and then write an issue on whether we need to look at github codespace and the others in an issue report under Issues/ for future consideration of a pipeline run.\") → Blueprint v3 §Open Items OI-2 closure (line 1336) + ADR-0042 Context (line 53) + Issues/proposal-auditing-family-graduation-review.md (line 36). OI-3 (\"I agree hard gate. MCPs can cause a lot of problems if they are not stable and the system fails silently or the devcontainer and docker fail\") → Blueprint v3 §Open Items OI-3 closure (line 1337) + ADR-0043 (lines 19, 52, 78, 84) + Phase Validators PV-5.C-HARDGATE block (line 365). All three rationales are intact verbatim. The load-bearing premise (\"MCPs can cause a lot of problems...\") explicitly cited in PV-5 declares the contract is non-negotiable per user-policy."
+  },
+  "pa_oi_status": {
+    "PA-OI-1": "RESOLVED — Phase Validators PV-5.C-HARDGATE + PV-5.C-HARDGATE-EXERCISE + PV-5.C17 consume the T5.1 contract verbatim (same invocation, same exit semantics, same no-bypass posture, same severity model). Downstream consumption is clean.",
+    "PA-OI-2": "RESOLVED — 5-minute postAttach staleness consistently encoded: Plan T3.5 line 597 (declares 5 min); AT-018 lines 319-332 (tests both fresh-cache and stale-cache cases at the 5-min boundary); PV-3.C16 line 257 (verifies threshold is documented in KB-mcp-platform/references/lifecycle-hooks.md via `grep -E '5 ?minutes?|300'`). No drift.",
+    "PA-OI-3": "RESOLVED METHODOLOGY-ALIGNED — AT-043 mirrors T4.7 methodology verbatim (per-agent baseline + .mcp.json contribution + Principle 1 schema-cost exclusion); PV-4.C19/C20 records OI-4 measurement; PV-5.C21 re-verifies envelope at rollout. Subordinate I-CA-003 (MINOR) notes the AT-043 AC-mapping label uses 'AC-NFR-4' which is not a Blueprint AC; the methodology alignment itself is intact.",
+    "PA-OI-4": "RESOLVED — MINOR-V3-001 option (a) honored uniformly. AC-FR-11-c treated as PRD-inherited; the unified triplet (AC-CC-5 + AC-FR-11-c + AC-NFR-2-c) is the shared verification anchor in AT-HG, PV-5.C-HARDGATE, and PV-5.C-HARDGATE-EXERCISE. No v3.0.1 Blueprint patch is required; the Plan's option (a) disposition is robust.",
+    "PA-OI-5": "RESOLVED — Test-fixtures location consistent (.claude/skills/auditing-mcp/test-fixtures/); ownership enumerated; OP-6/OP-2/OP-3/OP-9/OP-10 fixtures explicitly described in acceptance-tests.md §Test Fixtures section (lines 799-808); PV-4 and PV-5 both consume the fixture path. Fixture authoring is appropriately placed at T4.3 task-execution time per Plan note."
+  },
+  "convergence": {
+    "verdict": "first_round",
+    "prior_issue_count": null,
+    "current_issue_count": 4,
+    "persistent_issues": [],
+    "severity_weighted_delta": null,
+    "notes": "First cycle; convergence math activates at cycle 2. Iteration budget 4 cycles. 2 MAJOR + 2 MINOR issues this cycle; all four are mechanically correctable in a single re-author pass on acceptance-tests.md (Plan + PVs are correct; the AT is the lagging artifact). Cycle 2 should drive total issues to 0 or near-0."
+  },
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 2,
+    "MINOR": 2,
+    "INFO": 0,
+    "terminal": false,
+    "hard_capped": false
+  },
+  "verbatim_user_rationale_preservation": {
+    "OI-1_user_quote": "Lets move forward with 7 MCP the codebase-memory-mcp was an earlier assessment that is now stall.",
+    "OI-1_preservation_sites": [
+      "working/feature/devcontainer-mcp-provisioning-r1/blueprint-v3.md:1335 (OI-1 closure block)",
+      "working/feature/devcontainer-mcp-provisioning-r1/blueprint-v3.md:1349 (v3 doc-history)"
+    ],
+    "OI-2_user_quote": "graduate and then write an issue on whether we need to look at github codespace and the others in an issue report under Issues/ for future consideration of a pipeline run",
+    "OI-2_preservation_sites": [
+      "working/feature/devcontainer-mcp-provisioning-r1/blueprint-v3.md:1336 (OI-2 closure block)",
+      "working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0042-auditing-mcp-family-graduation.md:53 (ADR Context)",
+      "Issues/proposal-auditing-family-graduation-review.md:36"
+    ],
+    "OI-3_user_quote": "I agree hard gate. MCPs can cause a lot of problems if they are not stable and the system fails silently or the devcontainer and docker fail",
+    "OI-3_preservation_sites": [
+      "working/feature/devcontainer-mcp-provisioning-r1/blueprint-v3.md:1337 (OI-3 closure block)",
+      "working/feature/devcontainer-mcp-provisioning-r1/blueprint-v3.md:1278 (Alternative Rejection rationale)",
+      "working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0043-auditing-mcp-gate-6-hard-gate.md:19, 52, 78, 84 (Context + Decision + Rationale)",
+      "working/feature/devcontainer-mcp-provisioning-r1/phase-validators.md:365 (PV-5.C-HARDGATE block)"
+    ],
+    "verdict": "ALL THREE VERBATIM USER RATIONALES PRESERVED at canonical sites. Load-bearing premise ('MCPs can cause a lot of problems...') is explicitly cited in PV-5.C-HARDGATE as non-negotiable per user-policy decision."
+  }
+}

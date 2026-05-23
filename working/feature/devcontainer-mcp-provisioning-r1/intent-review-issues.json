@@ -1,0 +1,93 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "IntentClarification",
+    "target_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/intent-clarification.md",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "invocation_context": "recipe-feature-pipeline Invocation 1 (post-Intent-Clarification, pre-Gate-1-Intent-Confirmation)",
+    "reviewer": "shared-document-reviewer",
+    "skills_applied": [
+      "KB-documentation-criteria (templates/intent-clarification-template.md, references/shared-conventions.md)",
+      "KB-review-disciplines (references/gate-0-1-procedure.md, references/severity-taxonomy.md)",
+      "KB-general-coding-principles (N/A — no code samples in IntentClarification)"
+    ],
+    "reviewed_at": "2026-05-23T00:00:00Z"
+  },
+  "scores": {
+    "consistency": 92,
+    "completeness": 90,
+    "rule_compliance": 88,
+    "clarity": 88
+  },
+  "gate0": {
+    "status": "pass",
+    "missing_elements": [],
+    "checks_performed": [
+      "All 10 required H2 sections present and non-empty (Purpose, Source, Initial Interpretation, Clarifying Questions and Answers, Clarified Intent, Scope Posture, Stakeholder Posture, Success Posture, Confirmation, Open Items)",
+      "## Contents checklist present; all 10 boxes marked [x]",
+      "All 5 Clarifying Questions answered (Resolved? column = [x] for every row)",
+      "user_token placeholder present (correct lifecycle state pre-Intent-Confirmation-Gate per template line 124 + shared-conventions v2 Change 2)",
+      "Scope Posture has all three required subsections (in scope / not in scope / undecided)",
+      "Frontmatter parses as valid YAML; all universal required fields present except doc_type (see I-DR-001)",
+      "Document length 143 lines — within template 60-150 budget"
+    ]
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "verdict_token": "PASS",
+    "conditions": [
+      "Add `doc_type: intent-clarification` to frontmatter (per ADR-0032 Change 4 — universal required since canonicalization). Can be added in same edit when user_token is assigned at Intent Confirmation Gate. Does not block Gate 1 Intent Confirmation but must be present before status moves to `accepted`.",
+      "At Intent Confirmation Gate, orchestrator assigns and writes the real `user_token` value (currently placeholder)."
+    ],
+    "rationale": "Gate 0 passes cleanly (all 10 required sections, all clarifying questions resolved, well-bounded scope, length within budget). Gate 1 scores cleanly: Consistency 92 / Completeness 90 / Rule compliance 88 / Clarity 88. The doc demonstrates the exact discipline the template asks for: user voice preserved in Source, two corrected assumptions surfaced in Initial Interpretation, 5 explicit exclusions in Scope, and substantive Open Items with realistic feasibility caveats deferred correctly to PRD. The single `important` issue (missing `doc_type`) is forward-scoped migration debt per shared-conventions line 307, not a substantive defect."
+  },
+  "issues": [
+    {
+      "id": "I-DR-001",
+      "severity": "important",
+      "category": "compliance",
+      "location": "Frontmatter (lines 1-10)",
+      "description": "Frontmatter is missing `doc_type:` field. Per shared-conventions.md v2 Change 4 (ADR-0032), `doc_type` is a universal required field for every pipeline artifact, and the canonical value for this artifact is `intent-clarification`.",
+      "evidence": "Frontmatter fields present: id, version, status, feature_slug, scope_class, user_token, generated, generated_by. Field missing: doc_type. Per shared-conventions.md line 307: 'new planning-side artifacts will surface a doc_type missing MAJOR finding at Gate 0 — surfaced explicitly per ADR-0033 no-silent-absorption.'",
+      "suggestion": "Add `doc_type: intent-clarification` as a frontmatter field. Recommended placement: between `feature_slug:` and `scope_class:` for readability."
+    },
+    {
+      "id": "I-DR-002",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Open Items (Pending PRD Authoring), bullet 4",
+      "description": "The bullet 'Note the Serena fit caveat: this repo is markdown-heavy, so Serena's symbol-level value is realized mainly when the pipeline runs against real feature codebases.' is an informational observation, not an action item. The template describes Open Items as 'items the user surfaced but explicitly deferred to PRD Authoring or later' — i.e., things to resolve, not things to note.",
+      "suggestion": "Either (a) reword as an action item ('Decide in PRD whether Serena's role on this repo is acceptable given it is markdown-heavy, or whether to scope Serena's use to downstream feature-codebase runs'), or (b) move to a separate 'Observations for the Rationale Brief' subsection. Option (a) keeps the section coherent."
+    },
+    {
+      "id": "I-DR-003",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Clarifying Questions Q5 vs. Open Items bullet 2",
+      "description": "Q5 user answer states 'Codespaces secrets — keys are available.' Open Items bullet 2 separately calls out 'Confirm the Exa hosted-server authentication mechanism (request header vs. URL query parameter) before .mcp.json is finalized.' These are different concerns (key availability vs. transport-level auth mechanism), but a fast reader could perceive tension. Both are correct; only clarity is at issue.",
+      "suggestion": "In Open Items bullet 2, prefix with 'Per Q5 keys are available, but —' to make the distinction explicit. Alternatively, move this concern into a 'Discovery Research focus areas' note in the rationale brief."
+    },
+    {
+      "id": "I-DR-004",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Stakeholder Posture (Preliminary), bullet 2",
+      "description": "The 'Consuming sub-agents' bullet lists agents (discovery-codebase-researcher, design-iac / design-api / design-cicd, discovery-external-researcher) as a stakeholder, but sub-agents are surface area / consumers rather than stakeholders in the classical sense. Template explicitly notes this section is a SKETCH formalized in the PRD's Stakeholder Inventory, so this is acceptable as a preliminary, but the PRD's Stakeholder Inventory authoring should disambiguate.",
+      "suggestion": "Acceptable as-is for the Preliminary sketch. Surface as an item for the rationale brief: 'PRD Stakeholder Inventory should treat consuming sub-agents as a surface-area consideration, not a stakeholder.'"
+    }
+  ],
+  "recommendations": [
+    "At Intent Confirmation Gate: orchestrator assigns `user_token` AND author adds `doc_type: intent-clarification` in the same edit, so the v1.0.0 status transition to `accepted` carries a complete frontmatter.",
+    "Carry forward to the rationale brief the four 'undecided' / open items that genuinely need PRD/Discovery resolution: transport per server, install mechanism (Dockerfile vs. lifecycle hooks; Go vs. Docker for Terraform MCP), Serena's KB-codebase-research role, tool-to-agent allowlist mapping, and version pinning.",
+    "Carry forward the explicit user-confirmed decisions for the rationale brief: scope_class=FULL, wire into sub-agents (not register-only), all-six always-on, Codespaces secrets for credentials.",
+    "Document is well-bounded and exemplifies the discipline the template asks for — particularly the Initial Interpretation that names its two wrong assumptions, and the 5 explicit Scope exclusions. No structural rework needed."
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [],
+    "note": "First review of this artifact (no prior iteration context provided in invocation prompt). prior_context_count: 0."
+  }
+}

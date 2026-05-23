@@ -1,0 +1,358 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "cycle_number": 3,
+    "of_cap": 4,
+    "is_terminal_cycle": false,
+    "findings_source": "phase-0-supply-chain-findings",
+    "source_artifact": "working/feature/devcontainer-mcp-provisioning-r1/verify-at-execution.md",
+    "source_findings": ["T0.2", "T0.4", "T0.5"],
+    "generated": "2026-05-23T19:30:00Z",
+    "generated_by": "finalize-reconciler",
+    "prior_log_paths": [
+      "working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-1.md",
+      "working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-2.md"
+    ],
+    "harness_note": "Per Issues/analysis-execute-orchestrator-dispatch-limitation.md, sub-agents in this harness do not have the Agent dispatch tool at runtime. The parent (user-facing) orchestrator executes the dispatches below by invoking each target_agent with its feedback_brief. finalize-reconciler does not dispatch directly."
+  },
+  "input_summary": {
+    "BLOCKER": 1,
+    "HIGH": 1,
+    "MAJOR": 1,
+    "MINOR": 0,
+    "INFO": 0
+  },
+  "ac_cs_9_wrapping_intent_note": "AC-CS-9 ('cold-cache build doesn't need a C++ toolchain') is preserved under F2's npm install path. The env-var GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 does the same load-bearing work under npm (suppresses npm's vendored tree-sitter grammar build) as it was claimed to do under uvx (suppresses a Python C-extension build that never actually existed for this package). Re-authoring agents MUST preserve AC-CS-9's semantic guarantee. They are changing the install mechanism only; they are NOT re-deriving or weakening AC-CS-9. The verify-at-execution check (tasks.json T0.4 + AT-bound L1 probe) still asserts: no cc/g++/cargo in the install-process tree. The probe condition is install-command-agnostic; only the install command being probed changes (uvx form → npm/npx form).",
+  "dispatches": [
+    {
+      "dispatch_id": "D-3.1",
+      "order": 1,
+      "target_agent": "plan-author",
+      "mode": "focused-in-place-amendment",
+      "scope": ["working/feature/devcontainer-mcp-provisioning-r1/plan-v1.md"],
+      "version_transition": "1.0.1 -> 1.0.2",
+      "brief_summary": "Apply F1 (actionlint-mcp identifier) + F2 (gitnexus install mechanism) corrections to Plan v1.",
+      "specific_edits": [
+        {
+          "finding": "F1",
+          "file": "plan-v1.md",
+          "lines": [143, 148, 572],
+          "change": "Replace `2manymws/actionlint-mcp` with `hongkongkiwi/actionlint-mcp` in all 3 sites. On line 148, the `go install` path becomes `go install github.com/hongkongkiwi/actionlint-mcp@<SHA>` (drop the `/cmd/actionlint-mcp` suffix — upstream's main.go is at repo root per research note T-003). On line 572, same correction inside the build-loop snippet.",
+          "verification": "After patch, grep -n '2manymws' plan-v1.md returns no hits."
+        },
+        {
+          "finding": "F2",
+          "file": "plan-v1.md",
+          "lines": [451, 574],
+          "change": "Line 451: `gitnexus` .mcp.json entry — `command: \"uvx\", args: [\"--from\", \"gitnexus@${GITNEXUS_TAG}\", \"gitnexus\"], env: {\"GITNEXUS_SKIP_OPTIONAL_GRAMMARS\": \"1\"}` → `command: \"npx\", args: [\"-y\", \"gitnexus@${GITNEXUS_TAG}\", \"mcp\"], env: {\"GITNEXUS_SKIP_OPTIONAL_GRAMMARS\": \"1\"}` (env-block preserved per AC-CS-9). Line 574: smoke-test command `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 uvx --from \"gitnexus@${GITNEXUS_TAG}\" gitnexus --help` → `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 npx -y gitnexus@${GITNEXUS_TAG} --help`. Note that the smoke-test (postCreate fail-on-fail) discipline is unchanged; only the command form changes.",
+          "verification": "After patch, grep -nE 'uvx.*gitnexus|gitnexus.*uvx' plan-v1.md returns no hits. The env-var GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 still appears in the env block and in the smoke-test prefix."
+        },
+        {
+          "finding": "F2 side-effect",
+          "file": "plan-v1.md",
+          "lines": ["search §H-4 and T3.4 task bodies"],
+          "change": "Plan T3.4 (postCreate.sh authoring) install function for gitnexus must specify `npm install -g gitnexus@${GITNEXUS_TAG}` with `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` exported beforehand. Prereq added: Node.js LTS on PATH at postCreate time — Plan must declare this prereq (and confirm versions.env carries a `NODE_LTS_VERSION` or similar pin, or that the base image guarantees Node-LTS). If Plan does not currently mention Node-LTS, add a one-line task or §H entry to ensure base-image Node availability.",
+          "verification": "Plan §H-4 and T3.4 reference `npm install -g gitnexus`; Plan declares Node-LTS prereq."
+        }
+      ],
+      "out_of_scope": [
+        "Do not re-derive any AC.",
+        "Do not touch the F3 (Context7) sections of Plan v1 in this dispatch — those are gated on D-3.2's F3 investigation; if D-3.3 surfaces Plan-side Context7 edits as a follow-up, they will land in a subsequent micro-patch.",
+        "Do not modify Blueprint, PRD, ADRs, tasks.json, or per-layer design docs — those are D-3.2's scope.",
+        "Do not modify acceptance-tests.md or phase-validators.md — those are D-3.3 / D-3.4."
+      ],
+      "investigation_required": [],
+      "expected_output": {
+        "file_written": "working/feature/devcontainer-mcp-provisioning-r1/plan-v1.md (in-place)",
+        "version_after": "1.0.2",
+        "doc_history_row_added": true,
+        "return_summary_format": "Per-finding resolution lines and grep-verification outputs."
+      },
+      "depends_on_dispatch_order": [],
+      "issues_referenced": ["F1", "F2"]
+    },
+    {
+      "dispatch_id": "D-3.2",
+      "order": 1,
+      "target_agent": "design-composer",
+      "mode": "multi-artifact-coordinated-patch-with-investigation",
+      "scope": [
+        "working/feature/devcontainer-mcp-provisioning-r1/blueprint-v3.md",
+        "working/feature/devcontainer-mcp-provisioning-r1/cc-design.md",
+        "working/feature/devcontainer-mcp-provisioning-r1/cc-dependencies.json",
+        "working/feature/devcontainer-mcp-provisioning-r1/codespaces-design.md",
+        "working/feature/devcontainer-mcp-provisioning-r1/codespaces-dependencies.json",
+        "working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0041-install-mechanism-hybrid.md",
+        "working/feature/devcontainer-mcp-provisioning-r1/tasks.json",
+        "working/feature/devcontainer-mcp-provisioning-r1/verify-at-execution.md (add §H-5 v3.0.0 record)",
+        "working/feature/devcontainer-mcp-provisioning-r1/research-notes/T-005-context7.md (refresh)"
+      ],
+      "version_transition": "blueprint-v3.md: 3.0.1 -> 3.0.2; ADR-0041: in-place ADR Document History bump; tasks.json: no version (JSON)",
+      "brief_summary": "Apply F1 + F2 + F3 (after investigation) corrections to the composer-owned design surface.",
+      "specific_edits": [
+        {
+          "finding": "F1",
+          "file": "blueprint-v3.md",
+          "lines": [159],
+          "change": "Replace `go install github.com/2manymws/actionlint-mcp/cmd/actionlint-mcp@<sha>` with `go install github.com/hongkongkiwi/actionlint-mcp@<sha>` in the Fact Disposition row for actionlint-mcp."
+        },
+        {
+          "finding": "F1",
+          "file": "cc-dependencies.json",
+          "lines": [124],
+          "change": "Replace `(2manymws/actionlint-mcp)` with `(hongkongkiwi/actionlint-mcp)`."
+        },
+        {
+          "finding": "F1",
+          "file": "codespaces-design.md",
+          "lines": [113],
+          "change": "Replace `go install \"github.com/2manymws/actionlint-mcp/cmd/actionlint-mcp@${ACTIONLINT_MCP_SHA}\"` with `go install \"github.com/hongkongkiwi/actionlint-mcp@${ACTIONLINT_MCP_SHA}\"` (drop the `/cmd/actionlint-mcp` suffix; upstream main.go is at repo root)."
+        },
+        {
+          "finding": "F1",
+          "file": "tasks.json",
+          "lines": [72],
+          "change": "T0.2 description: replace `github.com/2manymws/actionlint-mcp` with `github.com/hongkongkiwi/actionlint-mcp`."
+        },
+        {
+          "finding": "F2",
+          "file": "cc-design.md",
+          "lines": [137, 138, 139, 140, 141],
+          "change": "Within the .mcp.json template gitnexus entry: `\"command\": \"uvx\", \"args\": [\"--from\", \"git+https://github.com/abhigyanpatwari/GitNexus@<PIN_TAG>\", \"gitnexus\", \"serve\"]` → `\"command\": \"npx\", \"args\": [\"-y\", \"gitnexus@${GITNEXUS_TAG}\", \"mcp\"]`. Env block (GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1) is preserved unchanged per AC-CS-9. Variable name change: `<PIN_TAG>` → `${GITNEXUS_TAG}` for consistency with versions.env discipline."
+        },
+        {
+          "finding": "F2",
+          "file": "cc-dependencies.json",
+          "lines": ["search for gitnexus entry"],
+          "change": "Replace any `uvx`-form install line with `npm install -g gitnexus@${GITNEXUS_TAG}` (or `npx -y gitnexus@${GITNEXUS_TAG} mcp` if dependencies.json carries a runtime form). Add Node-LTS as a declared prereq."
+        },
+        {
+          "finding": "F2",
+          "file": "codespaces-design.md",
+          "lines": [122],
+          "change": "Smoke-test: `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 uvx --from \"gitnexus@${GITNEXUS_TAG}\" --help` → `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 npx -y gitnexus@${GITNEXUS_TAG} --help`. Add (if not present) a postCreate install function: `install_gitnexus() { GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 npm install -g gitnexus@${GITNEXUS_TAG}; }`. Ensure the postCreate flow exports `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` BEFORE the npm install runs. Add Node-LTS-on-PATH prereq note."
+        },
+        {
+          "finding": "F2",
+          "file": "codespaces-dependencies.json",
+          "lines": ["search for gitnexus and node"],
+          "change": "Add Node-LTS as a base-image declared prereq if not already present. Replace any `uvx`-form gitnexus install line."
+        },
+        {
+          "finding": "F2",
+          "file": "blueprint-v3.md",
+          "lines": [161],
+          "change": "Fact Disposition row: `uvx --from gitnexus@<TAG>; GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 smoke-test` → `npm install -g gitnexus@<TAG>; GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 smoke-test (npx form for ephemeral verify; npm form for persistent install in postCreate)`."
+        },
+        {
+          "finding": "F2",
+          "file": "blueprint-v3.md",
+          "lines": [855],
+          "change": "Sub-Agents / .mcp.json table gitnexus row: `stdio; uvx --from gitnexus@${GITNEXUS_TAG}; GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` → `stdio; npx -y gitnexus@${GITNEXUS_TAG} mcp; GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1`."
+        },
+        {
+          "finding": "F2",
+          "file": "tasks.json",
+          "lines": [106],
+          "change": "T0.4 description: smoke-test command `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 uvx --from gitnexus@<TAG> gitnexus --help` → `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 npx -y gitnexus@${GITNEXUS_TAG} --help`. KEEP the C++-toolchain absence assertion verbatim (`confirm exit 0 AND no C++ toolchain (cc/g++/cargo) in process tree`) — that is the AC-CS-9 load-bearing check; it survives the mechanism change. KEEP the STOP-and-re-plan clause."
+        },
+        {
+          "finding": "F2",
+          "file": "tasks.json",
+          "lines": ["search T3.4"],
+          "change": "T3.4 postCreate.sh authoring task: install function spec for gitnexus is `npm install -g gitnexus@${GITNEXUS_TAG}` with `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` exported. Declare Node-LTS-on-PATH prereq."
+        },
+        {
+          "finding": "F2",
+          "file": "adrs/ADR-0041-install-mechanism-hybrid.md",
+          "lines": [173],
+          "change": "Per-server smoke-test dispatch table: `gitnexus) GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 uvx --from \"gitnexus@${version}\" --help` → `gitnexus) GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 npx -y \"gitnexus@${version}\" --help`. If ADR-0041's install-mechanism taxonomy currently has rows only for `uvx` and `go install`, ADD a row for npm/npx install paths (decision: when to use npm vs npx; the GitNexus pattern is `npm install -g` for persistent + `npx -y` for ephemeral smoke-test). Bump ADR Document History."
+        },
+        {
+          "finding": "F3",
+          "file": "investigation-prereq",
+          "lines": [],
+          "change": "BEFORE any F3 design edit: do a WebFetch on https://www.npmjs.com/package/@upstash/context7-mcp and the linked GitHub repo (likely github.com/upstash/context7-mcp) to enumerate v3.0.0's tool surface, auth model, and HTTP endpoint. Record findings in (a) a refresh of `research-notes/T-005-context7.md` with timestamped 2026-05-23 evidence, and (b) a new `§H-5` section in `verify-at-execution.md` recording the v3.0.0 verification. Required confirmations: (i) tool names exposed by v3.0.0; (ii) `Authorization: Bearer ${CONTEXT7_API_KEY}` header form is still canonical (ADR-0039 / OP-9 / OP-10); (iii) `https://mcp.context7.com/mcp` endpoint is stable across v1→v3."
+        },
+        {
+          "finding": "F3",
+          "file": "blueprint-v3.md",
+          "lines": [423],
+          "change": "(POST-INVESTIGATION) Fact Disposition row C-0037: replace `Context7 v1.2.0 ReplaceContentTool replaces ReplaceRegexTool` with the verified v3.0.0 tool surface. If the v3.0.0 tools are entirely different names, restate the disposition as: `Context7 v3.0.0 exposes tools {...}; allowlist entries are version-coupled; plan-author re-validates.` Drop the v1.2.0 framing entirely; that version never existed."
+        },
+        {
+          "finding": "F3",
+          "file": "cc-design.md",
+          "lines": [213],
+          "change": "(POST-INVESTIGATION) update C-0037 row if Context7 v1.2.0 / ReplaceContentTool is referenced; re-anchor to v3.0.0 names."
+        },
+        {
+          "finding": "F3",
+          "file": "cc-dependencies.json",
+          "lines": [128],
+          "change": "(POST-INVESTIGATION) replace `C-0037 ReplaceContentTool replaces ReplaceRegexTool at v1.2.0` with the v3.0.0-verified statement. Update the Context7 pin reference if v3.0.0 (or a chosen pin) is selected."
+        },
+        {
+          "finding": "F3",
+          "file": "tasks.json",
+          "lines": [124],
+          "change": "(POST-INVESTIGATION) T0.5 description: rewrite the Context7 tool/auth confirmation to anchor on v3.0.0 tools and the verified auth surface. Drop the `ReplaceContentTool renamed from ReplaceRegexTool` framing; that was about a Serena CHANGELOG entry that contaminated the Context7 claim."
+        },
+        {
+          "finding": "F3-historical",
+          "file": "synthesis files",
+          "lines": [],
+          "change": "DO NOT modify synthesis/*.json or synthesis.md in-place — these are historical records of an earlier-claim state. Instead, add an addendum note (in design-composer's discretion: either a top-of-synthesis.md note or a verify-at-execution §H-5 cross-reference) recording that C-0037 was found wrong at Phase 0 (Context7 v1.2.0 never existed; the ReplaceContentTool rename was actually a Serena v1.2.0 change misattributed to Context7)."
+        },
+        {
+          "finding": "cross-cutting",
+          "file": "blueprint-v3.md",
+          "lines": ["search AC-CS-9 wording"],
+          "change": "If AC-CS-9's wording references `uvx` or `Python` explicitly, retouch to `npm/npx` or generalize to install-mechanism-agnostic phrasing. The SEMANTIC INTENT (no C++ toolchain at cold-cache) is unchanged; only the install-mechanism phrasing changes. Do NOT re-derive the AC."
+        }
+      ],
+      "out_of_scope": [
+        "Do not patch plan-v1.md (D-3.1's scope).",
+        "Do not patch acceptance-tests.md (D-3.3's scope).",
+        "Do not patch phase-validators.md (D-3.4's scope).",
+        "Do not re-derive AC-CS-9. The acceptance criterion's semantic intent is load-bearing and preserved across this mechanism change.",
+        "Do not modify historical artifacts (blueprint-v1.md, blueprint-v2.md, prd-v1/2/3, research-plan-v1/2/3) — those are correct or superseded."
+      ],
+      "investigation_required": [
+        "F3: WebFetch https://www.npmjs.com/package/@upstash/context7-mcp + linked GitHub repo to enumerate v3.0.0 tool surface, auth model, HTTP endpoint. Record in research-notes/T-005-context7.md (refresh) AND verify-at-execution.md §H-5 (new section) BEFORE editing design artifacts. If investigation finds v3.0.0's tool surface materially different from any prior assumption (likely), re-author the C-0037 / Context7 Fact Disposition row from scratch rather than mechanical-replace."
+      ],
+      "expected_output": {
+        "files_written": [
+          "blueprint-v3.md (v3.0.2)",
+          "cc-design.md",
+          "cc-dependencies.json",
+          "codespaces-design.md",
+          "codespaces-dependencies.json",
+          "adrs/ADR-0041-install-mechanism-hybrid.md",
+          "tasks.json",
+          "verify-at-execution.md (added §H-5)",
+          "research-notes/T-005-context7.md (refreshed)"
+        ],
+        "doc_history_rows_added": ["blueprint-v3.md", "adrs/ADR-0041-install-mechanism-hybrid.md"],
+        "return_summary_format": "Per-finding resolution lines; investigation summary for F3 with verbatim tool names / auth model / endpoint; grep-verification outputs (zero hits for `2manymws`, `uvx.*gitnexus`, `gitnexus.*uvx`, `Context7 v1.2.0`, `ReplaceContentTool replaces ReplaceRegexTool` in current-version artifacts)."
+      },
+      "depends_on_dispatch_order": [],
+      "issues_referenced": ["F1", "F2", "F3"]
+    },
+    {
+      "dispatch_id": "D-3.3",
+      "order": 2,
+      "target_agent": "test-acceptance-author",
+      "mode": "focused-in-place-amendment",
+      "scope": ["working/feature/devcontainer-mcp-provisioning-r1/acceptance-tests.md"],
+      "version_transition": "1.0.2 -> 1.0.3",
+      "brief_summary": "Apply F2 wrapping-intent reaffirmation (AC-CS-9 npm-form) and F3 Context7 tool-name re-anchoring (post-D-3.2 investigation).",
+      "specific_edits": [
+        {
+          "finding": "F2",
+          "file": "acceptance-tests.md",
+          "lines": ["sweep file for gitnexus install commands and AC-CS-9 references"],
+          "change": "If any AT step or expected-outcome cites a `uvx`-form gitnexus install or smoke-test, replace with the npm/npx equivalent (matching D-3.1's Plan v1.0.2 form). The AC-CS-9 acceptance condition (no C++ toolchain in install-process tree) stays verbatim — only the install command being probed changes. Confirm AT-016 / AT-024..AT-026 (or whichever ATs anchor AC-CS-9) describe the new install command correctly. If acceptance-tests.md has no direct `uvx`-form gitnexus reference (grep this cycle showed 0 hits for `uvx` and 0 for `gitnexus.*uvx`), the F2 change is a NO-OP for AT — document this in the Document History row.",
+          "verification": "grep -nE 'uvx' acceptance-tests.md returns 0 hits."
+        },
+        {
+          "finding": "F3",
+          "file": "acceptance-tests.md",
+          "lines": ["sweep file for Context7 tool-name references"],
+          "change": "(POST-D-3.2) If any AT step names specific `mcp__context7__*` tool names (e.g., `mcp__context7__ReplaceContentTool`), re-anchor to v3.0.0 tool names as recorded in D-3.2's investigation output. If acceptance-tests.md has no v1.2.0-specific tool-name reference (grep this cycle showed 0 hits for `ReplaceContentTool` in acceptance-tests.md), F3 is a NO-OP for AT — document this in the Document History row."
+        }
+      ],
+      "out_of_scope": [
+        "Do not re-derive ACs.",
+        "Do not modify Plan, Blueprint, ADRs, tasks.json, design docs, phase-validators."
+      ],
+      "investigation_required": [],
+      "expected_output": {
+        "file_written": "acceptance-tests.md (in-place)",
+        "version_after": "1.0.3",
+        "doc_history_row_added": true,
+        "return_summary_format": "Per-finding resolution lines; grep-verification outputs; explicit NO-OP statement if the sweep found nothing to patch."
+      },
+      "depends_on_dispatch_order": ["D-3.2"],
+      "issues_referenced": ["F2", "F3"]
+    },
+    {
+      "dispatch_id": "D-3.4",
+      "order": 2,
+      "target_agent": "test-phase-validator-author",
+      "mode": "focused-in-place-amendment",
+      "scope": ["working/feature/devcontainer-mcp-provisioning-r1/phase-validators.md"],
+      "version_transition": "1.0.0 -> 1.0.1",
+      "brief_summary": "Apply F3 Context7 tool-name re-anchoring to PV-0.C6 and PV-4.C5 (post-D-3.2 investigation).",
+      "specific_edits": [
+        {
+          "finding": "F3",
+          "file": "phase-validators.md",
+          "lines": [73],
+          "change": "(POST-D-3.2) PV-0.C6: replace `H-5 (Context7 v1.2.0 tool-rename + auth-flag form) recorded; records ReplaceContentTool rename status + Authorization: Bearer auth surface` with: `H-5 (Context7 v3.0.0 tool surface + auth-flag form) recorded; records v3.0.0 tool names per D-3.2 investigation + Authorization: Bearer auth surface`. The verifier grep regex changes from `ReplaceContentTool` to whatever tool name(s) v3.0.0 exposes (per D-3.2 output)."
+        },
+        {
+          "finding": "F3",
+          "file": "phase-validators.md",
+          "lines": [307],
+          "change": "(POST-D-3.2) PV-4.C5: replace `grep -E 'mcp__context7__ReplaceContent' .claude/agents/discovery-external-researcher.md matches` with `grep -E 'mcp__context7__<v3-tool-name>' .claude/agents/discovery-external-researcher.md matches` — using the verified v3.0.0 tool name(s) from D-3.2's investigation output. If v3.0.0 exposes multiple tools and the allowlist names all of them, the grep can be a disjunction or a wildcard `mcp__context7__*`. The CHECK SHAPE (allowlist names match the upstream-verified tool surface) is preserved; only the literal tool name(s) change."
+        }
+      ],
+      "out_of_scope": [
+        "Do not modify any other PV row.",
+        "Do not re-derive any AC or coverage relationship.",
+        "F1 + F2 do not require PV changes (the existing PVs are install-command-agnostic for actionlint-mcp and gitnexus on the AC-CS-9 axis).",
+        "Do not modify Plan, Blueprint, ADRs, tasks.json, design docs, acceptance-tests."
+      ],
+      "investigation_required": [],
+      "expected_output": {
+        "file_written": "phase-validators.md (in-place)",
+        "version_after": "1.0.1",
+        "doc_history_row_added": true,
+        "return_summary_format": "Per-finding resolution lines; grep-verification outputs."
+      },
+      "depends_on_dispatch_order": ["D-3.2"],
+      "issues_referenced": ["F3"]
+    }
+  ],
+  "user_escalations": [],
+  "deferrals": [],
+  "convergence": {
+    "cycle": 3,
+    "of_cap": 4,
+    "prior_log_paths": [
+      "working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-1.md",
+      "working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-2.md"
+    ],
+    "persistent_issues": [],
+    "shape_parallel_observations": [
+      {
+        "id": "shape-parallel-1",
+        "observation": "F1 (actionlint-mcp upstream identifier drift) is shape-parallel to cycle-2 I-AA-001 (design-cc.md / design-claude-code.md filename drift): in both cases, upstream-of-design artifacts (PRD / research-plan / intent-clarification / agent frontmatter) were CORRECT, and the drift was introduced during design composition and propagated downstream. F2 (GitNexus install mechanism) is the same shape: research note T-008 is correct, design composition introduced the wrong mechanism. Pipeline-improvement track should consider a discovery-time identifier-grep gate at the design-composition step that cross-checks composer-output identifiers against research-note identifiers.",
+        "disposition": "NOT a persistent issue — F1+F2 are first-cycle surfaces from a new finding source (Phase 0 verify-at-execution). The shape-parallel observation is logged for the pipeline-improvement track (see Issues/ ledger). This cycle's dispatches resolve the instance; the pattern is a separate concern."
+      }
+    ],
+    "convergence_verdict": "first_round_for_supply_chain_findings",
+    "next_cycle_posture": "regular_with_investigation_gate",
+    "expected_cycle_4_actions": [
+      "Re-run execute-orchestrator Phase 0 verify-at-execution on T0.2, T0.4, T0.5.",
+      "Re-run cross-artifact-audit in diff-mode (Blueprint v3.0.1 -> v3.0.2; Plan v1.0.1 -> v1.0.2).",
+      "Re-run packager grep-residual checks for `2manymws`, `uvx.*gitnexus`, `Context7 v1.2.0`, `ReplaceContentTool replaces ReplaceRegexTool` in current-version artifacts."
+    ],
+    "expected_cycle_4_verdict": "pass — 3 findings mechanically tractable; F3's investigation step is bounded.",
+    "divergence_risk": {
+      "F1": "low — mechanical string + path swap; upstream verified.",
+      "F2": "medium — mechanism change requires Node-LTS in base image; touches multiple artifacts; AC-CS-9 wrapping intent must be deliberately preserved.",
+      "F3": "medium — investigation must precede patch; result-shape depends on v3.0.0 tool surface; the wider Serena/Context7 misattribution suggests a follow-up cycle-4 audit of synthesis-graph claim provenance may be warranted (out-of-scope for cycle 3 dispatches; raise in cycle 4 if it surfaces)."
+    },
+    "if_cycle_4_does_not_converge": "Surface to user with the residual issue list and trade-off analysis. The 4-cycle cap is exhausted; user makes the final call on ship-with-documented-exceptions vs descope-affected-server vs re-author-another-arm."
+  },
+  "downstream_orchestrator_actions": [
+    "Invoke plan-author with D-3.1 dispatch (parallel-safe with D-3.2).",
+    "Invoke design-composer with D-3.2 dispatch — design-composer must complete F3 investigation BEFORE editing F3-tagged artifacts; investigation output is recorded in research-notes/T-005-context7.md + verify-at-execution.md §H-5.",
+    "After D-3.2 returns, invoke test-acceptance-author with D-3.3 dispatch (depends on D-3.2's F3 investigation output for the Context7 part).",
+    "After D-3.2 returns, invoke test-phase-validator-author with D-3.4 dispatch (depends on D-3.2's F3 investigation output).",
+    "After all four dispatches return, re-run execute-orchestrator Phase 0 verify-at-execution on T0.2, T0.4, T0.5. If all three succeed, the cycle converges and the run advances out of Stage 9 reconciliation; if any fail, invoke finalize-reconciler with cycle_number=4 and prior_log_paths=[cycle-1, cycle-2, cycle-3]."
+  ]
+}

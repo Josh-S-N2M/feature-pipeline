@@ -1,0 +1,582 @@
+{
+  "schema_version": "1.1.0",
+  "pipeline_run_id": "devcontainer-mcp-provisioning-r1-discovery-research",
+  "generated_at": "2026-05-23T00:00:00Z",
+  "extraction_method": "manual-grep-and-read",
+  "extraction_method_notes": "Neither GitNexus nor codebase-memory-mcp is currently configured (.mcp.json is confirmed ABSENT — this is the exact gap the feature closes). The discovery-codebase-researcher.md spec says 'At least one MUST be available — surface as a blocking error if neither is.' Per the bootstrap nature of this feature (it provisions the MCPs themselves), the only viable extraction method is direct Read/Grep/Glob/find of the filesystem. Confidence on every claim below is therefore based on direct file inspection, not graph queries.",
+  "scope": {
+    "repo": "Josh-S-N2M/feature-pipeline",
+    "branch": "main",
+    "commit": "cf48e5e20602c9d3cb6f264c443aff4be027911e",
+    "paths": [
+      ".devcontainer/",
+      ".mcp.json (absent — to be created)",
+      ".claude/agents/",
+      ".claude/skills/auditing-mcp/",
+      ".claude/skills/KB-codebase-research/",
+      ".claude/skills/KB-cc-platform/",
+      ".claude/skills/KB-cc-design/",
+      ".claude/skills/auditing-cc-configs/",
+      ".claude/skills/KB-codespaces-platform/",
+      ".claude/skills/KB-codespaces-design/",
+      ".claude/skills/auditing-codespaces/",
+      ".claude/skills/KB-github-actions-platform/",
+      ".claude/skills/KB-github-actions-design/",
+      ".claude/skills/auditing-github-actions/",
+      "adrs/ADR-0018-codebase-analysis-schema.md",
+      "adrs-migrated/ADR-0007-code-graph-mcp-selection.md"
+    ]
+  },
+  "components": [
+    {
+      "name": ".devcontainer/Dockerfile",
+      "path": ".devcontainer/Dockerfile",
+      "layer": "codespaces",
+      "language": "dockerfile",
+      "framework": "devcontainers (mcr.microsoft.com/devcontainers/python:1-3.11-bookworm)",
+      "entry_points": ["devcontainer image build"],
+      "dependencies": ["mcr.microsoft.com/devcontainers/python:1-${PYTHON_VERSION}-bookworm"],
+      "notes": "19 lines. PYTHON_VERSION=3.11 ARG. Strips broken Yarn apt source (commit 5e7f4ac fixed devcontainer build failure caused by stale Yarn GPG key in base image). Installs ripgrep, jq, bat, tree, less at image-build time (cached). Drops to USER vscode at end. No MCP-server install layers today. No build-args for MCP secrets. Greenfield surface for FR-1 / UI-16 / UI-2 GitNexus + Terraform install layers."
+    },
+    {
+      "name": ".devcontainer/devcontainer.json",
+      "path": ".devcontainer/devcontainer.json",
+      "layer": "codespaces",
+      "language": "jsonc",
+      "framework": "devcontainers spec",
+      "entry_points": ["Codespace build", "Codespace start", "Codespace attach"],
+      "dependencies": [
+        "ghcr.io/devcontainers/features/common-utils:2",
+        "ghcr.io/devcontainers/features/github-cli:1",
+        "ghcr.io/devcontainers/features/node:1 (lts)",
+        "ghcr.io/anthropics/devcontainer-features/claude-code:1"
+      ],
+      "entry_points_lifecycle": {
+        "onCreateCommand": "claude --version && python3 --version && node --version && gh --version",
+        "postCreateCommand": "NOT SET — available for FR-8 health-check",
+        "postStartCommand": "NOT SET — available for FR-8 health-check",
+        "postAttachCommand": "NOT SET — available for FR-8 health-check",
+        "updateContentCommand": "NOT SET"
+      },
+      "notes": "70 lines. Currently uses ONLY onCreateCommand (verification of installed tools). postCreate, postStart, postAttach all unused — wide-open for FR-8 health-check additions. Features pin policy: github-cli is 'latest' (UNPINNED), node is 'lts' (UNPINNED in the strict sense), claude-code:1 is major-pinned, common-utils:2 is major-pinned. containerEnv contains only EDITOR + PAGER (no credentials — confirms IN-004 / NFR-2-a expectation). hostRequirements 4 cpus / 8gb / 32gb. forwardPorts: []. vscode customizations: nine extensions, settings include editor.rulers=[100], files.insertFinalNewline=true."
+    },
+    {
+      "name": ".mcp.json",
+      "path": ".mcp.json",
+      "layer": "cc",
+      "language": "json",
+      "framework": "Claude Code MCP",
+      "entry_points": [],
+      "dependencies": [],
+      "notes": "CONFIRMED ABSENT at repo root as of commit cf48e5e (verified by ls). This is the file FR-1 creates. Its absence is itself the finding: every Claude Code session in this repo today comes up with zero MCP servers registered. The discovery-codebase-researcher agent's own bootstrap check ('check .mcp.json for GitNexus ... At least one MUST be available — surface as a blocking error') currently fails by definition in this repo — and the agent therefore CANNOT run end-to-end against this codebase via its primary path until this feature ships."
+    },
+    {
+      "name": ".claude/agents/ (sub-agent inventory)",
+      "path": ".claude/agents/",
+      "layer": "cc",
+      "language": "markdown+yaml-frontmatter",
+      "framework": "Claude Code sub-agents",
+      "entry_points": ["36 sub-agent files invoked by the pipeline orchestrator"],
+      "dependencies": ["Various KB-* and auditing-* skills via the skills: frontmatter field"],
+      "notes": "36 .md files total. Frontmatter convention: name (required), description (multiline supported), tools (array or comma-form), model (opus|sonnet), effort (high|medium|low), skills (array of skill slugs), memory (project). 'tools:' field appears in BOTH bracketed-array form (most files, e.g. 'tools: [Read, Glob, Grep, ...]') AND comma-separated form (cc-critique.md, finalize-deliverable-packager.md, shared-document-reviewer.md). Bash() restrictions use 'Bash(grep:*)' / 'Bash(python3 *)' patterns. NO existing agent file has any 'mcp__<server>__<tool>' entry in its tools allowlist today — the seven-server feature will be the first to introduce that pattern. See likely-consumer mapping in 'known_facts' below."
+    },
+    {
+      "name": ".claude/agents/discovery-codebase-researcher.md",
+      "path": ".claude/agents/discovery-codebase-researcher.md",
+      "layer": "cc",
+      "language": "markdown+yaml-frontmatter",
+      "framework": "Claude Code sub-agent",
+      "entry_points": ["Invoked once per pipeline run during Discovery Research"],
+      "dependencies": ["KB-codebase-research (via skills: frontmatter)", "GitNexus MCP (PRIMARY — only as PROSE reference)", "codebase-memory-mcp (FALLBACK — only as PROSE reference)"],
+      "notes": "157 lines. THIS IS THE CANONICAL UI-15 / IN-023 ARTIFACT. Frontmatter declares: tools=[Read, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git show:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(python3:*), Write, TaskCreate, TaskUpdate]; skills=[KB-codebase-research]; model=opus; effort=high; memory=project. THE PRIMARY/FALLBACK WIRING IS EXPRESSED PURELY AS PROSE in THREE places (all in agent body, NONE in tools allowlist, NONE in any structured frontmatter field): (a) line 20: 'check .mcp.json for GitNexus (primary per ADR-0007 v2.x) and codebase-memory-mcp (fallback). At least one MUST be available'; (b) line 29: 'If absent, prefer GitNexus and fall back to codebase-memory-mcp on degradation'; (c) line 156: 'You do NOT silently fall back from GitNexus to codebase-memory-mcp without recording it in extraction_method.' The agent's description (line 3) also names the relationship: 'GitNexus MCP (or codebase-memory-mcp fallback)'. There is NO 'mcp__gitnexus__*' or 'mcp__codebase-memory__*' string anywhere in the file, in the tools allowlist or otherwise. The skills: list contains KB-codebase-research, which is where the policy is reinforced — see that component."
+    },
+    {
+      "name": ".claude/skills/KB-codebase-research/SKILL.md",
+      "path": ".claude/skills/KB-codebase-research/SKILL.md",
+      "layer": "cc",
+      "language": "markdown+yaml-frontmatter",
+      "framework": "Claude Code skill",
+      "entry_points": ["Loaded by discovery-codebase-researcher via skills: frontmatter"],
+      "dependencies": ["ADR-0018 (referenced for schema)", "ADR-0007 (referenced indirectly for primary/fallback policy)"],
+      "notes": "247 lines, single-file skill (no references/ subdirectory — explicitly called out at lines 238-247 as a deliberate stage-1 choice). Frontmatter description names BOTH primary AND fallback: 'reads the existing codebase using GitNexus MCP (or the fallback codebase-memory-mcp)'. The primary/fallback policy is expressed in PROSE at lines 5, 17, 63-91 (GitNexus Cypher query patterns — primary discipline), 93-95 (Use codebase-memory-mcp as fallback section header). The fallback section says: 'When GitNexus is degraded for the user's language stack ..., fall back to codebase-memory-mcp. The sub-agent's output schema is the same regardless of which MCP supplied the data; only the extraction_method field varies.' Schema field 'extraction_method' is the ONLY structured artifact (in the OUTPUT JSON, not in agent frontmatter) that captures which path was taken. ALSO IMPORTANT: SKILL.md frontmatter declares allowed-tools: 'Read, Grep, Glob' — no MCP tool references; the MCPs are not declared in any tool-allowlist field anywhere."
+    },
+    {
+      "name": ".claude/skills/auditing-mcp/",
+      "path": ".claude/skills/auditing-mcp/",
+      "layer": "cc",
+      "language": "markdown+python",
+      "framework": "Claude Code skill (audit family)",
+      "entry_points": ["scripts/audit_mcp.py <path> [--with-runtime]"],
+      "dependencies": ["auditing-cc-configs (family parent — shared rubric/weights/thresholds/triage per SKILL.md line 30)"],
+      "notes": "SKILL.md (116 lines) + references/ (4 files: anti-patterns.md, common-failures.md, mcp-spec.md, toxic-combinations.md) + scripts/ (4 files: audit_mcp.py, check_toxic_combinations.py, scan_mcp_secrets.py, validate_mcp_config.py) + examples/ (good-mcp-annotated.md, bad-mcp-annotated.md). Severity classes: BLOCKER, MAJOR, MINOR, NIT. Audit dimensions (10 from routing table): config schema validity, transport choice, credential handling, server-name uniqueness, toxic capability combinations, tool-description safety, supply-chain provenance, anti-pattern absence, cross-scope interactions, runtime behavior (--with-runtime only). Currently has ZERO rules referencing any of the seven named servers (Serena, mcp-openapi-schema, actionlint-mcp, Terraform MCP, Context7, Exa, GitNexus) by name — all current rules are server-agnostic. The augmentation surface for FR-11-c is: (a) add per-server rules under references/, (b) extend scripts/ for per-server validators, (c) potentially add operational-health rules (lifecycle-health-check outcomes, runtime log integrity, error-handling presence) which are entirely greenfield in this skill. Pedagogical-sections frontmatter declares examples/bad-mcp-annotated.md — confirmed present."
+    },
+    {
+      "name": ".claude/skills/KB-cc-platform/ (trifecta exemplar — Platform half, most-developed)",
+      "path": ".claude/skills/KB-cc-platform/",
+      "layer": "cc",
+      "language": "markdown+yaml-frontmatter",
+      "framework": "Claude Code skill",
+      "entry_points": ["Loaded by design-cc, design-composer, plan-author, shared-document-reviewer, review-architecture-auditor"],
+      "dependencies": ["KB-cc-design (sister skill)"],
+      "notes": "SKILL.md (large) + references/ (7 files: agent-sdk.md, architecture.md, cli-and-headless.md, configuration.md, extensions.md, integrations.md, workflows.md) + assets/templates/ (9 example files: CLAUDE.md.example, hook-config.json.example, mcp-config.json.example, output-style.md.example, rules-example.md, settings.json.example, skill-SKILL.md.example, slash-command.md.example, subagent.md.example). Frontmatter convention: name (kb-cc-platform — note lowercase-hyphenated, not matching directory name's KB- prefix), description (multiline; ends with 'Pairs with KB-cc-design' cross-reference), allowed-tools (Read, Grep, Glob, Edit, Write, WebFetch), pedagogical_sections list with path+justification per ADR-0030. Notable: mcp-config.json.example exists at line-referenced location (assets/templates/mcp-config.json.example, 82 lines) — documents the .mcp.json shape, stdio/HTTP/SSE transports, ${VAR_NAME} env expansion, and 'mcp__<server>__<tool>' naming convention with example permissions block. This is the design-template for the seven-server .mcp.json."
+    },
+    {
+      "name": ".claude/skills/KB-cc-design/ (trifecta exemplar — Design half)",
+      "path": ".claude/skills/KB-cc-design/",
+      "layer": "cc",
+      "language": "markdown+yaml-frontmatter",
+      "framework": "Claude Code skill",
+      "entry_points": ["Loaded by design-cc, design-composer, plan-author, shared-document-reviewer"],
+      "dependencies": ["KB-cc-platform (sister skill — explicit cross-reference in description)"],
+      "notes": "SKILL.md + references/ (2 files: patterns-and-anti-patterns.md, principles.md). NO assets/templates/. NO scripts/. Frontmatter convention: name (kb-cc-design), description (ends with cross-reference to KB-cc-platform), allowed-tools (Read, Grep, Glob — fewer than Platform half: no Edit/Write/WebFetch), pedagogical_sections (1 entry — patterns-and-anti-patterns.md). MUCH SLIMMER than KB-cc-platform — design halves consistently are."
+    },
+    {
+      "name": ".claude/skills/auditing-cc-configs/ (trifecta exemplar — Audit half, FAMILY COORDINATOR)",
+      "path": ".claude/skills/auditing-cc-configs/",
+      "layer": "cc",
+      "language": "markdown+python",
+      "framework": "Claude Code skill (audit family coordinator)",
+      "entry_points": ["scripts/audit_project.py <project-root> [--with-runtime] [--managed] [--json]"],
+      "dependencies": ["auditing-mcp, auditing-hooks, auditing-settings, auditing-subagents, auditing-skills, auditing-context-files (members of the auditing-cc-configs family it coordinates)"],
+      "notes": "SKILL.md + references/ (6 files: additive-vs-override.md, audit-rubric.md, common-failures.md, cross-file-checks.md, pedagogical-marker-spec.md, triage-protocol.md) + scripts/ (6+ files: audit_project.py, audit_target.py, cross_file_checks.py, pedagogical_marker_check.py, triage_with_judge.py, verdict_compute.py) + assets/ (triage-prompt.txt) + tests/. NAMING DEVIATION: 'auditing-cc-configs' rather than 'auditing-cc' — the trailing '-configs' is the only audit-skill name in the project that varies from the 'auditing-<platform>' pattern. This is the FAMILY COORDINATOR; auditing-mcp explicitly declares membership ('This skill is part of the auditing-cc-configs family. Shared rubric, weights, thresholds, and triage live in the coordinator skill.')."
+    },
+    {
+      "name": ".claude/skills/KB-codespaces-platform/ (trifecta exemplar — closest in subject matter)",
+      "path": ".claude/skills/KB-codespaces-platform/",
+      "layer": "codespaces",
+      "language": "markdown+yaml-frontmatter",
+      "framework": "Claude Code skill",
+      "entry_points": ["Loaded by design-codespaces"],
+      "dependencies": ["KB-codespaces-design (sister)"],
+      "notes": "SKILL.md + references/ (10 files: architecture.md, cli-and-api.md, devcontainer.md, features.md, org-management.md, prebuilds.md, secrets-and-env.md, security.md, troubleshooting.md, workflows.md) + assets/templates/ (subdirectories: dockerfile-based/, docker-compose/, typescript-monorepo/, plus standalone files terraform-iac.devcontainer.json, typescript-single.devcontainer.json). Frontmatter convention identical to KB-cc-platform (allowed-tools includes WebFetch; pedagogical_sections list)."
+    },
+    {
+      "name": ".claude/skills/KB-codespaces-design/ (trifecta exemplar — Design half)",
+      "path": ".claude/skills/KB-codespaces-design/",
+      "layer": "codespaces",
+      "language": "markdown+yaml-frontmatter",
+      "framework": "Claude Code skill",
+      "entry_points": ["Loaded by design-codespaces"],
+      "dependencies": ["KB-codespaces-platform (sister)"],
+      "notes": "SKILL.md + references/ (2 files: patterns-and-anti-patterns.md, principles.md). NO assets/templates/, NO scripts/. Mirrors KB-cc-design shape — same two reference filenames, same slimness."
+    },
+    {
+      "name": ".claude/skills/auditing-codespaces/ (trifecta exemplar — Audit half, STUB)",
+      "path": ".claude/skills/auditing-codespaces/",
+      "layer": "codespaces",
+      "language": "markdown+python",
+      "framework": "Claude Code skill (audit)",
+      "entry_points": ["scripts/audit_codespaces.py"],
+      "dependencies": [],
+      "notes": "SKILL.md (60 lines, declared STUB per AC-FR-8-b + Q-CC-4) + scripts/ (audit_codespaces.py — stub emitting {\"stub\": true, \"findings\": []}). NO references/ subdirectory, NO examples/. The stub IS the finding: the codespaces audit half is structurally present but functionally empty. STUB-VS-REAL distinction is per ADR-0033. Naming follows 'auditing-<platform>' convention (matches auditing-mcp; differs from auditing-cc-configs by lacking a trailing qualifier)."
+    },
+    {
+      "name": ".claude/skills/KB-github-actions-platform/ (trifecta exemplar — Platform half)",
+      "path": ".claude/skills/KB-github-actions-platform/",
+      "layer": "cicd",
+      "language": "markdown+yaml-frontmatter",
+      "framework": "Claude Code skill",
+      "entry_points": ["Loaded by design-cicd"],
+      "dependencies": ["KB-github-actions-design (sister)"],
+      "notes": "SKILL.md + references/ (19 files — much richer than the cc/codespaces platform halves) + assets/templates/ (21 workflow .yml files). Frontmatter allowed-tools includes Bash(python3 *). pedagogical_sections (8 entries — the richest set in the repo). NO scripts/ subdir at the platform-half level (audit scripts live in the audit half — per ADR-0031 relocation called out in auditing-github-actions SKILL.md)."
+    },
+    {
+      "name": ".claude/skills/KB-github-actions-design/ (trifecta exemplar — Design half)",
+      "path": ".claude/skills/KB-github-actions-design/",
+      "layer": "cicd",
+      "language": "markdown+yaml-frontmatter",
+      "framework": "Claude Code skill",
+      "entry_points": ["Loaded by design-cicd"],
+      "dependencies": ["KB-github-actions-platform (sister)"],
+      "notes": "SKILL.md + references/ (2 files: patterns-and-anti-patterns.md, principles.md). Mirrors KB-cc-design AND KB-codespaces-design exactly — same two filenames, same slimness. STRONG CONVENTION: design halves consistently carry exactly two references files with these exact names."
+    },
+    {
+      "name": ".claude/skills/auditing-github-actions/ (trifecta exemplar — Audit half, REAL)",
+      "path": ".claude/skills/auditing-github-actions/",
+      "layer": "cicd",
+      "language": "markdown+python",
+      "framework": "Claude Code skill (audit)",
+      "entry_points": ["scripts/audit_workflow.py"],
+      "dependencies": ["auditing-shared (per ADR-0031 canonical-helper-home)"],
+      "notes": "SKILL.md + references/ (1 file: action_versions.md — curated allowlist) + scripts/ (audit_workflow.py). NO examples/. Per ADR-0031, cross-cutting helpers live in auditing-shared, not duplicated here. Family declaration: explicitly part of the cc-style three-way split (SKILL.md line 17). Naming follows 'auditing-<platform>' convention."
+    },
+    {
+      "name": "adrs/ADR-0018-codebase-analysis-schema.md",
+      "path": "adrs/ADR-0018-codebase-analysis-schema.md",
+      "layer": "documentation",
+      "language": "markdown",
+      "framework": "ADR template per ADR.txt v1.0",
+      "entry_points": [],
+      "dependencies": ["ADR-0007 v2.0.0 (declared in adrs_inherited)", "ADR-0011", "ADR-0013", "ADR-0017"],
+      "notes": "215 lines, version 1.0.0 (status: Accepted, 2026-05-12). DECLARES schema v1.0.0 — NOT v1.1.0 as the PRD/research-plan/discovery-codebase-researcher agent state. The 'extended for blast-radius' v1.1.0 of the schema is documented IN KB-codebase-research/SKILL.md (lines 156-225), NOT in this ADR. THIS IS A DOCUMENTATION/CONVENTION DRIFT WORTH SURFACING: agent + research-plan + KB all reference 'schema v1.1.0 per ADR-0018'; ADR-0018 itself is still at v1.0.0. Naming the GitNexus/codebase-memory primary/fallback policy: line 9 (adrs_inherited) names 'ADR-0007 v2.0.0 (GitNexus primary, codebase-memory-mcp fallback)'; line 189 in Implementation Guidance says 'querying GitNexus (primary per ADR-0007 v2)'; line 193 'synth-architecture-auditor will do the deep blast-radius analysis with GitNexus tools per ADR-0007 v2'; line 209 'ADR-0007 v2.0.0: GitNexus primary, codebase-memory-mcp fallback — both can populate the canonical schema.' SO: the primary/fallback POLICY is recorded in ADR-0018 IN PROSE pointing OUT to ADR-0007. No structured field codifies which server is primary."
+    },
+    {
+      "name": "adrs-migrated/ADR-0007-code-graph-mcp-selection.md",
+      "path": "adrs-migrated/ADR-0007-code-graph-mcp-selection.md",
+      "layer": "documentation",
+      "language": "markdown",
+      "framework": "ADR template per ADR.txt v1.0",
+      "entry_points": [],
+      "dependencies": [],
+      "notes": "Version 2.2.0 (template-migrated). DECLARES: 'Primary: GitNexus (abhigyanpatwari/GitNexus)' / 'Fallback (configured concurrently, used when GitNexus fails for the user's stack): codebase-memory-mcp (DeusData/codebase-memory-mcp)'. IMPORTANT LOCATION FINDING: lives in 'adrs-migrated/' subdirectory, NOT in 'adrs/'. The research plan references 'adrs/ADR-0007*.md' as a touch point; the actual file is one directory over. Five variants are present in adrs-migrated/ (pre-naming-convention, v1-pre-template-migration, v1-superseded, v2-pre-template-migration, current). This is the SOURCE OF TRUTH for the primary/fallback decision; rationale gives four decisive factors when license is not a filter (ecosystem maturity, Claude Code integration depth, auto-installs agent skills, Code Wiki). Names the two MCPs by GitHub paths: abhigyanpatwari/GitNexus, DeusData/codebase-memory-mcp."
+    }
+  ],
+  "dependencies": [
+    {
+      "from": ".devcontainer/devcontainer.json",
+      "to": ".devcontainer/Dockerfile",
+      "kind": "config_reference",
+      "count": 1,
+      "representative_files": [".devcontainer/devcontainer.json:5"],
+      "confidence": "high",
+      "evidence": "build.dockerfile: 'Dockerfile' with context: '..'"
+    },
+    {
+      "from": ".devcontainer/devcontainer.json",
+      "to": "Codespaces secrets surface",
+      "kind": "config_reference",
+      "count": 0,
+      "representative_files": [],
+      "confidence": "high",
+      "evidence": "containerEnv currently holds only EDITOR + PAGER. No secret env-var references today. Greenfield surface for FR-5 / UI-4 ${VAR} references."
+    },
+    {
+      "from": ".claude/agents/discovery-codebase-researcher.md",
+      "to": "KB-codebase-research",
+      "kind": "skill_reference",
+      "count": 1,
+      "representative_files": [".claude/agents/discovery-codebase-researcher.md:7"],
+      "confidence": "high",
+      "evidence": "skills: [KB-codebase-research]"
+    },
+    {
+      "from": ".claude/agents/discovery-codebase-researcher.md",
+      "to": "GitNexus MCP (NOT YET REGISTERED)",
+      "kind": "prose_reference",
+      "count": 4,
+      "representative_files": [".claude/agents/discovery-codebase-researcher.md:3", ".claude/agents/discovery-codebase-researcher.md:20", ".claude/agents/discovery-codebase-researcher.md:29", ".claude/agents/discovery-codebase-researcher.md:156"],
+      "confidence": "high",
+      "evidence": "The primary/fallback relationship to GitNexus is named ONLY in prose (description + body), never in the tools allowlist or any structured frontmatter. THIS IS THE EXACT UI-15 / IN-023 FINDING."
+    },
+    {
+      "from": ".claude/agents/discovery-codebase-researcher.md",
+      "to": "codebase-memory-mcp (NOT YET REGISTERED)",
+      "kind": "prose_reference",
+      "count": 4,
+      "representative_files": [".claude/agents/discovery-codebase-researcher.md:3", ".claude/agents/discovery-codebase-researcher.md:20", ".claude/agents/discovery-codebase-researcher.md:29", ".claude/agents/discovery-codebase-researcher.md:156"],
+      "confidence": "high",
+      "evidence": "Same prose locations as GitNexus — the fallback is named in the same prose statements that name primary."
+    },
+    {
+      "from": "KB-codebase-research/SKILL.md",
+      "to": "GitNexus MCP",
+      "kind": "prose_reference",
+      "count": 8,
+      "representative_files": [".claude/skills/KB-codebase-research/SKILL.md:5", ".claude/skills/KB-codebase-research/SKILL.md:17", ".claude/skills/KB-codebase-research/SKILL.md:63-91", ".claude/skills/KB-codebase-research/SKILL.md:93-95"],
+      "confidence": "high",
+      "evidence": "Skill names GitNexus as primary throughout. Section 'Use codebase-memory-mcp as fallback' (line 93) explicitly states the fallback condition. Schema field extraction_method (line 163) records which path was taken."
+    },
+    {
+      "from": "ADR-0018-codebase-analysis-schema.md",
+      "to": "ADR-0007 (code-graph MCP selection)",
+      "kind": "config_reference",
+      "count": 4,
+      "representative_files": ["adrs/ADR-0018-codebase-analysis-schema.md:9", "adrs/ADR-0018-codebase-analysis-schema.md:189", "adrs/ADR-0018-codebase-analysis-schema.md:193", "adrs/ADR-0018-codebase-analysis-schema.md:209"],
+      "confidence": "high",
+      "evidence": "ADR-0018 declares ADR-0007 v2.0.0 as inherited, and refers to it for the primary/fallback policy in three implementation/related-info clauses. The policy is therefore expressed in TWO places (KB-codebase-research/SKILL.md and ADR-0018, both pointing OUT to ADR-0007) but is STORED canonically only in ADR-0007 (which lives in adrs-migrated/, not adrs/)."
+    },
+    {
+      "from": "auditing-mcp/SKILL.md",
+      "to": "auditing-cc-configs (family parent)",
+      "kind": "config_reference",
+      "count": 1,
+      "representative_files": [".claude/skills/auditing-mcp/SKILL.md:30"],
+      "confidence": "high",
+      "evidence": "'This skill is part of the auditing-cc-configs family. Shared rubric, weights, thresholds, and triage live in the coordinator skill.'"
+    },
+    {
+      "from": "auditing-github-actions/SKILL.md",
+      "to": "auditing-shared",
+      "kind": "config_reference",
+      "count": 1,
+      "representative_files": [".claude/skills/auditing-github-actions/SKILL.md:27-30"],
+      "confidence": "high",
+      "evidence": "'Per ADR-0031 canonical-helper-home, cross-cutting helper utilities ... live in auditing-shared. This skill consumes those utilities.'"
+    },
+    {
+      "from": "All 36 sub-agents in .claude/agents/",
+      "to": ".mcp.json (NOT YET PRESENT)",
+      "kind": "tools_allowlist (DOES NOT EXIST YET)",
+      "count": 0,
+      "representative_files": [],
+      "confidence": "high",
+      "evidence": "Verified by grep -rn 'mcp__' .claude/agents/ — ZERO hits. No agent currently has any mcp__<server>__<tool> entry. The seven-server feature introduces this pattern from scratch."
+    }
+  ],
+  "blast_radius": [
+    {
+      "touch_point": ".mcp.json (NEW FILE — 7 server entries)",
+      "direct_dependents": [
+        "Every Claude Code session in this repo (project-scope auto-load)",
+        "Every .claude/agents/*.md whose tools: allowlist will reference mcp__<server>__<tool> (specifically: discovery-codebase-researcher for GitNexus + codebase-memory-mcp; discovery-external-researcher for Context7 + Exa; design-api for mcp-openapi-schema; design-cicd for actionlint-mcp; design-iac for HashiCorp Terraform MCP)"
+      ],
+      "transitive_dependents_3_hop": [
+        "execute-orchestrator and every pipeline-stage caller of the above sub-agents",
+        "shared-document-reviewer + review-architecture-auditor (consume codebase-analysis.json which itself is GitNexus-produced)",
+        "design-composer (consumes codebase-analysis.json at Fact Disposition Table authoring per ADR-0018)"
+      ],
+      "test_files": ["NONE today — CI smoke deferred to Won't-Have per I-DR-005"],
+      "hop_tier_distribution": {"1": 6, "2": 8, "3+": 12},
+      "confidence": "medium",
+      "notes": "1-hop count: every Claude Code session + the 5 agents likely to consume each MCP at usage. 2-hop: orchestrator + review chain. The blast radius is universally SHALLOW (every reader is 1 hop from the file because the file is auto-loaded) but UNIVERSALLY BROAD (every session reads it). The risk profile is therefore drift/typo/credential-leak (any error blocks every session) rather than localized breakage."
+    },
+    {
+      "touch_point": ".claude/agents/discovery-codebase-researcher.md (tools allowlist + frontmatter)",
+      "direct_dependents": [
+        "execute-orchestrator (invokes this agent at Discovery Research)",
+        "shared-document-reviewer (audits artifacts from this agent at Gate 0/1)"
+      ],
+      "transitive_dependents_3_hop": [
+        "design-composer (consumes codebase-analysis.json this agent produces)",
+        "review-architecture-auditor (consumes codebase-analysis.json for blast-radius validation per ADR-0018)",
+        "Every per-layer Designer (consumes codebase-analysis.json via shared-document-reviewer at DesignDoc review per ADR-0017)"
+      ],
+      "test_files": ["NONE — agent invocations are not unit-tested today"],
+      "hop_tier_distribution": {"1": 2, "2": 3, "3+": 8},
+      "confidence": "high",
+      "notes": "This is the agent file Where UI-15 lands. Adding GitNexus tools (mcp__gitnexus__*) to its tools allowlist is the structural-convention introduction event for the entire repo (no agent currently has any mcp__ entry). Whatever convention Design chooses (primary/fallback as prose vs structured frontmatter field vs distinct allowlists) becomes the de-facto convention every future MCP-consuming agent file follows."
+    },
+    {
+      "touch_point": ".devcontainer/Dockerfile + .devcontainer/devcontainer.json (lifecycle hooks + install layers)",
+      "direct_dependents": [
+        "Every Codespace build event for this repo",
+        "Every Codespace start event",
+        "Every Codespace attach event",
+        "The existing onCreateCommand (must compose, not collide)"
+      ],
+      "transitive_dependents_3_hop": [
+        "Every sub-agent run inside any Codespace built from this devcontainer",
+        "Every Discovery Research run (because GitNexus is now primary and its install lands here)",
+        "Anyone running the pipeline locally via the same Dockerfile"
+      ],
+      "test_files": ["NONE — devcontainer build is not regression-tested"],
+      "hop_tier_distribution": {"1": 4, "2": 6, "3+": 15},
+      "confidence": "high",
+      "notes": "Dockerfile is currently 19 lines and has been twice-fixed (commit 5e7f4ac for stale Yarn key; commit 5c6df71 for devcontainer + gitattributes) — the surface is fragile and small changes have failed historically. The seven-server install adds substantially more layer surface; toolchain absences in the base image (no Go, no Docker-in-Docker per PRD-v3 Technical Considerations) constrain GitNexus (T-008) and Terraform MCP (T-004). Adding postCreate/postStart/postAttach is greenfield (none currently set) — composition with onCreateCommand is a real concern."
+    },
+    {
+      "touch_point": "auditing-mcp/ (augmented for FR-11-c)",
+      "direct_dependents": [
+        "Human/pipeline-stage runners of the audit (the security reviewer per US-5; design-cc per UI-14)",
+        "auditing-cc-configs family coordinator (which dispatches to auditing-mcp per audit_project.py)"
+      ],
+      "transitive_dependents_3_hop": [
+        "Every Gate 6 acceptance check that consumes auditing-mcp's verdict (if AC-NFR-2-c is upheld)",
+        "Future MCP additions (the augmented rubric becomes the convention)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 2, "2": 3, "3+": 5},
+      "confidence": "high",
+      "notes": "Adding seven-server-specific rules (esp. GitNexus rules) and operational-health rules (lifecycle health, runtime log integrity, secret-redaction) widens the rule surface considerably. The augmentation must conform to the auditing-cc-configs family shape (shared rubric/weights/thresholds/triage per the family's coordinator skill). The script set is currently 4 files; adding GitNexus + operational rules likely adds 1-3 scripts and 1-3 references files. The slot for a 'primary/fallback expression discoverable by audit' rule (UI-14) is greenfield — no existing rule reasons about agent-file tool-allowlist content vs prose-in-skill content."
+    },
+    {
+      "touch_point": "NEW: KB-mcp-platform/ + KB-mcp-design/",
+      "direct_dependents": [
+        "design-cc (consumes during MCP-related design choices)",
+        "design-codespaces (consumes during MCP-related lifecycle/install choices)",
+        "Future MCP operations maintainer per US-9 (PRIMARY consumer)"
+      ],
+      "transitive_dependents_3_hop": [
+        "design-composer (KB list in skills: frontmatter would expand)",
+        "shared-document-reviewer (Gate 1 MCP-specific checks)",
+        "plan-author (when tasks touch MCP artifacts)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 3, "2": 3, "3+": 4},
+      "confidence": "high",
+      "notes": "Greenfield skills. Must match the trifecta-platform-half shape (large SKILL.md + multi-file references/ + assets/templates/) for KB-mcp-platform; trifecta-design-half shape (slim SKILL.md + 2-file references/ matching the patterns-and-anti-patterns.md/principles.md duo) for KB-mcp-design. Skills frontmatter convention: lowercase-hyphenated name field; description ending with sister-cross-reference; pedagogical_sections list per ADR-0030."
+    },
+    {
+      "touch_point": "GitNexus primary / codebase-memory-mcp fallback wiring on discovery-codebase-researcher.md (UI-15 specific)",
+      "direct_dependents": [
+        "Discovery Research stage (codebase-analysis.json producer)",
+        "Every downstream stage consuming codebase-analysis.json (per Stage 5 Design Composition and shared-document-reviewer integration)"
+      ],
+      "transitive_dependents_3_hop": [
+        "Future agent files using primary/fallback patterns (if convention changes — none today)",
+        "Augmented auditing-mcp (must discover and validate the chosen expression per UI-14)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 2, "2": 2, "3+": 3},
+      "confidence": "high",
+      "notes": "CONVENTION CHOICE POINT. Current state (per evidence): the policy is PURELY PROSE in three layers (a) ADR-0007 v2.2.0 in adrs-migrated/ (canonical decision), (b) ADR-0018 in adrs/ (4 prose references pointing to ADR-0007), (c) KB-codebase-research/SKILL.md (named in description and the body, including a dedicated 'Use codebase-memory-mcp as fallback' section), (d) discovery-codebase-researcher.md agent file (4 prose mentions, including the bootstrap check at line 20). The ONLY structured artifact is the OUTPUT-side extraction_method field in the JSON schema — not an input-side convention. If Design chooses to introduce a structured frontmatter field (e.g., 'mcp_primary:' / 'mcp_fallback:' in agent frontmatter), it is a NEW convention with no existing exemplars."
+    }
+  ],
+  "conventions": {
+    "claude-code": {
+      "agent_file_frontmatter": {
+        "required_fields": ["name", "description"],
+        "common_fields": ["tools", "model", "effort", "skills", "memory"],
+        "tools_field_syntax": "Either bracketed array form ('tools: [Read, Glob, Grep, Write]') OR comma-separated unbracketed form ('tools: Read, Grep, Glob'). Both are observed. Bash() with colon-star restriction pattern: 'Bash(grep:*)', 'Bash(python3:*)'. Some use space form 'Bash(python3 *)' (auditing-mcp). No MCP tool entries exist in any current agent file.",
+        "skills_field_syntax": "Bracketed array of skill slugs matching .claude/skills/<slug>/ directory names",
+        "model_values_observed": ["opus"],
+        "effort_values_observed": ["high"],
+        "memory_values_observed": ["project"]
+      },
+      "mcp_tool_naming_convention": "mcp__<server-name>__<tool-name> per KB-cc-platform/references/extensions.md:364, configuration.md:79-80, architecture.md:46, integrations.md:165, and assets/templates/mcp-config.json.example:65. Whole-server allowlisting: 'mcp__<server>'. Permission patterns target individual tools or whole servers. NO existing usage in this repo's agent files today.",
+      "skill_directory_convention": "Per ADR-0020. Directories named KB-<topic>-platform (platform half), KB-<topic>-design (design half), auditing-<topic> (audit half). One exception: auditing-cc-configs (trailing '-configs'). The 'KB-' prefix is uppercase in directory names but the 'name:' field in frontmatter is lowercase-hyphenated (kb-cc-platform, kb-codespaces-platform, etc.).",
+      "primary_fallback_expression_convention": "DOES NOT EXIST AS A STRUCTURED CONVENTION TODAY. The only existing primary/fallback relationship in any agent (GitNexus / codebase-memory-mcp on discovery-codebase-researcher) is expressed via PROSE in four locations (description string + three body statements) plus PROSE in the linked skill (KB-codebase-research/SKILL.md) plus PROSE in two ADRs (ADR-0018 pointing to ADR-0007). NO structured frontmatter field, NO tools-allowlist convention, NO separate primary/fallback fields. This is the load-bearing UI-15 finding."
+    },
+    "codespaces": {
+      "lifecycle_hooks_in_use_today": ["onCreateCommand (verification only)"],
+      "lifecycle_hooks_available_for_extension": ["postCreateCommand", "postStartCommand", "postAttachCommand", "updateContentCommand"],
+      "feature_pin_policy": "MIXED. Currently: common-utils:2 major-pinned, github-cli:1 with version:'latest', node:1 with version:'lts', claude-code:1 major-pinned. No version pin is exact-version. UI-5 finding: there is no consistent pin policy in use today.",
+      "secrets_surface": "containerEnv currently holds only non-secret values (EDITOR, PAGER). Empty of credentials — confirms NFR-2-a baseline. ${VAR_NAME} expansion is the documented pattern in KB-cc-platform/assets/templates/mcp-config.json.example.",
+      "image_base": "mcr.microsoft.com/devcontainers/python:1-${PYTHON_VERSION}-bookworm (PYTHON_VERSION=3.11)",
+      "dockerfile_idiom": "ARG + FROM + apt-get cleanup (Yarn workaround) + apt-get install (cached) + USER vscode. Drops permissions at end."
+    },
+    "skill_trifecta_structure": {
+      "platform_half_convention": "SKILL.md (large, multi-section) + references/ (many files: agent-sdk.md, architecture.md, cli-and-headless.md, configuration.md, extensions.md, integrations.md, workflows.md OR analogues per platform — KB-codespaces-platform has 10, KB-github-actions-platform has 19) + assets/templates/ (example artifacts: .example files for KB-cc-platform; subdirectory templates for KB-codespaces-platform; full workflow .yml files for KB-github-actions-platform). NO scripts/ at platform-half today (per ADR-0031 relocation).",
+      "design_half_convention": "SKILL.md (slim) + references/ (exactly 2 files: patterns-and-anti-patterns.md + principles.md). NO assets/, NO scripts/. STRONG CONVENTION — observed identically across KB-cc-design, KB-codespaces-design, KB-github-actions-design.",
+      "audit_half_convention": "SKILL.md + scripts/ (Python audit entry point + supporting scripts) + references/ (usually anti-patterns.md, common-failures.md, possibly mcp-spec.md or analogues; auditing-mcp has 4 references files; auditing-github-actions has 1; auditing-codespaces is a STUB with no references at all) + examples/ (good-X-annotated.md / bad-X-annotated.md fixtures — present in auditing-mcp; not always present).",
+      "naming_convention": "KB-<platform>-platform / KB-<platform>-design / auditing-<platform>. One deviation: auditing-cc-configs (trailing '-configs'). auditing-mcp matches the canonical 'auditing-<platform>' pattern.",
+      "skill_frontmatter_name_field": "lowercase-hyphenated, often (but not always) prefixed with kb-. Examples: kb-cc-platform, kb-codespaces-platform, auditing-mcp, auditing-cc-configs.",
+      "pedagogical_sections_convention": "Per ADR-0030. Frontmatter list of {path, justification} entries naming files that legitimately carry pedagogical content (anti-pattern catalogs, negative-example fixtures) that the auditor would otherwise flag. Justification strings are domain-specific ('Documentation of .claude/settings.json configuration reference; references the canonical platform config paths the auditor flags as broken links'). KB-github-actions-platform has 8 entries (most); KB-cc-design has 1 (least among the three trifecta-design halves).",
+      "cross_reference_style": "Description field's last sentence names the sister skill explicitly ('Pairs with KB-cc-design', 'Pairs with KB-codespaces-design'). Body text uses inline backtick references. No [[wikilink]] style observed.",
+      "audit_family_membership_declaration": "auditing-mcp explicitly declares family membership in SKILL.md body line 30: 'This skill is part of the auditing-cc-configs family. Shared rubric, weights, thresholds, and triage live in the coordinator skill.' auditing-github-actions declares family membership differently (per ADR-0031 canonical-helper-home for auditing-shared). NOT a frontmatter convention — body-prose convention.",
+      "audit_severity_taxonomy": "BLOCKER / MAJOR / MINOR / NIT (auditing-mcp); SECURITY-BLOCK as a verdict-class for confirmed CRITICAL. Verdict classes: PASS 95+, PASS-WITH-MINOR-FIXES 85-94, NEEDS-WORK 70-84, FAIL <70."
+    },
+    "repo_composition": {
+      "markdown_dominance": "468 .md files of 634 total non-git, non-node_modules files = 73.8% markdown. Confirms the UI-8 / IN-009 question's premise: this IS a markdown-heavy repo. Source-code files: 52 .py (mostly audit scripts), 21 .yml (workflow templates), 8 .sh, 8 .example, 2 .txt. JSON: 70 (mostly artifact outputs in working/, plus templates).",
+      "src_code_ratio": "Effectively zero application source code. The repo is a 'tooling and discipline carrier' — sub-agent specs, KB skills, audit scripts, ADRs, working artifacts. Serena's symbol-level traversal value (UI-8) is therefore likely THIN here; GitNexus's code-graph value is similarly diminished EXCEPT for the audit-script Python (~52 files concentrated in .claude/skills/auditing-*/scripts/)."
+    },
+    "log_surface_convention": {
+      "existing_log_surface_in_devcontainer": "NONE. grep of .devcontainer/ for log/tail/rotat returned no hits.",
+      "existing_log_surface_in_claude_dir": "NONE for the operator-runtime sense. Python audit scripts in .claude/skills/auditing-*/scripts/ use stdout (subprocess.run + json output per audit_mcp.py:18-22). auditing-shared/scripts/log_state_transition.py exists but is a pipeline-state-transition logger (per filename), not an MCP runtime log.",
+      "implication_for_FR_10": "Greenfield. There is no log-rotation convention, no log-tail helper, no project-wide log path convention to reuse. UI-12's choice is unconstrained by existing convention."
+    }
+  },
+  "known_issues": [
+    {
+      "description": "ADR-0018 declares schema v1.0.0 but the agent file, KB-codebase-research/SKILL.md, and the research plan all reference 'schema v1.1.0 per ADR-0018'. The 'v1.1.0 extension for blast-radius' is documented IN KB-codebase-research/SKILL.md (lines 156-225, with a blast_radius array shape that differs from ADR-0018's potential_blast_radius_hints field). This is documentation drift — the ADR has not been incremented to reflect the v1.1.0 spec carried in the KB. Downstream consumers reading the ADR see v1.0.0; the agent and KB say v1.1.0.",
+      "files": ["adrs/ADR-0018-codebase-analysis-schema.md:3 (version field: 1.0.0)", "adrs/ADR-0018-codebase-analysis-schema.md:124 (schema_version: '1.0.0')", ".claude/skills/KB-codebase-research/SKILL.md:160 (schema_version: '1.1.0')", ".claude/agents/discovery-codebase-researcher.md:3 (description: 'schema v1.1.0')"],
+      "severity": "medium",
+      "notes": "Not blocking for this feature, but worth surfacing to design-composer + review-architecture-auditor since the schema this very analysis is supposed to conform to is documented in two places with two version numbers. The actual SHAPE in KB-codebase-research/SKILL.md is what I have followed in this output JSON."
+    },
+    {
+      "description": "ADR-0007 (the canonical primary/fallback decision) lives in adrs-migrated/, NOT in adrs/. The research plan references 'adrs/ADR-0007*.md' as a touch point; that path returns no file.",
+      "files": ["adrs-migrated/ADR-0007-code-graph-mcp-selection.md (actual location)", "adrs-migrated/ADR-0007-code-graph-mcp-selection-v1-pre-template-migration.md", "adrs-migrated/ADR-0007-code-graph-mcp-selection-v1-superseded.md", "adrs-migrated/ADR-0007-code-graph-mcp-selection-v2-pre-template-migration.md", "adrs-migrated/ADR-0007-code-graph-mcp-selection-pre-naming-convention.md"],
+      "severity": "low",
+      "notes": "Five versions in adrs-migrated/, including the current accepted v2.2.0. ADR-0018 still cites 'ADR-0007 v2.0.0' rather than v2.2.0 — minor version-pointer staleness. Not blocking for design but worth design-composer noting that cross-references from in-scope ADRs may point to the migrated/older locations."
+    },
+    {
+      "description": "Inconsistent tools: field syntax in agent files — both array form and comma form are used.",
+      "files": ["array form: most agents (e.g., design-api.md:tools: [Read, Glob, ...])", "comma form: cc-critique.md, finalize-deliverable-packager.md, shared-document-reviewer.md"],
+      "severity": "low",
+      "notes": "Not a defect this feature must fix, but design-cc's UI-15 choice of agent-file convention for primary/fallback expression should pick a form (array) and apply it consistently if it adds any new structured frontmatter."
+    },
+    {
+      "description": "Bash() restriction syntax inconsistency — some use colon-star (Bash(python3:*)) and some use space-star (Bash(python3 *)).",
+      "files": ["colon-star: discovery-codebase-researcher.md, review-architecture-auditor.md, plan-author.md, etc.", "space-star: cc-critique.md, auditing-mcp/SKILL.md, KB-cc-platform/SKILL.md allowed-tools field"],
+      "severity": "low",
+      "notes": "Surfaced for completeness; not blocking. The auditing-cc-configs family may already have a rule about this."
+    },
+    {
+      "description": "auditing-codespaces is a declared STUB; it emits {\"stub\": true, \"findings\": []} per ADR-0033 stub-vs-real surfacing.",
+      "files": [".claude/skills/auditing-codespaces/SKILL.md:9-13", ".claude/skills/auditing-codespaces/scripts/audit_codespaces.py"],
+      "severity": "low",
+      "notes": "Relevant because the seven-server provisioning DOES land in the Codespaces layer (devcontainer.json + Dockerfile changes); the lack of a real Codespaces auditor means the codespaces-layer changes this feature makes are NOT audit-checked by their family auditor. The augmented auditing-mcp covers the .mcp.json side; the devcontainer.json/Dockerfile changes have no audit surface beyond what auditing-cc-configs cross-file-checks already do. This is a pre-existing condition, not introduced by this feature."
+    },
+    {
+      "description": "Recent Dockerfile failure history — devcontainer build broke once and has been fixed twice in close commits.",
+      "files": [".devcontainer/Dockerfile (commit 5e7f4ac: 'fix: devcontainer — Dockerfile-based to bypass stale Yarn apt key')", ".devcontainer/devcontainer.json (commit 5c6df71: 'chore: add MCP-provisioning intent doc; devcontainer + gitattributes')"],
+      "severity": "medium",
+      "notes": "The devcontainer surface has demonstrated fragility — the base image's stale Yarn key broke the build (5e7f4ac fixed it). Adding seven-server install layers materially increases the failure surface. Worth flagging to design-codespaces that incremental layer additions should be testable / rollback-friendly."
+    }
+  ],
+  "open_questions_for_human": [
+    {
+      "question": "Is the ADR-0018 schema-version mismatch (ADR says v1.0.0, agent and KB say v1.1.0) intentional pending an ADR-0018 revision, or should this feature also include an ADR-0018 increment? Per ADR-0036 (single-location ADR placement, recently accepted), the schema should be source-of-truth in exactly one place.",
+      "context": "Surfacing here because review-architecture-auditor consumes the codebase-analysis.json schema and will compare against ADR-0018. If ADR-0018 lags the actual schema, the auditor's grounding is split.",
+      "blocks": "design-composition-completion (not discovery-research-completion)"
+    },
+    {
+      "question": "Is the ADR-0007 location (adrs-migrated/ rather than adrs/) intentional, and if so, what is the canonical lookup convention for inherited ADRs that have been migrated? The research plan referenced 'adrs/ADR-0007*.md' which does not match any file.",
+      "context": "All five ADR-0007 variants live in adrs-migrated/ — the current accepted v2.2.0 included. Other inherited ADRs (ADR-0009, ADR-0011, etc.) also appear in adrs-migrated/. The 'adrs/' directory contains ADR-0011 through ADR-0036.",
+      "blocks": "design-composition-completion"
+    },
+    {
+      "question": "Are the 36 agent files the canonical inventory for UI-1 tool-to-agent mapping, or are some deprecated/in-progress and should not be considered as MCP consumers? In particular: synth-* agents (6 files: critic, extractor, framer, grapher, substrate, synthesizer) appear to be older-pipeline-naming variants — should they get any MCP wiring?",
+      "context": "All 36 agent files exist on main. No agent file currently has any 'mcp__' tool entry. The PRD names five specific consumer agents (discovery-codebase-researcher, discovery-external-researcher, design-api, design-cicd, design-iac). The other 31 remain unwired by default; this is the expected baseline but worth confirming.",
+      "blocks": "design-cc-completion"
+    },
+    {
+      "question": "Should the augmented auditing-mcp absorb the operational-health rules (lifecycle health-check outcomes, runtime log integrity, secret-redaction) AS NEW DIMENSIONS in the existing 10-dimension routing table, or should those land in a new sibling audit skill that focuses on RUNTIME audits (vs auditing-mcp's CONFIG audits)?",
+      "context": "Per FR-11-c the augmentation lands inside auditing-mcp. But the existing skill is explicitly framed in SKILL.md line 9-11 as 'config' audit ('Audits Claude Code MCP (Model Context Protocol) server configurations'). Stretching it to cover runtime concerns is a real scope expansion. UI-14 is where this resolves.",
+      "blocks": "design-cc-completion"
+    },
+    {
+      "question": "If KB-mcp-platform follows the trifecta-platform-half convention of having an assets/templates/ subdirectory, what should it carry? KB-cc-platform has 9 .example files including mcp-config.json.example — which means there is ALREADY a .mcp.json template in KB-cc-platform/. Should KB-mcp-platform duplicate it (with the seven-server shape) or reference KB-cc-platform's existing template?",
+      "context": "Risk of duplication or split source-of-truth. KB-cc-platform owns .mcp.json schema as ONE of many Claude Code primitives; KB-mcp-platform would own MCP as the topic. This is a design-cc question (UI-13).",
+      "blocks": "design-cc-completion"
+    }
+  ],
+  "known_facts": {
+    "agent_count": 36,
+    "agent_inventory": [
+      "cc-critique.md", "design-api.md", "design-backend.md", "design-cicd.md", "design-claude-code.md",
+      "design-codespaces.md", "design-composer.md", "design-database.md", "design-frontend.md", "design-iac.md",
+      "design-query.md", "discovery-codebase-researcher.md", "discovery-external-researcher.md", "discovery-plan-author.md",
+      "execute-finalize-reconciler.md", "execute-orchestrator.md", "execute-phase-quality-reviewer.md",
+      "execute-task-code-producer.md", "execute-task-quality-handler.md", "finalize-deliverable-packager.md",
+      "finalize-reconciler.md", "finalize-task-decomposer.md", "intake-intent-clarifier.md", "intake-prd-author.md",
+      "plan-author.md", "review-architecture-auditor.md", "review-cross-artifact-auditor.md", "shared-document-reviewer.md",
+      "synth-critic.md", "synth-extractor.md", "synth-framer.md", "synth-grapher.md", "synth-substrate.md",
+      "synth-synthesizer.md", "test-acceptance-author.md", "test-phase-validator-author.md"
+    ],
+    "likely_mcp_consumer_mapping_inferred": {
+      "Serena": ["discovery-codebase-researcher (symbol-level value contingent on UI-8 narrowing)"],
+      "GitNexus": ["discovery-codebase-researcher (PRIMARY per ADR-0007 v2.2.0 + KB-codebase-research/SKILL.md)", "review-architecture-auditor (consumes for blast-radius per ADR-0018; the agent body line 23 names 'GitNexus primary (per ADR-0007 v2.x); codebase-memory-mcp fallback')"],
+      "codebase-memory-mcp": ["discovery-codebase-researcher (FALLBACK per ADR-0007 v2.2.0)", "review-architecture-auditor (FALLBACK)"],
+      "mcp-openapi-schema": ["design-api (API-layer designer)"],
+      "actionlint-mcp": ["design-cicd (CICD-layer designer)"],
+      "HashiCorp Terraform MCP": ["design-iac (IAC-layer designer)"],
+      "Context7": ["discovery-external-researcher (web-research consumer; ALSO referenced as a documentation fallback by KB-cc-platform/SKILL.md:109)"],
+      "Exa": ["discovery-external-researcher (web-research consumer)"]
+    },
+    "trifecta_inventory": [
+      {"platform": "KB-cc-platform", "design": "KB-cc-design", "audit": "auditing-cc-configs", "audit_naming_deviation": "trailing '-configs'", "status": "complete (largest)"},
+      {"platform": "KB-codespaces-platform", "design": "KB-codespaces-design", "audit": "auditing-codespaces", "audit_naming_deviation": "none", "status": "platform+design real; audit is STUB"},
+      {"platform": "KB-github-actions-platform", "design": "KB-github-actions-design", "audit": "auditing-github-actions", "audit_naming_deviation": "none", "status": "complete (richest assets/templates)"}
+    ],
+    "trifecta_present_count": 3,
+    "mcp_servers_referenced_in_existing_corpus": {
+      "GitNexus": ["KB-codebase-research/SKILL.md", "discovery-codebase-researcher.md", "ADR-0018", "ADR-0007 (in adrs-migrated/)", "review-architecture-auditor.md", "recipe-feature-pipeline skill", "KB-review-disciplines"],
+      "codebase-memory-mcp": ["same set as GitNexus — co-named as fallback"],
+      "Context7": ["KB-cc-platform/SKILL.md:109 (documentation fallback)"],
+      "Serena": ["NONE — first reference will be this feature"],
+      "mcp-openapi-schema": ["NONE"],
+      "actionlint-mcp": ["NONE"],
+      "HashiCorp Terraform MCP": ["NONE"],
+      "Exa": ["NONE"]
+    },
+    "primary_fallback_wiring_mechanism_extracted_for_UI15": {
+      "mechanism": "PROSE-ONLY in THREE corpus locations, ZERO STRUCTURED FRONTMATTER",
+      "evidence_layer_1_canonical_decision": "adrs-migrated/ADR-0007-code-graph-mcp-selection.md v2.2.0 — Decision section: 'Primary: GitNexus (abhigyanpatwari/GitNexus) / Fallback (configured concurrently, used when GitNexus fails for the user's stack): codebase-memory-mcp (DeusData/codebase-memory-mcp)'",
+      "evidence_layer_2_consumer_skill": "KB-codebase-research/SKILL.md: (a) description names both: 'using GitNexus MCP (or the fallback codebase-memory-mcp)'; (b) dedicated body section line 93 'Use codebase-memory-mcp as fallback'; (c) OUTPUT schema field 'extraction_method' is the ONLY structured field — but it records what was USED, not what should be used by configuration",
+      "evidence_layer_3_consumer_agent": "discovery-codebase-researcher.md: (a) description line 3 names both with role labels; (b) body line 20 says 'check .mcp.json for GitNexus (primary per ADR-0007 v2.x) and codebase-memory-mcp (fallback)'; (c) body line 29 names the run-time preference; (d) body line 156 prohibits silent fallback. NONE OF THESE ARE FRONTMATTER FIELDS.",
+      "evidence_layer_4_secondary_consumer": "review-architecture-auditor.md description and body — same prose convention",
+      "implication_for_UI15": "Any structured-frontmatter convention introduced by this feature (e.g., 'mcp_primary:' / 'mcp_fallback:' fields on agent files) would be UNPRECEDENTED in the corpus. The path of LEAST CONVENTION-DRIFT is to keep the mechanism as prose-in-agent-body + prose-in-skill, with the .mcp.json + tools allowlist providing the runtime registration. The path of MAXIMUM AUDITABILITY is to introduce structured fields (auditing-mcp can then read frontmatter mechanically rather than parsing prose) — this is a Design tradeoff for UI-15."
+    },
+    "file_composition_evidence_for_UI8": {
+      "total_files_non_git_non_node_modules": 634,
+      "markdown_files": 468,
+      "markdown_percent": 73.8,
+      "python_files": 52,
+      "yaml_files": 21,
+      "shell_files": 8,
+      "example_files": 8,
+      "interpretation": "This repo is markdown-heavy (73.8%). The remaining source-code surface is concentrated in .claude/skills/auditing-*/scripts/ (Python audit scripts). Serena's symbol-level traversal value is therefore limited to those Python files; for the majority of the repo, Read/Grep on markdown is the natural primitive. GitNexus, being TS-first per ADR-0007 rationale, is also a thin fit for this repo's actual content — but per ADR-0007 + KB-codebase-research GitNexus is nonetheless declared canonical for the primary-tool slot. The UI-8 question (Serena vs no codebase MCP — narrowed in v3 to Serena's symbol-level value on a markdown-heavy repo) is sharper given this evidence."
+    }
+  }
+}

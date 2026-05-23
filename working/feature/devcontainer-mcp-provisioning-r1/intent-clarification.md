@@ -1,10 +1,11 @@
 ---
 id: IC-devcontainer-mcp-provisioning-r1
+doc_type: intent-clarification
 version: 1.0.0
-status: draft
+status: accepted
 feature_slug: devcontainer-mcp-provisioning-r1
 scope_class: FULL
-user_token: <pending — assigned at Intent Confirmation Gate>
+user_token: gate1-approved-2026-05-23
 generated: 2026-05-22T20:45:00Z
 generated_by: intake-intent-clarifier
 ---

@@ -1,0 +1,164 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "PRD",
+    "target_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/prd-v2.md",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "version_reviewed": "2.0.0",
+    "predecessor_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/prd-v1.md",
+    "predecessor_review_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/prd-v1-review-issues.json",
+    "invocation_context": "recipe-feature-pipeline Invocation 2 — shared-document-reviewer re-run after Gate-3-triggered scope expansion produced PRD v2 (added FR-8 lifecycle health, FR-9 runtime failure, FR-10 runtime logging, FR-11 W/H/A trifecta; extended NFR-1/2/3/5/8/9; UI-9..14)",
+    "reviewer": "shared-document-reviewer",
+    "skills_applied": [
+      "KB-documentation-criteria (templates/prd-template.md, references/disciplines/prd-authoring.md, references/disciplines/ears-acceptance-criteria.md, references/layer-taxonomy.md, references/shared-conventions.md)",
+      "KB-review-disciplines (references/gate-0-1-procedure.md, references/severity-taxonomy.md, references/prior-context-check.md, references/issue-lifecycle.md)",
+      "KB-general-coding-principles (N/A — no code samples in PRD body)"
+    ],
+    "reviewed_at": "2026-05-23T00:00:00Z"
+  },
+  "scores": {
+    "consistency": 92,
+    "completeness": 93,
+    "rule_compliance": 95,
+    "clarity": 88
+  },
+  "gate0": {
+    "status": "pass",
+    "missing_elements": [],
+    "checks_performed": [
+      "Frontmatter parses as valid YAML; universal required fields present (id, doc_type=prd, version=2.0.0, status=draft, feature_slug, derived_from, generated, generated_by)",
+      "v2-specific supersession fields present: prior_version (line 8), supersedes (line 9, names predecessor and version), change_summary (lines 13-23, multi-line scalar enumerating the four v2 expansions)",
+      "intent_user_token: gate1-approved-2026-05-23 present (intent-stage user-token chain preserved per ADR-0032 Change 2)",
+      "Own user_token: deliberately absent in draft status — to be assigned at Gate 2 PRD Approval Gate per gated-artifact lifecycle (matches v1 pattern)",
+      "Revision History section present immediately after H1 (lines 28-33) with both v1.0.0 and v2.0.0 entries, each carrying Author + Summary",
+      "## Contents checklist present with all 11 required H2 sections marked [x]",
+      "All 11 required H2 sections present and non-empty (Overview, Stakeholders, User Stories, Functional Requirements, Non-Functional Requirements, Product Policy Decisions, Success Criteria, Technical Considerations, Rollout Plan, Undetermined Items, Appendix)",
+      "Required H3 substructure present: Overview {One-line Summary, Background, Layer Scope}; Stakeholders {Stakeholder Inventory, Primary Users}; User Stories {grouped by stakeholder, Use Cases, User Journey Diagram, Scope Boundary Diagram}; Functional Requirements {Must Have, Should Have, Could Have empty-with-note, Won't Have}; NFR {9 attributes addressed including explicit N/A for 6 and 7}; Technical Considerations {Dependencies, Constraints, Assumptions, Risks and Mitigation}; Appendix {References, Glossary}",
+      "Layer Scope enumerates all 9 canonical layers verbatim from layer-taxonomy.md in canonical order; 2 layers in scope (Claude Code, Dev Environment); 7 out-of-scope with explicit rationale block. Layer Scope deltas v1->v2 paragraph explicitly states no layers activate or deactivate (matches spec verification item 5)",
+      "EARS check: all v1-carried ACs (AC-FR-1-a/b/c, AC-FR-2-a/b, AC-FR-3-a/b, AC-FR-4-a/b, AC-FR-5-a/b, AC-NFR-1-a/b, AC-NFR-2-a/b/c) preserved with binding 'shall'. All v2-new ACs (AC-FR-8-a..e, AC-FR-9-a..d, AC-FR-10-a..d, AC-FR-11-a..d, AC-NFR-2-d) use canonical EARS patterns 1/4 with binding 'shall'. AC-FR-1-c surfacing channel tightened per I-DR-008. AC-NFR-2-c subject corrected per I-DR-009. AC-NFR-4-a removed and reframed as UI-7 Blueprint-author instruction per I-DR-006",
+      "AC-ID convention followed (AC-FR-N-letter for functional, AC-NFR-N-letter for non-functional)",
+      "Spec-verification items 1-7 all confirmed: (1) v2 frontmatter has version 2.0.0 + supersedes + change_summary + doc_type prd; (2) Revision History present; (3) FR-8/9/10/11 present with EARS ACs; (4) NFR extensions in Performance/Reliability/Security/Compatibility/Operability/DX; (5) Layer Scope still exhaustive with no new layers activating; (6) all 5 v1 review findings I-DR-005..009 absorbed; (7) UI-9..14 added with Owner + Needed-by"
+    ]
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "verdict_token": "PASS",
+    "conditions": [
+      "At Gate 2 PRD Approval (re-confirmation for v2), orchestrator assigns own user_token in frontmatter and updates status from 'draft' to 'accepted' in the same edit (currently absent in draft; same lifecycle pattern as v1 had at its Gate-2 stage).",
+      "Optional polish per the 5 recommended findings below (I-DR-010 through I-DR-014). None blocks Gate 3 re-confirmation; author may absorb inline or carry to Blueprint composition for resolution-by-replacement."
+    ],
+    "rationale": "Gate 0 passes cleanly: every required structural element present, frontmatter complete per ADR-0032 v2 conventions including the v2-specific supersession fields (prior_version, supersedes, change_summary), Revision History documenting both versions, all 11 required H2 sections and required H3 substructure, Layer Scope verbatim from layer-taxonomy.md with explicit no-delta paragraph, all v2-new ACs (FR-8..11) using canonical EARS patterns with binding 'shall'. Gate 1 scores Consistency 92 / Completeness 93 / Rule compliance 95 / Clarity 88 (slight uptick from v1's 92/92/95/88 driven by the explicit v2-delta markers throughout, the Glossary additions for new terms, and the Risks table extension with three v2-specific entries). Spec verification items 1 through 7 all confirmed. All 5 prior-context items from prd-v1-review-issues.json (I-DR-005 through I-DR-009) are resolved with explicit inline I-DR-NNN citations at each absorption point (FR-3 cross-reference, AC-FR-1-c surfacing channel tightening, AC-NFR-2-c subject correction, UI-7 Blueprint-author instruction replacing AC-NFR-4-a, FR-7 reclassification to Won't-Have). The 4 earlier intent-stage items (I-DR-001..004) remain resolved at their v1 locations and have not regressed. The 4 user-surfaced Gate-3 gaps are each addressed by a dedicated FR with proper EARS ACs, a corresponding NFR extension, supporting Policy Decision entry, Risks table entry, Success Criteria metric, and Glossary term. The new MCP-operations-maintainer stakeholder is cleanly threaded through Use Cases (cases 5/6/7), Primary Users (secondary primary), Stakeholder Inventory, US-9, FR-11, Risks, Success Criteria (qualitative #4), Rollout Plan, and Glossary. Findings below are clarity polish, none consistency/completeness/compliance-blocking."
+  },
+  "issues": [
+    {
+      "id": "I-DR-010",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Functional Requirements / FR-9 body (line 312) — 'meaning FR-11 is a prerequisite for the user-facing remediation experience to be useful.'",
+      "description": "FR-9's remediation pointer is committed to point at a section of KB-mcp-platform (FR-11's deliverable). Both are listed P1 Must Have with no explicit dependency ordering. The body line declares FR-11 a prerequisite for FR-9's remediation experience but does not propagate this into the Plan-author's view (no entry under any Plan-ordering discussion, no note on FR-11 itself that 'FR-9 depends on this'). A Plan author looking at FR-9 alone might schedule FR-9 ahead of FR-11.",
+      "evidence": "Line 312: 'The remediation pointer is what makes the failure actionable. It points at a section of KB-mcp-platform (FR-11) - meaning FR-11 is a prerequisite for the user-facing remediation experience to be useful.' FR-11 body (line 322-326) does not mirror this dependency note in the reverse direction.",
+      "suggestion": "Either (a) add a one-line note under FR-11 body: 'Prerequisite for FR-9 — the remediation pointers FR-9 surfaces resolve into KB-mcp-platform sections.' Or (b) state explicitly in Rollout Plan or Plan-handoff context that 'FR-11's KB-mcp-platform skeleton (at minimum the troubleshooting-section anchors that FR-9's remediation pointers reference) must exist before FR-9 is testable.' Option (a) is cleaner and lives at the requirement surface where the Plan author will read it."
+    },
+    {
+      "id": "I-DR-011",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Functional Requirements / FR-11 / AC-FR-11-d (line 212)",
+      "description": "AC-FR-11-d reads 'When the MCP operations maintainer reads KB-mcp-platform and KB-mcp-design together, the system shall make the relationship between the two skills explicit (What references How for design choices; How references What for platform facts), matching the cross-reference style used by the other trifectas in this project.' The trigger 'when the maintainer reads' is a human-side trigger; the subject 'the system' here means 'the two SKILL.md files in their content,' i.e., an artifact-content commitment rather than a runtime behavior. This is the same shape as v1's I-DR-006 concern about AC-NFR-4-a (which v2 correctly reframed as a Blueprint-author instruction at UI-7). A reader applying the same lens to AC-FR-11-d may flag it. The other AC-FR-11-a/b/c are 'After this feature ships, the system shall contain ...' which is artifact-presence — defensible. AC-FR-11-d is artifact-content-quality, which is more process-y.",
+      "evidence": "AC-FR-11-a/b/c are artifact-presence ACs ('the system shall contain a .claude/skills/.../SKILL.md following the same shape as ...'). AC-FR-11-d is alone among the FR-11 ACs in making a content-quality commitment ('make the relationship between the two skills explicit'). The grammatical subject is 'the system' but the actual artifact under test is the two skill files' cross-reference style.",
+      "suggestion": "Either (a) leave as-is and note that the cross-artifact auditor at Stage 12 (Cross-Artifact Consistency) is the right surface for this kind of artifact-content-quality check — the AC then becomes an explicit cross-artifact auditor commitment rather than a runtime AC. Or (b) reframe AC-FR-11-d as a Blueprint-author / KB-author instruction inside UI-13's Owner/Needed-by note (matching the v2 absorption of I-DR-006 at UI-7). Option (b) is more uniform with how v2 already handled the analogous v1 issue."
+    },
+    {
+      "id": "I-DR-012",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "Risks and Mitigation table / 'Lifecycle health-check misfires' risk (line 521) — mitigation column",
+      "description": "The mitigation column for the 'Lifecycle health-check misfires' risk cites 'Design (UI-10) must wire the health check to invoke the same probe FR-4 uses, not a weaker proxy.' UI-10 is the staleness-threshold + on-demand-invocation item, not the probe-mechanism item. The right pointer is UI-9 (lifecycle hook strategy) or NFR-2's 'Lifecycle health-check accuracy' bullet (which already commits to the same probe equivalence). Mis-pointing here is a minor cross-reference defect that a Plan author or Blueprint composer would notice when chasing the UI references.",
+      "evidence": "Line 521 mitigation: Design (UI-10) must wire the health check to invoke the same probe FR-4 uses, not a weaker proxy. UI-10 (line 552) is the staleness threshold and on-demand invocation item per AC-FR-8-c and AC-FR-8-e — not the probe-mechanism item. UI-9 (line 551) is the lifecycle hook strategy item — closer to the probe-mechanism question. NFR-2 line 366 already commits: healthy status implies the server is connected AND a probe equivalent succeeds.",
+      "suggestion": "Change the mitigation column to: NFR-2 commits healthy implies a probe equivalent passes; Design (UI-9 lifecycle hook strategy) must invoke the same probe FR-4 uses, not a weaker proxy. Augmented auditing-mcp (FR-11) audits the health-check script for this anti-pattern. This cites NFR-2 (the substantive commitment), points UI-9 (the lifecycle wiring), and preserves the auditing-mcp anti-pattern check."
+    },
+    {
+      "id": "I-DR-013",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Undetermined Items / UI-7 body (line 549) — 'a stated threshold above which mitigation is required'",
+      "description": "UI-7's v2 absorption of I-DR-006 commits the Blueprint to including a measured/estimated per-agent context overhead figure AND a stated threshold above which mitigation is required. NFR-4 body (line 383) commits 'If Design measures and the overhead is intolerable, mitigation is opened as a re-scope.' The two commitments use different language: 'threshold above which mitigation is required' (UI-7) vs 'intolerable opens a re-scope' (NFR-4). A Blueprint author needs to know: is the threshold (a) set by the PRD now, (b) set by the Blueprint based on the project's overall agent context budget, or (c) set by the operator at Gate 4? Neither NFR-4 nor UI-7 disambiguates.",
+      "evidence": "Line 383 (NFR-4): If Design measures and the overhead is intolerable, mitigation (e.g., conditional activation per agent) is opened as a re-scope. See UI-7. Line 549 (UI-7): ... AND a stated threshold above which mitigation is required - this is the Blueprint-author instruction that replaced v1's AC-NFR-4-a. Neither sentence names the threshold-setter.",
+      "suggestion": "Add one clarifying sentence to UI-7: The threshold itself is a Blueprint decision, justified against the project's overall agent context budget and visible at Gate 4 for operator confirmation. This closes the threshold-setter question without pre-deciding the number."
+    },
+    {
+      "id": "I-DR-014",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "Revision History / v2.0.0 entry (line 33) — change_summary completeness",
+      "description": "The v2.0.0 Revision History row summarizes the four main expansions and the I-DR-005..009 absorptions, but does not call out the Won't-Have additions beyond FR-7's reclassification. v2 adds two new Won't-Have entries that did not appear in v1: 'A CI workflow that runs auditing-mcp against .mcp.json on every PR' and 'A remote log sink, metrics dashboard, or alerting surface for the MCP runtime log.' These are substantive scope-closures (each prevents a future re-litigation of scope), and the change_summary should mention them. Additionally the Revision History bullet mentions UI-9..12 but the body has UI-9 through UI-14 (6 new UIs); UI-13 and UI-14 are present in the body but absent from the Revision History bullet.",
+      "evidence": "Line 33 Revision History v2.0.0 entry lists: (1) four gaps from Gate 3, (2) FR-8/9/10/11 additions, (3) NFR-2/8 extensions, (4) FR-7 reclassification per I-DR-005, (5) UI-9 through UI-12 additions, (6) Risks table 3 new entries, (7) I-DR-006..009 carry-forward. Two new Won't-Have entries (CI workflow for auditing-mcp; remote log sink) and UI-13/UI-14 are not mentioned in the Revision History row but are present in the document body.",
+      "suggestion": "Tighten the v2.0.0 Revision History row to: ... adds UI-9 through UI-14 covering the new design questions (lifecycle hook strategy, staleness threshold, mid-run failure surface, runtime log surface, KB-mcp skill internals, auditing-mcp augmentation set); adds two new Won't-Have entries (CI workflow for auditing-mcp; remote log sink / telemetry pipeline); updates Risks table with three new entries; carries forward I-DR-006 through I-DR-009 ... This is a one-line edit but improves the auditability of the v1->v2 delta."
+    }
+  ],
+  "recommendations": [
+    "Carry the 5 recommended findings (I-DR-010 through I-DR-014) to the Blueprint composition phase. Several (I-DR-011 AC-FR-11-d artifact-content-vs-runtime; I-DR-013 UI-7 threshold-setter) may be resolved by replacement when the Blueprint re-asserts the same commitments in Design-doc form (with explicit Blueprint-author instructions rather than runtime ACs).",
+    "I-DR-012 (Risks-table UI-10 mis-pointer) and I-DR-014 (Revision History incompleteness) are one-line fixes; the author may absorb in the same patch when the user_token is assigned at the Gate 2 re-confirmation if preferred. I-DR-010 (FR-9->FR-11 prerequisite note at FR-11 body) is also a one-line fix.",
+    "Forward the 14 Undetermined Items (UI-1 through UI-14) verbatim to the Discovery Planning rationale brief - the 6 new v2 UIs (UI-9 through UI-14) all have clear owners (design-codespaces, design-claude-code) and a single needed-by stage (Design Composition). Discovery Research should pick up UI-9..12 (codespaces lifecycle facts, log-surface options, mid-run failure surface options); UI-13..14 are pure Design choices that Design Composition will arbitrate against the W/H/A trifecta exemplars.",
+    "The v2 PRD demonstrates exemplary scope-expansion discipline: every gap surfaced at Gate 3 is closed by a dedicated FR with EARS ACs, a corresponding NFR extension, a Policy Decision entry, a Risks table entry, a Success Criteria metric, a Glossary term, AND a Revision History note. The carry-forward absorption of I-DR-005..009 is auditable at a glance via the inline I-DR-NNN citations. Layer Scope correctly remains unchanged (new work falls entirely within Claude Code + Dev Environment layers, which were already in scope) and the no-delta paragraph makes this explicit. No structural rework needed."
+  ],
+  "prior_context_check": {
+    "items_received": 5,
+    "resolved": 5,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [
+      {
+        "id": "I-DR-005",
+        "from_review": "prd-v1-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "FR-7 (CI smoke-test) was listed under Could Have (P3) but its body said 'Not in scope for this release ... Listed here only to make the deferral explicit.' Structurally a Won't Have, not a P3.",
+        "status": "resolved",
+        "location_in_prd_v2": "Won't Have section line 340; FR-7 absent from Could Have (P3) section line 336",
+        "evidence": "Won't Have line 340: A CI smoke-test that asserts claude mcp list shows all six servers connected. (v2: reclassified from v1's FR-7 P3 entry per I-DR-005 - Won't-Have is the correct disposition since CI/CD layer is out of scope.) Reason: CI/CD layer is out of scope this release per Layer Scope. If automated drift detection is later wanted, it becomes its own feature. The FR-N tag is correctly dropped (Won't Have items don't carry FR-N IDs). Could Have (P3) section line 336 now reads (none in this release.) - clean. Matches I-DR-005 suggestion option (a) verbatim."
+      },
+      {
+        "id": "I-DR-006",
+        "from_review": "prd-v1-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "AC-NFR-4-a was a process-level/artifact-completeness AC ('the Blueprint must include a measurement') rather than a runtime AC. Subject 'the system' was stretched to mean 'the feature-delivery process.'",
+        "status": "resolved",
+        "location_in_prd_v2": "NFR-4 section line 384 (AC removed); UI-7 body line 549 (commitment relocated as Blueprint-author instruction)",
+        "evidence": "NFR-4 line 384: (v2: AC-NFR-4-a from v1 - which committed the Blueprint to including a measurement - is reframed as a Blueprint-author instruction inside UI-7's Owner/Needed-by note rather than as a runtime AC, per I-DR-006. NFR-4 itself remains the commitment; the Blueprint instruction now lives at UI-7.) UI-7 line 549 now carries: (v2 per I-DR-006): the Blueprint shall include a measured or estimated per-agent context overhead figure for the six-server always-on configuration, AND a stated threshold above which mitigation is required - this is the Blueprint-author instruction that replaced v1's AC-NFR-4-a. Matches I-DR-006 suggestion option (a). All other NFR ACs in v2 are runtime-observable, preserving NFR-AC discipline."
+      },
+      {
+        "id": "I-DR-007",
+        "from_review": "prd-v1-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "FR-2 (allowlist-presence) and FR-3 (allowlist-readability + no-runtime-mutation) overlap; boundary was implicit; cross-reference to NFR-3 audit-and-traceability missing.",
+        "status": "resolved",
+        "location_in_prd_v2": "FR-3 body line 289 (cross-reference added)",
+        "evidence": "FR-3 line 289: Distinct from FR-2 (which requires the allowlist entries are present); FR-3 commits to the readability and no-runtime-mutation properties - see NFR-3 audit and traceability. (v2: cross-reference added per I-DR-007.) Matches I-DR-007 suggestion option (a) (one-line cross-reference inside FR-3 body). FR-2 body unchanged (the entries-present semantics is preserved); FR-3 now carries an explicit subset-vs-distinct disambiguation line."
+      },
+      {
+        "id": "I-DR-008",
+        "from_review": "prd-v1-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "AC-FR-1-c had a well-formed Pattern 4 trigger and the layer-of-failure list, but the surfacing channel ('shall surface a clear failure') was under-specified compared to AC-FR-4-b.",
+        "status": "resolved",
+        "location_in_prd_v2": "AC-FR-1-c line 121",
+        "evidence": "AC-FR-1-c line 121: If any of the six servers is missing, not registered, or not responding at probe time, then the system shall surface a clear failure in the probe tool's output (and in claude mcp list output where applicable) naming the specific server and the layer of failure (install / registration / transport / auth). (v2: tightened per I-DR-008 - surfacing channel made explicit.) Matches I-DR-008 in-place tightening suggestion. Pattern 4 structure preserved; surfacing channel now named (probe tool output + claude mcp list output where applicable)."
+      },
+      {
+        "id": "I-DR-009",
+        "from_review": "prd-v1-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "AC-NFR-2-c subject 'the system shall produce no BLOCKER findings' was awkward — auditing-mcp is the actor that produces findings, not 'the system.' Success Criteria row already used the correct subject.",
+        "status": "resolved",
+        "location_in_prd_v2": "AC-NFR-2-c line 198",
+        "evidence": "AC-NFR-2-c line 198: When the auditing-mcp skill is run against the resulting .mcp.json, the auditing-mcp skill shall report zero BLOCKER findings. (v2: reworded per I-DR-009 - subject corrected to the auditing skill.) Matches I-DR-009 suggested rewording precisely. EARS Pattern 1 form preserved; subject named correctly (auditing-mcp skill); assertion precise (report zero BLOCKER findings)."
+      }
+    ],
+    "note": "All 5 prior-context items from prd-v1-review-issues.json fully resolved. The 4 earlier intent-stage items (I-DR-001..004 from intent-review-issues.json) remain resolved at their v1 locations (Stakeholder Inventory preamble line 93; NFR-3 'Distinction' subsection line 373; UI-3 line 545; UI-8 line 550; Technical Considerations Dependencies note line 485) and have not regressed in v2. The PRD demonstrates exemplary carry-forward discipline: each I-DR-NNN absorption carries an explicit inline citation by ID, making the resolution auditable at a glance. Five new recommended findings (I-DR-010..014) are surfaced for v2; none blocks Gate 3 re-confirmation."
+  }
+}

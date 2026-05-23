@@ -1,0 +1,168 @@
+{
+  "metadata": {
+    "stage": "6 (Architecture Audit — retroactive)",
+    "auditor": "review-architecture-auditor",
+    "target": "blueprint-v3.md",
+    "blueprint_version": "v3.0.0",
+    "generated": "2026-05-23T17:45:00Z",
+    "audit_stage": "retroactive (PKG-BLOCKER-002 resolution per Gate-6 packager finding)",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "cycle": 1,
+    "of_cap": 4,
+    "is_terminal_cycle": false,
+    "blast_radius_method": "manual (Bash + grep + Read; GitNexus / codebase-memory-mcp not provisioned in current repo per Blueprint claim C-0462)",
+    "cove_sample_rate": 0.7,
+    "cove_sampling_strategy": "Prioritized: (1) Gate-4 OI-1/OI-2/OI-3 closure claims (highest load-bearing); (2) consumer-set math (8-of-36 + 5-agent Serena allowlist); (3) structural state claims about existing skill family files; (4) 36-agent demand-sweep matrix totals; (5) C-0445/C-0462 baseline invariants; (6) ADR-0040 design-iac/design-api hedge resolution. Sampled claims with high downstream-dependency weighting per architecture-audit.md §CoVe-time-budget.",
+    "inputs_read": [
+      "blueprint-v3.md (1349 lines, full read)",
+      "synthesis.md (load-bearing claims)",
+      "synthesis/02-graph-summary.md (cluster A 8-hub enumeration)",
+      "codebase-analysis.json (schema_version 1.1.0; blast_radius array)",
+      "ADR-0037, ADR-0038, ADR-0039, ADR-0040, ADR-0041, ADR-0042, ADR-0043 (full read for the v3-authored set)",
+      "agent-roster-impact-matrix.md (36-row demand-side closure)",
+      "cc-design.md (consumer-mapping ground truth)",
+      "Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md (§O event-trigger posture)",
+      "cross-artifact-audit-issues-cycle-2.json (convergence verification — not duplicated)",
+      ".claude/agents/ directory (36 files; mcp__ grep verification)",
+      ".claude/skills/auditing-mcp/SKILL.md, .claude/skills/auditing-cc-configs/SKILL.md, .claude/skills/auditing-shared/SKILL.md, .claude/skills/auditing-github-actions/SKILL.md (structural ground truth)"
+    ]
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "convergence_status": "first_cycle",
+    "summary": "Blueprint v3 substantively honors synthesis claims, the rationale brief, the inherited ADRs, and the Gate-4 user-override decisions. The three Gate-4 user decisions (OI-1 drop-fallback, OI-2 Path A graduation, OI-3 hard gate) are all (a) reflected verbatim in the Blueprint's Open Items closure block, (b) codified in ADRs (ADR-0042, ADR-0043) and an ADR edit (ADR-0037 line 143 revert), and (c) load-bearing rationale preserved (especially OI-3's 'MCPs can cause a lot of problems' verbatim in ADR-0043). The 7-server inventory, 8-of-36 consumer set, 5-agent Serena allowlist, 36-agent demand-side sweep, C-0445 zero-mcp__ invariant, ADR-0040 design-iac/design-api hedge resolution, and ADR-0038 schema v1.1.0 blast-radius schema honoring are all CoVe-verified against synthesis + codebase-analysis + actual codebase state. Two important issues surfaced: (I-AA-001) the filename `.claude/agents/design-cc.md` is used in 3 locations (blueprint line 450, ADR-0040 line 137, propagated downstream into plan-v1.md and tasks.json) but the actual file in the repo is `design-claude-code.md` (the `design-cc` token is a frontmatter `name:` only, per the Path-A reserved-word workaround); without correction, plan execution would not find the file. (I-AA-002) The consumer-set math description is inconsistent across artifacts: blueprint line 830 says '7-agent base consumer-mapping' but cc-design's table has 6 concrete rows + 1 TBD that ADR-0040 fills, and the agent-roster-impact-matrix line 57 cites '7+5=12 minus 4 overlaps = 8' (the overlap count is actually 3, not 4). The final 8-unique-agent figure is correct and consistent, but the math narrative confuses future readers. No BLOCKER issues. Three MINOR/NIT clarity items also surfaced. Recommend a focused in-place amendment dispatch (blueprint-v3.0.1 patch-level revision) to correct the filename references (I-AA-001) and clarify the consumer-set math narrative (I-AA-002); the recommended fix is small and does not require a full Gate-4 re-author."
+  },
+  "audit_dimensions": {
+    "cove_synthesis_claims": "PASS — sampled 12 load-bearing claims and verified all against synthesis + codebase + ADRs. 7-server inventory matches synthesis Cluster A hub enumeration (7 servers + codebase-memory-mcp fallback dropped at Gate-4 OI-1). FR-9 stdio-no-reconnect ground truth (C-0301) honored. ADR-0040 design-iac/design-api hedge resolved by agent-roster-impact-matrix line 67 ('no evidence found that design-iac / design-api touches auditing-*/scripts/ Python today').",
+    "codebase_facts_verification": "PARTIAL_PASS — C-0445 zero-mcp__ invariant verified: 36 of 36 agent files currently have zero mcp__ entries; agents directory contains exactly 36 .md files. C-0462 .mcp.json absent at repo root — verified. Auditing-mcp current family-declaration as 'auditing-cc-configs' verified at SKILL.md line 30. auditing-cc-configs/SKILL.md lines 144-155 area structure verified (6 sub-skills including auditing-mcp; lead-in says 'six sibling skills'). auditing-shared/SKILL.md description verified as listing exactly 4 consumers (auditing-cc-configs, auditing-skills, auditing-subagents, auditing-context-files); blueprint claim 'gains auditing-mcp as 5th consumer' is structurally correct. auditing-github-actions/SKILL.md verified as having no family: frontmatter field (de-facto graduated, supporting ADR-0042's structural-symmetry rationale). FAIL on one fact: '.claude/agents/design-cc.md' filename references — the actual file is design-claude-code.md (design-cc is the frontmatter name: only, per Path-A reserved-word workaround). See I-AA-001.",
+    "blast_radius_analysis": "PASS — codebase-analysis.json conforms to ADR-0038 schema v1.1.0 (schema_version field present; blast_radius array populated at line 316). Blueprint's Change Impact Map enumerates all 1-hop dependents named in codebase-analysis blast_radius entries (.mcp.json → every Claude Code session + 5 consumer agents; .claude/agents/discovery-codebase-researcher.md → orchestrator + reviewer chain; .devcontainer/* → every Codespace lifecycle event; auditing-mcp/ → audit invokers + family coordinator + Gate-6 callers per ADR-0043). The Interface Change Matrix covers the structural deltas (ADR-0018 v1.0.0 → v1.1.0; ADR-0007 file relocation; family-graduation; orchestrator Gate-6 wiring). One acknowledged drift between codebase-analysis (pre-OI-1) and blueprint v3 (post-OI-1) regarding fallback wiring on discovery-codebase-researcher; blueprint correctly carries forward the OI-1 resolution without editing the upstream codebase-analysis (snapshot was correct at generation time 2026-05-23T04:30 before Gate-4 OI-1 closure at 2026-05-23T13:27).",
+    "brief_honor_layer3": "PASS — all three Layer-3 checks pass. (1) Decision contradiction: no inherited ADR is silently contradicted; ADR-0007 v2.2.0's fallback policy is explicitly preserved at the project level even where this feature does not provision the fallback (Blueprint § Background and Context, Fact Disposition C-0447/C-0448 rationale, Open Items OI-1 closure). ADR-0005 append-only supersession honored (ADR-0018 v1.0.0 preserved; ADR-0038 v1.1.0 is canonical). ADR-0036 single-location ADR placement honored by the ADR-0007 relocation plan. ADR-0022 reasoning-config preservation honored (no model:/effort:/skills: changes per cc-design Principle 9 and Non-Scope checklist). ADR-0030 pedagogical_sections honored by both new skills. (2) Open-item handling: OI-1/OI-2/OI-3 explicitly closed with verbatim user rationale; OI-4/OI-5/OI-6 explicitly carried forward; OI-7 closed by agent-roster-impact-matrix. No silently-dropped open items. (3) Re-surfaced verified issue: blueprint-v2 reviewer-APPROVED (88-93 across axes); v3 is described as 'focused Gate-4 decision-propagation revision (no review-gated re-author)' — no prior verified-and-closed issues are re-opened.",
+    "gate4_user_overrides": "PASS_WITH_VERBATIM_RATIONALE_PRESERVED — All three OI closures captured: (OI-1) Verbatim 'Lets move forward with 7 MCP the codebase-memory-mcp was an earlier assessment that is now stall.' present in blueprint OI-1 closure block (line 1335) and reflected in AC-X-2 revision + ADR-0037 Implementation Guidance line-143 revert (with Document History row). (OI-2) Verbatim 'graduate and then write an issue on whether we need to look at github codespace and the others in an issue report under Issues/ for future consideration of a pipeline run' present in blueprint OI-2 closure block (line 1336) and codified in ADR-0042 (line 53). Issues/proposal-auditing-family-graduation-review.md exists as the follow-up artifact. (OI-3) Verbatim 'I agree hard gate. MCPs can cause a lot of problems if they are not stable and the system fails silently or the devcontainer and docker fail.' present in blueprint OI-3 closure block (line 1337) and codified in ADR-0043 (lines 19-20, 50-52). Critically, the load-bearing premise ('MCPs can cause a lot of problems if they are not stable and the system fails silently or the devcontainer and docker fail') is reproduced verbatim in ADR-0043 in three places (the user-decision-record frontmatter, the Context section, and the Why-this rationale in Decision Details) — confirming the rationale is not just cited but is the structural backbone of the decision documentation.",
+    "event_trigger_posture": "PASS — §O posture is explicitly honored at the Blueprint level. The deferral register §O establishes the posture (event-triggers, honest acceptance, or concrete machinery) and explicitly says 'Per user direction at Gate 4 v3 review: no changes to the feature scope. Blueprint v3 keeps the 90 days post-ship phrasing in OI-6 and the Risks-table cold-cache row verbatim. The pattern observation is captured here as the project's posture going forward; future features adopt it, this feature ships as-designed.' Blueprint v3 honors this verbatim — OI-6 (line 1340) carries the 90-day kill criterion as documented future-state, and the Risks table row for design-codespaces (line 1291) carries the same. These are design-time documentation of kill criteria (which §O explicitly says is fine); the machinery critique applies to the broader project posture, which blueprint correctly does not attempt to invent in this feature."
+  },
+  "issues": [
+    {
+      "id": "I-AA-001",
+      "severity": "important",
+      "category": "consistency",
+      "lens": "codebase_facts_verification",
+      "location": "blueprint-v3.md:450 (Change Impact Map claude_code row); ADR-0040:137 (Implementation Guidance); propagated downstream to plan-v1.md:673 and tasks.json:460 (produces_artifact field)",
+      "description": "Blueprint v3 line 450 lists `.claude/agents/design-cc.md` as one of the 8 agent files to be edited. The actual file in the repo is `.claude/agents/design-claude-code.md`; `design-cc` is the frontmatter `name:` field of that file (a Path-A reserved-word workaround per the agent file's body header note — the validator rejects names containing 'claude'). ADR-0040 line 137 has the same incorrect filename reference. The error has already propagated downstream into plan-v1.md:673 and tasks.json:460, neither of which the Cross-Artifact Audit caught. An execution-phase task following plan-v1.md verbatim would fail to locate `design-cc.md` on disk.",
+      "verification_chain": [
+        "Bash: ls /workspaces/feature-pipeline/.claude/agents/ | grep -i cc → returns only `cc-critique.md` and `test-acceptance-author.md` (no `design-cc.md`)",
+        "Bash: ls /workspaces/feature-pipeline/.claude/agents/ | grep -i claude → returns `design-claude-code.md`",
+        "grep -n 'name:' /workspaces/feature-pipeline/.claude/agents/design-claude-code.md:2 → `name: design-cc`",
+        "Read /workspaces/feature-pipeline/.claude/agents/design-claude-code.md:11-17 → body confirms 'The filename is design-claude-code.md (aligned with Blueprint v4.3.1 prose). The frontmatter name: is design-cc (the validator's reserved-word rule rejects names containing claude). This is the same Path A pattern adopted for KB-cc-platform / KB-cc-design.'",
+        "grep -n 'design-cc.md\\|design-claude-code.md' propagation: blueprint-v3.md:450 + adrs/ADR-0040…md:137 + plan-v1.md:673 + tasks.json:460 — all incorrectly use `design-cc.md`"
+      ],
+      "suggestion": "In blueprint-v3.md:450, change `.claude/agents/...design-cc.md, design-codespaces.md` to `.claude/agents/...design-claude-code.md, design-codespaces.md`. In ADR-0040 line 137, change `.claude/agents/design-cc.md` to `.claude/agents/design-claude-code.md`. Downstream: finalize-reconciler should also propagate the fix to plan-v1.md:673 and tasks.json:460 in the same dispatch. Note: keep agent-identity references to `design-cc` (the frontmatter `name:`) untouched — they are correct. The fix is filename-only. This is patch-level (v3.0.1) work; not a full re-author."
+    },
+    {
+      "id": "I-AA-002",
+      "severity": "important",
+      "category": "clarity",
+      "lens": "cove",
+      "location": "blueprint-v3.md:830 (§Sub-Agents narrative) vs blueprint-v3.md:399 (Fact Disposition C-0445 row) vs agent-roster-impact-matrix.md:57",
+      "description": "Three artifacts describe the union math from three slightly-different angles, producing an internally inconsistent narrative even though the final 8-unique-agent figure is correct. (a) Blueprint line 830 says 'three of those five overlap with the 7-agent base consumer-mapping (review-architecture-auditor, design-cicd, discovery-codebase-researcher)' — but cc-design's consumer-mapping table has 6 concrete rows + 1 TBD that ADR-0040 fills, not '7 agents' (the 7th row was a placeholder, not an agent). (b) Blueprint line 399 (Fact Disposition C-0445 rationale) says '3 from base consumer-mapping ... overlap with the 5-agent ADR-0040 Serena allowlist; the other 5 are non-overlapping' — the 'other 5' phrasing is correct (5 = 8 total − 3 overlaps) but confusing because there isn't an obvious 5-agent grouping that's 'non-overlapping' (the 5 are actually 3 base-only + 2 Serena-only). (c) agent-roster-impact-matrix line 57 says '7+5=12 minus 4 overlaps = 8' — but the actual overlap count is 3, not 4 (review-architecture-auditor + design-cicd + discovery-codebase-researcher). The matrix's '7+5=12' uses the 7-rows-from-cc-design count which includes the TBD row that ADR-0040 fills; if the TBD row is consumed by ADR-0040's narrowing, it's not legitimate to count it twice. Correct math: 6 concrete base + 5 Serena − 3 overlap = 8 unique.",
+      "verification_chain": [
+        "Read cc-design.md:200-216 → 7-row table where row 7 is 'TBD per D-13 narrowing'; only rows 1-6 list concrete agents (design-api, design-cicd, design-iac, discovery-external-researcher, discovery-codebase-researcher, review-architecture-auditor)",
+        "Read ADR-0040:62 → 5-agent Serena allowlist: review-architecture-auditor, design-cc, design-cicd, design-codespaces, discovery-codebase-researcher",
+        "Compute overlap: review-architecture-auditor (cc-design row 6 ∩ Serena), design-cicd (cc-design row 2 ∩ Serena), discovery-codebase-researcher (cc-design row 5 ∩ Serena) → 3 overlap items",
+        "Union: 6 concrete base + 5 Serena − 3 overlap = 8 unique. Final 8 figure is correct; the narrative '7-agent base' and 'minus 4 overlaps' are arithmetically inconsistent."
+      ],
+      "suggestion": "Replace 'the 7-agent base consumer-mapping' (blueprint-v3.md:830) with 'the 6-agent base consumer-mapping (cc-design.md rows 1-6 — row 7 was the TBD that ADR-0040 narrowing filled)'. Replace agent-roster-impact-matrix.md:57 math '7+5=12, not 7+5=12' chain with the cleaner '6 concrete base rows + 5 ADR-0040 Serena consumers − 3 overlap = 8 unique union; cc-design.md row 7 was a TBD placeholder consumed by ADR-0040 narrowing, not double-counted'. Blueprint line 399's 'other 5 are non-overlapping' can stay or be clarified to 'the remaining 5 are net-new from the union perspective: 3 base-only (design-api, design-iac, discovery-external-researcher) + 2 Serena-only (design-claude-code/design-cc, design-codespaces)'. This is a clarity fix; the architectural decision and the 8-unique-agent final figure are unchanged. Bundle with I-AA-001 in the same patch-level dispatch."
+    },
+    {
+      "id": "I-AA-003",
+      "severity": "recommended",
+      "category": "consistency",
+      "lens": "brief_honor",
+      "location": "blueprint-v3.md:1347 (Update History v1.0.0 row)",
+      "description": "The Update History row for v1.0.0 says 'adopts Path B for family-coordinator (Q-CC-1)' — but v1.0.0 was the initial composition. At v3 the Path B was overridden by user to Path A per OI-2 closure. The v1.0.0 row is historically accurate (Path B was indeed the v1 disposition); however, a future reader scanning the Update History without reading OI-2 closure could be confused about the final state. The v3 row (line 1349) does describe the override, but the row is enormous and the override is buried in long-form prose.",
+      "verification_chain": [
+        "Read blueprint-v3.md:1347 → v1.0.0 row: 'adopts Path B for family-coordinator (Q-CC-1)'",
+        "Read blueprint-v3.md:1349 → v3.0.0 row mentions 'OI-2 closed; Path A graduation' but the row exceeds 2000 characters",
+        "Read OI-2 closure at blueprint-v3.md:1336 → user override clearly documented"
+      ],
+      "suggestion": "Optional: add a parenthetical to the v1.0.0 row: '(superseded at v3 — see v3.0.0 row + ADR-0042)'. Or add a one-line summary at the head of the v3.0.0 row enumerating the three OI closures by ID before diving into the per-location-changed enumeration. Non-blocking; cosmetic clarity."
+    },
+    {
+      "id": "I-AA-004",
+      "severity": "recommended",
+      "category": "completeness",
+      "lens": "blast_radius",
+      "location": "blueprint-v3.md:450 (Change Impact Map claude_code), §Sub-Agents (line 830ff)",
+      "description": "The orchestrator Gate-6 phase-validator wiring (Component 9, NEW v3 per ADR-0043) is listed as a Change Impact Map item (line 458) and as Component 9 (line 674). But the existing `execute-orchestrator.md` agent file is not listed among the touched agents in §Sub-Agents (8 of 36) — even though Gate-6 phase-validator behavior is invoked from orchestrator code. The Blueprint resolves this implicitly via 'phase-validator script update by plan-author' (Interface Change Matrix line 495); but the demand-side sweep at agent-roster-impact-matrix.md classified execute-orchestrator as EXPLICIT_NO. The asymmetry is real: the orchestrator's Gate-6 invocation logic must change to honor the hard gate, but the orchestrator agent file's `tools:` allowlist does not need to change (the orchestrator invokes auditing-mcp via Bash, not via mcp__ tool). The matrix's EXPLICIT_NO classification is correct for the consumer-set scope; the Blueprint's Component 9 + Interface Change Matrix is correct for the orchestrator's gate-logic change. But a reader could miss the layering. No factual error — completeness recommendation only.",
+      "verification_chain": [
+        "blueprint-v3.md:458 — 'Orchestrator phase-validator at Gate 6 (NEW v3 — auditing-mcp non-zero exit is gate-blocking per ADR-0043)' in Change Impact Map",
+        "blueprint-v3.md:674-678 — Component 9 enumerates the orchestrator Gate-6 wiring with 'Plan-author authors the concrete phase-validator script per ADR-0043 Implementation Guidance'",
+        "agent-roster-impact-matrix.md:53 — execute-orchestrator in EXPLICIT_NO list",
+        "blueprint-v3.md:830 — §Sub-Agents '8 of 36 existing agents' tools: allowlists' — execute-orchestrator not among the 8"
+      ],
+      "suggestion": "Optional: add a one-sentence clarifying note near Component 9 or in §Sub-Agents acknowledging the asymmetry — e.g., 'The orchestrator agent file's tools: allowlist is not modified; the Gate-6 hard-gate per ADR-0043 lands in the orchestrator's phase-validator script logic (Bash/Python invocation of auditing-mcp), not in the orchestrator agent's mcp__ allowlist. Hence the orchestrator remains in EXPLICIT_NO per the demand-side sweep while still being a touched component per the Change Impact Map.' Non-blocking."
+    },
+    {
+      "id": "I-AA-005",
+      "severity": "recommended",
+      "category": "consistency",
+      "lens": "cove",
+      "location": "blueprint-v3.md:1158 (Test Boundaries Per-Layer Test Strategy)",
+      "description": "Per-Layer Test Strategy row for 'family-graduation structural test (NEW v3)' says 'manual at Gate 6 or in audit-skill OP-7 trifecta-consistency rule' — but OP-7 is the trifecta-consistency rule (KB-mcp-platform ↔ KB-mcp-design ↔ auditing-mcp). The family-graduation structural test (auditing-mcp frontmatter family: + Sub-skill family body section + auditing-cc-configs family-list pruning + auditing-shared cross-ref expansion) is not strictly trifecta-consistency; it's family-membership-consistency. Mapping it to OP-7 conflates two rule semantics. ADR-0042 Implementation Guidance does mention 'auditing-mcp augmentation gains family-graduation steps' (Implementation Plan step 8) but does not explicitly assign the graduation-structural-check to OP-7. Either (a) OP-7 should be explicitly broadened to include family-membership-consistency, with that documented in cc-design and/or ADR-0042, OR (b) the family-graduation structural test should be its own audit rule (e.g., OP-11 or a Sub-skill family-coordinator rule). Currently the Blueprint maps it ambiguously.",
+      "verification_chain": [
+        "blueprint-v3.md:1158 — 'family-graduation structural test (NEW v3) ... at Gate 6 or in audit-skill OP-7 trifecta-consistency rule'",
+        "blueprint-v3.md:222 + cc-design.md:483 — OP-7 = 'trifecta consistency' rule semantics",
+        "ADR-0042 Implementation Guidance — does not explicitly assign graduation-structural-check to OP-7"
+      ],
+      "suggestion": "Non-blocking. Either (a) tighten the OP-7 definition in cc-design / KB-mcp-design / ADR-0042 to explicitly include family-membership-consistency under the rule, OR (b) defer to plan-author to decide rule placement. Recommend (a) for clean semantic separation. Bundle with the patch-level dispatch if I-AA-001/002 trigger one."
+    }
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [],
+    "note": "First Architecture Audit cycle (retroactive run); no prior Architecture Audit issues exist. Cross-Artifact Audit cycle-2 issues are out of scope for this auditor's prior-context check (different reviewer prefix, different discipline)."
+  },
+  "scores": {
+    "consistency": 87,
+    "completeness": 92,
+    "rule_compliance": 95,
+    "clarity": "N/A (architecture audit focuses on correctness, not prose-clarity scoring per architecture-audit.md)"
+  },
+  "summary_counts": {
+    "blocker": 0,
+    "major": 0,
+    "important": 2,
+    "minor": 0,
+    "recommended": 3,
+    "nit": 0
+  },
+  "load_bearing_claims_verified": [
+    {"claim": "7 named MCP servers (Serena, mcp-openapi-schema, actionlint-mcp, terraform-mcp, gitnexus, context7, exa); codebase-memory-mcp fallback dropped per Gate-4 OI-1 closure", "verification": "Synthesis Cluster A enumerates 8 hubs (7 servers + codebase-memory-mcp as fallback for E-0007); Gate-4 OI-1 closure verbatim user rationale present in blueprint OI-1 (line 1335); AC-X-2 revised consistently; ADR-0037 Implementation Guidance line 143 reverted from 'eight' to 'seven' with Document History; 13+ blueprint locations propagated to 7-entry inventory.", "result": "VERIFIED"},
+    {"claim": "8 of 36 sub-agents touched (Sub-Agents table has 8 rows)", "verification": "Blueprint line 830ff + §Sub-Agents table verified; 36 agents in .claude/agents/ confirmed by Bash ls; 8 = 6 base concrete + 5 Serena − 3 overlap (math description inconsistency surfaced as I-AA-002; final figure correct).", "result": "VERIFIED with consistency-narrative issue"},
+    {"claim": "C-0445 zero-mcp__ invariant currently holds across 36 agents (preserved for 28 post-feature)", "verification": "Bash: grep -c 'mcp__' /workspaces/feature-pipeline/.claude/agents/*.md | grep ':0' | wc -l → 36; all 36 agent files have zero mcp__ entries today.", "result": "VERIFIED"},
+    {"claim": "5-agent Serena allowlist per ADR-0040 (review-architecture-auditor, design-cc, design-cicd, design-codespaces, discovery-codebase-researcher)", "verification": "ADR-0040:62 + ADR-0040:155 ('These five files get mcp__serena__*'); blueprint Sub-Agents table rows for design-cc + design-codespaces flag Serena-only entries.", "result": "VERIFIED with filename issue (I-AA-001 — design-cc.md vs design-claude-code.md)"},
+    {"claim": "36-agent demand-side sweep closure (Q-3 closure artifact)", "verification": "agent-roster-impact-matrix.md:51-55 — 36 = 8 IN_CC_DESIGN + 0 NEWLY_PROPOSED + 28 EXPLICIT_NO; arithmetic check passes; synth-* agents classified active-not-deprecated; ADR-0040 design-iac/design-api hedge tested (no evidence found).", "result": "VERIFIED"},
+    {"claim": "ADR-0040 hedge resolution on design-iac/design-api Python-audit-surface", "verification": "ADR-0040:74 acknowledges the hedge ('no current evidence; if true, they would be added in a follow-up'); agent-roster-impact-matrix.md:67 closes it ('ADR-0040 hedge tested: no evidence found that design-iac / design-api touches auditing-*/scripts/ Python today'); OI-7 closure block (blueprint line 1341) records the closure.", "result": "VERIFIED"},
+    {"claim": "Gate-4 OI-1 user override: 'Lets move forward with 7 MCP, codebase-memory-mcp was an earlier assessment that is now stall.'", "verification": "Verbatim present in blueprint OI-1 closure block (line 1335); reflected in AC-X-2 v3 revision + ADR-0037 Implementation Guidance line-143 revert (with Document History row noting v3 Gate-4 OI-1 trigger); 30+ propagation locations enumerated in v3 Update History.", "result": "VERIFIED with verbatim rationale"},
+    {"claim": "Gate-4 OI-2 user override: 'graduate and then write an issue on whether we need to look at github codespace and the others'", "verification": "Verbatim present in blueprint OI-2 closure (line 1336) and ADR-0042:53; codified by ADR-0042 (NEW v3); Issues/proposal-auditing-family-graduation-review.md exists as follow-up artifact; auditing-mcp current family-declaration ('auditing-cc-configs') verified at SKILL.md:30 as the transform-source state.", "result": "VERIFIED with verbatim rationale"},
+    {"claim": "Gate-4 OI-3 user override: 'I agree hard gate. MCPs can cause a lot of problems if they are not stable and the system fails silently or the devcontainer and docker fail.'", "verification": "Verbatim present in blueprint OI-3 closure (line 1337) AND in ADR-0043 in three places (frontmatter user_decision_record line 19-20; Context section line 50-52; Decision Details Why-this row line 78). Load-bearing premise is the structural backbone of ADR-0043 rather than a citation.", "result": "VERIFIED with verbatim rationale (load-bearing)"},
+    {"claim": "ADR-0038 codebase-analysis schema v1.1.0 with blast_radius array extension", "verification": "codebase-analysis.json:2 → schema_version 1.1.0; codebase-analysis.json:316 → blast_radius array populated with 4 touch_point entries; Field Propagation Map (blueprint line 714) records blast_radius as added per ADR-0038.", "result": "VERIFIED"},
+    {"claim": "auditing-github-actions de-facto graduated (no family: frontmatter) — structural symmetry rationale for ADR-0042", "verification": "Read /workspaces/feature-pipeline/.claude/skills/auditing-github-actions/SKILL.md:1-13 → no family: field in frontmatter; ADR-0042 cites this as structural-symmetry precedent.", "result": "VERIFIED"},
+    {"claim": "§O event-trigger posture honored at Blueprint level (no calendar-time machinery; design-time documentation OK)", "verification": "Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md:254 — 'Per user direction at Gate 4 v3 review: no changes to the feature scope. Blueprint v3 keeps the 90 days post-ship phrasing in OI-6 and the Risks-table cold-cache row verbatim.'; Blueprint OI-6 line 1340 + Risks row line 1291 carry the 90-day language as design-time documentation; no orchestrator-machinery for the 90-day trigger is invented in this feature.", "result": "VERIFIED"}
+  ],
+  "reconciliation_recommendation": {
+    "needs_revision": false,
+    "patch_level_revision_recommended": true,
+    "rationale": "Two important findings (I-AA-001 filename inconsistency + I-AA-002 consumer-set math narrative) warrant a patch-level dispatch (blueprint-v3.0.1 or in-place amendment). Neither is BLOCKER; neither contradicts a Gate-4 user decision or an inherited ADR; both are mechanical fixes. Three recommended-severity items (I-AA-003/004/005) are optional clarity polishes. The dispatch should be a single round on blueprint-v3.md + ADR-0040 + plan-v1.md + tasks.json (filename propagation fix) — the cross-artifact auditor's job is to verify the propagation in cycle 3 if reopened, but the propagation is mechanical and CA-Audit already converged at cycle 2 on the unrelated install-count fix. Recommend finalize-reconciler dispatch a focused in-place amendment on the four affected files; once the amendment lands, this Architecture Audit cycle terminates as approved (no need for a cycle-2 Architecture Audit if the patch is mechanical).",
+    "dispatch_targets": [
+      {"file": "blueprint-v3.md", "edits": ["line 450: 'design-cc.md' → 'design-claude-code.md' (I-AA-001)", "line 830: '7-agent base consumer-mapping' → '6-agent base consumer-mapping' with TBD-row clarification (I-AA-002)", "optional: brief clarifying note near Component 9 / §Sub-Agents on the orchestrator EXPLICIT_NO vs Change-Impact-Map asymmetry (I-AA-004)"]},
+      {"file": "adrs/ADR-0040-serena-narrowed-always-on.md", "edits": ["line 137: 'design-cc.md' → 'design-claude-code.md' (I-AA-001)"]},
+      {"file": "plan-v1.md", "edits": ["line 673: 'design-cc.md' → 'design-claude-code.md' (I-AA-001 propagation)"]},
+      {"file": "tasks.json", "edits": ["line 460: 'design-cc.md' → 'design-claude-code.md' in produces_artifact (I-AA-001 propagation)"]},
+      {"file": "agent-roster-impact-matrix.md", "edits": ["line 57: clarify math narrative — '6 concrete base + 5 Serena − 3 overlap = 8 unique union' instead of '7+5=12 minus 4 overlaps' (I-AA-002)"]}
+    ]
+  },
+  "convergence_note": "First Architecture Audit cycle on this Blueprint family. If finalize-reconciler dispatches a patch-level revision to address I-AA-001/002, recommend a quick re-audit cycle 2 to confirm propagation; expected to converge cleanly with zero new findings. If the user disposition is to accept I-AA-001/002 as-is (or defer to a future cleanup), the verdict approved_with_conditions stands and Gate 6 packager can advance with the audit-issues-JSON now on file."
+}

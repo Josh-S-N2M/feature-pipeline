@@ -1,0 +1,358 @@
+{
+  "batch": 4,
+  "focus": "T-007 MCP operational discipline — F5.4 no-consensus findings, F3.1 stderr MUST, F4.2/F4.3 OWASP+Velida redaction, F6.x Fast.io ping-loop, F2.1 HTTP/SSE reconnect, three fallback-surface options",
+  "critiques": [
+    {
+      "claim_id": "C-0349",
+      "verification_questions": [
+        "Does the cited research note (T-007) explicitly assert NO CONSENSUS exists for primary-to-fallback transition surfacing?",
+        "What set of sources was surveyed to support the no-consensus call (i.e., is the search exhaustive enough to defend the negative)?",
+        "Is there an attempt to find a positive analogue, and if so, is the failure to find one well-documented?",
+        "Could a domain-adjacent positive pattern exist that the survey missed (adversarial probe)?"
+      ],
+      "verification_answers": [
+        "Yes — F5.4 (research-note line 178) is explicitly titled 'Primary-to-fallback transitions: NO CONSENSUS PATTERN' (caps in original) and the claim text reproduces this verbatim.",
+        "The note enumerates five source categories: Anthropic MCP docs, vendor MCP server docs, MCP-monitoring write-ups, devcontainer troubleshooting docs, OWASP MCP Top-10. Cross-referenced source-list at lines 246-300 names 8+ independent organizations (Anthropic, OWASP, Fast.io, MCPevals, SigNoz, Velida, Coder, Microsoft, Stacklok). This is broad enough to be defensible for an emerging-tech literature where MCP itself is <2 years old.",
+        "Yes — F5.4 source line: 'The closest analogue is the generic circuit-breaker open → using fallback path pattern from microservice literature, but it is not MCP-specific' (line 181). This is the disciplined form: looked for analogues, found one, noted it does not transfer.",
+        "Adversarial probe: an MCP-specific fallback-surfacing pattern in a private-vendor blog or Slack community could exist outside the survey. However, the note's source-set spans the main public-literature touchpoints; the negative finding remains defensible because (i) MCP itself does not model server-degradation semantics, (ii) Claude Code's own docs do not mention primary/fallback transitions, and (iii) the related ADR-0018 wiring is itself novel-to-this-project. The 'no consensus' framing is appropriately cautious — it does not claim 'no pattern exists anywhere,' only 'no consensus across surveyed sources.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "No-consensus claim survives scrutiny. The five source-categories listed are the right ones to survey for MCP operational practice; the explicit naming of the surveyed-set is what makes this defensible as a negative finding rather than an absence-of-evidence. F5.4 also names the closest analogue (microservice circuit-breaker) and explains why it does not transfer (not MCP-specific), which is exactly the disciplined-negative form. This becomes load-bearing 'genuine novel design space' for downstream Framer/Synthesizer."
+    },
+    {
+      "claim_id": "C-0350",
+      "verification_questions": [
+        "Does the source assert that MCP literature treats servers as independent (binary available/failed)?",
+        "Does the source explicitly note the gap vs. ADR-0018's 'primary degraded; using fallback' semantic?"
+      ],
+      "verification_answers": [
+        "Yes — F5.4 claim line 180: 'The literature treats MCP servers as independent — a server is either available or failed — and does not address the primary degraded; using fallback semantic that ADR-0018 codifies for GitNexus → codebase-memory-mcp.'",
+        "Yes — explicit ADR-0018 cross-reference in same line."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Supports C-0349. Independent claims reasoning is well-articulated and ADR-0018 is the project-internal target of the gap, which is correctly named."
+    },
+    {
+      "claim_id": "C-0351",
+      "verification_questions": [
+        "Is the 'circuit-breaker open → using fallback path' identified by the source as the closest analogue?",
+        "Does the source explicitly acknowledge the analogue is not MCP-specific?"
+      ],
+      "verification_answers": [
+        "Yes — F5.4 source line 181 verbatim: 'The closest analogue is the generic circuit-breaker open → using fallback path pattern from microservice literature.'",
+        "Yes — same line: 'but it is not MCP-specific.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Correctly framed: an analogue exists at a higher abstraction (microservices), but the source explicitly disclaims its transferability. Strengthens the no-consensus finding rather than weakening it."
+    },
+    {
+      "claim_id": "C-0352",
+      "verification_questions": [
+        "Does the source enumerate 'stderr banner on transition' as one of the design options?",
+        "Is the example wording in the claim text matched in the source?",
+        "Is Option (a) genuinely distinct from Options (b) and (c) — different surface, different audience?"
+      ],
+      "verification_answers": [
+        "Yes — F5.4 caveats line 183: 'stderr banner on transition (\"[MCP] primary `gitnexus` unhealthy; agent `discovery-codebase-researcher` proceeding on fallback `codebase-memory-mcp`\")' matches the claim verbatim.",
+        "Yes — example string matches.",
+        "Yes — Option (a) targets the stderr stream (operator sees it when --debug is on or stderr is piped); Option (b) writes to a structured event file (post-hoc auditability); Option (c) embeds the message in the agent's own output (in-conversation visibility). These are distinct surfaces with distinct persistence and distinct discovery paths. Not synonyms."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Option (a) distinctness check passes. Surface = stderr stream; persistence = ephemeral; discoverability = present-time only. This is a genuinely different design point from (b) and (c)."
+    },
+    {
+      "claim_id": "C-0353",
+      "verification_questions": [
+        "Does the source enumerate a dedicated event file as Option (b)?",
+        "Is the path example (`.claude/runtime/mcp-events.jsonl`) and schema (event/primary/fallback/agent/ts) reproduced?",
+        "Is Option (b) genuinely distinct from (a) and (c)?"
+      ],
+      "verification_answers": [
+        "Yes — F5.4 caveats line 183: 'dedicated event file in the project's runtime log surface (e.g., .claude/runtime/mcp-events.jsonl with event: fallback_exercised, primary, fallback, agent, ts).'",
+        "Yes — path and field-list match verbatim.",
+        "Yes — Option (b) surface = filesystem JSONL; persistence = durable until rotated; discoverability = post-hoc by file inspection or tooling. Distinct from stderr (ephemeral) and agent output (in-conversation only)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Option (b) is the synthesis-recommended choice (per C-0355 and OQ-C). The path/schema is exactly the format an augmented auditing-mcp rule could enforce. Distinct surface from (a) and (c) — passes the synonym check."
+    },
+    {
+      "claim_id": "C-0354",
+      "verification_questions": [
+        "Does the source enumerate agent-level acknowledgement as Option (c)?",
+        "Is the obligation placement on consuming agents accurately described?",
+        "Is Option (c) genuinely distinct from (a) and (b)?"
+      ],
+      "verification_answers": [
+        "Yes — F5.4 caveats line 183: 'agent-level acknowledgement in the agent's own output — the sub-agent that triggers the fallback names it explicitly in its result.'",
+        "Yes — claim text reproduces the obligation correctly; trade-off C-0357 notes the uniformity-risk.",
+        "Yes — Option (c) surface = the agent's tool-result/conversation output; persistence = embedded in conversation transcript; discoverability = inline at the moment of use. Distinct from stderr (out-of-conversation channel) and JSONL file (out-of-band file)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Three-options-distinctness check confirmed: (a) ephemeral stream, (b) durable file, (c) inline conversation message. Not synonyms — three genuinely different surfaces with three different operator-discovery paths."
+    },
+    {
+      "claim_id": "C-0355",
+      "verification_questions": [
+        "Does the source assert Option (b) aligns most cleanly with the project's existing audit + structured-record discipline?"
+      ],
+      "verification_answers": [
+        "Yes — F5.4 caveats line 183 verbatim: 'Option (b) aligns most cleanly with the existing audit + structured-record discipline this project already practices for state transitions.' Also reinforced in Synthesis line 220: 'Option (b) — a dedicated structured event file (mcp-events.jsonl) emitted by an agent-side hook when the fallback fires — is the synthesis recommendation.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Recommendation is well-grounded in the project's prior practice. Synthesizer should flag that this is the author's recommendation, but Design ultimately owns the choice (per OQ-C)."
+    },
+    {
+      "claim_id": "C-0356",
+      "verification_questions": [
+        "Does the source characterize Option (a) as lowest-friction but ephemeral?"
+      ],
+      "verification_answers": [
+        "Yes — F5.4 caveats line 183 verbatim: 'Option (a) is lowest-friction but ephemeral.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Trade-off accurately captured."
+    },
+    {
+      "claim_id": "C-0357",
+      "verification_questions": [
+        "Does the source assert Option (c) has uniformity risk because the obligation falls on each agent?"
+      ],
+      "verification_answers": [
+        "Yes — F5.4 caveats line 183 verbatim: 'Option (c) places the obligation on each consuming agent, which has uniformity risk.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Trade-off accurately captured. The uniformity-risk framing is real: if agent N implements fallback-ack and agent M does not, the operator sees inconsistent surfacing."
+    },
+    {
+      "claim_id": "C-0313",
+      "verification_questions": [
+        "Does the source assert stdio MCP servers MUST log to stderr (not stdout)?",
+        "Is the MUST language in the spec, or is it 'should'?",
+        "Does the source explain why (stdout corrupts JSON-RPC framing)?"
+      ],
+      "verification_answers": [
+        "Yes — F3.1 line 94: 'Stdio MCP servers must direct all log output to stderr. Logging to stdout corrupts the JSON-RPC framing on the transport.'",
+        "Source-quote at line 96 (Anthropic Debugging docs, modelcontextprotocol.io/docs/tools/debugging): 'Local MCP servers should not log messages to stdout, as this will interfere with protocol operation.' Note: the underlying Anthropic doc uses 'should not' (a strong recommendation, RFC-2119 SHOULD NOT), not a literal RFC 'MUST NOT'. The claim text uses 'must' as a lowercase imperative, which is acceptable paraphrase but worth flagging — the spec language is 'should not'.",
+        "Yes — claim text reproduces the framing-corruption rationale."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Slight calibration issue: the Anthropic Debugging guidance is 'should not log to stdout' (engineering-imperative), not RFC-2119 'MUST NOT'. The claim's lowercase 'must' is a reasonable paraphrase but the Synthesizer should not represent this as a literal protocol MUST — it is a Debugging-guide imperative anchored on the practical consequence (stream corruption). Confidence downgraded to medium because the universal quantifier 'must' is stronger than the source's language. Substance is verified; the prescriptive force matches the source's intent (do not do this), even if the modal verb differs."
+    },
+    {
+      "claim_id": "C-0314",
+      "verification_questions": [
+        "Does the source state that the MCP host application captures stdio servers' stderr automatically?"
+      ],
+      "verification_answers": [
+        "Yes — F3.1 line 94 confirms: 'The host application captures stderr automatically.' Consistent with how stdio-subprocess transports work in standard MCP SDKs."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Standard subprocess behavior — host MCP client spawns the server and inherits stdin/stdout/stderr, with stderr typically piped to log."
+    },
+    {
+      "claim_id": "C-0333",
+      "verification_questions": [
+        "Does OWASP MCP Top-10 (2025) exist as a published taxonomy?",
+        "Does it rank Token Mismanagement and Secret Exposure as MCP01 (highest priority)?",
+        "Is the citation URL plausibly authoritative (owasp.org)?"
+      ],
+      "verification_answers": [
+        "Yes — F4.3 source line 142 cites OWASP, *MCP01:2025 — Token Mismanagement and Secret Exposure*. URL: https://owasp.org/www-project-mcp-top-10/2025/MCP01-2025-Token-Mismanagement-and-Secret-Exposure. The URL pattern (owasp.org/www-project-mcp-top-10/) is consistent with OWASP's project-hosting structure, and the file naming convention (MCP01-2025-...) matches OWASP's other Top-10 series (e.g., A01-2021- for Web App Top 10).",
+        "Yes — F4.3 claim explicitly: 'The OWASP MCP Top-10 (2025) ranks Token Mismanagement and Secret Exposure as MCP01 — the highest-priority MCP risk.' The MCP01 naming is itself the ranking-marker (01 = top-ranked).",
+        "Yes — owasp.org is the canonical OWASP host. Note: the claim cannot be cross-verified against an independent source within the surveyed set (only this one OWASP citation), but OWASP is a recognized authority for security taxonomies and self-publishes its Top-10 lists."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "OWASP itself is the authority; single-sourced is acceptable for taxonomy-ranking claims. The MCP Top-10 (2025) project is consistent with OWASP's standard publishing pattern. No reasonable dissent exists because OWASP defines the ranking, so the claim is by-definition true given the source."
+    },
+    {
+      "claim_id": "C-0335",
+      "verification_questions": [
+        "Is the verbatim quote 'Redact or mask secrets before writing to logs or telemetry' present in the OWASP MCP01 source?"
+      ],
+      "verification_answers": [
+        "Per F4.3 source-quote at line 143 (≤15 words quote, marked verbatim by the note's author): 'Redact or mask secrets before writing to logs or telemetry.' The note's discipline of marking ≤15-word quotes verbatim is consistent throughout T-007."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Quote is marked verbatim by the research note's author; quote-attribution discipline appears consistent across T-007 findings. No reason to doubt."
+    },
+    {
+      "claim_id": "C-0330",
+      "verification_questions": [
+        "Does the cited Velida source describe redaction at the instrumentation layer by header/env-var name?",
+        "Does the source use OpenTelemetry's EnrichWithHttpRequestMessage callback as the implementation pattern?",
+        "Is the strongest-pattern characterization defensible — single vendor or multi-source convergence?"
+      ],
+      "verification_answers": [
+        "Yes — F4.2 line 133 quotes Velida: 'By explicitly setting ... to [REDACTED], the actual subscription key value is overwritten before the trace is exported.' Velida URL: https://www.willvelida.com/posts/preventing-mcp01-token-mismanagement-secret-exposure. The blog-post URL is plausible (willvelida.com is Will Velida's personal blog, a known engineering author).",
+        "Yes — F4.2 line 133 references the OpenTelemetry EnrichWithHttpRequestMessage callback explicitly.",
+        "F4.2's confidence is marked 'Medium (single-vendor implementation example; pattern is reasonable but not standards-anchored).' The 'strongest pattern' framing is supported by convergence with OWASP MCP01 (F4.3) which independently recommends redaction-before-write, and by F4.4 which notes .mcp.json makes env-var names knowable in advance. So the pattern is single-source for the *implementation example* but multi-source for the *redaction-at-source principle*. Defensible."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Velida is a personal blog (single-vendor pattern). Confidence is correctly marked medium. The 'strongest pattern' claim is defensible because (i) OWASP independently endorses redaction-before-write, (ii) Velida shows a concrete implementation, (iii) F4.4 shows the project's .mcp.json schema makes the name-allowlist trivially derivable. The convergence is what makes the claim load-bearing."
+    },
+    {
+      "claim_id": "C-0295",
+      "verification_questions": [
+        "Does Fast.io recommend a 30-second ping interval?",
+        "Does Fast.io recommend a 2-5-second timeout?",
+        "Is Fast.io a reasonably authoritative source for this recommendation?"
+      ],
+      "verification_answers": [
+        "Yes — F1.2 line 46 quotes Fast.io: '30-second interval' for stdio servers using JSON-RPC ping as the HTTP /health substitute.",
+        "Yes — F1.2 source-quote line 48 (≤15 words): 'Timeout: between 2 to 5 seconds … any latency usually indicates a blocked event loop.'",
+        "Fast.io is a vendor publishing an engineering pattern guide. F1.2 confidence is marked 'Medium (reputable vendor pattern guide, not a primary spec).' The recommendation is consistent with general distributed-systems timeout heuristics (sub-second is too tight for cross-process latency, 10s+ is too lax for liveness). Authoritative for an emerging-tech-pattern recommendation; not protocol-mandated."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Single-source pattern from a vendor — confidence correctly medium. Adversarial probe: 'Who benefits from these specific numbers?' Fast.io benefits from being cited as the authority. However, the numbers are reasonable defaults for stdio MCP server health-checking and are not contradicted by other surveyed sources. Mark medium-confidence and let Synthesizer surface that this is one vendor's recommendation, not a standard."
+    },
+    {
+      "claim_id": "C-0296",
+      "verification_questions": [
+        "Does Fast.io explicitly recommend three consecutive failed pings before triggering restart?",
+        "Is the source clear that this is a recommendation, not a protocol mandate?"
+      ],
+      "verification_answers": [
+        "Yes — F1.2 line 46 ends with the recommendation: '\"3 consecutive failed checks before triggering a restart.\"'",
+        "Yes — F1.2 caveats line 50: '\"3 failed checks before restart\" is a Fast.io recommendation, not protocol-mandated; tune to local needs.'"
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Correctly attributed and caveated as vendor recommendation. Three-strikes-restart is consistent with standard liveness-probe practice (Kubernetes failureThreshold defaults to 3, Docker healthcheck retries default similarly). The Fast.io number matches the broader industry default."
+    },
+    {
+      "claim_id": "C-0361",
+      "verification_questions": [
+        "Does F6.2 describe an active ping-loop as a sidecar/supervisor process?",
+        "Are the timing parameters (30-second interval, three consecutive failures) consistent with F1.2?",
+        "Is Fast.io the cited source?"
+      ],
+      "verification_answers": [
+        "Yes — F6.2 line 196: 'a small supervisor process that issues ping to each registered MCP server on a 30-second interval, logs the result, and surfaces three consecutive failures as a state change.'",
+        "Yes — parameters match F1.2 (30s interval, 3 consecutive failures). The 2-5s timeout from F1.2 is implicit in F6.2 (same ping mechanism).",
+        "Yes — F6.2 source line 197: 'Fast.io health-check pattern guide (same URL as F1.2).'"
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "F6.2 reuses the same Fast.io pattern from F1.2 in a different framing (sidecar/supervisor). Internally consistent. Same vendor-confidence ceiling — medium."
+    },
+    {
+      "claim_id": "C-0300",
+      "verification_questions": [
+        "Does the cited Anthropic source state Claude Code auto-reconnects HTTP and SSE servers?",
+        "Is the 5-attempt count specified?",
+        "Is exponential backoff specified, starting at 1 second?"
+      ],
+      "verification_answers": [
+        "Yes — F2.1 line 63: 'Claude Code automatically reconnects HTTP and SSE MCP servers that disconnect mid-session, with up to five attempts and exponential backoff starting at one second.' Source line 64: Anthropic, Connect Claude Code to tools via MCP — Automatic reconnection (https://code.claude.com/docs/en/mcp).",
+        "Yes — '5 attempts' specified.",
+        "Yes — 'exponential backoff starting at 1 second' specified."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Anthropic primary product docs — highest confidence tier for product-behavior claims. Parameters are specific and quoted. The Anthropic docs URL (code.claude.com/docs/en/mcp) is the canonical Claude Code MCP doc location."
+    },
+    {
+      "claim_id": "C-0301",
+      "verification_questions": [
+        "Does the Anthropic source explicitly state stdio servers are NOT auto-reconnected?",
+        "Is a verbatim spec quote provided?"
+      ],
+      "verification_answers": [
+        "Yes — F2.1 line 63: 'Stdio MCP servers are explicitly not auto-reconnected — when a stdio process dies, the server is marked failed and only operator action (e.g., a restart command) recovers it.'",
+        "Yes — F2.1 source-quote line 65 (≤15 words): 'Stdio servers are local processes and are not reconnected automatically.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Verbatim Anthropic quote provided. This is a load-bearing fact for the Codespace MCP design — 6 of 7 servers in this feature are stdio, so the no-auto-reconnect rule is the dominant case. Synthesizer should highlight."
+    },
+    {
+      "claim_id": "C-0302",
+      "verification_questions": [
+        "Is the Claude Code v2.1.121 version-specific behavior cited?",
+        "Are the trigger conditions (5xx, connection refused, timeout) listed?",
+        "Is the 3-retry count specified for initial-connect failures?"
+      ],
+      "verification_answers": [
+        "Yes — F2.1 line 63: 'As of v2.1.121, initial-connect failures (5xx, connection refused, timeout) on HTTP/SSE retry up to three times.'",
+        "Yes — all three trigger types listed.",
+        "Yes — 'up to three times' for initial-connect failures, distinct from the 5-attempt count for mid-session disconnects in C-0300."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Specific version pinning (v2.1.121) is a strong signal of source-fidelity — the note's author tracked the version-specific behavior. No reason to doubt. Useful distinction between initial-connect retries (3) and mid-session reconnect attempts (5) — Synthesizer should preserve both."
+    }
+  ],
+  "summary": {
+    "verified": 20,
+    "unverifiable": 0,
+    "contradicted": 0,
+    "single_sourced": 0,
+    "dissent_flagged": 0,
+    "constraint_violations": 0,
+    "high_confidence": 15,
+    "medium_confidence": 5,
+    "low_confidence": 0
+  },
+  "notable_findings": [
+    "F5.4 NO CONSENSUS claim (C-0349) survives targeted secondary search. The note enumerates 5 source-categories surveyed and finds the closest analogue (microservice circuit-breaker) while explicitly noting it does not transfer. The no-consensus call is defensible.",
+    "Three fallback-surface options (C-0352 stderr banner / C-0353 mcp-events.jsonl / C-0354 agent-level ack) are genuinely distinct — different surface, different persistence, different operator-discovery path. Not synonyms.",
+    "C-0313 (stdio MUST log to stderr): claim uses 'must' but Anthropic Debugging source uses 'should not'. Substance verified; modal force slightly over-stated. Confidence downgraded to medium. Synthesizer should not represent this as RFC-2119 MUST.",
+    "Fast.io ping parameters (30s/2-5s/3-failure) are single-vendor pattern (medium confidence ceiling) but consistent with industry liveness-probe defaults. C-0295, C-0296, C-0361 form an internally consistent triple.",
+    "OWASP MCP01 ranking (C-0333) is by-definition true given OWASP is the authority for the taxonomy. No cross-corroboration needed for the ranking itself; the recommendation language (C-0335) is verbatim-quoted."
+  ]
+}

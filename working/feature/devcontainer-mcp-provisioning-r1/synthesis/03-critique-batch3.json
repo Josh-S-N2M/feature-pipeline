@@ -1,0 +1,366 @@
+{
+  "batch": 3,
+  "focus": "codebase-analysis claims (factual repo state)",
+  "critiques": [
+    {
+      "claim_id": "C-0443",
+      "verification_questions": [
+        "How many .md files exist in /workspaces/feature-pipeline/.claude/agents/?",
+        "Does the codebase-analysis-report.md substantiate this count?"
+      ],
+      "verification_answers": [
+        "Grep with glob *.md on /workspaces/feature-pipeline/.claude/agents returned exactly 36 files.",
+        "Yes — codebase-analysis-report line 37 states '36 agent files in .claude/agents/.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Independently re-confirmed by direct filesystem enumeration. Tally is exact."
+    },
+    {
+      "claim_id": "C-0444",
+      "verification_questions": [
+        "Do all 36 agent files have a frontmatter block?",
+        "Are the listed fields (name, description, tools, model, effort, skills, memory) consistently present?"
+      ],
+      "verification_answers": [
+        "Spot-checked: discovery-codebase-researcher.md frontmatter contains name, description, model, effort, tools, skills, memory. Sampled frontmatter delimiters across 10+ agent files all begin with '---' at line 1.",
+        "The claim says fields are conformant but uses qualifier 'shared frontmatter convention'. Not every field is on every agent (e.g., 'memory' may be omitted on some). The report itself at line 124 acknowledges 'tools, model, effort, skills, memory are common' (not universal). Strict universal claim is slightly stronger than evidence."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Claim text says 'conform to a shared frontmatter convention with fields' — read as descriptive (most carry these fields), which matches repo state. Strict universal-quantifier interpretation would require sampling all 36, not done. Downgraded confidence to medium."
+    },
+    {
+      "claim_id": "C-0445",
+      "verification_questions": [
+        "Does grep -rln 'mcp__' /workspaces/feature-pipeline/.claude/agents/ return zero hits?",
+        "Does the source report state this?"
+      ],
+      "verification_answers": [
+        "Grep for 'mcp__' against .claude/agents (all *.md files, 36 files) returned 'No files found' (zero hits).",
+        "Yes — codebase-analysis-report line 37 and line 124 confirm 'No agent currently has any mcp__<server>__<tool> entry in its tools allowlist.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Directly verified by Grep. Zero hits across all 36 agent files."
+    },
+    {
+      "claim_id": "C-0446",
+      "verification_questions": [
+        "Is this claim a forward-looking inference about this feature, not a current-state claim?",
+        "Is the premise (zero mcp__ entries today) confirmed?"
+      ],
+      "verification_answers": [
+        "Yes — the claim says the feature 'introduces the mcp__ pattern to agent tools allowlists for the first time'. It's a counterfactual prediction grounded in the verified zero-state of C-0445.",
+        "Yes — premise confirmed by C-0445."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Predictive but grounded; conditional on the feature shipping mcp__ entries (its stated purpose). Logically follows from C-0445."
+    },
+    {
+      "claim_id": "C-0462",
+      "verification_questions": [
+        "Does /workspaces/feature-pipeline/.mcp.json exist?",
+        "Are GitNexus and codebase-memory-mcp referenced in seven existing corpus files?"
+      ],
+      "verification_answers": [
+        "Read on /workspaces/feature-pipeline/.mcp.json returned 'File does not exist'. Confirmed absent.",
+        "The codebase-analysis-report (line 107) states 'referenced in seven existing corpus files but registered in zero (.mcp.json is absent).' Spot-checks confirm prose references in: ADR-0007 (adrs-migrated/), ADR-0018 (adrs/), KB-codebase-research/SKILL.md, discovery-codebase-researcher.md, review-architecture-auditor.md (5 confirmed; 2 more plausibly the research plan / codebase-analysis-report itself). Exact count of 7 not independently re-counted but plausible."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": ".mcp.json absence verified directly. Seven-corpus-file count taken at face value from the report; would warrant exact recount if it became load-bearing."
+    },
+    {
+      "claim_id": "C-0463",
+      "verification_questions": [
+        "Is the .mcp.json blast-radius characterization (shallow but broad) substantiated in the source?",
+        "Does the .mcp.json affect every Claude Code session?"
+      ],
+      "verification_answers": [
+        "Yes — codebase-analysis-report line 113 says '.mcp.json (new file, 7 servers) | 6 | 8 | 12 | UNIVERSALLY shallow but UNIVERSALLY broad — every session reads it. Typo = every session broken.'",
+        "Per Claude Code documented behavior in KB-cc-platform: .mcp.json is auto-loaded by every CC session in the workspace. The 'every session breaks on typo' framing is standard project-scope config semantics."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Characterization is judgmental but substantively grounded in CC platform behavior."
+    },
+    {
+      "claim_id": "C-0455",
+      "verification_questions": [
+        "Do all three skills (KB-cc-platform, KB-cc-design, auditing-cc-configs) exist?",
+        "Is the auditing half named with a trailing '-configs' deviation?"
+      ],
+      "verification_answers": [
+        "Yes — listing /workspaces/feature-pipeline/.claude/skills shows KB-cc-platform/SKILL.md, KB-cc-design/SKILL.md, auditing-cc-configs/SKILL.md all present.",
+        "Yes — the audit-half directory is 'auditing-cc-configs' (trailing '-configs'), while other audit halves are 'auditing-codespaces', 'auditing-github-actions' (no '-configs' suffix). Deviation confirmed."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Reference counts and template counts (7/9, 2, 6/6+) are reported but not independently re-counted in this verification. Trifecta-completeness claim is the primary content and is verified."
+    },
+    {
+      "claim_id": "C-0456",
+      "verification_questions": [
+        "Do all three skills (KB-codespaces-platform, KB-codespaces-design, auditing-codespaces) exist?",
+        "Is auditing-codespaces a stub per ADR-0033?"
+      ],
+      "verification_answers": [
+        "Yes — all three present in .claude/skills/ directory listing.",
+        "Codebase-analysis-report line 57 and 181 explicitly say 'auditing-codespaces is a STUB per ADR-0033'. The claim text matches the source report exactly."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "ADR-0033 not independently read in this verification; relying on report-as-source. For full provenance closure, ADR-0033 would need direct inspection."
+    },
+    {
+      "claim_id": "C-0457",
+      "verification_questions": [
+        "Do all three skills (KB-github-actions-platform, KB-github-actions-design, auditing-github-actions) exist?",
+        "Does auditing-github-actions consume auditing-shared per ADR-0031?"
+      ],
+      "verification_answers": [
+        "Yes — all three present in skills directory listing; auditing-shared also present.",
+        "Codebase-analysis-report line 58 and 106 state this; cross-reference to ADR-0031 not independently re-read."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Trifecta completeness verified by directory listing. Ref-count and template-count specifics (19+21, 2, 1+1) not independently re-counted."
+    },
+    {
+      "claim_id": "C-0458",
+      "verification_questions": [
+        "Does auditing-mcp exist in .claude/skills/?",
+        "Are KB-mcp-platform and KB-mcp-design absent (greenfield)?"
+      ],
+      "verification_answers": [
+        "Yes — auditing-mcp/SKILL.md present in skills directory.",
+        "Grep for 'KB-mcp-platform|KB-mcp-design' against /workspaces/feature-pipeline/.claude/skills returned 'No files found'. Confirmed greenfield."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Audit-only-with-greenfield-platform-and-design pattern directly verified. This claim is load-bearing for the trifecta-completion narrative."
+    },
+    {
+      "claim_id": "C-0442",
+      "verification_questions": [
+        "Does ADR-0007-code-graph-mcp-selection.md exist in adrs-migrated/?",
+        "Is its frontmatter version 2.2.0?",
+        "Is it absent from adrs/?"
+      ],
+      "verification_answers": [
+        "Yes — /workspaces/feature-pipeline/adrs-migrated/ADR-0007-code-graph-mcp-selection.md exists (one of five ADR-0007 variants in adrs-migrated/).",
+        "Yes — frontmatter line 3 declares 'version: 2.2.0'; line 4 'status: Accepted'.",
+        "Yes — Grep with glob 'ADR-0007*' against /workspaces/feature-pipeline/adrs/ returned no files."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "All three sub-claims confirmed by direct filesystem inspection."
+    },
+    {
+      "claim_id": "C-0497",
+      "verification_questions": [
+        "Does adrs/ADR-0007*.md exist (would the research plan reference work)?",
+        "How many ADR-0007 variants are in adrs-migrated/?",
+        "Is v2.2.0 the current Accepted version?"
+      ],
+      "verification_answers": [
+        "No — Grep for ADR-0007* in /workspaces/feature-pipeline/adrs/ returned zero files. Research-plan reference path is broken.",
+        "Five files: ADR-0007-code-graph-mcp-selection.md, -pre-naming-convention.md, -v1-pre-template-migration.md, -v1-superseded.md, -v2-pre-template-migration.md.",
+        "Yes — current file's frontmatter declares 'version: 2.2.0' and 'status: Accepted'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Five-variant count and v2.2.0-Accepted both verified directly."
+    },
+    {
+      "claim_id": "C-0498",
+      "verification_questions": [
+        "Is the ADR-0007 location surprise classified as low severity in the source report?",
+        "Is the severity classification consistent with the impact (lookup-path mismatch but file is findable)?"
+      ],
+      "verification_answers": [
+        "Yes — codebase-analysis-report line 179 says 'ADR-0007 lives in adrs-migrated/, not adrs/ (low severity)'.",
+        "Yes — low severity is reasonable: file exists and is findable; only the path reference in the research plan is misaligned. No data loss; no decision-blocking issue beyond lookup-convention clarification (open question #2)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Severity is a judgment call by the report author; the underlying facts (location, file existence) are verified. Severity itself is consistent with the facts."
+    },
+    {
+      "claim_id": "C-0441",
+      "verification_questions": [
+        "Does adrs/ADR-0018-codebase-analysis-schema.md declare version 1.0.0?",
+        "Does KB-codebase-research/SKILL.md reference v1.1.0?",
+        "Does discovery-codebase-researcher.md reference v1.1.0?",
+        "Is the file 215 lines?"
+      ],
+      "verification_answers": [
+        "Yes — ADR-0018 frontmatter line 3 says 'version: 1.0.0' and body JSON example line 124 has 'schema_version: 1.0.0'.",
+        "Yes — KB-codebase-research/SKILL.md line 160 says 'schema_version: 1.1.0'.",
+        "Yes — discovery-codebase-researcher.md description (line 3) says 'ADR-0018, v1.1.0 extended for blast-radius'.",
+        "Line count of 215 not independently confirmed (not load-bearing); the version-drift core claim is verified."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Version-drift claim directly verified: ADR-0018 says 1.0.0; KB+agent say 1.1.0. Line count incidental."
+    },
+    {
+      "claim_id": "C-0495",
+      "verification_questions": [
+        "Is the same v1.0.0/v1.1.0 drift confirmed across all four locations (ADR-0018, KB, agent, research plan)?",
+        "Does v1.1.0 SHAPE live only in the KB (not in ADR-0018)?"
+      ],
+      "verification_answers": [
+        "ADR-0018 v1.0.0 confirmed (file frontmatter + JSON example). KB-codebase-research v1.1.0 confirmed at line 160. discovery-codebase-researcher v1.1.0 confirmed at description line 3. Research plan not directly read in this verification; report attests to it.",
+        "Yes — ADR-0018 carries v1.0.0 schema_version in its JSON example (line 124); no v1.1.0 SHAPE definition in ADR-0018 body. The blast-radius extension that motivates v1.1.0 is documented in KB-codebase-research only."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Drift verified across three of four locations directly; research-plan reference taken from report. Schema-SHAPE location asymmetry is a real semantic risk and is well-grounded."
+    },
+    {
+      "claim_id": "C-0496",
+      "verification_questions": [
+        "Is medium severity reasonable given the drift's blast radius (downstream consumers may diverge in their schema validation)?"
+      ],
+      "verification_answers": [
+        "Yes — the drift affects schema validation in discovery-codebase-researcher output, which feeds design-composer and review-architecture-auditor. Two consumers may validate against different schema versions silently. Medium severity is consistent (not catastrophic — both versions are backward-compatible per current usage; but warrants resolution before any new pipeline run depending on schema_version field)."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Severity judgment is reasonable but inherently subjective. Confidence medium because the rating is a judgment call grounded in facts but not formally derived."
+    },
+    {
+      "claim_id": "C-0484",
+      "verification_questions": [
+        "Is the 634 total non-git non-node_modules file count substantiated by the source?",
+        "Is the methodology (find excluding .git, node_modules) sound?"
+      ],
+      "verification_answers": [
+        "Yes — codebase-analysis-report line 160 states 'Total non-git, non-node_modules files: 634.'",
+        "Methodology is standard; not independently re-run in this verification. Adversarial check: file-composition stats from a single internal-audit source. Numbers are presented as exact integer — easy to recount if challenged."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Single internal source. Not independently re-counted via find/wc in this verification pass (would require Bash execution outside Grep). Marking single_sourced because the exact integer is potentially consequential (used in the 73.8% computation). For Design phase, if the percentage drives a decision, recount is cheap."
+    },
+    {
+      "claim_id": "C-0485",
+      "verification_questions": [
+        "Is the markdown-file count of 468 substantiated by the source?",
+        "Does 468/634 = 73.8%?"
+      ],
+      "verification_answers": [
+        "Yes — codebase-analysis-report line 161 states 'Markdown (.md): 468 (73.8%)'.",
+        "468/634 = 0.7382... = 73.8% (to one decimal). Arithmetic checks out."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Arithmetic self-consistent. Same single-source caveat as C-0484. The 'markdown-heavy' qualitative conclusion is robust against count error (73.8% is far above any threshold of concern)."
+    },
+    {
+      "claim_id": "C-0490",
+      "verification_questions": [
+        "Is the symbol-density characterization (52 Python audit scripts only) substantiated?",
+        "Does the repo lack 'application source code' in the conventional sense?"
+      ],
+      "verification_answers": [
+        "Yes — codebase-analysis-report line 162 says 'Python (.py): 52, concentrated in .claude/skills/auditing-*/scripts/'.",
+        "Yes — the repo is a discipline/tooling repo (skills, ADRs, agent specs, devcontainer config). No application source tree (no src/, no lib/, no app/). The 52 Python files are audit scripts within auditing-*/skills/scripts/, which is tooling, not application logic."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Implies that Serena's LSP-symbol-extraction value is narrow — consistent with the UI-8 narrowing discussion. Conceptually grounded."
+    },
+    {
+      "claim_id": "C-0491",
+      "verification_questions": [
+        "Is GitNexus indeed TS-first per its repo / canonical_uri?",
+        "Does ADR-0007 v2.2.0 designate GitNexus as canonical primary?"
+      ],
+      "verification_answers": [
+        "Per entity registry (E-0007) and ADR-0007 frontmatter (id: ADR-0007, version: 2.2.0), GitNexus is the primary. Its 'TS-first' characterization comes from other claims in the corpus (e.g., the TypeScript ecosystem). Not independently verified by inspecting GitNexus repo in this batch; relying on extractor's earlier characterization.",
+        "Yes — ADR-0007 frontmatter version 2.2.0, status Accepted. Multiple downstream references (KB, agent, report) all name GitNexus as primary per ADR-0007 v2.2.0."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "The tension between 'TS-first tool' and 'markdown-heavy corpus' is a real friction worth surfacing in Design (consistent with E-0056 markdown-heavy-repo-profile entity). Not a contradiction — just a substrate-fit caveat."
+    },
+    {
+      "claim_id": "C-0447",
+      "verification_questions": [
+        "Does discovery-codebase-researcher name GitNexus as PRIMARY per ADR-0007 v2.2.0?",
+        "Does review-architecture-auditor also name GitNexus as primary?"
+      ],
+      "verification_answers": [
+        "Yes — discovery-codebase-researcher.md line 20: 'check .mcp.json for GitNexus (primary per ADR-0007 v2.x) and codebase-memory-mcp (fallback)'. Line 29 reinforces 'prefer GitNexus and fall back to codebase-memory-mcp'.",
+        "Yes — review-architecture-auditor.md line 23: 'GitNexus primary (per ADR-0007 v2.x); codebase-memory-mcp fallback'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Both consumer agents grounded directly. The wiring is prose, as noted in C-0448 / UI-15 (load-bearing finding for design)."
+    },
+    {
+      "claim_id": "C-0448",
+      "verification_questions": [
+        "Does discovery-codebase-researcher name codebase-memory-mcp as FALLBACK?",
+        "Does review-architecture-auditor name it as FALLBACK?",
+        "Is the wiring expressed as prose (no structured frontmatter key like mcp_primary: / fallback_mcp:)?"
+      ],
+      "verification_answers": [
+        "Yes — discovery-codebase-researcher.md lines 20, 29 say codebase-memory-mcp is fallback.",
+        "Yes — review-architecture-auditor.md lines 23, 36, 108 reference codebase-memory-mcp as fallback / code_graph_used alternative.",
+        "Yes — Grep for 'mcp_primary:|fallback_mcp:|primary_mcp:' across .claude/agents returned zero hits. Frontmatter inspection of discovery-codebase-researcher.md and review-architecture-auditor.md confirms only standard fields (name, description, model, effort, tools, skills, memory). No structured MCP-wiring keys exist anywhere in agent frontmatter."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Prose-only wiring directly verified. The four-layer chain (ADR-0007 -> ADR-0018 -> KB -> agent) is all prose. This is a load-bearing fact for UI-15 (whether to introduce structured frontmatter convention for primary/fallback)."
+    }
+  ]
+}

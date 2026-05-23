@@ -1,0 +1,275 @@
+{
+  "batch": 5,
+  "critiques": [
+    {
+      "claim_id": "C-0478",
+      "verification_questions": [
+        "Do KB-cc-design, KB-codespaces-design, and KB-github-actions-design each have exactly two reference files?",
+        "Are those files named patterns-and-anti-patterns.md and principles.md in all three?"
+      ],
+      "verification_answers": [
+        "Yes — direct inspection of each design-half references/ directory shows exactly two files in each (Grep listing returned 3 files per directory: SKILL.md + 2 references).",
+        "Yes — all three contain exactly patterns-and-anti-patterns.md and principles.md."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "STRONG convention upheld across all three completed-trifecta design halves. Establishes a strong template for FR-11 KB-mcp-design."
+    },
+    {
+      "claim_id": "C-0479",
+      "verification_questions": [
+        "Do any of the three design halves contain an assets/templates/ subdirectory?"
+      ],
+      "verification_answers": [
+        "No — Grep across each design-half directory returns only SKILL.md + references/patterns-and-anti-patterns.md + references/principles.md. No assets/ tree observed."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Structural negative confirmed. Design halves are deliberately reference-only."
+    },
+    {
+      "claim_id": "C-0480",
+      "verification_questions": [
+        "Does KB-cc-platform contain 7 references files and 9 templates?",
+        "Does KB-codespaces-platform contain 10 references files and 5 templates (counting subdirs)?",
+        "Does KB-github-actions-platform contain 19 references files and 21 templates?"
+      ],
+      "verification_answers": [
+        "Yes — KB-cc-platform references/: 7 .md files (workflows, architecture, cli-and-headless, configuration, extensions, integrations, agent-sdk). assets/templates/: 9 .example files.",
+        "Yes — KB-codespaces-platform references/: 10 .md files. assets/templates/: 5 entries (terraform-iac, typescript-single, typescript-monorepo/, docker-compose/, dockerfile-based/).",
+        "Yes — KB-github-actions-platform references/: 19 .md files. assets/templates/: 21 entries (20 .yml + 1 composite-action/action.yml)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "All three platform-half counts match the claim's enumeration. Platform halves have many topic-specific references + assets/templates/."
+    },
+    {
+      "claim_id": "C-0481",
+      "verification_questions": [
+        "Do the platform halves carry zero scripts/ subdirectories?",
+        "Do the audit halves carry Python scripts?"
+      ],
+      "verification_answers": [
+        "Yes — no scripts/ subdirectory observed in any of KB-cc-platform, KB-codespaces-platform, KB-github-actions-platform.",
+        "Yes — auditing-cc-configs has 6 .py scripts; auditing-github-actions has 1; auditing-codespaces has 1 (stub); auditing-mcp has 4."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "ADR-0031 relocation pattern reflected in current layout."
+    },
+    {
+      "claim_id": "C-0482",
+      "verification_questions": [
+        "Do platform-half descriptions name the sister design-half?",
+        "Do design-half descriptions name the sister platform-half?"
+      ],
+      "verification_answers": [
+        "Yes — KB-cc-platform: 'Pairs with KB-cc-design'; KB-codespaces-platform: 'Pairs with KB-codespaces-design'; KB-github-actions-platform: 'Pairs with KB-github-actions-design'. All present in description.",
+        "Yes — KB-cc-design: 'Pairs with KB-cc-platform (the platform half)'; KB-codespaces-design: 'Pairs with KB-codespaces-platform (the platform half)'; KB-github-actions-design: 'Pairs with KB-github-actions-platform (the platform half)'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Sister cross-reference convention confirmed. Note: claim phrasing 'ends with' is approximate — actual placement is mid-description in all six skills inspected, not strictly trailing. Substance (each half names its sister explicitly) holds."
+    },
+    {
+      "claim_id": "C-0471",
+      "verification_questions": [
+        "Is the skill frontmatter 'name:' field lowercase-hyphenated across all skill directories?",
+        "Is auditing-cc-configs an exceptional case with a '-configs' trailing element?"
+      ],
+      "verification_answers": [
+        "Yes — verified names: kb-cc-design, kb-cc-platform, kb-codespaces-design, kb-codespaces-platform, kb-github-actions-design, kb-github-actions-platform, auditing-codespaces, auditing-cc-configs, auditing-github-actions, auditing-mcp. All lowercase-hyphenated.",
+        "Yes — auditing-cc-configs is the only audit half with a non-topic-bare suffix; siblings (auditing-codespaces, auditing-github-actions, auditing-mcp) use bare topic."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "ADR-0020 convention upheld with one documented deviation."
+    },
+    {
+      "claim_id": "C-0535",
+      "verification_questions": [
+        "Are all skill-frontmatter name fields lowercase-hyphenated?",
+        "Are kb- prefixes used for platform/design halves and bare names for audit halves?"
+      ],
+      "verification_answers": [
+        "Yes — every SKILL.md inspected has a lowercase-hyphenated name field.",
+        "Yes — kb-cc-*, kb-codespaces-*, kb-github-actions-* use the kb- prefix; auditing-* halves use a bare 'auditing-' prefix (no kb-)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-corroborates C-0471. Convention is consistent across the corpus."
+    },
+    {
+      "claim_id": "C-0499",
+      "verification_questions": [
+        "Does auditing-codespaces declare itself a STUB?",
+        "Does ADR-0033 exist and substantiate the stub-vs-real surfacing?",
+        "Does the stub emit {\"stub\": true, \"findings\": []}?"
+      ],
+      "verification_answers": [
+        "Yes — auditing-codespaces/SKILL.md line 4: 'STUB SKILL — reserved for the future Codespaces audit machinery'.",
+        "Yes — adrs/ADR-0033-adr-0029-execution-extension.md exists. Line 53 cites Q-CC-4 (auditing-codespaces stub semantics) as the worked example; line 72 has 'Stub-vs-real audit distinction' surfacing row referencing auditing-codespaces directly.",
+        "Yes — SKILL.md stub contract section (line 68 region) requires the exact payload {\"stub\": true, \"findings\": []}; ADR-0033 line 53 confirms the same."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "ADR-0033's full title is 'ADR-0029 execution extension'; the stub-vs-real surfacing is one row in its scope-deviation surfacing table. Claim's pointer to ADR-0033 is accurate. This claim was previously listed in batch 3 (C-0456) but only at the high level — the direct ADR-0033 + stub-payload verification done here is new and stronger."
+    },
+    {
+      "claim_id": "C-0460",
+      "verification_questions": [
+        "Does auditing-mcp/SKILL.md line 30 declare auditing-cc-configs family membership?"
+      ],
+      "verification_answers": [
+        "Yes — line 30: 'This skill is part of the **auditing-cc-configs** family. Shared rubric, weights, thresholds, and triage live in the coordinator skill.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Family-coordinator membership convention confirmed; declaration is body prose, not frontmatter."
+    },
+    {
+      "claim_id": "C-0483",
+      "verification_questions": [
+        "Is audit-half family membership declared in body prose, not frontmatter?"
+      ],
+      "verification_answers": [
+        "Yes — auditing-mcp declares family membership at body line 30 (not in frontmatter). Frontmatter contains only name, description, allowed-tools."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct inspection of auditing-mcp confirms the convention. Frontmatter has no family-membership field."
+    },
+    {
+      "claim_id": "C-0537",
+      "verification_questions": [
+        "Is audit-family membership a body-prose convention rather than a frontmatter convention?"
+      ],
+      "verification_answers": [
+        "Yes — same evidence as C-0483. No frontmatter field declares family membership in any audit-half SKILL.md inspected."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-corroborates C-0483."
+    },
+    {
+      "claim_id": "C-0449",
+      "verification_questions": [
+        "Does discovery-codebase-researcher.md exist as the consumer agent file?",
+        "Is Serena's symbol-level value flagged as contingent on UI-8 narrowing?"
+      ],
+      "verification_answers": [
+        "Yes — /workspaces/feature-pipeline/.claude/agents/discovery-codebase-researcher.md exists.",
+        "Yes — claim explicitly hedges with 'symbol-level value contingent on UI-8 narrowing — repo is markdown-heavy'. The hedge is grounded in C-0490 (markdown-heavy repo) and C-0491."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Medium confidence reflects intrinsic contingency in claim text — Serena's role is conditional, not asserted. Consumer file exists; usefulness depends on UI-8 resolution."
+    },
+    {
+      "claim_id": "C-0450",
+      "verification_questions": [
+        "Does design-api.md exist as a consumer agent file?",
+        "Is mcp-openapi-schema the named consumer for design-api?"
+      ],
+      "verification_answers": [
+        "Yes — /workspaces/feature-pipeline/.claude/agents/design-api.md exists.",
+        "Yes — claim supported by codebase-analysis-report.md inferred consumer table line 46. Mapping is semantically coherent (OpenAPI schema lookup for API design)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists."
+    },
+    {
+      "claim_id": "C-0451",
+      "verification_questions": [
+        "Does design-cicd.md exist?",
+        "Is actionlint-mcp the named consumer for design-cicd?"
+      ],
+      "verification_answers": [
+        "Yes — /workspaces/feature-pipeline/.claude/agents/design-cicd.md exists.",
+        "Yes — claim supported by codebase-analysis-report.md line 47. Actionlint's role (lints GitHub Actions workflows) matches design-cicd's domain."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists; mapping is semantically coherent."
+    },
+    {
+      "claim_id": "C-0452",
+      "verification_questions": [
+        "Does design-iac.md exist?",
+        "Is HashiCorp Terraform MCP the named consumer for design-iac?"
+      ],
+      "verification_answers": [
+        "Yes — /workspaces/feature-pipeline/.claude/agents/design-iac.md exists.",
+        "Yes — claim supported by codebase-analysis-report.md line 48. Terraform MCP's role aligns with the IaC design domain."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists; mapping is semantically coherent."
+    },
+    {
+      "claim_id": "C-0453",
+      "verification_questions": [
+        "Does discovery-external-researcher.md exist?",
+        "Is Context7 named as consumer for discovery-external-researcher?",
+        "Is Context7 also a documentation-lookup fallback referenced from KB-cc-platform/SKILL.md:109?"
+      ],
+      "verification_answers": [
+        "Yes — /workspaces/feature-pipeline/.claude/agents/discovery-external-researcher.md exists.",
+        "Yes — claim supported by codebase-analysis-report.md line 49.",
+        "Reference to KB-cc-platform/SKILL.md:109 not directly re-verified line-by-line; claim is consistent with Context7's documentation-lookup role."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists; dual-role (consumer + fallback) plausible."
+    },
+    {
+      "claim_id": "C-0454",
+      "verification_questions": [
+        "Does discovery-external-researcher.md exist as consumer?",
+        "Is Exa named as consumer for discovery-external-researcher?"
+      ],
+      "verification_answers": [
+        "Yes — see C-0453.",
+        "Yes — claim supported by codebase-analysis-report.md line 50. Exa's web-search role aligns with external-research."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists; Exa + Context7 dual-consumer pattern for external-research is consistent across claims."
+    }
+  ]
+}

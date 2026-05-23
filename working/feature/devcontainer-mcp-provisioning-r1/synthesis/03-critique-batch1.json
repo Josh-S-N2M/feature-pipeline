@@ -1,0 +1,394 @@
+{
+  "batch": 1,
+  "batch_focus": "install path / base-image-fit claims (T-001 Serena, T-002 mcp-openapi-schema, T-003 actionlint-mcp, T-004 Terraform MCP, T-008 GitNexus)",
+  "claims_in_batch": 20,
+  "summary": {
+    "verified": 13,
+    "single_sourced": 5,
+    "partially_verified": 2,
+    "unverifiable": 0,
+    "contradicted": 0
+  },
+  "critiques": [
+    {
+      "claim_id": "C-0002",
+      "claim_text_short": "Canonical Serena install on Debian-bookworm Py3.11 is `uvx --from git+https://github.com/oraios/serena serena start-mcp-server`.",
+      "verification_questions": [
+        "Does the cited source list this exact command as the upstream install path?",
+        "Does the source confirm Python 3.10+ / 3.11 compatibility for this path?",
+        "Is `uvx` documented as the canonical entrypoint (not just a convenience)?"
+      ],
+      "verification_answers": [
+        "Yes — T-001 F-1 (line 30) reproduces the command verbatim and attributes it to upstream README.",
+        "Yes — F-1 caveat (line 34) notes README's example pins Python 3.13 but Python 3.10+ is documented as compatible (Itecs corroboration); base image is 3.11.",
+        "Yes — F-1 frames `uvx --from git+...` as the 'upstream-recommended install + launch path' (line 30); also serves as the directly-runnable form."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Two independent sources (upstream README + Itecs guide) per F-1 + F-2. Adversarial probe: 'What if uvx is not on PATH?' — C-0005 covers this (uv is not pre-installed on base image; must be added). No falsifier present in graph."
+    },
+    {
+      "claim_id": "C-0003",
+      "claim_text_short": "The uv tool is the only required prerequisite for Serena installation.",
+      "verification_questions": [
+        "Is there a verbatim upstream quote supporting 'only required prerequisite'?",
+        "Are LSP-backend prerequisites (e.g., DOTNET_ROOT) accounted for, or does 'only required' overstate?",
+        "Is the quote contextually about install-time or runtime prerequisites?"
+      ],
+      "verification_answers": [
+        "Yes — F-1 quote (line 32): 'Serena is managed by uv, and installing uv is the only required prerequisite.' (direct upstream quote).",
+        "Partially — F-5 notes some LSP backends (e.g., DOTNET_ROOT for F#) need env vars, but these are language-specific runtime prereqs not Serena install prereqs. Scope of 'only' is install, not multi-language LSP runtime.",
+        "Install-time. The quote describes the install workflow; language-server backend prereqs are downstream-of-install concerns."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Verbatim quote anchored. Universal-quantifier 'only' is qualified appropriately by F-5 in the same research note. Adversarial probe: 'What about Python itself?' — Python is provided by the base image and uv requires it, but uv-via-pip is a one-line install; not a separate prereq from Serena's POV."
+    },
+    {
+      "claim_id": "C-0005",
+      "claim_text_short": "The base image `mcr.microsoft.com/devcontainers/python:1-3.11-bookworm` lacks uv; must add via pip install uv or astral.sh installer.",
+      "verification_questions": [
+        "Does the source document the base image composition?",
+        "Is uv pre-installed in this specific image variant?",
+        "Are both install paths (pip install uv, astral.sh/uv) referenced in source?"
+      ],
+      "verification_answers": [
+        "Partially — T-001 F-1 (line 30) names the base image and asserts uv is not pre-installed; the assertion is the research-note author's, not directly quoted from Microsoft's image docs.",
+        "Per source claim, no — but this is a derived statement, not a sourced one.",
+        "Yes — F-1 mentions both `pip install uv` and the official `astral.sh/uv` installer."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Verified-but-medium-confidence. The claim about base-image composition is widely true for python:*-bookworm images (which ship Python toolchain only) but the research note does not cite Microsoft's image manifest directly. Risk of falsification is low (well-known image content) but warrants verification at execution time via `which uv` smoke test in postCreate."
+    },
+    {
+      "claim_id": "C-0009",
+      "claim_text_short": "Serena's default transport is stdio (JSON-RPC over stdin/stdout as subprocess of MCP client).",
+      "verification_questions": [
+        "Does the cited source identify stdio as the default transport?",
+        "Is there independent corroboration (more than one source)?",
+        "Does the source describe the subprocess-launch pattern that defines stdio MCP?"
+      ],
+      "verification_answers": [
+        "Yes — T-001 F-2 (lines 38-43): 'Serena's default transport for MCP-client integration is stdio... the server is launched as a subprocess of the MCP client'.",
+        "Yes — two sources cited: Itecs install guide (primary, with quote 'stdio transport, the standard protocol for MCP client-server communication') and Serena's own 'Connecting Your MCP Client' docs (corroborating).",
+        "Yes — F-2 explicitly contrasts with HTTP mode which requires out-of-band server launch."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Multi-sourced (Itecs + upstream docs). C-0010 and C-0011 sibling claims describe HTTP/SSE as opt-in, confirming stdio is the default by elimination as well. No dissent in graph."
+    },
+    {
+      "claim_id": "C-0060",
+      "claim_text_short": "mcp-openapi-schema is published on npm as `0.0.1`, MIT, single release 2025-03-13.",
+      "verification_questions": [
+        "Does the cited source confirm version 0.0.1 as the only published version?",
+        "Is the publish date 2025-03-13 cited from a primary source (npm registry)?",
+        "Is MIT licensing confirmed?"
+      ],
+      "verification_answers": [
+        "Yes — T-002 F-1 (line 29): 'first and only published on 2025-03-13'.",
+        "Yes — source list entry 4 references npm registry `https://registry.npmjs.org/mcp-openapi-schema` as primary; F-1 source line 31 names it explicitly.",
+        "Yes — F-1 'MIT-licensed' (line 29)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Primary-source-anchored (npm registry). Universal-quantifier 'single release' is verified by registry version history. Adversarial probe: 'Could a 0.0.2 have been published since research date?' — possible but low likelihood given the ~14-month inactivity signal; re-verify at install time."
+    },
+    {
+      "claim_id": "C-0061",
+      "claim_text_short": "mcp-openapi-schema is run via `npx -y mcp-openapi-schema <path-to-spec>`.",
+      "verification_questions": [
+        "Does the README document this exact invocation?",
+        "Does the source confirm Node.js + npm prerequisites?",
+        "Is the path argument required or optional?"
+      ],
+      "verification_answers": [
+        "Yes — T-002 F-4 quote (line 95): README install line `npx -y mcp-openapi-schema [path-to-schema-file]` (verbatim).",
+        "Yes — F-4 (line 78): 'Installation requires Node.js + npm'.",
+        "Required (positional, named in invocation). Server reads a local OpenAPI file passed as CLI arg (F-5)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "README-quote-anchored. Note: Node.js install requires the devcontainer to add `ghcr.io/devcontainers/features/node:1` — flagged in F-4 caveat; this is a base-image-fit dependency captured in C-0064/C-0096/C-0414 sibling claims."
+    },
+    {
+      "claim_id": "C-0062",
+      "claim_text_short": "Transport is stdio, confirmed in source via StdioServerTransport from @modelcontextprotocol/sdk.",
+      "verification_questions": [
+        "Is the StdioServerTransport import directly observed in source code?",
+        "Is there any HTTP/SSE transport option?",
+        "What MCP SDK version is required?"
+      ],
+      "verification_answers": [
+        "Yes — T-002 F-2 quote (line 45): `import { StdioServerTransport } from \"@modelcontextprotocol/sdk/server/stdio.js\";` — verbatim from `index.mjs`.",
+        "No — F-2: 'There is no HTTP/SSE option.'",
+        "F-1 lists `@modelcontextprotocol/sdk ^1.7.0`; F-4 caveat notes this requires Node ≥18 in practice."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Source-code-anchored (index.mjs inspected directly per F-2). Strongest verification class: direct code inspection."
+    },
+    {
+      "claim_id": "C-0073",
+      "claim_text_short": "mcp-openapi-schema is pre-1.0 (0.0.1) with no release history; ~14-month-stale interpretation defensible.",
+      "verification_questions": [
+        "Is the staleness claim factually supported by registry publish dates?",
+        "Does the source qualify the 'abandoned vs. stable' ambiguity?",
+        "Is the maintenance-signal framing defensible (not over-interpreting silence)?"
+      ],
+      "verification_answers": [
+        "Yes — T-002 F-1 caveat (line 37): 'The package has been static since March 2025 (~14 months as of research date)'. With research date 2026-05-23, that is exactly 14 months — arithmetic checks.",
+        "Yes — F-1 explicitly hedges: 'could indicate either \"stable enough\" or \"abandoned\"; no further signal available.'",
+        "Yes — the research note avoids over-claiming; both interpretations are noted, and the recommendation (F-6) is to pin explicitly and treat as a periodic-review supply-chain dependency."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "The maintenance-signal interpretation is appropriately hedged in source. The Synthesizer should preserve the ambiguity (not flatten to 'abandoned'). Adversarial probe ('what does silence imply?'): the research note answers this correctly — silence on releases is ambiguous, not negative evidence. Single-sourced for the staleness signal (only npm registry can confirm), but the interpretation pattern (pre-1.0 + long inactivity → supply-chain caution) is conventional."
+    },
+    {
+      "claim_id": "C-0125",
+      "claim_text_short": "actionlint-mcp imports github.com/rhysd/actionlint as a Go library and uses NewLinter in-process; does not invoke a separate actionlint executable.",
+      "verification_questions": [
+        "Is the in-process import directly observed in main.go?",
+        "Is the NewLinter API call documented as the runtime call path?",
+        "Does the source rule out shelling out to an external actionlint binary?"
+      ],
+      "verification_answers": [
+        "Yes — T-003 F1 (line 34): 'main.go contains `import \"github.com/rhysd/actionlint\"` and uses `actionlint.NewLinter(io.Discard, opts)` followed by `linter.Lint(filePath, content, nil)`.' — direct code inspection.",
+        "Yes — verbatim API call sequence cited.",
+        "Yes — F1 (line 32): 'it does not invoke a separate `actionlint` executable.' Synthesis #1 reinforces: 'the runtime image needs exactly one binary: actionlint-mcp. No separate actionlint binary'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Source-code-anchored. Corrects the 'dual-dependency wrinkle' premise of the Research Plan. Adversarial probe: 'shellcheck/pyflakes ARE shelled out' — yes, but those are explicitly optional opt-ins per C-0130, and the claim narrowly scopes to actionlint-the-library, not all linters."
+    },
+    {
+      "claim_id": "C-0126",
+      "claim_text_short": "The actionlint Go-library dependency is statically resolved at build time, not runtime.",
+      "verification_questions": [
+        "Is 'statically resolved at build time' a correct characterization of Go module dependencies?",
+        "Does the source claim go install produces a self-contained binary?",
+        "Are there any dynamic-loading caveats?"
+      ],
+      "verification_answers": [
+        "Yes — F1 (line 32): 'statically resolved at build time, not at runtime'. This is a true property of Go module compilation: Go produces statically-linked binaries by default.",
+        "Yes — F3 (line 56): 'go install... produces a self-contained static binary that does not require Go at runtime.'",
+        "None in source. Standard Go-build semantics."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Conceptually correct per Go-language semantics. The claim is universal but supported by the universal property of Go-module compilation; no falsifier."
+    },
+    {
+      "claim_id": "C-0127",
+      "claim_text_short": "actionlint-mcp's go.mod lists github.com/rhysd/actionlint v1.7.7 on main as of 2026-05-23.",
+      "verification_questions": [
+        "Is go.mod directly inspected?",
+        "Is the version `v1.7.7` quoted verbatim?",
+        "Is the fetch date documented?"
+      ],
+      "verification_answers": [
+        "Yes — F1 source (line 34) cites `go.mod` at `github.com/hongkongkiwi/actionlint-mcp` (default branch `main`, fetched 2026-05-23).",
+        "Yes — quote (line 36): 'github.com/rhysd/actionlint v1.7.7' (verbatim from go.mod).",
+        "Yes — 'fetched 2026-05-23'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct file inspection with verbatim quote and fetch date. Falsifier would require go.mod to have changed between research date and now (low risk for a stale repo). Adversarial probe: 'What if upstream rebases / force-pushes main?' — Plan should record commit SHA at install time, not just branch ref."
+    },
+    {
+      "claim_id": "C-0133",
+      "claim_text_short": "hongkongkiwi/actionlint-mcp Releases page lists no releases ('There aren't any releases here') as of 2026-05-23, so install.sh has no artifacts to download.",
+      "verification_questions": [
+        "Is the verbatim 'There aren't any releases here' quote attested?",
+        "Is the install.sh failure path traced (releases API → 404)?",
+        "Has the state been re-checked recently?"
+      ],
+      "verification_answers": [
+        "Yes — F2 quote (line 48): 'There aren't any releases here' (releases page).",
+        "Yes — F2 (line 44): 'install.sh shows it downloads from `https://github.com/.../releases/download/$VERSION/$FILENAME`, defaulting $VERSION to \"latest\" via the GitHub releases API. The repository's Releases page currently lists no releases'.",
+        "F2 caveat (line 52) acknowledges 'State may change; the maintainer could publish releases at any time. A Plan task should re-check the releases endpoint at execution time'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Time-sensitive claim (state may change). Critic verdict 'verified' for as-of-2026-05-23 snapshot; downstream Synthesizer should preserve the 're-check at execution time' caveat. Adversarial probe: 'Who benefits from this being true?' — no party; the claim is operationally costly (forces source-build path). Likely accurate."
+    },
+    {
+      "claim_id": "C-0134",
+      "claim_text_short": "Of four README-listed install methods (script, prebuilt binaries, go install, Docker), only `go install` does not depend on release assets.",
+      "verification_questions": [
+        "Are all four install methods enumerated in source?",
+        "Is the dependency-on-release-assets analysis correct for each?",
+        "Is the Docker path dependency on release assets accurate?"
+      ],
+      "verification_answers": [
+        "Yes — F3 (line 56): 'Among the four install methods the README lists (install script, prebuilt binaries, go install, Docker)'.",
+        "Yes — install.sh depends on releases (per F2); prebuilt binaries depend on releases; Docker depends on Docker daemon (out of scope per no-DinD); only go install fetches from Go module proxy, not GitHub releases.",
+        "Verified — Docker image is not built from GitHub release assets but from Docker Hub; however F4 / Synthesis note Docker is precluded by no-DinD constraint, making it ineligible for orthogonal reasons. The four-way analysis is logically consistent."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Logically consistent reduction; the load-bearing operational conclusion (Go toolchain is mandatory for source-based install) follows from this claim. C-0136/C-0137 sibling claims address the Debian-bookworm Go-toolchain provisioning question."
+    },
+    {
+      "claim_id": "C-0153",
+      "claim_text_short": "hongkongkiwi/actionlint-mcp has no tagged releases and no published release artifacts.",
+      "verification_questions": [
+        "Is this a restatement of C-0133, or does it add new information?",
+        "Does the source distinguish between 'no tags' and 'no release artifacts'?",
+        "Are both conditions independently verified?"
+      ],
+      "verification_answers": [
+        "Restatement plus generalization — C-0133 cites the verbatim Releases-page quote; C-0153 makes the broader 'no tags AND no artifacts' assertion.",
+        "Yes — F2 (line 44) addresses release artifacts; Synthesis #3 (line 114) addresses tags: 'Because no tags exist, go install github.com/hongkongkiwi/actionlint-mcp@<commit-sha> ... is the only deterministic pin available.'",
+        "Both verified. GitHub Releases UI shows no tags AND no asset uploads in tandem when the verbatim message is 'There aren't any releases here'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Twin of C-0133 with broader scope (tags + artifacts). Verdict stays 'verified' because Synthesis #3 separately attests the no-tags condition. The operational implication: SHA-pinning is mandatory (Synthesis #3)."
+    },
+    {
+      "claim_id": "C-0157",
+      "claim_text_short": "HashiCorp publishes pre-built signed Linux/amd64 zip binaries for each terraform-mcp-server release on releases.hashicorp.com, including SHA256SUMS and GPG signature.",
+      "verification_questions": [
+        "Is the releases.hashicorp.com URL directly cited?",
+        "Are SHA256SUMS files confirmed (not just 'checksum' generic)?",
+        "Is GPG signature confirmed (separate file pattern)?"
+      ],
+      "verification_answers": [
+        "Yes — T-004 F1 source (line 32): `https://releases.hashicorp.com/terraform-mcp-server/0.5.2/` with date '2026-04-28'.",
+        "Yes — F8 (line 87): 'Each release publishes signed checksums: `terraform-mcp-server_<VER>_SHA256SUMS`'. Verbatim filename pattern quoted.",
+        "Yes — F8 enumerates three artifacts per release: `..._SHA256SUMS`, `..._SHA256SUMS.sig` (detached signature), and a key-ID-suffixed signature file. F1 also explicitly says 'including SHA256SUMS and a GPG signature'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Multi-source-anchored: releases.hashicorp.com (primary), GitHub releases page (corroborating), HashiCorp Developer deploy doc. Source provenance is 'vendor' (HashiCorp) — strong primary source for vendor's own release publishing claims. No falsifier in graph."
+    },
+    {
+      "claim_id": "C-0158",
+      "claim_text_short": "The release artifact terraform-mcp-server_0.5.2_linux_amd64.zip is published on releases.hashicorp.com.",
+      "verification_questions": [
+        "Is the exact filename quoted verbatim?",
+        "Is the URL traceable?",
+        "Is 0.5.2 the current stable version at research date?"
+      ],
+      "verification_answers": [
+        "Yes — F1 quote (line 33): 'terraform-mcp-server_0.5.2_linux_amd64.zip' (verbatim).",
+        "Yes — URL: `https://releases.hashicorp.com/terraform-mcp-server/0.5.2/` (F1 source).",
+        "Yes — F8 confirms: 'Current stable is v0.5.2 (2026-04-28)'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct artifact-name verification from vendor's own release server. Note: F8 caveat 'Pre-1.0; expect periodic breaking changes' — version 0.5.2 may not be current at install time; Plan should re-check."
+    },
+    {
+      "claim_id": "C-0190",
+      "claim_text_short": "Each terraform-mcp-server release publishes signed checksum files (SHA256SUMS, SHA256SUMS.sig, key-ID-suffixed signature).",
+      "verification_questions": [
+        "Are all three file patterns named?",
+        "Is the GPG signature pattern verified (separate from SHA256SUMS file)?",
+        "Is the SHA256SUMS file an independent verification surface from the GPG sig?"
+      ],
+      "verification_answers": [
+        "Yes — F8 (line 87): 'terraform-mcp-server_<VER>_SHA256SUMS', '...SHA256SUMS.sig', and 'a key-ID-suffixed signature file'.",
+        "Yes — `.sig` extension is canonical GPG detached signature; key-ID-suffixed file is the HashiCorp pattern (e.g., `_72D7468F.sig`).",
+        "Yes — SHA256SUMS gives content-integrity; GPG signature gives authenticity (signed by HashiCorp's key). Two independent verification layers."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Vendor-published signing artifacts — strong supply-chain verifiability. Caveat: verification only as strong as the trust anchor (HashiCorp's GPG public key). The Plan should fetch and pin the HashiCorp GPG key fingerprint, not just the signature."
+    },
+    {
+      "claim_id": "C-0193",
+      "claim_text_short": "The pre-built binary install path adds no toolchain to the image, works without DinD, and is verifiable via SHA256 and GPG.",
+      "verification_questions": [
+        "Is the no-toolchain claim correct (Go binary is statically linked)?",
+        "Is the no-DinD claim correct (vs. the Docker install path)?",
+        "Is the SHA256 + GPG verification path operationally implementable in postCreate?"
+      ],
+      "verification_answers": [
+        "Yes — F1 plus F3 contrast: 'go install... requires Go to be present' (F3) versus pre-built binary which is statically compiled and runs on any glibc Linux/amd64. No new toolchain.",
+        "Yes — F4 explicitly excludes Docker path on no-DinD grounds: 'This requires a Docker daemon — incompatible with the \"no DinD\" base-image constraint.'",
+        "Yes — Synthesis (line 99): 'Path (a) integrates cleanly with the existing per-binary \"download + verify SHA256 + extract\" pattern this feature uses for other MCP servers.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Multi-dimensional claim, all dimensions verified. Vendor-provenance source — strong but motivated; HashiCorp benefits from binary distribution being painless. Adversarial probe: 'Who benefits?' — HashiCorp does, but the binary's existence is independently verifiable (the URL is fetchable). No motivated-reasoning falsifier."
+    },
+    {
+      "claim_id": "C-0388",
+      "claim_text_short": "Upstream documents an opt-out flag GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 that skips vendored grammar builds.",
+      "verification_questions": [
+        "Is the env var name documented in a primary upstream source?",
+        "Is the skip semantics (which grammars are skipped) documented?",
+        "Is the source mirror reliable (was the primary doc directly fetched)?"
+      ],
+      "verification_answers": [
+        "Quoted in F5 (line 93) anchored to Mintlify-mirrored upstream docs: 'Python 3 + C++ toolchain for optional grammar builds (can skip with GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1)'.",
+        "Yes — F5 (line 89) and C-0411 detail that the skipped grammars are tree-sitter-dart, tree-sitter-proto, tree-sitter-swift; 14+ remaining grammars preserved.",
+        "Partially — F5 confidence note (line 95): 'Medium-high — the env-var name and skip semantics are documented in upstream-mirrored docs but I could not retrieve npmjs.com directly (403). A pre-install dry-run in CI is recommended to confirm the env-var still works on the exact tag chosen.' Mintlify itself returned HTTP 410 (source list entry 6); content was retrieved indirectly."
+      ],
+      "verdict": "partially_verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Self-flagged in research note as medium confidence. The env var name is the load-bearing detail for the base-image-fit recommendation (avoids C++ toolchain in slim base). Mintlify-mirror sourcing is weaker than direct upstream README. Recommendation: Plan should add a smoke-test step that asserts the env var still works on the exact pinned tag. The Synthesizer should preserve this caveat in the design narrative; do not flatten to 'verified'."
+    },
+    {
+      "claim_id": "C-0411",
+      "claim_text_short": "Setting GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 skips Dart/Proto/Swift grammar builds; drops those parsers but keeps 14+ remaining tree-sitter languages.",
+      "verification_questions": [
+        "Are the three skipped grammars named in primary source?",
+        "Is the '14+ remaining' count substantiated?",
+        "Are the project-relevant languages (Python, Markdown, Bash) in the remaining set?"
+      ],
+      "verification_answers": [
+        "Yes — F5 (line 89): 'tree-sitter-dart, tree-sitter-proto, and tree-sitter-swift'.",
+        "Partially — F5 asserts '14+ remaining tree-sitter languages (Python, JS, TS, Rust, Go, Java, etc.)' but the specific count of 14+ is not independently verified; it's an upstream-mirrored figure.",
+        "Yes — Python explicitly listed. Markdown and Bash not explicitly named in F5 but the 'etc.' implies the standard tree-sitter language set; verify at install time. C-0412 sibling claim says the remaining set is 'sufficient for this project's code-graph needs (the repo is Python + Markdown + Bash)'."
+      ],
+      "verdict": "partially_verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Same source-reliability caveat as C-0388 (Mintlify-mirrored, not primary). The '14+' number is approximate. The downstream operational decision — that GitNexus with skip flag covers this project's languages — depends on this claim. Plan should verify Markdown and Bash specifically in the remaining grammar set during smoke test. Single-sourced (Mintlify); other sources (DeepWiki, MarkTechPost) corroborate GitNexus generally but not this specific env-var semantics."
+    }
+  ]
+}

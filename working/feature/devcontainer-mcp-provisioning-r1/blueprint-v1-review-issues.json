@@ -1,0 +1,378 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "DesignDoc",
+    "doc_subtype": "Blueprint",
+    "target_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/blueprint-v1.md",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "version": "1.0.0",
+    "reviewer": "shared-document-reviewer",
+    "invocation_context": "recipe-feature-pipeline Invocation 4 (after Design Composition; before Gate 4 Blueprint Approval)",
+    "kb_loaded": [
+      "KB-documentation-criteria",
+      "KB-general-coding-principles",
+      "KB-review-disciplines"
+    ],
+    "reviewed_at": "2026-05-23T00:00:00Z",
+    "inputs_consulted": [
+      "blueprint-v1.md",
+      "prd-v3.md",
+      "synthesis.md",
+      "cc-design.md (by reference)",
+      "codespaces-design.md (by reference)",
+      "codebase-analysis.json",
+      "adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md",
+      "adrs/ADR-0038-codebase-analysis-schema-v1-1-0.md",
+      "adrs/ADR-0039-credential-redaction-posture.md",
+      "adrs/ADR-0040-serena-narrowed-always-on.md",
+      "adrs/ADR-0041-install-mechanism-hybrid.md",
+      "cc-design-review-issues.json (prior context)",
+      "codespaces-design-review-issues.json (prior context)",
+      "/workspaces/feature-pipeline/adrs/ (existing ADR registry)",
+      "/workspaces/feature-pipeline/adrs-migrated/ (legacy ADR registry)"
+    ]
+  },
+  "scores": {
+    "consistency": 80,
+    "completeness": 88,
+    "rule_compliance": 92,
+    "clarity": 84
+  },
+  "gate0": {
+    "status": "pass",
+    "checks": {
+      "frontmatter_required_fields_present": "pass \u2014 id (BP-devcontainer-mcp-provisioning-r1), version (1.0.0), status (draft), doc_type (blueprint), feature_slug, derived_from (prd-v3.md), codebase_analysis, adrs_referenced (9 entries), adrs_authored (5 entries: ADR-0037..0041), generated (2026-05-23T00:00:00Z), generated_by (design-composer) \u2014 all present",
+      "contents_checklist_present": "pass \u2014 15 sections enumerated and all marked [x]",
+      "all_15_template_sections_present": "pass \u2014 Overview / Design Summary (Meta) / Background and Context / Acceptance Criteria (EARS) / Existing Codebase Analysis / Design / Implementation Plan / Security Considerations / Test Boundaries / Verification Strategy / Future Extensibility / Alternative Solutions / Risks and Mitigation / References / Update History \u2014 all 15 present",
+      "layer_scope_declared": "pass \u2014 9 layers enumerated; Claude Code + Codespaces marked [x] in scope; other 7 marked [ ] N/A consistent with PRD v3 Layer Scope",
+      "applicable_standards_classified": "pass \u2014 6 standards listed with explicit/implicit tag (W/H/A trifecta [explicit]; ADR-0020 [explicit]; ADR-0030 [explicit]; EARS [explicit]; C-0445 [implicit, confirmed: Yes]; OWASP MCP01 [explicit])",
+      "fact_disposition_table_present": "pass \u2014 table covers all listed codebase-analysis focusAreas (C-0445, C-0462, C-0455/6/7, C-0458, C-0441/0495, C-0442/0497/0498, C-0447/0448, C-0449, C-0484/0485, C-0490, C-0388/0411, C-0301, C-0300/0302, C-0290/0291, C-0333/0335, C-0094/E-0094, E-0095/C-0259/0260/0280, C-0349, E-0081, C-0463, C-0040/0042/E-0098, C-0073, C-0133/0153, C-0157/0190/0193, C-0037, C-0205, C-0444, C-0460, C-0471/0535, C-0478/0479/0480/0481, C-0482/0483/0528/0537, C-0499, OI-CS-1..5) with disposition values preserve|transform|out-of-scope and verbatim Evidence column",
+      "verification_strategy_section_present": "pass \u2014 Correctness Proof Method + Early Verification Point + Output Comparison (marked N/A) + Operational Verification all present",
+      "field_propagation_map_present": "pass \u2014 table covers CONTEXT7_API_KEY, EXA_API_KEY, TFE_TOKEN, extraction_method, blast_radius",
+      "5_adrs_authored_files_exist": "pass \u2014 ADR-0037 / ADR-0038 / ADR-0039 / ADR-0040 / ADR-0041 all present in working/feature/devcontainer-mcp-provisioning-r1/adrs/",
+      "5_adrs_madr_shape": "pass \u2014 all 5 ADRs carry the full 10-section template (Status / Context / Decision / Decision Details / Rationale / Options Considered / Consequences (Pos/Neg/Neutral) / Architecture Impact / Implementation Guidance / Related Information); status=Accepted; valid frontmatter (id, version, supersedes, adrs_inherited, applies_to, template_format, change_summary)",
+      "adr_numbering_collision_check": "pass \u2014 existing ADRs in /workspaces/feature-pipeline/adrs/ range from ADR-0011 to ADR-0036; legacy ADRs in /workspaces/feature-pipeline/adrs-migrated/ are ADR-0001..ADR-0010 and ADR-0018; new ADRs ADR-0037..ADR-0041 do NOT collide with any existing ID",
+      "supersession_recorded": "pass \u2014 ADR-0038 frontmatter supersedes: [{id: ADR-0018, version: 1.0.0}]; consistent with ADR-0005 append-only discipline; ADR-0018 file remains preserved per Decision item 1"
+    },
+    "missing_elements": []
+  },
+  "synthesis_work_item_coverage": {
+    "status": "complete",
+    "items": [
+      {
+        "item": ".mcp.json (NEW)",
+        "covered": true,
+        "location": "Design / Main Components #1; AC-CC-1; Fact Disposition C-0462"
+      },
+      {
+        "item": "Per-agent tools: allowlist edits (8 agents)",
+        "covered": true,
+        "location": "Design / Sub-Agents table; AC-CC-2; AC-CC-3; ADR-0040"
+      },
+      {
+        "item": "KB-mcp-platform (NEW)",
+        "covered": true,
+        "location": "Design / Component #3; AC-FR-11-a; AC-CC-8"
+      },
+      {
+        "item": "KB-mcp-design (NEW)",
+        "covered": true,
+        "location": "Design / Component #4; AC-FR-11-b; AC-CC-8"
+      },
+      {
+        "item": "auditing-mcp augmentation (10 OP rules)",
+        "covered": true,
+        "location": "Design / Component #5; AC-FR-11-c; AC-CC-5"
+      },
+      {
+        "item": "mcp-events.jsonl schema (NEW)",
+        "covered": true,
+        "location": "Contract Definitions; ADR-0037; KB-mcp-design/principles.md (referenced canonical home)"
+      },
+      {
+        "item": "devcontainer.json Features + containerEnv",
+        "covered": true,
+        "location": "Codespaces Design; AC-CS-1; AC-CS-6"
+      },
+      {
+        "item": "postCreate.sh (NEW)",
+        "covered": true,
+        "location": "Component #7; AC-CS-2 idempotence; AC-CS-3 fail-fast; ADR-0041"
+      },
+      {
+        "item": "postStart.sh (NEW)",
+        "covered": true,
+        "location": "Component #8; AC-CS-4 jsonl-write; AC-CS-5 warn-and-continue; ADR-0037 + ADR-0041"
+      },
+      {
+        "item": "install/terraform-mcp.sh + lib/mcp-ping.sh + lib/mcp-auth-probe.sh + versions.env",
+        "covered": true,
+        "location": "Layer Scope; Codespaces Design / Lifecycle Scripts; ADR-0041 Implementation Guidance"
+      }
+    ]
+  },
+  "prior_context_check": {
+    "items_received": 16,
+    "resolved": 12,
+    "partially_resolved": 1,
+    "unresolved": 3,
+    "items": [
+      {
+        "id": "I-DR-001",
+        "status": "resolved",
+        "location": "AC-X-2 (lines 318-319); Fact Disposition Table; Q-CC-6 resolution (line 704)",
+        "evidence": "AC-X-2 codifies '7 PRD-named primaries + 1 ADR-0007 fallback = 8 mcpServers entries'; auditing-mcp OP-2/OP-3/OP-8 special-case codebase-memory-mcp by name."
+      },
+      {
+        "id": "I-DR-002",
+        "status": "resolved",
+        "location": "Sub-Agents table (lines 749-765); ADR-0040 Implementation Guidance (5-agent list)",
+        "evidence": "ADR-0040 names 5 Serena consumers concretely: review-architecture-auditor, design-cc, design-cicd, design-codespaces, discovery-codebase-researcher. Blueprint Sub-Agents table reflects this."
+      },
+      {
+        "id": "I-DR-003",
+        "status": "unresolved",
+        "location": "Blueprint does not mention placeholder-convention unification",
+        "evidence": "Recommended-severity finding; Blueprint silent. Not blocking but should be acknowledged or explicitly deferred to plan-author."
+      },
+      {
+        "id": "I-DR-004",
+        "status": "resolved",
+        "location": "ADR-0037 Implementation Guidance (bootstrap semantics paragraph); Contract Definitions in Blueprint (line 630)",
+        "evidence": "ADR-0037 explicitly states: 'touch-if-absent on postCreate; absent file or zero records after postStart is an OP-5 BLOCKER'."
+      },
+      {
+        "id": "I-DR-005",
+        "status": "unresolved",
+        "location": "Blueprint does not address pedagogical_sections justification tightening",
+        "evidence": "Recommended-severity forward-quality nudge; Blueprint does not state which rule-specific justifications will be used. Tracked but not actioned."
+      },
+      {
+        "id": "I-DR-006",
+        "status": "unresolved",
+        "location": "Blueprint does not address jsonc-vs-json convention",
+        "evidence": "Recommended-severity; Blueprint does not state final file extension for KB-mcp-platform/assets/templates/.mcp.json.example. Plan-author concern."
+      },
+      {
+        "id": "I-DR-CS-001",
+        "status": "resolved",
+        "location": "ADR-0041 Decision item 2 (sentinel naming = <server>@<version>.installed)",
+        "evidence": "ADR-0041 explicitly resolves to the version-pinned form per Persistence Boundaries spec; unversioned form rejected as the bug."
+      },
+      {
+        "id": "I-DR-CS-002",
+        "status": "resolved",
+        "location": "ADR-0041 Decision item 4 (lifecycle placement rationale)",
+        "evidence": "ADR-0041 codifies 'all installs in postCreate; if prebuilds are later adopted, follow-up ADR moves the workspace-agnostic subset'."
+      },
+      {
+        "id": "I-DR-CS-003",
+        "status": "resolved",
+        "location": "AC-X-1 (line 268)",
+        "evidence": "AC-X-1 codifies: result=fail, failure_layer=auth, message_redacted naming the missing env-var; stderr banner names the env-var. Distinguishable from transport/auth-with-key-rejected failures."
+      },
+      {
+        "id": "I-DR-CS-004",
+        "status": "resolved",
+        "location": "AC-X-2 + AC-CS-4 + AC-CC-6 (all 8-entry SERVERS array)",
+        "evidence": "Blueprint codifies 8 readiness_probe records per postStart cycle, including codebase-memory-mcp; stderr banner says 'N/8 healthy'."
+      },
+      {
+        "id": "I-DR-CS-005",
+        "status": "resolved",
+        "location": "ADR-0041 Architecture Impact + Implementation Guidance (helper-script contracts)",
+        "evidence": "lib/mcp-ping.sh and lib/mcp-auth-probe.sh contract shapes (input args, exit codes) fixed in ADR-0041."
+      },
+      {
+        "id": "I-DR-CS-006",
+        "status": "resolved",
+        "location": "ADR-0041 Architecture Impact item 2 (install/terraform-mcp.sh ownership + wget+SHA256+GPG flow)",
+        "evidence": "Blueprint Layer Scope + ADR-0041 explicitly own install/terraform-mcp.sh with the verification flow."
+      },
+      {
+        "id": "I-DR-CS-007",
+        "status": "partially_resolved",
+        "location": "ADR-0041 Decision Details Known unknowns (c); Blueprint Codespaces Design recommendation-not-blocker",
+        "evidence": "Composer defers Go-feature version pin to plan-author with explicit rationale ('Go feature-default is acceptable for go install of a single binary'). Tracked, not blocking."
+      },
+      {
+        "id": "I-DR-CS-008",
+        "status": "resolved",
+        "location": "ADR-0041 + Blueprint Codespaces Design line 836 (postStart exit-0 refinement)",
+        "evidence": "Refined: exit 0 only when probe loop ran; infrastructure failures (jq missing, etc.) propagate as non-zero."
+      },
+      {
+        "id": "I-DR-CS-009",
+        "status": "resolved",
+        "location": "ADR-0041 Decision item 3 (sentinel + binary-presence check)",
+        "evidence": "postCreate install function verifies binary presence before honoring sentinel; sentinel-present + binary-missing triggers re-install + sentinel refresh."
+      },
+      {
+        "id": "I-DR-CS-010",
+        "status": "resolved",
+        "location": "ADR-0039 Implementation Guidance + Blueprint Codespaces Design line 838",
+        "evidence": "postStart wrapper is the canonical code-site for redaction filter; consumes env-block allowlist from .mcp.json at startup; default-fail-closed if allowlist empty."
+      }
+    ]
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "conditions": [
+      "Reconcile the agent-count contradiction: the Blueprint asserts both '7 touched / 29 untouched' (in 12+ locations) and '8 touched / 28 untouched' (Sub-Agents table line 763). After ADR-0040 narrowing, the correct count is 8 touched (5 Serena \u222a 7 consumer-mapping with 4-agent overlap) / 28 untouched. Propagate the 8/28 figure throughout: AC-CC-3 (line 257), Design Summary blast_radius (line 95), Agreement Checklist Scope (line 154), Agreement Checklist Non-Scope (line 173), Fact Disposition row C-0445 (line 367), Change Impact Map No Ripple Effect (line 438), Interface Change Matrix (line 451), Architecture Overview ASCII art (line 487), Component #2 description (line 586), State Invariants (line 687), Sub-Agents intro (line 749), Implementation Plan step 7 (line 968). See I-DR-BP-001.",
+      "Reconcile ADR-0037 Implementation Guidance line 143 from 'seven readiness_probe records' to 'eight' to align with AC-X-2 / AC-CS-4 / AC-CC-6 / Architecture Overview which all codify the 8-entry inventory. See I-DR-BP-002.",
+      "Acknowledge or defer to plan-author the three unresolved cc-design recommended-severity items: I-DR-003 (placeholder-convention unification), I-DR-005 (pedagogical_sections justification tightening per ADR-0030), I-DR-006 (jsonc-vs-json fence convention). Add an explicit row to Open Items or to the per-layer reconciliation section. See I-DR-BP-003."
+    ],
+    "rationale": "Gate 0 fully passes: all 15 sections present; frontmatter complete; 5 ADRs author-fresh and conform to MADR shape; no ADR-numbering collision (existing ADRs go to 0036; new ones are 0037-0041); 13/16 prior context items fully resolved. Gate 1 quality assessment is strong overall (rule_compliance 92, completeness 88) but consistency drops to 80 because the ADR-0040 Serena-narrowing resolution (which raises touched-agent count from 7 to 8) was applied to the Sub-Agents subsection and Plan step 7 but NOT propagated to the 12+ other locations that still cite the pre-narrowing 7/29 figures. AC-X-2 successfully reconciles the 8-vs-7 server inventory. AC-X-1 cleanly resolves the secret-absent failure mode. The three unresolved recommended-severity cc-design items are not blocking. No critical issues. Approval recommended once the three conditions are addressed; the agent-count propagation is the only one that could mislead the plan-author downstream."
+  },
+  "issues": [
+    {
+      "id": "I-DR-BP-001",
+      "severity": "important",
+      "category": "consistency",
+      "location": "Blueprint v1.md: multiple locations cite '7 of 36 agents touched' / '29 non-consumer agents preserve C-0445'. Specific lines: 53, 55, 95, 101, 154, 173, 206, 257 (AC-CC-3), 367 (Fact Disposition), 438, 451, 487 (Architecture Overview ASCII), 586 (Component #2), 687 (State Invariants), 968 (Implementation Plan step 7). Then Sub-Agents subsection line 749 says '7 of 36' followed by line 763 explicit resolution: 'Total touched agents: 8 ... The 28 untouched agents (36 \u2212 8) preserve C-0445.'",
+      "description": "The Blueprint contains a load-bearing internal contradiction on agent counts. ADR-0040's Serena narrowing adds Serena entries to 5 agents (review-architecture-auditor, design-cc, design-cicd, design-codespaces, discovery-codebase-researcher). Three of those five (review-architecture-auditor, discovery-codebase-researcher, design-cicd) are already in the original 7-agent consumer-mapping; two (design-cc, design-codespaces) are new. The union of the consumer-mapping (7) and the Serena allowlist (5) is 8 unique touched agents; 36 \u2212 8 = 28 untouched. ADR-0040 itself confirms this by stating '31 of 36 agents do not get mcp__serena__*' (which is consistent with 5 Serena consumers) and the Sub-Agents subsection explicitly resolves to 8/28. But every OTHER section of the Blueprint still cites the pre-narrowing figure of 7/29. AC-CC-3 in particular is operationally wrong: it states 'the operator inspects 29 non-consumer agent files' \u2014 but after this feature ships, only 28 files have zero mcp__ entries. A grep-based audit (which AC-CC-3 implicitly authorizes) will report a count mismatch.",
+      "suggestion": "Propagate the 8/28 figures consistently across the Blueprint. Specific edits: (1) AC-CC-3: change '29 non-consumer agent files' to '28 non-consumer agent files'. (2) Design Summary blast_radius.runtime: change '7 agents gain new mcp__ tool entries; the 29 untouched agents' to '8 agents gain new mcp__ tool entries; the 28 untouched agents'. (3) Design Summary main_constraints: change '29 non-consumer agents' to '28 non-consumer agents'. (4) Agreement Checklist Scope: change '7 of 36' to '8 of 36'. (5) Agreement Checklist Non-Scope: change 'C-0445 invariant for the 29 non-consumer agents' to '28 non-consumer agents'. (6) Fact Disposition Table row C-0445: change 'preserve (for 29 of 36)' to 'preserve (for 28 of 36)' and 'ADR-0040 narrows Serena' rationale should note '8 consumer agents total (3 from base mapping overlap with Serena consumers)'. (7) Change Impact Map No Ripple Effect: '29 non-consumer agents' \u2192 '28 non-consumer agents'. (8) Interface Change Matrix row: '7 of 36 agents gain ... 29 preserved' \u2192 '8 of 36 agents gain ... 28 preserved'. (9) Architecture Overview ASCII art line '(29 agents preserved zero-mcp__)' \u2192 '(28 agents preserved zero-mcp__)'. (10) Component #2 description: 'Preserve zero-mcp__ for 29 non-consumers' \u2192 '28 non-consumers'. (11) State Invariants: '29 of 36 agents always have zero mcp__ entries' \u2192 '28 of 36'. (12) Sub-Agents intro line 749: 'It modifies 7 of 36 existing agents' \u2192 '8 of 36'. (13) Implementation Plan step 7 line 968: '7 of 36 .claude/agents/*.md edits' \u2192 '8 of 36'. Plan-author depends on these counts being correct because the augmented auditing-mcp OP-3 rule (zero-mcp__ preservation) iterates over 28, not 29, files; a 29-cited count would cause an off-by-one audit-finding or, worse, the audit would silently treat the wrong file as a consumer."
+    },
+    {
+      "id": "I-DR-BP-002",
+      "severity": "important",
+      "category": "consistency",
+      "location": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md line 143: 'The first postStart run appends seven readiness_probe records.'",
+      "description": "ADR-0037 Implementation Guidance contains a record-count value that contradicts the Blueprint's AC-X-2 inventory reconciliation. AC-X-2 (Blueprint line 318), AC-CS-4 (line 279), AC-CC-6 (line 281), Data Flow step 6 (line 540), Architecture Overview Banner (line 544: 'N/8 healthy'), and Verification Strategy Correctness Definition (line 1089) all uniformly codify the eight-entry inventory (7 PRD-named primaries + codebase-memory-mcp fallback). But ADR-0037 \u2014 which is the authoritative source for the mcp-events.jsonl schema bootstrap semantics \u2014 still cites seven records. The ADR is canonical; if the ADR text disagrees with the Blueprint, downstream consumers (plan-author, auditing-mcp OP-5 rule definition) face an ambiguity about the expected bootstrap-state record count.",
+      "suggestion": "Update ADR-0037 line 143 from 'The first postStart run appends seven readiness_probe records' to 'The first postStart run appends eight readiness_probe records (one per registered server in .mcp.json, including the codebase-memory-mcp ADR-0007 fallback per AC-X-2).' Cross-reference AC-X-2 explicitly so readers of the ADR understand why eight, not seven. This is a small text edit but should be made before Gate 4 approval so the ADR is internally consistent on first publication."
+    },
+    {
+      "id": "I-DR-BP-003",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "Blueprint Open Items section (lines 1207-1211); per-layer reconciliation blocks (lines 699-707 for cc, 826-838 for codespaces)",
+      "description": "Three recommended-severity items from cc-design-review-issues.json are silent in the Blueprint and are neither marked resolved, deferred, nor wontfix: I-DR-003 (placeholder-convention unification \u2014 design-cc used '<PIN_TAG>' vs '<TBD-per-ADR-0007-v2.2.0>' in different .mcp.json sketch lines), I-DR-005 (KB-mcp-platform pedagogical_sections justification tightening per ADR-0030 spec \u2014 design-cc justifications passed the rules but were more generic than the KB-github-actions-platform precedent), I-DR-006 (jsonc-vs-json fence convention \u2014 design-cc sketched .mcp.json with jsonc fences but the project convention is .json with comments in surrounding prose). All three are forward-quality nudges, not blockers. But the Blueprint's per-layer reconciliation pattern (which explicitly walks through Q-CC-1..9 and I-DR-CS-001..010) breaks discipline here by silently dropping three CC items.",
+      "suggestion": "Add three rows to the Blueprint's Open Items section (or to the cc-design reconciliation block at lines 699-707) explicitly addressing each: (a) I-DR-003: 'placeholder convention unified at plan-author time per D-11 verify-at-execution discipline; canonical placeholder form is <PIN_TBD> across .mcp.json and versions.env.' (b) I-DR-005: 'KB-mcp-platform pedagogical_sections justifications will be tightened during skill authoring (Stage 9 plan task) to match the KB-github-actions-platform precedent \u2014 name the specific OP-rule and anti-pattern in each justification.' (c) I-DR-006: 'KB-mcp-platform/assets/templates/.mcp.json.example uses .json (matching project convention); design-time sketches that need inline comments may use jsonc fences with a caption disclaimer.' This closes the I-DR-N traceability discipline that the Blueprint otherwise honors carefully."
+    },
+    {
+      "id": "I-DR-BP-004",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Blueprint Sub-Agents table (lines 751-762)",
+      "description": "The Sub-Agents table lists design-cicd twice (rows 2 and 9) \u2014 once for the actionlint-mcp entries, once for the Serena addition. The parenthetical at line 760 ('Serena added: mcp__serena__*; alongside the actionlint-mcp entries above') acknowledges the duplication, but the table form makes it look like a typographical defect or scanning hazard. A reader counting rows in the table might count 9 distinct agents (which is wrong \u2014 the correct count is 8 unique with design-cicd appearing twice).",
+      "suggestion": "Consolidate the design-cicd row to a single line listing both tool sets: '| design-cicd | mcp__actionlint-mcp__lint_workflow, mcp__actionlint-mcp__check_all_workflows, mcp__serena__* | C-0144 + ADR-0040 |'. Then the table has 8 rows for the 8 unique touched agents, matching the resolved count and removing the visual ambiguity. Also remove the resolution-note parenthetical at lines 765-766 or shorten it now that the table is self-documenting."
+    },
+    {
+      "id": "I-DR-BP-005",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "Blueprint Acceptance Criteria section: AC-NFR-2-a, AC-NFR-2-c, AC-NFR-2-d are referenced (Verification Strategy line 1077-1078; State Invariants line 686; Risk Map indirectly) but the AC clauses themselves are not enumerated in the AC section of the Blueprint.",
+      "description": "The Blueprint AC section enumerates AC-FR-1-* through AC-FR-11-* and AC-CS-* / AC-CC-* / AC-X-1 / AC-X-2, plus AC-NFR-1-a/b for performance. But AC-NFR-2-a (no secret values committed), AC-NFR-2-c (auditing-mcp zero BLOCKER findings), and AC-NFR-2-d (runtime log redaction) \u2014 which are PRD-inherited and which several Verification Strategy bullets reference \u2014 are not present in the AC section. The Blueprint preamble at line 241 says 'inherits PRD AC-FR-* / AC-NFR-* clauses' which is the inheritance convention, but a reader auditing the Blueprint cannot read the AC-NFR-2-* text without going back to PRD v3. This is a clarity/completeness issue; the alternative (enumerate the AC-NFR-2-* clauses in the Blueprint's Cross-Layer / Operational ACs) would be self-contained.",
+      "suggestion": "Either (a) enumerate AC-NFR-2-a, AC-NFR-2-c, AC-NFR-2-d under 'Cross-Layer / Operational ACs' as PRD-inherited entries (mirroring how AC-NFR-1-a / AC-NFR-1-b are presently enumerated), or (b) explicitly say in the AC section preamble: 'AC-NFR-2-a, AC-NFR-2-c, AC-NFR-2-d are PRD-inherited and not re-enumerated here; see prd-v3.md \u00a7AC-NFR-2.' Option (a) is preferred for self-containment; option (b) is minimum-touch."
+    },
+    {
+      "id": "I-DR-BP-006",
+      "severity": "recommended",
+      "category": "feasibility",
+      "location": "ADR-0040 Decision item 2 (design-codespaces in Serena allowlist) + Blueprint Sub-Agents table row design-codespaces",
+      "description": "ADR-0040 includes design-codespaces in the 5-agent Serena allowlist with rationale 'may touch auditing-codespaces/scripts/ if/when the stub becomes real per ADR-0033.' But auditing-codespaces is currently STUB per ADR-0033 (per Fact Disposition row C-0499). Granting Serena access to a design agent whose target audit-script surface does not yet exist is forward-looking; if the auditing-codespaces stub is not filled in this feature's window or shortly after, design-codespaces's Serena entry sits unused. Not a blocker \u2014 additive entries are cheap \u2014 but worth surfacing as a known unknown.",
+      "suggestion": "Either (a) add a parenthetical to ADR-0040's design-codespaces inclusion: 'design-codespaces is included on a forward-looking basis; if the auditing-codespaces ADR-0033 stub remains unfilled for >90 days post-ship, this entry may be removed in a follow-up ADR amendment.' Or (b) document this as Known Unknown (c) under ADR-0040 Decision Details. Either makes the temporal contingency explicit. This is a recommendation, not a blocker; the inclusion itself is defensible."
+    }
+  ],
+  "checks_performed": {
+    "gate0_structural": "pass \u2014 all 15 blueprint-template sections present; frontmatter complete; ADR-authored files present with full MADR shape",
+    "gate1_consistency": "pass with I-DR-BP-001 (agent count 29-vs-28 contradiction across 12+ locations) and I-DR-BP-002 (ADR-0037 'seven' vs Blueprint 'eight' record count); other consistency checks (terminology, count of ACs, count of ADRs, count of Q-CC/Q-CS resolutions) clean",
+    "gate1_completeness": "pass with I-DR-BP-003 (three cc-design recommended items unresolved) and I-DR-BP-005 (AC-NFR-2-* inheritance not enumerated); all synthesis work items covered; all 16 prior context items have resolution status",
+    "gate1_rule_compliance": "pass \u2014 Blueprint conforms to canonical Blueprint template per ADR-0013; ADRs conform to canonical ADR template; ADR numbering ADR-0037..0041 does not collide with existing ADR-0001..0036; ADR-0005 append-only supersession honored (ADR-0018 v1.0.0 preserved; ADR-0038 v1.1.0 is canonical); ADR-0009 evidence-based rationale present throughout; ADR-0017 reviewer invocation point 4 satisfied; ADR-0020 KB naming honored for KB-mcp-platform / KB-mcp-design / auditing-mcp; ADR-0030 pedagogical_sections frontmatter declared (Applicable Standards line 191); ADR-0036 single-canonical-ADR-location honored (ADR-0007 relocation planned); cc-design Principle 9 honored (no model/effort/skills changes); EARS keyword discipline preserved on all new ACs",
+    "gate1_clarity": "pass with I-DR-BP-004 (Sub-Agents table design-cicd duplication) and I-DR-BP-005 (AC-NFR-2-* not enumerated)",
+    "gate1_feasibility": "pass with I-DR-BP-006 (design-codespaces Serena entry is forward-looking on auditing-codespaces stub-filling). All other dependencies described as 'existing' verified against codebase-analysis: KB-cc-platform / KB-cc-design / auditing-mcp / KB-codespaces-platform / KB-codespaces-design / KB-github-actions-platform / KB-github-actions-design / discovery-codebase-researcher.md / review-architecture-auditor.md / ADR-0007 v2.2.0 / ADR-0018 / ADR-0036 \u2014 all present in codebase. The 5 newly-authored ADRs have well-grounded supersession + adrs_inherited chains. Dependency-realizability check on Devcontainer Features (Node 20, Go, common-utils, github-cli, claude-code) all verified against existing devcontainer.json + canonical ghcr.io Feature catalog. Codespaces secrets surface (CONTEXT7_API_KEY / EXA_API_KEY / TFE_TOKEN) verified via PRD constraint #9.",
+    "adr_madr_shape_check": {
+      "ADR-0037": "pass \u2014 10-section template; Decision (5 enumerated items), Decision Details (5-row table), Rationale, Options Considered (5 options with selection marker), Consequences (Pos/Neg/Neutral), Architecture Impact (4 sub-items), Implementation Guidance (bootstrap + gitignore + append-only + stderr banner format), Related Information (Related ADRs / Specs / Issues / KBs)",
+      "ADR-0038": "pass \u2014 10-section template; explicit supersession of ADR-0018 v1.0.0; schema-version history table in Implementation Guidance; ADR-0007 relocation per ADR-0036 honored",
+      "ADR-0039": "pass \u2014 10-section template; OWASP MCP01 traceability; 4 Options Considered with explicit selection; redaction SSOT clearly named",
+      "ADR-0040": "pass \u2014 10-section template; concrete 5-agent list; pre-v1.3.0 pin rationale; ADR-0007 adrs_inherited",
+      "ADR-0041": "pass \u2014 10-section template; resolves I-DR-CS-001/002/005/006/009; binary-presence check codified; Terraform MCP supply-chain (SHA256 + GPG verify) codified"
+    },
+    "adr_numbering_collision_check": "pass \u2014 listed /workspaces/feature-pipeline/adrs/ (ADR-0011..0036) and /workspaces/feature-pipeline/adrs-migrated/ (ADR-0001..0010, ADR-0018); new ADR-0037..0041 ID range is clean of collisions",
+    "ac_x_n_reconciles_inventory": "pass \u2014 AC-X-2 explicitly codifies '7 PRD-named primaries + 1 ADR-0007 fallback = 8 mcpServers entries'; AC-X-1 explicitly codifies the secret-absent failure mode (resolves I-DR-CS-003); both convention notes referenced in Verification Strategy and Error Handling tables; OP-2/OP-3/OP-8 audit rules special-case codebase-memory-mcp by name (no audit ambiguity)",
+    "q_cc_n_resolution_traceability": {
+      "Q-CC-1_family_coordinator": "resolved \u2014 Path B (auditing-mcp remains in auditing-cc-configs family); Blueprint line 699 + OI-2",
+      "Q-CC-2_runtime_dir_git_status": "resolved \u2014 ADR-0037 + .gitkeep convention; Blueprint line 700",
+      "Q-CC-3_serena_agent_list": "resolved \u2014 ADR-0040 (5 agents); Blueprint line 701",
+      "Q-CC-4_auditing_mcp_dimensions": "resolved \u2014 expand existing rubric; Blueprint line 702",
+      "Q-CC-5_primary_fallback_expression": "resolved \u2014 ADR-0037 prose-only-with-OP-4; Blueprint line 703",
+      "Q-CC-6_inventory_count": "resolved \u2014 AC-X-2; Blueprint line 704",
+      "Q-CC-7_plugin_packaging": "deferred to follow-up feature; Blueprint line 705",
+      "Q-CC-8_adr_authorship_list": "resolved \u2014 5 ADRs authored (ADR-0037..0041); Blueprint line 706",
+      "Q-CC-9_auditing_mcp_gate6_status": "deferred to user via OI-3; Blueprint line 707"
+    },
+    "q_cs_n_resolution_traceability": {
+      "Q-CS-1": "ratified with Recommended posture (postCreate all-install homogeneity)",
+      "Q-CS-2": "deferred (prebuild adoption); Blueprint line 826",
+      "Q-CS-3": "ratified \u2014 warn-and-continue; Blueprint line 827",
+      "Q-CS-4": "ratified \u2014 containerEnv via ${localEnv:NAME}",
+      "Q-CS-5": "ratified \u2014 version-pinned sentinel + binary-presence check per ADR-0041; Blueprint line 828",
+      "Q-CS-6": "ratified \u2014 actionlint-mcp via Go feature",
+      "Q-CS-7": "OI-CS-5 verify-at-execution; fallback to direct JSON-RPC per ADR-0041",
+      "Q-CS-8": "ratified \u2014 design-cc owns schema first; Blueprint line 829"
+    },
+    "oi_n_deferrals": {
+      "OI-1": "AC-X-2 (resolved + user-confirms at Gate 4)",
+      "OI-2": "Path B (resolved + user may revisit at Gate 4)",
+      "OI-3": "Gate 6 hard-gate vs strongly-recommended \u2014 user decision required at Gate 4",
+      "OI-4": "Per-agent context-overhead measurement \u2014 deferred to plan-author",
+      "OI-5": "ADR-0007 content review post-relocation \u2014 deferred to follow-up"
+    },
+    "code_block_review": {
+      "blocks_evaluated": 5,
+      "blocks": [
+        {
+          "location": "Design Summary YAML block (lines 80-111)",
+          "language": "yaml",
+          "dimensions_pass": [
+            1,
+            2,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "dimension_4_note": "Dimension 4 (no fabricated APIs): N/A \u2014 config-shape only",
+          "auto_fail_check": "clear"
+        },
+        {
+          "location": "Change Impact Map YAML block (lines 406-443)",
+          "language": "yaml",
+          "dimensions_pass": "all",
+          "auto_fail_check": "clear"
+        },
+        {
+          "location": "Architecture Overview ASCII diagram (lines 459-515)",
+          "language": "ascii-art",
+          "dimensions_pass": "applicable dimensions (1, 9, 10)",
+          "auto_fail_check": "clear"
+        },
+        {
+          "location": "Data Flow pseudo-code (lines 519-562)",
+          "language": "pseudo",
+          "dimensions_pass": "all",
+          "auto_fail_check": "clear"
+        },
+        {
+          "location": "State Transitions and Invariants YAML (lines 663-691)",
+          "language": "yaml",
+          "dimensions_pass": "all",
+          "auto_fail_check": "clear; system invariants reference real audit rules (OP-1, OP-5) and real ADRs (ADR-0037, ADR-0039) \u2014 no fabrication"
+        }
+      ],
+      "note": "Most implementation samples live in the referenced per-layer designs (cc-design.md, codespaces-design.md), reviewed at Invocation 3. ADR-0041 contains a small bash pseudo-code block at lines 161-176 (check_installed function) \u2014 passes all 10 dimensions; comment-marked 'Pseudo-code; real script lives in postCreate.sh'."
+    },
+    "applicable_standards_classification": "pass \u2014 6 standards listed with explicit/implicit tag; C-0445 implicit standard carries 'Confirmed: Yes' per the codebase-analysis.json focusArea Batch 5"
+  },
+  "recommendations": [
+    "PRE-GATE-4 BLOCKER (light): resolve I-DR-BP-001 (agent count propagation) and I-DR-BP-002 (ADR-0037 record-count) before submitting to Gate 4. Both are 12-edit and 1-edit tasks respectively; together they take <30 min.",
+    "FOR PLAN-AUTHOR: Note that the augmented auditing-mcp OP-3 rule (zero-mcp__ preservation) iterates over 28 agent files, not 29; the 5 Serena consumers \u222a 3 non-Serena consumers = 8 unique consumer agents.",
+    "FOR PLAN-AUTHOR: Note that .claude/runtime/mcp-events.jsonl is expected to contain 8 readiness_probe records per postStart cycle (not 7 as ADR-0037 line 143 currently reads).",
+    "FOR USER AT GATE 4: Three Open Items require disposition: OI-1 (inventory count convention \u2014 composer's AC-X-2 is the recommended fix), OI-2 (family-coordinator Path B \u2014 composer's recommendation; user may revisit), OI-3 (auditing-mcp Gate 6 hard-gate vs strongly-recommended \u2014 composer recommends hard-gate but flags as user-policy decision).",
+    "FOR ARCHITECTURE AUDIT (Stage 8, next): The blueprint's brief-honor and CoVe checks should specifically verify (a) the AC-X-2 inventory convention against ADR-0007 v2.2.0's fallback semantics, (b) the OWASP MCP01 redaction-at-source posture against the synthesis \u00a75 D-0007 frame, and (c) the cc-design Principle 4 (subagent isolation) compliance of ADR-0040's narrowed 5-agent Serena allowlist.",
+    "STRENGTHS \u2014 record for composer: (1) The Fact Disposition Table covers every codebase-analysis focusArea explicitly with disposition + verbatim Evidence column. (2) The 5 ADRs each carry the full 10-section MADR shape with concrete Decision Details, Kill criteria, and Known unknowns; ADR-0038's schema-version history table is exemplary. (3) The per-layer reconciliation pattern (Q-CC-N walk + Q-CS-N walk + I-DR-CS-N walk) makes traceability self-documenting. (4) AC-X-1 + AC-X-2 cleanly absorb the two cross-cutting concerns surfaced at per-layer review (secret-absent failure + inventory contradiction) into the composer-authored AC layer. (5) The Verification Strategy section has a concrete Early Verification Point (single Serena install + claude mcp list)."
+  ]
+}

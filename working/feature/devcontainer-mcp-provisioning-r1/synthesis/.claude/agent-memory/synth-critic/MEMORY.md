@@ -1,0 +1,1 @@
+- [No-consensus verification pattern](no-consensus-verification-pattern.md) — How to verify "no consensus exists" claims via survey-set / analogue / framing / adversarial checks

@@ -1,0 +1,490 @@
+{
+  "mode": "implementation-strategy",
+  "mode_note": "Per recipe-feature-pipeline SKILL.md, the three-option enumeration invariant from substrate-translation-knowledge does NOT apply here. Each decision enumerates as many options as genuinely exist (1-N) with explicit rationale for option count. Single-option decisions are acceptable when a credible 'no alternatives considered because...' rationale exists.",
+  "feature_slug": "devcontainer-mcp-provisioning-r1",
+  "substrate_context": {
+    "base_image": "mcr.microsoft.com/devcontainers/python:1-3.11-bookworm",
+    "runtimes_present": ["python:3.11", "git", "github-cli (via feature)"],
+    "runtimes_absent": ["node", "go", "docker-in-docker"],
+    "secrets_surface": "GitHub Codespaces secrets (EXA_API_KEY, CONTEXT7_API_KEY, TFE_TOKEN, etc.)",
+    "agent_surface": "36 .claude/agents/*.md files, zero existing mcp__ namespace usage",
+    "kb_trifecta_precedents": ["KB-cc-platform + KB-cc-design + auditing-cc-configs", "KB-codespaces + auditing-codespaces (stub half)", "KB-github-actions + auditing-github-actions"],
+    "project_mcp_config": ".mcp.json (currently absent)",
+    "repo_composition": "73.8% markdown, ~52 python audit scripts as the LSP-symbol-rich surface"
+  },
+  "mappings": [
+    {
+      "decision_id": "D-0001",
+      "decision_title": "Install mechanism strategy",
+      "option_count": 4,
+      "option_count_rationale": "Four genuinely distinct posture options exist in the devcontainer substrate (Dockerfile RUN, devcontainer features, onCreate, postCreate). A fifth 'hybrid' is the credible recommended path because the five disjoint install mechanisms map onto different layers cleanly. Each option has independent merit; none is a straw-man.",
+      "options": [
+        {
+          "name": "hybrid_features_plus_postcreate",
+          "status": "recommended",
+          "description": "Devcontainer features for runtimes and CLIs that have first-party features (Node via ghcr.io/devcontainers/features/node, github-cli, Go toolchain via ghcr.io/devcontainers/features/go). postCreateCommand idempotent script for the 7 MCP-server installs (uvx Serena, npx mcp-openapi-schema, go install actionlint-mcp, binary fetch Terraform MCP, uvx/npx GitNexus). No project Dockerfile changes beyond what's already in place.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 1.5, "runtime_overhead": "minor (postCreate runs once per create)", "maintenance_burden": "low - features pin LTS; postCreate script is the single touchpoint for server inventory", "irreversibility_cost": "low - both layers are two-way reversible"},
+          "rationale": "Pushes transient/idempotent work into postCreate (where re-run is safe), keeps stable runtime provisioning in features (where ghcr handles versioning), avoids re-litigating the E-0081 Dockerfile-Yarn-key failure mode. Single coherent path with per-server overrides as exceptions.",
+          "per_server_overrides": {
+            "Terraform MCP (pre-built binary)": "wget + sha256sum verification inside postCreate; not a feature",
+            "actionlint-mcp (go install)": "uses Go toolchain provided by feature; postCreate invokes 'go install @<sha>'"
+          }
+        },
+        {
+          "name": "dockerfile_bake_everything",
+          "status": "rejected",
+          "description": "Add all 7 MCP-server installs as RUN layers in a project-owned Dockerfile, producing a single baked image.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 2.0, "runtime_overhead": "none (everything pre-baked)", "maintenance_burden": "high - every server bump requires image rebuild and re-push", "irreversibility_cost": "medium - image rollback is straightforward but cache-invalidation is slow"},
+          "rationale": "Already-broken-once posture on this base image (E-0081 stale-Yarn apt key). Mixed package managers (uvx, npx, go install, binary) inflate Dockerfile complexity. Slow developer feedback (full rebuild for any change)."
+        },
+        {
+          "name": "features_only",
+          "status": "rejected",
+          "description": "Author or use ghcr-hosted devcontainer features for every MCP server.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 6.0, "runtime_overhead": "none", "maintenance_burden": "high - we own seven feature repos", "irreversibility_cost": "high - other consumers may adopt the features"},
+          "rationale": "No upstream features exist for 6 of 7 servers. Authoring + maintaining them is grossly disproportionate to the value vs. a postCreate script."
+        },
+        {
+          "name": "postcreate_for_everything",
+          "status": "rejected",
+          "description": "Use only postCreateCommand for runtimes (Node, Go) AND MCP servers, skipping features entirely.",
+          "loss_summary": ["latency", "pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 2.5, "runtime_overhead": "moderate - every container create reinstalls runtimes", "maintenance_burden": "medium - we maintain version-pinning logic the features already handle", "irreversibility_cost": "low"},
+          "rationale": "Re-invents what ghcr.io/devcontainers/features/node and /go give us for free. Slower create-time and no benefit."
+        }
+      ],
+      "recommended_summary": "Hybrid: ghcr.io/devcontainers/features for Node + Go + github-cli, postCreateCommand idempotent script for the 7 MCP-server installs, with per-server overrides for the binary and go-install cases."
+    },
+    {
+      "decision_id": "D-0002",
+      "decision_title": "Transport per server",
+      "option_count": 2,
+      "option_count_rationale": "Per-server-stdio vs per-server-remote where vendor offers it. 'All stdio' or 'all remote' are pseudo-options because 5 of 7 are stdio-native (no remote endpoint exists) and 2 of 7 have vendor-canonical remote endpoints. The real decision degenerates to a per-server table.",
+      "options": [
+        {
+          "name": "per_server_vendor_canonical",
+          "status": "recommended",
+          "description": "Per-server transport selection based on what each vendor canonically publishes.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "none", "maintenance_burden": "low - .mcp.json is the single declaration site", "irreversibility_cost": "low"},
+          "rationale": "Aligns each server with its vendor-supported transport. Lets HTTP servers (Context7, Exa) inherit Claude Code's 5-attempt exponential-backoff auto-reconnect (C-0300/C-0302). Stdio servers cover the no-network-egress case and bypass SaaS availability dependencies.",
+          "per_server_table": {
+            "Serena": "stdio (uvx)",
+            "mcp-openapi-schema": "stdio (npx)",
+            "actionlint-mcp": "stdio (go-installed binary on PATH)",
+            "Terraform MCP": "stdio (pre-built binary on PATH)",
+            "GitNexus": "stdio (uvx/npx; TS-first stdio process)",
+            "Context7": "remote HTTP (vendor SaaS canonical)",
+            "Exa": "remote HTTP (vendor SaaS canonical)"
+          }
+        },
+        {
+          "name": "all_stdio_with_local_fallback_binaries",
+          "status": "rejected",
+          "description": "Run local fallback binaries for Context7 and Exa as well.",
+          "loss_summary": ["pattern_fidelity", "maintenance_burden"],
+          "viable": false,
+          "cost": {"effort_weeks": 1.5, "runtime_overhead": "minor", "maintenance_burden": "high - we track upstream local-binary releases for two vendors that prefer SaaS", "irreversibility_cost": "low"},
+          "rationale": "Loses Claude Code's stdio-no-reconnect (C-0301) safety net of HTTP auto-reconnect. Forces us to maintain local-fallback infra for vendor-SaaS-canonical surfaces. No benefit unless the user explicitly needs offline operation, which is not in scope."
+        }
+      ],
+      "recommended_summary": "Per-server table: stdio for the 5 OSS-local servers (Serena, mcp-openapi-schema, actionlint-mcp, Terraform MCP, GitNexus); remote HTTP for the 2 SaaS-canonical servers (Context7, Exa)."
+    },
+    {
+      "decision_id": "D-0003",
+      "decision_title": "Node.js runtime addition",
+      "option_count": 3,
+      "option_count_rationale": "Three credible provisioning mechanisms exist (devcontainer feature, NodeSource apt, nvm). Each is widely used in practice; selection is mostly about idiom-fit.",
+      "options": [
+        {
+          "name": "ghcr_node_feature",
+          "status": "recommended",
+          "description": "Add ghcr.io/devcontainers/features/node:1 with an explicit LTS major pin (e.g., version: '20' for Node 20 LTS) to devcontainer.json.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.1, "runtime_overhead": "none", "maintenance_burden": "low - one frontmatter line; upstream feature handles apt/PPA mechanics", "irreversibility_cost": "low"},
+          "rationale": "Declarative, ghcr-hosted, LTS-pinnable, idiomatic. Matches the precedent set by ghcr.io/devcontainers/features/github-cli already in use."
+        },
+        {
+          "name": "dockerfile_apt_nodesource",
+          "status": "rejected",
+          "description": "Add the NodeSource apt repo and install nodejs in a Dockerfile RUN layer.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.25, "runtime_overhead": "none", "maintenance_burden": "medium - we own the apt key + repo URL drift (E-0081 history)", "irreversibility_cost": "low"},
+          "rationale": "Already-burned-on-apt-keys posture (E-0081). The feature pins LTS more cleanly with less code surface."
+        },
+        {
+          "name": "nvm_postcreate",
+          "status": "rejected",
+          "description": "Install nvm in Dockerfile, then run 'nvm install <lts>' in postCreate.",
+          "loss_summary": ["latency"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.25, "runtime_overhead": "minor - nvm shim every shell", "maintenance_burden": "medium - shell-rc plumbing required", "irreversibility_cost": "low"},
+          "rationale": "nvm is right for multi-version Node workflows. We need one pinned LTS. Overkill."
+        }
+      ],
+      "recommended_summary": "Add ghcr.io/devcontainers/features/node:1 with an explicit LTS major pin in devcontainer.json features block."
+    },
+    {
+      "decision_id": "D-0004",
+      "decision_title": "Lifecycle hook placement",
+      "option_count": 2,
+      "option_count_rationale": "Four hook points exist (onCreate, postCreate, postStart, postAttach), but the FR-8 sub-tasks map onto them mechanically: install-time work goes in postCreate (runs once after create); readiness-probe work goes in postStart (runs every container start). onCreate is too early (no project mount for stdio servers needing repo context). postAttach is too late (user-visible delay). The real decision is whether to layer postCreate+postStart or pick one.",
+      "options": [
+        {
+          "name": "layered_postcreate_install_poststart_probe",
+          "status": "recommended",
+          "description": "postCreateCommand runs the idempotent install script and the initial install-verification ping for all 7 servers. postStartCommand runs a fast readiness probe (ping each server) and writes the result to .claude/runtime/mcp-events.jsonl. postAttachCommand is unused unless we need a user-facing greeting later.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "minor - probe loop on every container start (~7 pings, <2s)", "maintenance_burden": "low - two hook scripts; each is small", "irreversibility_cost": "low"},
+          "rationale": "Separates the once-per-create (install) work from the every-start (readiness) work. Captures both classes of FR-8 failure: install-time (postCreate) and start-time/transport (postStart). Aligns with claims attributing install completion to postCreate (C-0156/C-0240) and recurring readiness to postStart (C-0344/C-0367/C-0436).",
+          "hook_mapping": {
+            "onCreateCommand": "unused (too early for stdio servers needing project mount)",
+            "postCreateCommand": "install script + post-install verification (one-shot, idempotent)",
+            "postStartCommand": "readiness probe of all 7 servers, write event to mcp-events.jsonl, non-fatal on transient failures",
+            "postAttachCommand": "unused"
+          }
+        },
+        {
+          "name": "single_poststart_only",
+          "status": "rejected",
+          "description": "Put both install and probe in postStartCommand.",
+          "loss_summary": ["latency", "pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.3, "runtime_overhead": "significant - reinstall checks every container start", "maintenance_burden": "medium", "irreversibility_cost": "low"},
+          "rationale": "Conflates two distinct failure modes. Slow every-start cycle. Risks masking install-time failures when a postStart re-run silently passes."
+        }
+      ],
+      "recommended_summary": "postCreateCommand for install + verification; postStartCommand for readiness probe writing to mcp-events.jsonl; onCreate and postAttach unused."
+    },
+    {
+      "decision_id": "D-0005",
+      "decision_title": "UI-15 primary-to-fallback transition surfacing",
+      "option_count": 4,
+      "option_count_rationale": "C-0349 explicitly verifies 'NO CONSENSUS PATTERN' across 5 source categories. Three options are surfaced verbatim in the corpus (stderr banner, dedicated jsonl event file, agent-level acknowledgement). A fourth (frontmatter convention) is added because ADR-0018 already codifies primary/fallback semantics in agent frontmatter and a structured convention there is the cheapest way to make the transition machine-readable without inventing a runtime event surface. Genuine novel-design space, four genuine options.",
+      "options": [
+        {
+          "name": "combined_jsonl_plus_stderr_banner",
+          "status": "recommended",
+          "description": "Primary surface: append a structured JSON record to .claude/runtime/mcp-events.jsonl on every primary-to-fallback transition (event type 'primary_degraded', fields: timestamp, primary_server, fallback_server, reason, agent). Secondary surface: a one-line stderr banner from whichever MCP component detects the transition (ephemeral operator hint). Agents do NOT need to acknowledge in their own output — the jsonl is the contract.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 1.5, "runtime_overhead": "minor - one append per transition", "maintenance_burden": "low - schema lives in KB-mcp-design", "irreversibility_cost": "medium - .jsonl event-shape is a first-time convention; future consumers may grow"},
+          "rationale": "Combines the strengths of (a) ephemeral and (b) machine-readable. The jsonl gives FR-9 a structured-failure-record handle; the stderr banner gives an operator a visible 'using fallback' cue without forcing every agent to template-print the same string. Avoids uniformity risk of option (c) across 36 agents."
+        },
+        {
+          "name": "jsonl_only",
+          "status": "rejected",
+          "description": "Only the mcp-events.jsonl event file; no stderr surface.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 1.0, "runtime_overhead": "minor", "maintenance_burden": "low", "irreversibility_cost": "low"},
+          "rationale": "Operator-invisible until someone tails the file. Loses the ephemeral hint cheaply provided by stderr."
+        },
+        {
+          "name": "stderr_banner_only",
+          "status": "rejected",
+          "description": "Only the stderr banner; no structured event.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "none", "maintenance_burden": "low", "irreversibility_cost": "low"},
+          "rationale": "Loses machine-readability. FR-9's structured-failure-record requirement falls back on ad-hoc stderr parsing — brittle."
+        },
+        {
+          "name": "agent_level_acknowledgement",
+          "status": "rejected",
+          "description": "Each agent prints a 'using fallback' line in its own output when it detects primary degradation.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 2.5, "runtime_overhead": "none", "maintenance_burden": "high - 36 agents must adopt the convention uniformly", "irreversibility_cost": "high - retrofitting a different convention requires editing 36 files"},
+          "rationale": "Uniformity risk (C-0357). 36 agents adopting a free-text convention will drift. The runtime surface should be runtime-owned, not agent-owned."
+        },
+        {
+          "name": "frontmatter_convention_only",
+          "status": "rejected",
+          "description": "Encode primary/fallback in agent frontmatter (declarative); rely on agent to read its own frontmatter at startup and emit on transition.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 2.0, "runtime_overhead": "minor", "maintenance_burden": "high - every agent author owns the convention", "irreversibility_cost": "high"},
+          "rationale": "Declarative-only; still doesn't solve the transition-event surface. Frontmatter remains useful for declaring primary/fallback pairs (ADR-0018) but is not a transition-surfacing mechanism."
+        }
+      ],
+      "recommended_summary": "Append structured JSON record to .claude/runtime/mcp-events.jsonl on every primary->fallback transition, paired with a one-line stderr banner from the runtime detector. Agents do not template-print; the jsonl is the FR-9 contract."
+    },
+    {
+      "decision_id": "D-0006",
+      "decision_title": "Runtime log surface",
+      "option_count": 3,
+      "option_count_rationale": "Three credible surfaces map onto the seven-server reality: stderr (the spec-default, auto-captured by Claude Code per C-0314), the shared mcp-events.jsonl (UI-15 alignment), and MCP protocol-level notifications/message (logging/setLevel from the spec). Per-server file logs and a proxy/supervisor were enumerated in the frame but are rejected on operational complexity grounds.",
+      "options": [
+        {
+          "name": "stderr_default_plus_mcp_events_jsonl_for_transitions",
+          "status": "recommended",
+          "description": "All 7 servers log to stderr (the MCP-spec default for stdio; HTTP servers' logs come through Claude Code's HTTP client logging). Claude Code captures stderr automatically (C-0314). The shared .claude/runtime/mcp-events.jsonl is reserved for cross-server event correlation (UI-15 transitions, FR-8 readiness probe results, FR-9 structured failure records) — NOT a per-line log mirror.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "minor - jsonl append on coarse events only", "maintenance_burden": "low", "irreversibility_cost": "low"},
+          "rationale": "Aligns with MCP spec (C-0313 'should not stdout for stdio'), gets auto-capture for free (C-0314), and reserves the structured jsonl for actually-structured events. Composes cleanly with D-0005 (transitions) and D-0008 (probes)."
+        },
+        {
+          "name": "structured_json_stderr_per_server",
+          "status": "rejected",
+          "description": "Require every server to emit structured JSON on stderr (machine-parseable).",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 3.0, "runtime_overhead": "minor", "maintenance_burden": "high - 7 upstream servers don't agree on log format", "irreversibility_cost": "low"},
+          "rationale": "We don't control 7 upstream log formats. Forcing structured stderr requires wrapping each server in a json-reformatter. Disproportionate to value."
+        },
+        {
+          "name": "proxy_supervisor_toolhive_style",
+          "status": "rejected",
+          "description": "Run a ToolHive-style proxy/supervisor (E-0085) that intercepts every MCP transport and uniformly instruments logs.",
+          "loss_summary": ["pattern_fidelity", "latency"],
+          "viable": false,
+          "cost": {"effort_weeks": 6.0, "runtime_overhead": "significant - long-running process between Claude Code and every server", "maintenance_burden": "high - new long-running component to monitor", "irreversibility_cost": "high"},
+          "rationale": "Adds a new long-running process whose crash blast-radius is wider than the seven it's wrapping. Out-of-proportion for FR-10."
+        }
+      ],
+      "recommended_summary": "Stderr default for per-server logs (auto-captured by Claude Code); mcp-events.jsonl reserved for coarse-grained structured events (transitions, probe results, structured failure records)."
+    },
+    {
+      "decision_id": "D-0007",
+      "decision_title": "Credential redaction",
+      "option_count": 1,
+      "option_count_rationale": "Single-option decision with credible no-alternatives rationale. The .mcp.json env: block already declares which env vars are credentials (EXA_API_KEY, CONTEXT7_API_KEY, TFE_TOKEN); deriving the redaction allowlist from that block is the canonical single-source-of-truth approach. Per-server redaction config (option B in the frame) duplicates the declaration; sink-side redaction (option C) defers to log infra we don't control; header-name redaction (option D) is a sub-task within the recommended option, not a competing one. OWASP MCP01 (C-0333) does not prescribe a mechanism — it prescribes the property.",
+      "options": [
+        {
+          "name": "redact_at_source_env_var_name_allowlist",
+          "status": "recommended",
+          "description": "At the log-surface boundary (the layer that reads stderr from each MCP server and writes to host logs), apply a redaction filter keyed on the env-var NAMES declared in .mcp.json's env: block plus HTTP-header names for HTTP transports (CONTEXT7_API_KEY-equivalent headers, Authorization, x-api-key). Replace matched values with the literal '[REDACTED:<envvar>]'. Reject Exa's exaApiKey query-param URL form (E-0095) at .mcp.json validation time, not at log time.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 1.0, "runtime_overhead": "minor - regex match per log line", "maintenance_burden": "low - adding a new credential adds one line to .mcp.json and the redaction list rebuilds", "irreversibility_cost": "medium - log-format-stability commitment"},
+          "rationale": "Single source of truth (.mcp.json env: block); addresses OWASP MCP01 (C-0333) directly; rejects URL-embedded-credential anti-pattern at config time (E-0095); composes with secret-via-env-only invocation discipline to mitigate argv-leakage (E-0094, which cannot be fixed at log layer alone). Sink-side redaction at log-aggregator layer is rejected because we don't ship one; per-server redaction config is rejected because it duplicates .mcp.json."
+        }
+      ],
+      "no_alternatives_rationale": "All four corpus options reduce to either 'redact at source from a single declarative inventory' or non-options (deferring to non-existent log infra; duplicating the .mcp.json declaration in per-server configs). Header-name redaction for HTTP transports is folded into the recommended option as a sub-mechanism.",
+      "recommended_summary": "Redact at the log-surface boundary using an allowlist derived from .mcp.json env: var names plus HTTP-transport header names; reject URL-embedded credentials at config validation time."
+    },
+    {
+      "decision_id": "D-0008",
+      "decision_title": "Health-check primitive",
+      "option_count": 2,
+      "option_count_rationale": "MCP JSON-RPC ping (spec-canonical, transport-agnostic) vs claude mcp list output parsing (host-side, no spec dependency but brittle). HTTP /health endpoint is rejected upfront (HTTP-only, doesn't generalize). Real tool-call probes are rejected upfront (uneven side-effects across servers). The two surviving options are real and meaningfully different.",
+      "options": [
+        {
+          "name": "json_rpc_ping_plus_optional_probe",
+          "status": "recommended",
+          "description": "Use the MCP-spec JSON-RPC ping (E-0027, C-0290/C-0291) as the canonical readiness primitive in postStartCommand. For the 2 HTTP servers (Context7, Exa) where ping succeeds without validating auth, supplement with one explicit authenticated read-only probe call (Context7: resolve-library-id with a known id; Exa: web_search_exa with a trivial query) gated behind an environment flag so probes can be disabled when API quotas matter.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "minor - 7 ping calls + 2 optional probes at every container start", "maintenance_burden": "low - ping is spec-stable", "irreversibility_cost": "low"},
+          "rationale": "Spec-canonical (C-0290/C-0291), transport-agnostic, endorsed by Fast.io monitoring guidance (E-0107, C-0295/C-0296). Probe supplement addresses the 'ping doesn't validate auth' risk surfaced in the frame for Context7/Exa with bad API keys. Stays within a one-shot lifecycle hook (no active ping-loop supervisor E-0084)."
+        },
+        {
+          "name": "claude_mcp_list_parsing",
+          "status": "rejected",
+          "description": "Run 'claude mcp list' and parse output to determine each server's connection state.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "minor", "maintenance_burden": "high - brittle to Claude Code CLI output format changes", "irreversibility_cost": "low"},
+          "rationale": "Brittle host-side CLI scraping. Tightly coupled to Claude Code's output format with no SemVer contract."
+        }
+      ],
+      "recommended_summary": "Use MCP JSON-RPC ping for all 7 servers in postStartCommand; supplement with an authenticated read-only probe for Context7 and Exa to validate API-key correctness (env-flag-gated for quota-sensitive runs)."
+    },
+    {
+      "decision_id": "D-0009",
+      "decision_title": "Tool-to-agent allowlist mapping (UI-1)",
+      "option_count": 1,
+      "option_count_rationale": "Single-option decision with credible no-alternatives rationale. The mapping is determined by consumer roles already documented in agent frontmatter and per-agent consumer claims (E-0057..E-0060). 'Narrow per-agent' vs 'broad wildcard' frame options are not real alternatives — broad wildcard fails the least-privilege principle that the existing 36 agents already follow with their tools allowlist. The decision IS the table.",
+      "options": [
+        {
+          "name": "per_agent_narrow_allowlist_driven_by_consumer_claims",
+          "status": "recommended",
+          "description": "Each agent's tools allowlist gets exactly the mcp__<server>__<tool> entries its role requires. Non-consumers get no MCP tools added.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 2.0, "runtime_overhead": "none", "maintenance_burden": "medium - 36 agent files have frontmatter edits; per-tool granularity requires the team to track tool-id changes (e.g., Context7 v1.2.0 ReplaceContentTool replaces ReplaceRegexTool)", "irreversibility_cost": "low"},
+          "rationale": "Aligns with existing tools-allowlist precedent in the 36 agents (zero existing mcp__ usage, C-0445, is the starting point). Least-privilege; minimizes the set of agents that break on tool-id changes. The mapping itself is mechanical from consumer claims.",
+          "mapping_table": {
+            "design-api": ["mcp__mcp-openapi-schema__*"],
+            "design-cicd": ["mcp__actionlint-mcp__*"],
+            "design-iac": ["mcp__terraform-mcp__*"],
+            "discovery-external-researcher": ["mcp__context7__resolve-library-id", "mcp__context7__get-library-docs", "mcp__exa__web_search_exa", "mcp__exa__company_research_exa", "mcp__exa__crawling_exa"],
+            "discovery-codebase-researcher": ["mcp__gitnexus__*", "mcp__codebase-memory-mcp__* (fallback only)"],
+            "review-architecture-auditor": ["mcp__gitnexus__*", "mcp__codebase-memory-mcp__* (fallback only)"],
+            "Serena": "deferred to D-0013 outcome (full / narrowed to ~6 audit-script-touching agents / drop)",
+            "all_other_agents": "no mcp__ entries (zero existing usage preserved)"
+          }
+        }
+      ],
+      "no_alternatives_rationale": "'Broad wildcard' violates the existing least-privilege convention; 'narrow per-agent' is the convention. The remaining work is producing the table, which is determined by consumer claims, not a design choice.",
+      "recommended_summary": "Per-agent narrow allowlist driven by consumer claims. Serena entries are conditional on D-0013."
+    },
+    {
+      "decision_id": "D-0010",
+      "decision_title": "KB-mcp-platform + KB-mcp-design authoring",
+      "option_count": 1,
+      "option_count_rationale": "Single-option decision with credible no-alternatives rationale. Three existing W/H/A trifectas pass review and follow a consistent convention (ADR-0020 frontmatter, sister-cross-reference convention, body-prose family membership, ADR-0030 pedagogical_sections). Varying the convention for the MCP trifecta would create a 4th template to maintain with zero offsetting benefit. The 'KB-codespaces stub' option in the frame is not a real alternative — a stub is a temporary state, not a convention to copy.",
+      "options": [
+        {
+          "name": "follow_kb_cc_platform_template_verbatim",
+          "status": "recommended",
+          "description": "Author KB-mcp-platform/SKILL.md and KB-mcp-design/SKILL.md following KB-cc-platform + KB-cc-design template verbatim: ADR-0020 frontmatter, ADR-0030 pedagogical_sections, sister-cross-reference convention (auditing-mcp <-> KB-mcp-platform/design), body-prose family membership. Resolve the family-coordinator conflict (E-0044 vs E-0049, auditing-mcp currently lives in auditing-cc-configs family per C-0460) by either (a) graduating auditing-mcp to its own family with KB-mcp-platform/design as its sister halves, or (b) keeping auditing-mcp in auditing-cc-configs and treating KB-mcp-platform/design as sibling knowledge skills with explicit cross-refs. The Synthesizer should surface this family-coordinator question to the user before authoring.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 3.0, "runtime_overhead": "none", "maintenance_burden": "low - same review cadence as other trifectas", "irreversibility_cost": "low"},
+          "rationale": "Three existing trifectas pass review (C-0466/C-0470/C-0471 etc.). No reason to vary. Honors ADR-0030 pedagogical_sections (E-0078, C-0528). Fixes the broken sister-cross-reference (auditing-mcp -> non-existent KB-mcp-* halves)."
+        }
+      ],
+      "no_alternatives_rationale": "The KB-codespaces template is itself a degraded stub-precedent (auditing-codespaces is a STUB per ADR-0033); copying it would be copying a known-incomplete pattern. Custom MCP-specific structure deviates from convention with no offsetting benefit.",
+      "recommended_summary": "Follow KB-cc-platform + KB-cc-design template verbatim; resolve family-coordinator question (auditing-mcp graduates to its own family, or remains in auditing-cc-configs with KB-mcp-* as sibling skills) before authoring."
+    },
+    {
+      "decision_id": "D-0011",
+      "decision_title": "Version pinning policy",
+      "option_count": 3,
+      "option_count_rationale": "Three policy stances exist: exact-tag-where-available + commit-SHA-fallback, vendor-controlled-latest, floating-minor. Each is in real use somewhere in the broader devcontainer ecosystem; the choice is determined by reproducibility appetite and upstream release shape.",
+      "options": [
+        {
+          "name": "exact_tag_or_commit_sha_per_server",
+          "status": "recommended",
+          "description": "Per-server pinning where each server's pin form is driven by its upstream release shape. Exact tag where releases exist (Serena, mcp-openapi-schema, Terraform MCP, Context7, GitNexus). Commit SHA where no tags exist (actionlint-mcp via 'go install <repo>@<sha>', C-0133/C-0153). Pin-then-review discipline (E-0074) is mandatory: every supply-chain bump goes through audit.",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.25, "runtime_overhead": "none", "maintenance_burden": "medium - periodic supply-chain review cadence", "irreversibility_cost": "low"},
+          "rationale": "Already the established convention in the repo (E-0073). Honors deterministic-install for FR-2/FR-3. Pin-then-review caught Serena v1.3.0 base_modes->added_modes breaking change (E-0098) and Context7 v1.2.0 ReplaceContentTool tool-id change (E-0097).",
+          "per_server_pin": {
+            "Serena": "exact tag (e.g., v1.2.x where v1.3.0 breaking change is under review)",
+            "mcp-openapi-schema": "exact tag 0.0.1 (static ~14 months, E-0101)",
+            "actionlint-mcp": "commit SHA via go install (no tags exist, C-0133/C-0153)",
+            "Terraform MCP": "exact tag matching pre-built-binary release asset",
+            "Context7": "vendor-controlled at remote endpoint; for the .mcp.json client, pin to the API version header where available",
+            "GitNexus": "exact tag per ADR-0007 v2.2.0",
+            "Exa": "vendor-controlled at remote endpoint; pin client SDK by tag if applicable"
+          }
+        },
+        {
+          "name": "vendor_controlled_latest",
+          "status": "rejected",
+          "description": "Let each upstream/registry resolve to latest at install time.",
+          "loss_summary": ["replay_determinism", "pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.05, "runtime_overhead": "none", "maintenance_burden": "low until something breaks, then catastrophic", "irreversibility_cost": "low"},
+          "rationale": "Non-reproducible. Already-witnessed breakage (E-0098 Serena, E-0097 Context7) demonstrates this policy fails open."
+        },
+        {
+          "name": "floating_minor",
+          "status": "rejected",
+          "description": "Pin to major.x (e.g., 1.x) and float minor versions.",
+          "loss_summary": ["replay_determinism"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.1, "runtime_overhead": "none", "maintenance_burden": "medium", "irreversibility_cost": "low"},
+          "rationale": "Some upstreams (mcp-openapi-schema 0.0.1) have no minor range. Inconsistent applicability across the seven."
+        }
+      ],
+      "recommended_summary": "Exact-tag pin where releases exist; commit-SHA pin for actionlint-mcp (no tags); periodic supply-chain review on every bump."
+    },
+    {
+      "decision_id": "D-0012",
+      "decision_title": "ADR-0018 schema-drift remediation",
+      "option_count": 2,
+      "option_count_rationale": "Two real options: bump the ADR to v1.1.0 (codifying the blast-radius extension in the ADR) vs. clarify in the ADR that v1.1.0 SHAPE lives in KB-codebase-research and ADR remains the v1.0.0 contract. Status-quo defer is rejected upfront (the frame already labels it 'not recommended; documented drift'). Adjacent ADR-0007 relocation is a separate small task, not a competing option.",
+      "options": [
+        {
+          "name": "bump_adr_0018_to_v_1_1_0",
+          "status": "recommended",
+          "description": "Bump ADR-0018 schema_version frontmatter and the JSON example body to 1.1.0; add a section explicitly documenting the blast-radius extension. Add a 'schema-version history' table to the ADR. Update the two downstream consumers (discovery-codebase-researcher, review-architecture-auditor) to validate against v1.1.0. Also relocate or cross-reference ADR-0007 from adrs-migrated/ to adrs/ as a small adjacent fix (E-0080, low severity).",
+          "loss_summary": ["none"],
+          "viable": true,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "none", "maintenance_burden": "low - ADR is the contract; KB stays as guidance", "irreversibility_cost": "low"},
+          "rationale": "Eliminates the drift at its source. The ADR is the contract; making it match the actual KB-and-agent reality removes ambiguity. Closes the latent landmine (C-0496) by making the schema_version field unambiguous everywhere."
+        },
+        {
+          "name": "clarify_in_adr_kb_is_v_1_1_0_source",
+          "status": "rejected",
+          "description": "Keep ADR-0018 at v1.0.0; add a cross-reference clarifying that v1.1.0 SHAPE is described in KB-codebase-research.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.25, "runtime_overhead": "none", "maintenance_burden": "medium - readers must follow a cross-reference to find the canonical shape", "irreversibility_cost": "medium"},
+          "rationale": "Splits the contract across two documents. Future bumps would need the same dance. ADRs exist to be the contract; the KB shouldn't carry contract-grade material the ADR disclaims."
+        }
+      ],
+      "recommended_summary": "Bump ADR-0018 to v1.1.0; codify blast-radius extension; update two downstream consumers to validate v1.1.0; relocate/cross-reference ADR-0007 adjacent."
+    },
+    {
+      "decision_id": "D-0013",
+      "decision_title": "Serena always-on posture (UI-8)",
+      "option_count": 3,
+      "option_count_rationale": "Three genuinely distinct postures: full always-on (broad surface for all 36 agents), narrowed always-on (allowlisted to specific agents like the ones touching the 52 Python audit scripts), drop entirely (GitNexus fills the code-graph slot). Each has real cost/benefit tradeoffs given the 73.8% markdown finding and the GitNexus-as-canonical-primary status.",
+      "options": [
+        {
+          "name": "narrowed_always_on_python_audit_surface_only",
+          "status": "recommended",
+          "description": "Keep Serena in .mcp.json (always-on at the project level) but restrict mcp__serena__* tool entries in the 36 agent allowlists to only those whose role actually touches Python code: review-architecture-auditor (audit-script-related symbol lookups), the design-* agents that touch tooling Python, and any code-spelunking discovery agent. Markdown-dominant agents get no Serena tools. Pin to a pre-v1.3.0 tag while the base_modes->added_modes breaking change is reviewed (E-0098).",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": true,
+          "cost": {"effort_weeks": 1.0, "runtime_overhead": "minor - Serena process running but rarely invoked", "maintenance_burden": "medium - Serena breaking-change history (E-0098) requires periodic review", "irreversibility_cost": "low - can drop later by removing one .mcp.json entry and ~6 agent frontmatter lines"},
+          "rationale": "73.8% markdown (C-0485) means Serena's LSP-symbol value-prop is narrow but non-zero. The 52 Python audit scripts (C-0490, verified) are the real symbol-rich surface and benefit from Serena. GitNexus is the canonical code-graph primary (ADR-0007 v2.2.0, E-0038) for repository-graph queries; Serena complements it for in-file LSP lookups. C-0449 explicitly hedges 'symbol-level value contingent on UI-8 narrowing' — narrowing IS the resolution."
+        },
+        {
+          "name": "full_always_on",
+          "status": "rejected",
+          "description": "Broad Serena tool surface available to all 36 agents.",
+          "loss_summary": ["pattern_fidelity", "maintenance_burden"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "minor", "maintenance_burden": "high - every agent inherits Serena's breaking-change blast-radius", "irreversibility_cost": "low"},
+          "rationale": "Mismatch with 73.8% markdown corpus (C-0485). Most agents would never invoke a Serena tool but would carry its breaking-change risk. Violates least-privilege."
+        },
+        {
+          "name": "drop_from_always_on",
+          "status": "rejected",
+          "description": "Remove Serena from .mcp.json entirely; GitNexus fills the code-graph slot.",
+          "loss_summary": ["pattern_fidelity"],
+          "viable": false,
+          "cost": {"effort_weeks": 0.5, "runtime_overhead": "none", "maintenance_burden": "low - Serena no longer in the surface", "irreversibility_cost": "medium - reintroducing later requires re-litigating UI-8"},
+          "rationale": "Loses the LSP-symbol value-prop for the 52 Python audit-script surface where it genuinely helps. GitNexus is repo-graph-canonical, not in-file-LSP-canonical; the two are complementary, not substitutable. C-0449's 'contingent on UI-8 narrowing' implies narrowing was the expected path."
+        }
+      ],
+      "recommended_summary": "Narrowed always-on: Serena in .mcp.json at project level; mcp__serena__* entries only in agents that touch the 52 Python audit scripts (review-architecture-auditor and the Python-touching design agents). Pin pre-v1.3.0 pending base_modes->added_modes review."
+    }
+  ],
+  "summary": {
+    "frames_with_recommendation": 13,
+    "frames_with_human_required": 0,
+    "frames_with_fewer_than_two_options": [
+      {"decision_id": "D-0007", "reason": "Single-option decision: redact-at-source from .mcp.json env: var names is the canonical SSOT approach; corpus 'alternatives' reduce to deferral or duplication."},
+      {"decision_id": "D-0009", "reason": "Single-option decision: per-agent narrow allowlist driven by consumer claims is the existing least-privilege convention; the work is producing the table, not choosing a posture."},
+      {"decision_id": "D-0010", "reason": "Single-option decision: follow KB-cc-platform trifecta convention verbatim; three existing trifectas pass review. Caveat: family-coordinator question (auditing-mcp standalone family vs sibling of auditing-cc-configs) must be resolved before authoring."}
+    ],
+    "per_frame_recommended_summary": {
+      "D-0001": "Hybrid: ghcr.io/devcontainers/features for Node + Go + github-cli, postCreateCommand idempotent script for the 7 MCP-server installs, with per-server overrides for the binary and go-install cases.",
+      "D-0002": "Per-server table: stdio for the 5 OSS-local servers; remote HTTP for the 2 SaaS-canonical servers (Context7, Exa).",
+      "D-0003": "Add ghcr.io/devcontainers/features/node:1 with an explicit LTS major pin in devcontainer.json features block.",
+      "D-0004": "postCreateCommand for install + verification; postStartCommand for readiness probe writing to mcp-events.jsonl; onCreate and postAttach unused.",
+      "D-0005": "Append structured JSON record to .claude/runtime/mcp-events.jsonl on every primary->fallback transition, paired with a one-line stderr banner; agents do not template-print.",
+      "D-0006": "Stderr default for per-server logs (auto-captured by Claude Code); mcp-events.jsonl reserved for coarse-grained structured events.",
+      "D-0007": "Redact at the log-surface boundary using an allowlist derived from .mcp.json env: var names plus HTTP-transport header names; reject URL-embedded credentials at config validation time.",
+      "D-0008": "Use MCP JSON-RPC ping for all 7 servers in postStartCommand; supplement with authenticated read-only probe for Context7 and Exa (env-flag-gated for quota-sensitive runs).",
+      "D-0009": "Per-agent narrow allowlist driven by consumer claims; Serena entries conditional on D-0013.",
+      "D-0010": "Follow KB-cc-platform + KB-cc-design template verbatim; resolve family-coordinator question before authoring.",
+      "D-0011": "Exact-tag pin where releases exist; commit-SHA pin for actionlint-mcp; periodic supply-chain review on every bump.",
+      "D-0012": "Bump ADR-0018 to v1.1.0; codify blast-radius extension; update two downstream consumers; relocate/cross-reference ADR-0007 adjacent.",
+      "D-0013": "Narrowed always-on: Serena in .mcp.json at project level; mcp__serena__* entries only in agents that touch the 52 Python audit scripts; pin pre-v1.3.0 pending base_modes->added_modes review."
+    },
+    "human_decision_points_within_recommendations": [
+      {"decision_id": "D-0010", "question": "auditing-mcp family-coordinator resolution: graduate to its own family with KB-mcp-platform/design as sister halves, OR keep in auditing-cc-configs family with KB-mcp-* as sibling skills?"}
+    ]
+  }
+}

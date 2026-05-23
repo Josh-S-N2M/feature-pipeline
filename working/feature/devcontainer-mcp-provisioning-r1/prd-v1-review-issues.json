@@ -1,0 +1,153 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "PRD",
+    "target_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/prd-v1.md",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "version_reviewed": "1.0.0",
+    "invocation_context": "recipe-feature-pipeline Invocation 2 (post-PRD-Authoring, pre-Gate-2-PRD-Approval)",
+    "reviewer": "shared-document-reviewer",
+    "skills_applied": [
+      "KB-documentation-criteria (templates/prd-template.md, references/disciplines/prd-authoring.md, references/disciplines/ears-acceptance-criteria.md, references/layer-taxonomy.md, references/shared-conventions.md including v2 amendments per ADR-0032)",
+      "KB-review-disciplines (references/gate-0-1-procedure.md, references/severity-taxonomy.md, references/prior-context-check.md)",
+      "KB-general-coding-principles (N/A — no code samples in PRD body)"
+    ],
+    "prior_intent_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/intent-clarification.md",
+    "prior_intent_review_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/intent-review-issues.json",
+    "reviewed_at": "2026-05-23T00:00:00Z"
+  },
+  "scores": {
+    "consistency": 92,
+    "completeness": 92,
+    "rule_compliance": 95,
+    "clarity": 88
+  },
+  "gate0": {
+    "status": "pass",
+    "missing_elements": [],
+    "checks_performed": [
+      "Frontmatter parses as valid YAML; universal required fields present (id, doc_type=prd, version, status, feature_slug, derived_from, generated, generated_by)",
+      "doc_type: prd present (carry-forward I-DR-001 discipline honored per ADR-0032 Change 4)",
+      "intent_user_token: gate1-approved-2026-05-23 present (user-token chain per ADR-0032 Change 2)",
+      "Own user_token: deliberately absent in draft status — to be assigned at Gate 2 PRD Approval Gate per gated-artifact lifecycle (matches Intent-doc pattern)",
+      "## Contents checklist present with all 11 required H2 sections marked [x] (Overview, Stakeholders, User Stories, Functional Requirements, Non-Functional Requirements, Product Policy Decisions, Success Criteria, Technical Considerations, Rollout Plan, Undetermined Items, Appendix)",
+      "All 11 required H2 sections present and non-empty",
+      "Required H3 substructure under each H2 present: Overview {One-line Summary, Background, Layer Scope}; Stakeholders {Stakeholder Inventory, Primary Users}; User Stories {grouped by stakeholder, Use Cases, User Journey Diagram, Scope Boundary Diagram}; Functional Requirements {Must Have, Should Have, Could Have, Won't Have}; Non-Functional Requirements {9 attributes addressed including explicit N/A}; Technical Considerations {Dependencies, Constraints, Assumptions, Risks and Mitigation}; Appendix {References, Glossary}",
+      "Layer Scope enumerates all 9 canonical layers verbatim from layer-taxonomy.md in canonical order (FR-X check)",
+      "Layer Scope marks 2 layers in scope (Claude Code / Project Filesystem, Dev Environment) and provides explicit out-of-scope rationale block for the other 7",
+      "EARS check: all 17 ACs (AC-FR-1-a/b/c, AC-FR-2-a/b, AC-FR-3-a/b, AC-FR-4-a/b, AC-FR-5-a/b, AC-NFR-1-a/b, AC-NFR-2-a/b/c, AC-NFR-4-a) use one of the 5 canonical EARS patterns with binding 'shall' (FR-1 check)",
+      "AC-ID convention followed (AC-FR-N-letter for functional, AC-NFR-N-letter for non-functional)"
+    ]
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "verdict_token": "PASS",
+    "conditions": [
+      "At Gate 2 PRD Approval, orchestrator assigns own user_token in frontmatter (currently absent; same lifecycle pattern as Intent doc's pre-confirmation placeholder).",
+      "Optional polish per the 5 recommended findings below (I-DR-005 through I-DR-009). None blocks Gate 2; author may absorb in a patch revision or carry to Blueprint composition for resolution-by-replacement."
+    ],
+    "rationale": "Gate 0 passes cleanly: all 11 required H2 sections, all required H3 substructure, frontmatter fully populated per ADR-0032 v2 conventions including doc_type=prd and intent_user_token. Layer Scope verbatim from layer-taxonomy.md (FR-X check passes). All 17 ACs use canonical EARS patterns with binding shall (FR-1 check passes). Gate 1 scores Consistency 92 / Completeness 92 / Rule compliance 95 / Clarity 88. All three AI-PRD failure modes are avoided: no fabricated stakeholder quotes (Intent Q&A correctly cited as source), all numeric requirements round-numbered with inline rationale, no implementation suggestions in requirements (install mechanism, transport, version pinning, tool-to-agent mapping all explicitly deferred to Undetermined Items UI-1 through UI-8). All 4 prior-context items from intent-review-issues.json are resolved (I-DR-001 doc_type emitted; I-DR-002 Serena reframed as UI-8 action item; I-DR-003 Exa transport vs key availability disambiguated at NFR-3 and UI-3 with explicit I-DR-003 attribution; I-DR-004 sub-agents-as-stakeholders disambiguated at Stakeholder Inventory preamble AND Technical Considerations Dependencies note). Document is exemplar PRD discipline: user voice preserved with citations, scope-class FULL confirmed, all 8 undetermined items carry owner + needed-by + forward pointer to the resolving stage, Risks table maps to UI items, and N/A markers used appropriately for out-of-scope NFR attributes. Findings below are all clarity polish, none consistency/completeness/compliance-blocking."
+  },
+  "issues": [
+    {
+      "id": "I-DR-005",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Functional Requirements / FR-7 (line 220) vs Won't Have (lines 224-229)",
+      "description": "FR-7 ('CI smoke-test that asserts claude mcp list shows all six servers connected') is listed under 'Could Have (P3)' but its body says 'Not in scope for this release (CI/CD layer marked out of scope in Layer Scope). Listed here only to make the deferral explicit.' A 'not in scope, listed for deferral' item is structurally a Won't Have, not a P3. The contradiction is minor (the body resolves the ambiguity) but a fast reader who scans only the P-priority headings could mistake FR-7 as a candidate scope.",
+      "evidence": "Line 220: '- [ ] **FR-7: A CI smoke-test...** — Stakeholder: Pipeline operator — Layer: CI/CD'. Line 221: 'Not in scope for this release (CI/CD layer marked out of scope in Layer Scope).' This conflicts with the Could Have semantics ('would be valuable but is not committed for this release; could still be picked up if effort allows').",
+      "suggestion": "Either (a) move FR-7 into the 'Won't Have (this release)' bulleted list with the reason 'CI/CD layer is out of scope; deferred to a separate feature if drift detection is later desired', removing the FR-N tag (since Won't Have items don't carry FR-N IDs); or (b) remove FR-7 entirely and let Rollout Plan's communication-plan bullet + UI items (none currently address this) handle the deferral. Option (a) is cleaner."
+    },
+    {
+      "id": "I-DR-006",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Non-Functional Requirements / NFR-4 / AC-NFR-4-a (line 261)",
+      "description": "AC-NFR-4-a reads 'When the Blueprint is composed, the system shall include a measured or estimated per-agent context overhead figure for the six-server always-on configuration, and a stated threshold above which mitigation is required.' This is a process-level / artifact-completeness requirement (the Blueprint must contain a figure) rather than a system-runtime requirement (the system must behave a certain way). Mechanically the AC passes EARS Pattern 1, but the subject 'system' is being used to mean 'the feature-delivery process,' which is a soft stretch. The cross-artifact auditor may notice this asymmetry later.",
+      "evidence": "All other ACs in this PRD describe observable behaviors of the running system (Codespace build, claude mcp list, agent allowlists, probe responses). AC-NFR-4-a alone targets an artifact-content commitment.",
+      "suggestion": "Either (a) rephrase as a Blueprint-author instruction inside UI-7's 'Owner / Needed by' note (since NFR-4 already commits 'Design must measure and surface'), and remove AC-NFR-4-a so NFR-4 itself becomes the Blueprint-input instruction; or (b) reword to make the runtime subject explicit, e.g., 'When the operator inspects the composed Blueprint at Gate 4, the system shall make a per-agent context overhead measurement visible at a documented threshold.' Option (a) is cleaner because it keeps NFR ACs runtime-focused."
+    },
+    {
+      "id": "I-DR-007",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Functional Requirements / FR-2 (lines 192-195) and FR-3 (lines 197-199)",
+      "description": "FR-2 ('Affected sub-agents shall have the new MCP tools in their tools: allowlists') and FR-3 ('The active tool-to-agent wiring shall be expressed in human-readable files in the repo') overlap in subject matter. FR-2 is about presence-of-wiring; FR-3 is about auditability-and-locality-of-wiring. The boundary is implicit. A reader may wonder whether FR-3 is a strict subset of FR-2 (already implied) or whether it adds a distinct requirement (no runtime mutation, no out-of-repo registry).",
+      "evidence": "FR-2 covers AC-FR-2-a (allowlist entries present) and AC-FR-2-b (allowlist entries take effect). FR-3 covers AC-FR-3-a (union of .mcp.json + allowlists is the active mapping; both human-readable in repo) and AC-FR-3-b (changes take effect at next pipeline run with no other change). The novel content in FR-3 vs FR-2 is the no-runtime-mutation / single-source-of-truth commitment, which NFR-3 line 253 also states ('every change... shall be visible in git history... forbids runtime mutation').",
+      "suggestion": "Add a one-line note inside FR-3's body cross-referencing NFR-3's audit-and-traceability bullet: 'Distinct from FR-2 (which requires the allowlist entries are present); FR-3 commits to the readability and no-runtime-mutation properties — see NFR-3 audit & traceability.' Alternatively, merge AC-FR-3-a into FR-2 and demote FR-3 to a single-AC requirement that focuses solely on no-runtime-mutation; this would tighten the FR taxonomy without losing the commitment."
+    },
+    {
+      "id": "I-DR-008",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "User Stories / US-1 / AC-FR-1-c (line 94)",
+      "description": "AC-FR-1-c ('If any of the six servers is missing, not registered, or not responding at probe time, then the system shall surface a clear failure naming the specific server and the layer of failure (install / registration / transport / auth)') has a well-formed Pattern 4 trigger and a useful enumerated layer-of-failure list, but the action 'surface a clear failure' is under-specified about WHERE the failure surfaces — claude mcp list output? script stdout? exit code? probe-tool output? Compare AC-FR-4-b (line 205) which is more concrete: 'surface the failing server name, the probe input, and the response/error so the operator can diagnose without re-running.'",
+      "evidence": "An AC reviewer applying the ears-acceptance-criteria.md testability check ('precondition / trigger / assertion / boundary') finds the boundary fuzzy — the layer-of-failure list narrows the assertion but not the surfacing channel. A test author would need to invent the channel.",
+      "suggestion": "Tighten to: 'If any of the six servers is missing, not registered, or not responding at probe time, then the system shall surface a clear failure in the probe tool's output (and in claude mcp list output where applicable) naming the specific server and the layer of failure (install / registration / transport / auth).' Or defer the channel choice to Blueprint and add a note: 'specific surfacing channel decided at Design (UI / new sub-item)' — but the latter adds a 9th UI item, so tightening in-place is preferred."
+    },
+    {
+      "id": "I-DR-009",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Non-Functional Requirements / NFR-3 / AC-NFR-2-c (line 137) — duplicated in FR-1 references list (line 190)",
+      "description": "AC-NFR-2-c reads 'When the auditing-mcp skill is run against the resulting .mcp.json, the system shall produce no BLOCKER findings.' The subject 'the system' is awkward here — auditing-mcp is the actor that produces findings; the .mcp.json is what findings are produced about; the running 'system' (the devcontainer + Claude Code + the six servers) is a step removed from either. Compare Success Criteria row (line 311) which is cleaner: 'auditing-mcp BLOCKER findings ... target 0 ... Measurement Method: auditing-mcp skill run against the resulting .mcp.json.'",
+      "evidence": "The Success Criteria row reads more naturally because it names the subject (BLOCKER findings) and the measurement method (auditing-mcp skill run). The AC version 'the system shall produce' makes 'the system' the producer, which is grammatically off.",
+      "suggestion": "Reword to: 'When the auditing-mcp skill is run against the resulting .mcp.json, the auditing-mcp skill shall report zero BLOCKER findings.' This keeps EARS Pattern 1 form, names the correct subject (the auditing-mcp skill), and makes the assertion precise."
+    }
+  ],
+  "recommendations": [
+    "Carry the 5 recommended findings above to the Blueprint composition phase. Several (especially I-DR-006 NFR-4 process-vs-runtime and I-DR-007 FR-2/FR-3 boundary) may be resolved by replacement when the Blueprint re-asserts the same commitments in Design-doc form.",
+    "At Gate 2 PRD Approval: orchestrator assigns own user_token in frontmatter and updates status from 'draft' to 'accepted' in the same edit. Optionally absorb I-DR-005 (FR-7 reclassification) in the same patch since it's a one-line move; the other 4 findings are larger and best left for the Blueprint cycle.",
+    "Forward the 8 Undetermined Items (UI-1 through UI-8) verbatim to the Discovery Planning rationale brief — each has a clear owner and needed-by stage. Discovery Planning will dispatch UI-2/UI-3/UI-4 (transports + install paths) to discovery-codebase-researcher + discovery-external-researcher, and UI-1/UI-5/UI-6/UI-7/UI-8 to the relevant per-layer Designer at Stage 6.",
+    "The PRD exemplifies the discipline KB-documentation-criteria asks for: explicit I-DR-NNN carry-forward citations inline (Stakeholder Inventory preamble; NFR-3; UI-3; Technical Considerations Dependencies note), user-confirmed decisions traced back to Q1-Q5, and a Risks table that maps Medium-probability items to the UI items that resolve them. No structural rework needed."
+  ],
+  "prior_context_check": {
+    "items_received": 4,
+    "resolved": 4,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [
+      {
+        "id": "I-DR-001",
+        "from_review": "intent-review-issues.json",
+        "original_severity": "important",
+        "original_category": "compliance",
+        "original_description": "Intent Clarification frontmatter missing doc_type field per ADR-0032 Change 4.",
+        "status": "resolved",
+        "location_in_prd": "Frontmatter line 3",
+        "evidence": "PRD frontmatter declares 'doc_type: prd' as a top-level field. The discipline implied by I-DR-001 (universal required doc_type) is honored. Note: I-DR-001 itself was scoped to the Intent doc's frontmatter — this PRD's emission of doc_type satisfies the analogous discipline for its own frontmatter; the Intent doc's own doc_type backfill remains the deferred scope of planning-agent-doctype-backfill-r1 per shared-conventions.md line 307."
+      },
+      {
+        "id": "I-DR-002",
+        "from_review": "intent-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "Open Items bullet 'Note the Serena fit caveat' read as observation, not action item. Suggested reframing as an action item to decide whether to scope Serena's use.",
+        "status": "resolved",
+        "location_in_prd": "Undetermined Items / UI-8 (line 403); also Risks table line 378",
+        "evidence": "UI-8 reframes the caveat as an explicit decision item: 'Decide: is Serena warranted at the project scope here, or should it be scoped only to downstream feature-codebase runs (e.g., via a per-feature .mcp.json overlay)? Bound by the Q4 decision (all six always-on) — Design may not unilaterally drop Serena, but the open item invites the operator to confirm before Gate 4.' Owner (pipeline operator + design-claude-code) and needed-by (Design Composition) are both stated. This matches I-DR-002 suggestion option (a) verbatim."
+      },
+      {
+        "id": "I-DR-003",
+        "from_review": "intent-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "Q5 (keys available via Codespaces secrets) and Open Items bullet 2 (Exa transport-level auth) are different concerns that a fast reader could perceive as in tension. Suggested explicit prefix in Open Items bullet 2.",
+        "status": "resolved",
+        "location_in_prd": "NFR-3 'Distinction (per I-DR-003 carry-forward)' subsection (line 251); Undetermined Items / UI-3 (line 398)",
+        "evidence": "NFR-3 explicitly cites I-DR-003 and distinguishes: 'Q5 of the Intent Clarification confirmed that the API keys (EXA_API_KEY, CONTEXT7_API_KEY, TFE_TOKEN) are available via Codespaces secrets. The transport-level authentication mechanism for Exa (HTTP header vs. URL query parameter vs. stdio with env-var) is a separate question and is not yet resolved.' UI-3 reinforces with the parenthetical '(Note per I-DR-003: this is a transport-level question; the key availability question is closed by Q5.)'. Disambiguation is explicit at both ends."
+      },
+      {
+        "id": "I-DR-004",
+        "from_review": "intent-review-issues.json",
+        "original_severity": "recommended",
+        "original_category": "clarity",
+        "original_description": "Intent Stakeholder Posture listed consuming sub-agents as a stakeholder; sub-agents are surface area / consumers rather than stakeholders. PRD Stakeholder Inventory should disambiguate.",
+        "status": "resolved",
+        "location_in_prd": "Stakeholder Inventory preamble (line 67); Technical Considerations / Dependencies / Downstream consumers (line 346)",
+        "evidence": "Stakeholder Inventory preamble explicitly cites I-DR-004 and reclassifies: 'this section treats consuming sub-agents as a surface-area consideration handled under Technical Considerations, not as a stakeholder. The stakeholders below are real human or human-tooled roles.' The inventory then lists only human/human-tooled roles: pipeline operator, devcontainer user, sub-agent author (human), security reviewer. Technical Considerations / Dependencies / Downstream consumers (line 346) reinforces: 'Note (per I-DR-004 carry-forward): the sub-agents listed are surface area — they are consumers of the provisioned capability. They are not stakeholders in the PRD sense; the human sub-agent author is the stakeholder.' Disambiguation is explicit at both surfaces."
+      }
+    ],
+    "note": "All 4 prior-context items resolved. The PRD demonstrates exemplary carry-forward discipline: each I-DR-NNN that needed surfacing in the PRD body carries an explicit citation by ID (I-DR-002 → UI-8; I-DR-003 → NFR-3 + UI-3; I-DR-004 → Stakeholder preamble + Dependencies note). This makes the resolution auditable at a glance."
+  }
+}

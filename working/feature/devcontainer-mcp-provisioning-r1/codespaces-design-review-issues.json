@@ -1,0 +1,185 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "DesignDoc",
+    "target_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/codespaces-design.md",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "invocation_context": "shared-document-reviewer Invocation 3 — per-layer Design (Codespaces variant)",
+    "inputs_examined": [
+      "working/feature/devcontainer-mcp-provisioning-r1/codespaces-design.md",
+      "working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis.json",
+      "working/feature/devcontainer-mcp-provisioning-r1/synthesis.md",
+      "working/feature/devcontainer-mcp-provisioning-r1/prd-v3.md",
+      ".claude/skills/KB-codespaces-design/references/principles.md",
+      ".devcontainer/devcontainer.json (current state, for dependency realizability)"
+    ]
+  },
+  "scores": {
+    "consistency": 91,
+    "completeness": 89,
+    "rule_compliance": 93,
+    "clarity": 90
+  },
+  "gate0": {
+    "status": "pass",
+    "checks": [
+      {"item": "Frontmatter present with required fields (id, doc_type, layer, version, status, feature_slug, derived_from, generated, generated_by)", "status": "pass"},
+      {"item": "Layer Responsibility Scope section present", "status": "pass"},
+      {"item": "Base Mechanism section present", "status": "pass"},
+      {"item": "Tools Installation Strategy section present", "status": "pass"},
+      {"item": "Lifecycle-Hook Placement Table present", "status": "pass"},
+      {"item": "Prebuild Strategy section present", "status": "pass"},
+      {"item": "Persistence Boundaries section present", "status": "pass"},
+      {"item": "Machine Class section present", "status": "pass"},
+      {"item": "Secrets and Config section present", "status": "pass"},
+      {"item": "Port Forwarding section present", "status": "pass"},
+      {"item": "Multi-Container Topology / Dotfiles / Monorepo / Idle Timeout / Org Policy sections present", "status": "pass"},
+      {"item": "Acceptance Criteria Contribution (EARS) present (AC-CS-1..AC-CS-9)", "status": "pass"},
+      {"item": "Dependencies on Other Layers section present", "status": "pass"},
+      {"item": "Architectural Questions for Composer (Q-CS-N) present", "status": "pass"},
+      {"item": "Rebuild-Time Estimate section present (NFR-1 mapping)", "status": "pass"},
+      {"item": "Open Items section present (OI-CS-N)", "status": "pass"},
+      {"item": "Provenance section present", "status": "pass"},
+      {"item": "No ADRs authored (FR-5 compliance — questions surfaced as Q-CS-N for composer)", "status": "pass"}
+    ],
+    "missing_elements": []
+  },
+  "synthesis_work_item_coverage": {
+    "status": "complete",
+    "items": [
+      {"item": "Node feature (D-0003: pin to Node 20 LTS major)", "covered": true, "location": "Tools Installation Strategy / Features block changes — explicit lts→20 modification"},
+      {"item": "Go feature (constraint #2; for actionlint-mcp go install)", "covered": true, "location": "Features block changes / Add — ghcr.io/devcontainers/features/go:1"},
+      {"item": "postCreate install+verify script (D-0001 hybrid posture)", "covered": true, "location": "Lifecycle-Hook Placement Table + postCreate.sh outline (idempotent, sentinel-guarded, fail-fast)"},
+      {"item": "postStart probe→jsonl (D-0008 ping + D-0005 jsonl)", "covered": true, "location": "Lifecycle-Hook Placement Table + postStart.sh outline (readiness_probe records, warn-and-continue, optional auth-probes)"},
+      {"item": "containerEnv for 3 secrets (D-0007, constraint #9)", "covered": true, "location": "Secrets and Config / Wiring — containerEnv block with ${localEnv:NAME} indirection for CONTEXT7_API_KEY, EXA_API_KEY, TFE_TOKEN"},
+      {"item": "GitNexus skip-grammars smoke-test (synthesis 9.2, C-0388/C-0411)", "covered": true, "location": "postCreate.sh install_gitnexus function (GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 + --help check) + AC-CS-9"}
+    ]
+  },
+  "fr5_compliance": {
+    "status": "pass",
+    "evidence": "No ADRs authored in this document. All architectural choices either (a) recommend a posture with rationale and defer to composer via Q-CS-N (8 items: Q-CS-1 through Q-CS-8), or (b) defer to composer reconciliation (e.g., Dependencies on Other Layers row 3 — redaction-filter code-site reconciliation). The 'No new project Dockerfile' posture (D-0001 hybrid) is honored. The frontmatter declares doc_type: per_layer_design_subsection, not adr."
+  },
+  "nfr1_addressed": {
+    "status": "pass",
+    "evidence": "Rebuild-Time Estimate section provides per-phase breakdown (Base image pull, Features, onCreate, postCreate, postStart) with cold-cache total ~7-12 min and warm-cache ~1-2 min, both mapped to PRD NFR-1's ~10 min / ~2 min targets. Risk acknowledgement that cold-cache estimate sits near upper bound; mitigation surfaced via Q-CS-2 (prebuild adoption deferral). AC-CS-8 codifies the envelope into EARS form."
+  },
+  "dependency_realizability": {
+    "status": "pass",
+    "checks": [
+      {"dependency": "mcr.microsoft.com/devcontainers/python:1-3.11-bookworm base image", "verified": "Confirmed present in .devcontainer/devcontainer.json + Dockerfile (per codebase-analysis.json)"},
+      {"dependency": "ghcr.io/devcontainers/features/common-utils:2", "verified": "Already present in devcontainer.json (preserved per design)"},
+      {"dependency": "ghcr.io/devcontainers/features/github-cli:1", "verified": "Already present in devcontainer.json (preserved per design)"},
+      {"dependency": "ghcr.io/devcontainers/features/node:1", "verified": "Already present in devcontainer.json (design modifies version: lts → 20)"},
+      {"dependency": "ghcr.io/anthropics/devcontainer-features/claude-code:1", "verified": "Already present in devcontainer.json (preserved per design)"},
+      {"dependency": "ghcr.io/devcontainers/features/go:1 (new)", "verified": "Canonical devcontainers Feature; well-known and documented. Acceptable per KB-codespaces-design Principle 6 (Features for known tools)."},
+      {"dependency": "uv (Astral)", "verified": "Synthesis cites C-0005 verified-medium; design correctly notes pip install --user uv fallback with smoke-test"},
+      {"dependency": "Codespaces secrets surface (CONTEXT7_API_KEY, EXA_API_KEY, TFE_TOKEN)", "verified": "Confirmed via PRD constraint #9 and synthesis substrate_context. ${localEnv:NAME} indirection is devcontainer-spec canonical."},
+      {"dependency": "claude mcp ping primitive (Q-CS-7)", "verified": "Design correctly flags this as verify-at-execution (OI-CS-5); does not assume existence. Falls back to direct JSON-RPC."}
+    ]
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "conditions": [
+      "Composer arbitration on Q-CS-1 through Q-CS-8 (8 questions surfaced; each carries a Recommended posture — composer to ratify or revise)",
+      "Composer reconciliation of credential-redaction code-site (Dependencies on Other Layers row 3) — design-cc owns the env-var SSOT; this design's postStart writes to stderr/jsonl, so the redaction-filter boundary needs composer placement",
+      "design-cc must author the mcp-events.jsonl schema (KB-mcp-design principles.md) BEFORE the postStart.sh code is finalized — sequencing dependency named in Q-CS-8 and Dependencies table",
+      "Verify-at-execution items in Open Items (OI-CS-1 through OI-CS-5) must be resolved by Plan-stage tasks (acceptable to defer here per synthesis 'verify at execution' discipline)"
+    ]
+  },
+  "issues": [
+    {
+      "id": "I-DR-CS-001",
+      "severity": "important",
+      "category": "completeness",
+      "location": "postCreate.sh outline (lines 99-146) + Persistence Boundaries (line 248)",
+      "description": "Sentinel-file naming convention drift. The Persistence Boundaries section (line 248) specifies version-pinned sentinel names: '<server>@<version>.installed' so that pin-bump invalidates stale sentinels. However the postCreate.sh outline at line 126 uses unversioned sentinel: '$SENTINEL_DIR/${server}.installed'. This is a load-bearing inconsistency: if a maintainer bumps SERENA_TAG in versions.env, the unversioned sentinel will short-circuit and skip the re-install, leaving the old version on disk while the script reports OK. Q-CS-5's 'Recommended' posture (sentinel-file-guarded, version-pinned) is not implemented in the code outline.",
+      "suggestion": "Reconcile by either (a) changing the postCreate.sh sentinel construction to '$SENTINEL_DIR/${server}@${VERSION_VAR}.installed' (reading the per-server pinned version from versions.env), matching the Persistence Boundaries spec; or (b) explicitly noting in postCreate.sh that the script ALSO deletes any prior sentinel for the same server-base before writing the new one. Option (a) is preferred because it makes pin-bump idempotency self-evident from the sentinel inventory."
+    },
+    {
+      "id": "I-DR-CS-002",
+      "severity": "important",
+      "category": "consistency",
+      "location": "Lifecycle-Hook Placement Table row 'onCreateCommand' (line 82) + Rebuild-Time Estimate table (lines 386-388)",
+      "description": "Conflicting rationales for not relocating Node/Go priming into onCreateCommand. The lifecycle table says onCreateCommand 'runs before workspace mount — too early for stdio MCP installs that may reference repo paths.' But Q-CS-1 explicitly observes that 'uvx-based servers are workspace-agnostic at install' and 'actionlint-mcp and terraform-mcp install standalone binaries' — i.e., a substantial subset of the install work IS workspace-agnostic and would benefit from prebuild capture if it ran in onCreateCommand or updateContentCommand. KB-codespaces-design Principle 1 explicitly warns: 'A common bug: npm install in postCreateCommand. The dependency install runs once when the codespace is created, but prebuilds DON'T capture it.' The design's rationale acknowledges this in Q-CS-1 and Q-CS-2 but the table presents 'too early for stdio servers needing project mount' as a categorical reason when in fact it only applies to a subset.",
+      "suggestion": "Clarify the lifecycle table row for onCreateCommand to note that the design choice (keep all installs in postCreate for homogeneity) is the recommended posture but is explicitly contingent on the prebuild deferral decision (Q-CS-2). If the composer adopts prebuilds (Q-CS-2 path B), the workspace-agnostic subset of installs (uv prime, Go toolchain prime, actionlint-mcp go install, Terraform binary fetch) should move to onCreateCommand or updateContentCommand to be captured. Either inline this contingency note in the table or add a forward-reference: 'See Q-CS-1 / Q-CS-2 for the contingency.'"
+    },
+    {
+      "id": "I-DR-CS-003",
+      "severity": "important",
+      "category": "completeness",
+      "location": "Secrets and Config / Fallback when a secret is absent (lines 303-305) + AC-FR-5-b mapping",
+      "description": "Missing AC for the secret-absent failure mode. PRD AC-FR-5-b requires: 'If a required credential's environment variable is unset at server start, then the system shall fail the affected server's probe with a clearly named missing credential failure, not a silent skip.' The design's Fallback subsection (lines 303-305) describes the behavior in prose ('design-cc's .mcp.json should produce a clearer missing CONTEXT7_API_KEY message at session start (design-cc concern)') but does NOT produce a Codespaces-layer AC. The Codespaces layer is partially responsible: it is the layer that wires the env-vars; if EXA_API_KEY is unset in Codespaces secrets, the containerEnv mapping will inject an empty string (or unset, depending on shell semantics), and the postStart probe ought to detect that condition explicitly rather than relying on Exa's 401 response (which can be ambiguous with quota/network errors).",
+      "suggestion": "Add an EARS AC (proposed AC-CS-10): 'If an env-var referenced by .mcp.json (CONTEXT7_API_KEY, EXA_API_KEY, TFE_TOKEN) is unset or empty at postStart probe time, then the system shall record the probe result as result=fail with a distinguishable reason field naming the missing env-var, separate from transport/auth failures.' This makes the Codespaces-layer contribution to AC-FR-5-b explicit and gives auditing-mcp a concrete check target."
+    },
+    {
+      "id": "I-DR-CS-004",
+      "severity": "important",
+      "category": "consistency",
+      "location": "postStart.sh outline (lines 156-219) — declare -A SERVERS associative array",
+      "description": "Server enumeration in postStart.sh does NOT include codebase-memory-mcp (the documented ADR-0018 fallback for GitNexus). The synthesis §4 per-server matrix includes codebase-memory-mcp as a row (fallback only) and PRD US-1 AC-FR-1-a names 'seven named MCP servers' as the registered surface, but the discovery-codebase-researcher tools allowlist also gets mcp__codebase-memory-mcp__* per synthesis 9.1 work item 2. The design's SERVERS array enumerates exactly 7 (serena, mcp-openapi-schema, actionlint-mcp, terraform-mcp, gitnexus, context7, exa) and the stderr banner reports '7/7' — codebase-memory-mcp is absent. If codebase-memory-mcp is registered in .mcp.json (as design-cc work item 1 implies — it's the fallback wired into discovery-codebase-researcher), then postStart should also probe it. If it is NOT registered in .mcp.json, then the design should explicitly state that.",
+      "suggestion": "Clarify in the postStart.sh outline (or in Dependencies on Other Layers) whether codebase-memory-mcp is (a) registered in .mcp.json and therefore SHOULD be probed by postStart (eighth row in SERVERS, banner becomes '8/8'), or (b) is NOT a separate .mcp.json registration but a primary/fallback relationship expressed at the agent-tools-allowlist layer only. If (b), then the AC-CS-4 wording 'one readiness_probe JSONL record per registered server' is correct as-is at seven. If (a), the design under-counts. This needs explicit reconciliation with design-cc (whose .mcp.json schema is the source of truth) — surface as a new Q-CS-9 if design-cc has not yet decided, or update the SERVERS array if design-cc has."
+    },
+    {
+      "id": "I-DR-CS-005",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "postStart.sh outline (line 184) — invocation of .devcontainer/lib/mcp-ping.sh",
+      "description": "The postStart.sh outline calls '.devcontainer/lib/mcp-ping.sh' and '.devcontainer/lib/mcp-auth-probe.sh' as helper scripts but their existence, contract, and content are not documented anywhere in this design subsection. The Layer Responsibility Scope section does not list them as new artifacts. This leaves a gap: the design owns the lifecycle hooks but is silent about the helper-script surface that implements the probe primitive (Q-CS-7's verify-at-execution item leaves uncertainty about whether 'claude mcp ping' exists, which means mcp-ping.sh may need to implement the JSON-RPC fallback path itself).",
+      "suggestion": "Either (a) add the two helper scripts to the Layer Responsibility Scope section's new-artifacts list, with a one-paragraph contract for each (input args, output behavior, exit codes); or (b) inline the ping logic into postStart.sh (avoid the helper-script abstraction). Option (a) is preferred because the helper scripts will likely be reused at install-time verification too. If (a), the Q-CS-7 verify-at-execution item should be re-located to OI-CS-N as 'helper-script contract finalized at execution time' so the design surface is complete."
+    },
+    {
+      "id": "I-DR-CS-006",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "Tools Installation Strategy — Terraform MCP install",
+      "description": "Reference to '.devcontainer/install/terraform-mcp.sh' (line 117 in postCreate.sh) is the only mention of this helper script in the entire design. Its existence, its SHA256/GPG verification logic (per synthesis C-0157/C-0190/C-0193), and its placement in .devcontainer/install/ are not in the Layer Responsibility Scope list of new artifacts. Synthesis 9.2 item 2 commits to 'wget pre-built binary → sha256sum -c → GPG verify (HashiCorp public key)' — this is non-trivial code-surface that deserves explicit ownership.",
+      "suggestion": "Add '.devcontainer/install/terraform-mcp.sh (NEW)' to the Layer Responsibility Scope section's owned-artifacts list, with a one-paragraph note on the verification flow (wget → sha256sum -c SHA256SUMS → GPG verify against HashiCorp public key → install to PATH). This makes the security-critical code surface (the GPG verify is the supply-chain safety net per constraint #10 OWASP MCP01-adjacent) explicit and audit-checkable."
+    },
+    {
+      "id": "I-DR-CS-007",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Acceptance Criteria Contribution / AC-CS-1 (line 341)",
+      "description": "AC-CS-1 binds Go version to 'any feature-default version' which is loosely specified. While the synthesis does not require a Go pin (constraint #2 just requires Go to be available), 'any feature-default version' is non-deterministic across re-runs and across the lifetime of the feature: ghcr.io/devcontainers/features/go:1 may default to different minor versions over time. Synthesis D-0011 includes a per-server pin table but does not address the Go toolchain version itself. Since actionlint-mcp is built FROM the Go toolchain via 'go install', toolchain version drift could break the actionlint-mcp install.",
+      "suggestion": "Either (a) tighten AC-CS-1 to specify a Go feature version pin (e.g., feature config {\"version\": \"1.22\"} or similar), and add a row to versions.env; or (b) explicitly note in the design that Go feature-default is acceptable because actionlint-mcp's go install does not bind to a specific Go version. (a) is the lower-risk path given the existing 'pin discipline' E-0073/E-0074. This is a recommendation, not a blocker; surface as a refinement candidate."
+    },
+    {
+      "id": "I-DR-CS-008",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "postStart.sh outline — exit 0 always (line 218) + AC-CS-5",
+      "description": "The design's warn-and-continue posture (Q-CS-3 recommended; AC-CS-5) is well-motivated, but the categorical 'exit 0 always' on line 218 has an edge case: if the postStart.sh script itself fails before the probe loop (e.g., jq not installed, $EVENTS_FILE path unwritable due to permission error in a hostile rebuild scenario, malformed .mcp.json), the warn-and-continue does NOT apply — the script should distinguish 'probe-failure (warn-and-continue)' from 'infrastructure-failure (the script itself broke)'. The set -uo pipefail (line 161) catches some of this but the trailing 'exit 0 always' overrides it.",
+      "suggestion": "Either (a) move 'exit 0' to be conditional on the probe loop having executed (e.g., set a 'probe_loop_ran=1' flag inside the loop and exit 0 only if set, otherwise exit 1); or (b) explicitly document that postStart.sh treats infrastructure failures (jq missing, etc.) as catastrophic and propagates them, while probe failures are warn-and-continue. The AC-CS-5 EARS wording 'If one or more probes returns fail, then the system shall... AND exit 0' is already scoped to probe failures, but the script body's 'exit 0 always' contradicts that scoping."
+    },
+    {
+      "id": "I-DR-CS-009",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "Persistence Boundaries — install-sentinels directory + Rebuild-Time Estimate",
+      "description": "The design states that install sentinels live under '/workspaces/<repo>/.claude/runtime/install-sentinels/' (line 248), inside the workspace mount, surviving rebuild. KB-codespaces-design Principle 3 confirms only /workspaces persists. However, the BINARIES that the sentinels gate are NOT under /workspaces — actionlint-mcp goes to $GOPATH/bin, terraform-mcp to a PATH location, uv-installed binaries to ~/.local/bin, etc. (line 250-251). On rebuild, the sentinels survive but the binaries are GONE. The design notes 'Sentinel-file idempotence is the recommended baseline per Q-CS-5' and 'On rebuild, the sentinels survive, so re-run of postCreate is a no-op' — but this is exactly the bug: a no-op re-run means the binaries are NOT reinstalled, but the sentinels claim they are. The next postStart probe will then fail across the board.",
+      "suggestion": "Reconcile the sentinel/binary persistence model. Two options: (a) move install-sentinels OUT of /workspaces (e.g., to ~/.cache/mcp-installs/) so sentinels are also ephemeral on rebuild, ensuring sentinel-presence implies binary-presence; or (b) keep sentinels in /workspaces BUT have postCreate.sh validate binary presence (e.g., `command -v actionlint-mcp >/dev/null`) before honoring the sentinel — if binary is missing despite sentinel present, treat as 'sentinel stale, re-install'. Option (a) is simpler; option (b) is more robust if operators manually delete binaries. Either way, the current design has a real failure mode on rebuild and should be reconciled before Plan-stage. Surface as a Q-CS-5 refinement note (the Q-CS-5 already exists for the broader idempotence question; this is a sub-issue within it)."
+    },
+    {
+      "id": "I-DR-CS-010",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Dependencies on Other Layers table (lines 353-358) — design-composer row",
+      "description": "The 'design-composer' row says: 'Reconciliation of where the credential-redaction filter runs at the log boundary...design-codespaces postStart writes stderr, so the redaction filter at the stderr-capture boundary needs a code-site decision the composer arbitrates.' This is correct, but the design does not state what THIS layer will do if the composer chooses option A vs B. If composer decides 'redaction filter lives in postStart.sh wrapper around mcp-ping/auth-probe', then this design's postStart.sh shape changes substantially (it needs to filter stderr before structured logging). If composer decides 'redaction lives in the host-side Claude Code MCP client', then this design's postStart.sh is unaffected.",
+      "suggestion": "Add a single sentence to the Dependencies table or to a new Q-CS-9 noting which postStart.sh affordances depend on the composer outcome. Suggested wording: 'If composer routes redaction through postStart.sh, this design will add a preprocessing stage to mcp-ping.sh that pipes stderr through a redaction-allowlist filter keyed on env-var names from .mcp.json. If composer routes redaction host-side, postStart.sh is unaffected.' Makes the surface change conditional and forward-resolvable."
+    }
+  ],
+  "recommendations": [
+    "STRENGTHS — record for composer: (1) Explicit lifecycle-hook placement table with prebuild-capture column matches KB-codespaces-design Principle 1's anti-pattern guidance precisely. (2) Anti-pattern callouts ('Anti-pattern explicitly avoided') in three places (lifecycle, persistence, multi-container) demonstrate good defensive design discipline. (3) The Rebuild-Time Estimate per-phase table provides a falsifiable claim against NFR-1 — a measurable contract. (4) Q-CS-N items each carry a 'Recommended:' label, giving the composer a clear default while preserving choice. (5) FR-5 compliance is exemplary — no ADRs authored, 8 Q-CS items surfaced, 5 OI items deferred with explicit owners/timing.",
+    "FOR COMPOSER ARBITRATION: The 8 Q-CS items range from low-stakes (Q-CS-4 containerEnv vs runArgs — basically settled) to high-stakes (Q-CS-3 warn-and-continue posture — affects every operator's perception of MCP health). Recommend composer ratifies Q-CS-3, Q-CS-5, Q-CS-7 explicitly; Q-CS-1, Q-CS-2, Q-CS-4, Q-CS-6, Q-CS-8 can likely be auto-accepted as 'Recommended posture confirmed.'",
+    "FOR PLAN-STAGE: OI-CS-1 through OI-CS-5 are verify-at-execution. The Plan should ensure each maps to a concrete task: SERENA_TAG resolution (OI-CS-1), actionlint-mcp SHA resolution (OI-CS-2), TERRAFORM_MCP_VERSION confirmation (OI-CS-3), Exa --header flag confirmation (OI-CS-4 — though noted as design-cc concern), 'claude mcp ping' existence check (OI-CS-5).",
+    "RESOLVING I-DR-CS-001 (sentinel naming) and I-DR-CS-009 (sentinel/binary persistence mismatch) is RECOMMENDED before Plan-stage — both are real failure modes on rebuild, and Plan tasks built on the current shape would inherit the bugs. Lift both to 'important' if not addressed in v2 of this design."
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [],
+    "note": "Invocation 3 of shared-document-reviewer for this feature is the first review of the codespaces-design.md document specifically. No prior reviewer findings on this document exist in the feature's working/ directory. The 'prior context' frame applies across iterations of the SAME document; this is iteration 1."
+  }
+}

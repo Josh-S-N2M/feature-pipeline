@@ -1,0 +1,181 @@
+{
+  "schema_version": "1.0.0",
+  "layer": "codespaces",
+  "feature_slug": "devcontainer-mcp-provisioning-r1",
+  "generated_at": "2026-05-23T00:00:00Z",
+  "generated_by": "design-codespaces",
+  "source_design": "working/feature/devcontainer-mcp-provisioning-r1/codespaces-design.md",
+
+  "depends_on": [
+    {
+      "layer": "cc",
+      "what": ".mcp.json env-var contract",
+      "contract": "design-cc owns .mcp.json. The codespaces layer's containerEnv MUST expose exactly the env-var NAMES that .mcp.json references (CONTEXT7_API_KEY, EXA_API_KEY, TFE_TOKEN at minimum). If design-cc adds a new env-var reference, design-codespaces' containerEnv block must be updated in lockstep.",
+      "binding": "tight",
+      "evidence": [
+        "synthesis.md §9.1 item 1 (.mcp.json env: block enumerates CONTEXT7_API_KEY, EXA_API_KEY, TFE_TOKEN)",
+        "AC-NFR-2-b (env-var-name reference; runtime supply via Codespaces secrets)",
+        "AC-CS-6 (containerEnv mapping)"
+      ]
+    },
+    {
+      "layer": "cc",
+      "what": "mcp-events.jsonl schema (readiness_probe record shape)",
+      "contract": "design-cc owns the schema for mcp-events.jsonl records (in KB-mcp-design/references/principles.md). The codespaces layer's postStart.sh writes readiness_probe records using that schema. The fields used by postStart.sh are: ts, event='readiness_probe', server, probe_method, latency_ms, result. Schema must be authored before postStart.sh is finalized; sequencing dependency captured in Q-CS-8.",
+      "binding": "tight",
+      "evidence": [
+        "synthesis.md §9.1 item 6 (mcp-events.jsonl JSONL schema; readiness_probe fields)",
+        "synthesis.md §9.2 item 3 (postStart.sh appends readiness_probe events)",
+        "AC-CS-4 (records written per schema owned by design-cc)"
+      ]
+    },
+    {
+      "layer": "cc",
+      "what": "per-server install command specifics",
+      "contract": "design-cc's .mcp.json declares the command and args for each MCP server. design-codespaces' postCreate.sh installs the binaries / packages those commands reference (uvx-based for Serena, npm-installed-globally-then-npx for GitNexus per cycle-3 D-3.2 F2 correction, go-installed for actionlint-mcp at the cycle-3-corrected upstream identifier hongkongkiwi/actionlint-mcp per F1, wget-fetched for terraform-mcp, or npx-via-cache for mcp-openapi-schema). The command strings must match between .mcp.json and postCreate.sh (e.g., if .mcp.json invokes `npx -y gitnexus@${GITNEXUS_TAG} mcp`, postCreate must have run `npm install -g gitnexus@${GITNEXUS_TAG}` first to populate the global npm cache).",
+      "binding": "tight",
+      "evidence": [
+        "synthesis.md §4 per-server matrix (install command per server)",
+        "synthesis.md §9.1 item 1; §9.2 item 2"
+      ]
+    },
+    {
+      "layer": "composer",
+      "what": "Redaction-filter code-site placement",
+      "contract": "The credential-redaction filter (synthesis D-0007) consumes the env-var SSOT from .mcp.json's env: block (cc-owned). Where the filter actually runs at the log-surface boundary is a cross-layer call the composer arbitrates. design-codespaces' postStart.sh writes to stderr (captured by Claude Code); if the redaction filter runs at the stderr-capture boundary, the codespaces layer's scripts are the redaction integration point. If it runs elsewhere (e.g., in Claude Code host config), the codespaces layer is uninvolved.",
+      "binding": "loose",
+      "evidence": [
+        "synthesis.md §9.3 item 2 (composer reconciliation: redaction allowlist code-site)",
+        "Q-CS / Q-COMP cross-reference"
+      ]
+    }
+  ],
+
+  "provides_to": [
+    {
+      "layer": "cc",
+      "what": "Codespaces-secrets-backed env vars",
+      "contract": "containerEnv injects CONTEXT7_API_KEY, EXA_API_KEY, TFE_TOKEN into the container env from the operator's Codespaces secrets. .mcp.json reads them by name via ${VAR} substitution.",
+      "binding": "tight",
+      "evidence": [
+        "AC-CS-6 (containerEnv mapping)",
+        "AC-NFR-2-a (no secret value in committed files)",
+        "synthesis.md §9.2 item 4"
+      ]
+    },
+    {
+      "layer": "cc",
+      "what": "Installed MCP server binaries on PATH (or uvx/npx-resolvable)",
+      "contract": "After postCreate.sh completes, the following are available: `serena` (via uvx), `mcp-openapi-schema` (via npx cache), `actionlint-mcp` (binary on PATH from `go install github.com/hongkongkiwi/actionlint-mcp@<sha>` — identifier corrected at cycle-3 reconciliation D-3.2 F1; was 2manymws/...), `terraform-mcp` (binary on PATH from wget+verify), `gitnexus` (via `npm install -g gitnexus@${GITNEXUS_TAG}` for persistent install + `npx -y gitnexus@${GITNEXUS_TAG} mcp` for MCP server invocation — install mechanism corrected at cycle-3 reconciliation D-3.2 F2; was uvx-form which assumed PyPI publication that does not exist; GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 exported BEFORE install per AC-CS-9). Context7 and Exa require no local install. .mcp.json's command/args strings depend on these being resolvable. Prereq for GitNexus install path: Node-LTS-on-PATH at postCreate time (already provided by the `ghcr.io/devcontainers/features/node:1@20` Feature; no new base-image dep introduced).",
+      "binding": "tight",
+      "evidence": [
+        "synthesis.md §9.2 item 2 (per-server install commands)",
+        "AC-FR-1-a (claude mcp list shows seven connected)",
+        "reconciliation-log-cycle-3.md F1 (actionlint-mcp identifier) + F2 (gitnexus install mechanism)"
+      ]
+    },
+    {
+      "layer": "cc",
+      "what": "readiness_probe records in mcp-events.jsonl",
+      "contract": "postStart.sh writes one readiness_probe record per server per Codespace start, using the schema design-cc owns. design-cc tooling (auditing-mcp augmentation, future operator scripts) may consume these records as the canonical lifecycle-event surface.",
+      "binding": "tight",
+      "evidence": [
+        "AC-CS-4 (postStart probe records)",
+        "AC-FR-8-a (consolidated output at postCreate lifecycle)",
+        "synthesis.md §9.2 item 3"
+      ]
+    },
+    {
+      "layer": "cc",
+      "what": "Per-server install + readiness in a fresh Codespace (the end-to-end dev environment)",
+      "contract": "The 36 sub-agents and the entire Claude Code session run inside this devcontainer. All MCP-consuming agents (per design-cc's allowlist updates) depend on the seven servers being installed and connectable. The codespaces layer is the substrate.",
+      "binding": "tight",
+      "evidence": [
+        "PRD US-1 (operator can rebuild and find all seven ready)",
+        "AC-FR-1-a, AC-FR-1-b"
+      ]
+    }
+  ],
+
+  "no_dependency": [
+    {
+      "layer": "frontend",
+      "reason": "Layer Scope unchecked — no UI components in this feature."
+    },
+    {
+      "layer": "backend",
+      "reason": "Layer Scope unchecked — no services / domain logic."
+    },
+    {
+      "layer": "api",
+      "reason": "Layer Scope unchecked — no HTTP/RPC endpoints."
+    },
+    {
+      "layer": "query",
+      "reason": "Layer Scope unchecked — no ORM / query layer."
+    },
+    {
+      "layer": "database",
+      "reason": "Layer Scope unchecked — no schema / migrations."
+    },
+    {
+      "layer": "cicd",
+      "reason": "Layer Scope unchecked. PRD explicitly Won't-Have for this release. If a CI smoke-test workflow for `claude mcp list` is later added, it would consume the same devcontainer.json but is out of scope here."
+    },
+    {
+      "layer": "iac",
+      "reason": "Layer Scope unchecked — no cloud infra provisioned."
+    }
+  ],
+
+  "cross_cutting_open_items": [
+    {
+      "id": "Q-CS-1",
+      "title": "onCreate vs postCreate split for install",
+      "recommendation": "All installs in postCreate.",
+      "blocks": "composition"
+    },
+    {
+      "id": "Q-CS-2",
+      "title": "Prebuild adoption",
+      "recommendation": "Defer; do not adopt this release.",
+      "blocks": "composition"
+    },
+    {
+      "id": "Q-CS-3",
+      "title": "postStart probe failure handling",
+      "recommendation": "Warn-and-continue (write JSONL, stderr banner, exit 0).",
+      "blocks": "composition"
+    },
+    {
+      "id": "Q-CS-4",
+      "title": "containerEnv vs runArgs --env",
+      "recommendation": "containerEnv with ${localEnv:NAME}.",
+      "blocks": "composition"
+    },
+    {
+      "id": "Q-CS-5",
+      "title": "Idempotence mechanism",
+      "recommendation": "Sentinel files under .claude/runtime/install-sentinels/<server>@<version>.installed.",
+      "blocks": "composition"
+    },
+    {
+      "id": "Q-CS-6",
+      "title": "Multi-stage Dockerfile vs Go-feature for actionlint-mcp",
+      "recommendation": "Go feature + postCreate go install.",
+      "blocks": "composition"
+    },
+    {
+      "id": "Q-CS-7",
+      "title": "Probe primitive (claude mcp ping vs direct JSON-RPC)",
+      "recommendation": "Prefer claude mcp ping if available; JSON-RPC fallback.",
+      "blocks": "composition; verify-at-execution"
+    },
+    {
+      "id": "Q-CS-8",
+      "title": "mcp-events.jsonl schema ownership (sequencing)",
+      "recommendation": "design-cc authors schema first; codespaces consumes.",
+      "blocks": "composition"
+    }
+  ]
+}

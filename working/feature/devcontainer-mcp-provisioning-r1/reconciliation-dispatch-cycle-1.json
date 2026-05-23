@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "devcontainer-mcp-provisioning-r1",
+  "cycle_number": 1,
+  "of_cap": 4,
+  "is_terminal_cycle": false,
+  "source_issues": "working/feature/devcontainer-mcp-provisioning-r1/cross-artifact-audit-issues.json",
+  "source_verdict": "needs_reconciliation",
+  "dispatches": [
+    {
+      "order": 1,
+      "target_agent": "test-acceptance-author",
+      "mode": "focused-in-place-amendment",
+      "artifact": "working/feature/devcontainer-mcp-provisioning-r1/acceptance-tests.md",
+      "version_transition": "1.0.0 -> 1.0.1",
+      "rationale": "All four cycle-1 findings localize to acceptance-tests.md. Plan v1 and Phase Validators v1 are correct on every point of contention. AT is the lagging artifact. Mechanical amendment; no semantics change; no full re-author.",
+      "feedback_brief": "Apply four targeted fixes to acceptance-tests.md (in-place, no new file; bump §Document History to v1.0.1 with one row summarizing the four cycle-1 fixes). DO NOT trigger a full re-author. DO NOT touch any other artifact. Issues are listed below verbatim from cross-artifact-audit-issues.json with cycle-1 dispositions. After amending, return a summary listing each finding's resolution.",
+      "issues_referenced": [
+        {
+          "id": "I-CA-001",
+          "severity": "MAJOR",
+          "location": "acceptance-tests.md:303 (AT-016 expected outcome)",
+          "fix": "Amend AT-016 expected outcome from '7 install_complete records' to '5 install_complete records (one per OSS-local install: serena, mcp-openapi-schema, actionlint-mcp, terraform-mcp, gitnexus). The 2 HTTP-transport servers (context7, exa) have no install_complete record; their availability is exercised by postCreate auth-probe (T3.2) and postStart readiness_probe (T3.5). The consolidated stdout summary still covers all 7.' This brings AT-016 into alignment with Plan T3.4 (plan-v1.md lines 564, 576) and PV-5.C5 (phase-validators.md line 379), both of which already correctly state 5."
+        },
+        {
+          "id": "I-CA-002",
+          "severity": "MAJOR",
+          "location": "acceptance-tests.md:507, 631-632, 738-740 (AT-032, AT-041, AT-049 op-script commands)",
+          "fix": "Replace all op-script references in Acceptance Tests with the Plan/PV canonical convention 'audit_op<N>_<descriptor>.py' (no zero-padding; 'audit_' prefix). Required renames: 'op_06_redaction.py' -> 'audit_op6_runtime_log_redaction.py' (AT-032); 'op_09_url_credential.py' -> 'audit_op9_url_credential_rejection.py' (AT-041); 'op_10_argv_leakage.py' -> 'audit_op10_argv_leakage.py' (AT-041); 'op_02_consumer_mapping.py' -> 'audit_op2_consumer_mapping.py' (AT-049); 'op_03_zero_mcp.py' -> 'audit_op3_zero_mcp_invariant.py' (AT-049); 'op_08_gitnexus.py' -> 'audit_op8_gitnexus.py' (AT-049); 'op_04_*.py' -> 'audit_op4_primary_fallback_prose.py' (AT-049). Sweep the entire file: any other op-script reference must follow the same convention. The canonical source for this convention is plan-v1.md T4.3 (lines 699-708) and phase-validators.md PV-4 (lines 308, 313, 388-389)."
+        },
+        {
+          "id": "I-CA-003",
+          "severity": "MINOR",
+          "location": "acceptance-tests.md:82, 93, 651 (AT-043 mapping to phantom 'AC-NFR-4')",
+          "fix": "Adopt recommended-resolution (a) from the audit. Pre-verified by finalize-reconciler: Blueprint v3 has NO 'AC-NFR-4' declaration and NO replacement AC ID. The PRD's NFR-4 commitment was reframed at PRD v2 (per I-DR-006) into a Blueprint-author instruction inside UI-7's Owner/Needed-by note; Blueprint v3 tracks the measurement under OI-4 (Open Items, line 1338) and the methodology is operationalized via Plan T4.7 + PV-4.C19/C20 + PV-5.C21 (per PA-OI-3 RESOLVED-METHODOLOGY-ALIGNED). Required edits: (1) at acceptance-tests.md:651, change 'Maps to AC: AC-NFR-4 (per PA-OI-3 alignment with T4.7 methodology)' to 'Maps to AC: PRD-NFR-4 / UI-7 / OI-4 (no Blueprint AC ID; methodology coverage via T4.7 + PV-4.C19+C20 + PV-5.C21 per PA-OI-3 RESOLVED-METHODOLOGY-ALIGNED).' (2) at acceptance-tests.md:82 (AC Coverage Matrix row for AT-043), update the AC-ID column to 'PRD-NFR-4 / UI-7 / OI-4' (no Blueprint AC ID). (3) at acceptance-tests.md:93 (note about AT-043 non-standard mapping), retain the PA-OI-3 acknowledgment but remove any 'AC-NFR-4' literal and replace with the PRD-NFR-4 / UI-7 / OI-4 framing. DO NOT retire AT-043; its methodology coverage is real and necessary. DO NOT invent a new Blueprint AC ID. The '51 of 51 Blueprint ACs covered' overview claim is true and must remain. The point is purely to remove the phantom Blueprint-AC label."
+        },
+        {
+          "id": "I-CA-004",
+          "severity": "MINOR",
+          "location": "acceptance-tests.md:91 (overview total phrasing)",
+          "fix": "Rephrase line 91 to: 'Total: 50 unique test IDs (AT-001..AT-049 + AT-HG); AT-HG is the unified verification for the AC-CC-5 / AC-FR-11-c / AC-NFR-2-c triplet per MINOR-V3-001 disposition.' Cosmetic clarity; no functional change."
+        }
+      ],
+      "out_of_scope": [
+        "Do not re-derive or re-author any AC. The 51-AC Blueprint chain is correct.",
+        "Do not touch acceptance-tests.md sections unrelated to the four findings (e.g., AT-001..AT-015, AT-017..AT-031, AT-033..AT-040, AT-042, AT-044..AT-048, AT-HG bodies).",
+        "Do not modify the Plan, Phase Validators, Blueprint, PRD, or any ADR. They are the authoritative sources this cycle is reconciling toward.",
+        "Do not introduce new ACs, new AT IDs, or new fixture conventions."
+      ],
+      "expected_output": {
+        "file_written": "working/feature/devcontainer-mcp-provisioning-r1/acceptance-tests.md (in-place)",
+        "version_after": "1.0.1",
+        "doc_history_row_added": true,
+        "return_summary_required": true,
+        "return_summary_format": "Per-finding resolution lines: 'I-CA-NNN: <one-line resolution statement>'."
+      },
+      "depends_on_dispatch_order": []
+    }
+  ],
+  "user_escalations": [],
+  "deferrals": [],
+  "convergence": {
+    "cycle": 1,
+    "of_cap": 4,
+    "prior_log_paths": [],
+    "persistent_issues": [],
+    "convergence_verdict": "first_round",
+    "next_cycle_posture": "regular",
+    "expected_cycle_2_verdict": "pass (zero MAJOR; zero or one trivial MINOR)",
+    "divergence_risk": "low — mechanical single-artifact amendment, no semantics change, no upstream churn"
+  },
+  "downstream_orchestrator_actions": [
+    "Invoke test-acceptance-author with the dispatch above.",
+    "After test-acceptance-author returns, re-invoke review-cross-artifact-auditor in iteration_number=2 mode (diff-mode, prior_context = cycle-1 issues + this dispatch).",
+    "If cycle-2 returns pass with 0 MAJOR + <=1 trivial MINOR: feature-pipeline advances out of Stage 9 reconciliation.",
+    "If cycle-2 returns needs_reconciliation: invoke finalize-reconciler with cycle_number=2 and prior_log_paths=[reconciliation-log-cycle-1.md]."
+  ]
+}

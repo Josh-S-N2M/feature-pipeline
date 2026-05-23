@@ -1,0 +1,1697 @@
+{
+  "feature_slug": "devcontainer-mcp-provisioning-r1",
+  "stage": "critique-merge",
+  "batches": [
+    {
+      "file": "03-critique-batch1.json",
+      "count": 20
+    },
+    {
+      "file": "03-critique-batch2.json",
+      "count": 19
+    },
+    {
+      "file": "03-critique-batch3.json",
+      "count": 22
+    },
+    {
+      "file": "03-critique-batch4.json",
+      "count": 20
+    },
+    {
+      "file": "03-critique-batch5.json",
+      "count": 17
+    }
+  ],
+  "critiques": [
+    {
+      "claim_id": "C-0002",
+      "claim_text_short": "Canonical Serena install on Debian-bookworm Py3.11 is `uvx --from git+https://github.com/oraios/serena serena start-mcp-server`.",
+      "verification_questions": [
+        "Does the cited source list this exact command as the upstream install path?",
+        "Does the source confirm Python 3.10+ / 3.11 compatibility for this path?",
+        "Is `uvx` documented as the canonical entrypoint (not just a convenience)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 T-001 F-1 (line 30) reproduces the command verbatim and attributes it to upstream README.",
+        "Yes \u2014 F-1 caveat (line 34) notes README's example pins Python 3.13 but Python 3.10+ is documented as compatible (Itecs corroboration); base image is 3.11.",
+        "Yes \u2014 F-1 frames `uvx --from git+...` as the 'upstream-recommended install + launch path' (line 30); also serves as the directly-runnable form."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Two independent sources (upstream README + Itecs guide) per F-1 + F-2. Adversarial probe: 'What if uvx is not on PATH?' \u2014 C-0005 covers this (uv is not pre-installed on base image; must be added). No falsifier present in graph."
+    },
+    {
+      "claim_id": "C-0003",
+      "claim_text_short": "The uv tool is the only required prerequisite for Serena installation.",
+      "verification_questions": [
+        "Is there a verbatim upstream quote supporting 'only required prerequisite'?",
+        "Are LSP-backend prerequisites (e.g., DOTNET_ROOT) accounted for, or does 'only required' overstate?",
+        "Is the quote contextually about install-time or runtime prerequisites?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F-1 quote (line 32): 'Serena is managed by uv, and installing uv is the only required prerequisite.' (direct upstream quote).",
+        "Partially \u2014 F-5 notes some LSP backends (e.g., DOTNET_ROOT for F#) need env vars, but these are language-specific runtime prereqs not Serena install prereqs. Scope of 'only' is install, not multi-language LSP runtime.",
+        "Install-time. The quote describes the install workflow; language-server backend prereqs are downstream-of-install concerns."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Verbatim quote anchored. Universal-quantifier 'only' is qualified appropriately by F-5 in the same research note. Adversarial probe: 'What about Python itself?' \u2014 Python is provided by the base image and uv requires it, but uv-via-pip is a one-line install; not a separate prereq from Serena's POV."
+    },
+    {
+      "claim_id": "C-0005",
+      "claim_text_short": "The base image `mcr.microsoft.com/devcontainers/python:1-3.11-bookworm` lacks uv; must add via pip install uv or astral.sh installer.",
+      "verification_questions": [
+        "Does the source document the base image composition?",
+        "Is uv pre-installed in this specific image variant?",
+        "Are both install paths (pip install uv, astral.sh/uv) referenced in source?"
+      ],
+      "verification_answers": [
+        "Partially \u2014 T-001 F-1 (line 30) names the base image and asserts uv is not pre-installed; the assertion is the research-note author's, not directly quoted from Microsoft's image docs.",
+        "Per source claim, no \u2014 but this is a derived statement, not a sourced one.",
+        "Yes \u2014 F-1 mentions both `pip install uv` and the official `astral.sh/uv` installer."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Verified-but-medium-confidence. The claim about base-image composition is widely true for python:*-bookworm images (which ship Python toolchain only) but the research note does not cite Microsoft's image manifest directly. Risk of falsification is low (well-known image content) but warrants verification at execution time via `which uv` smoke test in postCreate."
+    },
+    {
+      "claim_id": "C-0009",
+      "claim_text_short": "Serena's default transport is stdio (JSON-RPC over stdin/stdout as subprocess of MCP client).",
+      "verification_questions": [
+        "Does the cited source identify stdio as the default transport?",
+        "Is there independent corroboration (more than one source)?",
+        "Does the source describe the subprocess-launch pattern that defines stdio MCP?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 T-001 F-2 (lines 38-43): 'Serena's default transport for MCP-client integration is stdio... the server is launched as a subprocess of the MCP client'.",
+        "Yes \u2014 two sources cited: Itecs install guide (primary, with quote 'stdio transport, the standard protocol for MCP client-server communication') and Serena's own 'Connecting Your MCP Client' docs (corroborating).",
+        "Yes \u2014 F-2 explicitly contrasts with HTTP mode which requires out-of-band server launch."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Multi-sourced (Itecs + upstream docs). C-0010 and C-0011 sibling claims describe HTTP/SSE as opt-in, confirming stdio is the default by elimination as well. No dissent in graph."
+    },
+    {
+      "claim_id": "C-0060",
+      "claim_text_short": "mcp-openapi-schema is published on npm as `0.0.1`, MIT, single release 2025-03-13.",
+      "verification_questions": [
+        "Does the cited source confirm version 0.0.1 as the only published version?",
+        "Is the publish date 2025-03-13 cited from a primary source (npm registry)?",
+        "Is MIT licensing confirmed?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 T-002 F-1 (line 29): 'first and only published on 2025-03-13'.",
+        "Yes \u2014 source list entry 4 references npm registry `https://registry.npmjs.org/mcp-openapi-schema` as primary; F-1 source line 31 names it explicitly.",
+        "Yes \u2014 F-1 'MIT-licensed' (line 29)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Primary-source-anchored (npm registry). Universal-quantifier 'single release' is verified by registry version history. Adversarial probe: 'Could a 0.0.2 have been published since research date?' \u2014 possible but low likelihood given the ~14-month inactivity signal; re-verify at install time."
+    },
+    {
+      "claim_id": "C-0061",
+      "claim_text_short": "mcp-openapi-schema is run via `npx -y mcp-openapi-schema <path-to-spec>`.",
+      "verification_questions": [
+        "Does the README document this exact invocation?",
+        "Does the source confirm Node.js + npm prerequisites?",
+        "Is the path argument required or optional?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 T-002 F-4 quote (line 95): README install line `npx -y mcp-openapi-schema [path-to-schema-file]` (verbatim).",
+        "Yes \u2014 F-4 (line 78): 'Installation requires Node.js + npm'.",
+        "Required (positional, named in invocation). Server reads a local OpenAPI file passed as CLI arg (F-5)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "README-quote-anchored. Note: Node.js install requires the devcontainer to add `ghcr.io/devcontainers/features/node:1` \u2014 flagged in F-4 caveat; this is a base-image-fit dependency captured in C-0064/C-0096/C-0414 sibling claims."
+    },
+    {
+      "claim_id": "C-0062",
+      "claim_text_short": "Transport is stdio, confirmed in source via StdioServerTransport from @modelcontextprotocol/sdk.",
+      "verification_questions": [
+        "Is the StdioServerTransport import directly observed in source code?",
+        "Is there any HTTP/SSE transport option?",
+        "What MCP SDK version is required?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 T-002 F-2 quote (line 45): `import { StdioServerTransport } from \"@modelcontextprotocol/sdk/server/stdio.js\";` \u2014 verbatim from `index.mjs`.",
+        "No \u2014 F-2: 'There is no HTTP/SSE option.'",
+        "F-1 lists `@modelcontextprotocol/sdk ^1.7.0`; F-4 caveat notes this requires Node \u226518 in practice."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Source-code-anchored (index.mjs inspected directly per F-2). Strongest verification class: direct code inspection."
+    },
+    {
+      "claim_id": "C-0073",
+      "claim_text_short": "mcp-openapi-schema is pre-1.0 (0.0.1) with no release history; ~14-month-stale interpretation defensible.",
+      "verification_questions": [
+        "Is the staleness claim factually supported by registry publish dates?",
+        "Does the source qualify the 'abandoned vs. stable' ambiguity?",
+        "Is the maintenance-signal framing defensible (not over-interpreting silence)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 T-002 F-1 caveat (line 37): 'The package has been static since March 2025 (~14 months as of research date)'. With research date 2026-05-23, that is exactly 14 months \u2014 arithmetic checks.",
+        "Yes \u2014 F-1 explicitly hedges: 'could indicate either \"stable enough\" or \"abandoned\"; no further signal available.'",
+        "Yes \u2014 the research note avoids over-claiming; both interpretations are noted, and the recommendation (F-6) is to pin explicitly and treat as a periodic-review supply-chain dependency."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "The maintenance-signal interpretation is appropriately hedged in source. The Synthesizer should preserve the ambiguity (not flatten to 'abandoned'). Adversarial probe ('what does silence imply?'): the research note answers this correctly \u2014 silence on releases is ambiguous, not negative evidence. Single-sourced for the staleness signal (only npm registry can confirm), but the interpretation pattern (pre-1.0 + long inactivity \u2192 supply-chain caution) is conventional."
+    },
+    {
+      "claim_id": "C-0125",
+      "claim_text_short": "actionlint-mcp imports github.com/rhysd/actionlint as a Go library and uses NewLinter in-process; does not invoke a separate actionlint executable.",
+      "verification_questions": [
+        "Is the in-process import directly observed in main.go?",
+        "Is the NewLinter API call documented as the runtime call path?",
+        "Does the source rule out shelling out to an external actionlint binary?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 T-003 F1 (line 34): 'main.go contains `import \"github.com/rhysd/actionlint\"` and uses `actionlint.NewLinter(io.Discard, opts)` followed by `linter.Lint(filePath, content, nil)`.' \u2014 direct code inspection.",
+        "Yes \u2014 verbatim API call sequence cited.",
+        "Yes \u2014 F1 (line 32): 'it does not invoke a separate `actionlint` executable.' Synthesis #1 reinforces: 'the runtime image needs exactly one binary: actionlint-mcp. No separate actionlint binary'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Source-code-anchored. Corrects the 'dual-dependency wrinkle' premise of the Research Plan. Adversarial probe: 'shellcheck/pyflakes ARE shelled out' \u2014 yes, but those are explicitly optional opt-ins per C-0130, and the claim narrowly scopes to actionlint-the-library, not all linters."
+    },
+    {
+      "claim_id": "C-0126",
+      "claim_text_short": "The actionlint Go-library dependency is statically resolved at build time, not runtime.",
+      "verification_questions": [
+        "Is 'statically resolved at build time' a correct characterization of Go module dependencies?",
+        "Does the source claim go install produces a self-contained binary?",
+        "Are there any dynamic-loading caveats?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F1 (line 32): 'statically resolved at build time, not at runtime'. This is a true property of Go module compilation: Go produces statically-linked binaries by default.",
+        "Yes \u2014 F3 (line 56): 'go install... produces a self-contained static binary that does not require Go at runtime.'",
+        "None in source. Standard Go-build semantics."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Conceptually correct per Go-language semantics. The claim is universal but supported by the universal property of Go-module compilation; no falsifier."
+    },
+    {
+      "claim_id": "C-0127",
+      "claim_text_short": "actionlint-mcp's go.mod lists github.com/rhysd/actionlint v1.7.7 on main as of 2026-05-23.",
+      "verification_questions": [
+        "Is go.mod directly inspected?",
+        "Is the version `v1.7.7` quoted verbatim?",
+        "Is the fetch date documented?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F1 source (line 34) cites `go.mod` at `github.com/hongkongkiwi/actionlint-mcp` (default branch `main`, fetched 2026-05-23).",
+        "Yes \u2014 quote (line 36): 'github.com/rhysd/actionlint v1.7.7' (verbatim from go.mod).",
+        "Yes \u2014 'fetched 2026-05-23'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct file inspection with verbatim quote and fetch date. Falsifier would require go.mod to have changed between research date and now (low risk for a stale repo). Adversarial probe: 'What if upstream rebases / force-pushes main?' \u2014 Plan should record commit SHA at install time, not just branch ref."
+    },
+    {
+      "claim_id": "C-0133",
+      "claim_text_short": "hongkongkiwi/actionlint-mcp Releases page lists no releases ('There aren't any releases here') as of 2026-05-23, so install.sh has no artifacts to download.",
+      "verification_questions": [
+        "Is the verbatim 'There aren't any releases here' quote attested?",
+        "Is the install.sh failure path traced (releases API \u2192 404)?",
+        "Has the state been re-checked recently?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F2 quote (line 48): 'There aren't any releases here' (releases page).",
+        "Yes \u2014 F2 (line 44): 'install.sh shows it downloads from `https://github.com/.../releases/download/$VERSION/$FILENAME`, defaulting $VERSION to \"latest\" via the GitHub releases API. The repository's Releases page currently lists no releases'.",
+        "F2 caveat (line 52) acknowledges 'State may change; the maintainer could publish releases at any time. A Plan task should re-check the releases endpoint at execution time'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Time-sensitive claim (state may change). Critic verdict 'verified' for as-of-2026-05-23 snapshot; downstream Synthesizer should preserve the 're-check at execution time' caveat. Adversarial probe: 'Who benefits from this being true?' \u2014 no party; the claim is operationally costly (forces source-build path). Likely accurate."
+    },
+    {
+      "claim_id": "C-0134",
+      "claim_text_short": "Of four README-listed install methods (script, prebuilt binaries, go install, Docker), only `go install` does not depend on release assets.",
+      "verification_questions": [
+        "Are all four install methods enumerated in source?",
+        "Is the dependency-on-release-assets analysis correct for each?",
+        "Is the Docker path dependency on release assets accurate?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F3 (line 56): 'Among the four install methods the README lists (install script, prebuilt binaries, go install, Docker)'.",
+        "Yes \u2014 install.sh depends on releases (per F2); prebuilt binaries depend on releases; Docker depends on Docker daemon (out of scope per no-DinD); only go install fetches from Go module proxy, not GitHub releases.",
+        "Verified \u2014 Docker image is not built from GitHub release assets but from Docker Hub; however F4 / Synthesis note Docker is precluded by no-DinD constraint, making it ineligible for orthogonal reasons. The four-way analysis is logically consistent."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Logically consistent reduction; the load-bearing operational conclusion (Go toolchain is mandatory for source-based install) follows from this claim. C-0136/C-0137 sibling claims address the Debian-bookworm Go-toolchain provisioning question."
+    },
+    {
+      "claim_id": "C-0153",
+      "claim_text_short": "hongkongkiwi/actionlint-mcp has no tagged releases and no published release artifacts.",
+      "verification_questions": [
+        "Is this a restatement of C-0133, or does it add new information?",
+        "Does the source distinguish between 'no tags' and 'no release artifacts'?",
+        "Are both conditions independently verified?"
+      ],
+      "verification_answers": [
+        "Restatement plus generalization \u2014 C-0133 cites the verbatim Releases-page quote; C-0153 makes the broader 'no tags AND no artifacts' assertion.",
+        "Yes \u2014 F2 (line 44) addresses release artifacts; Synthesis #3 (line 114) addresses tags: 'Because no tags exist, go install github.com/hongkongkiwi/actionlint-mcp@<commit-sha> ... is the only deterministic pin available.'",
+        "Both verified. GitHub Releases UI shows no tags AND no asset uploads in tandem when the verbatim message is 'There aren't any releases here'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Twin of C-0133 with broader scope (tags + artifacts). Verdict stays 'verified' because Synthesis #3 separately attests the no-tags condition. The operational implication: SHA-pinning is mandatory (Synthesis #3)."
+    },
+    {
+      "claim_id": "C-0157",
+      "claim_text_short": "HashiCorp publishes pre-built signed Linux/amd64 zip binaries for each terraform-mcp-server release on releases.hashicorp.com, including SHA256SUMS and GPG signature.",
+      "verification_questions": [
+        "Is the releases.hashicorp.com URL directly cited?",
+        "Are SHA256SUMS files confirmed (not just 'checksum' generic)?",
+        "Is GPG signature confirmed (separate file pattern)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 T-004 F1 source (line 32): `https://releases.hashicorp.com/terraform-mcp-server/0.5.2/` with date '2026-04-28'.",
+        "Yes \u2014 F8 (line 87): 'Each release publishes signed checksums: `terraform-mcp-server_<VER>_SHA256SUMS`'. Verbatim filename pattern quoted.",
+        "Yes \u2014 F8 enumerates three artifacts per release: `..._SHA256SUMS`, `..._SHA256SUMS.sig` (detached signature), and a key-ID-suffixed signature file. F1 also explicitly says 'including SHA256SUMS and a GPG signature'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Multi-source-anchored: releases.hashicorp.com (primary), GitHub releases page (corroborating), HashiCorp Developer deploy doc. Source provenance is 'vendor' (HashiCorp) \u2014 strong primary source for vendor's own release publishing claims. No falsifier in graph."
+    },
+    {
+      "claim_id": "C-0158",
+      "claim_text_short": "The release artifact terraform-mcp-server_0.5.2_linux_amd64.zip is published on releases.hashicorp.com.",
+      "verification_questions": [
+        "Is the exact filename quoted verbatim?",
+        "Is the URL traceable?",
+        "Is 0.5.2 the current stable version at research date?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F1 quote (line 33): 'terraform-mcp-server_0.5.2_linux_amd64.zip' (verbatim).",
+        "Yes \u2014 URL: `https://releases.hashicorp.com/terraform-mcp-server/0.5.2/` (F1 source).",
+        "Yes \u2014 F8 confirms: 'Current stable is v0.5.2 (2026-04-28)'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct artifact-name verification from vendor's own release server. Note: F8 caveat 'Pre-1.0; expect periodic breaking changes' \u2014 version 0.5.2 may not be current at install time; Plan should re-check."
+    },
+    {
+      "claim_id": "C-0190",
+      "claim_text_short": "Each terraform-mcp-server release publishes signed checksum files (SHA256SUMS, SHA256SUMS.sig, key-ID-suffixed signature).",
+      "verification_questions": [
+        "Are all three file patterns named?",
+        "Is the GPG signature pattern verified (separate from SHA256SUMS file)?",
+        "Is the SHA256SUMS file an independent verification surface from the GPG sig?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F8 (line 87): 'terraform-mcp-server_<VER>_SHA256SUMS', '...SHA256SUMS.sig', and 'a key-ID-suffixed signature file'.",
+        "Yes \u2014 `.sig` extension is canonical GPG detached signature; key-ID-suffixed file is the HashiCorp pattern (e.g., `_72D7468F.sig`).",
+        "Yes \u2014 SHA256SUMS gives content-integrity; GPG signature gives authenticity (signed by HashiCorp's key). Two independent verification layers."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Vendor-published signing artifacts \u2014 strong supply-chain verifiability. Caveat: verification only as strong as the trust anchor (HashiCorp's GPG public key). The Plan should fetch and pin the HashiCorp GPG key fingerprint, not just the signature."
+    },
+    {
+      "claim_id": "C-0193",
+      "claim_text_short": "The pre-built binary install path adds no toolchain to the image, works without DinD, and is verifiable via SHA256 and GPG.",
+      "verification_questions": [
+        "Is the no-toolchain claim correct (Go binary is statically linked)?",
+        "Is the no-DinD claim correct (vs. the Docker install path)?",
+        "Is the SHA256 + GPG verification path operationally implementable in postCreate?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F1 plus F3 contrast: 'go install... requires Go to be present' (F3) versus pre-built binary which is statically compiled and runs on any glibc Linux/amd64. No new toolchain.",
+        "Yes \u2014 F4 explicitly excludes Docker path on no-DinD grounds: 'This requires a Docker daemon \u2014 incompatible with the \"no DinD\" base-image constraint.'",
+        "Yes \u2014 Synthesis (line 99): 'Path (a) integrates cleanly with the existing per-binary \"download + verify SHA256 + extract\" pattern this feature uses for other MCP servers.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Multi-dimensional claim, all dimensions verified. Vendor-provenance source \u2014 strong but motivated; HashiCorp benefits from binary distribution being painless. Adversarial probe: 'Who benefits?' \u2014 HashiCorp does, but the binary's existence is independently verifiable (the URL is fetchable). No motivated-reasoning falsifier."
+    },
+    {
+      "claim_id": "C-0388",
+      "claim_text_short": "Upstream documents an opt-out flag GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 that skips vendored grammar builds.",
+      "verification_questions": [
+        "Is the env var name documented in a primary upstream source?",
+        "Is the skip semantics (which grammars are skipped) documented?",
+        "Is the source mirror reliable (was the primary doc directly fetched)?"
+      ],
+      "verification_answers": [
+        "Quoted in F5 (line 93) anchored to Mintlify-mirrored upstream docs: 'Python 3 + C++ toolchain for optional grammar builds (can skip with GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1)'.",
+        "Yes \u2014 F5 (line 89) and C-0411 detail that the skipped grammars are tree-sitter-dart, tree-sitter-proto, tree-sitter-swift; 14+ remaining grammars preserved.",
+        "Partially \u2014 F5 confidence note (line 95): 'Medium-high \u2014 the env-var name and skip semantics are documented in upstream-mirrored docs but I could not retrieve npmjs.com directly (403). A pre-install dry-run in CI is recommended to confirm the env-var still works on the exact tag chosen.' Mintlify itself returned HTTP 410 (source list entry 6); content was retrieved indirectly."
+      ],
+      "verdict": "partially_verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Self-flagged in research note as medium confidence. The env var name is the load-bearing detail for the base-image-fit recommendation (avoids C++ toolchain in slim base). Mintlify-mirror sourcing is weaker than direct upstream README. Recommendation: Plan should add a smoke-test step that asserts the env var still works on the exact pinned tag. The Synthesizer should preserve this caveat in the design narrative; do not flatten to 'verified'."
+    },
+    {
+      "claim_id": "C-0411",
+      "claim_text_short": "Setting GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 skips Dart/Proto/Swift grammar builds; drops those parsers but keeps 14+ remaining tree-sitter languages.",
+      "verification_questions": [
+        "Are the three skipped grammars named in primary source?",
+        "Is the '14+ remaining' count substantiated?",
+        "Are the project-relevant languages (Python, Markdown, Bash) in the remaining set?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5 (line 89): 'tree-sitter-dart, tree-sitter-proto, and tree-sitter-swift'.",
+        "Partially \u2014 F5 asserts '14+ remaining tree-sitter languages (Python, JS, TS, Rust, Go, Java, etc.)' but the specific count of 14+ is not independently verified; it's an upstream-mirrored figure.",
+        "Yes \u2014 Python explicitly listed. Markdown and Bash not explicitly named in F5 but the 'etc.' implies the standard tree-sitter language set; verify at install time. C-0412 sibling claim says the remaining set is 'sufficient for this project's code-graph needs (the repo is Python + Markdown + Bash)'."
+      ],
+      "verdict": "partially_verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Same source-reliability caveat as C-0388 (Mintlify-mirrored, not primary). The '14+' number is approximate. The downstream operational decision \u2014 that GitNexus with skip flag covers this project's languages \u2014 depends on this claim. Plan should verify Markdown and Bash specifically in the remaining grammar set during smoke test. Single-sourced (Mintlify); other sources (DeepWiki, MarkTechPost) corroborate GitNexus generally but not this specific env-var semantics."
+    },
+    {
+      "claim_id": "C-0256",
+      "verification_questions": [
+        "Does the cited research note (T-006-exa.md) attribute the x-api-key header form to docs.exa.ai canonical docs?",
+        "Is the endpoint URL https://mcp.exa.ai/mcp shown alongside the header form?",
+        "Is the header form actually the canonical/recommended form per the cited vendor source?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F2 cites Exa Docs 'Web Search MCP' (https://exa.ai/docs/reference/exa-mcp) and quotes the headers block verbatim.",
+        "Yes \u2014 F2 explicitly states 'with the bare URL https://mcp.exa.ai/mcp as the endpoint. No query string is shown in this form.'",
+        "Yes \u2014 F2 confidence high, primary vendor documentation."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Vendor canonical-docs form; corroborated by direct quote in the research note."
+    },
+    {
+      "claim_id": "C-0257",
+      "verification_questions": [
+        "Is the exact string `\"headers\": { \"x-api-key\": \"YOUR_EXA_API_KEY\" }` quoted in the cited source?",
+        "Is the quote attributed to docs.exa.ai?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F2 quote (\u226415 words) is verbatim: `\"headers\": { \"x-api-key\": \"YOUR_EXA_API_KEY\" }`",
+        "Yes \u2014 sourced from Exa Docs Web Search MCP reference page."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct verbatim quote; F2 of the research note."
+    },
+    {
+      "claim_id": "C-0259",
+      "verification_questions": [
+        "Does T-006-exa.md document an alternative auth form using the exaApiKey query parameter?",
+        "Is the source attributed to the exa-labs/exa-mcp-server GitHub README?",
+        "Is the tools= parameter combined with exaApiKey in the example?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F3 explicitly describes the URL query-parameter form.",
+        "Yes \u2014 source attribution: github.com/exa-labs/exa-mcp-server/blob/main/README.md.",
+        "Yes \u2014 verbatim example quote: `https://mcp.exa.ai/mcp?exaApiKey=YOUR_KEY&tools=web_search_exa`"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Confirms both wire-supported auth forms; together with C-0256 demonstrates the apparent vendor-source split."
+    },
+    {
+      "claim_id": "C-0266",
+      "verification_questions": [
+        "Does the DeepWiki source (cited via F4) state precedence among auth methods when multiple are present?",
+        "Is the query parameter named as the highest-priority credential in this precedence?",
+        "Does the research note flag this precedence claim as fragile / lower-confidence?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F4: 'The Exa MCP server's auth resolver accepts (in priority order): (1) exaApiKey query parameter, (2) Authorization: Bearer \u2026, (3) EXA_API_KEY env var'.",
+        "Yes \u2014 query parameter is position 1 (wins) per F4.",
+        "Yes \u2014 claim marked confidence: medium; note in research note: 'precedence ordering is the most fragile claim and should be re-verified at integration time.'"
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "DeepWiki is a single auto-generated reference, not vendor-authored prose. Source itself flags fragility. Consequential for FR-4 probe design \u2014 claim should be re-verified before relying on it; recommended form (header-only) avoids the precedence question entirely."
+    },
+    {
+      "claim_id": "C-0279",
+      "verification_questions": [
+        "Does the research note's Executive summary/Synthesis recommend the x-api-key header form?",
+        "Are the rationales for choosing header over URL form articulated?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 Synthesis: 'For this feature the deciding factors are: 1. Secret hygiene\u2026 2. Canonical-docs alignment\u2026 3. Probe testability for FR-4\u2026 Recommend hosted-HTTP unless network egress is constrained.'",
+        "Yes \u2014 four rationales: secret hygiene, canonical-docs alignment, probe testability, transport choice (hosted HTTP)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Recommendation cleanly grounded in vendor-canonical form and secret-hygiene best practice."
+    },
+    {
+      "claim_id": "C-0280",
+      "verification_questions": [
+        "Does the source explain why the header form keeps the secret out of URL logs?",
+        "Does the source identify specific URL-leakage surfaces (logs, ps listings, server access logs)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F3 caveat: 'Query-parameter form leaks the key into URL logs (browser history, proxy logs, server access logs, MCP client config dumps).'",
+        "Yes \u2014 explicitly enumerates browser history, proxy logs, server access logs, MCP client config dumps."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Rationale matches general security hygiene principles (URL credentials are well-known anti-pattern, e.g., OWASP)."
+    },
+    {
+      "claim_id": "C-0284",
+      "verification_questions": [
+        "Does the research note's Synthesis section give a canonical install command?",
+        "Does the command use --transport http with x-api-key header and EXA_API_KEY env var?",
+        "Is OQ-T006-1 noted as an open question about --header support?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 Synthesis section shows: `claude mcp add --transport http exa https://mcp.exa.ai/mcp --header \"x-api-key: ${EXA_API_KEY}\"`",
+        "Yes \u2014 exact form quoted verbatim.",
+        "Yes \u2014 OQ-T006-1 explicitly notes: 'Does claude mcp add --transport http accept --header (or equivalent) for injecting the x-api-key header at install time, or must the header live in a separate config file\u2026 Defer to the Claude Code CLI docs check in T-007 / Design.'"
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Marked medium confidence because the install command is a 'hypothesis' per the source \u2014 OQ-T006-1 deferred to Claude Code CLI docs validation. The header-injection syntax is unconfirmed; if Claude Code CLI requires .mcp.json config rather than --header flag, command would need adjustment."
+    },
+    {
+      "claim_id": "C-0203",
+      "verification_questions": [
+        "Does T-005-context7.md confirm https://mcp.context7.com/mcp as the remote HTTP endpoint?",
+        "Is the source attribution from the official Upstash repo?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F1: 'vendor-hosted remote HTTP endpoint (https://mcp.context7.com/mcp)'.",
+        "Yes \u2014 source: github.com/upstash/context7 (official), quote: 'Context7 MCP server URL https://mcp.context7.com/mcp'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Vendor-canonical endpoint URL; verified verbatim."
+    },
+    {
+      "claim_id": "C-0205",
+      "verification_questions": [
+        "Does the source confirm the same API key authenticates both stdio and remote HTTP transports?",
+        "Does the source specify --api-key flag and CONTEXT7_API_KEY env var as input methods?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F2: 'For the local server, supply via either the --api-key CLI flag or the CONTEXT7_API_KEY environment variable\u2026 For the remote HTTP endpoint, the same key is passed as the CONTEXT7_API_KEY request header.'",
+        "Yes \u2014 both input methods explicitly named; CLI flag wins if both set."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Source: Upstash README + npm registry corroboration. Note: research note advises against --api-key CLI flag form due to argv leakage (entity E-0094)."
+    },
+    {
+      "claim_id": "C-0208",
+      "verification_questions": [
+        "Does the research note recommend remote HTTP at https://mcp.context7.com/mcp for project-scoped always-on use?",
+        "Is the API key supplied as a header sourced from a Codespaces secret?",
+        "Is the header name CONTEXT7_API_KEY?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 Acceptance-criteria check: 'Remote URL https://mcp.context7.com/mcp; header CONTEXT7_API_KEY.'",
+        "Yes \u2014 Synthesis: 'the canonical answer is CONTEXT7_API_KEY Codespaces secret. For remote HTTP, surface it as a header named CONTEXT7_API_KEY.'",
+        "Yes \u2014 header name is exactly CONTEXT7_API_KEY (same string as the env var name)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Header name reuses env var name \u2014 somewhat unusual but documented by Upstash. Cleanly resolves PRD UI-4."
+    },
+    {
+      "claim_id": "C-0062",
+      "verification_questions": [
+        "Does T-002-mcp-openapi-schema.md confirm StdioServerTransport import from @modelcontextprotocol/sdk?",
+        "Is this verified in actual source code (index.mjs)?",
+        "Is HTTP/SSE explicitly ruled out?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F-2: 'The index.mjs source imports StdioServerTransport from @modelcontextprotocol/sdk/server/stdio.js and connects the server to it as the sole transport.'",
+        "Yes \u2014 verbatim quote: `import { StdioServerTransport } from \"@modelcontextprotocol/sdk/server/stdio.js\";` from github.com/hannesj/mcp-openapi-schema/blob/master/index.mjs.",
+        "Yes \u2014 'There is no HTTP/SSE option.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct source-code introspection; highest possible evidence quality for a transport claim."
+    },
+    {
+      "claim_id": "C-0063",
+      "verification_questions": [
+        "Does the source confirm no authentication is used by mcp-openapi-schema?",
+        "Is there evidence the server has no outbound HTTP / credential handling?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F-5: 'There is no outbound HTTP, no API-key handling, no auth flow.' Playbooks listing corroborates: 'No external API credentials needed.'",
+        "Yes \u2014 F-5 confidence: 'High \u2014 consistent with the read-only stdio architecture and the absence of any HTTP client dependency in package.json.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Local file read + stdio only; security posture is clean. Operator must still treat the spec file as in-scope data (caveat noted in source)."
+    },
+    {
+      "claim_id": "C-0143",
+      "verification_questions": [
+        "Does T-003-actionlint-mcp.md confirm stdio transport for actionlint-mcp?",
+        "Is the invocation pattern documented (e.g., direct binary launch with no transport flags)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5 title: 'Transport is stdio; tool surface is two tools; no authentication.'",
+        "Yes \u2014 F5 source: README + lobehub.com listing; stdio is the documented transport."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "F5 omitted from grep snippet (long matching line); inferred from acceptance-criteria check ('Transport recommendation Satisfied. stdio (F5).') and finding title."
+    },
+    {
+      "claim_id": "C-0144",
+      "verification_questions": [
+        "Does the source enumerate exactly two tools for actionlint-mcp?",
+        "Are the tool names lint_workflow and check_all_workflows?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 acceptance-criteria check: 'Tool surface Satisfied. lint_workflow, check_all_workflows (F5).'",
+        "Yes \u2014 both names exactly as claimed."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Tool surface verified; matches PRD UI-3 expected resolution."
+    },
+    {
+      "claim_id": "C-0147",
+      "verification_questions": [
+        "Does the source confirm no authentication is required by actionlint-mcp?",
+        "Is the no-auth claim consistent with the local-only operation pattern?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5 title includes 'no authentication' and acceptance-criteria check: 'Auth (likely none) Satisfied. No authentication required (F5).'",
+        "Yes \u2014 local stdio server reads local YAML files; no outbound network calls; matches the local stdio + no-auth pattern (E-0021)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Clean local-stdio no-auth posture."
+    },
+    {
+      "claim_id": "C-0290",
+      "verification_questions": [
+        "Does the MCP spec (cited 2025-03-26) define a JSON-RPC ping method?",
+        "Is the verbatim text 'receiver MUST respond promptly with an empty response' present in the cited spec?",
+        "Is the spec URL https://modelcontextprotocol.io/specification/2025-03-26/basic/utilities/ping correct?",
+        "Does the spec note that timeout MAY be treated as connection failure?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F1.1: 'MCP defines a JSON-RPC ping method that either side may invoke.'",
+        "Yes \u2014 verbatim quote in research note: 'The receiver MUST respond promptly with an empty response.'",
+        "Yes \u2014 source link as cited.",
+        "Yes \u2014 F1.1 paraphrases: 'timeout MAY be treated as connection failure.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Primary spec source; spec version 2025-03-26 is authoritative for stable release. (Spec 2025-06-18 also exists per F3.2 for logging \u2014 not contradictory; both are valid revisions of the protocol.)"
+    },
+    {
+      "claim_id": "C-0291",
+      "verification_questions": [
+        "Does the cited source claim ping is the only spec-canonical primitive that works uniformly across stdio and HTTP?",
+        "Is this claim supported by the spec definition (transport-agnostic JSON-RPC method)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F1.1 explicit: 'This is the only spec-canonical health primitive that works uniformly across stdio and HTTP transports.'",
+        "Yes \u2014 F1.2 confirms by contrast: HTTP servers expose /health and /ready, but stdio has no HTTP surface, so ping is the substitute."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-transport uniformity claim is structurally correct (JSON-RPC method works on both transports by definition)."
+    },
+    {
+      "claim_id": "C-0301",
+      "verification_questions": [
+        "Does the cited Anthropic Claude Code MCP docs state stdio servers are not auto-reconnected?",
+        "Is the verbatim quote 'Stdio servers are local processes and are not reconnected automatically.' present in the source?",
+        "Does the source describe the failure mode (marked failed, recovered only by operator action)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F2.1: 'Stdio MCP servers are explicitly not auto-reconnected.'",
+        "Yes \u2014 verbatim quote: 'Stdio servers are local processes and are not reconnected automatically.' Cited from code.claude.com/docs/en/mcp.",
+        "Yes \u2014 F2.1: 'when a stdio process dies, the server is marked failed and only operator action (e.g., a restart command) recovers it.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Primary product docs. Critical operational constraint for this feature \u2014 six of seven servers are stdio (per F2.1 caveat), so no-auto-reconnect applies to most of the surface. Drives need for FR-9 structured failure record."
+    },
+    {
+      "claim_id": "C-0302",
+      "verification_questions": [
+        "Does the source state initial-connect failures on HTTP/SSE retry up to three times?",
+        "Is the Claude Code version (v2.1.121) tied to this behavior?",
+        "Is the source the Anthropic Claude Code MCP docs?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F2.1: 'As of v2.1.121, initial-connect failures (5xx, connection refused, timeout) on HTTP/SSE retry up to three times.'",
+        "Yes \u2014 version explicitly v2.1.121.",
+        "Yes \u2014 same source URL as F2.1 (code.claude.com/docs/en/mcp)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Version-pinned behavior claim \u2014 future Claude Code versions may change retry count; design should not depend on exact value."
+    },
+    {
+      "claim_id": "C-0443",
+      "verification_questions": [
+        "How many .md files exist in /workspaces/feature-pipeline/.claude/agents/?",
+        "Does the codebase-analysis-report.md substantiate this count?"
+      ],
+      "verification_answers": [
+        "Grep with glob *.md on /workspaces/feature-pipeline/.claude/agents returned exactly 36 files.",
+        "Yes \u2014 codebase-analysis-report line 37 states '36 agent files in .claude/agents/.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Independently re-confirmed by direct filesystem enumeration. Tally is exact."
+    },
+    {
+      "claim_id": "C-0444",
+      "verification_questions": [
+        "Do all 36 agent files have a frontmatter block?",
+        "Are the listed fields (name, description, tools, model, effort, skills, memory) consistently present?"
+      ],
+      "verification_answers": [
+        "Spot-checked: discovery-codebase-researcher.md frontmatter contains name, description, model, effort, tools, skills, memory. Sampled frontmatter delimiters across 10+ agent files all begin with '---' at line 1.",
+        "The claim says fields are conformant but uses qualifier 'shared frontmatter convention'. Not every field is on every agent (e.g., 'memory' may be omitted on some). The report itself at line 124 acknowledges 'tools, model, effort, skills, memory are common' (not universal). Strict universal claim is slightly stronger than evidence."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Claim text says 'conform to a shared frontmatter convention with fields' \u2014 read as descriptive (most carry these fields), which matches repo state. Strict universal-quantifier interpretation would require sampling all 36, not done. Downgraded confidence to medium."
+    },
+    {
+      "claim_id": "C-0445",
+      "verification_questions": [
+        "Does grep -rln 'mcp__' /workspaces/feature-pipeline/.claude/agents/ return zero hits?",
+        "Does the source report state this?"
+      ],
+      "verification_answers": [
+        "Grep for 'mcp__' against .claude/agents (all *.md files, 36 files) returned 'No files found' (zero hits).",
+        "Yes \u2014 codebase-analysis-report line 37 and line 124 confirm 'No agent currently has any mcp__<server>__<tool> entry in its tools allowlist.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Directly verified by Grep. Zero hits across all 36 agent files."
+    },
+    {
+      "claim_id": "C-0446",
+      "verification_questions": [
+        "Is this claim a forward-looking inference about this feature, not a current-state claim?",
+        "Is the premise (zero mcp__ entries today) confirmed?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 the claim says the feature 'introduces the mcp__ pattern to agent tools allowlists for the first time'. It's a counterfactual prediction grounded in the verified zero-state of C-0445.",
+        "Yes \u2014 premise confirmed by C-0445."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Predictive but grounded; conditional on the feature shipping mcp__ entries (its stated purpose). Logically follows from C-0445."
+    },
+    {
+      "claim_id": "C-0462",
+      "verification_questions": [
+        "Does /workspaces/feature-pipeline/.mcp.json exist?",
+        "Are GitNexus and codebase-memory-mcp referenced in seven existing corpus files?"
+      ],
+      "verification_answers": [
+        "Read on /workspaces/feature-pipeline/.mcp.json returned 'File does not exist'. Confirmed absent.",
+        "The codebase-analysis-report (line 107) states 'referenced in seven existing corpus files but registered in zero (.mcp.json is absent).' Spot-checks confirm prose references in: ADR-0007 (adrs-migrated/), ADR-0018 (adrs/), KB-codebase-research/SKILL.md, discovery-codebase-researcher.md, review-architecture-auditor.md (5 confirmed; 2 more plausibly the research plan / codebase-analysis-report itself). Exact count of 7 not independently re-counted but plausible."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": ".mcp.json absence verified directly. Seven-corpus-file count taken at face value from the report; would warrant exact recount if it became load-bearing."
+    },
+    {
+      "claim_id": "C-0463",
+      "verification_questions": [
+        "Is the .mcp.json blast-radius characterization (shallow but broad) substantiated in the source?",
+        "Does the .mcp.json affect every Claude Code session?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 codebase-analysis-report line 113 says '.mcp.json (new file, 7 servers) | 6 | 8 | 12 | UNIVERSALLY shallow but UNIVERSALLY broad \u2014 every session reads it. Typo = every session broken.'",
+        "Per Claude Code documented behavior in KB-cc-platform: .mcp.json is auto-loaded by every CC session in the workspace. The 'every session breaks on typo' framing is standard project-scope config semantics."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Characterization is judgmental but substantively grounded in CC platform behavior."
+    },
+    {
+      "claim_id": "C-0455",
+      "verification_questions": [
+        "Do all three skills (KB-cc-platform, KB-cc-design, auditing-cc-configs) exist?",
+        "Is the auditing half named with a trailing '-configs' deviation?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 listing /workspaces/feature-pipeline/.claude/skills shows KB-cc-platform/SKILL.md, KB-cc-design/SKILL.md, auditing-cc-configs/SKILL.md all present.",
+        "Yes \u2014 the audit-half directory is 'auditing-cc-configs' (trailing '-configs'), while other audit halves are 'auditing-codespaces', 'auditing-github-actions' (no '-configs' suffix). Deviation confirmed."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Reference counts and template counts (7/9, 2, 6/6+) are reported but not independently re-counted in this verification. Trifecta-completeness claim is the primary content and is verified."
+    },
+    {
+      "claim_id": "C-0456",
+      "verification_questions": [
+        "Do all three skills (KB-codespaces-platform, KB-codespaces-design, auditing-codespaces) exist?",
+        "Is auditing-codespaces a stub per ADR-0033?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 all three present in .claude/skills/ directory listing.",
+        "Codebase-analysis-report line 57 and 181 explicitly say 'auditing-codespaces is a STUB per ADR-0033'. The claim text matches the source report exactly."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "ADR-0033 not independently read in this verification; relying on report-as-source. For full provenance closure, ADR-0033 would need direct inspection."
+    },
+    {
+      "claim_id": "C-0457",
+      "verification_questions": [
+        "Do all three skills (KB-github-actions-platform, KB-github-actions-design, auditing-github-actions) exist?",
+        "Does auditing-github-actions consume auditing-shared per ADR-0031?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 all three present in skills directory listing; auditing-shared also present.",
+        "Codebase-analysis-report line 58 and 106 state this; cross-reference to ADR-0031 not independently re-read."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Trifecta completeness verified by directory listing. Ref-count and template-count specifics (19+21, 2, 1+1) not independently re-counted."
+    },
+    {
+      "claim_id": "C-0458",
+      "verification_questions": [
+        "Does auditing-mcp exist in .claude/skills/?",
+        "Are KB-mcp-platform and KB-mcp-design absent (greenfield)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 auditing-mcp/SKILL.md present in skills directory.",
+        "Grep for 'KB-mcp-platform|KB-mcp-design' against /workspaces/feature-pipeline/.claude/skills returned 'No files found'. Confirmed greenfield."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Audit-only-with-greenfield-platform-and-design pattern directly verified. This claim is load-bearing for the trifecta-completion narrative."
+    },
+    {
+      "claim_id": "C-0442",
+      "verification_questions": [
+        "Does ADR-0007-code-graph-mcp-selection.md exist in adrs-migrated/?",
+        "Is its frontmatter version 2.2.0?",
+        "Is it absent from adrs/?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 /workspaces/feature-pipeline/adrs-migrated/ADR-0007-code-graph-mcp-selection.md exists (one of five ADR-0007 variants in adrs-migrated/).",
+        "Yes \u2014 frontmatter line 3 declares 'version: 2.2.0'; line 4 'status: Accepted'.",
+        "Yes \u2014 Grep with glob 'ADR-0007*' against /workspaces/feature-pipeline/adrs/ returned no files."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "All three sub-claims confirmed by direct filesystem inspection."
+    },
+    {
+      "claim_id": "C-0497",
+      "verification_questions": [
+        "Does adrs/ADR-0007*.md exist (would the research plan reference work)?",
+        "How many ADR-0007 variants are in adrs-migrated/?",
+        "Is v2.2.0 the current Accepted version?"
+      ],
+      "verification_answers": [
+        "No \u2014 Grep for ADR-0007* in /workspaces/feature-pipeline/adrs/ returned zero files. Research-plan reference path is broken.",
+        "Five files: ADR-0007-code-graph-mcp-selection.md, -pre-naming-convention.md, -v1-pre-template-migration.md, -v1-superseded.md, -v2-pre-template-migration.md.",
+        "Yes \u2014 current file's frontmatter declares 'version: 2.2.0' and 'status: Accepted'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Five-variant count and v2.2.0-Accepted both verified directly."
+    },
+    {
+      "claim_id": "C-0498",
+      "verification_questions": [
+        "Is the ADR-0007 location surprise classified as low severity in the source report?",
+        "Is the severity classification consistent with the impact (lookup-path mismatch but file is findable)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 codebase-analysis-report line 179 says 'ADR-0007 lives in adrs-migrated/, not adrs/ (low severity)'.",
+        "Yes \u2014 low severity is reasonable: file exists and is findable; only the path reference in the research plan is misaligned. No data loss; no decision-blocking issue beyond lookup-convention clarification (open question #2)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Severity is a judgment call by the report author; the underlying facts (location, file existence) are verified. Severity itself is consistent with the facts."
+    },
+    {
+      "claim_id": "C-0441",
+      "verification_questions": [
+        "Does adrs/ADR-0018-codebase-analysis-schema.md declare version 1.0.0?",
+        "Does KB-codebase-research/SKILL.md reference v1.1.0?",
+        "Does discovery-codebase-researcher.md reference v1.1.0?",
+        "Is the file 215 lines?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 ADR-0018 frontmatter line 3 says 'version: 1.0.0' and body JSON example line 124 has 'schema_version: 1.0.0'.",
+        "Yes \u2014 KB-codebase-research/SKILL.md line 160 says 'schema_version: 1.1.0'.",
+        "Yes \u2014 discovery-codebase-researcher.md description (line 3) says 'ADR-0018, v1.1.0 extended for blast-radius'.",
+        "Line count of 215 not independently confirmed (not load-bearing); the version-drift core claim is verified."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Version-drift claim directly verified: ADR-0018 says 1.0.0; KB+agent say 1.1.0. Line count incidental."
+    },
+    {
+      "claim_id": "C-0495",
+      "verification_questions": [
+        "Is the same v1.0.0/v1.1.0 drift confirmed across all four locations (ADR-0018, KB, agent, research plan)?",
+        "Does v1.1.0 SHAPE live only in the KB (not in ADR-0018)?"
+      ],
+      "verification_answers": [
+        "ADR-0018 v1.0.0 confirmed (file frontmatter + JSON example). KB-codebase-research v1.1.0 confirmed at line 160. discovery-codebase-researcher v1.1.0 confirmed at description line 3. Research plan not directly read in this verification; report attests to it.",
+        "Yes \u2014 ADR-0018 carries v1.0.0 schema_version in its JSON example (line 124); no v1.1.0 SHAPE definition in ADR-0018 body. The blast-radius extension that motivates v1.1.0 is documented in KB-codebase-research only."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Drift verified across three of four locations directly; research-plan reference taken from report. Schema-SHAPE location asymmetry is a real semantic risk and is well-grounded."
+    },
+    {
+      "claim_id": "C-0496",
+      "verification_questions": [
+        "Is medium severity reasonable given the drift's blast radius (downstream consumers may diverge in their schema validation)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 the drift affects schema validation in discovery-codebase-researcher output, which feeds design-composer and review-architecture-auditor. Two consumers may validate against different schema versions silently. Medium severity is consistent (not catastrophic \u2014 both versions are backward-compatible per current usage; but warrants resolution before any new pipeline run depending on schema_version field)."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Severity judgment is reasonable but inherently subjective. Confidence medium because the rating is a judgment call grounded in facts but not formally derived."
+    },
+    {
+      "claim_id": "C-0484",
+      "verification_questions": [
+        "Is the 634 total non-git non-node_modules file count substantiated by the source?",
+        "Is the methodology (find excluding .git, node_modules) sound?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 codebase-analysis-report line 160 states 'Total non-git, non-node_modules files: 634.'",
+        "Methodology is standard; not independently re-run in this verification. Adversarial check: file-composition stats from a single internal-audit source. Numbers are presented as exact integer \u2014 easy to recount if challenged."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Single internal source. Not independently re-counted via find/wc in this verification pass (would require Bash execution outside Grep). Marking single_sourced because the exact integer is potentially consequential (used in the 73.8% computation). For Design phase, if the percentage drives a decision, recount is cheap."
+    },
+    {
+      "claim_id": "C-0485",
+      "verification_questions": [
+        "Is the markdown-file count of 468 substantiated by the source?",
+        "Does 468/634 = 73.8%?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 codebase-analysis-report line 161 states 'Markdown (.md): 468 (73.8%)'.",
+        "468/634 = 0.7382... = 73.8% (to one decimal). Arithmetic checks out."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Arithmetic self-consistent. Same single-source caveat as C-0484. The 'markdown-heavy' qualitative conclusion is robust against count error (73.8% is far above any threshold of concern)."
+    },
+    {
+      "claim_id": "C-0490",
+      "verification_questions": [
+        "Is the symbol-density characterization (52 Python audit scripts only) substantiated?",
+        "Does the repo lack 'application source code' in the conventional sense?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 codebase-analysis-report line 162 says 'Python (.py): 52, concentrated in .claude/skills/auditing-*/scripts/'.",
+        "Yes \u2014 the repo is a discipline/tooling repo (skills, ADRs, agent specs, devcontainer config). No application source tree (no src/, no lib/, no app/). The 52 Python files are audit scripts within auditing-*/skills/scripts/, which is tooling, not application logic."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Implies that Serena's LSP-symbol-extraction value is narrow \u2014 consistent with the UI-8 narrowing discussion. Conceptually grounded."
+    },
+    {
+      "claim_id": "C-0491",
+      "verification_questions": [
+        "Is GitNexus indeed TS-first per its repo / canonical_uri?",
+        "Does ADR-0007 v2.2.0 designate GitNexus as canonical primary?"
+      ],
+      "verification_answers": [
+        "Per entity registry (E-0007) and ADR-0007 frontmatter (id: ADR-0007, version: 2.2.0), GitNexus is the primary. Its 'TS-first' characterization comes from other claims in the corpus (e.g., the TypeScript ecosystem). Not independently verified by inspecting GitNexus repo in this batch; relying on extractor's earlier characterization.",
+        "Yes \u2014 ADR-0007 frontmatter version 2.2.0, status Accepted. Multiple downstream references (KB, agent, report) all name GitNexus as primary per ADR-0007 v2.2.0."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "The tension between 'TS-first tool' and 'markdown-heavy corpus' is a real friction worth surfacing in Design (consistent with E-0056 markdown-heavy-repo-profile entity). Not a contradiction \u2014 just a substrate-fit caveat."
+    },
+    {
+      "claim_id": "C-0447",
+      "verification_questions": [
+        "Does discovery-codebase-researcher name GitNexus as PRIMARY per ADR-0007 v2.2.0?",
+        "Does review-architecture-auditor also name GitNexus as primary?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 discovery-codebase-researcher.md line 20: 'check .mcp.json for GitNexus (primary per ADR-0007 v2.x) and codebase-memory-mcp (fallback)'. Line 29 reinforces 'prefer GitNexus and fall back to codebase-memory-mcp'.",
+        "Yes \u2014 review-architecture-auditor.md line 23: 'GitNexus primary (per ADR-0007 v2.x); codebase-memory-mcp fallback'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Both consumer agents grounded directly. The wiring is prose, as noted in C-0448 / UI-15 (load-bearing finding for design)."
+    },
+    {
+      "claim_id": "C-0448",
+      "verification_questions": [
+        "Does discovery-codebase-researcher name codebase-memory-mcp as FALLBACK?",
+        "Does review-architecture-auditor name it as FALLBACK?",
+        "Is the wiring expressed as prose (no structured frontmatter key like mcp_primary: / fallback_mcp:)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 discovery-codebase-researcher.md lines 20, 29 say codebase-memory-mcp is fallback.",
+        "Yes \u2014 review-architecture-auditor.md lines 23, 36, 108 reference codebase-memory-mcp as fallback / code_graph_used alternative.",
+        "Yes \u2014 Grep for 'mcp_primary:|fallback_mcp:|primary_mcp:' across .claude/agents returned zero hits. Frontmatter inspection of discovery-codebase-researcher.md and review-architecture-auditor.md confirms only standard fields (name, description, model, effort, tools, skills, memory). No structured MCP-wiring keys exist anywhere in agent frontmatter."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Prose-only wiring directly verified. The four-layer chain (ADR-0007 -> ADR-0018 -> KB -> agent) is all prose. This is a load-bearing fact for UI-15 (whether to introduce structured frontmatter convention for primary/fallback)."
+    },
+    {
+      "claim_id": "C-0349",
+      "verification_questions": [
+        "Does the cited research note (T-007) explicitly assert NO CONSENSUS exists for primary-to-fallback transition surfacing?",
+        "What set of sources was surveyed to support the no-consensus call (i.e., is the search exhaustive enough to defend the negative)?",
+        "Is there an attempt to find a positive analogue, and if so, is the failure to find one well-documented?",
+        "Could a domain-adjacent positive pattern exist that the survey missed (adversarial probe)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5.4 (research-note line 178) is explicitly titled 'Primary-to-fallback transitions: NO CONSENSUS PATTERN' (caps in original) and the claim text reproduces this verbatim.",
+        "The note enumerates five source categories: Anthropic MCP docs, vendor MCP server docs, MCP-monitoring write-ups, devcontainer troubleshooting docs, OWASP MCP Top-10. Cross-referenced source-list at lines 246-300 names 8+ independent organizations (Anthropic, OWASP, Fast.io, MCPevals, SigNoz, Velida, Coder, Microsoft, Stacklok). This is broad enough to be defensible for an emerging-tech literature where MCP itself is <2 years old.",
+        "Yes \u2014 F5.4 source line: 'The closest analogue is the generic circuit-breaker open \u2192 using fallback path pattern from microservice literature, but it is not MCP-specific' (line 181). This is the disciplined form: looked for analogues, found one, noted it does not transfer.",
+        "Adversarial probe: an MCP-specific fallback-surfacing pattern in a private-vendor blog or Slack community could exist outside the survey. However, the note's source-set spans the main public-literature touchpoints; the negative finding remains defensible because (i) MCP itself does not model server-degradation semantics, (ii) Claude Code's own docs do not mention primary/fallback transitions, and (iii) the related ADR-0018 wiring is itself novel-to-this-project. The 'no consensus' framing is appropriately cautious \u2014 it does not claim 'no pattern exists anywhere,' only 'no consensus across surveyed sources.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "No-consensus claim survives scrutiny. The five source-categories listed are the right ones to survey for MCP operational practice; the explicit naming of the surveyed-set is what makes this defensible as a negative finding rather than an absence-of-evidence. F5.4 also names the closest analogue (microservice circuit-breaker) and explains why it does not transfer (not MCP-specific), which is exactly the disciplined-negative form. This becomes load-bearing 'genuine novel design space' for downstream Framer/Synthesizer."
+    },
+    {
+      "claim_id": "C-0350",
+      "verification_questions": [
+        "Does the source assert that MCP literature treats servers as independent (binary available/failed)?",
+        "Does the source explicitly note the gap vs. ADR-0018's 'primary degraded; using fallback' semantic?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5.4 claim line 180: 'The literature treats MCP servers as independent \u2014 a server is either available or failed \u2014 and does not address the primary degraded; using fallback semantic that ADR-0018 codifies for GitNexus \u2192 codebase-memory-mcp.'",
+        "Yes \u2014 explicit ADR-0018 cross-reference in same line."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Supports C-0349. Independent claims reasoning is well-articulated and ADR-0018 is the project-internal target of the gap, which is correctly named."
+    },
+    {
+      "claim_id": "C-0351",
+      "verification_questions": [
+        "Is the 'circuit-breaker open \u2192 using fallback path' identified by the source as the closest analogue?",
+        "Does the source explicitly acknowledge the analogue is not MCP-specific?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5.4 source line 181 verbatim: 'The closest analogue is the generic circuit-breaker open \u2192 using fallback path pattern from microservice literature.'",
+        "Yes \u2014 same line: 'but it is not MCP-specific.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Correctly framed: an analogue exists at a higher abstraction (microservices), but the source explicitly disclaims its transferability. Strengthens the no-consensus finding rather than weakening it."
+    },
+    {
+      "claim_id": "C-0352",
+      "verification_questions": [
+        "Does the source enumerate 'stderr banner on transition' as one of the design options?",
+        "Is the example wording in the claim text matched in the source?",
+        "Is Option (a) genuinely distinct from Options (b) and (c) \u2014 different surface, different audience?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5.4 caveats line 183: 'stderr banner on transition (\"[MCP] primary `gitnexus` unhealthy; agent `discovery-codebase-researcher` proceeding on fallback `codebase-memory-mcp`\")' matches the claim verbatim.",
+        "Yes \u2014 example string matches.",
+        "Yes \u2014 Option (a) targets the stderr stream (operator sees it when --debug is on or stderr is piped); Option (b) writes to a structured event file (post-hoc auditability); Option (c) embeds the message in the agent's own output (in-conversation visibility). These are distinct surfaces with distinct persistence and distinct discovery paths. Not synonyms."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Option (a) distinctness check passes. Surface = stderr stream; persistence = ephemeral; discoverability = present-time only. This is a genuinely different design point from (b) and (c)."
+    },
+    {
+      "claim_id": "C-0353",
+      "verification_questions": [
+        "Does the source enumerate a dedicated event file as Option (b)?",
+        "Is the path example (`.claude/runtime/mcp-events.jsonl`) and schema (event/primary/fallback/agent/ts) reproduced?",
+        "Is Option (b) genuinely distinct from (a) and (c)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5.4 caveats line 183: 'dedicated event file in the project's runtime log surface (e.g., .claude/runtime/mcp-events.jsonl with event: fallback_exercised, primary, fallback, agent, ts).'",
+        "Yes \u2014 path and field-list match verbatim.",
+        "Yes \u2014 Option (b) surface = filesystem JSONL; persistence = durable until rotated; discoverability = post-hoc by file inspection or tooling. Distinct from stderr (ephemeral) and agent output (in-conversation only)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Option (b) is the synthesis-recommended choice (per C-0355 and OQ-C). The path/schema is exactly the format an augmented auditing-mcp rule could enforce. Distinct surface from (a) and (c) \u2014 passes the synonym check."
+    },
+    {
+      "claim_id": "C-0354",
+      "verification_questions": [
+        "Does the source enumerate agent-level acknowledgement as Option (c)?",
+        "Is the obligation placement on consuming agents accurately described?",
+        "Is Option (c) genuinely distinct from (a) and (b)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5.4 caveats line 183: 'agent-level acknowledgement in the agent's own output \u2014 the sub-agent that triggers the fallback names it explicitly in its result.'",
+        "Yes \u2014 claim text reproduces the obligation correctly; trade-off C-0357 notes the uniformity-risk.",
+        "Yes \u2014 Option (c) surface = the agent's tool-result/conversation output; persistence = embedded in conversation transcript; discoverability = inline at the moment of use. Distinct from stderr (out-of-conversation channel) and JSONL file (out-of-band file)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Three-options-distinctness check confirmed: (a) ephemeral stream, (b) durable file, (c) inline conversation message. Not synonyms \u2014 three genuinely different surfaces with three different operator-discovery paths."
+    },
+    {
+      "claim_id": "C-0355",
+      "verification_questions": [
+        "Does the source assert Option (b) aligns most cleanly with the project's existing audit + structured-record discipline?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5.4 caveats line 183 verbatim: 'Option (b) aligns most cleanly with the existing audit + structured-record discipline this project already practices for state transitions.' Also reinforced in Synthesis line 220: 'Option (b) \u2014 a dedicated structured event file (mcp-events.jsonl) emitted by an agent-side hook when the fallback fires \u2014 is the synthesis recommendation.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Recommendation is well-grounded in the project's prior practice. Synthesizer should flag that this is the author's recommendation, but Design ultimately owns the choice (per OQ-C)."
+    },
+    {
+      "claim_id": "C-0356",
+      "verification_questions": [
+        "Does the source characterize Option (a) as lowest-friction but ephemeral?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5.4 caveats line 183 verbatim: 'Option (a) is lowest-friction but ephemeral.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Trade-off accurately captured."
+    },
+    {
+      "claim_id": "C-0357",
+      "verification_questions": [
+        "Does the source assert Option (c) has uniformity risk because the obligation falls on each agent?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F5.4 caveats line 183 verbatim: 'Option (c) places the obligation on each consuming agent, which has uniformity risk.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Trade-off accurately captured. The uniformity-risk framing is real: if agent N implements fallback-ack and agent M does not, the operator sees inconsistent surfacing."
+    },
+    {
+      "claim_id": "C-0313",
+      "verification_questions": [
+        "Does the source assert stdio MCP servers MUST log to stderr (not stdout)?",
+        "Is the MUST language in the spec, or is it 'should'?",
+        "Does the source explain why (stdout corrupts JSON-RPC framing)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F3.1 line 94: 'Stdio MCP servers must direct all log output to stderr. Logging to stdout corrupts the JSON-RPC framing on the transport.'",
+        "Source-quote at line 96 (Anthropic Debugging docs, modelcontextprotocol.io/docs/tools/debugging): 'Local MCP servers should not log messages to stdout, as this will interfere with protocol operation.' Note: the underlying Anthropic doc uses 'should not' (a strong recommendation, RFC-2119 SHOULD NOT), not a literal RFC 'MUST NOT'. The claim text uses 'must' as a lowercase imperative, which is acceptable paraphrase but worth flagging \u2014 the spec language is 'should not'.",
+        "Yes \u2014 claim text reproduces the framing-corruption rationale."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Slight calibration issue: the Anthropic Debugging guidance is 'should not log to stdout' (engineering-imperative), not RFC-2119 'MUST NOT'. The claim's lowercase 'must' is a reasonable paraphrase but the Synthesizer should not represent this as a literal protocol MUST \u2014 it is a Debugging-guide imperative anchored on the practical consequence (stream corruption). Confidence downgraded to medium because the universal quantifier 'must' is stronger than the source's language. Substance is verified; the prescriptive force matches the source's intent (do not do this), even if the modal verb differs."
+    },
+    {
+      "claim_id": "C-0314",
+      "verification_questions": [
+        "Does the source state that the MCP host application captures stdio servers' stderr automatically?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F3.1 line 94 confirms: 'The host application captures stderr automatically.' Consistent with how stdio-subprocess transports work in standard MCP SDKs."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Standard subprocess behavior \u2014 host MCP client spawns the server and inherits stdin/stdout/stderr, with stderr typically piped to log."
+    },
+    {
+      "claim_id": "C-0333",
+      "verification_questions": [
+        "Does OWASP MCP Top-10 (2025) exist as a published taxonomy?",
+        "Does it rank Token Mismanagement and Secret Exposure as MCP01 (highest priority)?",
+        "Is the citation URL plausibly authoritative (owasp.org)?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F4.3 source line 142 cites OWASP, *MCP01:2025 \u2014 Token Mismanagement and Secret Exposure*. URL: https://owasp.org/www-project-mcp-top-10/2025/MCP01-2025-Token-Mismanagement-and-Secret-Exposure. The URL pattern (owasp.org/www-project-mcp-top-10/) is consistent with OWASP's project-hosting structure, and the file naming convention (MCP01-2025-...) matches OWASP's other Top-10 series (e.g., A01-2021- for Web App Top 10).",
+        "Yes \u2014 F4.3 claim explicitly: 'The OWASP MCP Top-10 (2025) ranks Token Mismanagement and Secret Exposure as MCP01 \u2014 the highest-priority MCP risk.' The MCP01 naming is itself the ranking-marker (01 = top-ranked).",
+        "Yes \u2014 owasp.org is the canonical OWASP host. Note: the claim cannot be cross-verified against an independent source within the surveyed set (only this one OWASP citation), but OWASP is a recognized authority for security taxonomies and self-publishes its Top-10 lists."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "OWASP itself is the authority; single-sourced is acceptable for taxonomy-ranking claims. The MCP Top-10 (2025) project is consistent with OWASP's standard publishing pattern. No reasonable dissent exists because OWASP defines the ranking, so the claim is by-definition true given the source."
+    },
+    {
+      "claim_id": "C-0335",
+      "verification_questions": [
+        "Is the verbatim quote 'Redact or mask secrets before writing to logs or telemetry' present in the OWASP MCP01 source?"
+      ],
+      "verification_answers": [
+        "Per F4.3 source-quote at line 143 (\u226415 words quote, marked verbatim by the note's author): 'Redact or mask secrets before writing to logs or telemetry.' The note's discipline of marking \u226415-word quotes verbatim is consistent throughout T-007."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Quote is marked verbatim by the research note's author; quote-attribution discipline appears consistent across T-007 findings. No reason to doubt."
+    },
+    {
+      "claim_id": "C-0330",
+      "verification_questions": [
+        "Does the cited Velida source describe redaction at the instrumentation layer by header/env-var name?",
+        "Does the source use OpenTelemetry's EnrichWithHttpRequestMessage callback as the implementation pattern?",
+        "Is the strongest-pattern characterization defensible \u2014 single vendor or multi-source convergence?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F4.2 line 133 quotes Velida: 'By explicitly setting ... to [REDACTED], the actual subscription key value is overwritten before the trace is exported.' Velida URL: https://www.willvelida.com/posts/preventing-mcp01-token-mismanagement-secret-exposure. The blog-post URL is plausible (willvelida.com is Will Velida's personal blog, a known engineering author).",
+        "Yes \u2014 F4.2 line 133 references the OpenTelemetry EnrichWithHttpRequestMessage callback explicitly.",
+        "F4.2's confidence is marked 'Medium (single-vendor implementation example; pattern is reasonable but not standards-anchored).' The 'strongest pattern' framing is supported by convergence with OWASP MCP01 (F4.3) which independently recommends redaction-before-write, and by F4.4 which notes .mcp.json makes env-var names knowable in advance. So the pattern is single-source for the *implementation example* but multi-source for the *redaction-at-source principle*. Defensible."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Velida is a personal blog (single-vendor pattern). Confidence is correctly marked medium. The 'strongest pattern' claim is defensible because (i) OWASP independently endorses redaction-before-write, (ii) Velida shows a concrete implementation, (iii) F4.4 shows the project's .mcp.json schema makes the name-allowlist trivially derivable. The convergence is what makes the claim load-bearing."
+    },
+    {
+      "claim_id": "C-0295",
+      "verification_questions": [
+        "Does Fast.io recommend a 30-second ping interval?",
+        "Does Fast.io recommend a 2-5-second timeout?",
+        "Is Fast.io a reasonably authoritative source for this recommendation?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F1.2 line 46 quotes Fast.io: '30-second interval' for stdio servers using JSON-RPC ping as the HTTP /health substitute.",
+        "Yes \u2014 F1.2 source-quote line 48 (\u226415 words): 'Timeout: between 2 to 5 seconds \u2026 any latency usually indicates a blocked event loop.'",
+        "Fast.io is a vendor publishing an engineering pattern guide. F1.2 confidence is marked 'Medium (reputable vendor pattern guide, not a primary spec).' The recommendation is consistent with general distributed-systems timeout heuristics (sub-second is too tight for cross-process latency, 10s+ is too lax for liveness). Authoritative for an emerging-tech-pattern recommendation; not protocol-mandated."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Single-source pattern from a vendor \u2014 confidence correctly medium. Adversarial probe: 'Who benefits from these specific numbers?' Fast.io benefits from being cited as the authority. However, the numbers are reasonable defaults for stdio MCP server health-checking and are not contradicted by other surveyed sources. Mark medium-confidence and let Synthesizer surface that this is one vendor's recommendation, not a standard."
+    },
+    {
+      "claim_id": "C-0296",
+      "verification_questions": [
+        "Does Fast.io explicitly recommend three consecutive failed pings before triggering restart?",
+        "Is the source clear that this is a recommendation, not a protocol mandate?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F1.2 line 46 ends with the recommendation: '\"3 consecutive failed checks before triggering a restart.\"'",
+        "Yes \u2014 F1.2 caveats line 50: '\"3 failed checks before restart\" is a Fast.io recommendation, not protocol-mandated; tune to local needs.'"
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Correctly attributed and caveated as vendor recommendation. Three-strikes-restart is consistent with standard liveness-probe practice (Kubernetes failureThreshold defaults to 3, Docker healthcheck retries default similarly). The Fast.io number matches the broader industry default."
+    },
+    {
+      "claim_id": "C-0361",
+      "verification_questions": [
+        "Does F6.2 describe an active ping-loop as a sidecar/supervisor process?",
+        "Are the timing parameters (30-second interval, three consecutive failures) consistent with F1.2?",
+        "Is Fast.io the cited source?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F6.2 line 196: 'a small supervisor process that issues ping to each registered MCP server on a 30-second interval, logs the result, and surfaces three consecutive failures as a state change.'",
+        "Yes \u2014 parameters match F1.2 (30s interval, 3 consecutive failures). The 2-5s timeout from F1.2 is implicit in F6.2 (same ping mechanism).",
+        "Yes \u2014 F6.2 source line 197: 'Fast.io health-check pattern guide (same URL as F1.2).'"
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "F6.2 reuses the same Fast.io pattern from F1.2 in a different framing (sidecar/supervisor). Internally consistent. Same vendor-confidence ceiling \u2014 medium."
+    },
+    {
+      "claim_id": "C-0300",
+      "verification_questions": [
+        "Does the cited Anthropic source state Claude Code auto-reconnects HTTP and SSE servers?",
+        "Is the 5-attempt count specified?",
+        "Is exponential backoff specified, starting at 1 second?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F2.1 line 63: 'Claude Code automatically reconnects HTTP and SSE MCP servers that disconnect mid-session, with up to five attempts and exponential backoff starting at one second.' Source line 64: Anthropic, Connect Claude Code to tools via MCP \u2014 Automatic reconnection (https://code.claude.com/docs/en/mcp).",
+        "Yes \u2014 '5 attempts' specified.",
+        "Yes \u2014 'exponential backoff starting at 1 second' specified."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Anthropic primary product docs \u2014 highest confidence tier for product-behavior claims. Parameters are specific and quoted. The Anthropic docs URL (code.claude.com/docs/en/mcp) is the canonical Claude Code MCP doc location."
+    },
+    {
+      "claim_id": "C-0301",
+      "verification_questions": [
+        "Does the Anthropic source explicitly state stdio servers are NOT auto-reconnected?",
+        "Is a verbatim spec quote provided?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F2.1 line 63: 'Stdio MCP servers are explicitly not auto-reconnected \u2014 when a stdio process dies, the server is marked failed and only operator action (e.g., a restart command) recovers it.'",
+        "Yes \u2014 F2.1 source-quote line 65 (\u226415 words): 'Stdio servers are local processes and are not reconnected automatically.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Verbatim Anthropic quote provided. This is a load-bearing fact for the Codespace MCP design \u2014 6 of 7 servers in this feature are stdio, so the no-auto-reconnect rule is the dominant case. Synthesizer should highlight."
+    },
+    {
+      "claim_id": "C-0302",
+      "verification_questions": [
+        "Is the Claude Code v2.1.121 version-specific behavior cited?",
+        "Are the trigger conditions (5xx, connection refused, timeout) listed?",
+        "Is the 3-retry count specified for initial-connect failures?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 F2.1 line 63: 'As of v2.1.121, initial-connect failures (5xx, connection refused, timeout) on HTTP/SSE retry up to three times.'",
+        "Yes \u2014 all three trigger types listed.",
+        "Yes \u2014 'up to three times' for initial-connect failures, distinct from the 5-attempt count for mid-session disconnects in C-0300."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Specific version pinning (v2.1.121) is a strong signal of source-fidelity \u2014 the note's author tracked the version-specific behavior. No reason to doubt. Useful distinction between initial-connect retries (3) and mid-session reconnect attempts (5) \u2014 Synthesizer should preserve both."
+    },
+    {
+      "claim_id": "C-0478",
+      "verification_questions": [
+        "Do KB-cc-design, KB-codespaces-design, and KB-github-actions-design each have exactly two reference files?",
+        "Are those files named patterns-and-anti-patterns.md and principles.md in all three?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 direct inspection of each design-half references/ directory shows exactly two files in each (Grep listing returned 3 files per directory: SKILL.md + 2 references).",
+        "Yes \u2014 all three contain exactly patterns-and-anti-patterns.md and principles.md."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "STRONG convention upheld across all three completed-trifecta design halves. Establishes a strong template for FR-11 KB-mcp-design."
+    },
+    {
+      "claim_id": "C-0479",
+      "verification_questions": [
+        "Do any of the three design halves contain an assets/templates/ subdirectory?"
+      ],
+      "verification_answers": [
+        "No \u2014 Grep across each design-half directory returns only SKILL.md + references/patterns-and-anti-patterns.md + references/principles.md. No assets/ tree observed."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Structural negative confirmed. Design halves are deliberately reference-only."
+    },
+    {
+      "claim_id": "C-0480",
+      "verification_questions": [
+        "Does KB-cc-platform contain 7 references files and 9 templates?",
+        "Does KB-codespaces-platform contain 10 references files and 5 templates (counting subdirs)?",
+        "Does KB-github-actions-platform contain 19 references files and 21 templates?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 KB-cc-platform references/: 7 .md files (workflows, architecture, cli-and-headless, configuration, extensions, integrations, agent-sdk). assets/templates/: 9 .example files.",
+        "Yes \u2014 KB-codespaces-platform references/: 10 .md files. assets/templates/: 5 entries (terraform-iac, typescript-single, typescript-monorepo/, docker-compose/, dockerfile-based/).",
+        "Yes \u2014 KB-github-actions-platform references/: 19 .md files. assets/templates/: 21 entries (20 .yml + 1 composite-action/action.yml)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "All three platform-half counts match the claim's enumeration. Platform halves have many topic-specific references + assets/templates/."
+    },
+    {
+      "claim_id": "C-0481",
+      "verification_questions": [
+        "Do the platform halves carry zero scripts/ subdirectories?",
+        "Do the audit halves carry Python scripts?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 no scripts/ subdirectory observed in any of KB-cc-platform, KB-codespaces-platform, KB-github-actions-platform.",
+        "Yes \u2014 auditing-cc-configs has 6 .py scripts; auditing-github-actions has 1; auditing-codespaces has 1 (stub); auditing-mcp has 4."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "ADR-0031 relocation pattern reflected in current layout."
+    },
+    {
+      "claim_id": "C-0482",
+      "verification_questions": [
+        "Do platform-half descriptions name the sister design-half?",
+        "Do design-half descriptions name the sister platform-half?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 KB-cc-platform: 'Pairs with KB-cc-design'; KB-codespaces-platform: 'Pairs with KB-codespaces-design'; KB-github-actions-platform: 'Pairs with KB-github-actions-design'. All present in description.",
+        "Yes \u2014 KB-cc-design: 'Pairs with KB-cc-platform (the platform half)'; KB-codespaces-design: 'Pairs with KB-codespaces-platform (the platform half)'; KB-github-actions-design: 'Pairs with KB-github-actions-platform (the platform half)'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Sister cross-reference convention confirmed. Note: claim phrasing 'ends with' is approximate \u2014 actual placement is mid-description in all six skills inspected, not strictly trailing. Substance (each half names its sister explicitly) holds."
+    },
+    {
+      "claim_id": "C-0471",
+      "verification_questions": [
+        "Is the skill frontmatter 'name:' field lowercase-hyphenated across all skill directories?",
+        "Is auditing-cc-configs an exceptional case with a '-configs' trailing element?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 verified names: kb-cc-design, kb-cc-platform, kb-codespaces-design, kb-codespaces-platform, kb-github-actions-design, kb-github-actions-platform, auditing-codespaces, auditing-cc-configs, auditing-github-actions, auditing-mcp. All lowercase-hyphenated.",
+        "Yes \u2014 auditing-cc-configs is the only audit half with a non-topic-bare suffix; siblings (auditing-codespaces, auditing-github-actions, auditing-mcp) use bare topic."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "ADR-0020 convention upheld with one documented deviation."
+    },
+    {
+      "claim_id": "C-0535",
+      "verification_questions": [
+        "Are all skill-frontmatter name fields lowercase-hyphenated?",
+        "Are kb- prefixes used for platform/design halves and bare names for audit halves?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 every SKILL.md inspected has a lowercase-hyphenated name field.",
+        "Yes \u2014 kb-cc-*, kb-codespaces-*, kb-github-actions-* use the kb- prefix; auditing-* halves use a bare 'auditing-' prefix (no kb-)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-corroborates C-0471. Convention is consistent across the corpus."
+    },
+    {
+      "claim_id": "C-0499",
+      "verification_questions": [
+        "Does auditing-codespaces declare itself a STUB?",
+        "Does ADR-0033 exist and substantiate the stub-vs-real surfacing?",
+        "Does the stub emit {\"stub\": true, \"findings\": []}?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 auditing-codespaces/SKILL.md line 4: 'STUB SKILL \u2014 reserved for the future Codespaces audit machinery'.",
+        "Yes \u2014 adrs/ADR-0033-adr-0029-execution-extension.md exists. Line 53 cites Q-CC-4 (auditing-codespaces stub semantics) as the worked example; line 72 has 'Stub-vs-real audit distinction' surfacing row referencing auditing-codespaces directly.",
+        "Yes \u2014 SKILL.md stub contract section (line 68 region) requires the exact payload {\"stub\": true, \"findings\": []}; ADR-0033 line 53 confirms the same."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "ADR-0033's full title is 'ADR-0029 execution extension'; the stub-vs-real surfacing is one row in its scope-deviation surfacing table. Claim's pointer to ADR-0033 is accurate. This claim was previously listed in batch 3 (C-0456) but only at the high level \u2014 the direct ADR-0033 + stub-payload verification done here is new and stronger."
+    },
+    {
+      "claim_id": "C-0460",
+      "verification_questions": [
+        "Does auditing-mcp/SKILL.md line 30 declare auditing-cc-configs family membership?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 line 30: 'This skill is part of the **auditing-cc-configs** family. Shared rubric, weights, thresholds, and triage live in the coordinator skill.'"
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Family-coordinator membership convention confirmed; declaration is body prose, not frontmatter."
+    },
+    {
+      "claim_id": "C-0483",
+      "verification_questions": [
+        "Is audit-half family membership declared in body prose, not frontmatter?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 auditing-mcp declares family membership at body line 30 (not in frontmatter). Frontmatter contains only name, description, allowed-tools."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Direct inspection of auditing-mcp confirms the convention. Frontmatter has no family-membership field."
+    },
+    {
+      "claim_id": "C-0537",
+      "verification_questions": [
+        "Is audit-family membership a body-prose convention rather than a frontmatter convention?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 same evidence as C-0483. No frontmatter field declares family membership in any audit-half SKILL.md inspected."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-corroborates C-0483."
+    },
+    {
+      "claim_id": "C-0449",
+      "verification_questions": [
+        "Does discovery-codebase-researcher.md exist as the consumer agent file?",
+        "Is Serena's symbol-level value flagged as contingent on UI-8 narrowing?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 /workspaces/feature-pipeline/.claude/agents/discovery-codebase-researcher.md exists.",
+        "Yes \u2014 claim explicitly hedges with 'symbol-level value contingent on UI-8 narrowing \u2014 repo is markdown-heavy'. The hedge is grounded in C-0490 (markdown-heavy repo) and C-0491."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Medium confidence reflects intrinsic contingency in claim text \u2014 Serena's role is conditional, not asserted. Consumer file exists; usefulness depends on UI-8 resolution."
+    },
+    {
+      "claim_id": "C-0450",
+      "verification_questions": [
+        "Does design-api.md exist as a consumer agent file?",
+        "Is mcp-openapi-schema the named consumer for design-api?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 /workspaces/feature-pipeline/.claude/agents/design-api.md exists.",
+        "Yes \u2014 claim supported by codebase-analysis-report.md inferred consumer table line 46. Mapping is semantically coherent (OpenAPI schema lookup for API design)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists."
+    },
+    {
+      "claim_id": "C-0451",
+      "verification_questions": [
+        "Does design-cicd.md exist?",
+        "Is actionlint-mcp the named consumer for design-cicd?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 /workspaces/feature-pipeline/.claude/agents/design-cicd.md exists.",
+        "Yes \u2014 claim supported by codebase-analysis-report.md line 47. Actionlint's role (lints GitHub Actions workflows) matches design-cicd's domain."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists; mapping is semantically coherent."
+    },
+    {
+      "claim_id": "C-0452",
+      "verification_questions": [
+        "Does design-iac.md exist?",
+        "Is HashiCorp Terraform MCP the named consumer for design-iac?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 /workspaces/feature-pipeline/.claude/agents/design-iac.md exists.",
+        "Yes \u2014 claim supported by codebase-analysis-report.md line 48. Terraform MCP's role aligns with the IaC design domain."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists; mapping is semantically coherent."
+    },
+    {
+      "claim_id": "C-0453",
+      "verification_questions": [
+        "Does discovery-external-researcher.md exist?",
+        "Is Context7 named as consumer for discovery-external-researcher?",
+        "Is Context7 also a documentation-lookup fallback referenced from KB-cc-platform/SKILL.md:109?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 /workspaces/feature-pipeline/.claude/agents/discovery-external-researcher.md exists.",
+        "Yes \u2014 claim supported by codebase-analysis-report.md line 49.",
+        "Reference to KB-cc-platform/SKILL.md:109 not directly re-verified line-by-line; claim is consistent with Context7's documentation-lookup role."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists; dual-role (consumer + fallback) plausible."
+    },
+    {
+      "claim_id": "C-0454",
+      "verification_questions": [
+        "Does discovery-external-researcher.md exist as consumer?",
+        "Is Exa named as consumer for discovery-external-researcher?"
+      ],
+      "verification_answers": [
+        "Yes \u2014 see C-0453.",
+        "Yes \u2014 claim supported by codebase-analysis-report.md line 50. Exa's web-search role aligns with external-research."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Consumer file exists; Exa + Context7 dual-consumer pattern for external-research is consistent across claims."
+    }
+  ],
+  "total_critiques": 98
+}

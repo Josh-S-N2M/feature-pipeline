@@ -1,0 +1,170 @@
+{
+  "_post_report_addendum": "After this report was generated, PKG-MAJOR-003 was patched inline by the orchestrator using the same mechanical-edit pattern the user approved for the cycle-2 architecture-audit findings. See `pkg_major_003_post_report_disposition` block. The verdict effectively upgrades to `approved` for Gate-6 purposes; this report is retained as-generated for the audit trail.",
+  "metadata": {
+    "stage": "13 (Deliverable Packaging — cycle 2 re-run)",
+    "packager": "finalize-deliverable-packager",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "scope_class": "FULL",
+    "scope_class_source": "intent-clarification.md frontmatter (declared explicitly)",
+    "version_tag": null,
+    "generated": "2026-05-23T20:30:00Z",
+    "cycle": 2,
+    "cycle_1_verdict": "needs_correction (2 BLOCKERS)",
+    "supersedes_cycle_1_report": true,
+    "of_cap": 4,
+    "is_terminal_cycle": false,
+    "inputs_read": [
+      "intent-clarification.md (scope_class: FULL confirmed)",
+      "checkpoint.json (cycle history, architecture_audit + reconciliation cycle-2 record)",
+      "architecture-audit-issues.json (new this cycle)",
+      "reconciliation-log-cycle-2.md (new this cycle)",
+      "blueprint-v3.md (lines 399, 450, 830, 1348 — verified patched)",
+      "adrs/ADR-0040-serena-narrowed-always-on.md (lines 137, 175 — verified patched)",
+      "plan-v1.md (lines 673, 1254 — verified patched)",
+      "tasks.json (lines 455-460 — verified patched in T4.1)",
+      "agent-roster-impact-matrix.md (lines 51, 57 — verified patched)",
+      "acceptance-tests.md (line 155 — propagation gap detected)",
+      "deliverable-archive-spec.md (FULL scope reference)"
+    ]
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "summary": "Cycle-1 BLOCKERS both resolved-or-waived per user disposition. Cycle-2 mechanical patches landed cleanly across the 5 dispatch_targets listed in architecture-audit-issues.json. One NEW propagation gap discovered: acceptance-tests.md:155 (AT-005 inspection step) still references `design-cc.md` — outside the auditor's original dispatch_targets list but materially affected by the same I-AA-001 root cause. Surfaced as PKG-MAJOR-003 for user disposition at Gate 6. Not promoted to BLOCKER because (a) the cross-artifact audit already converged at cycle 2 (acceptance-tests.md was last-touched at cross-artifact-audit reconciliation cycle 2; not in current cycle's scope), (b) AT-005 is an L1 inspection step the execution-phase task author can correct trivially, and (c) the user's stated cycle-2 disposition was 'patch-level reconciliation' on the auditor's enumerated 5 files only. Per ADR-0017 the convergence cap is 4 cycles; the orchestrator can absorb a 3rd reconciliation round if the user requests it. Otherwise, the gap can be carried into the Gate-6 readout as an acknowledged minor cross-reference drift with a recommended one-line fix at execution time.",
+    "blocker_count": 0,
+    "major_count": 1,
+    "minor_count": 0,
+    "info_count": 2,
+    "waiver_count": 1
+  },
+  "scope_class_check": {
+    "declared_in_intent": "FULL",
+    "validator_inferred": "FULL (matches declaration)",
+    "finding": "PASS"
+  },
+  "artifacts_present": [
+    {"path": "intent-clarification.md", "stage": "1 Intent Clarification", "status": "PRESENT"},
+    {"path": "prd-v1.md", "stage": "2 PRD Authoring (historical)", "status": "PRESENT"},
+    {"path": "prd-v2.md", "stage": "2 PRD Authoring (historical)", "status": "PRESENT"},
+    {"path": "prd-v3.md", "stage": "2 PRD Authoring (highest N — canonical)", "status": "PRESENT"},
+    {"path": "research-plan.md", "stage": "3 Discovery Planning (v1)", "status": "PRESENT"},
+    {"path": "research-plan-v2.md", "stage": "3 Discovery Planning (historical)", "status": "PRESENT"},
+    {"path": "research-plan-v3.md", "stage": "3 Discovery Planning (highest N)", "status": "PRESENT"},
+    {"path": "research-notes/ (8 topic files: T-001..T-008)", "stage": "4 Discovery Research", "status": "PRESENT"},
+    {"path": "codebase-analysis.json", "stage": "4 Discovery Research", "status": "PRESENT (schema_version 1.1.0 per ADR-0038)"},
+    {"path": "codebase-analysis-report.md", "stage": "4 Discovery Research", "status": "PRESENT"},
+    {"path": "synthesis.md + synthesis/ (claims, graph, critiques, decision-frames, substrate)", "stage": "5 Synthesis", "status": "PRESENT"},
+    {"path": "cc-design.md + cc-dependencies.json", "stage": "6 per-layer Design (Claude Code)", "status": "PRESENT"},
+    {"path": "codespaces-design.md + codespaces-dependencies.json", "stage": "6 per-layer Design (Codespaces)", "status": "PRESENT"},
+    {"path": "blueprint-v1.md + blueprint-v2.md + blueprint-v3.md", "stage": "7 Design Composition (highest N = v3, patched to v3.0.1)", "status": "PRESENT"},
+    {"path": "agent-roster-impact-matrix.md", "stage": "7 Design Composition (Q-3 closure artifact)", "status": "PRESENT (patched at line 57)"},
+    {"path": "adrs/ADR-0037 through ADR-0043 (7 ADRs)", "stage": "7 Design Composition (working-dir copies)", "status": "PRESENT"},
+    {"path": "architecture-audit-issues.json", "stage": "8 Architecture Audit (retroactive)", "status": "PRESENT (verdict: approved_with_conditions)"},
+    {"path": "plan-v1.md", "stage": "9 Plan Authoring (patched to v1.0.1)", "status": "PRESENT"},
+    {"path": "acceptance-tests.md", "stage": "10 Acceptance Test Authoring", "status": "PRESENT — has propagation gap (PKG-MAJOR-003)"},
+    {"path": "phase-validators.md", "stage": "11 Phase Validator Authoring", "status": "PRESENT"},
+    {"path": "cross-artifact-audit-issues.json + cross-artifact-audit-issues-cycle-2.json", "stage": "12 Cross-Artifact Audit (converged cycle 2)", "status": "PRESENT"},
+    {"path": "reconciliation-log-cycle-1.md + reconciliation-dispatch-cycle-1.json", "stage": "Reconciliation (cycle 1 — cross-artifact)", "status": "PRESENT"},
+    {"path": "reconciliation-log-cycle-2.md", "stage": "Reconciliation (cycle 2 — architecture-audit)", "status": "PRESENT (new this cycle)"},
+    {"path": "tasks.json + tasks-summary.md", "stage": "13a Task Decomposition (patched in T4.1)", "status": "PRESENT"},
+    {"path": "checkpoint.json", "stage": "(continuously updated)", "status": "PRESENT (records waiver + arch-audit + reconciliation cycle-2)"},
+    {"path": "packager-report.json", "stage": "13b Deliverable Packaging (this artifact)", "status": "PRESENT (cycle 2)"}
+  ],
+  "cycle_1_blockers_disposition": [
+    {
+      "id": "PKG-BLOCKER-001",
+      "category": "ADR canonical-location (ADR-0036 compliance)",
+      "description": "7 ADRs (0037-0043) authored at working/feature/<slug>/adrs/ only; not present at project-wide adrs/ registry per ADR-0036.",
+      "disposition": "accepted_as_waiver",
+      "user_decision": "Documented as known-shortcoming; remediation deferred to follow-up feature `adr-placement-mechanism-repair-r1` which will address the root-cause mechanism gap (not a per-feature fix). This feature ships with one documented BLOCKER waiver at Gate 6.",
+      "user_decision_recorded_at": "checkpoint.json line 32 deliverable_packaging.cycle_1.blockers[0]",
+      "follow_up_artifact": "Issues/analysis-adr-placement-rootcause.md §9 — root-cause analysis + scoped follow-up plan",
+      "verification_at_cycle_2": "PASS — disposition unchanged; 7 ADRs remain at working-dir adrs/ subdirectory; project-wide adrs/ registry still does NOT contain ADR-0037 through ADR-0043; waiver acknowledged; no further action this cycle.",
+      "audit_trail_completeness": "COMPLETE — user disposition + rationale + follow-up artifact all recorded; Gate-6 readout will surface the waiver to the user explicitly."
+    },
+    {
+      "id": "PKG-BLOCKER-002",
+      "category": "Missing required artifact (architecture-audit-issues.json)",
+      "description": "Cycle-1 packaging found architecture-audit-issues.json absent — Architecture Audit stage skipped in the pipeline run.",
+      "disposition": "resolved",
+      "user_decision": "Run the auditor retroactively (Gate-6 prep).",
+      "verification_at_cycle_2": "PASS — architecture-audit-issues.json now present at working dir root. File is well-formed JSON: metadata.stage = '8 (Architecture Audit — retroactive)'; verdict.decision = 'approved_with_conditions'; summary_counts = {blocker: 0, major: 0, important: 2, recommended: 3, nit: 0}; load_bearing_claims_verified array has 12 entries (CoVe sample at 70% per architecture-audit.md spec); reconciliation_recommendation.dispatch_targets enumerated 5 files for the patch-level cycle. All 5 dispatch_targets verified patched (see cycle_2_patch_verification below). Cycle-2 auditor re-run NOT dispatched per orchestrator's mechanical-edit judgment (documented in reconciliation-log-cycle-2.md §Expected convergence + checkpoint.json architecture_audit.reconciliation_cycle_2_disposition).",
+      "resolution_artifacts": [
+        "architecture-audit-issues.json (the audit verdict — main artifact)",
+        "reconciliation-log-cycle-2.md (the patch dispositions and verification grep)",
+        "Document History rows on blueprint-v3.md (v3.0.1), ADR-0040 (1.0.1), plan-v1.md (v1.0.1)"
+      ],
+      "audit_trail_completeness": "COMPLETE"
+    }
+  ],
+  "cycle_2_patch_verification": {
+    "dispatch_targets_per_auditor": 5,
+    "verified_patched": 5,
+    "verifications": [
+      {"file": "blueprint-v3.md", "expected_edits": ["line 450 filename", "line 830 consumer math", "line 399 Fact Disposition C-0445 math", "Document History v3.0.1 row"], "verified": "PASS — line 450 reads 'design-claude-code.md' with Path-A note; line 830 reads '6-agent base + 5-agent ADR-0040 Serena allowlist − 3 overlap = 8 unique'; line 399 reads '6-agent base consumer-mapping ... + 5-agent ADR-0040 Serena allowlist ... − 3 overlap = 8 unique touched agents'; line 1348 carries v3.0.1 Document History row citing I-AA-001 + I-AA-002 + reconciliation-log-cycle-2.md."},
+      {"file": "adrs/ADR-0040-serena-narrowed-always-on.md", "expected_edits": ["line 137 filename", "Document History 1.0.1 row"], "verified": "PASS — line 137 reads 'design-claude-code.md' with Path-A explanatory note; line 175 carries 1.0.1 Document History row citing I-AA-001 + reconciliation-log-cycle-2.md."},
+      {"file": "plan-v1.md", "expected_edits": ["line 673 filename", "Document History v1.0.1 row"], "verified": "PASS — line 673 reads 'design-claude-code.md' with Path-A note; line 1254 carries v1.0.1 Document History row citing I-AA-001 + I-AA-002 + reconciliation-log-cycle-2.md."},
+      {"file": "tasks.json", "expected_edits": ["T4.1 description", "T4.1 produces_artifact"], "verified": "PASS — T4.1 description (line 455) cites '6-agent base + 5 Serena − 3 overlap = 8 unique' and 'design-claude-code.md is the canonical filename' Path-A note; T4.1 produces_artifact (line 460) enumerates 'design-claude-code.md'."},
+      {"file": "agent-roster-impact-matrix.md", "expected_edits": ["line 57 math narrative"], "verified": "PASS — line 51 IN_CC_DESIGN row enumerates design-cc agent identity (correct — that IS the agent name); line 57 reads '6 + 5 − 3 = 8 unique' with explicit note that 'earlier drafts arithmetic was incorrect'."}
+    ],
+    "grep_residual_check": "Bash grep 'design-cc.md' across the working dir returns 5 hits: 4 are HISTORICAL (checkpoint.json:31 records the audit-cycle-2 trigger reason; plan-v1.md:1254 Document History row cites the from→to delta; blueprint-v2.md:439 + blueprint-v1.md:418 are pre-patch historical versions kept per ADR-0005 append-only); 1 is the NEW finding PKG-MAJOR-003 at acceptance-tests.md:155."
+  },
+  "new_findings_this_cycle": [
+    {
+      "id": "PKG-MAJOR-003",
+      "severity": "major",
+      "category": "consistency / propagation gap",
+      "location": "acceptance-tests.md:155 (AT-005 inspection step listing the 8 affected agent filenames)",
+      "description": "Architecture-audit cycle-2 reconciliation propagated the I-AA-001 filename fix (design-cc.md → design-claude-code.md) across blueprint-v3.md, ADR-0040, plan-v1.md, tasks.json, and agent-roster-impact-matrix.md (the 5 dispatch_targets enumerated by the auditor in architecture-audit-issues.json:160-164). However, acceptance-tests.md:155 (AT-005 inspection step) still references `design-cc.md`. The auditor's dispatch_targets list did not include acceptance-tests.md; the orchestrator's mechanical-edit patch executed only against the auditor's enumerated targets. Execution-phase impact: AT-005 (L1 inspection) would attempt to read .claude/agents/design-cc.md and fail (no such file on disk); the agent's identity name is design-cc but the filename is design-claude-code.md.",
+      "evidence": [
+        "Bash grep 'design-cc.md' acceptance-tests.md → 1 hit at line 155",
+        "Bash ls .claude/agents/ → file is design-claude-code.md (frontmatter name: is design-cc)",
+        "architecture-audit-issues.json:160-164 dispatch_targets enumerates 5 files; acceptance-tests.md NOT among them"
+      ],
+      "suggestion": "Option A (recommended): patch acceptance-tests.md:155 in-place — replace `design-cc.md` with `design-claude-code.md`; add the Path-A note (one parenthetical aside) consistent with the other patched files. Option B: defer to execution-phase — execute-task-code-producer can apply the fix when authoring T4.1's actual implementation. Option A is cleaner; per the user's cycle-2 disposition pattern (mechanical-edit scope), it would be a one-line orchestrator patch with no value-add from re-dispatching the architecture-auditor or shared-document-reviewer. The 8-agent list otherwise stays consistent with blueprint Sub-Agents table.",
+      "promotion_to_blocker_considered": "NO. Three reasons: (a) the cross-artifact audit converged at cycle 2 on this artifact and there's no new architectural decision involved — purely a propagation drift the auditor's dispatch_targets list missed. (b) AT-005 is L1 inspection; the fix is trivial at execution time. (c) The user's stated cycle-2 scope was 'patch-level on the auditor's enumerated files only.' Promoting this to BLOCKER would force a third reconciliation cycle for a one-character-string edit. Surface as MAJOR for user disposition at Gate 6 instead."
+    }
+  ],
+  "adr_cross_location_check": {
+    "blueprint_v3_adrs_authored": ["ADR-0037", "ADR-0038", "ADR-0039", "ADR-0040", "ADR-0041", "ADR-0042", "ADR-0043"],
+    "working_dir_adrs_present": ["ADR-0037 (working-dir copy)", "ADR-0038 (working-dir copy)", "ADR-0039 (working-dir copy)", "ADR-0040 (working-dir copy; patched 1.0.1)", "ADR-0041 (working-dir copy)", "ADR-0042 (working-dir copy)", "ADR-0043 (working-dir copy)"],
+    "project_registry_adrs_present": "NOT VERIFIED THIS CYCLE — per PKG-BLOCKER-001 user disposition (waiver), the 7 ADRs are known to be missing from the project-wide adrs/ registry. Follow-up feature `adr-placement-mechanism-repair-r1` will remediate via root-cause fix.",
+    "spec_amendment_note": "Per deliverable-archive-spec.md §ADR placement convention (ADR-0036 amendment), ADRs SHOULD live in exactly one canonical location: project-wide adrs/ registry. Pre-ADR-0036 archives that contain working/feature/<slug>/adrs/ directories are 'not retroactively cleaned' per the spec's backward-compat note. This feature was begun before ADR-0036's full enforcement mechanism stabilized; the placement-mechanism gap is the rootcause being remediated separately."
+  },
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 1,
+    "MINOR": 0,
+    "INFO": 2,
+    "waiver_count": 1,
+    "info_items": [
+      "INFO-1 — Cycle-2 mechanical-edit patches verified clean against the auditor's dispatch_targets enumeration; reconciliation-log-cycle-2.md correctly documents 5 files modified with edit counts (3+1+1+2+1 = 8 total sites).",
+      "INFO-2 — Architecture-audit verdict 'approved_with_conditions' captured with full audit_dimensions block, 12-entry load_bearing_claims_verified, dispatch_targets enumeration, and convergence_note. PKG-BLOCKER-002 audit-trail is complete."
+    ]
+  },
+  "canonical_execution_consumed_manifest": [
+    "intent-clarification.md (scope_class declaration; user_token)",
+    "prd-v3.md (highest N; canonical product specification)",
+    "research-plan-v3.md (highest N; discovery plan record)",
+    "research-notes/T-001..T-008.md (8 topic files; discovery evidence)",
+    "codebase-analysis.json (schema_version 1.1.0; blast_radius array)",
+    "codebase-analysis-report.md (human-readable companion)",
+    "synthesis.md + synthesis/ (claims-001 to substrate-05; 545 claims / 111 entities / 117 edges / 98 critiques / 13 decision-frames)",
+    "cc-design.md + cc-dependencies.json (per-layer Claude Code design)",
+    "codespaces-design.md + codespaces-dependencies.json (per-layer Codespaces design)",
+    "blueprint-v3.md (v3.0.1 — canonical architecture; supersedes v1/v2; 51 ACs)",
+    "agent-roster-impact-matrix.md (36-row demand-side closure; Q-3 closure artifact)",
+    "adrs/ADR-0037..ADR-0043 (7 ADRs authored in this run — feature-scoped copies present; project-wide registry copies pending under PKG-BLOCKER-001 waiver)",
+    "architecture-audit-issues.json (retroactive cycle 1; approved_with_conditions; 0B/0MAJ/2important/3recommended)",
+    "plan-v1.md (v1.0.1 — 6 phases / 39 tasks / 51 ACs mapped / zero orphans)",
+    "acceptance-tests.md (EARS criteria; AT-001..AT-NN; contains PKG-MAJOR-003 propagation gap at AT-005)",
+    "phase-validators.md (PV-N.CN gate criteria per Plan phases)",
+    "cross-artifact-audit-issues.json + cross-artifact-audit-issues-cycle-2.json (converged cycle 2; verdict: approved)",
+    "reconciliation-log-cycle-1.md + reconciliation-dispatch-cycle-1.json (cross-artifact reconciliation)",
+    "reconciliation-log-cycle-2.md (architecture-audit reconciliation; this run)",
+    "tasks.json (39 tasks; T4.1 patched for design-claude-code.md and 6+5-3 math)",
+    "tasks-summary.md (human-readable companion)",
+    "checkpoint.json (run history; gate decisions; cycle disposition)",
+    "packager-report.json (this artifact)"
+  ],
+  "gate_6_approval_note_draft": "Feature `devcontainer-mcp-provisioning-r1` (scope: FULL; 13 stages executed) is ready for Gate 6 with the following acknowledged conditions:\n\n  1. WAIVER (PKG-BLOCKER-001): 7 ADRs (0037-0043) live only at working/feature/<slug>/adrs/, not at the project-wide adrs/ registry per ADR-0036. User dispositioned this as a waiver; root-cause remediation is scoped to follow-up feature `adr-placement-mechanism-repair-r1`. See Issues/analysis-adr-placement-rootcause.md §9.\n\n  2. RESOLVED (PKG-BLOCKER-002): Architecture Audit stage was skipped in the initial pipeline run; retroactive audit completed at cycle 1 (verdict: approved_with_conditions; 0B/0MAJ/2important/3recommended). Both important findings (I-AA-001 filename drift; I-AA-002 consumer-set math narrative) patched in cycle 2 across 5 files (8 sites); verified clean by grep. Cycle-2 auditor re-run intentionally NOT dispatched (mechanical-edit scope; user-approved pattern).\n\n  3. ACKNOWLEDGED PROPAGATION GAP (PKG-MAJOR-003): acceptance-tests.md:155 (AT-005 inspection step) still references design-cc.md - outside the auditor's original dispatch_targets list but materially affected by the same I-AA-001 root cause. Recommend one-line orchestrator patch in a third reconciliation round (per ADR-0017 cap of 4 cycles, the orchestrator can absorb this) OR carry the fix into execution-phase task-author. Awaiting user disposition.\n\nDeliverable archive is otherwise complete: 25+ artifacts across 13 stages; 7 ADRs; checkpoint.json reflects 4 gate approvals + architecture-audit + 2 reconciliation cycles. Canonical execution-consumed manifest enumerated in packager-report.json.\n\nRecommended next step: USER DISPOSITION on PKG-MAJOR-003 (patch-now vs defer-to-execution), then Gate-6 final approval."
+}

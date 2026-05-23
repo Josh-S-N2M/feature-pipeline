@@ -1,0 +1,162 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "DesignDoc",
+    "target_path": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/cc-design.md",
+    "feature_slug": "devcontainer-mcp-provisioning-r1",
+    "layer": "claude-code",
+    "reviewer": "shared-document-reviewer",
+    "invocation_context": "recipe-feature-pipeline Invocation 3 (per-layer Design — Claude Code variant)",
+    "kb_loaded": ["KB-documentation-criteria", "KB-general-coding-principles", "KB-review-disciplines", "KB-cc-design (implicit via design-cc skills frontmatter)"],
+    "reviewed_at": "2026-05-23T00:00:00Z"
+  },
+  "scores": {
+    "consistency": 92,
+    "completeness": 91,
+    "rule_compliance": 95,
+    "clarity": 90
+  },
+  "gate0": {
+    "status": "pass",
+    "checks": {
+      "frontmatter_required_fields_present": "pass — id, doc_type, layer, version, status, feature_slug, derived_from, synthesis_input, generated, generated_by, change_summary all present",
+      "layer_scope_declared": "pass — 'claude-code' layer in frontmatter; explicit scope-boundary subsection at top of body",
+      "inventory_table_present": "pass — table at 'Inventory of CC primitives' enumerates 6 primitives with type/path/scope/activation/lowest-cost-justification",
+      "primitive_subsections_present": "pass — CLAUDE.md changes, Rule patterns, Skill patterns, Subagent patterns, Hook patterns, Permission policy, MCP server policy, Plugin packaging, Command-to-skill migration all addressed (each with explicit 'not introduced' rationale where applicable)",
+      "acceptance_criteria_contribution_present": "pass — 9 EARS-form AC-CC-N entries reduce to specific PRD AC-FR-* / AC-NFR-* clauses",
+      "dependencies_section_present": "pass — Provides to / Depends on / No dependency on subsections present",
+      "architectural_questions_section_present": "pass — Q-CC-1 through Q-CC-9 with Recommended + Defer to Composer disposition",
+      "applicable_standards_listed": "pass — explicit references to KB-cc-design Principles 1, 3, 4, 5, 6, 7, 8, 9 throughout (e.g., Principle 1 lowest-cost-primitive at inventory table; Principle 3 hooks-determinism at Hook patterns; Principle 5 one-source-of-truth at CLAUDE.md changes; Principle 7 plugins at Plugin packaging)"
+    },
+    "missing_elements": []
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "conditions": [
+      "Composer must resolve Q-CC-1 (family-coordinator path A vs B) before plan-author finalizes auditing-mcp augmentation — the family-membership wording on the SKILL.md changes is path-dependent",
+      "Composer must resolve Q-CC-3 (exact agent list for D-13 Serena narrowing) — row 7 of the per-agent allowlist table is currently TBD and blocks plan-author's per-agent edit instructions",
+      "Composer should explicitly confirm Q-CC-6 disposition (codebase-memory-mcp inventory status) — AC-CC-1 currently asserts '.mcp.json carries 8 entries; PRD says 7'; either the PRD is amended or the AC needs a glossary footnote",
+      "Composer should decide Q-CC-9 (whether AC-CC-5 BLOCKER count is a hard Gate 6 gate or a recommended check) before plan-author writes the phase-validator for the augmented auditing-mcp"
+    ],
+    "rationale": "The design covers all six cc-layer work items from synthesis §9.1, honors FR-5 (zero ADRs authored, 9 Q-CC-N items deferred), preserves the C-0445 grep-verified zero-mcp__ invariant for 29 of 36 agents, and conforms to the trifecta structural conventions extracted in synthesis §6. The four conditions are all 'Composer-bound, not author-bound' — they cannot be resolved by the design-cc agent itself per FR-5, and the design surfaces them correctly. No critical issues; one important issue (I-DR-001 inventory-count mismatch) and four recommended improvements."
+  },
+  "issues": [
+    {
+      "id": "I-DR-001",
+      "severity": "important",
+      "category": "consistency",
+      "location": "Inventory of CC primitives (table row 1) + `.mcp.json` design (note on codebase-memory-mcp at line 176) + AC-CC-1 (line 499) + Q-CC-6 (line 544)",
+      "description": "The design includes 8 servers in .mcp.json (the 7 PRD-named primaries PLUS codebase-memory-mcp as the ADR-0018 fallback). The PRD v3 explicitly closes the named-server list at seven. AC-CC-1 states 'shall list exactly the seven named servers ... plus codebase-memory-mcp ... as connected' which surfaces the contradiction inline. Q-CC-6 names the conflict and recommends interpretation (a) — fallback is implicit, not the eighth primary — but the AC text still couples the count promise to the fallback. As written, an audit run against AC-CC-1 will either flag the 8th entry as drift OR have to special-case codebase-memory-mcp; either path needs a recorded convention.",
+      "suggestion": "Either (a) update AC-CC-1 to explicitly say '7 named primaries + 1 documented fallback (codebase-memory-mcp per ADR-0018) = 8 mcpServers entries total' and have OP-2 / OP-3 in auditing-mcp special-case codebase-memory-mcp by name; or (b) defer the codebase-memory-mcp .mcp.json registration to a follow-up feature and document the resulting fallback unavailability. Composer should record the chosen convention in the UI-15 ADR (synthesis §7 risk 1) or a separate one-paragraph ADR-amendment to ADR-0018."
+    },
+    {
+      "id": "I-DR-002",
+      "severity": "important",
+      "category": "completeness",
+      "location": "Subagent patterns — per-agent allowlist updates (table row 7, line 216)",
+      "description": "Row 7 of the per-agent allowlist table is 'TBD per D-13 narrowing' with no concrete agent list. The downstream plan-author cannot author per-agent edits for Serena consumers without this list. Q-CC-3 surfaces the question correctly but the design subsection itself leaves the consumer-mapping table incomplete on 1 of 7 rows.",
+      "suggestion": "Either (a) add a provisional list to the table (e.g., 'review-architecture-auditor + design-cc; subject to Composer confirmation in Q-CC-3') so the table is concrete-default-overridable, or (b) explicitly state in the table cell that 'Serena row finalization blocks plan-authoring; design-cc returns to Composer before plan-author runs.' The current 'TBD' is correct but underspecified about the resolution mechanism."
+    },
+    {
+      "id": "I-DR-003",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "`.mcp.json` design — gitnexus entry (line 138-143)",
+      "description": "The gitnexus entry's args use `git+https://github.com/abhigyanpatwari/GitNexus@<PIN_TAG>` — but codebase-analysis.json line 221 records the canonical source as 'abhigyanpatwari/GitNexus' AND synthesis D-11 says 'exact tag per ADR-0007 v2.2.0'. The `<PIN_TAG>` placeholder is correct (pin determined at install time, per D-11 verify-at-execution discipline), but the surrounding prose at line 176 also uses '<TBD-per-ADR-0007-v2.2.0>' for codebase-memory-mcp's command — these two placeholder conventions should be unified.",
+      "suggestion": "Use a single placeholder convention across all TBD pins (e.g., always `<PIN_TBD>` or always `<TBD-per-ADR-NNNN>`) and add a 1-line note above the .mcp.json sketch saying 'placeholders of the form `<...>` are resolved at plan-author time per D-11.' Minor consistency win for the downstream plan-author who will template-fill these."
+    },
+    {
+      "id": "I-DR-004",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "`mcp-events.jsonl` schema (UI-15 contract) — 'What the file is NOT' subsection (line 339-343)",
+      "description": "The schema correctly enumerates 3 event types (primary_degraded, readiness_probe, structured_failure) but does not specify how the file is BOOTSTRAPPED — i.e., what state the file is in before postCreate runs. Without bootstrap semantics, OP-5 (lifecycle health-check completeness, line 480) cannot tell 'postStart never ran' from 'postStart ran and produced no events.' This matters for the AC-FR-8-c 'stale beyond a threshold' clause in PRD.",
+      "suggestion": "Add a single line to the schema section: 'On postCreate, the file is created (touch) if absent; postStart appends 7 readiness_probe records on every container start. An absent file or zero records after postStart indicates a layer-zero failure (the hook did not run) and is itself an OP-5 BLOCKER.' This unblocks the auditing-mcp OP-5 rule definition and gives plan-author a concrete contract."
+    },
+    {
+      "id": "I-DR-005",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "`KB-mcp-platform` authoring outline — pedagogical_sections frontmatter (line 367-370)",
+      "description": "Two pedagogical_sections entries are declared (auth-and-redaction.md and lifecycle-hooks.md), each with brief justifications. The justifications are correct in shape but could be tightened — e.g., 'Names anti-patterns ... that the auditor would otherwise flag as anti-pattern occurrences' could be more specific about WHICH auditor rule. Given KB-documentation-criteria/references/pedagogical-marker-justification-spec.md (substance-keyword requirement), the current text passes the rules but is more generic than the KB-github-actions-platform 8 entries that codebase-analysis flags as the richest set.",
+      "suggestion": "When authoring (this is an outline, not the final SKILL.md), aim for justifications that explicitly name (a) the specific anti-pattern (e.g., 'E-0094 argv-leakage'), (b) which auditing-mcp rule would flag it (e.g., 'OP-10'), and (c) why the reference legitimately names it (e.g., 'reference legitimately documents anti-pattern as guidance, not as project occurrence'). This is a forward-quality nudge; the outline is fine for design-stage review."
+    },
+    {
+      "id": "I-DR-006",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "Code-block convention — `.mcp.json` sketch language fence (line 108)",
+      "description": "The .mcp.json sketch uses ```jsonc as the language fence. Per KB-general-coding-principles dimension 9 (language matches project): the project's existing examples (`KB-cc-platform/assets/templates/mcp-config.json.example` per codebase-analysis) use straight `.json` extension. JSONC (JSON-with-comments) is appropriate for sketches with prose comments BUT introduces a divergence from the project's existing template extension. Acceptable as a design-time sample with comments, but the FINAL artifact (KB-mcp-platform/assets/templates/.mcp.json.example) should use `.json` and move comments to surrounding prose, OR the project should standardize on JSONC for its MCP templates.",
+      "suggestion": "Add a one-line note in the sketch caption: 'rendered as jsonc here for inline comments; final template is .json with comments moved to surrounding prose in KB-mcp-platform.' This addresses KB-general-coding-principles dimension 9 (language matches project) and prevents the plan-author from accidentally committing a .jsonc file when the project convention is .json."
+    }
+  ],
+  "checks_performed": {
+    "gate0_structural": "pass — all required template subsections present per blueprint-template / KB-cc-design conventions",
+    "gate1_consistency": "pass with I-DR-001 (inventory-count) and I-DR-003 (placeholder unification)",
+    "gate1_completeness": "pass with I-DR-002 (Serena row TBD) and I-DR-004 (mcp-events.jsonl bootstrap semantics) — all six synthesis §9.1 cc-layer work items covered",
+    "gate1_rule_compliance": "pass — FR-5 honored (zero ADRs authored, 9 Q-CC-N items surfaced); C-0445 zero-mcp__ invariant preserved for 29 of 36 agents; KB-cc-design Principles 1/3/4/5/6/7/8/9 cited and applied; trifecta convention (slim design-half, two reference files, no assets) honored for KB-mcp-design; ADR-0030 pedagogical_sections declared",
+    "gate1_clarity": "pass with I-DR-005 (pedagogical justification tightening) and I-DR-006 (jsonc vs json fence)",
+    "gate1_feasibility": "pass — all dependencies described as 'existing' verified against codebase-analysis.json: KB-cc-platform (verified), KB-cc-design (verified, 2-file references confirmed via ls), auditing-mcp (verified with 10 dimensions + BLOCKER/MAJOR/MINOR/NIT taxonomy), ADR-0018 (verified in adrs/), ADR-0007 v2.2.0 (verified in adrs-migrated/), discovery-codebase-researcher.md (verified with 4 prose references at lines 3/20/29/156), KB-codebase-research (verified)",
+    "fr5_compliance": "pass — Q-CC-1 through Q-CC-9 cleanly enumerate every Composer-bound architectural question; design author authored zero ADRs; Q-CC-8 explicitly lists the 5 ADR candidates Composer is expected to author from synthesis §7 risks",
+    "six_work_items_coverage": {
+      "item_1_mcp_json": "covered — full per-server sketch + redaction-allowlist-SSOT rationale (D-7) + per-server design notes",
+      "item_2_agent_allowlists": "covered for 6 of 7 consumer agents with concrete tool entries; row 7 (Serena) TBD per Q-CC-3 — I-DR-002",
+      "item_3_kb_mcp_platform": "covered — full authoring outline with frontmatter (incl. pedagogical_sections), 7-file references/ outline, assets/templates/ outline, body-structure router",
+      "item_4_kb_mcp_design": "covered — full authoring outline honoring the slim 2-file design-half convention (patterns-and-anti-patterns.md + principles.md, no assets/, no scripts/)",
+      "item_5_auditing_mcp_augmentation": "covered — 10 new rule families (OP-1 through OP-10) including GitNexus-specific (OP-8) and operational-health (OP-5/OP-6); 6 new scripts + 2 extensions enumerated; --with-runtime semantics defined; dimension-organization question explicitly deferred as Q-CC-4",
+      "item_6_mcp_events_jsonl": "covered — full schema with 3 event types, common fields, event-specific fields, example records, NOT-list; bootstrap semantics underspecified — I-DR-004"
+    },
+    "dependency_realizability_check": {
+      "method": "Grep + Glob against codebase-analysis.json components + direct ls of .claude/skills/KB-cc-design/",
+      "findings": "All claimed-existing dependencies verified: KB-cc-platform (present, multi-reference platform-half shape); KB-cc-design (present, 2-file references shape confirmed); auditing-mcp (present, 4 scripts + 4 references + examples/); ADR-0018 (present at adrs/); ADR-0007 v2.2.0 (present at adrs-migrated/); KB-codebase-research (present, with extraction_method schema field); discovery-codebase-researcher.md (present, 4 prose references at lines 3/20/29/156); 36 agents with zero mcp__ entries (C-0445 grep-verified); .mcp.json absent (C-0462)."
+    },
+    "code_block_review": {
+      "blocks_evaluated": 4,
+      "blocks": [
+        {
+          "location": ".mcp.json sketch (line 108-166)",
+          "language": "jsonc",
+          "dimension_findings": "Dimensions 1-10 mostly pass. Dimension 9 (language-matches-project): minor divergence — see I-DR-006. Dimension 4 (no fabricated APIs): uvx/npx/git+ patterns verified against synthesis Per-Server Implementation Brief. Dimension 5 (no secrets): all credentials use ${VAR} env references, no inline secrets. Auto-fail checks all clear (no real credentials, no fabricated dependency, no shared-infrastructure execution)."
+        },
+        {
+          "location": "mcp-events.jsonl example records (line 332-337)",
+          "language": "jsonl",
+          "dimension_findings": "All dimensions pass. Realistic timestamps in 2026-05-23 range; redaction example uses '[REDACTED:<envvar-name>]' placeholder pattern per D-7. No real credentials."
+        },
+        {
+          "location": "KB-mcp-platform SKILL.md frontmatter (line 354-371)",
+          "language": "yaml",
+          "dimension_findings": "All dimensions pass. Matches KB-cc-platform convention verbatim (lowercase-hyphenated name, multiline description ending with sister-cross-reference, allowed-tools list, pedagogical_sections list with path+justification per ADR-0030)."
+        },
+        {
+          "location": "KB-mcp-design SKILL.md frontmatter (line 414-426)",
+          "language": "yaml",
+          "dimension_findings": "All dimensions pass. Honors design-half-slim convention (no Edit/Write/WebFetch in allowed-tools, only 1 pedagogical_sections entry matching KB-cc-design precedent)."
+        }
+      ],
+      "auto_fail_checks": "all clear — no real credentials anywhere, no fabricated APIs (verified against codebase-analysis + synthesis Per-Server Implementation Brief), no shared-infrastructure execution"
+    },
+    "applicable_standards_explicit_classification": {
+      "KB-cc-design": "explicit — Principle 1 (lowest-cost-primitive) at inventory table, Principle 3 (hooks deterministic) at Hook patterns, Principle 4 (subagent isolation) at UI-15 expression, Principle 5 (one source of truth) at CLAUDE.md changes + Q-CC-4, Principle 6 (permissions safety net) at Permission policy, Principle 7 (plugins cross-project) at Plugin packaging, Principle 8 (commands vs skills) at Command-to-skill migration, Principle 9 (reasoning config discipline) at Subagent patterns intro",
+      "KB-cc-platform": "implicit — referenced for template shape (frontmatter conventions, allowed-tools, pedagogical_sections); existence + shape verified via codebase-analysis",
+      "ADR-0007 v2.2.0": "explicit — referenced for GitNexus primary / codebase-memory-mcp fallback policy",
+      "ADR-0018": "explicit — referenced for codebase-analysis schema",
+      "ADR-0020": "explicit — KB- prefix naming convention and lowercase-hyphenated 'name:' field",
+      "ADR-0030": "explicit — pedagogical_sections frontmatter convention",
+      "ADR-0033": "explicit — STUB-vs-real distinction for auditing-codespaces context",
+      "ADR-0036": "implicit — single-canonical-ADR-location (referenced indirectly via 'adrs-migrated/ vs adrs/' discussion)",
+      "FR-5 of recipe-feature-pipeline": "explicit — zero ADRs authored; all architectural questions surfaced as Q-CC-N"
+    }
+  },
+  "prior_context_check": {
+    "items_received": 0,
+    "items": [],
+    "note": "This is the first review pass on cc-design.md (no prior iteration); no prior context items to resolve."
+  },
+  "recommendations": [
+    "Composer: prioritize resolving Q-CC-1 (family-coordinator path) and Q-CC-3 (Serena agent list) before invoking plan-author — both directly gate concrete plan tasks.",
+    "Composer: Q-CC-6 disposition (codebase-memory-mcp as 8th .mcp.json entry vs 7 primaries) should be recorded in the UI-15 ADR or a separate one-paragraph amendment — I-DR-001 surfaces the inline tension.",
+    "Plan-author (when this design is composed): I-DR-004 (mcp-events.jsonl bootstrap semantics) is the cheapest concrete fix and unblocks OP-5 rule definition.",
+    "Design-cc (if a revision is requested): consider tightening pedagogical_sections justifications per I-DR-005 to match the KB-github-actions-platform precedent (8 entries with rule-specific justifications)."
+  ]
+}
