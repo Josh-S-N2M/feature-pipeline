@@ -20,8 +20,6 @@ pedagogical_sections:
     justification: "Migration-guide reference for adopting GitHub Actions; references .circleci/config.yml as an example of legacy CI (auditor flags non-existent path)"
   - path: references/reusable-workflows-and-actions.md
     justification: "Reusable-workflows reference; documents dist/index.js example paths typical of JavaScript actions (auditor flags non-existent example artifacts)"
-  - path: scripts/action_versions.md
-    justification: "Action-versions script reference; documents .github/labeler.yml example path typical of action consumers (auditor flags non-existent demo path)"
   - path: references/security.md
     justification: "Security reference catalog documenting curl-pipe-shell anti-pattern, credential-file references, and prompt-injection payloads the auditor flags. Contains intentional negative-example pipe-to-shell installer commands as anti-pattern training material; not real install instructions."
   - path: references/debugging-and-troubleshooting.md
@@ -77,7 +75,7 @@ For any GitHub Actions task, work in this order:
 1. **Anchor the mental model** — make sure you are clear on the five primitives (below) before touching YAML.
 2. **Pick the right reference doc** from the routing table — don't try to hold the entire surface in working memory.
 3. **For new workflows, start from a template** in `assets/templates/` rather than typing from scratch — the templates encode current best practice (SHA-pinned actions, least-privilege permissions, OIDC, sensible caching).
-4. **For reviews, run the audit script** (`scripts/audit_workflow.py`) on the workflow file(s) and combine its output with `references/review-checklist.md`. The script requires PyYAML — if you hit `ModuleNotFoundError: No module named 'yaml'`, run `pip install pyyaml` first.
+4. **For reviews, run the audit script** (now located at `../auditing-github-actions/scripts/audit_workflow.py` per ADR-0036 + AC-FR-8-a) on the workflow file(s) and combine its output with `references/review-checklist.md`. The script requires PyYAML — if you hit `ModuleNotFoundError: No module named 'yaml'`, run `pip install pyyaml` first.
 5. **Cite the specific rule** when flagging an issue — vague "this is unsafe" feedback is much less actionable than "third-party action `foo/bar@v2` is pinned to a tag, which is mutable; pin to a 40-character commit SHA per `references/security.md` § Pinning."
 
 ## The five primitives
@@ -132,8 +130,8 @@ Full rationale and worked examples for each of these is in `references/security.
 | Debug logging, common errors, why a workflow won't trigger | `references/debugging-and-troubleshooting.md` |
 | Migrating from Jenkins, CircleCI, GitLab CI, Travis, Azure DevOps | `references/migration.md` |
 | Running Claude Code itself in CI (PR review, issue triage, agentic automation) — via direct API, Bedrock, Vertex AI, or Microsoft Foundry | `references/claude-code-cicd.md` |
-| Reviewing or auditing a workflow | `references/review-checklist.md` + run `scripts/audit_workflow.py` |
-| Looking up the current major version of a specific action (e.g. `actions/checkout`, `aws-actions/configure-aws-credentials`) before suggesting a `uses:` line | `scripts/action_versions.md` |
+| Reviewing or auditing a workflow | `references/review-checklist.md` + run `../auditing-github-actions/scripts/audit_workflow.py` (relocated per AC-FR-8-a) |
+| Looking up the current major version of a specific action (e.g. `actions/checkout`, `aws-actions/configure-aws-credentials`) before suggesting a `uses:` line | `../auditing-github-actions/references/action_versions.md` (relocated per AC-FR-8-a) |
 | Catalogue of patterns that look reasonable but cause incidents | `references/anti-patterns.md` |
 | TypeScript/Node project CI patterns | `references/recipe-typescript.md` |
 | Python project CI patterns | `references/recipe-python.md` |
@@ -182,7 +180,7 @@ When asked to design a new workflow, ask these questions in order:
 
 The full checklist is in `references/review-checklist.md`. The high-leverage questions to ask of any existing workflow:
 
-- Are all third-party actions pinned to a SHA? (Run `scripts/audit_workflow.py`.)
+- Are all third-party actions pinned to a SHA? (Run `../auditing-github-actions/scripts/audit_workflow.py`.)
 - Is there an explicit `permissions:` block? Is it minimal?
 - Is any `${{ github.event.* }}` value or `${{ github.head_ref }}` interpolated into a `run:` block? (Injection risk.)
 - Is `pull_request_target` used? If so, does it check out the PR's head SHA? (Critical danger; see `references/security.md` § pull_request_target.)

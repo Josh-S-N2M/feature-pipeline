@@ -4,7 +4,7 @@ description: Authors the CI/CD Design subsection of the Blueprint during per-lay
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-github-actions-platform, KB-github-actions-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-github-actions-platform, KB-github-actions-design, auditing-github-actions, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
 memory: project
 ---
 

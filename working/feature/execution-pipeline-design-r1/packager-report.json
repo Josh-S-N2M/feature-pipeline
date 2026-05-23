@@ -1,0 +1,164 @@
+{
+  "schema_version": "1.0.0",
+  "id": "PackagerReport-execution-pipeline-design-r1",
+  "feature_slug": "execution-pipeline-design-r1",
+  "scope_class_declared": null,
+  "scope_class_inferred": "FULL",
+  "scope_class_source": "orchestrator brief; inference fallback per deliverable-archive-spec.md §'Inference fallback' (research-plan.md + synthesis.md present)",
+  "doc_type": "packager-report",
+  "version": "1.0.0",
+  "status": "complete",
+  "generated": "2026-05-22T24:20:00Z",
+  "generated_by": "finalize-deliverable-packager (Claude Code subagent dispatch, authoritative)",
+  "agent_invocation_simulation": false,
+  "verdict": "REVIEW",
+  "verdict_one_sentence": "Archive is substantively complete with all 13 stage artifacts present and authoritatively approved upstream, but FOUR completeness gaps (1 BLOCKER, 2 MAJOR, 1 MINOR) require human disposition at Gate 6 — each is small enough to remediate inside the 1 remaining reconciliation cycle.",
+  "spec_consulted": ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md",
+  "version_tag": null,
+  "version_tag_note": "Not supplied by orchestrator; handoff document + continuation prompt drafting is skipped per agent spec §'Optional handoff drafting'.",
+  "artifacts_present": [
+    {"path": "working/feature/execution-pipeline-design-r1/intent-clarification.md", "version": "1.0.0", "status": "accepted", "gate_passed": 1, "stage": "Intent Clarification"},
+    {"path": "working/feature/execution-pipeline-design-r1/prd-v1.md", "version": "1.0.0", "status": "superseded", "supersession_target": "prd-v1.1.0.md", "stage": "PRD Authoring (historical)"},
+    {"path": "working/feature/execution-pipeline-design-r1/prd-v1.1.0.md", "version": "1.1.0", "status": "accepted", "gate_passed": 2, "reviewer_verdict": "approved", "stage": "PRD Authoring (authoritative)"},
+    {"path": "working/feature/execution-pipeline-design-r1/research-plan.md", "version": "1.1.0", "status": "accepted", "gate_passed": 3, "reviewer_verdict": "approved", "stage": "Discovery Planning"},
+    {"path": "working/feature/execution-pipeline-design-r1/codebase-analysis.md", "version": "1.1.1", "status": "complete", "reviewer_verdict": "approved", "stage": "Discovery Research"},
+    {"path": "working/feature/execution-pipeline-design-r1/synthesis.md", "version": "1.1.0", "status": "draft", "reviewer_verdict": "approved", "stage": "Synthesis"},
+    {"path": "working/feature/execution-pipeline-design-r1/cc-design.md", "version": "1.0.0", "status": "draft", "reviewer_verdict": "approved", "stage": "Per-layer Design (Claude Code layer)"},
+    {"path": "working/feature/execution-pipeline-design-r1/cc-dependencies.json", "version": "1.0.0", "stage": "Per-layer Design (dependencies)"},
+    {"path": "working/feature/execution-pipeline-design-r1/blueprint-v1.md", "version": "1.0.0", "status": "superseded", "supersession_target": "blueprint-v2.md", "agent_invocation_simulation": true, "stage": "Design Composition (historical)"},
+    {"path": "working/feature/execution-pipeline-design-r1/blueprint-v2.md", "version": "2.0.0", "status": "superseded", "supersession_target": "blueprint-v3.md", "agent_invocation_simulation": true, "stage": "Design Composition (historical)"},
+    {"path": "working/feature/execution-pipeline-design-r1/blueprint-v3.md", "version": "3.0.0", "status": "superseded", "supersession_target": "blueprint-v4.md", "agent_invocation_simulation": true, "stage": "Design Composition (historical)"},
+    {"path": "working/feature/execution-pipeline-design-r1/blueprint-v4.md", "version": "4.0.0", "status": "superseded", "supersession_target": "blueprint-v5.md", "agent_invocation_simulation": true, "stage": "Design Composition (historical)"},
+    {"path": "working/feature/execution-pipeline-design-r1/blueprint-v5.md", "version": "5.0.0", "status": "draft", "agent_invocation_simulation": false, "audit_round": 7, "audit_verdict": "pass", "stage": "Design Composition (authoritative)"},
+    {"path": "working/feature/execution-pipeline-design-r1/architecture-audit-issues.json", "round": 1, "stage": "Architecture Audit r1"},
+    {"path": "working/feature/execution-pipeline-design-r1/architecture-audit-issues-r2.json", "round": 2, "stage": "Architecture Audit r2"},
+    {"path": "working/feature/execution-pipeline-design-r1/architecture-audit-issues-r3.json", "round": 3, "stage": "Architecture Audit r3"},
+    {"path": "working/feature/execution-pipeline-design-r1/architecture-audit-issues-r4.json", "round": 4, "stage": "Architecture Audit r4"},
+    {"path": "working/feature/execution-pipeline-design-r1/architecture-audit-issues-r5.json", "round": 5, "stage": "Architecture Audit r5"},
+    {"path": "working/feature/execution-pipeline-design-r1/architecture-audit-issues-r6.json", "round": 6, "stage": "Architecture Audit r6 (authoritative; verdict=needs_revision)"},
+    {"path": "working/feature/execution-pipeline-design-r1/architecture-audit-report-r6.md", "round": 6, "stage": "Architecture Audit r6 companion report"},
+    {"path": "working/feature/execution-pipeline-design-r1/architecture-audit-issues-r7.json", "round": 7, "stage": "Architecture Audit r7 (authoritative; verdict=pass)"},
+    {"path": "working/feature/execution-pipeline-design-r1/architecture-audit-report-r7.md", "round": 7, "stage": "Architecture Audit r7 companion report"},
+    {"path": "working/feature/execution-pipeline-design-r1/reconciliation-log-cycle1.md", "cycle": 1, "agent_invocation_simulation": true, "stage": "Reconciliation cycle 1"},
+    {"path": "working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle1.json", "cycle": 1, "stage": "Reconciliation cycle 1 dispatch"},
+    {"path": "working/feature/execution-pipeline-design-r1/reconciliation-log-cycle2.md", "cycle": 2, "agent_invocation_simulation": true, "stage": "Reconciliation cycle 2"},
+    {"path": "working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle2.json", "cycle": 2, "stage": "Reconciliation cycle 2 dispatch"},
+    {"path": "working/feature/execution-pipeline-design-r1/reconciliation-log-cycle3.md", "cycle": 3, "agent_invocation_simulation": false, "stage": "Reconciliation cycle 3 (authoritative)"},
+    {"path": "working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle3.json", "cycle": 3, "stage": "Reconciliation cycle 3 dispatch"},
+    {"path": "working/feature/execution-pipeline-design-r1/plan-v1.md", "version": "1.0.0", "status": "superseded", "supersession_target": "plan-v2.md", "agent_invocation_simulation": true, "stage": "Plan Authoring (historical)"},
+    {"path": "working/feature/execution-pipeline-design-r1/plan-v2.md", "version": "2.0.0", "status": "draft", "agent_invocation_simulation": false, "gate_5_verdict": "APPROVED", "stage": "Plan Authoring (authoritative)"},
+    {"path": "working/feature/execution-pipeline-design-r1/plan-v2-review-report.md", "stage": "Plan Review report"},
+    {"path": "working/feature/execution-pipeline-design-r1/plan-v2-review-issues.json", "stage": "Plan Review issues"},
+    {"path": "working/feature/execution-pipeline-design-r1/acceptance-tests.md", "version": "1.0.0", "status": "draft", "agent_invocation_simulation": false, "test_count": 78, "ac_coverage": 63, "stage": "Acceptance Test Authoring"},
+    {"path": "working/feature/execution-pipeline-design-r1/phase-validators.md", "version": "1.0.0", "status": "draft", "agent_invocation_simulation": false, "validator_count": 7, "pass_criterion_count": 85, "stage": "Phase Validator Authoring"},
+    {"path": "working/feature/execution-pipeline-design-r1/cross-artifact-audit-issues.json", "verdict": "pass", "agent_invocation_simulation": false, "stage": "Cross-Artifact Audit"},
+    {"path": "working/feature/execution-pipeline-design-r1/cross-artifact-audit-report.md", "agent_invocation_simulation": false, "stage": "Cross-Artifact Audit report"},
+    {"path": "working/feature/execution-pipeline-design-r1/tasks.json", "version": "1.0.0", "status": "draft", "agent_invocation_simulation": false, "task_count": 32, "edge_count": 76, "stage": "Task Decomposition"},
+    {"path": "working/feature/execution-pipeline-design-r1/tasks-summary.md", "version": "1.0.0", "status": "draft", "agent_invocation_simulation": false, "stage": "Task Decomposition summary"},
+    {"path": "working/feature/execution-pipeline-design-r1/deliverable-archive-review-issues.json", "agent_invocation_simulation": false, "stage": "Deliverable Archive review (this stage)"}
+  ],
+  "adrs_authored_in_run": [
+    {"id": "ADR-0032", "title": "conventions-canonicalization", "project_registry_path": "adrs/ADR-0032-conventions-canonicalization.md", "project_registry_present": true, "feature_scoped_path_expected": "working/feature/execution-pipeline-design-r1/adrs/ADR-0032-conventions-canonicalization.md", "feature_scoped_present": false, "status": "proposed"},
+    {"id": "ADR-0033", "title": "adr-0029-execution-extension", "project_registry_path": "adrs/ADR-0033-adr-0029-execution-extension.md", "project_registry_present": true, "feature_scoped_path_expected": "working/feature/execution-pipeline-design-r1/adrs/ADR-0033-adr-0029-execution-extension.md", "feature_scoped_present": false, "status": "proposed", "note": "§Context revised in-place during reconciliation cycle 3 per I-AA-606"},
+    {"id": "ADR-0034", "title": "prd-mis-credit-cleanup", "project_registry_path": "adrs/ADR-0034-prd-mis-credit-cleanup.md", "project_registry_present": true, "feature_scoped_path_expected": "working/feature/execution-pipeline-design-r1/adrs/ADR-0034-prd-mis-credit-cleanup.md", "feature_scoped_present": false, "status": "proposed", "note": "revised in v2 Blueprint authoring"},
+    {"id": "ADR-0035", "title": "auditing-shared-skill-binding-convention", "project_registry_path": "adrs/ADR-0035-auditing-shared-skill-binding-convention.md", "project_registry_present": true, "feature_scoped_path_expected": "working/feature/execution-pipeline-design-r1/adrs/ADR-0035-auditing-shared-skill-binding-convention.md", "feature_scoped_present": false, "status": "proposed", "note": "new this run (cycle 3); pairs with ADR-0031"}
+  ],
+  "artifacts_missing_required": [],
+  "artifacts_missing_conditional_unjustified": [
+    {
+      "kind": "research-notes/<topic>.md (at least one)",
+      "spec_reference": "deliverable-archive-spec.md §FULL scope line 46",
+      "severity": "MAJOR",
+      "rationale": "Orchestrator brief notes 'external research not used (KB-gap analysis closed)' but no `discovery_shortcut:` section in intent-clarification.md justifies the absence. Acknowledged-skip discipline incomplete."
+    },
+    {
+      "kind": "codebase-analysis.json (JSON companion to codebase-analysis.md)",
+      "spec_reference": "deliverable-archive-spec.md §FULL scope line 47; ADR-0018 codebase-analysis-schema",
+      "severity": "MAJOR",
+      "rationale": "Only the .md form exists. ADR-0018 specifies a machine-readable JSON schema; no justification recorded."
+    }
+  ],
+  "artifacts_missing_conditional_justified": [],
+  "artifacts_unexpected": [
+    {"path": "working/feature/execution-pipeline-design-r1/prd-v1.md", "explanation": "Historical iteration superseded by prd-v1.1.0.md; supersession metadata present and resolves; expected under FULL conditional 'prd-v<N>.md with N > 1' pattern; NOT a defect."},
+    {"path": "working/feature/execution-pipeline-design-r1/blueprint-v1.md through blueprint-v4.md", "explanation": "Historical Blueprint iterations preserved per ADR-0005 append-only; chain resolves to v5; expected under conditional 'blueprint-v<N>.md with N > 1' pattern; NOT a defect."},
+    {"path": "working/feature/execution-pipeline-design-r1/plan-v1.md", "explanation": "Historical Plan superseded by plan-v2.md; supersession metadata present; expected; NOT a defect."},
+    {"path": "working/feature/execution-pipeline-design-r1/tasks-summary.md", "explanation": "Human-readable companion to tasks.json; not in spec's expected-set but provides Gate 6 reviewer comprehension surface; MINOR (forward-compat extension of the spec)."},
+    {"path": "working/feature/execution-pipeline-design-r1/plan-v2-review-report.md + plan-v2-review-issues.json", "explanation": "Plan Review (Gate 5) artifacts; not in the FULL-scope expected-set table but present per ADR-0017 reviewer integration; MINOR (forward-compat extension)."},
+    {"path": "working/feature/execution-pipeline-design-r1/cross-artifact-audit-report.md", "explanation": "Companion report to cross-artifact-audit-issues.json; analogous to architecture-audit-report-r{6,7}.md; expected pattern; NOT a defect."},
+    {"path": "working/feature/execution-pipeline-design-r1/reconciliation-{log,dispatch}-cycle{1,2,3}.{md,json}", "explanation": "Reconciliation artifacts per ADR-0017 4-cycle cap; not enumerated in spec's FULL-scope table line-by-line but expected under 'Reconciliation' stage; NOT a defect."}
+  ],
+  "adr_cross_location_findings": [
+    {
+      "severity": "BLOCKER",
+      "finding": "All four ADRs authored this run (ADR-0032, ADR-0033, ADR-0034, ADR-0035) are present in the project-wide `adrs/` registry but MISSING from `working/feature/execution-pipeline-design-r1/adrs/`. The deliverable-archive spec §'ADR placement convention' requires dual-location placement.",
+      "remediation": "Create `working/feature/execution-pipeline-design-r1/adrs/` and copy the four ADR files from the project-wide registry. Single `cp` operation; well within the 1 remaining reconciliation cycle. After copy, re-validate."
+    }
+  ],
+  "reviewer_findings": {
+    "reviewer_invocation_doc_type": "DeliverableArchive",
+    "reviewer_output_path": "working/feature/execution-pipeline-design-r1/deliverable-archive-review-issues.json",
+    "reviewer_verdict": "review",
+    "reviewer_summary": {
+      "BLOCKER": 1,
+      "MAJOR": 2,
+      "MINOR": 1,
+      "RECOMMENDED": 4,
+      "INFO": 1
+    }
+  },
+  "summary": {
+    "BLOCKER": 1,
+    "MAJOR": 2,
+    "MINOR": 1,
+    "RECOMMENDED": 4,
+    "INFO": 1
+  },
+  "gate_6_user_decision_items": [
+    {
+      "id": "G6-UD-1",
+      "source": "tasks.json + tasks-summary.md + Plan v2 Open Item #5",
+      "decision_label": "T6.1 Posture A (defer) vs Posture B (execute) for doc_type backfill of ~20+ planning-side agents",
+      "context": "ADR-0033 + ADR-0029 require explicit user disposition for scope changes. The execution-pipeline-design-r1 feature scope is the EXECUTION pipeline; doc_type backfill on planning-side agents is a scope deviation surfaced explicitly (no silent change). Plan v2 defaults to Posture A (defer to a follow-on feature run); user can override to Posture B at Gate 6.",
+      "default_disposition": "Posture A — defer the doc_type backfill of planning-side agents to a follow-on grooming feature; preserve the 4 cycle-3 cleanup items in the execution-pipeline-design-r1 scope.",
+      "blocking_packager_pass": false,
+      "blocking_gate_6_decision": true
+    },
+    {
+      "id": "G6-UD-2",
+      "source": "ADR-0032, ADR-0033, ADR-0034, ADR-0035 (all status: proposed)",
+      "decision_label": "Ratification of four new ADRs (proposed → accepted)",
+      "context": "Per ADR template lifecycle, ADRs authored during a feature run land at status: proposed and advance to accepted at Gate 4 / Gate 6 ratification. Four new ADRs are in this state.",
+      "default_disposition": "Ratify all four to status: accepted as the standard Gate 6 close-out step (Cross-Artifact Audit cycle 1 already verified consistency across Blueprint/Plan/Tests/Validators; Architecture Audit r7 returned pass).",
+      "blocking_packager_pass": false,
+      "blocking_gate_6_decision": true
+    },
+    {
+      "id": "G6-UD-3",
+      "source": "this packager report — I-DR-DA-002",
+      "decision_label": "ADR dual-location remediation (BLOCKER from this packager pass)",
+      "context": "The feature-scoped ADR mirror directory does not exist; the four new ADRs live only in the project-wide registry. Spec requires both locations. Single `cp` operation remediates.",
+      "default_disposition": "Direct in-place remediation inside the remaining 1 reconciliation cycle (recommended) OR explicitly waive (records a discipline-floor exception against deliverable-archive-spec for v4.5.x).",
+      "blocking_packager_pass": true,
+      "blocking_gate_6_decision": true
+    },
+    {
+      "id": "G6-UD-4",
+      "source": "this packager report — I-DR-DA-003 + I-DR-DA-004 + I-DR-DA-001",
+      "decision_label": "MAJOR/MINOR completeness gaps (codebase-analysis.json absent; research-notes/ absent; scope_class frontmatter absent in intent-clarification)",
+      "context": "Three minor in-place remediations: (a) add `scope_class: FULL` line to intent-clarification.md frontmatter; (b) author retroactive `codebase-analysis.json` from the .md, OR document acknowledged-shortcut; (c) add a `discovery_shortcut:` section to intent-clarification.md justifying no-external-research, OR add a stub `research-notes/no-external-research.md`.",
+      "default_disposition": "Direct in-place remediation (all three are text-only file additions) OR waive with explicit acknowledgment.",
+      "blocking_packager_pass": false,
+      "blocking_gate_6_decision": false
+    }
+  ],
+  "reconciliation_budget_status": {
+    "blueprint_side_cycles_consumed": 3,
+    "blueprint_side_cycles_remaining": 1,
+    "plan_test_validator_side_cycles_consumed": 0,
+    "packager_findings_can_fit_inside_remaining_cycle": true,
+    "notes": "1 reconciliation cycle remains. The BLOCKER (ADR dual-location) and the MAJOR/MINOR completeness gaps are all file-level operations (cp + text additions). They do NOT require re-invoking any authoring sub-agent. The remaining cycle is sufficient to remediate all surfaced findings if the user chooses that path at Gate 6."
+  },
+  "readiness_characterization_for_gate_6": "The deliverable archive for execution-pipeline-design-r1 is substantively ready for Gate 6 (all 13 stages produced authoritative artifacts with approved reviewer verdicts and a passing Cross-Artifact Audit), with four small in-place remediations and two pre-existing user decisions (T6.1 Posture and ADR ratification) to disposition.",
+  "spec_compliance_note_v4_5_0": "Per spec §'Backward-compat note (v4.5.0 transition)', missing `packager-report.json` is MINOR for archives predating v4.5.0; this archive IS a v4.5.0+ run and CORRECTLY produces this packager-report.json — the v4.5.0 ADR-0027 / ADR-0028 closure is itself partially being designed in this feature run."
+}

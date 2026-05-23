@@ -1,8 +1,9 @@
 ---
 id: ADR-0034
 title: PRD v1.1.0 narrative housekeeping — ADR-0017 is canonical home for the 4-cycle reconciliation cap
-status: proposed
+status: accepted
 date: 2026-05-22
+accepted: 2026-05-22
 deciders: [user, claude (as design-composer)]
 supersedes: []
 superseded_by: []

@@ -1,0 +1,413 @@
+{
+  "schema_version": "1.0.0",
+  "dispatch_id": "reconciliation-dispatch-execution-pipeline-design-r1-cycle3",
+  "feature_slug": "execution-pipeline-design-r1",
+  "stage": "Architecture Audit Reconciliation",
+  "cycle_number": 3,
+  "is_terminal_cycle": false,
+  "is_final_cycle_in_budget": false,
+  "budget_used_so_far": 3,
+  "budget_remaining": 1,
+  "budget_cap_reference": "ADR-0017 (4-cycle reconciliation cap; symmetric per ADR-0034 ↔ D-12)",
+  "generated": "2026-05-22T21:30:00Z",
+  "generated_by": "finalize-reconciler (authoritative Claude Code subagent dispatch)",
+  "agent_invocation_simulation": false,
+  "agent_invocation_note": "First authoritative (non-simulated) reconciliation dispatch for this feature. Cycles 1 and 2 were claude.ai simulations preserved for audit-trail continuity; this cycle dispatches against the authoritative round-6 architecture audit.",
+  "source_audit": "working/feature/execution-pipeline-design-r1/architecture-audit-issues-r6.json",
+  "source_audit_companion_report": "working/feature/execution-pipeline-design-r1/architecture-audit-report-r6.md",
+  "source_audit_verdict": "needs_revision",
+  "source_audit_summary": {"BLOCKER": 1, "MAJOR": 5, "MINOR": 3, "INFO": 3},
+  "predecessor_dispatch": "working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle2.json",
+  "predecessor_log": "working/feature/execution-pipeline-design-r1/reconciliation-log-cycle2.md",
+  "current_artifact_paths": {
+    "blueprint": "working/feature/execution-pipeline-design-r1/blueprint-v4.md",
+    "blueprint_predecessor_chain": [
+      "working/feature/execution-pipeline-design-r1/blueprint-v3.md",
+      "working/feature/execution-pipeline-design-r1/blueprint-v2.md",
+      "working/feature/execution-pipeline-design-r1/blueprint-v1.md"
+    ],
+    "adr_0032": "adrs/ADR-0032-conventions-canonicalization.md",
+    "adr_0033": "adrs/ADR-0033-adr-0029-execution-extension.md",
+    "adr_0034": "adrs/ADR-0034-prd-mis-credit-cleanup.md",
+    "cc_design": "working/feature/execution-pipeline-design-r1/cc-design.md",
+    "synthesis": "working/feature/execution-pipeline-design-r1/synthesis.md",
+    "prd": "working/feature/execution-pipeline-design-r1/prd-v1.1.0.md"
+  },
+  "explicit_decisions_made_this_cycle": [
+    {
+      "decision_id": "D-RC3-1",
+      "finding_id": "I-AA-602",
+      "decision": "WIDEN quality-handler Bash to unrestricted (Path a per audit recommended_resolution)",
+      "rationale_summary": "Match cc-design.md (reviewer_verdict=approved) verbatim. v3-era narrowing was undocumented and creates a silent-absorption pattern per v4's own acknowledged-but-unfixed contract gap. Path b (re-architecture) would re-open D-2c contract and exceed cycle scope.",
+      "introduces_silent_absorption": false,
+      "surfacing_for_blueprint_v5": "Permissioning consideration surfaces as a new Risk row in blueprint-v5; Bash widening is documented in the rationale paragraph with explicit cross-link to cc-design.md."
+    },
+    {
+      "decision_id": "D-RC3-2",
+      "finding_id": "I-AA-603",
+      "decision": "AUTHOR new ADR-0035 ratifying auditing-shared Skill-binding convention (Path i per audit recommended_resolution)",
+      "rationale_summary": "ADR-0032 is at 5 changes per its own framing; folding a sixth, semantically distinct concern would muddle its framing. One-decision-per-ADR is the established pattern (ADR-0029/ADR-0033 split rather than fold). ADR-0035 pairs structurally with ADR-0031 (canonical-helper-home for auditing-shared).",
+      "introduces_silent_absorption": false,
+      "new_adr_metadata": {
+        "id": "ADR-0035",
+        "title": "Auditing-shared Skill-binding convention for execution-phase agents",
+        "status": "proposed",
+        "date": "2026-05-22",
+        "deciders": ["user", "claude (as design-composer)"],
+        "related": ["ADR-0029", "ADR-0031", "ADR-0032"],
+        "pairs_synthesis_decisions": [],
+        "authored_in_feature": "execution-pipeline-design-r1"
+      }
+    },
+    {
+      "decision_id": "D-RC3-3",
+      "finding_id": "I-AA-604",
+      "decision": "Add Blueprint correction-surface footnotes at AC-FR-6-e and AC-FR-10-b (Path a per audit recommended_resolution)",
+      "rationale_summary": "Symmetric with cycle-1 Path B disposition for same citation-propagation pattern. Path b (PRD re-author) contradicts ADR-0034's own framing (declines PRD v1.1.1 supersession). Path c (accept as known-stale) perpetuates the documentary error ADR-0034 was authored to close.",
+      "introduces_silent_absorption": false,
+      "footnote_text_for_blueprint": "ADR-0021 citation transcribed verbatim from PRD v1.1.0 per ADR-0005 (PRD prose unchanged). The corrected attribution per ADR-0034 is ADR-0017 (the canonical home for the 4-cycle reconciliation cap; ADR-0021 has no actual cap content). Downstream artifacts (Plan, Acceptance Tests, Phase Validators) authored from this Blueprint should cite ADR-0017, not ADR-0021. The PRD's verbatim attribution is preserved here as a transcription artifact, not endorsed as the canonical citation."
+    }
+  ],
+  "dispatches": [
+    {
+      "order": 1,
+      "target_agent": "design-composer",
+      "target_invocation": "authoritative Claude Code subagent dispatch",
+      "rationale": "All 9 actionable findings (1 BLOCKER + 5 MAJOR + 3 MINOR) are addressable by a single design-composer pass. They share consistent disposition direction with no inter-finding conflicts. Corrections are mechanical text revisions plus one new ADR authoring; no architectural rework. ADR-0005 append-only supersession applies to the Blueprint (author blueprint-v5.md; mark v4 superseded at frontmatter only). ADR-0033 is status:proposed and may be edited in-place per ADR-0005's proposed-status exception. ADR-0035 is a new authored artifact.",
+      "issues_referenced": [
+        "I-AA-601",
+        "I-AA-602",
+        "I-AA-603",
+        "I-AA-604",
+        "I-AA-605",
+        "I-AA-606",
+        "I-AA-607",
+        "I-AA-608",
+        "I-AA-609"
+      ],
+      "depends_on_dispatch_order": [],
+      "target_artifacts": [
+        {
+          "path": "working/feature/execution-pipeline-design-r1/blueprint-v5.md",
+          "action": "create",
+          "version": "5.0.0",
+          "status": "draft",
+          "predecessor": "working/feature/execution-pipeline-design-r1/blueprint-v4.md",
+          "supersedes": [],
+          "addresses_issues": ["I-AA-601", "I-AA-602", "I-AA-603", "I-AA-604", "I-AA-605", "I-AA-607", "I-AA-608", "I-AA-609"]
+        },
+        {
+          "path": "working/feature/execution-pipeline-design-r1/blueprint-v4.md",
+          "action": "frontmatter_edit_only_per_ADR-0005",
+          "edits": {
+            "status": "draft → superseded",
+            "superseded_by": "working/feature/execution-pipeline-design-r1/blueprint-v5.md",
+            "superseded_at": "<ISO-8601-UTC at v5 authoring time>",
+            "superseded_reason": "Cycle 3 reconciliation (authoritative round-6 audit): addresses I-AA-601 BLOCKER + I-AA-602 through I-AA-609 MAJOR/MINOR findings."
+          },
+          "body_edit_forbidden_per": "ADR-0005 (append-only supersession discipline)"
+        },
+        {
+          "path": "adrs/ADR-0035-auditing-shared-skill-binding-convention.md",
+          "action": "create",
+          "status": "proposed",
+          "addresses_issues": ["I-AA-603"],
+          "frontmatter_target": {
+            "id": "ADR-0035",
+            "title": "Auditing-shared Skill-binding convention for execution-phase agents",
+            "status": "proposed",
+            "date": "2026-05-22",
+            "deciders": ["user", "claude (as design-composer)"],
+            "supersedes": [],
+            "superseded_by": [],
+            "related": ["ADR-0029", "ADR-0031", "ADR-0032"],
+            "authored_in_feature": "execution-pipeline-design-r1",
+            "pairs_synthesis_decisions": [],
+            "subsumes": []
+          },
+          "body_target_sections": [
+            "Context — auditing-shared as cross-cutting helper-home per ADR-0031; this feature's execution-side agents materially depend on multiple auditing-shared scripts; existing planning-side agents invoke single scripts via Bash without binding the SKILL.md",
+            "Decision — execution-side agents that materially depend on multiple auditing-shared scripts MAY bind auditing-shared in their skills: field (loading SKILL.md as context) in addition to invoking scripts via Bash. Planning-side agents that invoke a single script via Bash do not need the binding. The convention is OPT-IN for cross-cutting helper-home skills; not mandatory.",
+            "Validation evidence — 4 agents in this feature bind auditing-shared (execute-orchestrator, execute-task-quality-handler, execute-phase-quality-reviewer, execute-finalize-reconciler) per cc-design.md (reviewer_verdict=approved)",
+            "Consequences — Positive: shared conceptual model available to agents materially depending on multiple scripts. Negative: context-window cost for agents loading the SKILL.md. Forward implications: future features authoring new audit-touching agents have ADR-0035 to cite for the binding decision.",
+            "Alternatives considered — Alt 1: fold into ADR-0032 (rejected: ADR-0032 already at 5 changes; muddles framing). Alt 2: defer to a follow-on conventions feature (rejected: deviation already in play in this feature; needs ratification now per ADR-0029).",
+            "Notes — Pairs with ADR-0031 (canonical-helper-home) — ADR-0031 defines where the shared scripts live; ADR-0035 defines how downstream agents bind to them."
+          ]
+        },
+        {
+          "path": "adrs/ADR-0033-adr-0029-execution-extension.md",
+          "action": "in_place_edit_per_ADR-0005_proposed_status_exception",
+          "status_unchanged": "proposed",
+          "addresses_issues": ["I-AA-606"],
+          "edit_target_section": "Context",
+          "edit_target_content_to_add": "Two-sentence cross-reference to Blueprint Path B disposition: (1) `pipeline-run-summary` serves as the PRD AC-FR-7-c 'execution-reconciliation log' equivalent per Blueprint Path B disposition (the per-feature-run reconciliation aggregation). (2) The 'frontmatter-validation report' floor item exists as a JSON-output schema in `validate_pipeline_frontmatter.py` source rather than as a pair-pattern artifact — outside ADR-0033's per-artifact Scope-Deviation surfacing scope.",
+          "edit_position": "Append to existing Context section after the enumerated 5-artifact list (lines 27-31 of current ADR-0033)"
+        }
+      ],
+      "expected_changes_per_finding": [
+        {
+          "finding_id": "I-AA-601",
+          "severity": "BLOCKER",
+          "target_artifact": "blueprint-v5.md",
+          "target_section": "Agent Frontmatter Specifications → Frontmatter validator coverage subsection",
+          "current_location_in_v4": "lines 1081-1091",
+          "change_type": "rewrite_subsection",
+          "expected_content": [
+            "Replace 'five required fields present: model, effort, tools, skills, memory' with: REQUIRED fields are model, effort, tools, skills; memory is OPTIONAL with enum {user, project, local} when present (the value 'none' is INVALID and MUST be REJECTED; omitting the field = no persistent memory per Gate 4 verification).",
+            "Replace 'Task as synonym for TaskCreate' framing with: tools whitelist MUST list 'Agent' and 'TaskUpdate' as SEPARATE entries with separate semantics (Agent = subagent dispatch; TaskUpdate = task-board management). They are NOT synonyms; conflating them was the v3-era misreading v4 corrects per convention note 2. Also valid: 'Task' as alias for 'Agent' (pre-v2.1.63 form; still works per platform docs).",
+            "Replace 'Edit pending Gate 4 validation' framing with: 'Edit is VALID per Gate 4 verification (confirmed by Claude Code docs Debugger example).'",
+            "Replace 'Bash(python3:*) pending Gate 4 validation' framing with: 'Bash and Bash(<pattern>:*) restrictions are both VALID per Gate 4 verification; agents may use either form per their security/feasibility trade-off. For execute-task-quality-handler in v5 specifically: unrestricted Bash per cc-design.md (see I-AA-602 resolution / D-RC3-1).'",
+            "Replace 'memory value from known enum (project confirmed; none pending Gate 4)' with: 'memory value from documented enum {user, project, local}; the value none is INVALID Claude Code syntax per Gate 4 verification and MUST be REJECTED. Field omission = no persistent memory (canonical pattern).'",
+            "Replace 'effort: ∈ {low, medium, high, xhigh}' with: 'effort: ∈ {low, medium, high, xhigh, max} per KB-cc-platform/references/extensions.md. (max = maximum effort; Opus 4.7 only on max; falls back to high on other models.)'",
+            "Add cross-reference statement inline: 'For verification, see Convention notes 1, 2, 3 above in this subsection — the validator coverage MUST reflect those notes' resolved state, not regenerate the v3-era pre-Gate-4 questions.'"
+          ]
+        },
+        {
+          "finding_id": "I-AA-602",
+          "severity": "MAJOR",
+          "target_artifact": "blueprint-v5.md",
+          "target_section": "Agent Frontmatter Specifications → execute-task-quality-handler",
+          "current_location_in_v4": "lines 1020-1037",
+          "change_type": "yaml_and_rationale_edit",
+          "expected_content": [
+            "YAML tools field: change from `tools: [Read, Glob, Grep, Bash(python3:*)]` to `tools: [Read, Glob, Grep, Bash]` per cc-design.md verbatim.",
+            "Rationale paragraph rewrite: Remove the v3-era narrowing-rationale paragraph (currently lines 1033 of v4). Replace with: 'Bash unrestricted per cc-design.md (reviewer_verdict=approved). The quality-handler invokes language-stack-specific test commands (pytest, npm test, cargo test, go test, dotnet test, mvn test, etc.) per the modified files declared in the task spec; restricting Bash to python3-only would mechanically break the agent for non-Python stacks per FR-2 + D-11 + Component 3 contract. Permissioning is handled via .claude/settings.json allow-list per the project sandbox pattern (see Security Considerations — Filesystem write surface).' Then add: 'A candidate follow-on architectural decision (Path b in audit I-AA-602 recommended_resolution) would re-route all test invocation through run_phase_checks.py so quality-handler genuinely only consumes results; deferred as out-of-scope for this feature run, preserved in Risks/Future Extensibility.'",
+            "Add Risk row to §Risks and Mitigation: 'Risk: quality-handler runs arbitrary Bash commands per task language stack. Mitigation: scoped to working/feature/<feature-slug>/ per project sandbox; .claude/settings.json allow-list governs permission; test commands are invoked by the task spec which is itself authored by plan-author and reviewed at Plan Gate. Future Extensibility: re-route via run_phase_checks.py per Path b in I-AA-602 resolution.'"
+          ]
+        },
+        {
+          "finding_id": "I-AA-603",
+          "severity": "MAJOR",
+          "target_artifact_primary": "adrs/ADR-0035-auditing-shared-skill-binding-convention.md (NEW)",
+          "target_artifact_secondary": "blueprint-v5.md",
+          "change_type": "new_adr_plus_blueprint_cross_references",
+          "expected_content": [
+            "NEW ADR-0035 — full ADR per ADR-template; sections per target_artifacts entry above (Context, Decision, Validation evidence, Consequences, Alternatives, Notes).",
+            "blueprint-v5 §Agent Frontmatter Specifications convention note 1: append final sentence to existing convention note 1: 'Ratified by ADR-0035 (this run; status: proposed) as the canonical statement of the Skill-binding convention for cross-cutting helper-home skills (per ADR-0031 ↔ ADR-0035 pairing).'",
+            "blueprint-v5 §Background and Context → Prerequisite ADRs: add row for ADR-0035 as 'Auditing-shared Skill-binding convention — this run; status: proposed'.",
+            "blueprint-v5 §Change Impact Map: add row 'adrs/ADR-0035-auditing-shared-skill-binding-convention.md | create | New ADR authored in this run per I-AA-603 resolution / D-RC3-2'.",
+            "blueprint-v5 §References → ADRs authored or referenced → Authored in this feature run: add bullet for ADR-0035.",
+            "blueprint-v5 §Update History: add entry acknowledging ADR-0035 authoring in this run (cycle 3 reconciliation).",
+            "blueprint-v5 §ADR Authoring (this run): add ADR-0035 summary alongside existing ADR-0032/0033/0034 summaries.",
+            "blueprint-v5 frontmatter `adrs_added_in_this_run`: add ADR-0035 entry."
+          ]
+        },
+        {
+          "finding_id": "I-AA-604",
+          "severity": "MAJOR",
+          "target_artifact": "blueprint-v5.md",
+          "target_section": "Acceptance Criteria → AC-FR-6-e AND AC-FR-10-b",
+          "current_location_in_v4": "lines 373 (AC-FR-6-e) and 402 (AC-FR-10-b)",
+          "change_type": "add_footnote_at_each_AC",
+          "expected_content": [
+            "AC-FR-6-e: keep verbatim transcription from PRD v1.1.0 (per the Blueprint's AC section preamble: 'All 60 ACs are transferred faithfully from PRD v1.1.0'). Add inline footnote marker at first 'ADR-0021' citation in the AC text.",
+            "AC-FR-6-e footnote text: 'ADR-0021 citation transcribed verbatim from PRD v1.1.0 per ADR-0005 (PRD prose unchanged). The corrected attribution per ADR-0034 is ADR-0017 (the canonical home for the 4-cycle reconciliation cap; ADR-0021 has no actual cap content). Downstream artifacts (Plan, Acceptance Tests, Phase Validators) authored from this Blueprint should cite ADR-0017, not ADR-0021. The PRD's verbatim attribution is preserved here as a transcription artifact, not endorsed as the canonical citation.'",
+            "AC-FR-10-b: same treatment. Add footnote marker at the 'ADR-0021' citation in the AC text.",
+            "AC-FR-10-b footnote text: SAME content as AC-FR-6-e footnote (the correction surface is identical; design-composer may either repeat the footnote text in full at each AC or define it once and reference by footnote ID — design-composer's editorial choice; both honor brief).",
+            "Optional but recommended: add a short preamble note to the Functional ACs section header stating that 'two ACs (AC-FR-6-e and AC-FR-10-b) carry a transcription footnote correcting their PRD-inherited ADR-0021 citation to ADR-0017 per ADR-0034.' This makes the correction visible at the section level too."
+          ]
+        },
+        {
+          "finding_id": "I-AA-605",
+          "severity": "MAJOR",
+          "target_artifact": "blueprint-v5.md",
+          "target_section": "Design → Change Impact Map AND Migration Strategy",
+          "current_location_in_v4": "Change Impact Map lines 589-616; Migration Strategy lines 1924-1931",
+          "change_type": "add_row_and_paragraph",
+          "expected_content": [
+            "Add row to Change Impact Map (after the shared-document-reviewer row at line 596): 'Location: .claude/agents/ | Artifact: intake-*.md, design-*.md, discovery-*.md, finalize-*.md, plan-author.md, test-*.md (wildcard, ~20+ planning-side agents) | Action: edit (small) | Disposition: Add doc_type emission to author-prompt frontmatter section per ADR-0032 Change 4. ~1-line change per agent. Required for the agent's authored artifacts to pass the FR-6 frontmatter validator at Gate 0 (doc_type universal-required field). Plan-stage task generation per this row should produce one task per affected agent OR one batched task covering all ~20+ agents per the plan-author's discretion.'",
+            "Update Total impact line at end of Change Impact Map: add '+ ~20 planning-side agent author-prompt edits' to the count. Total becomes ~49 file operations (was ~29).",
+            "Update Migration Strategy section: add new paragraph: 'doc_type backfill — author-prompt vs historical artifact distinction. ADR-0032 Change 4 makes doc_type a universal-required field. Two distinct populations apply: (a) historical artifacts (pre-implementation date) — per AC-FR-11-d, the validator tolerates missing doc_type for these. (b) Planning-side agent author-prompts — these must be modified to emit doc_type in their authored artifacts going forward (post-ratification). The Change Impact Map enumerates the ~20+ planning-side agent author-prompts; Plan-stage task generation produces the corresponding tasks. Without this enumeration, the first post-ratification feature run would trigger validator failures at Gate 0 for every artifact those agents author.'"
+          ]
+        },
+        {
+          "finding_id": "I-AA-606",
+          "severity": "MAJOR",
+          "target_artifact": "adrs/ADR-0033-adr-0029-execution-extension.md",
+          "target_section": "Context",
+          "current_location_in_adr": "lines 27-31",
+          "change_type": "in_place_edit_append_to_section_per_ADR-0005_proposed_exception",
+          "expected_content": [
+            "Append to existing Context section (after the enumerated 5-artifact list): 'Two cross-references to the Blueprint AC-FR-7 floor coverage subsection are warranted for downstream-reader legibility:',",
+            "'(1) `pipeline-run-summary` serves as the PRD AC-FR-7-c \"execution-reconciliation log\" floor item — per Blueprint Path B disposition (the per-feature-run reconciliation aggregation is the same artifact under a different framing; see Blueprint §AC-FR-7 floor coverage).'",
+            "'(2) The PRD AC-FR-7-c \"frontmatter-validation report\" floor item exists as a JSON-output schema in `validate_pipeline_frontmatter.py` source rather than as a pair-pattern artifact — outside ADR-0033 per-artifact Scope-Deviation surfacing scope (script source is the canonical schema location; see Blueprint §AC-FR-7 floor coverage Path B rationale).'",
+            "ADR-0033 status remains 'proposed' (no change). The edit is permitted per ADR-0005 proposed-status in-place exception; same exception was used for ADR-0034's revision (2026-05-22T18:30:00Z)."
+          ]
+        },
+        {
+          "finding_id": "I-AA-607",
+          "severity": "MINOR",
+          "target_artifact": "blueprint-v5.md",
+          "target_section": "References → Pipeline artifacts in this feature run",
+          "current_location_in_v4": "line 2328",
+          "change_type": "row_edit",
+          "expected_content": [
+            "Update the 'This Blueprint' row from 'working/feature/execution-pipeline-design-r1/blueprint-v1.md | v1.0.0 draft (this document)' to 'working/feature/execution-pipeline-design-r1/blueprint-v5.md | v5.0.0 draft (this document)'.",
+            "Same correction applies to any other stale self-references in the table (design-composer should scan the References section for stale carry-forwards introduced via v1→v2→v3→v4 chain and update them all to v5 state)."
+          ]
+        },
+        {
+          "finding_id": "I-AA-608",
+          "severity": "MINOR",
+          "target_artifact": "blueprint-v5.md",
+          "target_section": "Security Considerations → Filesystem write surface",
+          "current_location_in_v4": "line 1958",
+          "change_type": "paragraph_rewrite",
+          "expected_content": [
+            "Rewrite the paragraph from: 'The orchestrator does NOT have Write (per cc-design.md orchestrator profile: tools include [Read, Glob, Grep, Bash, Task, TaskUpdate], NOT Write).'",
+            "To: 'The execution pipeline writes to working/feature/<feature-slug>/ only. The orchestrator HAS Write per the v3 defensive reading (retained in v4+) because Blueprint Outputs include pipeline-run-summary.json and state-transitions.log which the orchestrator authors directly (see execute-orchestrator YAML and rationale at §Agent Frontmatter Specifications). Subagents have Write tool permission scoped to working/feature/<feature-slug>/ per the project sandbox. The state-transition hook script (log_state_transition.py) provides write access for transition logging via the .claude/settings.json allow-list pattern. quality-handler does NOT have Write (per cc-design + Component 3 contract: returns verdict to orchestrator; does not modify artifacts).'"
+          ]
+        },
+        {
+          "finding_id": "I-AA-609",
+          "severity": "MINOR",
+          "target_artifact": "blueprint-v5.md",
+          "target_section": "State Transitions and Invariants",
+          "current_location_in_v4": "lines 1396-1471",
+          "change_type": "add_boundary_transitions_to_inventory",
+          "expected_content": [
+            "Update header from 'Transitions (12 total per cc-design.md D-16)' to 'Transitions (12 substantive + 2 boundary = 14 total)'.",
+            "Add T0 row at top of transitions table: '| 0 | Orchestrator init | (INIT) | pending | orchestrator startup; first task selected from tasks.json |'",
+            "Add T13 row at bottom: '| 13 | Run termination | (any state) | (TERMINATED) | gate-pass to Deliverable Packaging (from phase_complete) OR user resolution (from any escalated_*) OR abort |'",
+            "Update States table: change line 1413 from 'Plus implicit boundary states INIT (orchestrator startup) and TERMINATED (final)' to 'Plus 2 boundary states INIT (orchestrator startup; entry point) and TERMINATED (run end; exit point). Total states: 12 substantive + 2 boundary = 14.'",
+            "Update Invariant #5 (line 1466) to clarify: 'Application-level hook fires on EVERY transition (including T0 and T13 boundary transitions); hook failure does not block the transition.'",
+            "Update Invariant #10 to clarify: 'Cycle counter equivalence applies to T4 (per-task NEEDS_REVISION) and T10 (phase reconciliation cycle) only; boundary transitions (T0, T13) do not affect cycle counters.'"
+          ]
+        }
+      ],
+      "feedback_brief_summary": "Author blueprint-v5.md addressing 8 findings (I-AA-601 BLOCKER + I-AA-602 through I-AA-605 MAJOR + I-AA-607/608/609 MINOR). Author NEW ADR-0035 addressing I-AA-603. In-place edit ADR-0033 Context section addressing I-AA-606. Frontmatter-only edit on blueprint-v4 to mark superseded per ADR-0005. The 3 explicit-choice decisions (D-RC3-1/2/3) are made in the cycle-3 log; expected_changes_per_finding above operationalizes them.",
+      "completion_signal": "design-composer returns: (a) blueprint-v5.md authored with all 8 finding-edits applied + all 5 cross-reference updates per I-AA-603; (b) ADR-0035 authored with all sections per body_target_sections; (c) ADR-0033 §Context edited in-place per edit_target_content_to_add; (d) blueprint-v4.md frontmatter updated per edits dict. Round-7 architecture audit will then be dispatched on the resulting artifacts."
+    }
+  ],
+  "user_escalations": [],
+  "deferrals": [
+    {
+      "issue_id": "I-AA-610",
+      "severity": "INFO",
+      "rationale": "Budget awareness: cycle 3 dispatch leaves 1 cycle remaining. Tracking via this dispatch's budget_used_so_far / budget_remaining fields and the cycle-3 log's 4-cycle cap awareness section. No artifact edit needed.",
+      "tracking": "this dispatch + cycle-3 log frontmatter"
+    },
+    {
+      "issue_id": "I-AA-611",
+      "severity": "INFO",
+      "rationale": "Audit-procedure deficiency (KB-review-disciplines should add canonical-agent-frontmatter-pattern check and canonical-platform-docs verification per I-AA-310/I-AA-501 carry-forward). Out of scope for this Blueprint. The r6 audit itself applied both checks per orchestrator brief; gap is in the KB spec, not in r6 coverage. Tracked for follow-on KB-review-disciplines enhancement feature.",
+      "tracking": "follow-on feature candidate; not in this feature's scope"
+    },
+    {
+      "issue_id": "I-AA-612",
+      "severity": "INFO",
+      "rationale": "Manual blast-radius method (no GitNexus/codebase-memory-mcp in this dispatch environment). High-confidence for this single-layer feature; the blast-radius gap surfaced in I-AA-605 was caught by manual scan. Method recorded in audit JSON code_graph_used + code_graph_degradation_note fields. Future audits should provision GitNexus when available for wider-blast-radius features.",
+      "tracking": "deliverable archive note; future-audit infrastructure consideration"
+    }
+  ],
+  "do_not_edit": [
+    {
+      "path": "working/feature/execution-pipeline-design-r1/blueprint-v1.md",
+      "reason": "Already superseded per ADR-0005; body edits forbidden",
+      "exception": "none"
+    },
+    {
+      "path": "working/feature/execution-pipeline-design-r1/blueprint-v2.md",
+      "reason": "Already superseded per ADR-0005; body edits forbidden",
+      "exception": "none"
+    },
+    {
+      "path": "working/feature/execution-pipeline-design-r1/blueprint-v3.md",
+      "reason": "Already superseded per ADR-0005; body edits forbidden",
+      "exception": "none"
+    },
+    {
+      "path": "working/feature/execution-pipeline-design-r1/blueprint-v4.md",
+      "reason": "Draft status; per ADR-0005 the next version (v5) addresses the corrections, not in-place edits to v4. Frontmatter-only edit permitted (and required) for supersession marking.",
+      "exception": "frontmatter-only edits to mark superseded per ADR-0005 supersession discipline"
+    },
+    {
+      "path": "adrs/ADR-0032-conventions-canonicalization.md",
+      "reason": "Per D-RC3-2: the auditing-shared Skill-binding convention is NOT folded into ADR-0032 as Change 6. ADR-0032's 5-change framing is preserved; the new convention is the standalone ADR-0035.",
+      "exception": "none (no edits this cycle)"
+    },
+    {
+      "path": "adrs/ADR-0034-prd-mis-credit-cleanup.md",
+      "reason": "Per D-RC3-3: ADR-0034 wording is NOT softened to acknowledge PRD-inherited verbatim ACs as an exception. Instead, the Blueprint correction-surface footnotes (per D-RC3-3 Path a) carry the corrective reference forward. ADR-0034 remains canonical as authored.",
+      "exception": "none (no edits this cycle)"
+    },
+    {
+      "path": "working/feature/execution-pipeline-design-r1/prd-v1.1.0.md",
+      "reason": "Per ADR-0034 + D-RC3-3: no PRD v1.1.1 supersession; PRD prose preserved per ADR-0005; corrective reference propagates via Blueprint footnotes only.",
+      "exception": "none"
+    },
+    {
+      "path": "working/feature/execution-pipeline-design-r1/cc-design.md",
+      "reason": "Per-layer design with reviewer_verdict=approved; cycle-3 corrections are at Blueprint integration grade. cc-design is the source-of-truth for I-AA-602's resolution direction (D-RC3-1 widens Bash to match cc-design verbatim) — editing it would invert the cascade direction.",
+      "exception": "none"
+    },
+    {
+      "path": "working/feature/execution-pipeline-design-r1/synthesis.md",
+      "reason": "Approved; cycle-3 corrections do not cascade upstream per cascade analysis in cycle-3 log.",
+      "exception": "none"
+    },
+    {
+      "path": "working/feature/execution-pipeline-design-r1/codebase-analysis.md",
+      "reason": "Approved; no cycle-3 finding cascades upstream to this stage.",
+      "exception": "none"
+    },
+    {
+      "path": "working/feature/execution-pipeline-design-r1/architecture-audit-issues-r6.json",
+      "reason": "Authoritative audit JSON; immutable. cycle-3 dispatch derives from it; does not edit it.",
+      "exception": "none"
+    }
+  ],
+  "convergence_assessment": {
+    "verdict": "converging-with-known-risk",
+    "rationale": "Cycle 3 dispatch is mechanical (BLOCKER has explicit rewrite spec; MAJORs each have explicit recommended_resolution refined in cycle-3 log per-finding triage; MINORs are localized edits). No architectural rework. Cycle 4 audit verification expected to converge cleanly if design-composer executes dispatch faithfully AND round-7 audit applies the full r6-established procedure (full audit from scratch; not delta verification).",
+    "persistent_themes": [
+      {
+        "theme": "Blueprint under-transcribes / over-narrows cc-design.md specifications",
+        "audits_surfaced_in": ["r3", "r4", "r5", "r6"],
+        "persistence_count": 2,
+        "structural_address": "ADR-0035 (this cycle) ratifies one of the conventions; KB-review-disciplines audit-procedure enhancements (per I-AA-611) will add canonical-agent-frontmatter-pattern + platform-docs-verification checks. The structural address is underway; no within-cycle escalation needed."
+      }
+    ],
+    "diverged_from_simulated_pass": true,
+    "diverged_from_simulated_pass_note": "Round-6 audit's convergence_verdict declared diverged_from_simulated_pass; the simulated r5 pass was scope-narrow (delta verification only) and is retracted as a global verdict. Authoritative audit cadence (r6, r7 if needed, r8 if cycle-4) governs convergence going forward.",
+    "recommended_next_audit_invocation_directive": "FULL audit from scratch per the r6 procedure; not a delta verification. Apply Lens 1 (CoVe) + Lens 2 (blast-radius — manual via Grep acceptable for this single-layer feature) + Lens 3 (brief-honor against inherited + this-run-authored ADRs including the new ADR-0035) + the two r6-established checks (canonical-agent-frontmatter-pattern; canonical-platform-docs verification)."
+  },
+  "scope_deviation_surfacing": {
+    "rationale": "Per ADR-0029 + ADR-0033, this reconciliation cycle's deviations are surfaced here rather than absorbed silently.",
+    "deviations": [
+      {
+        "deviation": "Cycles 1+2 were claude.ai simulations; this cycle 3 is the first authoritative finalize-reconciler subagent dispatch",
+        "surfaced_in": ["frontmatter agent_invocation_simulation: false", "cycle-3 log Cycle context preamble"],
+        "absorbed_silently": false
+      },
+      {
+        "deviation": "Round-6 audit retracts the simulated round-5 pass verdict; both verdicts true at their respective scopes per audit's diverged_from_simulated_pass framing",
+        "surfaced_in": ["cycle-3 log Cycle context", "convergence_assessment.diverged_from_simulated_pass field"],
+        "absorbed_silently": false
+      },
+      {
+        "deviation": "Manual blast-radius method (no GitNexus/codebase-memory-mcp)",
+        "surfaced_in": ["I-AA-612 INFO finding; deferred to acceptance with explicit rationale"],
+        "absorbed_silently": false
+      },
+      {
+        "deviation": "Cycle budget consumed: 3 of 4 used after this dispatch; 1 cycle remaining",
+        "surfaced_in": ["frontmatter budget_used_so_far + budget_remaining", "cycle-3 log 4-cycle cap awareness section"],
+        "absorbed_silently": false
+      },
+      {
+        "deviation": "Persistent thematic carry: Blueprint under-transcribes / over-narrows cc-design.md across audits r3/r4/r5/r6",
+        "surfaced_in": ["convergence_assessment.persistent_themes field; cycle-3 log Convergence assessment section"],
+        "absorbed_silently": false
+      }
+    ]
+  },
+  "next_step": {
+    "action": "orchestrator_dispatches_design_composer",
+    "dispatch_payload_summary": "Single bundled dispatch to design-composer: author blueprint-v5.md (addresses 8 findings); author ADR-0035 (addresses I-AA-603 / D-RC3-2); in-place edit ADR-0033 Context (addresses I-AA-606); frontmatter-only edit blueprint-v4.md (supersession per ADR-0005).",
+    "expected_followup": "After design-composer completes, orchestrator re-invokes review-architecture-auditor (authoritative; round 7) on the new artifacts with explicit full-audit-from-scratch directive.",
+    "convergence_target": "review-architecture-auditor returns verdict: pass (or conditional_pass with acceptable conditions) → Gate 4 (Blueprint Approval) user touch-point.",
+    "cycle_budget_remaining_after_this_cycle": 1,
+    "if_round_7_returns_needs_revision": "Dispatch cycle 4 (final reconciliation cycle per ADR-0017 4-cycle cap). Cycle 4 dispatch will inherit do_not_edit list extended with blueprint-v5.md. If cycle 4 also returns needs_revision after round 8 audit, escalate to user per Cycle-Cap Escalation Gate (AC-FR-10-c) with open-issue list + recommended resolutions + trade-off analysis."
+  }
+}

@@ -3,7 +3,7 @@ name: review-cross-artifact-auditor
 description: "At the Cross-Artifact Audit stage (after Architecture Audit, Plan Authoring, and Test Authoring complete), performs cross-artifact consistency check across Blueprint + Plan + Acceptance Tests + Phase Validators. CMC posture (declares `model: opus` for cross-family critique). Diff-mode input (does NOT see full upstream context — only the diffs between artifact versions plus the new artifacts themselves). Convergence-based termination + 4-cycle hard cap. Per FR-9, renamed from synth-critic-2. Produces `cross-artifact-audit-issues.json` for triage by finalize-reconciler."
 model: opus
 effort: xhigh
-tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
+tools: [Read, Glob, Grep, Bash(git diff:*), Bash(diff:*), Write, TaskCreate, TaskUpdate]
 skills: [KB-review-disciplines, KB-documentation-criteria]
 memory: project
 ---

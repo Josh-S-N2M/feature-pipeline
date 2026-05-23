@@ -1,15 +1,33 @@
 ---
 id: ADR-0033
 title: ADR-0029 execution-phase extension — Scope-Deviation surfacing for execution-pipeline artifacts
-status: proposed
+status: accepted
 date: 2026-05-22
+accepted: 2026-05-22
 deciders: [user, claude (as design-composer)]
 supersedes: []
 superseded_by: []
-related: [ADR-0029, ADR-0030, ADR-0031, ADR-0032]
+related: [ADR-0029, ADR-0030, ADR-0031, ADR-0032, ADR-0035]
 authored_in_feature: execution-pipeline-design-r1
 pairs_synthesis_decisions: [D-7]
 closes: ["ADR-0029 Forward Implications anticipated extension"]
+revised: 2026-05-22T22:00:00Z
+revision_reason: |
+  In-place edit per blueprint-v5.md authoring (reconciliation cycle 3),
+  addressing audit finding I-AA-606. The Context section gains two cross-
+  reference sentences pointing at the Blueprint AC-FR-7 floor coverage
+  subsection: (1) pipeline-run-summary serves as the PRD AC-FR-7-c
+  "execution-reconciliation log" floor item per Blueprint Path B disposition;
+  (2) the "frontmatter-validation report" floor item exists as a JSON-output
+  schema in validate_pipeline_frontmatter.py source rather than as a pair-
+  pattern artifact — outside ADR-0033's per-artifact Scope-Deviation surfacing
+  scope. In-place edit acceptable because status: proposed (per ADR-0032's
+  per-doc-type ADR vocabulary, the proposed → accepted transition has not yet
+  occurred at the Architecture Audit pass); same exception used for ADR-0034's
+  revision at 2026-05-22T18:30:00Z. Also adds ADR-0035 to the related field
+  (new this run; ADR-0035 ratifies the auditing-shared skill-binding
+  convention referenced indirectly by the deviation-surfacing principles
+  in this ADR).
 ---
 
 # ADR-0033: ADR-0029 execution-phase extension — Scope-Deviation surfacing for execution-pipeline artifacts
@@ -33,6 +51,11 @@ This Blueprint's feature (`execution-pipeline-design-r1`) creates the execution-
 These artifacts need explicit Scope-Deviation surfacing locations per the no-silent-scope-changes principle. Absent this extension, execution-phase agents (`execute-orchestrator`, `execute-phase-quality-reviewer`, `execute-task-code-producer`, `execute-task-quality-handler`, `execute-finalize-reconciler`) would have no canonical statement of where to surface deviations — recreating the silent-absorption failure mode at the execution surface that ADR-0029 was specifically designed to prevent.
 
 Additionally, Q-CC-4 arbitration in this Blueprint (auditing-codespaces stub semantics, decided `{"stub": true, "findings": []}`) cited this ADR-0033 as the principle's execution-side extension — the stub-vs-real distinction IS a Scope-Deviation that must surface per ADR-0029, and the execution-phase representation needs canonical documentation.
+
+Two cross-references to the Blueprint AC-FR-7 floor coverage subsection are warranted for downstream-reader legibility (added 2026-05-22 per audit finding I-AA-606):
+
+1. `pipeline-run-summary` serves as the PRD AC-FR-7-c "execution-reconciliation log" floor item — per Blueprint Path B disposition (the per-feature-run reconciliation aggregation is the same artifact under a different framing; see Blueprint §AC-FR-7 floor coverage). The 5-artifact enumeration above thus maps to PRD AC-FR-7-c's 5-item floor: per-task-execution-result = "per-task execution log"; phase-quality-report = "phase-quality report"; quality-reconciliation-log = "quality-reconciliation log (per cycle)"; pipeline-run-summary = "execution-reconciliation log"; state-transitions.log covers the beyond-floor artifact per AC-FR-7-d permission.
+2. The PRD AC-FR-7-c "frontmatter-validation report" floor item exists as a JSON-output schema in `validate_pipeline_frontmatter.py` source rather than as a pair-pattern artifact — outside ADR-0033's per-artifact Scope-Deviation surfacing scope (script source is the canonical schema location; see Blueprint §AC-FR-7 floor coverage Path B rationale). This is why the enumeration above lists 5 artifacts and not 6: the 6th PRD floor item is intentionally not a pair-pattern artifact and therefore does not get a Scope-Deviation surfacing row in the table below.
 
 ## Decision
 

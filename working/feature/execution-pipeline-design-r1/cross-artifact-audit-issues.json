@@ -1,0 +1,189 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "cross-artifact-audit-execution-pipeline-design-r1-round-1",
+  "feature_slug": "execution-pipeline-design-r1",
+  "stage": "Cross-Artifact Audit (Gate 11)",
+  "generated": "2026-05-22T23:59:30Z",
+  "generated_by": "review-cross-artifact-auditor",
+  "agent_invocation": "authoritative Claude Code subagent dispatch (CMC posture; diff-mode)",
+  "agent_invocation_simulation": false,
+  "model_posture": "opus",
+  "round_number": 1,
+  "terminal": false,
+  "input_mode": "diff",
+  "diff_mode": true,
+  "target_artifacts": [
+    "working/feature/execution-pipeline-design-r1/blueprint-v5.md",
+    "working/feature/execution-pipeline-design-r1/plan-v2.md",
+    "working/feature/execution-pipeline-design-r1/acceptance-tests.md",
+    "working/feature/execution-pipeline-design-r1/phase-validators.md"
+  ],
+  "audited_against_diffs": [
+    "blueprint-v4.md -> blueprint-v5.md (predecessor diff)",
+    "plan-v1.md -> plan-v2.md (predecessor diff)"
+  ],
+  "checks_performed": [
+    "ac_traceability_count_alignment",
+    "task_id_consistency_plan_to_tests_to_validators",
+    "v5_introduced_items_flow_through_all_artifacts",
+    "ac_fr_9_e_skill_install_sequencing",
+    "adr_0034_forward_citation_discipline_adr_0017_not_0021",
+    "adr_0035_single_script_criterion_t3_2_negative",
+    "posture_a_t6_1_scope_deviation_surfacing",
+    "reconciliation_budget_awareness",
+    "no_silent_scope_changes_adr_0029",
+    "doc_type_universal_required_adr_0032_change_4",
+    "open_items_consolidation_no_duplicates_or_contradictions",
+    "agent_frontmatter_yaml_verbatim_blueprint_to_plan",
+    "phase_exit_criteria_to_validator_pass_criteria_alignment",
+    "named_authors_judgment_calls_resolved"
+  ],
+  "convergence": {
+    "verdict": "first_round",
+    "prior_issue_count": null,
+    "current_issue_count": 5,
+    "persistent_issues": [],
+    "severity_weighted_delta": null,
+    "signal": "in_progress",
+    "notes": "First round of Cross-Artifact Audit; no prior round to compare against. Convergence metrics established for any subsequent round (none expected given pass verdict)."
+  },
+  "findings": [
+    {
+      "id": "I-CA-001",
+      "severity": "RECOMMENDED",
+      "category": "plan_internal_narrative_drift",
+      "artifact_pair": "Plan (internal)",
+      "summary": "Plan v2 Update History row narrates '34 tasks across 7 phases' but frontmatter total_tasks and Purpose body both say '31 executable tasks'.",
+      "evidence": [
+        {"artifact": "plan-v2.md", "section": "frontmatter line 11", "quote": "total_tasks: 31"},
+        {"artifact": "plan-v2.md", "section": "Purpose, line 73", "quote": "31 executable tasks across 7 phases"},
+        {"artifact": "plan-v2.md", "section": "Update History row v2.0.0, line 850", "quote": "FIRST authoritative plan-author dispatch. Derived from blueprint-v5.md ... 34 tasks across 7 phases."}
+      ],
+      "cross_artifact_impact": "None substantive — downstream artifacts (acceptance-tests.md line 22, line 78) consistently reference '31 tasks'. The drift is purely Plan-internal narrative.",
+      "recommended_resolution": "In-place edit Plan v2 Update History row v2.0.0: change '34 tasks across 7 phases' to '31 tasks across 7 phases'. ADR-0005 permits frontmatter+narrative in-place edits while status: draft. Defer to reconciliation if Cross-Artifact Audit is opening cycle 4 budget; otherwise edit can be a follow-on grooming commit (does NOT block Gate 11 progression).",
+      "verdict_impact": "none",
+      "judgment_call": "Surfaced as a Plan-internal narrative echo of the Gate-5 MINOR fix; the substantive (frontmatter + Purpose) record is correct. Not a cross-artifact contradiction."
+    },
+    {
+      "id": "I-CA-002",
+      "severity": "RECOMMENDED",
+      "category": "phase_validators_internal_narrative_inconsistency",
+      "artifact_pair": "Phase Validators (internal)",
+      "summary": "PV-2.C10 description begins 'ALL 3 skills' then enumerates 4 names (ai-development-guide, auditing-shared, auditing-github-actions, auditing-codespaces); the Assertion column then says 'binding each of the 4 skills in auditing-shared family + ai-development-guide'. The criterion's own numbering is self-inconsistent (3 vs 4); the assertion's '4 skills in auditing-shared family' is also imprecise — there is one shared helper-home skill (auditing-shared) plus two auditing-X siblings (auditing-github-actions + auditing-codespaces), not '4 skills in auditing-shared family'.",
+      "evidence": [
+        {"artifact": "phase-validators.md", "section": "PV-2.C10, line 210", "quote": "ALL 3 skills (`ai-development-guide`, `auditing-shared` (pre-existing — should already pass), `auditing-github-actions`, `auditing-codespaces`) ... binding each of the 4 skills in `auditing-shared` family + `ai-development-guide`"}
+      ],
+      "cross_artifact_impact": "None substantive — the validator's intent is clear: every skill that a Phase-3 agent may bind must exist on disk so T1.1 doesn't emit skill_not_found. The intent is correctly enforced; only the narrative count is off.",
+      "recommended_resolution": "Reword PV-2.C10 description to: 'ALL 4 skills referenced by any Phase-3 agent (ai-development-guide newly installed; auditing-shared pre-existing; auditing-github-actions newly extracted; auditing-codespaces newly stubbed) can be referenced in any Phase-3 agent's skills: field without skill_not_found.' Defer to follow-on grooming commit.",
+      "verdict_impact": "none",
+      "judgment_call": "Narrative-only; assertion semantics are recoverable from context. Not verdict-affecting."
+    },
+    {
+      "id": "I-CA-003",
+      "severity": "RECOMMENDED",
+      "category": "acceptance_tests_ambiguous_assertion",
+      "artifact_pair": "Acceptance Tests ↔ Plan",
+      "summary": "AT-023 (AC-FR-4-f) speculatively assigns the depth-classifier-and-dispatch-matrix ADR satisfaction to 'ADR-0035 paired with the existing-Blueprint dispatch-matrix content, or referenced via Blueprint §Contract 4'. ADR-0035 is the auditing-shared Skill-binding convention; it does NOT document depth classifier or dispatch matrix. The Plan resolves AC-FR-4-f at line 753 via 'the depth-classifier semantics ratified via Blueprint integration of cc-design.md — the AC is satisfied by the substrate ratification at T0.2'. AT-023 should align to that resolution rather than speculatively citing ADR-0035.",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "section": "AT-023, lines 545-546", "quote": "Assert: ADR (most likely ADR-0035 paired with the existing-Blueprint dispatch-matrix content, or referenced via Blueprint §Contract 4) is in `status: accepted`; documents depth classifier and dispatch matrix semantics."},
+        {"artifact": "plan-v2.md", "section": "AC traceability AC-FR-4-f, line 753", "quote": "ADR-0035 (Skill-binding convention; cycle-3 new) + ADR-0017 (canonical 4-cycle cap home per ADR-0034) + the depth-classifier semantics ratified via Blueprint integration of cc-design.md — the AC is satisfied by the substrate ratification at T0.2"},
+        {"artifact": "acceptance-tests.md", "section": "Open Items #1", "quote": "AT-023 verifies the ADR-substrate satisfies AC-FR-4-f, but a stricter reading would require a stand-alone ADR-NNNN-depth-classifier-and-dispatch-matrix.md. The Cross-Artifact Auditor should confirm the Blueprint's reading is intended."}
+      ],
+      "cross_artifact_impact": "Test author surfaced this exact ambiguity as Open Item #1 and explicitly requested Cross-Artifact Auditor confirmation. Confirming here: the Blueprint's reading IS intended — AC-FR-4-f is satisfied by cc-design.md substrate ratification through Blueprint integration (not a stand-alone ADR). AT-023's wording 'most likely ADR-0035 paired with ... or referenced via Blueprint §Contract 4' overstates ADR-0035's role.",
+      "recommended_resolution": "Reword AT-023 assertion to: 'Assert that the depth classifier + dispatch matrix substrate is ratified — specifically that Blueprint §Contract 4 publishes the dispatch matrix AND that cc-design.md substrate (ratified by Blueprint integration at T0.2) carries the depth-classifier semantics. ADR-0017 (canonical 4-cycle cap) is accepted. ADR-0035 is the auditing-shared Skill-binding convention, NOT the depth-classifier ADR.' Defer to follow-on grooming.",
+      "verdict_impact": "none",
+      "judgment_call": "RESOLUTION OF TEST-AUTHOR OPEN ITEM #1: The Blueprint's reading (cc-design substrate via Blueprint integration; no stand-alone depth-classifier ADR) IS intended. The Plan's AC-FR-4-f traceability is correct. AT-023's wording can be tightened in a follow-on; the underlying coverage is sound."
+    },
+    {
+      "id": "I-CA-004",
+      "severity": "INFO",
+      "category": "test_author_open_item_resolution",
+      "artifact_pair": "Acceptance Tests ↔ Blueprint",
+      "summary": "Acceptance-tests Open Item #2 (AT-037 frontmatter-validation report Path B) and Open Item #3 (AT-037 execution-reconciliation log Path B equivalence) request Cross-Artifact Auditor confirmation that the absence of standalone templates is intended. CONFIRMED. Blueprint § AC-FR-7 floor coverage Path B is the explicit cycle-3 disposition; ADR-0033 §Context cross-reference per I-AA-606 ratifies it bidirectionally. Plan T1.1 (script-output schema for frontmatter-validation report) and Plan T5.5 (pipeline-run-summary as execution-reconciliation log per Path B equivalence) honor the disposition. PV-5.C9 + PV-5.C10 enforce it on the Phase Validator side. AT-037 + AT-074 + AT-075 verify it on the test side. All four artifacts agree.",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "section": "Open Items #2 and #3, lines 1471-1473", "quote": "Cross-Artifact Auditor should confirm the absence of a standalone frontmatter-validation-report-template.md is intended (per the bidirectional cross-reference verified by AT-074 + AT-075)."},
+        {"artifact": "blueprint-v5.md", "section": "AC-FR-7 floor coverage", "quote": "Path B disposition: 4 of 5 floor items covered by templates + 1 inline script-output schema (per validate_pipeline_frontmatter.py source)"},
+        {"artifact": "plan-v2.md", "section": "AC traceability AC-FR-7-c, line 766", "quote": "T5.1 (1/5), T5.2 (2/5), T5.3 (3/5), T1.1 (4/5 via script-output schema per Path B), T5.5 (5/5 = execution-reconciliation log per Path B equivalence with pipeline-run-summary)"},
+        {"artifact": "phase-validators.md", "section": "PV-5.C10", "quote": "AC-FR-7-c floor coverage verified: 4 of 5 floor items covered by templates ... 5th floor item (frontmatter-validation report) covered by validate_pipeline_frontmatter.py source schema (NOT a separate template)."}
+      ],
+      "cross_artifact_impact": "No misalignment. All four artifacts agree on Path B. The Cross-Artifact Auditor's role here is to AFFIRM the test author's interpretation, which is correct.",
+      "recommended_resolution": "No edits needed. Cross-Artifact Audit affirms: Path B disposition is intended; AT-037's coverage map honors it; PV-5.C10 enforces it. The bidirectional cross-reference Blueprint § AC-FR-7 floor coverage ↔ ADR-0033 §Context (per I-AA-606) is in place and verified by AT-074/075 + PV-5.C9. Test-author Open Items #2 + #3 are closed by this affirmation.",
+      "verdict_impact": "none",
+      "judgment_call": "RESOLUTION OF TEST-AUTHOR OPEN ITEMS #2 + #3: confirmed intended; closed."
+    },
+    {
+      "id": "I-CA-005",
+      "severity": "INFO",
+      "category": "judgment_call_affirmations_batch",
+      "artifact_pair": "Multiple (Plan + Acceptance Tests + Phase Validators)",
+      "summary": "Batch affirmation of the remaining test-author and validator-author Open Items the Cross-Artifact Auditor was explicitly asked to verify: (a) Test-author Open Item #5 (T6.1 Posture-A asymmetry); (b) Test-author Open Item #7 (ADR-0035 single-script criterion verification surface); (c) Validator-author Open Item #1 (run_phase_validator.py wrapper deferred); (d) Validator-author Open Item #2 (PV-6.C14 regression suite); (e) Validator-author Open Item #4 (PV-2.C9/C10 static-not-runtime enforcement); (f) Validator-author Open Item #5 (posture-decision-r1.md artifact deferred); (g) Validator-author Open Item #6 (PV-6.C15 scope-deviation scanning manual). All are consistent with Blueprint v5 + Plan v2 + the four ADRs (0029, 0032, 0033, 0035).",
+      "evidence": [
+        {"artifact": "blueprint-v5.md", "section": "Migration Strategy", "quote": "Incremental rollout option: the ~20+ planning-side agent edits ship as a dedicated follow-on feature OR as the first post-ratification feature run's Phase 0."},
+        {"artifact": "plan-v2.md", "section": "Open Items #5", "quote": "Plan v2 selects Posture A (defer) as the default per Blueprint § Migration Strategy 'Incremental rollout option' ... The deferred-edits state is a Scope-Deviation per ADR-0033 and surfaces in this Open Items list AND in this Plan's Update History AND (during T6.2) in the smoke-test pipeline-run-summary.json."},
+        {"artifact": "acceptance-tests.md", "section": "AT-073 + Open Items #5", "quote": "AT-073 verifies the Plan v2 surfaces the postures explicitly. However: if Posture B is selected at execution time, the ~20+ planning-side agent author-prompt edits need their own per-agent verification — AT-073 does NOT enumerate one test per edited agent. Judgment call: This is consistent with the Blueprint's Migration Strategy 'Incremental rollout option' and the Plan's Posture-A default; per-agent verification would be a follow-on feature's test concern."},
+        {"artifact": "phase-validators.md", "section": "PV-6.C1 + PV-6.C13 + Open Items #1-6", "quote": "PV-6.C1 disposition recorded explicitly per ADR-0029 + ADR-0033 no-silent-absorption"},
+        {"artifact": "blueprint-v5.md", "section": "Future Extensibility", "quote": "scan_unsurfaced_deviations.py mechanical script deferred to follow-on feature"}
+      ],
+      "cross_artifact_impact": "All seven judgment calls flow consistently across the four artifacts. The Cross-Artifact Auditor confirms the staging is sound; no reconciliation required.",
+      "recommended_resolution": "No edits needed. Cross-Artifact Audit affirms:\n  (a) Test-author Open Item #5: Posture-A asymmetry is consistent with Blueprint Migration Strategy + Plan Posture-A default. Per-agent verification is correctly deferred. AT-073 + PV-6.C1 + PV-6.C13 are sufficient at this feature run's scope.\n  (b) Test-author Open Item #7: AT-070 verifies code-producer's non-binding; the single-script criterion documentation lives in ADR-0035 + Blueprint Component 2; Plan T3.2 description references it. Wording verification is preserved across the chain.\n  (c) Validator-author Open Item #1: run_phase_validator.py wrapper is correctly deferred; no acceptance test or plan task expects it. The Validator Runbook explicitly states 'v1 ships manual orchestration'. Consistent.\n  (d) Validator-author Open Item #2: PV-6.C14 warning severity aligned with Plan Open Item #6 (regression suite out of scope). Consistent.\n  (e) Validator-author Open Item #4: Static-not-runtime enforcement is the Blueprint's intended posture per Verification Strategy. AC-FR-9-e is a sequencing constraint enforced at Phase 2 exit (PV-2.C9 + C10), AT-049/AT-050; both static. Consistent.\n  (f) Validator-author Open Item #5: posture-decision-r1.md artifact deferred; the Plan v2 Open Items + Update History + smoke-test pipeline-run-summary.json are sufficient surfaces per ADR-0029 + ADR-0033. No acceptance test or other validator expects the dedicated artifact. Consistent.\n  (g) Validator-author Open Item #6: PV-6.C15 manual scope-deviation scanning aligned with Plan Open Item #7 (scan_unsurfaced_deviations.py deferred per Blueprint Risk 7 + Future Extensibility). Consistent.",
+      "verdict_impact": "none",
+      "judgment_call": "RESOLUTION OF TEST-AUTHOR OPEN ITEMS #5, #7 + VALIDATOR-AUTHOR OPEN ITEMS #1, #2, #4, #5, #6: all affirmed; closed."
+    }
+  ],
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 0,
+    "RECOMMENDED": 3,
+    "INFO": 2
+  },
+  "verdict": "pass",
+  "verdict_rationale": "All cross-artifact consistency checks pass. The four artifacts (Blueprint v5, Plan v2, acceptance-tests.md, phase-validators.md) tell the same story: 63 ACs covered, 31 tasks consistently referenced, all 7 v5-introduced cycle-3 items (I-AA-602 through I-AA-609) flow through Blueprint → Plan → Tests → Validators consistently. AC-FR-9-e skill-install-before-binding sequencing, ADR-0034 ADR-0017-forward citation discipline, ADR-0035 single-script criterion for execute-task-code-producer, Posture-A T6.1 scope deviation surfacing, doc_type universal-required, and the Path B floor-coverage disposition all agree across the four artifacts. The five findings are RECOMMENDED-or-INFO grade: three minor narrative drift items (Plan Update History echo of '34 tasks'; PV-2.C10 self-inconsistent 3/4 count; AT-023 speculative ADR-0035 mention) and two batch affirmations of test-author + validator-author Open Items the auditor was explicitly asked to resolve. None are cross-artifact contradictions; none warrant invoking cycle 4 (the final reconciliation cycle).",
+  "next_step": "Proceed to Task Decomposition (downstream stage). The Plan + Tests + Phase Validators package is approved for downstream consumption. The five RECOMMENDED+INFO findings can be addressed via opportunistic in-place edits (per ADR-0005 while status: draft) at the discretion of the orchestrator OR deferred to follow-on grooming; they do NOT block downstream progression and do NOT consume the remaining 1-of-4 reconciliation cycle.",
+  "reconciliation_budget_status": {
+    "blueprint_side_cycles_consumed": 3,
+    "blueprint_side_cycles_remaining": 1,
+    "plan_test_validator_side_cycles_consumed": 0,
+    "plan_test_validator_side_cycles_remaining_after_this_audit": "1 (THIS audit consumed 0 cycles because the verdict is pass; the cycle budget is preserved for any unforeseen Task Decomposition surfacing)",
+    "notes": "Per the dispatch context: 1 reconciliation cycle remains before AC-FR-10-c Cycle-Cap Escalation. Cross-Artifact Audit verdict=pass means cycle 4 is NOT triggered. The remaining cycle is preserved for any potential Task Decomposition or downstream-stage reconciliation need."
+  },
+  "diffs_consulted": {
+    "blueprint_v4_to_v5_diff_summary": "Cycle-3 reconciliation diff: I-AA-601 Frontmatter validator coverage rewrite (memory optional, Agent/TaskUpdate separate, effort enum extended); I-AA-602 Bash widening (execute-task-quality-handler line 1103); I-AA-603 ADR-0035 + auditing-shared binding on 4 of 5 agents; I-AA-604 correction-surface footnotes at AC-FR-6-e + AC-FR-10-b; I-AA-605 ~20+ planning-side agent doc_type backfill enumeration; I-AA-606 ADR-0033 §Context bidirectional cross-reference; I-AA-607 References table updated to v5.0.0; I-AA-608 Security § filesystem write surface rewritten (orchestrator HAS Write); I-AA-609 T0/T13 boundary transitions added.",
+    "plan_v1_to_v2_diff_summary": "Authoritative re-authoring against blueprint-v5: 5 new agent YAML transcriptions reflect cycle-3 corrections; T0.2 advances 4 ADRs (was 3); T6.1 (OPT-IN) batch task added for doc_type backfill with Posture A default; Open Items #5 + #9 added (Posture-A surfacing + reconciliation budget caution); AC traceability rows for AC-FR-6-e + AC-FR-10-b cite ADR-0017 forward; T5.4 + T5.5 + Phase 5 Exit Criteria reference Path B + I-AA-606 cross-reference."
+  },
+  "key_alignment_proofs": [
+    {
+      "claim": "Blueprint v5 ↔ Plan v2 agent frontmatter YAMLs are verbatim-identical for all 5 new agents",
+      "evidence": "Blueprint v5 lines 1060/1082/1103/1124/1146 match Plan v2 lines 347/370/392/414/436 character-for-character on the tools list."
+    },
+    {
+      "claim": "63 AC count agrees across Plan + Tests",
+      "evidence": "Plan AC traceability table enumerates 60 PRD + 3 OP = 63; Tests Coverage Matrix table enumerates same 63 with 78 test specifications across them."
+    },
+    {
+      "claim": "31 task count agrees across Plan + Tests + Validators",
+      "evidence": "Plan frontmatter total_tasks: 31; Plan Purpose '31 executable tasks'; Tests source artifacts table '31 tasks / 7 phases'; Validators reference T0.1-T6.2 = 31 across PV-0 through PV-6."
+    },
+    {
+      "claim": "ADR-0034 forward-citation discipline (ADR-0017, NOT ADR-0021) is consistent across all four artifacts",
+      "evidence": "Blueprint v5 footnotes at AC-FR-6-e + AC-FR-10-b cite ADR-0017; Plan AC traceability rows for AC-FR-6-e + AC-FR-10-b cite ADR-0017 forward; Acceptance Tests AT-034 + AT-052 + AT-072 cite ADR-0017; Phase Validator PV-3.C14 asserts grep ADR-0021 returns 0 matches in the budget-cap context."
+    },
+    {
+      "claim": "ADR-0035 single-script criterion (execute-task-code-producer does NOT bind auditing-shared) is consistent across all four artifacts",
+      "evidence": "Blueprint v5 line 1082-1093 (skills: [ai-development-guide, KB-cc-design]; rationale 'auditing-shared NOT bound'); Plan T3.2 verbatim YAML + rationale; Acceptance Tests AT-070 (structural negative); Phase Validator PV-3.C5 (negative assertion enforcement)."
+    },
+    {
+      "claim": "I-AA-609 14-transition (12 substantive + 2 boundary T0/T13) state machine is consistent across all four artifacts",
+      "evidence": "Blueprint v5 State Transitions and Invariants section explicitly enumerates 12+2=14; Plan T1.2 contract + T3.1 orchestrator body description; Tests AT-001 (12 substantive) + AT-077 (boundary explicit) + AT-078 (boundary schema); Validators PV-1.C4 (schema), PV-1.C11 (cycle-counter scoping), PV-3.C10 (body enumeration), PV-3.C12 (invariant 10 scope), PV-5.C7 (template), PV-6.C4 (all 14 observed in smoke)."
+    },
+    {
+      "claim": "AC-FR-9-e skill-install-before-binding sequencing is consistent across all four artifacts",
+      "evidence": "Blueprint v5 Component 2-3 + AC-FR-9-e; Plan Phase 2 (T2.3) → Phase 3 (T3.2/T3.3) hard dependency; Acceptance Tests AT-049 + AT-050 (sequencing dependency check); Phase Validators PV-2.C9 + PV-2.C10 (gate enforcement) + PV-3.C2 + PV-3.C11 (skill-existence cross-check)."
+    },
+    {
+      "claim": "Posture-A T6.1 scope deviation is surfaced explicitly per ADR-0029 + ADR-0033, NOT silently absorbed",
+      "evidence": "Blueprint v5 Migration Strategy explicit 'Incremental rollout option'; Plan T6.1 description names Posture A vs B + Open Item #5 carries disposition + Update History records it; Acceptance Tests AT-073 verifies the explicit surfacing; Phase Validators PV-6.C1 + PV-6.C13 enforce ADR-0029+0033 no-silent-absorption."
+    }
+  ],
+  "audited_at": "2026-05-22T23:59:30Z"
+}

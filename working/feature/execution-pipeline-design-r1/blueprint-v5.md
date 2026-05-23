@@ -1,38 +1,45 @@
 ---
 id: Blueprint-execution-pipeline-design-r1
-version: 4.0.0
-status: superseded
-superseded_by: working/feature/execution-pipeline-design-r1/blueprint-v5.md
-superseded_at: 2026-05-22T22:00:00Z
-superseded_reason: |
-  Cycle 3 reconciliation (authoritative round-6 audit; first non-simulated
-  cycle): addresses I-AA-601 BLOCKER (Frontmatter validator coverage subsection
-  contradicted v4's own surgical corrections) plus I-AA-602 through I-AA-609
-  MAJOR/MINOR findings. blueprint-v5.md authored per ADR-0005 append-only
-  supersession discipline. Body of v4 unchanged (only frontmatter edited for
-  supersession marking).
+version: 5.0.0
+status: draft
+predecessor: working/feature/execution-pipeline-design-r1/blueprint-v4.md
+supersedes: [working/feature/execution-pipeline-design-r1/blueprint-v4.md]
 feature_slug: execution-pipeline-design-r1
-generated: 2026-05-22T20:10:00Z
-generated_by: claude (acting as design-composer; re-author cycle 3 after Gate 4 platform-validity verification; claude.ai simulation — see scope-deviation surfacing)
-predecessor: working/feature/execution-pipeline-design-r1/blueprint-v3.md
-supersedes: []
+doc_type: blueprint
+generated: 2026-05-22T22:30:00Z
+generated_by: design-composer (Claude Code subagent dispatch, authoritative)
+agent_invocation_simulation: false
+agent_invocation_note: |
+  FIRST authoritative (non-simulated) design-composer dispatch for this feature.
+  Prior versions v1-v4 were claude.ai simulations. v5 addresses authoritative audit-r6 findings
+  per reconciliation-log-cycle3.md (the first authoritative reconciliation cycle). The cycle-3
+  dispatch was a single bundled re-author; ADR-0035 and the ADR-0033 §Context edit were
+  produced by an earlier design-composer dispatch in the same cycle whose socket closed before
+  it could write this Blueprint file. This continuation closes the supersession chain.
 adrs_added_in_this_run:
   - ADR-0032 (conventions-canonicalization) [authored in v1; status unchanged]
-  - ADR-0033 (adr-0029-execution-extension) [authored in v1; status unchanged]
-  - ADR-0034 (prd-mis-credit-cleanup) [authored in v1; revised in v2; status unchanged in v3+v4]
+  - ADR-0033 (adr-0029-execution-extension) [authored in v1; §Context revised in this cycle 3 dispatch per I-AA-606; status unchanged at proposed]
+  - ADR-0034 (prd-mis-credit-cleanup) [authored in v1; revised in v2; status unchanged in v3+v4+v5]
+  - ADR-0035 (auditing-shared-skill-binding-convention) [authored in this run (cycle 3); status proposed; pairs with ADR-0031]
 derived_from:
-  - working/feature/execution-pipeline-design-r1/blueprint-v3.md (v3.0.0, predecessor; status will be marked superseded)
-  - working/feature/execution-pipeline-design-r1/architecture-audit-issues-r4.json (Architecture Audit round 4; verdict=pass on v3; this round did not include platform-validity check)
-  - Gate 4 platform-validity verification against https://code.claude.com/docs/en/sub-agents (verified 'memory' enum, 'Edit' tool, non-KB skill binding, and Task→Agent canonical rename in v2.1.63)
+  - working/feature/execution-pipeline-design-r1/blueprint-v4.md (v4.0.0, immediate predecessor; status superseded by this v5)
+  - working/feature/execution-pipeline-design-r1/architecture-audit-issues-r6.json (Architecture Audit round 6; authoritative; verdict=needs_revision)
+  - working/feature/execution-pipeline-design-r1/architecture-audit-report-r6.md (Architecture Audit round 6 companion report)
+  - working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle3.json (cycle 3 dispatch payload)
+  - working/feature/execution-pipeline-design-r1/reconciliation-log-cycle3.md (cycle 3 reconciliation log)
+  - adrs/ADR-0035-auditing-shared-skill-binding-convention.md (new this run; proposed)
+  - adrs/ADR-0033-adr-0029-execution-extension.md (§Context edited in-place per I-AA-606 + ADR-0005 proposed-status exception)
+  - working/feature/execution-pipeline-design-r1/blueprint-v3.md (v3.0.0, superseded; ancestor)
   - working/feature/execution-pipeline-design-r1/blueprint-v2.md (v2.0.0, superseded; ancestor)
-  - working/feature/execution-pipeline-design-r1/architecture-audit-issues-r3.json (Architecture Audit round 3)
-  - working/feature/execution-pipeline-design-r1/reconciliation-log-cycle2.md (Reconciliation cycle 2)
-  - working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle2.json (Reconciliation dispatch cycle 2)
-  - working/feature/execution-pipeline-design-r1/blueprint-v1.md (v1.0.0, ancestor)
-  - working/feature/execution-pipeline-design-r1/architecture-audit-issues.json (Architecture Audit round 1)
-  - working/feature/execution-pipeline-design-r1/architecture-audit-issues-r2.json (Architecture Audit round 2; pass verdict retracted)
-  - working/feature/execution-pipeline-design-r1/reconciliation-log-cycle1.md (Reconciliation cycle 1)
-  - working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle1.json (Reconciliation dispatch cycle 1)
+  - working/feature/execution-pipeline-design-r1/blueprint-v1.md (v1.0.0, superseded; ancestor)
+  - working/feature/execution-pipeline-design-r1/architecture-audit-issues.json (round 1)
+  - working/feature/execution-pipeline-design-r1/architecture-audit-issues-r2.json (round 2)
+  - working/feature/execution-pipeline-design-r1/architecture-audit-issues-r3.json (round 3)
+  - working/feature/execution-pipeline-design-r1/architecture-audit-issues-r4.json (round 4)
+  - working/feature/execution-pipeline-design-r1/reconciliation-log-cycle1.md (cycle 1)
+  - working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle1.json (cycle 1)
+  - working/feature/execution-pipeline-design-r1/reconciliation-log-cycle2.md (cycle 2)
+  - working/feature/execution-pipeline-design-r1/reconciliation-dispatch-cycle2.json (cycle 2)
   - working/feature/execution-pipeline-design-r1/cc-design.md (v1.0.0, reviewer_verdict=approved)
   - working/feature/execution-pipeline-design-r1/cc-dependencies.json (v1.0.0)
   - working/feature/execution-pipeline-design-r1/synthesis.md (v1.1.0, reviewer_verdict=approved)
@@ -42,6 +49,7 @@ derived_from:
   - working/feature/execution-pipeline-design-r1/intent-clarification.md (v1.0.0, gate_passed=1)
   - .claude/skills/KB-documentation-criteria/references/templates/blueprint-template.md
   - .claude/skills/KB-cc-platform/SKILL.md
+  - .claude/skills/KB-cc-platform/references/extensions.md (effort enum reference: low/medium/high/xhigh/max)
   - .claude/skills/KB-cc-design/SKILL.md
   - .claude/skills/recipe-feature-pipeline/SKILL.md
   - .claude/skills/KB-review-disciplines/SKILL.md
@@ -53,15 +61,41 @@ derived_from:
   - adrs/ADR-0029-no-silent-scope-changes-principle.md
   - adrs/ADR-0030-mechanism-alpha-pedagogical-marker-justification.md
   - adrs/ADR-0031-auditing-shared-skill-module.md
-re_author_reason: Gate 4 platform-validity verification (against https://code.claude.com/docs/en/sub-agents) surfaced that (a) 'memory: none' is INVALID Claude Code platform syntax — the documented valid values are 'user' | 'project' | 'local', and "no persistent memory" is achieved by omitting the field, not by writing 'none'; (b) the 'Task' vs 'TaskCreate' question in I-AA-305 conflated two separate Claude Code tool families — 'Agent' (formerly 'Task' pre-v2.1.63) is for subagent dispatch, while 'TaskCreate'/'TaskUpdate'/'TaskList' are for the built-in session task-board management; cc-design.md's 'Task' was the subagent-dispatch tool (correct), and the v3 substitution of 'TaskCreate'/'TaskUpdate' for cc-design's 'Task' was a misreading I am correcting. v4 surgically fixes both: removes 'memory: none' from 3 agents (omits the field); changes execute-orchestrator and execute-finalize-reconciler tool lists to use 'Agent' (canonical) for subagent dispatch while preserving 'TaskUpdate' on the orchestrator for task-board management per cc-design's intent.
+re_author_reason: |
+  Cycle 3 (first authoritative) reconciliation of round-6 architecture audit. Eight
+  findings addressed mechanically: I-AA-601 BLOCKER (Frontmatter validator coverage
+  subsection rewritten to mechanically accept what v5 declares — memory optional,
+  Task/Agent and TaskCreate/TaskUpdate as separate tool families, Gate 4 COMPLETE,
+  effort enum extended to include max); I-AA-602 MAJOR (execute-task-quality-handler
+  Bash widened to UNRESTRICTED matching cc-design.md verbatim, per D-RC3-1); I-AA-603
+  MAJOR (ADR-0035 referenced in 5 sections per D-RC3-2); I-AA-604 MAJOR (correction-
+  surface footnotes at AC-FR-6-e and AC-FR-10-b per D-RC3-3); I-AA-605 MAJOR (Change
+  Impact Map gains wildcard row for ~20+ planning-side agents requiring doc_type
+  emission per ADR-0032 Change 4; Migration Strategy paragraph added); I-AA-606
+  MAJOR (cross-reference to ADR-0033 §Context Path B mapping); I-AA-607 MINOR
+  (References "This Blueprint" row updated to v5.0.0); I-AA-608 MINOR (Security
+  §Filesystem write surface rewritten — orchestrator HAS Write per v3+ YAML);
+  I-AA-609 MINOR (T0 INIT and T13 TERMINATED boundary transitions added to
+  state-machine inventory; invariant scopes clarified). Plus the new ADR-0035 is
+  enumerated and cross-referenced throughout.
 addresses_issues:
-  - I-AA-308 partial (memory: none invalid — REMOVED from 3 agents; verified against canonical docs)
-  - I-AA-305 REVISED (Task/Agent vs TaskCreate/TaskUpdate — corrected disposition; the two are separate tool families)
-  - I-AA-401 carry-forward (cumulative simulation context; Gate 4 platform-validity verification now complete for memory + tool family question; Edit + non-KB skill binding verified valid)
+  - I-AA-601 BLOCKER
+  - I-AA-602 MAJOR
+  - I-AA-603 MAJOR (alongside new ADR-0035)
+  - I-AA-604 MAJOR
+  - I-AA-605 MAJOR
+  - I-AA-606 MAJOR (alongside ADR-0033 §Context in-place edit per ADR-0005 proposed-status exception)
+  - I-AA-607 MINOR
+  - I-AA-608 MINOR
+  - I-AA-609 MINOR
+addresses_issues_v4_carry_forward:
+  - I-AA-308 partial (memory: none invalid — RESOLVED in v4; preserved in v5)
+  - I-AA-305 REVISED (Task/Agent vs TaskCreate/TaskUpdate — RESOLVED in v4; preserved in v5 with validator coverage now mechanically aligned per I-AA-601)
+  - I-AA-401 carry-forward (cumulative simulation context; Gate 4 platform-validity verification complete as of v4; v5 makes the validator coverage subsection mechanically accept it)
 addresses_issues_v3_carry_forward:
-  - I-AA-301 through I-AA-307 (resolved in v3; preserved in v4)
+  - I-AA-301 through I-AA-307 (resolved in v3; preserved in v5)
 addresses_issues_v2_carry_forward:
-  - I-AA-001 through I-AA-007 (resolved in v2; preserved in v4)
+  - I-AA-001 through I-AA-007 (resolved in v2; preserved in v5)
 ---
 
 # Blueprint — Execution Pipeline Design (run r1)
@@ -80,7 +114,7 @@ addresses_issues_v2_carry_forward:
   - [Current Challenges](#current-challenges)
   - [Requirements](#requirements)
 - [Acceptance Criteria (AC) - EARS Format](#acceptance-criteria-ac---ears-format)
-  - [Functional ACs](#functional-acs) — FR-1 through FR-13 (60 ACs)
+  - [Functional ACs](#functional-acs) — FR-1 through FR-13 (60 ACs; two ACs carry a footnote correcting PRD-inherited ADR-0021 citation to ADR-0017 per ADR-0034 and per cycle-3 D-RC3-3)
   - [Cross-Layer / Operational ACs](#cross-layer--operational-acs) — 3 cross-cutting ACs
 - [Existing Codebase Analysis](#existing-codebase-analysis)
   - [Implementation Path Mapping](#implementation-path-mapping)
@@ -89,7 +123,7 @@ addresses_issues_v2_carry_forward:
   - [Fact Disposition Table](#fact-disposition-table) — 17-row IN disposition
 - [Q-CC-N Arbitration](#q-cc-n-arbitration) — 5 architectural questions resolved
 - [Design](#design)
-  - [Change Impact Map](#change-impact-map) — 28+ file operations inventoried
+  - [Change Impact Map](#change-impact-map) — ~49 file operations inventoried (29 in-scope + ~20 planning-side agent author-prompt edits per ADR-0032 Change 4)
   - [Interface Change Matrix](#interface-change-matrix) — 18 inter-component contracts
   - [Architecture Overview](#architecture-overview) — with rendered Mermaid diagram
   - [Data Flow](#data-flow) — 5-stage end-to-end lifecycle
@@ -99,7 +133,7 @@ addresses_issues_v2_carry_forward:
   - [Contract Definitions](#contract-definitions) — 5 contracts
   - [Data Contract](#data-contract) — per-component
   - [Field Propagation Map](#field-propagation-map-when-fields-cross-boundaries) — task_id, phase_id, finding, cycle_counter, doc_type
-  - [State Transitions and Invariants](#state-transitions-and-invariants-when-applicable) — 12 states + 12 transitions + 10 invariants + state diagram
+  - [State Transitions and Invariants](#state-transitions-and-invariants-when-applicable) — 12 substantive + 2 boundary = 14 transitions + 10 invariants + state diagram
   - [Claude Code / Project Filesystem Design](#claude-code--project-filesystem-design) — embeds cc-design.md + 4-refinement audit trail
   - [Per-layer Design (Frontend/Backend/API/Query/Database/CI-CD/IaC/Codespaces)](#frontend-design) — all N/A
   - [Error Handling](#error-handling)
@@ -110,18 +144,18 @@ addresses_issues_v2_carry_forward:
 - [Verification Strategy](#verification-strategy)
 - [Future Extensibility](#future-extensibility)
 - [Alternative Solutions](#alternative-solutions) — 8 rejected alternatives
-- [Risks and Mitigation](#risks-and-mitigation) — 8 cross-cutting risks
+- [Risks and Mitigation](#risks-and-mitigation) — 9 cross-cutting risks (was 8 in v4; +1 per I-AA-602 / D-RC3-1)
 - [References](#references)
 - [Update History](#update-history)
-- [ADR Authoring (this run)](#adr-authoring-this-run) — ADR-0032, ADR-0033, ADR-0034 summaries
+- [ADR Authoring (this run)](#adr-authoring-this-run) — ADR-0032, ADR-0033, ADR-0034, ADR-0035 summaries
 
 ## Overview
 
 This Blueprint designs the **execution side** of the feature pipeline — the stages that take a completed planning-pipeline output (tasks.json + acceptance tests + phase validators) through to production-quality shipped artifacts. The feature is **single-layer** (Claude Code only); no CI/CD, MCP, Codespaces, Backend, Frontend, Database, or IaC changes are in scope.
 
-The execution architecture introduces 5 new subagents organized around a centralized orchestrator owning a 12-state machine, 3 skill additions (1 install + 2 extractions per ADR-0031 canonical-home discipline), and 7 new scripts under `auditing-shared/` + `auditing-github-actions/` + `auditing-codespaces/`. Three meta-disciplines from prior architectural work extend to execution surface: ADR-0017's 4-cycle reconciliation cap (symmetric across per-task quality loops AND phase-level reconciliation per D-12); ADR-0029's no-silent-scope-changes principle (extended via new ADR-0033 to execution-phase Scope-Deviation surfacing); and ADR-0030's mechanism-α discipline pattern (the model for D-15's mechanical discipline-enforcement at the recipe-skill discipline-5 level).
+The execution architecture introduces 5 new subagents organized around a centralized orchestrator owning a 12-substantive-state machine (plus 2 boundary states INIT/TERMINATED), 3 skill additions (1 install + 2 extractions per ADR-0031 canonical-home discipline), and 7 new scripts under `auditing-shared/` + `auditing-github-actions/` + `auditing-codespaces/`. Three meta-disciplines from prior architectural work extend to execution surface: ADR-0017's 4-cycle reconciliation cap (symmetric across per-task quality loops AND phase-level reconciliation per D-12); ADR-0029's no-silent-scope-changes principle (extended via ADR-0033 to execution-phase Scope-Deviation surfacing); and ADR-0030's mechanism-α discipline pattern (the model for D-15's mechanical discipline-enforcement at the recipe-skill discipline-5 level).
 
-Three new ADRs are introduced this run: **ADR-0032** (conventions canonicalization + per-doc-type state vocabulary, pairing D-4 + D-18); **ADR-0033** (ADR-0029 execution-phase extension, D-7); optionally **ADR-0034** (PRD v1.1.0 ADR-0017 vs ADR-0021 mis-credit cleanup) which may fold into ADR-0032 as housekeeping.
+Four ADRs are referenced this run: **ADR-0032** (conventions canonicalization + per-doc-type state vocabulary, pairing D-4 + D-18; authored in v1); **ADR-0033** (ADR-0029 execution-phase extension, D-7; authored in v1, §Context cross-references added in cycle 3 per I-AA-606); **ADR-0034** (PRD v1.1.0 ADR-0017 vs ADR-0021 mis-credit cleanup; authored in v1); **ADR-0035** (auditing-shared Skill-binding convention for execution-phase agents; authored in cycle 3 per I-AA-603 / D-RC3-2 — pairs structurally with ADR-0031).
 
 The cc-design.md authoring also surfaced four material refinements of the synthesis-stage substrate (D-9 role-split, D-3 third-option, D-13 reframing, D-16 platform-vs-application-hooks disambiguation) — each emerged from substrate detail unavailable to synthesis-stage pressure-tests, and is preserved in the Pass-by-pass audit trail for downstream visibility.
 
@@ -153,7 +187,7 @@ The feature is single-layer because the project's "product" IS the feature pipel
 | Claude Code Design | `cc-design.md` v1.0.0 (reviewer=approved) | 21 decision targets resolved; 4 synthesis-substrate refinements |
 | CC Dependencies sidecar | `cc-dependencies.json` v1.0.0 | Machine-readable dependency graph |
 | ADRs inherited | adrs/ADR-{0013,0016,0017,0021,0028,0029,0030,0031} | Foundational architectural decisions applied |
-| ADRs to be authored | ADR-0032, ADR-0033, optionally ADR-0034 (Batches 3-4) | This run's ADR additions |
+| ADRs authored or revised this feature | ADR-0032 (v1), ADR-0033 (v1; §Context revised cycle 3), ADR-0034 (v1; Context+Decision revised v2), ADR-0035 (cycle 3 new) | This run's ADR additions; ADR-0035 added in cycle 3 per I-AA-603 / D-RC3-2 |
 
 ## Design Summary (Meta)
 
@@ -166,14 +200,14 @@ dependencies:
   internal:
     - planning-pipeline (consumes tasks.json output of finalize-task-decomposer)
     - existing 9 auditing-* skills (auditing-cc-configs, auditing-shared, auditing-skills, auditing-subagents, auditing-cc-configs, etc.)
-    - existing 31 planning-side agents (pattern reference; no modifications)
+    - existing 31 planning-side agents (pattern reference; ~20+ will get author-prompt edits to emit doc_type per ADR-0032 Change 4 — enumerated in Change Impact Map)
     - recipe-feature-pipeline/SKILL.md (discipline statements being mechanically enforced)
     - KB-cc-design + KB-cc-platform (design discipline + primitive knowledge)
     - shared-conventions.md (extended via ADR-0032; edits happen at Plan + Execution)
     - shared-document-reviewer (doc_type taxonomy extended)
   external: []
   blueprint_decisions_resolved: 21  # all 18 D-* with D-2 split into D-2a-d
-  new_adrs: 3  # ADR-0032 (conventions+vocabulary), ADR-0033 (ADR-0029 extension), optionally ADR-0034 (PRD mis-credit cleanup)
+  new_adrs: 4  # ADR-0032 (conventions+vocabulary), ADR-0033 (ADR-0029 extension), ADR-0034 (PRD mis-credit cleanup), ADR-0035 (auditing-shared skill-binding convention — cycle 3)
   q_layer_n_arbitrated: 5  # Q-CC-1 through Q-CC-5
   synthesis_substrate_refinements: 4  # D-9 role-split, D-3 third-option, D-13 reframing, D-16 disambiguation
   ci_cd_impact: none
@@ -184,9 +218,9 @@ dependencies:
 
 **Risk-level rationale**: medium-high reflects that the execution pipeline becomes the substrate for every future feature run — failure modes affect the entire downstream pipeline economy. Mitigated by mechanical defenses (FR-6 validator, discipline-5 check) and the symmetric application of ADR-0017's 4-cycle cap.
 
-**Complexity-level rationale**: high reflects the 21 decision targets, the 4 synthesis-substrate refinements (each surfaced substrate detail unknowable at synthesis time), the orchestrator state machine (12 transitions), and the dispatch taxonomy (6 row mapping).
+**Complexity-level rationale**: high reflects the 21 decision targets, the 4 synthesis-substrate refinements (each surfaced substrate detail unknowable at synthesis time), the orchestrator state machine (12 substantive + 2 boundary = 14 transitions), and the dispatch taxonomy (8-row mapping).
 
-**Blast-radius rationale**: wide because the artifacts produced (orchestrator, reviewer, reconciler, code-producer, quality-handler agents + 7 scripts) are consumed by every future execution-phase run. Changes propagate to all future features. Mitigated by additive deployment (no existing artifacts removed; agents are new) and by ADR-0032's archive-authoritative spec direction (codifies validated practice).
+**Blast-radius rationale**: wide because the artifacts produced (orchestrator, reviewer, reconciler, code-producer, quality-handler agents + 7 scripts) are consumed by every future execution-phase run. Changes propagate to all future features. Additionally, ADR-0032 Change 4 (universal-required `doc_type`) cascades to ~20+ planning-side agent author-prompts that must be updated to emit `doc_type` going forward — enumerated explicitly in Change Impact Map. Mitigated by additive deployment (no existing artifacts removed; agents are new), by ADR-0032's archive-authoritative spec direction (codifies validated practice), and by AC-FR-11-d's historical-tolerance scoping rule.
 
 ## Background and Context
 
@@ -198,12 +232,13 @@ These ADRs are inherited; this Blueprint applies them without modification:
 |---|---|---|
 | ADR-0013 | Blueprint template canonical | Defines the Blueprint structure this document follows (per design-composer Phase 5) |
 | ADR-0016 | Design fan-out fan-in | Defines the fan-out (per-layer designers) + fan-in (design-composer) pattern; single-layer makes fan-out trivial |
-| ADR-0017 | Document-reviewer integration | **Canonical home for the 4-cycle reconciliation cap** (note: PRD v1.1.0 informally credits ADR-0021 for this; cleaned up in codebase-analysis.md v1.1.1 in-table caption; closed in ADR-0034 stand-alone, per Blueprint Batch 4 decision; ADR-0032 covers separate housekeeping per its Change 1-5 scope) |
-| ADR-0021 | Discovery-phase architecture | Defines the planning-pipeline flow; execution-side is the parallel structure this feature designs |
+| ADR-0017 | Document-reviewer integration | **Canonical home for the 4-cycle reconciliation cap** (per ADR-0034 cleanup; PRD v1.1.0 informally credits ADR-0021 — the two AC verbatim citations are footnoted in this Blueprint per cycle-3 D-RC3-3) |
+| ADR-0021 | Discovery-phase architecture | Defines the planning-pipeline flow; execution-side is the parallel structure this feature designs. Per ADR-0034, ADR-0021 has no actual cap content; verbatim PRD citations in AC-FR-6-e and AC-FR-10-b are preserved as transcription artifacts not as canonical citations. |
 | ADR-0028 | Skill-design fixes v4.5.0 | Codifies `recipe-feature-pipeline/SKILL.md` discipline 5 ("no pipeline-stage references by number"); mechanically enforced by D-15 |
 | ADR-0029 | No-silent-scope-changes principle | The meta-discipline being extended to execution surface via new ADR-0033 |
 | ADR-0030 | Mechanism-α pedagogical-marker-justification | The mechanical-defense pattern that D-15's discipline-enforcement applies symmetrically |
-| ADR-0031 | Auditing-shared skill module | Canonical-helper-home pattern that auditing-shared scripts + auditing-github-actions extraction follow |
+| ADR-0031 | Auditing-shared skill module | Canonical-helper-home pattern that auditing-shared scripts + auditing-github-actions extraction follow. **Pairs structurally with new ADR-0035** (ADR-0031 defines where the shared scripts live; ADR-0035 defines how downstream agents bind to them via `skills:` frontmatter). |
+| **ADR-0035** | **Auditing-shared Skill-binding convention for execution-phase agents** | **Authored in this run (cycle 3, status: proposed) per I-AA-603 / D-RC3-2.** Ratifies the convention that execution-phase agents materially depending on multiple auditing-shared scripts MAY bind auditing-shared in their `skills:` field (loading SKILL.md as context) in addition to invoking scripts via Bash. Opt-in for cross-cutting helper-home skills; not mandatory. Pairs structurally with ADR-0031. |
 
 ### External Resources Used
 
@@ -222,9 +257,10 @@ In scope for this feature:
 - 1 modified subagent: `shared-document-reviewer` (doc_type taxonomy extended per ADR-0032)
 - 3 new skills: `ai-development-guide` (install), `auditing-github-actions` (extract from KB-github-actions-platform), `auditing-codespaces` (stub per AC-FR-8-b)
 - 7 new scripts: `detect_stubs.py`, `run_phase_checks.py`, `log_state_transition.py`, `validate_pipeline_frontmatter.py`, `check_pipeline_discipline.py` (all in auditing-shared/scripts/); `audit_workflow.py` (relocated to auditing-github-actions/scripts/); `audit_codespaces.py` stub
-- 3 new ADRs: ADR-0032, ADR-0033, optionally ADR-0034
+- 4 new ADRs across the multi-cycle run: ADR-0032, ADR-0033, ADR-0034 (all authored in v1), ADR-0035 (authored cycle 3 per I-AA-603)
 - Permission policy additions in `.claude/settings.json` (allow-list extensions for the new script invocation patterns)
 - Template additions in `KB-documentation-criteria/references/templates/` for execution-phase artifact pairs (per D-5)
+- **~20+ planning-side agent author-prompt edits** to emit `doc_type` in their authored artifacts per ADR-0032 Change 4 (per I-AA-605 / D-RC3 enumeration). Plan-stage task generation produces one task per affected agent OR one batched task covering all ~20+ agents per the plan-author's discretion.
 
 #### Non-Scope (Explicitly not changing)
 
@@ -235,10 +271,11 @@ In scope for this feature:
 - CLAUDE.md — no changes (per Principle 5: disciplines live in recipe skill or scripts, not CLAUDE.md)
 - Plugin packaging — not applicable (per Principle 7)
 - Command-to-skill migration — no legacy `.claude/commands/*.md` in scope
-- Existing 31 planning-side agents — unmodified
+- Existing 31 planning-side agents — bodies are unmodified; ~20+ get author-prompt edits to emit `doc_type` only (per I-AA-605 enumeration)
 - Existing 9 auditing-* skills (except: auditing-github-actions skill is created; existing scripts are MOVED into it via git mv)
 - `recipe-feature-pipeline/SKILL.md` — unchanged (discipline statements are referenced; not re-written)
-- ADR-0017 / ADR-0021 informal mis-credit in PRD v1.1.0 narrative — cleaned up via ADR-0034 (stand-alone per Blueprint Batch 4 decision) (not via PRD supersession)
+- ADR-0017 / ADR-0021 informal mis-credit in PRD v1.1.0 narrative — cleaned up via ADR-0034 + per-AC correction-surface footnotes in this Blueprint per D-RC3-3 (no PRD supersession)
+- **Historical pre-implementation artifacts** — per AC-FR-11-d's scoping rule, historical artifacts do NOT require `doc_type` backfill; the validator tolerates the field's absence on artifacts whose `generated:` timestamp predates this feature's deployment date.
 
 #### Constraints
 
@@ -250,11 +287,12 @@ In scope for this feature:
 - `auditing-github-actions` extraction must preserve git history (git mv, not copy-and-delete)
 - `ai-development-guide` skill install must happen BEFORE per-task agents that reference it become functional (Plan-stage sequencing)
 - All new scripts must follow canonical-helper-home pattern per ADR-0031 (location: `auditing-shared/scripts/` for cross-cutting; per-skill-scripts for skill-specific)
+- Auditing-shared `skills:` frontmatter binding on the four affected agents (execute-orchestrator, execute-task-quality-handler, execute-phase-quality-reviewer, execute-finalize-reconciler) is the opt-in convention ratified by ADR-0035; future agents declaring multi-script-orchestration may exercise the same convention.
 
 #### Applicable Standards
 
 - KB-cc-design's 9 principles (lowest-cost primitive, path-gate, enforce vs instruct, isolate when pays-off, one-source-of-truth, permissions-as-safety-net, plugins-for-distribution-not-organization, migrate-commands-to-skills, reasoning-config-intentional)
-- KB-cc-platform conventions (primitive syntax + scoping rules)
+- KB-cc-platform conventions (primitive syntax + scoping rules); effort enum is `{low, medium, high, xhigh, max}` per KB-cc-platform/references/extensions.md (max = maximum effort; Opus 4.7 only on max; falls back to high on other models)
 - KB-documentation-criteria templates + shared-conventions.md (extended via ADR-0032)
 - KB-review-disciplines (Gate 0/1 procedure for reviewer pass)
 - EARS format for all 60 Functional ACs
@@ -327,6 +365,8 @@ Acceptance criteria use EARS format per the convention: `WHEN <trigger>, the <su
 
 All 60 ACs are transferred faithfully from PRD v1.1.0 Section "Functional Requirements" and organized by FR. The cc-design.md Acceptance criteria contribution table maps each AC to the design element that satisfies it; see also the Per-Layer Design subsection (Batch 6).
 
+**Note on PRD-inherited ADR-0021 citations** (per cycle-3 D-RC3-3): Two ACs (AC-FR-6-e and AC-FR-10-b) carry a transcription footnote correcting their PRD-inherited ADR-0021 citation to ADR-0017 per ADR-0034. The PRD's verbatim attribution is preserved here as a transcription artifact, not endorsed as the canonical citation. Downstream artifacts (Plan, Acceptance Tests, Phase Validators) authored from this Blueprint should cite ADR-0017, not ADR-0021. See the per-AC footnotes below.
+
 ### Functional ACs
 
 #### FR-1 — Layer: claude-code (Explicit execution-pipeline stages with named gates and sub-agents)
@@ -379,7 +419,9 @@ All 60 ACs are transferred faithfully from PRD v1.1.0 Section "Functional Requir
 - **AC-FR-6-b**: The frontmatter validator shall check, at minimum: required fields present per the artifact's doc-type schema; `status` value is in the canonical state vocabulary (FR-11); `status` value is current for the pipeline state (e.g., a ratified artifact is not still in `draft`); superseded artifacts have `superseded_by:` back-link; execution-phase artifacts conform to the schemas defined in FR-7.
 - **AC-FR-6-c**: WHEN the frontmatter validator detects a missing required field or invalid value, it shall emit a finding at Level 0 (auto-fixable) or Level 1 (manual correction needed) per the dispatch matrix.
 - **AC-FR-6-d**: The frontmatter validator shall run as part of the phase-level quality stage (FR-3) and shall additionally be invokable at every other gate.
-- **AC-FR-6-e**: The validator's failure on a planning-side artifact shall route the finding to the planning-side reconciliation flow (governed by ADR-0021); the validator's failure on an execution-side artifact shall route through the execution-side flow (governed by the ADR from FR-10).
+- **AC-FR-6-e**: The validator's failure on a planning-side artifact shall route the finding to the planning-side reconciliation flow (governed by ADR-0021[^correction-AC-FR-6-e]); the validator's failure on an execution-side artifact shall route through the execution-side flow (governed by the ADR from FR-10).
+
+[^correction-AC-FR-6-e]: **PRD-inherited transcription footnote (per ADR-0034 + cycle-3 D-RC3-3).** ADR-0021 citation transcribed verbatim from PRD v1.1.0 per ADR-0005 (PRD prose unchanged). The corrected attribution per ADR-0034 is ADR-0017 (the canonical home for the 4-cycle reconciliation cap; ADR-0021 has no actual cap content). Downstream artifacts (Plan, Acceptance Tests, Phase Validators) authored from this Blueprint should cite ADR-0017, not ADR-0021. The PRD's verbatim attribution is preserved here as a transcription artifact, not endorsed as the canonical citation.
 
 #### FR-7 — Layer: claude-code (Execution-phase artifact schemas and templates)
 
@@ -408,9 +450,11 @@ All 60 ACs are transferred faithfully from PRD v1.1.0 Section "Functional Requir
 #### FR-10 — Layer: claude-code (Execution-side reconciliation budget)
 
 - **AC-FR-10-a**: An ADR shall be authored defining the execution-side reconciliation budget (numeric cycle cap and escalation policy). (*Resolved*: this Blueprint's design defers to ADR-0017 as canonical home for the 4-cycle cap, symmetric-extended to per-task quality loop per D-12. The ADR-0017 canonical home is acknowledged; ADR-0034 (stand-alone per Blueprint Batch 4 decision) cleans up the PRD v1.1.0 mis-credit.)
-- **AC-FR-10-b**: The budget cap shall apply to the quality-reconciliation loop (FR-4) but shall not modify the planning-side budget governed by ADR-0021.
+- **AC-FR-10-b**: The budget cap shall apply to the quality-reconciliation loop (FR-4) but shall not modify the planning-side budget governed by ADR-0021[^correction-AC-FR-10-b].
 - **AC-FR-10-c**: WHEN the budget is exhausted, the orchestrator shall produce a `budget-exhausted` artifact summarizing the unresolved findings and shall escalate to the project owner with the options to extend the budget, accept the finding(s) as named-exempt (per mechanism α / ADR-0030 if applicable), or abort the run.
 - **AC-FR-10-d**: The budget numeric cap shall be a per-feature configurable value with a project-wide default of 4 cycles (specified in ADR-0017 canonical home).
+
+[^correction-AC-FR-10-b]: **PRD-inherited transcription footnote (per ADR-0034 + cycle-3 D-RC3-3).** ADR-0021 citation transcribed verbatim from PRD v1.1.0 per ADR-0005 (PRD prose unchanged). The corrected attribution per ADR-0034 is ADR-0017 (the canonical home for the 4-cycle reconciliation cap; ADR-0021 has no actual cap content). Downstream artifacts (Plan, Acceptance Tests, Phase Validators) authored from this Blueprint should cite ADR-0017, not ADR-0021. The PRD's verbatim attribution is preserved here as a transcription artifact, not endorsed as the canonical citation.
 
 #### FR-11 — Layer: claude-code (Canonical state vocabulary)
 
@@ -448,6 +492,7 @@ Detailed analysis is in `codebase-analysis.md` v1.1.1 (reviewer=approved); this 
 |---|---|---|
 | New execution-side subagents | `.claude/agents/execute-orchestrator.md`, `.claude/agents/execute-phase-quality-reviewer.md`, `.claude/agents/execute-finalize-reconciler.md`, `.claude/agents/execute-task-code-producer.md`, `.claude/agents/execute-task-quality-handler.md` | create |
 | Modified subagent | `.claude/agents/shared-document-reviewer.md` | edit (doc_type taxonomy extension per ADR-0032) |
+| **Planning-side agent author-prompt edits (wildcard, ~20+ agents)** | `.claude/agents/intake-*.md`, `.claude/agents/design-*.md`, `.claude/agents/discovery-*.md`, `.claude/agents/finalize-*.md`, `.claude/agents/plan-author.md`, `.claude/agents/test-*.md` | **edit (small) per ADR-0032 Change 4 — add doc_type emission to author-prompt frontmatter section. ~1-line change per agent. Required for the agent's authored artifacts to pass the FR-6 frontmatter validator at Gate 0 (doc_type universal-required field).** |
 | New skill installs | `.claude/skills/ai-development-guide/`, `.claude/skills/auditing-github-actions/`, `.claude/skills/auditing-codespaces/` | create skills (with SKILL.md + scripts/ + references/ as appropriate) |
 | Migrated files (preserve git history) | `KB-github-actions-platform/scripts/audit_workflow.py` → `auditing-github-actions/scripts/audit_workflow.py`; `KB-github-actions-platform/scripts/action_versions.md` → `auditing-github-actions/references/action_versions.md` | git mv |
 | New shared scripts | `.claude/skills/auditing-shared/scripts/detect_stubs.py`, `.claude/skills/auditing-shared/scripts/run_phase_checks.py`, `.claude/skills/auditing-shared/scripts/log_state_transition.py`, `.claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py`, `.claude/skills/auditing-shared/scripts/check_pipeline_discipline.py` | create |
@@ -455,7 +500,7 @@ Detailed analysis is in `codebase-analysis.md` v1.1.1 (reviewer=approved); this 
 | Permission policy | `.claude/settings.json` | edit (allow-list extensions for the 8 script invocation patterns) |
 | Document conventions spec | `.claude/skills/KB-documentation-criteria/references/shared-conventions.md` | edit (add 4 fields + doc_type taxonomy + per-doc-type state vocabulary per ADR-0032) |
 | Document templates (execution-phase) | `.claude/skills/KB-documentation-criteria/references/templates/` (4 new templates per D-5: per-task-execution-result, phase-quality-report, quality-reconciliation-log, state-transitions-log entry-schema) | create |
-| ADRs (this run) | `adrs/ADR-0032-conventions-canonicalization.md`, `adrs/ADR-0033-adr-0029-execution-extension.md`, optionally `adrs/ADR-0034-prd-mis-credit-cleanup.md` | create |
+| ADRs (this run) | `adrs/ADR-0032-conventions-canonicalization.md`, `adrs/ADR-0033-adr-0029-execution-extension.md`, `adrs/ADR-0034-prd-mis-credit-cleanup.md`, **`adrs/ADR-0035-auditing-shared-skill-binding-convention.md` (cycle 3, new this run per I-AA-603 / D-RC3-2)** | create |
 
 ### Integration Points (Include even for new implementations)
 
@@ -470,7 +515,7 @@ Detailed analysis is in `codebase-analysis.md` v1.1.1 (reviewer=approved); this 
 | Output | writes to feature working directory | `state-transitions.log` (JSONL; append-only) | New artifact type per FR-5 + D-16 |
 | Output | writes to feature working directory | `pipeline-run-summary.json` (one per feature run) | New artifact type per FR-7 |
 | Reference | inherits from CC layer | existing 9 `auditing-*` skills | Pattern reference + dispatch targets via `run_phase_checks.py` |
-| Reference | inherits from CC layer | existing 31 planning-side agents in `.claude/agents/` | Pattern reference only; no modifications |
+| Reference | inherits from CC layer | existing 31 planning-side agents in `.claude/agents/` | Pattern reference; ~20+ get author-prompt edits per Change Impact Map (per I-AA-605 enumeration) |
 | Reference | inherits from CC layer | `recipe-feature-pipeline/SKILL.md` | Discipline statements being enforced; not modified |
 | Reference | inherits from CC layer | `shared-document-reviewer` (existing) | Extended (doc_type taxonomy); not replaced |
 
@@ -478,11 +523,11 @@ Detailed analysis is in `codebase-analysis.md` v1.1.1 (reviewer=approved); this 
 
 Substrate gathered during Discovery Research stage (codebase-analysis.md v1.1.1):
 
-- **31 planning-side agents** at `.claude/agents/` — pattern reference for agent structure; no orchestrator file exists (distributed orchestration via per-agent prompts). Execution-side adopts centralized orchestrator pattern per D-6 (departure from planning-side; non-linear flow justifies the difference).
+- **31 planning-side agents** at `.claude/agents/` — pattern reference for agent structure; no orchestrator file exists (distributed orchestration via per-agent prompts). Execution-side adopts centralized orchestrator pattern per D-6 (departure from planning-side; non-linear flow justifies the difference). **~20+ planning-side agent author-prompts will receive ~1-line edits per ADR-0032 Change 4** (doc_type emission) — enumerated in Change Impact Map.
 - **9 existing `auditing-*` skills** (auditing-cc-configs, auditing-skills, auditing-shared, auditing-subagents, etc.) — pattern reference for the auditing-github-actions extraction (FR-8). Symmetric structure adopted.
 - **`recipe-feature-pipeline/SKILL.md`** at 414 lines — defines 5 disciplines; enforcement status uneven (discipline 3 mechanical; discipline 4 field-recording; disciplines 1, 2, 5 procedural-only). D-15 ships discipline-5 mechanical enforcement; broader inventory in Open items.
 - **`shared-conventions.md`** at 220 lines — defines canonical 5-state vocabulary + frontmatter spec. 4 archive-practice fields (`intent_user_token`, `gate_passed`, `reviewer_verdict`, `approved_at`) used in practice but absent from spec; canonicalized via ADR-0032.
-- **ADR-0017** vs **ADR-0021** mis-credit in PRD v1.1.0 narrative — surfaced during Batch E review. ADR-0017 is canonical home for 4-cycle reconciliation cap; PRD prose informally credited ADR-0021. Resolution: ADR-0034 (stand-alone per Blueprint Batch 4 decision; ADR-0032 covers separate housekeeping per its Change 1-5 scope).
+- **ADR-0017** vs **ADR-0021** mis-credit in PRD v1.1.0 narrative — surfaced during Batch E review. ADR-0017 is canonical home for 4-cycle reconciliation cap; PRD prose informally credited ADR-0021. Resolution: ADR-0034 (stand-alone per Blueprint Batch 4 decision; ADR-0032 covers separate housekeeping per its Change 1-5 scope). Per cycle-3 D-RC3-3, the two ACs (AC-FR-6-e + AC-FR-10-b) that carry the verbatim PRD-inherited citation are footnoted in this Blueprint.
 - **`audit-findings-remediation-r1` prior archive** at `working/feature/audit-findings-remediation-r1/` — 9 ad-hoc artifacts (`observations.md`, `reconciliation-log-cycle*.md`, `final-audit-report.md`, etc.) without templates or schemas; precedent for what execution-side templates should canonicalize (per FR-7 + D-5 pair pattern).
 
 ### Fact Disposition Table
@@ -497,7 +542,7 @@ One row per IN from codebase-analysis.md with disposition (preserve / transform 
 | IN-004 | shared-conventions.md drift (4 fields + state vocab + doc_type taxonomy) | **transform** | Canonicalize archive practice per ADR-0032 (D-4 + D-18). Spec edits happen at Plan + Execution; ADR documents the decision. |
 | IN-005 | shared-document-reviewer + KB-review-disciplines | **preserve** + enhance | Extend doc_type taxonomy (per D-9 second role); no replacement of the agent. |
 | IN-006 | auditing-* family with 8 skills + canonical helper auditing-shared | **preserve** + symmetric addition | Add auditing-github-actions (extract) + auditing-codespaces (stub) following the same structure. |
-| IN-007 | 31 planning-side agents inventory | **preserve** + net-add | All 31 unmodified; 5 new execute-* agents added. |
+| IN-007 | 31 planning-side agents inventory | **preserve** + net-add | All 31 bodies unmodified; 5 new execute-* agents added; ~20+ planning-side agents get ~1-line author-prompt edits per ADR-0032 Change 4 (per I-AA-605). |
 | IN-008 | No orchestrator file (distributed pattern) | **transform** | Execution-side adopts centralized orchestrator per D-6 (departure justified by non-linear execution flow). |
 | IN-009 | 6 inherited ADRs (0017, 0021, 0028, 0029, 0030, 0031) | **preserve** all + extend | All 6 inherited. ADR-0017 canonical 4-cycle cap is symmetric-extended to per-task per D-12. ADR-0029 forward-anticipated extension closed via ADR-0033. ADR-0030 mechanism-α pattern is symmetric model for D-15. ADR-0031 canonical-helper-home applied to all 7 new scripts. (ADR-0017 is genuinely inherited though not in PRD v1.1.0 Dependencies — its content drives the symmetric extension; the PRD's omission is part of the same documentary mis-credit pattern corrected by ADR-0034.) |
 | IN-010 | audit-findings-remediation-r1 prior archive (9 ad-hoc artifacts) | **out-of-scope** for modification; **preserve** as reference | Archive is sealed; the artifacts inform FR-7 template design. FR-7-c floor editorial expansion (5 → 9-11 artifacts) flagged for cross-artifact audit. |
@@ -591,18 +636,33 @@ Five architectural questions surfaced during cc-design.md authoring (Passes 2-4)
 
 ## Design
 
+### Architectural Decisions Inventory (this feature run)
+
+The Blueprint's architectural decisions are organized via three vehicles:
+
+1. **18 substantive synthesis-stage decisions (D-1 through D-18, D-2 split into D-2a-d)** — carried forward from synthesis.md v1.1.0 and resolved by cc-design.md v1.0.0.
+2. **5 architectural questions Q-CC-N** — surfaced during cc-design.md authoring and arbitrated in this Blueprint (§Q-CC-N Arbitration).
+3. **4 ADRs authored or referenced this run** (cross-feature artifacts; see also §ADR Authoring):
+   - **ADR-0032** (conventions canonicalization + per-doc-type state vocabulary; pairs D-4 + D-18; authored in v1, status: proposed)
+   - **ADR-0033** (ADR-0029 execution-phase extension; pairs D-7; authored in v1; §Context cross-references added in cycle 3 per I-AA-606; status: proposed)
+   - **ADR-0034** (PRD v1.1.0 mis-credit cleanup; no synthesis pairing; authored in v1, revised in v2 for Context+Decision rewrites, status: proposed)
+   - **ADR-0035** (auditing-shared Skill-binding convention for execution-phase agents; no synthesis pairing — emerged from cycle-3 audit finding I-AA-603; authored cycle 3 per D-RC3-2; pairs structurally with ADR-0031; status: proposed)
+
+ADR-0035 is the newest ADR (this cycle); its content is the canonical statement of the Skill-binding convention referenced in §Agent Frontmatter Specifications convention note 1.
+
 ### Change Impact Map
 
-The 16 CC artifacts this feature introduces or modifies, organized by location and disposition. Single-layer feature; all paths are under `.claude/` or `adrs/`.
+The CC artifacts this feature introduces or modifies, organized by location and disposition. Single-layer feature; all paths are under `.claude/` or `adrs/`.
 
 | Location | Artifact | Action | Disposition |
 |---|---|---|---|
-| `.claude/agents/` | `execute-orchestrator.md` | create | New subagent (opus/high); owns 12-state machine; centralized orchestrator per D-6 |
+| `.claude/agents/` | `execute-orchestrator.md` | create | New subagent (opus/high); owns 12-substantive-state machine + 2 boundary states; centralized orchestrator per D-6 |
 | `.claude/agents/` | `execute-task-code-producer.md` | create | New subagent (sonnet/medium); binds `ai-development-guide` per D-11 |
-| `.claude/agents/` | `execute-task-quality-handler.md` | create | New subagent (sonnet/medium per Q-CC-1); binds `ai-development-guide`; emits APPROVED enum per D-2c |
+| `.claude/agents/` | `execute-task-quality-handler.md` | create | New subagent (sonnet/medium per Q-CC-1); binds `ai-development-guide`; emits APPROVED enum per D-2c; Bash UNRESTRICTED per cc-design.md verbatim (per I-AA-602 / D-RC3-1) |
 | `.claude/agents/` | `execute-phase-quality-reviewer.md` | create | New subagent (opus/high); aggregates 5 dimensions per D-13 dimensional verdict structure; D-9 first role |
 | `.claude/agents/` | `execute-finalize-reconciler.md` | create | New subagent (opus/high); 6-row dispatch matrix per D-14; 4-cycle cap per D-12 |
 | `.claude/agents/` | `shared-document-reviewer.md` | edit | Existing subagent; extend doc_type taxonomy per ADR-0032 + D-9 second role |
+| `.claude/agents/` | `intake-*.md`, `design-*.md`, `discovery-*.md`, `finalize-*.md`, `plan-author.md`, `test-*.md` (wildcard, ~20+ planning-side agents) | edit (small) | **Per I-AA-605: Add doc_type emission to author-prompt frontmatter section per ADR-0032 Change 4. ~1-line change per agent. Required for the agent's authored artifacts to pass the FR-6 frontmatter validator at Gate 0 (doc_type universal-required field). Plan-stage task generation per this row should produce one task per affected agent OR one batched task covering all ~20+ agents per the plan-author's discretion.** |
 | `.claude/skills/` | `ai-development-guide/` | create skill | Install per AC-FR-9-e; source from `/mnt/user-data/uploads/SKILL__2_.md` |
 | `.claude/skills/` | `auditing-github-actions/` | create skill | Extract per FR-8-a; SKILL.md + relocated scripts |
 | `.claude/skills/` | `auditing-codespaces/` | create skill (stub) | Per FR-8-b; SKILL.md + stub script `audit_codespaces.py` |
@@ -619,10 +679,11 @@ The 16 CC artifacts this feature introduces or modifies, organized by location a
 | `.claude/skills/KB-documentation-criteria/references/templates/` | create (5 new templates) | Per D-5 pair pattern + FR-7-a: per-task-execution-result, phase-quality-report, quality-reconciliation-log, pipeline-run-summary, state-transitions-log-entry-schema. These 5 templates cover 4 of the 5 AC-FR-7-c floor items (per-task execution log → per-task-execution-result; phase-quality report → phase-quality-report; quality-reconciliation log → quality-reconciliation-log; execution-reconciliation log → pipeline-run-summary as the feature-run-level reconciliation aggregation) plus 1 beyond-floor item (state-transitions-log-entry-schema, the JSONL entry schema per AC-FR-7-d). The 5th floor item — frontmatter-validation report — is satisfied by the JSON-output schema defined inline in `validate_pipeline_frontmatter.py` source (see "AC-FR-7 floor coverage" section below). |
 | `.claude/settings.json` | edit | Permission policy: allow-list extensions for the 8 script invocation patterns (the 7 new auditing-shared/auditing-codespaces scripts + relocated audit_workflow.py) |
 | `adrs/ADR-0032-conventions-canonicalization.md` | (already created in Batch 3) | ADR | Spec changes for shared-conventions.md |
-| `adrs/ADR-0033-adr-0029-execution-extension.md` | (already created in Batch 4) | ADR | Scope-Deviation surfacing extension |
+| `adrs/ADR-0033-adr-0029-execution-extension.md` | (already created in Batch 4; §Context revised cycle 3 per I-AA-606 + ADR-0005 proposed-status exception) | ADR | Scope-Deviation surfacing extension; cycle-3 §Context cross-references Blueprint Path B mappings |
 | `adrs/ADR-0034-prd-mis-credit-cleanup.md` | (already created in Batch 4) | ADR | Documentary clarification |
+| `adrs/ADR-0035-auditing-shared-skill-binding-convention.md` | **create (cycle 3, new this run per I-AA-603 / D-RC3-2)** | ADR | **Ratifies auditing-shared Skill-binding convention for execution-phase agents; pairs structurally with ADR-0031** |
 
-**Total impact**: 5 new agents + 1 modified agent + 3 new skills + 7 new scripts (+ 1 stub) + 2 file moves + 2 modified skill SKILL.md files + 1 spec file (shared-conventions.md) + 5 new templates + 1 settings.json edit + 3 new ADRs = **~29 file operations**. All under `.claude/` or `adrs/`; no product-layer files touched. The 5 templates cover 4 of 5 AC-FR-7-c floor items as pair-pattern templates plus 1 beyond-floor item; the 5th floor item (frontmatter-validation report) is covered by the script-output schema in `validate_pipeline_frontmatter.py` source per AC-FR-7-c "minimum named artifacts" reading (see AC-FR-7 floor coverage section).
+**Total impact**: 5 new agents + 1 modified agent + **~20+ planning-side agent author-prompt edits (per I-AA-605)** + 3 new skills + 7 new scripts (+ 1 stub) + 2 file moves + 2 modified skill SKILL.md files + 1 spec file (shared-conventions.md) + 5 new templates + 1 settings.json edit + 4 new ADRs (ADR-0032, ADR-0033, ADR-0034 in v1; ADR-0035 in cycle 3) = **~49 file operations** (was ~29 in v4; added ~20 planning-side agent author-prompt edits per I-AA-605, plus the +1 ADR-0035). All under `.claude/` or `adrs/`; no product-layer files touched. The 5 templates cover 4 of 5 AC-FR-7-c floor items as pair-pattern templates plus 1 beyond-floor item; the 5th floor item (frontmatter-validation report) is covered by the script-output schema in `validate_pipeline_frontmatter.py` source per AC-FR-7-c "minimum named artifacts" reading (see AC-FR-7 floor coverage section).
 
 ### Interface Change Matrix
 
@@ -643,6 +704,7 @@ Single-layer feature; interfaces are between Claude Code primitives (agents, ski
 | `execute-orchestrator` | `log_state_transition.py` | per-transition invocation (application-level hook per D-16) | New |
 | `log_state_transition.py` | `state-transitions.log` (JSONL) | append-only write | New artifact |
 | `execute-task-code-producer`, `execute-task-quality-handler` | `ai-development-guide` SKILL | skill binding (frontmatter `skills:` field) per D-11 | New binding (FR-9) |
+| `execute-orchestrator`, `execute-task-quality-handler`, `execute-phase-quality-reviewer`, `execute-finalize-reconciler` | `auditing-shared` SKILL | skill binding (frontmatter `skills:` field) — opt-in convention per ADR-0035 | New binding (cycle 3 / ADR-0035) |
 | `shared-document-reviewer` | `doc_type` field (in artifact frontmatter) | dispatch-key consumption | New consumption pattern (per D-9 second role + ADR-0032) |
 | `validate_pipeline_frontmatter.py` | artifact frontmatter (any pipeline artifact) | validation invocation | New invocation pattern (per FR-6) |
 | `check_pipeline_discipline.py` | artifact content (any pipeline artifact) | discipline-5 scan + finding emit | New invocation pattern (per D-15) |
@@ -653,7 +715,7 @@ The matrix is exhaustive at the inter-component-interface level; intra-component
 
 ### Architecture Overview
 
-The execution pipeline is a centralized-orchestrator architecture: `execute-orchestrator` owns a 12-state machine and invokes the four other subagents in defined sequences. The orchestrator is the single point of state ownership; the other agents are stateless transformations invoked with explicit scope.
+The execution pipeline is a centralized-orchestrator architecture: `execute-orchestrator` owns a 12-substantive-state machine (plus 2 boundary states INIT and TERMINATED) and invokes the four other subagents in defined sequences. The orchestrator is the single point of state ownership; the other agents are stateless transformations invoked with explicit scope.
 
 ```mermaid
 flowchart TD
@@ -733,7 +795,7 @@ flowchart TD
 
 ### Key architectural properties
 
-1. **Centralized state ownership**: `execute-orchestrator` owns the entire 12-state machine. No other agent transitions pipeline state; they return verdicts/findings that the orchestrator interprets and acts upon. This is a departure from the planning-side 31-agent distributed pattern; justified by execution-side's non-linear flow (reconciliation cycles, per-task loops within a phase, conditional dispatch).
+1. **Centralized state ownership**: `execute-orchestrator` owns the entire 12-substantive-state machine (plus 2 boundary states INIT/TERMINATED). No other agent transitions pipeline state; they return verdicts/findings that the orchestrator interprets and acts upon. This is a departure from the planning-side 31-agent distributed pattern; justified by execution-side's non-linear flow (reconciliation cycles, per-task loops within a phase, conditional dispatch).
 
 2. **Stateless transformations**: code-producer, quality-handler, phase-quality-reviewer, finalize-reconciler are all invoked with explicit scope and return structured verdicts. No agent persists state across invocations. This makes the orchestrator's state machine the canonical source of truth and simplifies reasoning about run state.
 
@@ -752,8 +814,9 @@ End-to-end flow from `tasks.json` (planning-side input) through to `pipeline-run
 ```
 1. INITIALIZATION
    - execute-orchestrator reads tasks.json (planning-side output)
-   - Orchestrator initializes 12-state machine to state INIT
-   - log_state_transition.py emits {timestamp, from: INIT, to: TASK_SELECT, ...}
+   - Orchestrator initializes 12-substantive-state machine; current state = INIT (boundary)
+   - T0 (boundary): INIT → pending (orchestrator startup; first task selected)
+   - log_state_transition.py emits {timestamp, from: INIT, to: pending, ...}
 
 2. PER-TASK LOOP (for each task in tasks.json)
    a. Orchestrator transitions: TASK_SELECT → CODE_PRODUCER_RUNNING
@@ -794,8 +857,8 @@ End-to-end flow from `tasks.json` (planning-side input) through to `pipeline-run
       - 4-cycle cap exhaustion: orchestrator emits budget-exhausted artifact + escalates to user per AC-FR-10-c
 
 5. RUN TERMINATION
-   a. Orchestrator transitions to TERMINATED state (either via gate-pass to Deliverable Packaging OR via user escalation OR via abort)
-   b. log_state_transition.py emits final transition event
+   a. Orchestrator transitions to TERMINATED state (T13 boundary) — either via gate-pass to Deliverable Packaging OR via user escalation OR via abort
+   b. log_state_transition.py emits final transition event (T13)
    c. pipeline-run-summary.json written with: per-stage gate outcomes + total reconciliation cycles + findings dispatched per level + final ship status
    d. If gate-pass: orchestrator hands off to Deliverable Packaging (out of scope)
 ```
@@ -838,6 +901,7 @@ The execution pipeline integrates with the planning pipeline at the input bounda
 | `auditing-shared/scripts/validate_pipeline_frontmatter.py` | All agents (via `run_phase_checks.py` and at every gate per AC-FR-6-d) | Per FR-6; consumes `doc_type` field per ADR-0032 |
 | `auditing-shared/scripts/check_pipeline_discipline.py` | All agents (via `run_phase_checks.py`) | D-15 worked example; mechanism-α pattern per ADR-0030 |
 | `ai-development-guide` SKILL | `execute-task-code-producer`, `execute-task-quality-handler` | Per D-11 binding criterion ("authors code OR applies code-level quality gates") |
+| `auditing-shared` SKILL (binding) | `execute-orchestrator`, `execute-task-quality-handler`, `execute-phase-quality-reviewer`, `execute-finalize-reconciler` | **Per ADR-0035 (cycle-3 new): opt-in Skill-binding convention for execution-phase agents materially depending on multiple auditing-shared scripts. Pairs structurally with ADR-0031.** |
 | `auditing-github-actions/scripts/audit_workflow.py` | `execute-phase-quality-reviewer` (via `run_phase_checks.py`) | Relocated from `KB-github-actions-platform/` per FR-8-a |
 | `auditing-codespaces/scripts/audit_codespaces.py` (stub) | `execute-phase-quality-reviewer` (via `run_phase_checks.py`) | Per FR-8-b + Q-CC-4 stub semantics |
 | `shared-document-reviewer` (extended) | (Invoked at every artifact's reviewer-pass, including execution-phase artifacts) | Extended doc_type taxonomy per ADR-0032 + D-9 second role |
@@ -851,12 +915,12 @@ Ten components are introduced or modified. Each is profiled below with role, mod
 #### Component 1: execute-orchestrator
 
 - **Type**: Subagent (`.claude/agents/execute-orchestrator.md`)
-- **Model / effort**: `opus / high` — owns the 12-state machine + dispatch logic; opus warranted for state-machine reasoning per KB-cc-design Principle 9
-- **Role**: Centralized owner of the execution-pipeline 12-state machine. Invokes the other 4 execution-side agents in defined sequences. Routes dispatch matrix outputs back to upstream agents.
+- **Model / effort**: `opus / high` — owns the 12-substantive-state machine + dispatch logic; opus warranted for state-machine reasoning per KB-cc-design Principle 9
+- **Role**: Centralized owner of the execution-pipeline 12-substantive-state machine (plus 2 boundary states INIT/TERMINATED). Invokes the other 4 execution-side agents in defined sequences. Routes dispatch matrix outputs back to upstream agents.
 - **Inputs**: `tasks.json` (planning-side output); state-transition events from invocations.
 - **Outputs**: `state-transitions.log` (JSONL), `pipeline-run-summary.json`, transitions to Deliverable Packaging on terminal-gate-pass.
-- **Key contracts**: 12-state machine (defined in 5b State Transitions section); dispatch routing per 8-row dispatch matrix (D-14 6-row base + 2 additions) from `execute-finalize-reconciler`; application-level hook invocations to `log_state_transition.py`.
-- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): `KB-cc-platform`, `KB-cc-design`, `recipe-feature-pipeline`, `auditing-shared`, `KB-review-disciplines`. KB-cc-platform/design for primitive knowledge; recipe-feature-pipeline for the discipline statements being enforced; auditing-shared for FR-6 validator + state-transition hook invocation per D-15/D-16; KB-review-disciplines for understanding what phase-quality-reviewer applies.
+- **Key contracts**: 12-substantive-state machine (defined in §State Transitions); dispatch routing per 8-row dispatch matrix (D-14 6-row base + 2 additions) from `execute-finalize-reconciler`; application-level hook invocations to `log_state_transition.py`.
+- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): `KB-cc-platform`, `KB-cc-design`, `recipe-feature-pipeline`, `auditing-shared`, `KB-review-disciplines`. KB-cc-platform/design for primitive knowledge; recipe-feature-pipeline for the discipline statements being enforced; **auditing-shared bound per ADR-0035 (cycle-3 new) — orchestrator materially depends on 5 auditing-shared scripts (log_state_transition.py, validate_pipeline_frontmatter.py, check_pipeline_discipline.py, run_phase_checks.py, detect_stubs.py); the SKILL.md binding provides the conceptual model for multi-script orchestration**; KB-review-disciplines for understanding what phase-quality-reviewer applies.
 - **Per cc-design**: D-6 (centralized orchestrator decision), D-8 (multi-agent loop), D-16 (state-transition hook application-level).
 
 #### Component 2: execute-task-code-producer
@@ -867,7 +931,7 @@ Ten components are introduced or modified. Each is profiled below with role, mod
 - **Inputs**: Task spec (one entry from tasks.json); allowed-files-scope; `ai-development-guide` SKILL content.
 - **Outputs**: Modified files; return value `{status: completed | escalation_needed, filesModified: [...], scope_deviations: [...]}` per AC-FR-2-f.
 - **Key contracts**: Status enum (`completed`, `escalation_needed`); filesModified list (used by quality-handler as quality scope); scope-deviations surfaced per ADR-0033.
-- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): base set `[ai-development-guide, KB-cc-design]`; task-spec-declared additional skills loaded per-invocation via orchestrator's task spec (not at agent-definition time). `ai-development-guide` per D-11 binding criterion; `KB-cc-design` for design discipline awareness during code authoring.
+- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): base set `[ai-development-guide, KB-cc-design]`; task-spec-declared additional skills loaded per-invocation via orchestrator's task spec (not at agent-definition time). `ai-development-guide` per D-11 binding criterion; `KB-cc-design` for design discipline awareness during code authoring. (Does NOT bind auditing-shared — code-producer does not materially depend on auditing-shared scripts; ADR-0035 convention's multi-script-orchestration criterion does not apply.)
 - **Per cc-design**: D-11 (binding criterion), D-2a (selective BLOCKING annotation discipline adopted), D-2b (single-gate escalation rejected).
 
 #### Component 3: execute-task-quality-handler
@@ -878,8 +942,9 @@ Ten components are introduced or modified. Each is profiled below with role, mod
 - **Inputs**: filesModified list (per-task quality scope); acceptance-tests reference; `ai-development-guide` SKILL content.
 - **Outputs**: Return value `{status: APPROVED | NEEDS_REVISION | STUB_DETECTED | BLOCKER, findings: [...]}` per D-2c.
 - **Key contracts**: Status enum with 4 values (D-2c); STUB_DETECTED is a distinct status per D-2d; findings carry depth-level classification per FR-4.
-- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): `[ai-development-guide, KB-cc-design, auditing-shared]`. `ai-development-guide` per D-11; `KB-cc-design` for context; `auditing-shared` for the detect_stubs.py invocation pattern and other shared utilities (new convention per §Agent Frontmatter Specifications note 1).
+- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): `[ai-development-guide, KB-cc-design, auditing-shared]`. `ai-development-guide` per D-11; `KB-cc-design` for context; **auditing-shared bound per ADR-0035 (cycle-3 new) — quality-handler materially depends on multiple auditing-shared utilities (detect_stubs.py invocation pattern, plus acceptance-test runners / per-task validators delegated via auditing-shared); the SKILL.md binding provides the conceptual model**.
 - **Per cc-design**: D-2c (APPROVED status enum), D-2d (stub detection centralized), D-11 (binding criterion), Q-CC-1 (model/effort), Q-CC-2 (stub detection path-awareness).
+- **Bash widening (per I-AA-602 / D-RC3-1, cycle 3)**: Bash UNRESTRICTED per cc-design.md verbatim. The quality-handler invokes language-stack-specific test commands (pytest, npm test, cargo test, go test, dotnet test, mvn test, etc.) per the modified files declared in the task spec; restricting Bash to python3-only would mechanically break the agent for non-Python stacks per FR-2 + D-11 + Component 3 contract. Permissioning is handled via .claude/settings.json allow-list per the project sandbox pattern (see Security Considerations — Filesystem write surface). A candidate follow-on architectural decision (Path b in audit I-AA-602 recommended_resolution) would re-route all test invocation through run_phase_checks.py so quality-handler genuinely only consumes results; deferred as out-of-scope for this feature run, preserved in Risks/Future Extensibility.
 
 #### Component 4: execute-phase-quality-reviewer
 
@@ -888,8 +953,8 @@ Ten components are introduced or modified. Each is profiled below with role, mod
 - **Role**: First role of D-9 split. Aggregates phase-quality findings from `run_phase_checks.py` coordinator into D-13 dimensional verdict structure. Surfaces Scope-Deviations per ADR-0033.
 - **Inputs**: All per-task-execution-result artifacts from the phase; `phase-validators.md` reference; output of `run_phase_checks.py` (aggregated check results).
 - **Outputs**: `phase-quality-report.{json,md}` per FR-7; verdict in 5-dimension structure (tests, audits, frontmatter, discipline, scope-deviations) per D-13; audit-counter delta per FR-12 + Q-CC-3 (per-domain breakdown).
-- **Key contracts**: D-13 dimensional verdict (NOT numeric scoring per D-13 reframing); audit-counter delta schema (defined in 5b Contract Definitions).
-- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): `[KB-cc-design, KB-review-disciplines, auditing-shared]`. KB-cc-design for understanding what the audit families check; KB-review-disciplines for scoring rubric per D-13 (dimensional verdict, not numeric); auditing-shared for utility helpers + `run_phase_checks.py` invocation.
+- **Key contracts**: D-13 dimensional verdict (NOT numeric scoring per D-13 reframing); audit-counter delta schema (defined in §Contract Definitions).
+- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): `[KB-cc-design, KB-review-disciplines, auditing-shared]`. KB-cc-design for understanding what the audit families check; KB-review-disciplines for scoring rubric per D-13 (dimensional verdict, not numeric); **auditing-shared bound per ADR-0035 (cycle-3 new) — reviewer materially depends on run_phase_checks.py (which fans out to multiple auditing-* families), validate_pipeline_frontmatter.py, check_pipeline_discipline.py (3+ scripts); the SKILL.md binding provides the conceptual model for multi-script orchestration**.
 - **Per cc-design**: D-9 first role, D-13 (dimensional verdict reframing), D-3 (third-option coordinator), FR-3 substrate.
 
 #### Component 5: execute-finalize-reconciler
@@ -900,7 +965,7 @@ Ten components are introduced or modified. Each is profiled below with role, mod
 - **Inputs**: `phase-quality-report` findings; cycle counter from orchestrator.
 - **Outputs**: `quality-reconciliation-log-cycle-<N>.{json,md}` per cycle; dispatch table (per-finding routing decision); budget-exhausted artifact if cap reached.
 - **Key contracts**: 6-row dispatch matrix (D-14); 4-cycle cap symmetric application (D-12); cascade rules per AC-FR-4-d.
-- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): `[KB-cc-design, KB-review-disciplines, auditing-shared]`. Symmetric with phase-quality-reviewer's skill set; the reconciler reads the same artifacts and applies a complementary discipline (dispatch rather than aggregate). The skill set diverges deliberately from the planning-side `finalize-reconciler` (which has `[KB-review-disciplines, KB-documentation-criteria]`) because the execute-side reconciler operates on the cc-design surface rather than document-structure surfaces — see §Agent Frontmatter Specifications for the full rationale.
+- **Skills bound** (see §Agent Frontmatter Specifications for the authoritative YAML): `[KB-cc-design, KB-review-disciplines, auditing-shared]`. Symmetric with phase-quality-reviewer's skill set; the reconciler reads the same artifacts and applies a complementary discipline (dispatch rather than aggregate). The skill set diverges deliberately from the planning-side `finalize-reconciler` (which has `[KB-review-disciplines, KB-documentation-criteria]`) because the execute-side reconciler operates on the cc-design surface rather than document-structure surfaces. **auditing-shared bound per ADR-0035 (cycle-3 new) — reconciler materially depends on dispatch-matrix discipline + cycle-counter tracking via auditing-shared dispatch artifacts (2+ scripts via dispatch protocol); the SKILL.md binding provides the conceptual model** — see §Agent Frontmatter Specifications for the full rationale.
 - **Per cc-design**: D-14 (dispatch table), D-12 (4-cycle cap symmetric), FR-4 substrate.
 
 #### Component 6: shared-document-reviewer (extended)
@@ -937,7 +1002,7 @@ Ten components are introduced or modified. Each is profiled below with role, mod
 
 #### Component 10: auditing-shared scripts cluster (7 new scripts)
 
-- **Type**: Scripts under existing `auditing-shared/scripts/` (skill exists; scripts are new)
+- **Type**: Scripts under existing `auditing-shared/scripts/` (skill exists; scripts are new). **Per ADR-0035 (cycle-3 new): the skill is also bindable as a Skill in the `skills:` frontmatter of execution-phase agents that materially depend on multiple of its scripts (opt-in convention for cross-cutting helper-home skills).**
 - **Role**: Cross-cutting helpers per ADR-0031 canonical-helper-home discipline. 7 new scripts:
   - `detect_stubs.py` — Q-CC-2 path-aware stub detection; consumed by quality-handler
   - `run_phase_checks.py` — D-3 third-option thin coordinator; invokes auditing-* + validate + check_pipeline_discipline
@@ -946,49 +1011,51 @@ Ten components are introduced or modified. Each is profiled below with role, mod
   - `check_pipeline_discipline.py` — D-15 worked example; discipline 5 mechanical enforcement
   - (relocated) `audit_workflow.py` — Component 8 owns; listed here for cross-cluster visibility
   - (stub) `audit_codespaces.py` — Component 9 owns; listed here for cross-cluster visibility
-- **Bound by**: Various execution-side agents per Interface Change Matrix
-- **Per cc-design**: D-3, D-15, D-16, ADR-0031, ADR-0032, ADR-0033.
+- **Bound by**: Various execution-side agents per Interface Change Matrix + ADR-0035 convention
+- **Per cc-design**: D-3, D-15, D-16, ADR-0031, ADR-0032, ADR-0033, **ADR-0035 (Skill-binding convention)**.
 
 #### Component cross-reference index
 
 | Component | cc-design.md decisions | PRD FRs satisfied | ADRs related |
 |---|---|---|---|
-| execute-orchestrator | D-6, D-8, D-16 | FR-1, FR-5 | ADR-0017 (cap), ADR-0029 |
+| execute-orchestrator | D-6, D-8, D-16 | FR-1, FR-5 | ADR-0017 (cap), ADR-0029, **ADR-0035 (Skill-binding)** |
 | execute-task-code-producer | D-2a, D-11 | FR-2 (parts), FR-9 | (none new) |
-| execute-task-quality-handler | D-2c, D-2d, D-11, Q-CC-1, Q-CC-2 | FR-2 (parts), FR-9 | (none new) |
-| execute-phase-quality-reviewer | D-9 first role, D-13, D-3 | FR-3 | ADR-0033 (audit-stage enforcement) |
-| execute-finalize-reconciler | D-14, D-12 | FR-4, FR-10 | ADR-0017 (4-cycle cap canonical) |
+| execute-task-quality-handler | D-2c, D-2d, D-11, Q-CC-1, Q-CC-2 | FR-2 (parts), FR-9 | **ADR-0035 (Skill-binding)** |
+| execute-phase-quality-reviewer | D-9 first role, D-13, D-3 | FR-3 | ADR-0033 (audit-stage enforcement), **ADR-0035 (Skill-binding)** |
+| execute-finalize-reconciler | D-14, D-12 | FR-4, FR-10 | ADR-0017 (4-cycle cap canonical), **ADR-0035 (Skill-binding)** |
 | shared-document-reviewer (ext) | D-9 second role | FR-6 (consumption) | ADR-0032 (doc_type) |
 | ai-development-guide | D-11, FR-9 substrate | FR-9 | (none new) |
 | auditing-github-actions | FR-8-a substrate | FR-8 | ADR-0031 |
 | auditing-codespaces | FR-8-b substrate, Q-CC-4 | FR-8 | ADR-0033 (stub surfacing) |
-| auditing-shared scripts | D-3, D-15, D-16 | FR-6, FR-3, FR-5 | ADR-0031, ADR-0032, ADR-0033 |
+| auditing-shared scripts | D-3, D-15, D-16 | FR-6, FR-3, FR-5 | ADR-0031, ADR-0032, ADR-0033, **ADR-0035 (Skill-binding convention pairs with ADR-0031)** |
 
 #### Agent Frontmatter Specifications
 
-This subsection provides literal YAML frontmatter blocks for the five new execution-phase agents (Components 1–5). These specifications are transcribed from `cc-design.md` (reviewer_verdict=approved) at integration-stage grade so the Plan stage can author the agent definition files (`.claude/agents/execute-*.md`) directly from the Blueprint without having to read the per-layer design. Added in v3 to address audit findings I-AA-301 through I-AA-307.
+This subsection provides literal YAML frontmatter blocks for the five new execution-phase agents (Components 1–5). These specifications are transcribed from `cc-design.md` (reviewer_verdict=approved) at integration-stage grade so the Plan stage can author the agent definition files (`.claude/agents/execute-*.md`) directly from the Blueprint without having to read the per-layer design. Added in v3 to address audit findings I-AA-301 through I-AA-307; refined in v4 per Gate 4 platform-validity verification; refined in v5 per cycle-3 D-RC3-1 (Bash widening) + D-RC3-2 (ADR-0035 ratification of Skill-binding convention).
 
 **Three convention notes apply across all five specifications:**
 
-1. **`auditing-shared` as a Skill binding**: This feature establishes a new convention. The execute-orchestrator, execute-task-quality-handler, execute-phase-quality-reviewer, and execute-finalize-reconciler bind `auditing-shared` in their `skills:` field. Existing planning-side agents do not — they invoke `auditing-shared` scripts via `Bash` only and never load its SKILL.md as context. The new convention loads the SKILL.md as context (so the agent has the conceptual model of the shared utilities) AND retains Bash invocation for script execution. **Gate 4 verification (v4): VALID per `code.claude.com/docs/en/sub-agents`.** The platform's `skills:` field accepts any skill name; the KB-prefix is a project convention, not a platform requirement.
+1. **`auditing-shared` as a Skill binding (ratified by ADR-0035 cycle 3)**: This feature establishes a new convention. The execute-orchestrator, execute-task-quality-handler, execute-phase-quality-reviewer, and execute-finalize-reconciler bind `auditing-shared` in their `skills:` field. Existing planning-side agents do not — they invoke `auditing-shared` scripts via `Bash` only and never load its SKILL.md as context. The new convention loads the SKILL.md as context (so the agent has the conceptual model of the shared utilities) AND retains Bash invocation for script execution. **Gate 4 verification (v4): VALID per `code.claude.com/docs/en/sub-agents`.** The platform's `skills:` field accepts any skill name; the KB-prefix is a project convention, not a platform requirement. **Ratified by ADR-0035 (this run; status: proposed) as the canonical statement of the Skill-binding convention for cross-cutting helper-home skills (per ADR-0031 ↔ ADR-0035 pairing).**
 
-2. **Subagent-dispatch tool naming — IMPORTANT correction in v4**: There are TWO separate Claude Code tool families that earlier Blueprint versions conflated:
+2. **Subagent-dispatch tool naming — IMPORTANT correction in v4 (preserved in v5)**: There are TWO separate Claude Code tool families that earlier Blueprint versions conflated:
    - **`Agent`** (formerly `Task` pre-v2.1.63; `Task(...)` still works as alias) — spawns subagents / delegation
    - **`TaskCreate`/`TaskUpdate`/`TaskList`** — built-in session task-board management (assistant's own todo list)
 
    cc-design.md uses `Task` for subagent dispatch (correctly; this is now canonically `Agent`). Existing planning-side agents declare `TaskCreate`/`TaskUpdate` for task-board management (different tool family). The v3 Blueprint substitution of `TaskCreate`/`TaskUpdate` for cc-design's `Task` was a misreading — they are not equivalents. v4 corrects this: `execute-orchestrator` uses `Agent` for subagent dispatch and `TaskUpdate` for task-board management; `execute-finalize-reconciler` uses `Agent` for re-dispatch. Per Claude Code v2.1.63 docs.
 
-3. **Gate 4 platform-validity verification — UPDATED in v4 with authoritative answers** (verified against `code.claude.com/docs/en/sub-agents`):
-   - (a) `memory: none` is **INVALID** — documented valid values are `user` | `project` | `local`; "no persistent memory" is achieved by **omitting the field entirely**, not by writing `none`. v4 removes `memory: none` from the three agents that had it (code-producer, quality-handler, phase-quality-reviewer); the field is now absent for those agents (default behavior: no persistent memory).
-   - (b) `Edit` is **VALID** — confirmed by the docs Debugger example (`tools: Read, Edit, Bash, Grep, Glob`). Code-producer retains Edit.
+3. **Gate 4 platform-validity verification — COMPLETE as of v4 (preserved in v5)** (verified against `code.claude.com/docs/en/sub-agents`):
+   - (a) `memory:` field is **OPTIONAL**, not required. Documented valid values when present are `user` | `project` | `local`; "no persistent memory" is achieved by **omitting the field entirely**, not by writing `none`. The value `none` is INVALID Claude Code syntax and MUST be REJECTED by the FR-6 validator. v4 removed `memory: none` from the three agents that had it (code-producer, quality-handler, phase-quality-reviewer); v5 preserves the field absence (default behavior: no persistent memory).
+   - (b) `Edit` tool is **VALID** — confirmed by the Claude Code docs Debugger example (`tools: Read, Edit, Bash, Grep, Glob`). Code-producer retains Edit.
    - (c) Non-KB skill binding (`auditing-shared` in `skills:`) is **VALID** — see note 1 above.
+   - (d) `Bash` restriction patterns (`Bash`, `Bash(<pattern>:*)`) are both **VALID**. Agents may use either form per their security/feasibility trade-off. For execute-task-quality-handler in v5: **unrestricted `Bash` per cc-design.md verbatim** (per I-AA-602 / D-RC3-1) — the agent invokes language-stack-specific test commands across multiple stacks (pytest, npm test, cargo test, etc.).
+   - (e) `effort:` enum is `{low, medium, high, xhigh, max}` per `KB-cc-platform/references/extensions.md`. (max = maximum effort; Opus 4.7 only on max; falls back to high on other models.) The validator's enum check accepts all five values.
 
 ##### Agent: execute-orchestrator
 
 ```yaml
 ---
 name: execute-orchestrator
-description: Centralized owner of the execution-pipeline 12-state machine. Invokes the four execution-side specialist agents (code-producer, quality-handler, phase-quality-reviewer, execute-finalize-reconciler) in defined sequences. Routes dispatch matrix outputs back to upstream agents. Tracks per-task and phase-level cycle counters against ADR-0017's 4-cycle cap (symmetric application per D-12).
+description: Centralized owner of the execution-pipeline 12-substantive-state machine (plus 2 boundary states INIT/TERMINATED). Invokes the four execution-side specialist agents (code-producer, quality-handler, phase-quality-reviewer, execute-finalize-reconciler) in defined sequences. Routes dispatch matrix outputs back to upstream agents. Tracks per-task and phase-level cycle counters against ADR-0017's 4-cycle cap (symmetric application per D-12).
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, Bash(python3:*), Agent, TaskUpdate]
@@ -999,10 +1066,11 @@ memory: project
 
 **Rationale for divergences from cc-design.md verbatim:**
 
-- `Write` added: cc-design omitted Write but the orchestrator's Blueprint Outputs include `pipeline-run-summary.json` and `state-transitions.log`. Two readings exist: (a) the orchestrator writes these directly (Write needed), (b) a helper script writes them and the orchestrator invokes via Bash (Write not needed). v3 adopted reading (a) defensively; v4 retains. If reading (b) proves correct in operation, Write can be removed in a follow-on revision.
+- `Write` added: cc-design omitted Write but the orchestrator's Blueprint Outputs include `pipeline-run-summary.json` and `state-transitions.log`. Two readings exist: (a) the orchestrator writes these directly (Write needed), (b) a helper script writes them and the orchestrator invokes via Bash (Write not needed). v3 adopted reading (a) defensively; v4 + v5 retain. If reading (b) proves correct in operation, Write can be removed in a follow-on revision.
 - `Bash(python3:*)` restriction added (vs cc-design's unrestricted `Bash`): matches existing-agent convention of restricting Bash to python3 invocation when the agent's Bash usage is script-only.
-- `Agent` is the canonical Claude Code subagent-dispatch tool (renamed from `Task` in v2.1.63; `Task` still works as alias). cc-design.md used `Task`; v4 uses the canonical `Agent`.
-- `TaskUpdate` retained for built-in session task-board management per cc-design's intent (the orchestrator marks individual task statuses during the 12-state walk). Note: `TaskCreate` is NOT in this list because tasks.json is authored upstream by `finalize-task-decomposer`; the orchestrator updates existing task-board entries rather than creating new ones.
+- `Agent` is the canonical Claude Code subagent-dispatch tool (renamed from `Task` in v2.1.63; `Task` still works as alias). cc-design.md used `Task`; v4 + v5 use the canonical `Agent`.
+- `TaskUpdate` retained for built-in session task-board management per cc-design's intent (the orchestrator marks individual task statuses during the 12-substantive-state walk). Note: `TaskCreate` is NOT in this list because tasks.json is authored upstream by `finalize-task-decomposer`; the orchestrator updates existing task-board entries rather than creating new ones.
+- `auditing-shared` skill binding per ADR-0035 (cycle-3 new): orchestrator materially depends on 5 auditing-shared scripts per Convention note 1.
 
 ##### Agent: execute-task-code-producer
 
@@ -1021,8 +1089,9 @@ skills: [ai-development-guide, KB-cc-design]
 
 - The `skills:` list above is the **base set bound at agent-definition time.** The task-spec-declared additional skills (e.g., `KB-frontend-design`, `KB-backend-design`, language-specific skills) are loaded **per-invocation** via the orchestrator's task spec, not at agent-definition time. This means the agent's frontmatter is static; the per-task skill loading happens through Claude Code's per-invocation skill-augmentation mechanism (Plan stage will detail the mechanism in task spec schema).
 - `Edit` tool inclusion is per cc-design; **Gate 4 verified VALID** per Claude Code docs (Debugger example uses it).
-- `memory:` field is **omitted** (v4 correction from v3): cc-design originally specified `memory: none` but Gate 4 verification revealed this is invalid Claude Code syntax. The documented valid values are `user`, `project`, `local`; omitting the field is the canonical way to achieve "no persistent memory across invocations" (the desired behavior for this stateless per-task agent).
+- `memory:` field is **omitted** (v4 correction from v3, preserved in v5): cc-design originally specified `memory: none` but Gate 4 verification revealed this is invalid Claude Code syntax. The documented valid values are `user`, `project`, `local`; omitting the field is the canonical way to achieve "no persistent memory across invocations" (the desired behavior for this stateless per-task agent).
 - `Bash` unrestricted (no python3 narrowing) because the agent runs build/test/lint commands which span many tools (npm, cargo, pytest, etc.) per the task's language stack.
+- `auditing-shared` NOT bound — code-producer does not materially depend on auditing-shared scripts; ADR-0035 convention's multi-script-orchestration criterion does not apply.
 
 ##### Agent: execute-task-quality-handler
 
@@ -1032,17 +1101,17 @@ name: execute-task-quality-handler
 description: Per-task quality verdict-issuer. Runs the ai-development-guide 4-phase verification + detect_stubs.py with Q-CC-2 path-aware patterns. Emits APPROVED | NEEDS_REVISION | STUB_DETECTED | BLOCKER status enum per D-2c. STUB_DETECTED is distinct per D-2d (returned before quality checks, prevents silent-success failure mode).
 model: sonnet
 effort: medium
-tools: [Read, Glob, Grep, Bash(python3:*)]
+tools: [Read, Glob, Grep, Bash]
 skills: [ai-development-guide, KB-cc-design, auditing-shared]
 ---
 ```
 
-**Rationale:**
+**Rationale (Bash widened to UNRESTRICTED in v5 per I-AA-602 / D-RC3-1):**
 
-- `Bash(python3:*)` restricted because quality-handler's Bash usage is script-only (detect_stubs.py + acceptance-test runners via python wrappers). If acceptance-tests are non-python (e.g., npm test), the orchestrator runs them and passes results to quality-handler. Validation needed at runtime — if direct test execution by quality-handler is required, Bash restriction needs to be widened.
+- **`Bash` unrestricted per cc-design.md (reviewer_verdict=approved).** The quality-handler invokes language-stack-specific test commands (pytest, npm test, cargo test, go test, dotnet test, mvn test, etc.) per the modified files declared in the task spec; restricting Bash to python3-only would mechanically break the agent for non-Python stacks per FR-2 + D-11 + Component 3 contract. Permissioning is handled via .claude/settings.json allow-list per the project sandbox pattern (see Security Considerations — Filesystem write surface). A candidate follow-on architectural decision (Path b in audit I-AA-602 recommended_resolution) would re-route all test invocation through run_phase_checks.py so quality-handler genuinely only consumes results; deferred as out-of-scope for this feature run, preserved in Risks/Future Extensibility.
 - `Write` deliberately absent per cc-design — the agent does NOT modify code, only evaluates. Control returns to orchestrator for revisions.
-- `memory:` field is **omitted** (v4 correction from v3, same as code-producer): `memory: none` is invalid Claude Code syntax per Gate 4 verification; field absence is canonical for no persistent memory.
-- `auditing-shared` in skills per cc-design; convention note 1 applies.
+- `memory:` field is **omitted** (v4 correction from v3, same as code-producer, preserved in v5): `memory: none` is invalid Claude Code syntax per Gate 4 verification; field absence is canonical for no persistent memory.
+- `auditing-shared` in skills per cc-design + ADR-0035 convention note 1.
 - Model upgrade to opus is reserved per Q-CC-1 for if classification errors prove frequent in operation.
 
 ##### Agent: execute-phase-quality-reviewer
@@ -1064,7 +1133,8 @@ skills: [KB-cc-design, KB-review-disciplines, auditing-shared]
 - `Bash(python3:*)` restricted (run_phase_checks.py coordinator + sub-script invocation).
 - `Agent` deliberately absent — does NOT delegate (per cc-design: "performs aggregation directly").
 - `Edit` deliberately absent — does NOT modify upstream artifacts.
-- `memory:` field is **omitted** (v4 correction from v3): same correction as code-producer + quality-handler.
+- `memory:` field is **omitted** (v4 correction from v3, preserved in v5): same correction as code-producer + quality-handler.
+- `auditing-shared` in skills per cc-design + ADR-0035 convention note 1 — phase-quality-reviewer materially depends on run_phase_checks.py + validate_pipeline_frontmatter.py + check_pipeline_discipline.py (3+ scripts).
 
 ##### Agent: execute-finalize-reconciler
 
@@ -1085,17 +1155,26 @@ memory: project
 - `Agent` (canonical name; cc-design used `Task` which is still a valid alias) for re-invoking upstream subagents (execute-task-code-producer, etc.) when dispatching reconciliation revisions. Per convention note 2, this is the subagent-dispatch tool, not the task-board tool. `TaskCreate`/`TaskUpdate` deliberately absent — the reconciler does not manage the session task-board; it dispatches via Agent and writes its log via Write.
 - `Write` retained per cc-design — owns quality-reconciliation-log.{json,md} authoring per cycle.
 - `memory: project` per cc-design — shares cycle-count state with execute-orchestrator (orchestrator increments; reconciler reads to check against cap). **Gate 4 verified VALID** — `project` is in the documented enum (`user` | `project` | `local`).
-- Skills divergence from existing planning-side `finalize-reconciler` (which has `[KB-review-disciplines, KB-documentation-criteria]`) is deliberate: the execute-side reconciler operates on the cc-design surface, not on document-structure surfaces, so KB-cc-design replaces KB-documentation-criteria. Both reconcilers retain KB-review-disciplines (verdict-issuance class precedent). The auditing-shared binding is the new convention per note 1.
+- Skills divergence from existing planning-side `finalize-reconciler` (which has `[KB-review-disciplines, KB-documentation-criteria]`) is deliberate: the execute-side reconciler operates on the cc-design surface, not on document-structure surfaces, so KB-cc-design replaces KB-documentation-criteria. Both reconcilers retain KB-review-disciplines (verdict-issuance class precedent). The auditing-shared binding is the new convention per note 1 (ratified by ADR-0035 cycle 3).
 
 ##### Frontmatter validator coverage
 
-The FR-6 frontmatter validator (`validate_pipeline_frontmatter.py`) is responsible for verifying that authored agent files conform to the canonical pattern. For these five new agents, the validator's checks should include:
+The FR-6 frontmatter validator (`validate_pipeline_frontmatter.py`) is responsible for verifying that authored agent files conform to the canonical pattern. **This subsection was rewritten in v5 per I-AA-601 BLOCKER to mechanically accept what v5's agent declarations express (memory optional, Task/Agent and TaskCreate/TaskUpdate as separate tool families per Gate 4, effort enum extended to include `max`).** For these five new agents, the validator's checks include:
 
-- All five required fields present: `model`, `effort`, `tools`, `skills`, `memory`
-- `tools:` values from a known whitelist (with the three new patterns — `Task` as synonym for `TaskCreate`, `Edit`, restricted `Bash(python3:*)` — added to the whitelist after Gate 4 validates them)
-- `skills:` values reference SKILL.md files that exist on disk (FR-9-e enforces this for `ai-development-guide`; the same check generalizes)
-- `memory:` value from known enum (`project` confirmed; `none` pending Gate 4 validation)
-- `model:` ∈ {opus, sonnet, haiku}; `effort:` ∈ {low, medium, high, xhigh}
+- **Required fields**: `model`, `effort`, `tools`, `skills`. (Four required, not five — `memory` is optional per Gate 4 verification.) The validator MUST emit a Level 0 / Level 1 finding when a required field is missing.
+- **Optional fields**: `memory`. When present, the value MUST be in the enum `{user, project, local}` per Gate 4 verification. The value `none` is INVALID Claude Code syntax and MUST be REJECTED by the validator with an explicit error ("`memory: none` is invalid; omit the field for no persistent memory or use one of `user|project|local`"). Field omission = no persistent memory (canonical pattern; the four required-field-only agents (code-producer, quality-handler, phase-quality-reviewer) do this).
+- **`tools:` whitelist**: `tools:` values from a known whitelist. The whitelist MUST treat **`Agent` and `TaskUpdate` as SEPARATE entries with separate semantics**:
+  - `Agent` = subagent dispatch (formerly `Task` pre-v2.1.63; `Task` is still a valid alias and the validator accepts it).
+  - `TaskUpdate` = task-board management (separate tool family; manages assistant's own todo list).
+  - **They are NOT synonyms**; conflating them was the v3-era misreading v4 corrects per convention note 2. The validator MUST NOT treat `Agent` as a synonym for `TaskCreate` or `TaskUpdate`. Also valid: `Task` as alias for `Agent` (pre-v2.1.63 form; still works per platform docs).
+  - `Edit` is VALID per Gate 4 verification (confirmed by Claude Code docs Debugger example).
+  - `Bash` and `Bash(<pattern>:*)` restrictions are both VALID per Gate 4 verification; agents may use either form per their security/feasibility trade-off. For execute-task-quality-handler in v5 specifically: unrestricted Bash per cc-design.md (see I-AA-602 resolution / D-RC3-1).
+- **`skills:` existence check**: `skills:` values reference SKILL.md files that exist on disk (FR-9-c enforces this for `ai-development-guide`; the same check generalizes to all bound skills including `auditing-shared` per ADR-0035 convention).
+- **`memory:` value enum** (when present): value MUST be in `{user, project, local}` per Gate 4 verification. The value `none` is INVALID Claude Code syntax and MUST be REJECTED. Field omission = no persistent memory (canonical pattern).
+- **`model:` enum**: `model:` ∈ {opus, sonnet, haiku} per KB-cc-platform.
+- **`effort:` enum**: `effort:` ∈ **{low, medium, high, xhigh, max}** per KB-cc-platform/references/extensions.md. (max = maximum effort; Opus 4.7 only on max; falls back to high on other models.)
+
+For verification, see Convention notes 1, 2, 3 above in this subsection — the validator coverage MUST reflect those notes' resolved state, not regenerate the v3-era pre-Gate-4 questions.
 
 The validator does NOT check that the agent body correctly uses the bound skills — that's a runtime concern, not a frontmatter concern.
 
@@ -1110,6 +1189,8 @@ The Plan author should generate one task per agent-file creation:
 - Task: Author `.claude/agents/execute-finalize-reconciler.md` with frontmatter + body per Component 5
 
 Per AC-FR-9-e sequencing constraint: the `ai-development-guide` SKILL.md install task MUST precede the code-producer + quality-handler agent-authoring tasks (they bind to it). Similarly, the `auditing-shared` SKILL.md must exist before any of the four agents binding to it can become functional — but `auditing-shared` is pre-existing (per ADR-0031 v4.6.0), so no new install task is needed; the dependency is documented in the Plan but is not gating.
+
+In addition, per I-AA-605 (Change Impact Map wildcard row): ~20+ planning-side agent author-prompts require ~1-line edits to emit `doc_type` per ADR-0032 Change 4. Plan-stage task generation produces one task per affected agent OR one batched task covering all ~20+ agents per the plan-author's discretion. The edits are mechanical; the affected agents' bodies (their substantive authoring logic) are NOT modified — only the author-prompt frontmatter section gains the `doc_type` field.
 
 ### Data Representation Decision (When Introducing New Structures)
 
@@ -1156,7 +1237,7 @@ Every artifact in the pipeline (planning + execution) carries a `doc_type` field
 
 **Rationale**: `doc_type` is the canonical dispatch key for type-specific validation (per-doc-type vocabulary + per-doc-type required fields + per-doc-type traceability rules). Encoding the type in frontmatter makes it cheap for tools and authors to look up; alternative (inferring from filename or path) is brittle.
 
-**Implementation note**: the existing artifact templates need updates to set `doc_type` in their default frontmatter. This is in scope for the FR-7 implementation tasks.
+**Implementation note**: the existing artifact templates need updates to set `doc_type` in their default frontmatter. This is in scope for the FR-7 implementation tasks. **Additionally per I-AA-605: ~20+ planning-side agent author-prompts need to be updated to emit `doc_type` in their authored artifacts going forward; the Change Impact Map enumerates this with a wildcard row, and §Migration Strategy documents the rollout approach.**
 
 ### Contract Definitions
 
@@ -1287,7 +1368,7 @@ The `log_state_transition.py` script accepts JSON via stdin:
 ```json
 {
   "timestamp": "<ISO-8601-UTC>",
-  "transition_name": "<symbolic-name-from-12-row-table>",
+  "transition_name": "<symbolic-name-from-14-row-table>",
   "from_state": "<state-name>",
   "to_state": "<state-name>",
   "trigger": "<what-caused-the-transition>",
@@ -1387,7 +1468,7 @@ Both counters are owned by `execute-orchestrator`:
 | Per-task quality cycle | quality-handler returns NEEDS_REVISION | Task selection (new task starts at cycle 0) | 4 |
 | Phase reconciliation cycle | finalize-reconciler dispatches | Phase start (new phase starts at cycle 0) | 4 |
 
-Both counters carry through `state-transitions.log` events for audit trail. When either cap is reached (cycle 4), the orchestrator transitions to the appropriate escalated state per the 12-row transition table.
+Both counters carry through `state-transitions.log` events for audit trail. When either cap is reached (cycle 4), the orchestrator transitions to the appropriate escalated state per the 14-row transition table.
 
 #### `doc_type` propagation (per ADR-0032)
 
@@ -1398,11 +1479,13 @@ Every artifact produced carries `doc_type` in its frontmatter; this field is con
 
 The `doc_type` is canonical at authoring time; it does NOT change through the artifact's lifecycle. (Status changes via state-transition hooks; `doc_type` is immutable.)
 
+**Migration note per I-AA-605**: ~20+ planning-side agent author-prompts require ~1-line edits to emit `doc_type` going forward; this is enumerated in the Change Impact Map wildcard row and discussed in §Migration Strategy.
+
 ### State Transitions and Invariants (When Applicable)
 
-The `execute-orchestrator` owns a 12-state machine governing the execution pipeline. The states and transitions are derived from cc-design.md D-16 substrate.
+The `execute-orchestrator` owns a state machine governing the execution pipeline. The states and transitions are derived from cc-design.md D-16 substrate. **Per I-AA-609 (cycle 3): the inventory enumerates 12 substantive transitions + 2 boundary transitions (T0 INIT, T13 TERMINATED) = 14 total. The states table similarly enumerates 12 substantive + 2 boundary states.**
 
-#### States (12 total)
+#### States (12 substantive + 2 boundary = 14 total)
 
 | State | Meaning | Owning agent activity |
 |---|---|---|
@@ -1419,12 +1502,17 @@ The `execute-orchestrator` owns a 12-state machine governing the execution pipel
 | `escalated_phase_reconciliation` | Phase 4-cycle cap reached; user escalation | (no activity; user resolution) |
 | `escalated_phase_blocker` | BLOCKER verdict from phase-quality-reviewer; direct escalation | (no activity; user resolution) |
 
-Plus implicit boundary states `INIT` (orchestrator startup) and `TERMINATED` (final).
+Plus **2 boundary states** (per I-AA-609 cycle-3 clarification):
+- **`INIT`** (orchestrator startup; entry point) — the orchestrator's pre-`pending` state at process start; never a destination for a substantive transition; only the source of T0.
+- **`TERMINATED`** (run end; exit point) — the orchestrator's post-substantive-state final state; never a source for a subsequent transition; only the destination of T13.
 
-#### Transitions (12 total per cc-design.md D-16)
+**Total states**: 12 substantive + 2 boundary = 14.
+
+#### Transitions (12 substantive + 2 boundary = 14 total per cc-design.md D-16 + cycle-3 I-AA-609 boundary additions)
 
 | # | Transition | from_state | to_state | trigger |
 |---|---|---|---|---|
+| **0** | **Orchestrator init (boundary)** | **(INIT)** | **pending** | **orchestrator startup; first task selected from tasks.json** |
 | 1 | Task start | `pending` | `producing` | orchestrator selects task from tasks.json |
 | 2 | Code-producer completes | `producing` | `quality_checking` | code-producer returns `completed` |
 | 3 | Quality-handler approves | `quality_checking` | `done` | quality-handler returns `APPROVED` |
@@ -1437,12 +1525,13 @@ Plus implicit boundary states `INIT` (orchestrator startup) and `TERMINATED` (fi
 | 10 | Reconciliation cycle complete | `reconciling` | `phase_quality_check` | reconciler dispatches; re-execution + re-review (phase cycle counter incremented) |
 | 11 | Phase reconciliation exhausted | `reconciling` | `escalated_phase_reconciliation` | phase cycle 4 reconciliation |
 | 12 | Phase-quality blocker | `phase_quality_check` | `escalated_phase_blocker` | reviewer verdict `BLOCKER` |
+| **13** | **Run termination (boundary)** | **(any state)** | **(TERMINATED)** | **gate-pass to Deliverable Packaging (from phase_complete) OR user resolution (from any escalated_*) OR abort** |
 
 #### State machine diagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> pending: orchestrator initialized
+    [*] --> pending: T0 INIT (orchestrator initialized)
     pending --> producing: T1 task start
     producing --> quality_checking: T2 code-producer completes
     quality_checking --> done: T3 quality-handler APPROVED
@@ -1457,11 +1546,11 @@ stateDiagram-v2
     reconciling --> phase_quality_check: T10 cycle complete (phase cycle++)
     reconciling --> escalated_phase_reconciliation: T11 phase cycle 4
     phase_quality_check --> escalated_phase_blocker: T12 reviewer BLOCKER
-    phase_complete --> [*]: gate-pass to Deliverable Packaging
-    escalated_task_quality --> [*]: user resolution
-    escalated_stub --> [*]: user resolution
-    escalated_phase_reconciliation --> [*]: user resolution
-    escalated_phase_blocker --> [*]: user resolution
+    phase_complete --> [*]: T13 gate-pass to Deliverable Packaging
+    escalated_task_quality --> [*]: T13 user resolution
+    escalated_stub --> [*]: T13 user resolution
+    escalated_phase_reconciliation --> [*]: T13 user resolution
+    escalated_phase_blocker --> [*]: T13 user resolution
 ```
 
 #### Invariants
@@ -1471,13 +1560,13 @@ The state machine enforces these invariants (checked by orchestrator's transitio
 1. **Single state at any time per phase**: the orchestrator is in exactly one state per phase scope. Multiple phases in flight is not supported in v1 (sequential phases only).
 2. **Per-task quality counter scoped to task**: the per-task cycle counter increments only on T4 (NEEDS_REVISION); resets on T1 (new task start). Carrying across tasks would conflate independent loops.
 3. **Phase reconciliation counter scoped to phase**: the phase cycle counter increments only on T10 (reconciliation cycle complete); resets on T7 (new phase enters phase_quality_check). Per D-12 symmetric application.
-4. **No skip-states**: every transition matches an entry in the 12-row table. Transitions not in the table are invalid; the orchestrator emits a Level-1 finding and halts rather than executing an undefined transition.
-5. **Application-level hook fires on EVERY transition** (per D-16 + Q-CC-5): `log_state_transition.py` invoked at each transition point. Hook failure does NOT block the transition (per D-16 observer-only); instead, the failure surfaces as a Level-1 finding (per AC-FR-5-e).
-6. **Escalated states are terminal for the phase**: `escalated_task_quality`, `escalated_stub`, `escalated_phase_reconciliation`, `escalated_phase_blocker` are absorbing states from the phase's perspective. The orchestrator hands off to user resolution; the phase does not progress until the user provides a resolution path (PRD amendment / named-exempt / abort per AC-FR-10-c).
+4. **No skip-states**: every transition matches an entry in the 14-row table (12 substantive T1-T12 + 2 boundary T0/T13). Transitions not in the table are invalid; the orchestrator emits a Level-1 finding and halts rather than executing an undefined transition.
+5. **Application-level hook fires on EVERY transition** (per D-16 + Q-CC-5; **scope clarified per I-AA-609 cycle 3**): `log_state_transition.py` invoked at each transition point — **including T0 and T13 boundary transitions**. Hook failure does NOT block the transition (per D-16 observer-only); instead, the failure surfaces as a Level-1 finding (per AC-FR-5-e).
+6. **Escalated states are terminal for the phase**: `escalated_task_quality`, `escalated_stub`, `escalated_phase_reconciliation`, `escalated_phase_blocker` are absorbing states from the phase's perspective. The orchestrator hands off to user resolution; the phase does not progress until the user provides a resolution path (PRD amendment / named-exempt / abort per AC-FR-10-c). User resolution drives T13 (TERMINATED).
 7. **`doc_type` is immutable per artifact**: an artifact's `doc_type` is set at authoring time and does not change through state transitions. Status changes; doc_type does not.
 8. **`status` field updates at every gate-pass per FR-5** (AC-FR-5-a/b/c/d): the orchestrator's transition logic invokes the state-transition hook which updates artifact frontmatter `status` to the next state in the appropriate per-doc-type vocabulary (per ADR-0032).
-9. **No silent transitions**: every transition is logged to `state-transitions.log`. Per ADR-0029 + ADR-0033, unlogged transitions are Scope-Deviations and surface as findings.
-10. **Cycle counter equivalence**: at any moment, the orchestrator's in-memory cycle counter MUST equal the count of corresponding T4/T10 entries in `state-transitions.log`. The validator (FR-6) checks this invariant at every gate; mismatch indicates lost transitions and surfaces as a BLOCKER finding.
+9. **No silent transitions**: every transition is logged to `state-transitions.log` — including T0/T13 boundary transitions. Per ADR-0029 + ADR-0033, unlogged transitions are Scope-Deviations and surface as findings.
+10. **Cycle counter equivalence** (**scope clarified per I-AA-609 cycle 3**): at any moment, the orchestrator's in-memory cycle counter MUST equal the count of corresponding **T4 (per-task NEEDS_REVISION)** and **T10 (phase reconciliation cycle)** entries in `state-transitions.log`. The validator (FR-6) checks this invariant at every gate; mismatch indicates lost transitions and surfaces as a BLOCKER finding. **Boundary transitions (T0, T13) do NOT affect cycle counters** (they're entry/exit events, not cycle increments).
 
 ### Claude Code / Project Filesystem Design
 
@@ -1523,26 +1612,26 @@ The actual file edits are Plan + Execution work; this Blueprint documents the sp
 
 **Application-level hooks only** per Q-CC-5 disambiguation (NOT Claude Code platform hooks).
 
-The `execute-orchestrator` invokes `auditing-shared/scripts/log_state_transition.py` at each procedural transition point (12 transitions per the State Transitions table above). Hook is observer-only in v1 per D-16; hook failure does NOT block the transition but surfaces as Level-1 finding per AC-FR-5-e.
+The `execute-orchestrator` invokes `auditing-shared/scripts/log_state_transition.py` at each procedural transition point (14 transitions per the State Transitions table above — 12 substantive + 2 boundary). Hook is observer-only in v1 per D-16; hook failure does NOT block the transition but surfaces as Level-1 finding per AC-FR-5-e.
 
 Platform-hook surface (PreToolUse / PostToolUse / SessionStart / Stop / etc.) is NOT modified by this feature.
 
 #### Skills
 
-**Three skill additions + one existing-skill extension**:
+**Three skill additions + one existing-skill extension + one Skill-binding convention ratification (ADR-0035)**:
 
 | Skill | Action | Path | Rationale |
 |---|---|---|---|
 | `ai-development-guide` | New install (sourced from uploaded SKILL__2_.md per AC-FR-9-e) | `.claude/skills/ai-development-guide/SKILL.md` + references/ as needed | FR-9 binding requirement; D-11 binding criterion |
 | `auditing-github-actions` | New skill extracted via git mv (preserves history) | `.claude/skills/auditing-github-actions/SKILL.md` + scripts/audit_workflow.py + references/action_versions.md | FR-8-a + ADR-0031 canonical-helper-home; IN-002 transform |
 | `auditing-codespaces` | New skill stub | `.claude/skills/auditing-codespaces/SKILL.md` + scripts/audit_codespaces.py (stub) | FR-8-b + Q-CC-4 stub semantics |
-| `auditing-shared` | Extended (skill exists; scripts are new) | Add 5 scripts: detect_stubs, run_phase_checks, log_state_transition, validate_pipeline_frontmatter, check_pipeline_discipline | D-3, D-15, D-16, FR-6, ADR-0031, ADR-0032 |
+| `auditing-shared` | Extended (skill exists; scripts are new) + **Skill-binding convention ratified by ADR-0035 (cycle 3)** | Add 5 scripts: detect_stubs, run_phase_checks, log_state_transition, validate_pipeline_frontmatter, check_pipeline_discipline | D-3, D-15, D-16, FR-6, ADR-0031, ADR-0032, **ADR-0035** |
 
 No existing skills are removed. `KB-github-actions-platform/SKILL.md` is edited per AC-FR-8-e to point to the new `auditing-github-actions` skill for audit functionality.
 
 #### Sub-Agents
 
-**Five new agents + one extended existing agent** (per Components 1-6 in Main Components section above; full inventory at Change Impact Map).
+**Five new agents + one extended existing agent** (per Components 1-6 in Main Components section above; full inventory at Change Impact Map). **Plus ~20+ planning-side agent author-prompt edits per I-AA-605 / D-RC3 enumeration** (mechanical ~1-line `doc_type` emission additions; not agent-body modifications).
 
 The reasoning configurations follow KB-cc-design Principle 9 (reasoning-config intentional): opus/high for state-machine reasoning (orchestrator) and judgment-bearing aggregation (phase-quality-reviewer, finalize-reconciler); sonnet/medium for bounded transformations (code-producer, quality-handler).
 
@@ -1855,7 +1944,7 @@ The execution pipeline produces structured logs at multiple granularities:
 
 | Artifact | Granularity | Content | Audience |
 |---|---|---|---|
-| `state-transitions.log` (JSONL) | Per-transition (12 transitions × N occurrences over a feature run) | timestamp + transition payload per Contract 5 | Audit trail; future analytics (FR-13) |
+| `state-transitions.log` (JSONL) | Per-transition (14 transitions × N occurrences over a feature run, including T0/T13 boundary transitions) | timestamp + transition payload per Contract 5 | Audit trail; future analytics (FR-13) |
 | `per-task-execution-result.{json,md}` | Per task | task_id + status + filesModified + findings + scope-deviations | Phase-quality-reviewer; reconciler dispatch context; deliverable archive |
 | `phase-quality-report.{json,md}` | Per phase-quality gate | Dimensional verdict + findings + audit-counter delta | Reconciler input; deliverable archive; FR-13 analytics |
 | `quality-reconciliation-log-cycle-<N>.{json,md}` | Per reconciliation cycle | Per-cycle dispatch records + dispatched-findings + cycle outcome (CONVERGED / RECONCILIATION_EXHAUSTED) | Audit trail; cross-feature reconciliation pattern analytics |
@@ -1881,11 +1970,11 @@ This Blueprint provides the **high-level phase decomposition** for the Plan-auth
 
 ### Implementation Approach
 
-**Additive deployment**: this feature is purely additive at the Claude Code primitive level. No existing agents or skills are removed; the one existing modification (`shared-document-reviewer` doc_type taxonomy extension per ADR-0032 + D-9) is backward-compatible (existing artifacts continue to work; new doc_types add to the vocabulary without removing old).
+**Additive deployment**: this feature is purely additive at the Claude Code primitive level. No existing agents or skills are removed; the one existing modification (`shared-document-reviewer` doc_type taxonomy extension per ADR-0032 + D-9) is backward-compatible (existing artifacts continue to work; new doc_types add to the vocabulary without removing old). Planning-side agent author-prompts gain ~1-line `doc_type` emission edits (per I-AA-605) — the agent-body authoring logic is unchanged.
 
-**Spec-then-implementation**: the three ADRs (0032, 0033, 0034) document spec-level decisions. The actual implementation work follows the spec: `shared-conventions.md` v1 → v2 edits + new fields → templates + agent prompts + scripts. The implementation feature run (a follow-on feature) consumes this Blueprint to author detailed plan-v1.md tasks.
+**Spec-then-implementation**: the four ADRs (0032, 0033, 0034, 0035) document spec-level decisions. The actual implementation work follows the spec: `shared-conventions.md` v1 → v2 edits + new fields → templates + agent prompts + scripts. The implementation feature run (a follow-on feature) consumes this Blueprint to author detailed plan-v1.md tasks.
 
-**Skill-install-before-binding sequencing**: `ai-development-guide` skill MUST be installed at `.claude/skills/ai-development-guide/SKILL.md` before any execution-phase agent definition that binds to it becomes functional (per AC-FR-9-e). The Plan stage sequences the install task before agent-authoring tasks that include `ai-development-guide` in their `skills:` frontmatter.
+**Skill-install-before-binding sequencing**: `ai-development-guide` skill MUST be installed at `.claude/skills/ai-development-guide/SKILL.md` before any execution-phase agent definition that binds to it becomes functional (per AC-FR-9-e). The Plan stage sequences the install task before agent-authoring tasks that include `ai-development-guide` in their `skills:` frontmatter. Same dependency applies to `auditing-shared` per ADR-0035 — but the skill is pre-existing, so no new install task; the dependency is documentary.
 
 ### Technical Dependencies and Implementation Order
 
@@ -1893,7 +1982,7 @@ This Blueprint provides the **high-level phase decomposition** for the Plan-auth
 
 The following ordering constraints apply during Plan + Execution. Plan-stage tasks must respect these as DAG edges.
 
-1. **ADR ratification** (Architecture Audit pass at Gate 4): ADR-0032, ADR-0033, ADR-0034 must reach `status: accepted` before any spec-level edits or implementation work begins. Architecture Audit is the gate.
+1. **ADR ratification** (Architecture Audit pass at Gate 4): ADR-0032, ADR-0033, ADR-0034, **ADR-0035** must reach `status: accepted` before any spec-level edits or implementation work begins. Architecture Audit is the gate. (Note: ADR-0035 was authored in cycle 3 per I-AA-603 / D-RC3-2; advances to accepted at next round of Architecture Audit pass.)
 
 2. **shared-conventions.md v1 → v2 edits** (per ADR-0032 5 changes): MUST land before:
    - Frontmatter validator (`validate_pipeline_frontmatter.py`) — validator consumes the new vocabulary + required fields
@@ -1922,9 +2011,11 @@ The following ordering constraints apply during Plan + Execution. Plan-stage tas
 
 8. **Sub-agent definitions** (5 new + 1 modified): depend on skills + scripts being in place. The five new agents can be authored in parallel once their substrate is ready. `shared-document-reviewer` modification can happen in parallel.
 
-9. **Permission policy edits** (`.claude/settings.json` allow-list extensions): MUST happen alongside script creation (so the new scripts can actually be invoked during testing). One-shot edit covering all 7+ scripts.
+9. **Planning-side agent author-prompt edits (~20+ agents per I-AA-605)**: can happen in parallel with the rest of the work; depends on shared-conventions.md v2 (so the agents know which doc_type values to emit). MUST land before the next post-ratification feature run, otherwise that run will trigger validator failures at Gate 0 for every artifact those agents author.
 
-10. **End-to-end testing**: requires all above. Tests in Test Boundaries section below.
+10. **Permission policy edits** (`.claude/settings.json` allow-list extensions): MUST happen alongside script creation (so the new scripts can actually be invoked during testing). One-shot edit covering all 7+ scripts.
+
+11. **End-to-end testing**: requires all above. Tests in Test Boundaries section below.
 
 #### Cross-Layer Sequencing Notes
 
@@ -1936,7 +2027,14 @@ Single-layer feature; no cross-layer sequencing. The above ordering is intra-Cla
 
 **Artifact migration**: NOT in scope. Existing pipeline artifacts under the prior spec stay as authored. The discipline-5 mechanical enforcement (D-15) does not retroactively scan archived artifacts; it scans new artifacts produced after this feature ships.
 
-**`doc_type` field backfill**: per AC-FR-11-d's scoping rule, historical artifacts are not required to add `doc_type`. The validator will tolerate missing `doc_type` on artifacts whose `generated:` timestamp predates the feature's deployment date.
+**`doc_type` field backfill** (clarified in v5 per I-AA-605): per AC-FR-11-d's scoping rule, historical artifacts are not required to add `doc_type`. The validator will tolerate missing `doc_type` on artifacts whose `generated:` timestamp predates the feature's deployment date.
+
+**doc_type backfill — author-prompt vs historical artifact distinction (NEW per I-AA-605 / D-RC3 enumeration, cycle 3)**: ADR-0032 Change 4 makes `doc_type` a universal-required field. Two distinct populations apply:
+
+- **(a) Historical artifacts (pre-implementation date)** — per AC-FR-11-d, the validator tolerates missing `doc_type` for these. No migration required.
+- **(b) Planning-side agent author-prompts** — these must be modified to emit `doc_type` in their authored artifacts going forward (post-ratification). The Change Impact Map enumerates the ~20+ planning-side agent author-prompts (the wildcard row); Plan-stage task generation produces the corresponding tasks. Without this enumeration, the first post-ratification feature run would trigger validator failures at Gate 0 for every artifact those agents author.
+
+**Incremental rollout option**: if Plan-stage decides the ~20+ agent edits are too large for a single batch, the work can be split — agents are independent and the edits are mechanical. A pre-shipping subset (e.g., the agents on the critical path of the next planned feature run) can be edited first; the remainder follows in the same feature run or a subsequent dedicated rollout feature. The validator's enforcement is forward-scoped (per AC-FR-11-d), so the rollout sequencing has no historical-artifact impact.
 
 ### Feature Flags & Rollout
 
@@ -1964,7 +2062,9 @@ The 7 new scripts + 1 stub + 1 relocated script (8 total invocation patterns) re
 
 #### Filesystem write surface
 
-The execution pipeline writes to `working/feature/<feature-slug>/` only. Subagents have explicit `Write` tool permission scoped to this directory. The orchestrator does NOT have `Write` (per cc-design.md orchestrator profile: tools include `[Read, Glob, Grep, Bash, Task, TaskUpdate]`, NOT `Write`). State-transition hook writes go through the script, which is permitted via the allow-list.
+**Rewritten in v5 per I-AA-608 (cycle 3) — earlier v3+ versions inaccurately stated the orchestrator does NOT have Write.**
+
+The execution pipeline writes to `working/feature/<feature-slug>/` only. **The orchestrator HAS Write** per the v3 defensive reading (retained in v4+) because Blueprint Outputs include `pipeline-run-summary.json` and `state-transitions.log` which the orchestrator authors directly (see execute-orchestrator YAML and rationale at §Agent Frontmatter Specifications: `tools: [Read, Glob, Grep, Write, Bash(python3:*), Agent, TaskUpdate]`). Subagents have Write tool permission scoped to `working/feature/<feature-slug>/` per the project sandbox. The state-transition hook script (`log_state_transition.py`) provides write access for transition logging via the .claude/settings.json allow-list pattern. **quality-handler does NOT have Write** (per cc-design + Component 3 contract: returns verdict to orchestrator; does not modify artifacts).
 
 #### No external service calls
 
@@ -1973,6 +2073,10 @@ The pipeline is fully offline. No MCP servers added (per cc-design.md), no API c
 #### Stub script trust boundary
 
 `auditing-codespaces/scripts/audit_codespaces.py` is a stub (per FR-8-b + Q-CC-4). It is permitted via the same allow-list pattern; it returns `{"stub": true, "findings": []}` deterministically. A future feature that authors the real audit script will pass through the same allow-list pattern (no new permission needed).
+
+#### Bash-widening security note (per I-AA-602 / D-RC3-1)
+
+The quality-handler's Bash tool is unrestricted (per cc-design.md verbatim). This trades a wider attack surface for the ability to run language-stack-specific test commands (pytest, npm test, cargo test, go test, dotnet test, mvn test, etc.). Mitigation: the agent's invocation scope is `working/feature/<feature-slug>/` per the project sandbox; the test commands are invoked by the task spec which is itself authored by `plan-author` and reviewed at Plan Gate. The `.claude/settings.json` allow-list governs permission boundaries. Future Extensibility: re-route via `run_phase_checks.py` per Path b in I-AA-602 resolution — would constrain quality-handler to consuming results rather than running commands directly.
 
 ### Frontend
 
@@ -2023,7 +2127,7 @@ N/A — no data layer.
 
 **Unit tests** (each script + state-machine logic):
 - 5 new scripts: each has unit tests for primary logic paths + edge cases
-- Orchestrator state-machine: tests cover all 12 transitions + invariant violations
+- Orchestrator state-machine: tests cover all 14 transitions (12 substantive + 2 boundary) + invariant violations
 - Estimated count: ~30-40 unit tests total
 
 **Integration tests** (multi-component flows):
@@ -2064,18 +2168,19 @@ For this Blueprint specifically:
 - 60 ACs → mapped to design elements via cc-design.md's Acceptance criteria contribution table (referenced at the end of each FR's AC list)
 - 60 ACs → satisfied by Plan tasks (authored at Plan stage)
 - Plan tasks → covered by Acceptance Tests (authored after Plan stage) and Phase Validators (authored alongside Plan)
+- Two ACs (AC-FR-6-e and AC-FR-10-b) carry a transcription footnote correcting PRD-inherited ADR-0021 citation to ADR-0017 per ADR-0034 + D-RC3-3; downstream artifacts should cite ADR-0017.
 
 **Cross-artifact-audit at the execution-side**: per ADR-0033 audit-stage enforcement extension, `execute-phase-quality-reviewer` scans per-task-execution-result artifacts for unsurfaced deviations; `execute-finalize-reconciler` scans phase-quality-report for the same. Symmetric with planning-side Architecture Audit + Cross-Artifact Audit pattern.
 
 ### Early Verification Point
 
-**Architecture Audit (Gate 4)**: the next stage after this Blueprint. `review-architecture-auditor` reviews:
-- Internal consistency (the Blueprint's claims align with cc-design.md substrate; ADRs are coherent)
+**Architecture Audit (Gate 4)**: the next stage after this Blueprint. Round 7 (post-cycle-3) of `review-architecture-auditor` will review:
+- Internal consistency (the Blueprint's claims align with cc-design.md substrate; ADRs are coherent; ADR-0035 ratifies the binding convention per ADR-0029 + ADR-0033 brief-honor)
 - Completeness (every FR's ACs are present; every AC has design-element coverage; no orphan ADRs)
-- Rule compliance (KB-documentation-criteria + shared-conventions.md adherence; KB-cc-design principles applied)
+- Rule compliance (KB-documentation-criteria + shared-conventions.md adherence; KB-cc-design principles applied; canonical-agent-frontmatter-pattern check; canonical-platform-docs verification — both r6-established checks)
 - Clarity (the Blueprint is readable; the substrate is traceable)
 
-Gate 4 is the early verification point before plan-stage commits. Any issues surface here for revision (with reconciliation cycles per ADR-0017 cap if needed). If Gate 4 passes, Plan Authoring proceeds.
+Gate 4 is the early verification point before plan-stage commits. Any issues surface here for revision (with reconciliation cycles per ADR-0017 cap if needed — cycle 3 of 4 used; 1 cycle remaining as of authoring of v5). If Gate 4 passes, Plan Authoring proceeds.
 
 ### Output Comparison (When Replacing or Modifying Existing Behavior)
 
@@ -2083,16 +2188,19 @@ Gate 4 is the early verification point before plan-stage commits. Any issues sur
 
 For the `shared-document-reviewer` modification (per D-9 second role): backward-compatibility is verified by unit tests that exercise the reviewer against existing-doc_type artifacts; new doc_types extend the dispatch table without altering pre-existing dispatch logic.
 
+For the ~20+ planning-side agent author-prompt edits (per I-AA-605): backward-compatibility is verified by Plan-stage tests that exercise the agents' authored artifacts against the FR-6 frontmatter validator after the edit — the edits are mechanical (~1-line addition); regression risk is low.
+
 ### Operational Verification (When Pipeline / Infra / Migration in Scope)
 
 **The first feature run using the new execution pipeline is the operational verification.** That feature run will produce the execution-phase artifacts the design specifies (per-task-execution-result + phase-quality-report + quality-reconciliation-log + state-transitions.log + pipeline-run-summary.json) and exercise the full state machine.
 
 Pre-conditions for declaring the design operationally verified:
 1. First feature run completes (either ships normally or escalates with documented reason)
-2. All 12 state transitions observed at least once across the run (the state-transitions.log is replayable)
+2. All 14 state transitions (12 substantive + 2 boundary) observed at least once across the run (the state-transitions.log is replayable)
 3. No invariant violations (validator's invariant-10 check passes at every gate)
 4. ADR-0033 Scope-Deviation surfacing observed in practice (i.e., when a deviation arises, it surfaces at the expected location)
-5. Audit-counter delta is populated and meaningful (per FR-12 + Q-CC-3 per-domain breakdown)
+5. ADR-0035's Skill-binding convention exercised by the four affected agents at runtime (the SKILL.md content is referenced; not a vestigial binding)
+6. Audit-counter delta is populated and meaningful (per FR-12 + Q-CC-3 per-domain breakdown)
 
 If operational issues arise (e.g., the dimensional verdict structure proves inadequate; the 4-cycle cap is wrong for execution-side; the dispatch taxonomy needs additional rows), the design is revised per ADR-0005 supersession discipline. The substrate refinement audit trail (the 4 refinements surfaced during cc-design.md authoring) is the precedent: substrate detail unavailable at design time may emerge at operation time; the design adapts.
 
@@ -2128,6 +2236,14 @@ The D-15 broader inventory + per-discipline mechanical scripts are out of scope 
 
 ADR-0033 articulates the audit-stage enforcement requirement (execute-phase-quality-reviewer scans inputs for unsurfaced deviations; execute-finalize-reconciler scans phase-quality-report for the same). V1 ships the requirement statement in agent prompts; mechanical enforcement via a candidate `scan_unsurfaced_deviations.py` script is deferred to follow-on feature. The mechanism-α pattern (ADR-0030) is the model.
 
+### I-AA-602 Path b — re-route quality-handler test invocation through run_phase_checks.py
+
+The cycle-3 D-RC3-1 decision widened quality-handler's Bash to UNRESTRICTED to match cc-design.md verbatim. The audit's Path b alternative (re-architect so quality-handler genuinely only consumes results, with all test commands invoked by run_phase_checks.py centrally) is preserved as a future-extensibility candidate. The re-architecture would: (a) extract all language-stack test-command invocation logic from quality-handler to a centralized location; (b) restrict quality-handler's Bash back to a narrower set; (c) require Component 3's contract to be revised. Deferred because Path b would re-open the D-2c quality-handler contract and exceed cycle scope.
+
+### KB-cc-design "helper-skill bindings vs knowledge-skill bindings" section (deferred per ADR-0035 Implementation Guidance)
+
+ADR-0035's Implementation Guidance notes that KB-cc-design may grow a section canonicalizing the helper-skill-binding-vs-knowledge-skill-binding distinction. Deferred to a follow-on KB-enhancement feature, not blocking ratification of ADR-0035.
+
 ### Cross-feature analytics pass (FR-13)
 
 FR-13 specifies that quality-reconciliation log entries are machine-parseable so future analytics can extract cross-feature patterns. The actual analytics tool is deferred:
@@ -2148,9 +2264,9 @@ ADR-0034 introduced the "ADR-as-corrective-reference for documentary mis-attribu
 
 ### Template additions per FR-7-d
 
-This Blueprint introduces 5 execution-phase artifact templates covering 4 of 5 AC-FR-7-c floor items (per-task-execution-result for "per-task execution log"; phase-quality-report for "phase-quality report"; quality-reconciliation-log for "quality-reconciliation log per cycle"; pipeline-run-summary for "execution-reconciliation log" — the feature-run-level reconciliation aggregation) plus 1 beyond-floor item (state-transitions-log-entry-schema, the JSONL entry schema per AC-FR-7-d). The 5th floor item ("frontmatter-validation report") is satisfied by the script-output schema defined inline in `validate_pipeline_frontmatter.py` source; this reading of AC-FR-7-a's "named in the Blueprint" applies a substantive interpretation — the frontmatter-validation report is named as a script JSON output rather than a separate pair-pattern artifact, and the script's source is its canonical schema location. This disposition is explicitly surfaced (see Path-B rationale in Update History below and the AC-FR-7 floor coverage subsection) per ADR-0029 + ADR-0033 no-silent-absorption discipline. Per AC-FR-7-d, additional artifacts produced by future design evolution must conform to AC-FR-7-a + AC-FR-7-b. The template pattern (D-5 pair pattern; doc_type per ADR-0032) is extensible.
+This Blueprint introduces 5 execution-phase artifact templates covering 4 of 5 AC-FR-7-c floor items (per-task-execution-result for "per-task execution log"; phase-quality-report for "phase-quality report"; quality-reconciliation-log for "quality-reconciliation log per cycle"; pipeline-run-summary for "execution-reconciliation log" — the feature-run-level reconciliation aggregation) plus 1 beyond-floor item (state-transitions-log-entry-schema, the JSONL entry schema per AC-FR-7-d). The 5th floor item ("frontmatter-validation report") is satisfied by the script-output schema defined inline in `validate_pipeline_frontmatter.py` source; this reading of AC-FR-7-a's "named in the Blueprint" applies a substantive interpretation — the frontmatter-validation report is named as a script JSON output rather than a separate pair-pattern artifact, and the script's source is its canonical schema location. This disposition is explicitly surfaced (see Path-B rationale in Update History below and the AC-FR-7 floor coverage subsection) per ADR-0029 + ADR-0033 no-silent-absorption discipline. **Per ADR-0033 §Context (revised cycle 3 per I-AA-606): pipeline-run-summary serves as the PRD AC-FR-7-c "execution-reconciliation log" floor item; the "frontmatter-validation report" floor item exists as a JSON-output schema in validate_pipeline_frontmatter.py source rather than as a pair-pattern artifact — outside ADR-0033's per-artifact Scope-Deviation surfacing scope.** Per AC-FR-7-d, additional artifacts produced by future design evolution must conform to AC-FR-7-a + AC-FR-7-b. The template pattern (D-5 pair pattern; doc_type per ADR-0032) is extensible.
 
-### AC-FR-7 floor coverage (added in v2 per I-AA-001 Path B)
+### AC-FR-7 floor coverage (added in v2 per I-AA-001 Path B; cross-referenced by ADR-0033 §Context per I-AA-606 cycle 3)
 
 The PRD AC-FR-7-c enumerates a 5-item floor; the Blueprint addresses each as follows:
 
@@ -2159,8 +2275,8 @@ The PRD AC-FR-7-c enumerates a 5-item floor; the Blueprint addresses each as fol
 | per-task execution log | Templated as `per-task-execution-result-template.md` (pair pattern per D-5; `.json` + `.md` halves) | Direct map; pair pattern fits per-task semantics |
 | phase-quality report | Templated as `phase-quality-report-template.md` (pair pattern; D-13 dimensional verdict structure) | Direct map; pair pattern fits per-phase semantics |
 | quality-reconciliation log (per cycle) | Templated as `quality-reconciliation-log-template.md` (pair pattern; one per reconciliation cycle) | Direct map; D-12 cycle structure preserved |
-| frontmatter-validation report | Covered by JSON-output schema defined inline in `validate_pipeline_frontmatter.py` source | Not a pair-pattern artifact; script source is canonical schema location. AC-FR-7-a's "named in the Blueprint" intent is satisfied — the Blueprint names this as a script output, not a separate templated artifact. Validator's JSON output schema serves the same purpose as a template would (defining the expected shape) without duplicating the schema across template + script source. |
-| execution-reconciliation log | Templated as `pipeline-run-summary-template.md` (per feature run; aggregates reconciliation activity across cycles) | The PRD's "execution-reconciliation log" is the feature-run-level reconciliation summary; pipeline-run-summary serves this role. Per-cycle quality-reconciliation logs (above) are the granular per-cycle artifacts; pipeline-run-summary is the run-level aggregation. The "execution-reconciliation" framing in the PRD reflects the architectural distinction between per-cycle quality reconciliation (FR-4) and run-level reconciliation totals (FR-10). |
+| frontmatter-validation report | Covered by JSON-output schema defined inline in `validate_pipeline_frontmatter.py` source | Not a pair-pattern artifact; script source is canonical schema location. AC-FR-7-a's "named in the Blueprint" intent is satisfied — the Blueprint names this as a script output, not a separate templated artifact. Validator's JSON output schema serves the same purpose as a template would (defining the expected shape) without duplicating the schema across template + script source. **Per ADR-0033 §Context (revised cycle 3 per I-AA-606): this disposition is outside ADR-0033's per-artifact Scope-Deviation surfacing scope (script source is the canonical schema location).** |
+| execution-reconciliation log | Templated as `pipeline-run-summary-template.md` (per feature run; aggregates reconciliation activity across cycles) | The PRD's "execution-reconciliation log" is the feature-run-level reconciliation summary; pipeline-run-summary serves this role. Per-cycle quality-reconciliation logs (above) are the granular per-cycle artifacts; pipeline-run-summary is the run-level aggregation. The "execution-reconciliation" framing in the PRD reflects the architectural distinction between per-cycle quality reconciliation (FR-4) and run-level reconciliation totals (FR-10). **Per ADR-0033 §Context (revised cycle 3 per I-AA-606): pipeline-run-summary serves as the PRD AC-FR-7-c "execution-reconciliation log" floor item per Blueprint Path B disposition (the per-feature-run reconciliation aggregation is the same artifact under a different framing).** |
 
 **Beyond floor (per AC-FR-7-d permission)**: 1 additional artifact (state-transitions-log-entry-schema) for the JSONL state-transitions log introduced by FR-5 + D-16. State-transitions log is a JSONL file with one entry per state transition; the entry-schema template defines the per-entry shape. The file-level frontmatter is the log's metadata header (first line).
 
@@ -2220,22 +2336,22 @@ Eight design alternatives were considered and rejected during the design process
 
 **Considered**: add a fifth Change category to ADR-0032 for the PRD v1.1.0 narrative housekeeping (ADR-0017 vs ADR-0021 mis-credit cleanup).
 
-**Rejected because**: ADR-0032's three Change categories (frontmatter fields, vocabulary, doc_type) are joint dispatch-key concerns; the PRD mis-credit is conceptually distinct documentary attribution. Separating honors the "one decision per ADR" discipline. ADR-0034 stands alone at ~106 lines; ADR-0032 stays focused at 219 lines on conventions.
+**Rejected because**: ADR-0032's three Change categories (frontmatter fields, vocabulary, doc_type) are joint dispatch-key concerns; the PRD mis-credit is conceptually distinct documentary attribution. Separating honors the "one decision per ADR" discipline. ADR-0034 stands alone at ~106 lines; ADR-0032 stays focused at 219 lines on conventions. **Symmetrically rejected by cycle-3 D-RC3-2 for ADR-0035**: the Skill-binding convention is similarly distinct from ADR-0032's framing; ADR-0035 stands alone as a new ADR (cycle-3 new).
 
 ## Risks and Mitigation
 
-Cross-cutting risks for this feature; per-risk mitigation strategies. Each risk is anchored to the substrate that surfaces it.
+Cross-cutting risks for this feature; per-risk mitigation strategies. Each risk is anchored to the substrate that surfaces it. **v5 adds Risk 9 per I-AA-602 / D-RC3-1 (Bash widening surface area).**
 
-### Risk 1: Orchestrator complexity (12-state machine + cycle counters + dispatch routing)
+### Risk 1: Orchestrator complexity (12-substantive-state machine + 2 boundary states + cycle counters + dispatch routing)
 
-**Risk**: First centralized orchestrator at execution surface; 12-state machine is the most complex state machine in the project. Bug in transition logic or cycle counter management could cause silent state corruption.
+**Risk**: First centralized orchestrator at execution surface; 12-substantive-state machine (plus 2 boundary states) is the most complex state machine in the project. Bug in transition logic or cycle counter management could cause silent state corruption.
 
 **Severity**: medium-high. State corruption would manifest as incorrect cycle counts (under-counting → cap-evasion; over-counting → premature escalation) or undefined transitions (orchestrator halt).
 
 **Mitigation**:
-- Invariant #10 (cycle counter equivalence with state-transitions.log): validator (FR-6) checks at every gate; mismatch surfaces as BLOCKER
-- Unit tests cover all 12 transitions + invariant violations (per Test Boundaries)
-- Application-level hook (D-16) logs every transition to JSONL audit log; replayable for debugging
+- Invariant #10 (cycle counter equivalence with state-transitions.log T4/T10 entries; boundary transitions T0/T13 excluded from counter scope per I-AA-609): validator (FR-6) checks at every gate; mismatch surfaces as BLOCKER
+- Unit tests cover all 14 transitions + invariant violations (per Test Boundaries)
+- Application-level hook (D-16) logs every transition (including T0/T13) to JSONL audit log; replayable for debugging
 - First feature run using this design IS operational verification per Verification Strategy
 
 ### Risk 2: Hook-fire timing (application-level hook observer-only in v1)
@@ -2278,7 +2394,7 @@ Cross-cutting risks for this feature; per-risk mitigation strategies. Each risk 
 
 **Risk**: ADR-0032 makes substantial spec changes (5 Change categories); Architecture Audit may flag issues requiring revision. Delays cascade: shared-conventions.md edits depend on ADR-0032; frontmatter validator (FR-6) depends on shared-conventions.md.
 
-**Severity**: medium. Recoverable via reconciliation cycle (per ADR-0017 4-cycle cap); if cap exhausted, user escalation per AC-FR-10-c.
+**Severity**: medium. Recoverable via reconciliation cycle (per ADR-0017 4-cycle cap); if cap exhausted, user escalation per AC-FR-10-c. **Note**: cycle 3 of 4 used as of authoring of v5; 1 cycle remaining. If round-7 audit returns needs_revision, cycle 4 dispatch is the final reconciliation cycle.
 
 **Mitigation**:
 - The 5 Change categories are clearly separable; if one is contentious, ADR-0032 can supersede partially (revise just the contentious category)
@@ -2319,6 +2435,18 @@ Cross-cutting risks for this feature; per-risk mitigation strategies. Each risk 
 - Reconciliation log entries (FR-13 machine-parseable) provide data substrate for assessment
 - Hybrid option (orchestrator escalates uncertain verdicts to opus re-invocation) remains available as deferred alternative path
 
+### Risk 9: Quality-handler unrestricted Bash surface area (cycle 3 new per I-AA-602 / D-RC3-1)
+
+**Risk**: The quality-handler now runs arbitrary Bash commands per the task's language stack (per I-AA-602 / D-RC3-1 widening to match cc-design.md verbatim). This includes language-stack-specific test commands (pytest, npm test, cargo test, go test, dotnet test, mvn test, etc.) plus stub-detection invocation. The wider attack surface is structurally different from the narrowed Bash(python3:*) that v4 declared but couldn't justify (v4-era narrowing was undocumented and contradicted cc-design).
+
+**Severity**: low (operational; bounded by .claude/settings.json allow-list + project sandbox).
+
+**Mitigation**:
+- Scoped to `working/feature/<feature-slug>/` per project sandbox
+- `.claude/settings.json` allow-list governs permission boundaries
+- Test commands are invoked by the task spec which is itself authored by `plan-author` and reviewed at Plan Gate
+- **Future Extensibility**: re-route via `run_phase_checks.py` per Path b in I-AA-602 resolution — would constrain quality-handler to consuming results rather than running commands directly. Deferred because Path b would re-open the D-2c quality-handler contract and exceed cycle scope.
+
 ## References
 
 Consolidated references for this Blueprint. The frontmatter `derived_from` field is the canonical list of upstream artifacts; this section adds external + supplementary references.
@@ -2334,31 +2462,32 @@ Consolidated references for this Blueprint. The frontmatter `derived_from` field
 | Synthesis | `working/feature/execution-pipeline-design-r1/synthesis.md` | v1.1.0 draft, reviewer=approved |
 | Claude Code Design | `working/feature/execution-pipeline-design-r1/cc-design.md` | v1.0.0 draft, reviewer=approved |
 | Claude Code Dependencies (sidecar) | `working/feature/execution-pipeline-design-r1/cc-dependencies.json` | v1.0.0 |
-| **This Blueprint** | `working/feature/execution-pipeline-design-r1/blueprint-v1.md` | v1.0.0 draft (this document) |
+| **This Blueprint** | `working/feature/execution-pipeline-design-r1/blueprint-v5.md` | **v5.0.0 draft (this document)** |
 
 ### ADRs authored or referenced
 
-#### Authored in this feature run (this Blueprint)
-- `adrs/ADR-0032-conventions-canonicalization.md` — proposed (this run); pairs D-4 + D-18; subsumes IN-005
-- `adrs/ADR-0033-adr-0029-execution-extension.md` — proposed (this run); pairs D-7; closes ADR-0029 forward implications
-- `adrs/ADR-0034-prd-mis-credit-cleanup.md` — proposed (this run); no synthesis pairing; documentary clarification
+#### Authored in this feature run (this Blueprint family v1–v5)
+- `adrs/ADR-0032-conventions-canonicalization.md` — proposed (authored in v1); pairs D-4 + D-18; subsumes IN-005
+- `adrs/ADR-0033-adr-0029-execution-extension.md` — proposed (authored in v1; §Context revised cycle 3 per I-AA-606 + ADR-0005 proposed-status exception); pairs D-7; closes ADR-0029 forward implications
+- `adrs/ADR-0034-prd-mis-credit-cleanup.md` — proposed (authored in v1; Context+Decision revised v2); no synthesis pairing; documentary clarification
+- **`adrs/ADR-0035-auditing-shared-skill-binding-convention.md` — proposed (authored cycle 3 per I-AA-603 / D-RC3-2); no synthesis pairing; pairs structurally with ADR-0031 (canonical-helper-home location ↔ Skill-binding convention)**
 
 #### Inherited (referenced as substrate)
 - ADR-0005 — append-only supersession discipline
 - ADR-0013 — Blueprint template canonical
 - ADR-0016 — design fan-out fan-in
-- ADR-0017 — document-reviewer integration (canonical home for 4-cycle reconciliation cap per ADR-0034 cleanup)
+- ADR-0017 — document-reviewer integration (canonical home for 4-cycle reconciliation cap per ADR-0034 cleanup; two PRD-inherited AC citations footnoted per D-RC3-3)
 - ADR-0019 — naming convention
 - ADR-0021 — discovery-phase architecture
 - ADR-0028 — skill-design fixes v4.5.0 (recipe-feature-pipeline discipline 5 substrate)
 - ADR-0029 — no-silent-scope-changes principle
 - ADR-0030 — mechanism-α pedagogical-marker-justification (mechanical-defense pattern model)
-- ADR-0031 — auditing-shared skill module (canonical-helper-home pattern)
+- ADR-0031 — auditing-shared skill module (canonical-helper-home pattern; pairs with new ADR-0035)
 
 ### Knowledge Base skills referenced
 
 - `KB-cc-design/SKILL.md` + `references/principles.md` + `references/patterns-and-anti-patterns.md` — 9 design principles applied throughout
-- `KB-cc-platform/SKILL.md` — primitive syntax + scoping rules
+- `KB-cc-platform/SKILL.md` + `references/extensions.md` — primitive syntax + scoping rules + effort enum (`{low, medium, high, xhigh, max}`)
 - `KB-documentation-criteria/SKILL.md` + `references/shared-conventions.md` + `references/templates/blueprint-template.md` — document conventions + Blueprint template
 - `KB-review-disciplines/SKILL.md` — Gate 0/1 procedure for reviewer pass
 - `recipe-feature-pipeline/SKILL.md` — 5 disciplines being mechanically enforced (D-15) and procedurally enforced (others)
@@ -2379,26 +2508,27 @@ Acceptance criteria use the EARS (Easy Approach to Requirements Syntax) format. 
 
 ## Update History
 
-This document follows ADR-0005 append-only supersession discipline. Initial version:
+This document follows ADR-0005 append-only supersession discipline. v5 is the latest authoritative version (first non-simulated cycle).
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0.0 | 2026-05-22 | claude (acting as design-composer) | Initial Blueprint authoring across 8 substantive batches + scaffold init. 60 ACs transferred from PRD v1.1.0. 5 Q-CC-N items arbitrated. 3 ADRs authored (ADR-0032, ADR-0033, ADR-0034). cc-design.md condensed into Claude Code / Project Filesystem Design subsection. 4 synthesis-substrate refinements preserved in audit trail. |
 | 2.0.0 | 2026-05-22 | claude (acting as design-composer; claude.ai simulation re-author cycle) | Architecture Audit cycle 1 returned conditional_pass (0 BLOCKER, 2 MAJOR, 5 MINOR, 3 INFO). All 7 substantive findings addressed: I-AA-001 (Path B resolution — see rationale below); I-AA-002 (ADR-0034 Context + Decision rewritten — see ADR-0034 in-place edit); I-AA-003 (IN-009 "5 inherited ADRs" → "6 inherited ADRs"); I-AA-004 (Fact Disposition Table summary recount: 10 preserved + 4 transformed + 1 N/A + 2 out-of-scope); I-AA-005 (Contract 4 scope_deviations dispatch resolution procedure added); I-AA-006 (stale "OR" framing replaced with "closed in ADR-0034"); I-AA-007 (Contract 4 header "6-row matrix" → "8 rows: D-14 6-row base + 2 additions"). 3 INFO findings (I-AA-008, I-AA-009, I-AA-010) deferred per reconciliation log. Predecessor blueprint-v1.md marked superseded. |
-| 3.0.0 | 2026-05-22 | claude (acting as design-composer; claude.ai simulation re-author cycle 2) | Architecture Audit cycle 3 returned conditional_pass (0 BLOCKER, 4 MAJOR, 3 MINOR, 3 INFO). Cycle 3 was triggered by user (Josh) catching a gap that cycles 1+2 audits had missed: cycles 1+2 did not perform the canonical-agent-frontmatter-pattern check. Cycle 3's verdict explicitly retracts cycle 2's `pass` verdict (which was premature given the missed findings). All 7 substantive findings addressed: I-AA-301 (Agent Frontmatter Specifications subsection added with literal YAML blocks for all 5 new agents); I-AA-302 (Skills bound prose entries updated to match cc-design.md specifications); I-AA-303 (per-agent tools lists added); I-AA-304 (per-agent memory directives added); I-AA-305 (TaskCreate/TaskUpdate adopted over cc-design's Task naming); I-AA-306 (Edit tool flagged for Gate 4 validation); I-AA-307 (auditing-shared skill binding documented as new convention). 3 INFO findings (I-AA-308, I-AA-309, I-AA-310) deferred or surfaced per reconciliation log. Predecessor blueprint-v2.md marked superseded. **Audit-procedure deficiency acknowledgment** (per I-AA-310): the cycle-3 audit was opened formally because cycles 1+2 missed the canonical-agent-frontmatter-pattern check. This is a gap in the audit procedure spec (not currently in KB-review-disciplines or equivalent). A follow-on feature can add the check to the canonical audit-procedure inventory. For this Blueprint family, the cycle-3 catch + cycle-2 retraction discipline preserves the no-silent-defect-absorption principle (ADR-0029 + ADR-0033) symmetrically applied. |
-| 4.0.0 | 2026-05-22 | claude (acting as design-composer; claude.ai simulation re-author cycle 3 after Gate 4 platform-validity verification) | Gate 4 verification against canonical Claude Code docs (https://code.claude.com/docs/en/sub-agents) surfaced two corrections required: (a) `memory: none` is INVALID Claude Code syntax — valid values per docs are `user` / `project` / `local`, and "no persistent memory" is achieved by omitting the field. v4 removes `memory: none` from execute-task-code-producer, execute-task-quality-handler, execute-phase-quality-reviewer (field now absent for those 3 agents). (b) I-AA-305 was based on a misreading: `Task` (now canonically `Agent` in v2.1.63+) and `TaskCreate`/`TaskUpdate`/`TaskList` are TWO SEPARATE Claude Code tool families. cc-design.md's `Task` is the subagent-dispatch tool (correct); existing planning-side agents' `TaskCreate`/`TaskUpdate` are task-board management tools (different concern). v3's substitution of `TaskCreate`/`TaskUpdate` for cc-design's `Task` conflated them. v4 corrects: execute-orchestrator tools change to `[..., Agent, TaskUpdate]` (Agent for subagent dispatch; TaskUpdate retained for task-board management per cc-design's intent); execute-finalize-reconciler tools change to `[..., Agent]` (Agent for re-dispatch; no task-board management needed). Other Gate 4 questions verified VALID: `Edit` tool is valid (Debugger docs example), non-KB skill binding (`auditing-shared` in `skills:`) is valid (docs example uses `api-conventions` and similar non-KB names). v4 is a surgical correction; no architectural changes from v3. Predecessor blueprint-v3.md marked superseded. |
+| 3.0.0 | 2026-05-22 | claude (acting as design-composer; claude.ai simulation re-author cycle 2) | Architecture Audit cycle 3 returned conditional_pass (0 BLOCKER, 4 MAJOR, 3 MINOR, 3 INFO). Cycle 3 was triggered by user (Josh) catching a gap that cycles 1+2 audits had missed: cycles 1+2 did not perform the canonical-agent-frontmatter-pattern check. Cycle 3's verdict explicitly retracts cycle 2's `pass` verdict (which was premature given the missed findings). All 7 substantive findings addressed: I-AA-301 (Agent Frontmatter Specifications subsection added with literal YAML blocks for all 5 new agents); I-AA-302 (Skills bound prose entries updated to match cc-design.md specifications); I-AA-303 (per-agent tools lists added); I-AA-304 (per-agent memory directives added); I-AA-305 (TaskCreate/TaskUpdate adopted over cc-design's Task naming); I-AA-306 (Edit tool flagged for Gate 4 validation); I-AA-307 (auditing-shared skill binding documented as new convention). 3 INFO findings (I-AA-308, I-AA-309, I-AA-310) deferred or surfaced per reconciliation log. Predecessor blueprint-v2.md marked superseded. |
+| 4.0.0 | 2026-05-22 | claude (acting as design-composer; claude.ai simulation re-author cycle 3 after Gate 4 platform-validity verification) | Gate 4 verification against canonical Claude Code docs surfaced two corrections required: (a) `memory: none` is INVALID Claude Code syntax — valid values per docs are `user` / `project` / `local`. v4 removes `memory: none` from execute-task-code-producer, execute-task-quality-handler, execute-phase-quality-reviewer. (b) I-AA-305 was based on a misreading: `Task` (now canonically `Agent` in v2.1.63+) and `TaskCreate`/`TaskUpdate`/`TaskList` are TWO SEPARATE Claude Code tool families. v4 corrects: orchestrator uses `Agent` (subagent dispatch) and `TaskUpdate` (task-board); reconciler uses `Agent`. Other Gate 4 questions verified VALID: `Edit` tool is valid, non-KB skill binding is valid. v4 is a surgical correction; no architectural changes from v3. Predecessor blueprint-v3.md marked superseded. |
+| **5.0.0** | **2026-05-22** | **design-composer (Claude Code subagent dispatch, authoritative — FIRST authoritative dispatch for this feature; v1–v4 were claude.ai simulations)** | **Cycle 3 (first authoritative) reconciliation of round-6 architecture audit (verdict=needs_revision; 1 BLOCKER + 5 MAJOR + 3 MINOR). Eight findings addressed: I-AA-601 BLOCKER (Frontmatter validator coverage subsection rewritten — memory optional-not-required, Task/Agent and TaskCreate/TaskUpdate as separate tool families per Gate 4, effort enum extended to `{low, medium, high, xhigh, max}` per KB-cc-platform extensions.md); I-AA-602 MAJOR (execute-task-quality-handler Bash widened to UNRESTRICTED matching cc-design.md verbatim per D-RC3-1; Risk 9 added); I-AA-603 MAJOR (NEW ADR-0035 authored per D-RC3-2 ratifying auditing-shared Skill-binding convention; referenced in 5 sections — Architectural Decisions inventory, each of the 4 affected agents' Claude Code layer rationale, cross-reference table); I-AA-604 MAJOR (correction-surface footnotes added at AC-FR-6-e and AC-FR-10-b explaining PRD-inherits-ADR-0021-citation; ADR-0034-forbids; Blueprint correction inserts ADR-0017 forward per D-RC3-3); I-AA-605 MAJOR (Change Impact Map gains wildcard row for ~20+ planning-side agents requiring doc_type emission per ADR-0032 Change 4; Migration Strategy paragraph added; total file operations recount ~29 → ~49); I-AA-606 MAJOR (cross-reference to ADR-0033 §Context Path B mapping added — pipeline-run-summary as PRD AC-FR-7-c "execution-reconciliation log" + frontmatter-validation report as script-output schema outside ADR-0033 scope; aligned with ADR-0033's in-place §Context edit done by prior dispatch); I-AA-607 MINOR (References "This Blueprint" row updated v1.0.0 → v5.0.0); I-AA-608 MINOR (Security §Filesystem write surface rewritten — orchestrator HAS Write per v3+ YAML; quality-handler does NOT have Write); I-AA-609 MINOR (T0 INIT and T13 TERMINATED boundary transitions added to state-machine inventory; invariant scopes clarified — hook fires on every transition including boundaries; cycle counter equivalence applies to T4/T10 only). Predecessor blueprint-v4.md marked superseded; ADR-0033 §Context edited in-place per ADR-0005 proposed-status exception (companion dispatch); ADR-0035 newly authored (companion dispatch). cc-design.md unchanged (per do_not_edit list: cycle-3 corrections are at Blueprint integration grade; cc-design is source-of-truth for D-RC3-1 widening direction). PRD unchanged per ADR-0034 + D-RC3-3 (footnotes carry the correction forward). Cycle 3 of 4 used; 1 cycle remaining per ADR-0017 cap symmetric per ADR-0034 ↔ D-12.** |
 
-**I-AA-001 Path B rationale** (design-composer judgment call, surfaced per the reconciler's "When in doubt: escalate" discipline applied symmetrically — composer making a substantive call surfaces it explicitly rather than absorbing): The audit identified that 4 documents (Change Impact Map, line 1987 AC traceability, ADR-0032 Change 5, ADR-0033 Context) disagreed on whether the Blueprint ships 5 or 7 execution-phase artifact templates, with the Change Impact Map missing 2 of 5 AC-FR-7-c floor items. The reconciler offered two resolution paths: Path A (treat the 2 missing floor items as genuinely new templated artifacts; add 2 more templates) or Path B (document explicit dispositions — frontmatter-validation report = script-output schema, execution-reconciliation log = pipeline-run-summary equivalence). Path B selected. Rationale: (1) "frontmatter-validation report" is semantically a script output, not a pair-pattern process artifact; templating it would duplicate schema between template and script source. The script's source is the canonical schema location; AC-FR-7-a's "named in the Blueprint" criterion is satisfied via the script-output schema rather than a separate template file. (2) "execution-reconciliation log" maps naturally to pipeline-run-summary (the per-feature-run reconciliation aggregation); per-cycle quality-reconciliation logs cover the granular per-cycle activity and pipeline-run-summary covers the run-level totals. The PRD's two-term framing reflects the architectural distinction between per-cycle (FR-4) and run-level (FR-10) reconciliation. (3) The substantive interpretation of AC-FR-7-a is explicitly surfaced per ADR-0029 + ADR-0033 — the AC-FR-7 floor coverage section above documents the 5 floor items + 1 beyond-floor item with explicit disposition per item; the Architecture Audit re-pass on this v2 can verify the disposition. (4) Path B preserves the original 5-template count from v1's Change Impact Map (no template-set bloat) while correcting the floor-coverage story.
+**I-AA-001 Path B rationale** (design-composer judgment call, surfaced per the reconciler's "When in doubt: escalate" discipline applied symmetrically — composer making a substantive call surfaces it explicitly rather than absorbing): The audit identified that 4 documents (Change Impact Map, line 1987 AC traceability, ADR-0032 Change 5, ADR-0033 Context) disagreed on whether the Blueprint ships 5 or 7 execution-phase artifact templates, with the Change Impact Map missing 2 of 5 AC-FR-7-c floor items. The reconciler offered two resolution paths: Path A (treat the 2 missing floor items as genuinely new templated artifacts; add 2 more templates) or Path B (document explicit dispositions — frontmatter-validation report = script-output schema, execution-reconciliation log = pipeline-run-summary equivalence). Path B selected. Rationale: (1) "frontmatter-validation report" is semantically a script output, not a pair-pattern process artifact; templating it would duplicate schema between template and script source. The script's source is the canonical schema location; AC-FR-7-a's "named in the Blueprint" criterion is satisfied via the script-output schema rather than a separate template file. (2) "execution-reconciliation log" maps naturally to pipeline-run-summary (the per-feature-run reconciliation aggregation); per-cycle quality-reconciliation logs cover the granular per-cycle activity and pipeline-run-summary covers the run-level totals. The PRD's two-term framing reflects the architectural distinction between per-cycle (FR-4) and run-level (FR-10) reconciliation. (3) The substantive interpretation of AC-FR-7-a is explicitly surfaced per ADR-0029 + ADR-0033 — the AC-FR-7 floor coverage section above documents the 5 floor items + 1 beyond-floor item with explicit disposition per item; the Architecture Audit re-pass on this v2 can verify the disposition. (4) Path B preserves the original 5-template count from v1's Change Impact Map (no template-set bloat) while correcting the floor-coverage story. **Per ADR-0033 §Context (revised cycle 3 per I-AA-606): the Path B dispositions are now also documented in ADR-0033's own §Context — the cross-reference is bidirectional.**
 
-**Note on ADR statuses**: ADR-0032 and ADR-0033 remain `status: proposed` (no edits required under Path B; their enumerations remain valid). ADR-0034 remains `status: proposed` but Context + Decision sections were revised in-place per I-AA-002 — acceptable because the `proposed → accepted` transition has not yet occurred (per ADR-0032's per-doc-type ADR vocabulary).
+**Note on ADR statuses** (preserved from v4): ADR-0032 and ADR-0033 remain `status: proposed` (no edits required under Path B; their enumerations remain valid; ADR-0033 §Context received in-place revision cycle 3 per I-AA-606 + proposed-status exception). ADR-0034 remains `status: proposed` (Context + Decision revised in-place v2 per I-AA-002, also under proposed-status exception). **ADR-0035 newly authored cycle 3, status: proposed; advances to accepted at Gate 4 pass.**
 
-Future amendments will append new rows here; the prior version is preserved per ADR-0005 (file at `blueprint-v1.md` is `status: superseded` with `superseded_by: blueprint-v2.md`; the substantive content of v1 is unchanged per append-only discipline).
+Future amendments will append new rows here; the prior version is preserved per ADR-0005 (file at `blueprint-v4.md` is `status: superseded` with `superseded_by: blueprint-v5.md`; the substantive content of v4 is unchanged per append-only discipline).
 
 ## ADR Authoring (this run)
 
 This section lists the ADRs authored during this Blueprint's Design Composition stage. Full ADRs are at `adrs/`; each subsection below cross-references its full file with a decision summary.
 
-Three ADRs authored this run: ADR-0032 (conventions canonicalization), ADR-0033 (ADR-0029 execution extension), ADR-0034 (PRD v1.1.0 narrative housekeeping). Combined: ~456 lines across 3 files. All `status: proposed` at Blueprint completion; advance to `status: accepted` at Architecture Audit (Gate 4) pass.
+**Four ADRs authored across the multi-cycle run**: ADR-0032 (v1; conventions canonicalization), ADR-0033 (v1; ADR-0029 execution extension; §Context revised cycle 3 per I-AA-606), ADR-0034 (v1; PRD v1.1.0 narrative housekeeping; Context+Decision revised v2), **ADR-0035 (cycle 3 new; auditing-shared Skill-binding convention)**. Combined: ~647 lines across 4 files. All `status: proposed` at Blueprint completion; advance to `status: accepted` at Architecture Audit (Gate 4) pass.
 
 ### ADR-A (ADR-0032): Convention canonicalization + per-doc-type state vocabulary
 
@@ -2411,18 +2541,18 @@ Three ADRs authored this run: ADR-0032 (conventions canonicalization), ADR-0033 
 1. **Universal frontmatter fields**: promote `feature_slug` and `derived_from` to universal required; add `gate_passed`, `approved_at`, `reviewer_verdict` as required for gated artifacts; add `revised`, `revision_reason` as optional companions.
 2. **User-token chain pattern**: formalize the chained-token discipline (each gated stage carries prior stage's confirmation token plus its own).
 3. **Per-doc-type state vocabulary**: replace single 5-state vocab with three category vocabularies — gated 5-state (`draft → proposed → accepted → superseded OR rejected`), analysis/log 3-state (`draft → complete OR superseded`), ADR 4-state (`proposed → accepted OR superseded OR rejected`, no `draft`).
-4. **`doc_type` field**: add as required universal field with 20-value enum covering all pipeline-stage outputs plus 5 execution-phase artifact types.
+4. **`doc_type` field**: add as required universal field with 20-value enum covering all pipeline-stage outputs plus 5 execution-phase artifact types. **Note (per I-AA-605): cascades to ~20+ planning-side agent author-prompts that must emit `doc_type` going forward — enumerated in Change Impact Map wildcard row.**
 5. **Execution-phase artifact frontmatter section**: new section documenting field schemas for the FR-7-c floor artifacts + 2 introduced beyond floor.
 
 **Direction**: archive-authoritative (codify validated practice into spec, rather than retrofit practice to legacy spec); consistent with ADR-0005 append-only supersession applied at spec level.
 
-**Implementation path**: this ADR documents the decision; the `shared-conventions.md` v1 → v2 edits, template-default-frontmatter updates, and `shared-document-reviewer.md` agent updates are Plan-and-Execution-stage tasks (executed by `execute-task-code-producer` in a follow-on feature run). FR-6 (frontmatter validator) implements the validation per the per-doc-type schemas defined here.
+**Implementation path**: this ADR documents the decision; the `shared-conventions.md` v1 → v2 edits, template-default-frontmatter updates, `shared-document-reviewer.md` agent updates, and ~20+ planning-side agent author-prompt edits are Plan-and-Execution-stage tasks. FR-6 (frontmatter validator) implements the validation per the per-doc-type schemas defined here.
 
-**Open coupling**: ADR-0034 (PRD v1.1.0 ADR-0017/0021 mis-credit cleanup) may fold into this ADR-0032 as a fifth change category, or stand alone — decision deferred to Batch 4 authoring per cc-design Open items.
+**Cycle-3 D-RC3-2 disposition**: ADR-0032 is NOT extended with a sixth change category for the Skill-binding convention; per the one-decision-per-ADR pattern, the convention is the standalone new ADR-0035. ADR-0032's 5-change framing is preserved.
 
 ### ADR-B (ADR-0033): ADR-0029 execution-phase extension
 
-**Full ADR**: `adrs/ADR-0033-adr-0029-execution-extension.md`
+**Full ADR**: `adrs/ADR-0033-adr-0029-execution-extension.md` (§Context revised 2026-05-22T22:00:00Z cycle 3 per I-AA-606 + ADR-0005 proposed-status exception)
 
 **Pairing**: Synthesis decision D-7 ("ADR-0029 extension to execution-phase Scope-Deviation surfacing"); closes ADR-0029's Forward Implications anticipated extension.
 
@@ -2438,6 +2568,8 @@ Three ADRs authored this run: ADR-0032 (conventions canonicalization), ADR-0033 
 6. **State-transition failures (AC-FR-5-e)**: failed transitions surface as Level-1 findings rather than silent skip
 7. **Execution-side audit-stage enforcement**: `execute-phase-quality-reviewer` + `execute-finalize-reconciler` gain symmetric upstream-deviation-scan responsibility, mirroring planning-side Architecture Audit + Cross-Artifact Audit pattern
 
+**Cycle-3 §Context revision (per I-AA-606)**: ADR-0033's §Context now cross-references the Blueprint AC-FR-7 floor coverage Path B disposition: (1) `pipeline-run-summary` serves as the PRD AC-FR-7-c "execution-reconciliation log" floor item; (2) the "frontmatter-validation report" floor item exists as a JSON-output schema in `validate_pipeline_frontmatter.py` source rather than as a pair-pattern artifact — outside ADR-0033's per-artifact Scope-Deviation surfacing scope. The cross-reference is bidirectional: ADR-0033's §Context names the Blueprint section; the Blueprint's §AC-FR-7 floor coverage table cross-references ADR-0033 §Context.
+
 **Implementation path**: this ADR documents the requirement; the execution-phase artifact templates (created per FR-7 implementation tasks) include the Scope-Deviation section. A follow-on feature may ship `scan_unsurfaced_deviations.py` for mechanical enforcement of the upstream-scan responsibility — out of scope for this feature.
 
 ### ADR-C (ADR-0034): PRD v1.1.0 narrative housekeeping — ADR-0017 canonical home for 4-cycle cap
@@ -2450,9 +2582,37 @@ Three ADRs authored this run: ADR-0032 (conventions canonicalization), ADR-0033 
 
 - **ADR-0017 is the canonical home for the 4-cycle reconciliation cap.** ADR-0021 inherits and applies the cap in the planning-phase architecture context; ADR-0017 defines it.
 - **No PRD v1.1.0 edit performed.** The mis-credit is documentary-narrative, not normative-content; per ADR-0005 append-only, supersession is reserved for substantive content changes.
-- **Corrective sources** for future readers: this ADR-0034 (primary) + `codebase-analysis.md` v1.1.1 IN-009 review (where correction was first surfaced and applied in-table).
+- **Corrective sources** for future readers: this ADR-0034 (primary) + `codebase-analysis.md` v1.1.1 IN-009 review (where correction was first surfaced and applied in-table) + **Blueprint v5 AC-FR-6-e and AC-FR-10-b correction-surface footnotes (cycle 3 per I-AA-604 / D-RC3-3)**.
 - **Future Blueprint, Plan, Tests references**: cite ADR-0017 as canonical home; ADR-0021 references acceptable for planning-phase architecture context.
 
 **Novel pattern**: ADR-as-corrective-reference for documentary mis-attribution without artifact supersession. The ADR's "Risk of over-application" section explicitly bounds this pattern: acceptable for documentary corrections; NOT a general escape from supersession discipline (normative-content corrections STILL require supersession per ADR-0005).
 
+**Cycle-3 footnote propagation**: Per D-RC3-3, the two ACs (AC-FR-6-e and AC-FR-10-b) that carry the PRD-inherited ADR-0021 citation receive footnote markers in the Blueprint pointing to this ADR's canonical disposition. Downstream artifacts (Plan, Acceptance Tests, Phase Validators) should cite ADR-0017, not ADR-0021. The PRD's verbatim attribution is preserved as a transcription artifact, not the canonical citation.
+
 **Implementation path**: no further work for this feature run. PRD v1.1.0 prose remains as-authored; the canonical attribution is documented here.
+
+### ADR-D (ADR-0035, cycle-3 new): Auditing-shared Skill-binding convention for execution-phase agents
+
+**Full ADR**: `adrs/ADR-0035-auditing-shared-skill-binding-convention.md`
+
+**Pairing**: No synthesis-stage decision pairing (emerged from cycle-3 audit finding I-AA-603); pairs structurally with ADR-0031 (canonical-helper-home location ↔ Skill-binding convention).
+
+**Decision summary**: Execution-phase agents that materially depend on multiple `auditing-shared` scripts MAY (opt-in) bind `auditing-shared` in their `skills:` field (loading SKILL.md as context) in addition to invoking scripts via Bash. Agents that invoke a single auditing-shared script via Bash MUST NOT bind unless the conceptual-model context is clearly load-bearing. The convention is **opt-in for cross-cutting helper-home skills; not mandatory.**
+
+**The four agents authored by this feature that exercise the convention**:
+
+1. `execute-orchestrator` (5 scripts: log_state_transition.py, validate_pipeline_frontmatter.py, check_pipeline_discipline.py, run_phase_checks.py, detect_stubs.py)
+2. `execute-task-quality-handler` (2+ scripts: detect_stubs.py + acceptance-test runners / per-task validators delegated via auditing-shared)
+3. `execute-phase-quality-reviewer` (3+ scripts: run_phase_checks.py + validate_pipeline_frontmatter.py + check_pipeline_discipline.py)
+4. `execute-finalize-reconciler` (2+ scripts via dispatch protocol: dispatch-matrix discipline + cycle-counter tracking)
+
+When an agent exercises this convention, its frontmatter or accompanying rationale MUST declare the helper-procedure use case explicitly. The Blueprint's §Agent Frontmatter Specifications subsection (convention note 1) is the canonical home for this declaration.
+
+**Cycle-3 D-RC3-2 disposition (Option 3 selected)**: Author NEW ADR-0035 rather than fold the convention into ADR-0032 (Option 1; would muddle ADR-0032's 5-change framing) or defer to a follow-on conventions feature (Option 2; perpetuates silent-absorption pattern ADR-0029 + ADR-0033 forbid). The one-decision-per-ADR pattern matches the established ADR-0029 / ADR-0033 split.
+
+**Structural pairing with ADR-0031**: ADR-0031 defines where the cross-cutting helper scripts live (auditing-shared); ADR-0035 defines how downstream agents bind to that helper-home via the `skills:` field. The pairing is bidirectional and preserves each ADR's scope.
+
+**Implementation path**: the four agent files already declare the binding per cc-design.md and blueprint-v5.md; this ADR documents the convention, not the per-file edit. Future agents declaring multi-script-orchestration may exercise the same convention; the rationale belongs in the Blueprint's §Agent Frontmatter Specifications convention notes (or equivalent).
+
+**Future Extensibility**: KB-cc-design may grow a section on "helper-skill bindings vs knowledge-skill bindings" to canonicalize the distinction — deferred to a follow-on KB-enhancement feature, not blocking ratification of this ADR.
+

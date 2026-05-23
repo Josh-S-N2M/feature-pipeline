@@ -1,0 +1,276 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-execution-pipeline-design-r1-round-6",
+  "feature_slug": "execution-pipeline-design-r1",
+  "stage": "Architecture Audit (Gate 4 — authoritative)",
+  "generated": "2026-05-22T21:00:00Z",
+  "generated_by": "review-architecture-auditor (Claude Code subagent dispatch, authoritative)",
+  "target": "working/feature/execution-pipeline-design-r1/blueprint-v4.md",
+  "blueprint_version": "4.0.0",
+  "agent_invocation": "authoritative Claude Code subagent dispatch (first such invocation for this Blueprint; prior 5 rounds were claude.ai simulation). Round 6 audits Blueprint v4 from scratch; the simulated r5 pass verdict is treated as background, not authority.",
+  "audit_method": "Full Architecture Audit per KB-review-disciplines references/architecture-audit.md — Lens 1 (CoVe), Lens 2 (blast-radius — degraded to manual / Grep + cross-artifact reading because GitNexus and codebase-memory-mcp are not available in this dispatch environment; the feature touches only `.claude/`, `adrs/`, `working/feature/`, so manual scan is high-confidence), Lens 3 (brief-honor against rationale brief + prior 5 simulated audit JSONs + inherited ADRs). Phase 5 cross-section consistency includes the two checks the simulation missed and the brief flagged: canonical-agent-frontmatter-pattern check and canonical-platform-docs verification.",
+  "code_graph_used": "manual_via_grep_and_cross_artifact_read",
+  "code_graph_degradation_note": "GitNexus and codebase-memory-mcp not provisioned in this dispatch. Feature is single-layer (Claude Code) with all touch points under `.claude/agents/`, `.claude/skills/`, and `adrs/`; manual Grep across those directories produces a complete blast-radius enumeration for this feature class. No degradation impact on findings.",
+  "checks_performed": [
+    "cove_substantive_claim_verification",
+    "blast_radius_manual_grep_against_claude_dir",
+    "brief_honor_against_inherited_adrs_0005_0009_0017_0027_0029_0032_0033_0034",
+    "cross_section_consistency_inside_blueprint_v4",
+    "canonical_agent_frontmatter_pattern_check_against_KB_cc_platform_extensions_md_and_existing_agents",
+    "canonical_platform_docs_verification_memory_enum_tools_enum_skills_binding_Agent_vs_TaskCreate",
+    "synthesis_load_bearing_claim_re_verification",
+    "prior_audit_resurfacing_check_r1_through_r5"
+  ],
+  "inputs_read": [
+    "blueprint-v4.md (full)",
+    "blueprint-v3.md (frontmatter + supersession metadata)",
+    "cc-design.md (subagent specifications, lines 167-346)",
+    "synthesis.md (decisions D-1 through D-18, mechanical applications, surfaced-for-cross-artifact-audit)",
+    "prd-v1.1.0.md (FR-1 through FR-13 acceptance criteria, FR-7-c floor, ADR-0017/0021 attribution context)",
+    "codebase-analysis.md (selected — IN-001, IN-003, IN-009, IN-016, IN-017)",
+    "ADR-0017 (canonical 4-cycle cap definition, line 155)",
+    "ADR-0021 (verified no reconciliation-cap content; only ≤6 parallel research cap at line 85)",
+    "ADR-0029 (Forward Implications anticipating ADR-0033 extension)",
+    "ADR-0032 (frontmatter + decision sections)",
+    "ADR-0033 (frontmatter + Extended Scope-Deviation surfacing table)",
+    "ADR-0034 (Context, Decision, Validation evidence — revised in-place 2026-05-22T18:30:00Z)",
+    "KB-cc-platform/references/extensions.md (canonical pattern for subagent frontmatter; memory enum; effort enum including `max`)",
+    "KB-cc-platform/references/agent-sdk.md (Agent tool documentation as subagent-dispatch primitive)",
+    ".claude/agents/* (existing agent frontmatter patterns; no existing agent declares `Task` or `Agent` in its tools list)",
+    "architecture-audit-issues.json through architecture-audit-issues-r5.json (simulated rounds; treated as background)",
+    "plan-v1.md (frontmatter only — checks `derived_from: blueprint-v4.md` reference)"
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [],
+    "note": "Per orchestrator brief, this is the first authoritative dispatch; the 5 prior simulated rounds are treated as background context, not as a ledger of prior-context items requiring classification under the prior-context-check discipline. The simulated audits' issue IDs (I-AA-001 through I-AA-501) are referenced where re-surfacing or stable-resolution checks apply; see findings below."
+  },
+  "findings": [
+    {
+      "id": "I-AA-601",
+      "severity": "BLOCKER",
+      "category": "consistency",
+      "lens": "cross_section_consistency",
+      "summary": "Frontmatter-validator-coverage subsection contradicts v4's own surgical corrections in four ways; would mechanically reject the agents v4 declares correct",
+      "location": "blueprint-v4.md §Agent Frontmatter Specifications → Frontmatter validator coverage (lines 1081-1091)",
+      "description": "The 'Frontmatter validator coverage' subsection prescribes what the FR-6 validator (`validate_pipeline_frontmatter.py`) should enforce on agent frontmatter. As written in v4, the subsection is internally inconsistent with v4's own corrections in the YAML blocks immediately above it and the convention notes at lines 962-975. Four specific contradictions: (1) Line 1085 lists `memory` among 'five required fields' that the validator must verify present; but v4 explicitly omits `memory` from three of the five new agents (execute-task-code-producer, execute-task-quality-handler, execute-phase-quality-reviewer) per the v4 surgical correction documented in the frontmatter `re_author_reason` field. The validator-as-spec'd would FAIL those three agents that v4 declares correct. (2) Line 1086 says `Task` is 'a synonym for TaskCreate', whereas convention note 2 (lines 966-970) explicitly states they are TWO SEPARATE TOOL FAMILIES — Agent (formerly Task) for subagent dispatch vs TaskCreate/TaskUpdate for task-board management — and that conflating them was the v3-era misreading v4 corrects. The validator-as-spec'd would re-introduce the v3 conflation. (3) Lines 1086 and 1088 treat Gate 4 platform-validity verification as 'pending' ('added to the whitelist after Gate 4 validates them', '`none` pending Gate 4 validation') — but the frontmatter's `re_author_reason` and convention note 3 both state that Gate 4 verification is COMPLETE and that `memory: none` is INVALID. The validator-as-spec'd would still accept the invalid value v4 was authored to remove. (4) Line 1089 declares `effort: ∈ {low, medium, high, xhigh}` but KB-cc-platform/references/extensions.md (the canonical platform docs the v4 corrections cite) explicitly documents `max` as a valid effort value ('max (maximum effort)' — extensions.md line ~181). Validator-as-spec'd would reject agents that legitimately use `effort: max`.",
+      "evidence": [
+        {"artifact": "blueprint-v4.md", "section": "Frontmatter validator coverage", "lines": "1081-1091", "quote_paraphrase": "Lists memory as required-present; calls Task a synonym for TaskCreate; treats `none` as pending Gate 4 validation; omits `max` from effort enum."},
+        {"artifact": "blueprint-v4.md", "section": "frontmatter re_author_reason field", "lines": "47", "quote_paraphrase": "v4 surgically fixes both: removes 'memory: none' from 3 agents (omits the field)... changes execute-orchestrator and execute-finalize-reconciler tool lists to use 'Agent' (canonical) for subagent dispatch while preserving 'TaskUpdate'..."},
+        {"artifact": "blueprint-v4.md", "section": "convention note 2", "lines": "966-970", "quote_paraphrase": "There are TWO separate Claude Code tool families that earlier Blueprint versions conflated: Agent (formerly Task pre-v2.1.63) — spawns subagents; TaskCreate/TaskUpdate/TaskList — built-in session task-board management. The v3 Blueprint substitution of TaskCreate/TaskUpdate for cc-design's Task was a misreading."},
+        {"artifact": "blueprint-v4.md", "section": "convention note 3", "lines": "972-975", "quote_paraphrase": "Gate 4 platform-validity verification — UPDATED in v4 with authoritative answers (verified against code.claude.com/docs/en/sub-agents): (a) memory: none is INVALID — documented valid values are user|project|local; (b) Edit is VALID; (c) non-KB skill binding is VALID."},
+        {"artifact": ".claude/skills/KB-cc-platform/references/extensions.md", "section": "subagent frontmatter — effort enum", "quote_paraphrase": "Documented values are low (minimal thinking, fastest), medium (moderate), high (deep reasoning), xhigh (extended; Opus 4.7 only, falls back to high on other models), max (maximum effort). Source: Claude Code Agent SDK EffortLevel literal."}
+      ],
+      "impact": "BLOCKER because this subsection drives Plan-stage task generation for the validator script (validate_pipeline_frontmatter.py). If the validator is implemented as this subsection prescribes, it will reject all three v4-corrected agents that omit memory, perpetuate the v3 Task/TaskCreate conflation in the whitelist, and reject any `effort: max` agent. Per AC-FR-9-c the validator's frontmatter check is the mechanical gate for the FR-9 skill-binding requirement — a misconfigured validator silently degrades the entire FR-6 + FR-9 enforcement story, and any agent definition v4 currently declares correct would be flagged invalid by its own validator spec.",
+      "recommended_resolution": "Rewrite the Frontmatter validator coverage subsection to reflect v4's resolved state: (a) `memory` is OPTIONAL (omitted = no persistent memory; enum when present = user|project|local; `none` is INVALID and must be REJECTED); (b) `tools:` whitelist must list `Agent` and `TaskUpdate` as separate entries with separate semantics (subagent-dispatch vs task-board-management) and explicitly NOT treat them as synonyms; (c) `Edit` and `Bash(python3:*)` are VALID per Gate 4; (d) `effort:` enum must include `max`. Cross-reference convention notes 1-3 inline so the validator-coverage spec stays tied to the resolved state. Re-author by design-composer in reconciliation cycle 3."
+    },
+    {
+      "id": "I-AA-602",
+      "severity": "MAJOR",
+      "category": "feasibility",
+      "lens": "cove",
+      "summary": "execute-task-quality-handler Bash restriction `Bash(python3:*)` precludes running the non-Python test stacks the 4-phase verification requires",
+      "location": "blueprint-v4.md §Agent Frontmatter Specifications → execute-task-quality-handler YAML (lines 1020-1029) + rationale (lines 1031-1037)",
+      "description": "The quality-handler's tools are declared `[Read, Glob, Grep, Bash(python3:*)]`. Per FR-2 + D-11 + Component 3 spec, the quality-handler runs the `ai-development-guide` 4-phase verification (lint → build → test → final gate) on filesModified. Many production test stacks are non-Python: npm/yarn/pnpm test, cargo test, go test, dotnet test, mvn test, etc. The 4-phase pattern explicitly spans the language stack of the modified files; the task spec declares which stack. The Bash restriction silently breaks the quality-handler for any modified-file set whose tests are not python invokable. The v4 rationale acknowledges this: 'Validation needed at runtime — if direct test execution by quality-handler is required, Bash restriction needs to be widened.' Shipping with an acknowledged-but-unfixed contract gap is precisely the silent-absorption failure mode ADR-0029 + ADR-0033 forbid. cc-design.md line 327 (the source-of-truth for this agent's tools) uses unrestricted `[Read, Glob, Grep, Bash]`; the v4 narrowing diverges from the per-layer-design spec without arbitration evidence (no Q-CC-N covers this; no decision in D-2/D-11 mandates the narrowing).",
+      "evidence": [
+        {"artifact": "cc-design.md", "section": "execute-task-quality-handler Tools", "lines": "327", "quote_paraphrase": "Tools: [Read, Glob, Grep, Bash]. Read for inputs; Bash for invoking detect_stubs.py + lint + test commands."},
+        {"artifact": "blueprint-v4.md", "section": "execute-task-quality-handler YAML", "lines": "1026", "quote_paraphrase": "tools: [Read, Glob, Grep, Bash(python3:*)]"},
+        {"artifact": "blueprint-v4.md", "section": "execute-task-quality-handler Rationale", "lines": "1033", "quote_paraphrase": "Bash(python3:*) restricted because quality-handler's Bash usage is script-only (detect_stubs.py + acceptance-test runners via python wrappers). If acceptance-tests are non-python (e.g., npm test), the orchestrator runs them and passes results to quality-handler. Validation needed at runtime — if direct test execution by quality-handler is required, Bash restriction needs to be widened."},
+        {"artifact": "blueprint-v4.md", "section": "Component 3 Role description", "lines": "868", "quote_paraphrase": "Runs the ai-development-guide 4-phase verification + detect_stubs.py (Q-CC-2 path-aware patterns)."}
+      ],
+      "impact": "Operational: any task with non-Python tests will exit the per-task quality loop with infrastructure errors rather than verdict. The handler will return BLOCKER/escalation_needed for routine non-Python tests, triggering false-positive escalations. This compounds Risk 4 (skill-install sequencing) — even with correct binding, the agent can't actually run the tests it's bound to verify. Reduces FR-9 binding to ornamental.",
+      "recommended_resolution": "Two paths: (a) WIDEN to unrestricted `Bash` matching cc-design.md (the simplest correction; this is what cc-design specifies and the rationale's 'orchestrator runs them' workaround is not in any FR/AC); or (b) RE-ARCHITECT so all test invocation goes through `run_phase_checks.py` (already python-invoked) and quality-handler genuinely only consumes results — but this is a redesign of FR-2's per-task quality loop that needs to be reconciled with D-2c's APPROVED-status return contract and the per-task-execution-result schema. Recommended Path (a) for v5 (minimal change matches per-layer source); flag Path (b) as a candidate follow-on feature if `Bash(python3:*)` is preferred for security narrowing."
+    },
+    {
+      "id": "I-AA-603",
+      "severity": "MAJOR",
+      "category": "compliance",
+      "lens": "brief_honor",
+      "summary": "New 'auditing-shared as a Skill binding' convention introduced across 4 agents without an ADR; convention note 1 declares the divergence but no ADR ratifies it",
+      "location": "blueprint-v4.md §Agent Frontmatter Specifications → convention note 1 (line 964); 4 agents binding `auditing-shared` in `skills:` (orchestrator, quality-handler, phase-quality-reviewer, finalize-reconciler)",
+      "description": "Convention note 1 reads: 'This feature establishes a new convention. The execute-orchestrator, execute-task-quality-handler, execute-phase-quality-reviewer, and execute-finalize-reconciler bind auditing-shared in their skills: field. Existing planning-side agents do not — they invoke auditing-shared scripts via Bash only and never load its SKILL.md as context. The new convention loads the SKILL.md as context (so the agent has the conceptual model of the shared utilities) AND retains Bash invocation for script execution.' The note correctly surfaces the deviation per ADR-0029, but the deviation is a project-wide convention change affecting how all future agents bind auditing-shared. Per the established pattern (ADR-0011 for KB structure conventions, ADR-0019 for naming conventions, ADR-0031 for canonical-helper-home), cross-feature shared-conventions changes warrant an ADR by design-composer. The Blueprint authors ADR-0032 (per-doc-type vocabulary + frontmatter fields), ADR-0033 (Scope-Deviation surfacing extension), ADR-0034 (PRD mis-credit cleanup) but none cover the auditing-shared binding convention. ADR-0032's scope (per its Change 1-5 enumeration and per its own line: 'covers separate housekeeping per its Change 1-5 scope') does NOT include skill-binding conventions. The convention exists in the Blueprint and would be enforced by FR-6 (validator's skills: existence check) without a ratifying ADR.",
+      "evidence": [
+        {"artifact": "blueprint-v4.md", "section": "convention note 1", "lines": "964", "quote_paraphrase": "This feature establishes a new convention. The execute-orchestrator, execute-task-quality-handler, execute-phase-quality-reviewer, and execute-finalize-reconciler bind auditing-shared in their skills: field. Existing planning-side agents do not."},
+        {"artifact": "adrs/ADR-0032-conventions-canonicalization.md", "section": "Decision — Changes 1-5", "quote_paraphrase": "Change 1: Universal frontmatter fields. Change 2: User-token chain pattern. Change 3: Per-doc-type state vocabulary. Change 4: doc_type field. Change 5: Execution-phase artifact frontmatter section. (No mention of skill-binding conventions.)"},
+        {"artifact": "adrs/ADR-0031-auditing-shared-skill-module.md", "section": "scope", "quote_paraphrase": "Canonical-helper-home pattern for shared scripts; does not address whether downstream agents bind auditing-shared as a skill or just invoke its scripts via Bash."},
+        {"artifact": ".claude/agents/finalize-reconciler.md", "section": "skills field", "quote_paraphrase": "skills: [KB-review-disciplines, KB-documentation-criteria] — no auditing-shared binding; uses scripts via Bash if needed."}
+      ],
+      "impact": "Two failure modes: (a) brief-honor — ADR-0029 + ADR-0033 require deviations to surface in discoverable artifact locations AND get explicit ratification when they affect cross-feature norms; the convention-note surfacing is necessary but not sufficient. (b) Downstream contagion — Plan-stage tasks will codify the new convention into the validator's whitelist + 4 agent files; later features authoring new audit-touching agents will be uncertain whether the convention applies to them, lacking an ADR to cite.",
+      "recommended_resolution": "Two paths: (i) Author a new ADR (ADR-0035) capturing the auditing-shared-as-skill-binding convention, with the rationale that load-bearing context (conceptual model of shared utilities) is warranted for agents that materially depend on multiple auditing-shared scripts; OR (ii) fold into ADR-0032 as a sixth change category covering skill-binding conventions (parallel to Change 5's frontmatter additions). Recommended (i) for one-decision-per-ADR cleanliness (ADR-0032 is already at 5 changes per its own framing). The new ADR is authored by design-composer in reconciliation cycle 3."
+    },
+    {
+      "id": "I-AA-604",
+      "severity": "MAJOR",
+      "category": "consistency",
+      "lens": "brief_honor",
+      "summary": "PRD v1.1.0 normative ACs cite ADR-0021 as governing planning-side reconciliation; ADR-0034 says ADR-0021 has zero reconciliation content; the contradiction reaches into AC-FR-6-e + AC-FR-10-b which the Blueprint inherits verbatim",
+      "location": "blueprint-v4.md AC-FR-6-e (line 373) and AC-FR-10-b (line 402); PRD v1.1.0 AC-FR-6-e (line 256), AC-FR-10-b (line 293), Won't-Have line 331, line 499; ADR-0034 Decision (lines 45-49)",
+      "description": "ADR-0034 (revised in-place 2026-05-22T18:30:00Z per audit r2 finding I-AA-002) declares: 'ADR-0021 has no actual relationship to the cap (the PRD's attribution to it is the documentary error this ADR corrects); future references should cite ADR-0017... ADR-0021 should NOT be cited for the cap (it has no content on this discipline); citing ADR-0021 alongside ADR-0017 perpetuates the original documentary error.' But Blueprint v4 transcribes ACs verbatim from PRD v1.1.0 (per the AC section preamble: 'All 60 ACs are transferred faithfully from PRD v1.1.0'), and PRD v1.1.0 AC-FR-6-e + AC-FR-10-b cite ADR-0021 as 'governing' the planning-side reconciliation flow / budget. These ACs are now in the Blueprint at lines 373 and 402 — both with the ADR-0021 citation intact. ADR-0034's Decision explicitly says: 'No PRD v1.1.0 edit is performed... documentary corrections of this nature do not warrant a v1.1.1 supersession.' Fine for the PRD. But the Blueprint transcribes those ACs — Blueprint v4 is the gate-passed-pending normative document for downstream Plan/Tests. By inheriting the ACs verbatim, the Blueprint perpetuates exactly the citation ADR-0034 forbids ('citing ADR-0021 alongside ADR-0017 perpetuates the original documentary error'). Either ADR-0034's Decision needs softening (acknowledge PRD-inherited ACs as a documented exception), OR the AC transcription needs an explicit footnote/correction surface inside the Blueprint pointing at ADR-0034.",
+      "evidence": [
+        {"artifact": "blueprint-v4.md", "section": "AC-FR-6-e", "lines": "373", "quote_paraphrase": "The validator's failure on a planning-side artifact shall route the finding to the planning-side reconciliation flow (governed by ADR-0021); the validator's failure on an execution-side artifact shall route through the execution-side flow (governed by the ADR from FR-10)."},
+        {"artifact": "blueprint-v4.md", "section": "AC-FR-10-b", "lines": "402", "quote_paraphrase": "The budget cap shall apply to the quality-reconciliation loop (FR-4) but shall not modify the planning-side budget governed by ADR-0021."},
+        {"artifact": "adrs/ADR-0034-prd-mis-credit-cleanup.md", "section": "Decision", "lines": "45-49", "quote_paraphrase": "ADR-0017 is the canonical home for the 4-cycle reconciliation cap. ADR-0021 has no actual relationship to the cap... ADR-0021 should NOT be cited for the cap... citing ADR-0021 alongside ADR-0017 perpetuates the original documentary error."},
+        {"artifact": "prd-v1.1.0.md", "section": "AC-FR-6-e, AC-FR-10-b, Won't-Have line 331, Dependencies line 499", "quote_paraphrase": "Multiple ADR-0021 attributions for reconciliation discipline / budget governance."},
+        {"artifact": "adrs/ADR-0017-document-reviewer-integration.md", "section": "Decision line 155", "quote_paraphrase": "Iteration cap: 4 cycles (matching the pipeline's broader fixed-point iteration discipline from blueprint v3 §3.7)."}
+      ],
+      "impact": "Brief-honor: ADR-0034 is one of the three ADRs authored this run; the Blueprint must honor it. Inheriting the AC citations verbatim without correction surface re-instates the documentary error ADR-0034 was authored to close. Downstream (Plan / Tests) will reference the Blueprint ACs as canonical and re-propagate the ADR-0021 citation, neutralizing ADR-0034's purpose.",
+      "recommended_resolution": "Add a single explicit correction surface inside the Blueprint at the AC-FR-6-e and AC-FR-10-b transcriptions: a footnote or inline note stating 'ADR-0021 citation transcribed verbatim from PRD v1.1.0; corrected attribution per ADR-0034 is ADR-0017 — future downstream artifacts (Plan, Acceptance Tests, Phase Validators) should cite ADR-0017.' This preserves PRD fidelity (PRD prose unchanged per ADR-0005) while honoring ADR-0034 (the corrective reference is propagated forward). Alternatively, soften ADR-0034 Decision wording to acknowledge that Blueprint-verbatim AC transcription is the one permitted exception (with the corrective-attribution-footnote requirement)."
+    },
+    {
+      "id": "I-AA-605",
+      "severity": "MAJOR",
+      "category": "completeness",
+      "lens": "blast_radius",
+      "summary": "Blast-radius for shared-document-reviewer modification (doc_type taxonomy extension) is documented at the Change Impact Map level but the actual dependent set across the project is unaccounted for",
+      "location": "blueprint-v4.md Change Impact Map line 596; Component 6 (lines 897-904); ADR-0032 Change 4 (doc_type field as universal required)",
+      "description": "shared-document-reviewer is the only modified existing agent in this feature. The Change Impact Map line 596 marks it 'edit (doc_type taxonomy extension per ADR-0032 + D-9 second role)'. ADR-0032 Change 4 elevates `doc_type` to a universal required frontmatter field across all pipeline doc types (~20 doc_type values). Per blast-radius discipline: every existing artifact, template, and agent that authors an artifact has `doc_type` in its blast radius. Manual grep against `.claude/agents/*.md` and `.claude/skills/KB-documentation-criteria/references/templates/*.md` is the appropriate Lens-2 method here (GitNexus would just enumerate the same set). The Blueprint enumerates the touch-points partially — Change Impact Map line 609 covers the templates, but does NOT enumerate the 31 planning-side agents that author artifacts and would need their authoring frontmatter to include `doc_type` (this is the 'doc_type backfill' question). The Migration Strategy section (lines 1924-1931) addresses historical archives ('historical artifacts are not required to add doc_type'), which handles the past. But the present-set — every planning-side agent that authors a new artifact post-ratification — must be modified to emit `doc_type` in its frontmatter. The Blueprint does not enumerate which planning-side agents are affected nor what their modification surface is. Per AC-FR-11-d, the validator's enforcement is scoped to post-implementation date forward, but enforcement on what — agents that don't emit `doc_type` fail the validator at Gate 0 (frontmatter check). The blast-radius is wider than the 1 modified agent the Change Impact Map currently shows.",
+      "evidence": [
+        {"artifact": "blueprint-v4.md", "section": "Change Impact Map", "lines": "596 and 609", "quote_paraphrase": "shared-document-reviewer.md: edit (doc_type taxonomy extension). KB-documentation-criteria/references/shared-conventions.md: edit (Plan + Execution) — Per ADR-0032 (5 changes); spec-level edits happen at Plan + Execution time."},
+        {"artifact": "adrs/ADR-0032-conventions-canonicalization.md", "section": "Change 4", "quote_paraphrase": "doc_type field — add as required universal field with 20-value enum covering all pipeline-stage outputs plus 5 execution-phase artifact types."},
+        {"artifact": "blueprint-v4.md", "section": "Migration Strategy", "lines": "1924-1931", "quote_paraphrase": "doc_type field backfill: per AC-FR-11-d's scoping rule, historical artifacts are not required to add doc_type. The validator will tolerate missing doc_type on artifacts whose generated: timestamp predates the feature's deployment date."},
+        {"artifact": ".claude/agents/", "section": "31 planning-side agents", "quote_paraphrase": "Each authors a primary artifact (PRD, Blueprint, Plan, etc.); after this feature ratifies, each must emit doc_type in artifact frontmatter or fail validator at Gate 0."}
+      ],
+      "impact": "Blast-radius gap. Plan-stage task generation that follows the Change Impact Map alone will create 1 task to modify shared-document-reviewer + N tasks to update templates, but will NOT generate tasks to update the 31 planning-side agents' authoring prompts to emit `doc_type`. The first post-ratification pipeline run will then trigger validator failures at Gate 0 for every artifact those agents author (because none emit `doc_type`). The migration-scoping rule excuses historical artifacts but does not excuse newly-authored ones.",
+      "recommended_resolution": "Add to Change Impact Map a row enumerating the planning-side agents (or a wildcard '.claude/agents/intake-*.md, design-*.md, discovery-*.md, finalize-*.md, plan-author.md, test-*.md — author-prompt update to emit `doc_type` per the per-doc-type ADR-0032 enum') with action `edit (small)` and disposition 'minimal prompt amendment to author-time frontmatter section'. Quantify the touch count (likely 20+ agents, ~1-line change each). Alternatively, ship the validator with a grace period (e.g., 'doc_type missing emits warning, not failure, for the first 2 feature runs after ratification') — but this would require AC-FR-11-d revision. Recommend the explicit enumeration approach because it aligns with the Plan-stage task-generation pattern."
+    },
+    {
+      "id": "I-AA-606",
+      "severity": "MAJOR",
+      "category": "consistency",
+      "lens": "cross_section_consistency",
+      "summary": "FR-7-c floor coverage via Path B is internally defensible but the Blueprint's own internal-consistency narrative leaves ADR-0033 enumerating only 5 artifacts (omitting frontmatter-validation report and execution-reconciliation log per the PRD's 5-item floor)",
+      "location": "blueprint-v4.md AC-FR-7 floor coverage section (lines 2146-2158); ADR-0033 Context lines 27-31; PRD AC-FR-7-c line 264",
+      "description": "Path B (resolved as I-AA-001 in audit r1, retained through v2/v3/v4) disposes of the 'frontmatter-validation report' floor item as the script-output schema in `validate_pipeline_frontmatter.py` source, and the 'execution-reconciliation log' floor item as equivalent to `pipeline-run-summary.json`. The Blueprint documents this disposition cleanly at lines 2144-2158. However, ADR-0033 (`adrs/ADR-0033-adr-0029-execution-extension.md`) Context lines 27-31 still enumerates 5 execution-phase artifacts: per-task-execution-result, phase-quality-report, quality-reconciliation-log, state-transitions.log, pipeline-run-summary — matching the Path B substantive count, but not labeling pipeline-run-summary as 'execution-reconciliation log' and not naming the validator's JSON-output schema as a sixth surfacing target. ADR-0033's Extended Scope-Deviation surfacing table (lines 43-52) covers 8 rows including stub-vs-real audits, discipline-5 mechanical findings, state-transition failures, and run-termination — comprehensive. But the implicit-equivalence of pipeline-run-summary to 'execution-reconciliation log' is left without explicit mapping inside ADR-0033, which means a future reader cross-referencing PRD floor → ADR-0033 enumerated artifacts will see a 5-vs-5 match by count but miss that one of them is the PRD's 'execution-reconciliation log' under a different name. The Blueprint's Path B section does the mapping; ADR-0033 does not.",
+      "evidence": [
+        {"artifact": "blueprint-v4.md", "section": "AC-FR-7 floor coverage", "lines": "2148-2154", "quote_paraphrase": "PRD floor item 'execution-reconciliation log' → Blueprint disposition: Templated as pipeline-run-summary-template.md (per feature run; aggregates reconciliation activity across cycles). PRD floor item 'frontmatter-validation report' → Blueprint disposition: Covered by JSON-output schema defined inline in validate_pipeline_frontmatter.py source. Not a pair-pattern artifact; script source is canonical schema location."},
+        {"artifact": "adrs/ADR-0033-adr-0029-execution-extension.md", "section": "Context", "lines": "27-31", "quote_paraphrase": "These artifacts need explicit Scope-Deviation surfacing locations per the no-silent-scope-changes principle: per-task-execution-result.{json,md}; phase-quality-report.{json,md}; quality-reconciliation-log.{json,md}; state-transitions.log (JSONL); pipeline-run-summary.json. (5 enumerated; no inline label as 'execution-reconciliation log equivalent'; no row for frontmatter-validation-report-as-script-output.)"},
+        {"artifact": "prd-v1.1.0.md", "section": "AC-FR-7-c", "lines": "264", "quote_paraphrase": "5-item floor: per-task execution log; phase-quality report; quality-reconciliation log (per cycle); frontmatter-validation report; execution-reconciliation log."}
+      ],
+      "impact": "Path B disposition is sound; the issue is that ADR-0033 (the authoritative cross-feature ADR) doesn't mirror the Blueprint's explicit Path B mapping. A future feature reading ADR-0033 will see 5 execution-phase artifacts and not know that one of them ('pipeline-run-summary') is the PRD's 'execution-reconciliation log' and that the PRD's 'frontmatter-validation report' is intentionally not in the ADR's enumeration (because it lives as a script-output schema, not a pair-pattern artifact). Lower severity than I-AA-604 because the discoverable evidence (Blueprint Path B section) bridges the gap; but the ADR is the cross-feature canonical artifact, so it should hold the mapping too.",
+      "recommended_resolution": "Add 2 sentences to ADR-0033's Context section (or a footnote): (1) 'pipeline-run-summary serves as the PRD AC-FR-7-c "execution-reconciliation log" — per Blueprint Path B disposition'; (2) 'frontmatter-validation report exists as a JSON-output schema in validate_pipeline_frontmatter.py source rather than a pair-pattern artifact — outside ADR-0033's per-artifact-Scope-Deviation surfacing scope.' ADR-0033 is `status: proposed`, so in-place edit acceptable per the same ADR-0005 exception that allowed ADR-0034's revision; or fold into reconciliation cycle 3."
+    },
+    {
+      "id": "I-AA-607",
+      "severity": "MINOR",
+      "category": "consistency",
+      "lens": "cross_section_consistency",
+      "summary": "References section line 2328 still says 'This Blueprint | blueprint-v1.md | v1.0.0 draft (this document)' — stale carry-forward from v1",
+      "location": "blueprint-v4.md References → Pipeline artifacts in this feature run (line 2328)",
+      "description": "The References table's 'This Blueprint' row reads: `working/feature/execution-pipeline-design-r1/blueprint-v1.md | v1.0.0 draft (this document)`. The Blueprint is at v4.0.0 (frontmatter line 3). The row was correct in v1 and was carried forward verbatim through v2, v3, v4 without update. Minor because no downstream consumer would be misled (the frontmatter is canonical for version/path), but the table is structurally a self-reference and being stale advertises a documentation-discipline failure.",
+      "evidence": [
+        {"artifact": "blueprint-v4.md", "section": "References", "lines": "2328", "quote_paraphrase": "**This Blueprint** | working/feature/execution-pipeline-design-r1/blueprint-v1.md | v1.0.0 draft (this document)"},
+        {"artifact": "blueprint-v4.md", "section": "frontmatter", "lines": "1-8", "quote_paraphrase": "version: 4.0.0; status: draft; predecessor: blueprint-v3.md"}
+      ],
+      "impact": "Documentation hygiene; no operational consequence. But it's an own-goal on FR-6's frontmatter-validator-consumes-canonical-references pattern.",
+      "recommended_resolution": "Update the row to: `working/feature/execution-pipeline-design-r1/blueprint-v4.md | v4.0.0 draft (this document)`. Reconciliation cycle 3 small edit."
+    },
+    {
+      "id": "I-AA-608",
+      "severity": "MINOR",
+      "category": "clarity",
+      "lens": "cove",
+      "summary": "execute-orchestrator narrative says 'orchestrator does NOT have Write' (Security Considerations §filesystem write surface line 1958) but YAML block at line 985 declares Write in tools",
+      "location": "blueprint-v4.md Security Considerations → Filesystem write surface (line 1958); execute-orchestrator YAML (line 985)",
+      "description": "Security Considerations §Filesystem write surface line 1958: 'The orchestrator does NOT have Write (per cc-design.md orchestrator profile: tools include [Read, Glob, Grep, Bash, Task, TaskUpdate], NOT Write).' But the execute-orchestrator YAML at line 985 declares `tools: [Read, Glob, Grep, Write, Bash(python3:*), Agent, TaskUpdate]` — Write IS present. The v4 rationale at line 993 explicitly justifies Write inclusion ('Write added: cc-design omitted Write but the orchestrator's Blueprint Outputs include pipeline-run-summary.json and state-transitions.log... v3 adopted reading (a) defensively; v4 retains'). So the orchestrator HAS Write per the YAML. The Security section reflects the cc-design profile, not the Blueprint-as-authored. This is an under-transcription artifact: the Security section was not updated when v3 added Write to the orchestrator.",
+      "evidence": [
+        {"artifact": "blueprint-v4.md", "section": "Security Considerations → Filesystem write surface", "lines": "1958", "quote_paraphrase": "The orchestrator does NOT have Write (per cc-design.md orchestrator profile: tools include [Read, Glob, Grep, Bash, Task, TaskUpdate], NOT Write)."},
+        {"artifact": "blueprint-v4.md", "section": "execute-orchestrator YAML", "lines": "985", "quote_paraphrase": "tools: [Read, Glob, Grep, Write, Bash(python3:*), Agent, TaskUpdate]"},
+        {"artifact": "blueprint-v4.md", "section": "execute-orchestrator Rationale", "lines": "993", "quote_paraphrase": "Write added: cc-design omitted Write but the orchestrator's Blueprint Outputs include pipeline-run-summary.json and state-transitions.log. Two readings exist: (a) the orchestrator writes these directly (Write needed)... v3 adopted reading (a) defensively; v4 retains."}
+      ],
+      "impact": "Internal consistency defect that confuses the security posture statement; downstream security-review readers may assume the orchestrator is write-restricted when in fact it has full Write. Low severity because the YAML is the authoritative source for Plan-stage task generation; high severity if a security review consumed the Security section as canonical.",
+      "recommended_resolution": "Update Security Considerations §Filesystem write surface to: 'The orchestrator's tools include Write per v3 defensive reading (Blueprint Outputs include pipeline-run-summary.json and state-transitions.log; orchestrator authors these directly). The write surface is scoped to `working/feature/<feature-slug>/` only per project sandbox; subagent Write is similarly scoped. The hook script (`log_state_transition.py`) provides write access for transition logging via the allow-list pattern.' Reconciliation cycle 3 small edit."
+    },
+    {
+      "id": "I-AA-609",
+      "severity": "MINOR",
+      "category": "completeness",
+      "lens": "cross_section_consistency",
+      "summary": "12-state machine + 12 transitions inventory has implicit boundary states (INIT, TERMINATED) that the validator's invariant #10 cycle-count equivalence check needs to handle",
+      "location": "blueprint-v4.md State Transitions and Invariants (lines 1396-1471)",
+      "description": "Line 1413: 'Plus implicit boundary states INIT (orchestrator startup) and TERMINATED (final).' These two boundary states bring the actual state count to 14, not 12. The 12-state title is a documented convention but invariant #10 (cycle counter equivalence: 'at any moment, the orchestrator's in-memory cycle counter MUST equal the count of corresponding T4/T10 entries in state-transitions.log') depends on which transitions are logged. The state diagram (mermaid lines 1434-1456) shows INIT-to-pending and various-to-TERMINATED transitions, but the 12-transition inventory (lines 1417-1430) does NOT enumerate them. The validator's invariant check would need to know whether INIT-to-pending and terminal-to-TERMINATED transitions are logged or skipped; the Blueprint does not specify.",
+      "evidence": [
+        {"artifact": "blueprint-v4.md", "section": "State Transitions — States", "lines": "1413", "quote_paraphrase": "Plus implicit boundary states INIT (orchestrator startup) and TERMINATED (final)."},
+        {"artifact": "blueprint-v4.md", "section": "State Transitions — Transitions (12 total per cc-design.md D-16)", "lines": "1417-1430", "quote_paraphrase": "Table T1-T12. T1 = pending→producing. (No INIT→pending entry; no terminal→TERMINATED entries.)"},
+        {"artifact": "blueprint-v4.md", "section": "State machine diagram (mermaid)", "lines": "1436-1455", "quote_paraphrase": "[*] --> pending: orchestrator initialized. phase_complete --> [*]: gate-pass to Deliverable Packaging. escalated_*_quality --> [*]: user resolution. (Diagram shows INIT and TERMINATED transitions.)"},
+        {"artifact": "blueprint-v4.md", "section": "Invariants — Invariant #10", "lines": "1471", "quote_paraphrase": "at any moment, the orchestrator's in-memory cycle counter MUST equal the count of corresponding T4/T10 entries in state-transitions.log."}
+      ],
+      "impact": "Minor: invariant #10 specifies T4 + T10 only (per-task and phase reconciliation cycles), so the boundary transitions don't directly affect the invariant. But the discrepancy between '12 states / 12 transitions' (table count) and 'INIT + 12 + TERMINATED states / 12 + boundary-entry + boundary-exit transitions' (diagram) is an under-transcription. A Plan author writing the validator would need to decide whether to log INIT→pending and might pick differently from the orchestrator's actual behavior, breaking invariant #10's equivalence.",
+      "recommended_resolution": "Either (a) document boundary transitions as 'T0 (INIT→pending, fired on orchestrator startup)' and 'T13 (any state → TERMINATED, fired on gate-pass / user-resolution / abort)' to make the inventory match the diagram; OR (b) explicitly state that boundary transitions are NOT logged (and explain how the validator handles the resulting absence). Recommended (a) for completeness — also clarifies invariant #5 'application-level hook fires on EVERY transition'."
+    },
+    {
+      "id": "I-AA-610",
+      "severity": "INFO",
+      "category": "completeness",
+      "lens": "brief_honor",
+      "summary": "Convergence-cap awareness — round 6 is the first authoritative audit; per the orchestrator brief, 2 of 4 reconciliation cycles remain after this audit (if needs_revision/blocker)",
+      "location": "Orchestrator brief metadata; ADR-0017 4-cycle cap",
+      "description": "Per orchestrator brief: 'Reconciliation budget per ADR-0017: 2 of 4 cycles used; 2 remain.' This audit is the first authoritative one. The 5 prior rounds were claude.ai simulation per the brief. If this audit returns needs_revision (which it does), reconciliation cycle 3 would run; 1 reconciliation cycle would remain after cycle 3 if cycle 4 audit also fails. Auditors should be aware that the convergence cap is real and aggressive iteration is no longer cost-free.",
+      "evidence": [
+        {"artifact": "orchestrator brief", "section": "Reconciliation context", "quote_paraphrase": "Reconciliation budget per ADR-0017: 2 of 4 cycles used; 2 remain."},
+        {"artifact": "adrs/ADR-0017-document-reviewer-integration.md", "section": "Decision", "lines": "155", "quote_paraphrase": "Iteration cap: 4 cycles. After 4 cycles, escalate to Cycle-Cap Escalation Gate."}
+      ],
+      "impact": "Awareness only.",
+      "recommended_resolution": "No action. Tracked for orchestrator triage."
+    },
+    {
+      "id": "I-AA-611",
+      "severity": "INFO",
+      "category": "compliance",
+      "lens": "brief_honor",
+      "summary": "Audit-procedure deficiency acknowledgment carried forward from r3/r5 (per I-AA-310 / I-AA-501): canonical-agent-frontmatter-pattern check and canonical-platform-docs verification should be added to KB-review-disciplines",
+      "location": "KB-review-disciplines/references/architecture-audit.md (procedure spec)",
+      "description": "Per the orchestrator brief: 'The simulation missed this in r1+r2 (caught in r3 only after a user prompt)... The simulation missed memory: none being invalid syntax and a Task/Agent tool-naming confusion until Gate 4 verification (r4 → r5).' Both gaps reflect missing checks in KB-review-disciplines/references/architecture-audit.md. The audit-procedure should grow these two checks to be canonical: (1) For every agent file specified in a Blueprint, verify YAML frontmatter against the canonical pattern documented in KB-cc-platform; (2) For every Claude Code primitive specified (tools enum values, memory enum, skills binding, Agent vs TaskCreate distinction), verify against the authoritative platform docs (KB-cc-platform first; spot-check code.claude.com/docs/en/sub-agents for novel patterns). This audit (r6) applied both checks per the brief; the gap is in KB-review-disciplines, not in this audit's coverage.",
+      "evidence": [
+        {"artifact": "architecture-audit-issues-r3.json", "section": "I-AA-310 audit-procedure-deficiency entry", "quote_paraphrase": "the cycle-3 audit was opened formally because cycles 1+2 missed the canonical-agent-frontmatter-pattern check. This is a gap in the audit procedure spec (not currently in KB-review-disciplines or equivalent)."},
+        {"artifact": "architecture-audit-issues-r5.json", "section": "audit_procedure_improvement_candidates_for_followon_feature", "quote_paraphrase": "Add canonical-agent-frontmatter-pattern check to KB-review-disciplines Architecture Audit procedure spec... Add canonical-platform-docs verification step to KB-review-disciplines Gate 4 procedure spec."},
+        {"artifact": "KB-review-disciplines/references/architecture-audit.md", "section": "Lens 1-3 procedures", "quote_paraphrase": "The current spec does not enumerate canonical-frontmatter-pattern or canonical-platform-docs checks as mandatory steps."}
+      ],
+      "impact": "Carried to follow-on feature. Does not gate this Blueprint's verdict.",
+      "recommended_resolution": "Future feature (KB-review-disciplines enhancement) adds the two checks to the Architecture Audit procedure spec. This audit run applied them per the orchestrator brief's direction; no Blueprint change needed."
+    },
+    {
+      "id": "I-AA-612",
+      "severity": "INFO",
+      "category": "completeness",
+      "lens": "blast_radius",
+      "summary": "Blast-radius analysis was conducted without GitNexus or codebase-memory-mcp; manual Grep + cross-artifact reading was sufficient for this single-layer feature but is recorded for transparency",
+      "location": "Audit method — code_graph_used field",
+      "description": "Per KB-review-disciplines/references/architecture-audit.md, GitNexus is the primary code-graph MCP; codebase-memory-mcp is the fallback. Neither was provisioned in this dispatch environment. Per the discipline's degradation rule (lines 117-124 of the architecture-audit.md), manual best-effort blast-radius via Grep/Glob is acceptable with an INFO surface and the method recorded. Feature is single-layer (Claude Code only); all touch points enumerated by manual scan of `.claude/agents/`, `.claude/skills/`, `adrs/`, and the Blueprint's own Change Impact Map. Manual method is high-confidence for this feature class. Recorded for downstream auditor awareness.",
+      "evidence": [
+        {"artifact": ".claude/skills/KB-review-disciplines/references/architecture-audit.md", "section": "GitNexus / codebase-memory-mcp degradation", "lines": "117-124", "quote_paraphrase": "If both MCPs are unavailable... performs a best-effort manual blast-radius using Grep/Glob on the change targets' symbols; surfaces an `important` issue noting the manual method, with severity downgrade-or-upgrade rationale."}
+      ],
+      "impact": "Informational. The blast-radius gap surfaced in I-AA-605 was caught by manual scan; the method is reliable for this single-layer feature scope.",
+      "recommended_resolution": "Note in deliverable archive; future audits should provision GitNexus when available for wider-blast-radius features."
+    }
+  ],
+  "scores": {
+    "consistency": 72,
+    "completeness": 78,
+    "rule_compliance": 80,
+    "clarity": "n/a (architecture audit does not score clarity per KB-review-disciplines severity-taxonomy.md line 140)"
+  },
+  "score_rationale": "Consistency drops below 80 due to I-AA-601 (validator-coverage subsection contradicts its own surgical corrections; this is a major internal inconsistency), I-AA-604 (ADR-0034 vs verbatim AC transcription), and I-AA-608 (Security section vs YAML Write declaration). Completeness drops below 85 due to I-AA-603 (auditing-shared binding convention without ADR ratification), I-AA-605 (doc_type backfill blast-radius gap), I-AA-606 (ADR-0033 doesn't mirror Blueprint's Path B disposition). Rule compliance above 75 but below 85 due to brief-honor gaps with ADR-0029/0034 (I-AA-603, I-AA-604).",
+  "summary": {
+    "BLOCKER": 1,
+    "MAJOR": 5,
+    "MINOR": 3,
+    "INFO": 3
+  },
+  "verdict": "needs_revision",
+  "verdict_rationale": "Per KB-review-disciplines/references/severity-taxonomy.md: any BLOCKER → needs_revision (mandatory). I-AA-601 alone forces this verdict — the Frontmatter validator coverage subsection codifies a validator spec that would mechanically reject the very agents v4 declares correct, directly undermining FR-6's mechanical defense. Additionally, 5 MAJOR findings (any single one would also push toward conditional_pass per the taxonomy; aggregate pushes to needs_revision) cover real architectural defects: feasibility (quality-handler Bash restriction), brief-honor (auditing-shared convention without ADR; ADR-0034 perpetuated in inherited AC citations), blast-radius (doc_type backfill gap), and cross-section consistency (ADR-0033 vs Blueprint Path B mapping). Recommend reconciliation cycle 3 with design-composer addressing the 6 BLOCKER+MAJOR findings; the 3 MINOR + 3 INFO findings can be batched in the same cycle or surfaced as wontfix-with-rationale per user judgment. The simulated r5 'pass' verdict is retracted; the simulated audits' scope (verifying v4's surgical corrections were applied) was narrow and missed the broader internal-consistency, brief-honor, and blast-radius concerns this authoritative round 6 surfaced.",
+  "convergence_verdict": "diverged_from_simulated_pass",
+  "convergence_note": "The simulated r5 returned `pass`; this authoritative r6 returns `needs_revision`. The divergence is because r5 was scoped to verify the v4 surgical corrections only (5 specific change-IDs against blueprint-v3); the authoritative r6 conducts a full audit from scratch per the brief's direction. Both verdicts can be simultaneously true relative to their scopes: the v3→v4 surgical corrections WERE applied correctly (r5 scope), AND the Blueprint v4 as a whole has 1 BLOCKER + 5 MAJOR issues a full audit surfaces (r6 scope).",
+  "ready_for_plan_stage": false,
+  "next_step": "Route to finalize-reconciler for reconciliation cycle 3. Cycle budget after this cycle: 3 of 4 used, 1 remaining. The 6 BLOCKER + MAJOR findings each have explicit recommended_resolution; design-composer can batch them into a single re-author cycle. If cycle 3's v5 still has BLOCKER, cycle 4 is the final reconciliation cycle per ADR-0017; cycle 4 failure escalates to user per Cycle-Cap Escalation Gate.",
+  "cycle_budget_summary": {
+    "audit_rounds_completed_authoritative": 1,
+    "audit_rounds_simulated_background": 5,
+    "reconciliation_cycles_used": 2,
+    "reconciliation_cycle_cap": 4,
+    "reconciliation_cycles_remaining_if_cycle_3_dispatched": 1,
+    "convergence_cap_status": "within_cap; one reconciliation cycle remaining after the dispatch this verdict recommends"
+  }
+}

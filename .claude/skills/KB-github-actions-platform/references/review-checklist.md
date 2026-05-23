@@ -1,6 +1,6 @@
 # Review Checklist
 
-A structured pass to make when reviewing or auditing a GitHub Actions workflow. Combine this with `scripts/audit_workflow.py` for the mechanical checks; this document covers the judgment calls.
+A structured pass to make when reviewing or auditing a GitHub Actions workflow. Combine this with the audit script at `../../auditing-github-actions/scripts/audit_workflow.py` (relocated per ADR-0036 + AC-FR-8-a) for the mechanical checks; this document covers the judgment calls.
 
 Group findings by severity:
 - **Blocker** — security vulnerability or correctness bug. Must be fixed before merging.

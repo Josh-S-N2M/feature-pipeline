@@ -428,5 +428,47 @@ Template storage locations follow KB-documentation-criteria skill. Review proced
 
 The Output Protocol section above is the canonical contract. The output JSON object must include:
 - `metadata`, `verdict`/`analysis`, `issues` objects
+
+## v2: doc_type dispatch (per ADR-0032 Change 4 + Blueprint D-9 second role)
+
+This reviewer dispatches type-specific checks based on the artifact's `doc_type:` frontmatter field. See `.claude/skills/KB-documentation-criteria/references/shared-conventions.md` § v2 Amendments for the full canonical taxonomy. The summary dispatch:
+
+### Per-doc-type vocabulary dispatch
+
+Apply the 3-tier vocabulary check from shared-conventions.md § Change 3:
+
+- **Gated** (`intent-clarification`, `prd`, `research-plan`, `blueprint`, `plan`) — vocab `{draft, accepted, superseded, rejected}`. Reject `status: complete` or `status: proposed` as out-of-vocab.
+- **Analysis/log** (`codebase-analysis`, `synthesis`, `*-design`, `*-issues`, `*-tests`, `*-validators`, `*-log`, `*-report`, `*-result`, `*-summary`, `task-dag`) — vocab `{draft, complete, superseded}`. Reject `status: accepted` or `status: proposed` as out-of-vocab.
+- **ADR** (`adr`) — vocab `{proposed, accepted, superseded, rejected}` (no `draft`). Reject `status: draft` as out-of-vocab.
+
+### Per-doc-type required-field set
+
+In addition to universal required fields (per Change 1: `feature_slug`, `derived_from`, `doc_type`, plus `id`, `version`, `status`, `generated`, `generated_by`):
+
+| doc_type | Additional required fields after reviewer pass |
+|---|---|
+| Gated artifacts | `gate_passed`, `approved_at`, `reviewer_verdict`, prior-stage `user_token` chain |
+| ADR | `date`, `accepted` (when status: accepted), `deciders` |
+| `per-task-execution-result` | `task_id`, `phase_id` |
+| `phase-quality-report` | `phase_id`, `feature_slug` |
+| `quality-reconciliation-log` | `phase_id`, `cycle`, `budget_used`, `budget_remaining` |
+| `state-transitions-log` | append-only JSONL; no per-entry frontmatter — header line only |
+| `pipeline-run-summary` | `run_id`, `feature_slug`, `start_at`, `end_at`, final-ship status |
+
+### Validator integration
+
+Invoke `.claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py` as the mechanical first pass; consume its findings as Gate-0 structural input. Then layer this reviewer's Gate-1 quality checks on top per the doc_type dispatch above.
+
+### Execution-phase doc_type recognition
+
+The 5 execution-phase doc_types (`per-task-execution-result`, `phase-quality-report`, `quality-reconciliation-log`, `state-transitions-log`, `pipeline-run-summary`) are new in v2. For each:
+
+- Confirm the artifact conforms to its canonical template (under `KB-documentation-criteria/references/templates/<doc-type>-template.md`).
+- Apply analysis/log 3-state vocabulary.
+- Cross-reference upstream artifacts (e.g., `per-task-execution-result` references a task in `tasks.json`; `phase-quality-report` references a phase in `plan-v<N>.md`).
+
+### ADR placement (per ADR-0036)
+
+When reviewing ADRs, expect a single canonical location: `adrs/ADR-NNNN-<slug>.md` at project root. Do NOT flag absence of a `working/feature/<slug>/adrs/` mirror copy — that convention is retired.
 - `id`, `severity`, `category` for each issue
 - `suggestion` must be specific and actionable

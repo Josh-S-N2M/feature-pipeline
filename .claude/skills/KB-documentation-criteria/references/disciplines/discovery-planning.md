@@ -4,6 +4,17 @@ Operational rules for the Discovery Planning stage, authored by `discovery-plan-
 
 This discipline file complements `references/templates/research-plan-template.md` (the structural contract). The template says what sections must exist; this discipline says how each section is populated.
 
+## Contents
+
+- Core principle: KB-and-ADR-first
+- Five-way disposition triage (the central rubric)
+- When to choose `designer-general-knowledge` vs other dispositions
+- KB gap-analysis discipline
+- ADR substrate analysis
+- External-research authorization criteria
+- Research budget discipline
+- Anti-patterns
+
 ## Core principle: KB-and-ADR-first
 
 Every information need produced by reading the PRD goes through a **five-way disposition triage**:

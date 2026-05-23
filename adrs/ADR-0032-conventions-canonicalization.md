@@ -1,8 +1,9 @@
 ---
 id: ADR-0032
 title: Conventions canonicalization — pipeline-frontmatter fields, per-doc-type state vocabulary, and `doc_type` taxonomy
-status: proposed
+status: accepted
 date: 2026-05-22
+accepted: 2026-05-22
 deciders: [user, claude (as design-composer)]
 supersedes: []
 superseded_by: []

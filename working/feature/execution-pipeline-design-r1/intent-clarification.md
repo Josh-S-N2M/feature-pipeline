@@ -3,11 +3,21 @@ id: IC-execution-pipeline-design-r1
 version: 1.0.0
 status: accepted
 feature_slug: execution-pipeline-design-r1
+scope_class: FULL
 user_token: IC-CONFIRM-execution-pipeline-design-r1-20260522T024500Z
 generated: 2026-05-22T02:42:00Z
 generated_by: claude (acting as intake-intent-clarifier, continuation session)
 approved_at: 2026-05-22T02:45:00Z
 gate_passed: 1
+doc_type: intent-clarification
+amended: 2026-05-22T23:30:00Z
+amendment_reason: |
+  Gate-6 packaging completeness pass. Added (a) scope_class: FULL per
+  ADR-0023 + deliverable-archive-spec line 27 explicit-declaration pattern;
+  (b) doc_type: intent-clarification per ADR-0032 Change 4 universal-required
+  field; (c) Discovery shortcut section justifying absence of research-notes/
+  (external research budget unused; KB-gap analysis closed all topics —
+  consistent with codebase-analysis.md's external_research_topics_consumed: 0).
 ---
 
 # Intent Clarification: Execution Pipeline Design (r1)
@@ -24,6 +34,7 @@ gate_passed: 1
 - [x] Success Posture (Preliminary)
 - [x] Confirmation
 - [x] Open Items (Pending PRD Authoring)
+- [x] Discovery shortcut (Gate-6 packaging amendment)
 
 ## Purpose
 
@@ -105,3 +116,30 @@ Pending Intent Confirmation Gate. User to confirm by saying "approve" (or equiva
 - The finding-depth classifier (Level 0 through Level 8, as discussed) needs PRD-level formalization as a functional requirement, with the dispatch matrix specified at Blueprint time.
 - The reconciliation-budget cap for execution needs PRD-level decision; default-proposed value is one that the PRD author selects based on cascade-cost analysis.
 - The full enumeration of execution-phase artifact templates needs Blueprint-level decision and KB-documentation-criteria authorship as part of the Plan.
+
+## Discovery shortcut (Gate-6 packaging amendment)
+
+This section was added retroactively at Gate-6 Deliverable Packaging to formalize why no external `research-notes/<topic>.md` files were authored despite the FULL scope class. The deliverable-archive-spec §FULL scope requires research-notes at BLOCKER severity; this Discovery shortcut documents the deliberate omission per the same pattern the spec uses for MINOR scope skipped-stage justifications.
+
+### Why external research was not consumed
+
+The `research-plan.md` enumerated six candidate external-research topics (external_research_topics_budget: 6 in `codebase-analysis.md` frontmatter). The Discovery Research stage's KB-gap analysis evaluated whether each topic was already covered by existing project knowledge bases (KB-cc-platform, KB-cc-design, KB-documentation-criteria, KB-review-disciplines, KB-task-decomposition) or by prior ADRs (ADR-0017, ADR-0021, ADR-0029, ADR-0031). The gap-analysis verdict: **all six candidate topics were already covered**; no external research was warranted.
+
+Codebase-analysis.md captures this explicitly via:
+
+- `external_research_topics_consumed: 0` (frontmatter)
+- `external_research_topics_budget: 6` (frontmatter; budget preserved unused)
+- No `discovery-external-researcher` invocations were dispatched during this feature run.
+
+### What this Discovery shortcut does NOT cover
+
+This shortcut justifies only the absence of external research-notes. It does NOT skip any other FULL-scope stage:
+
+- Discovery Planning ran (`research-plan.md` v1.1.0 present)
+- Discovery Codebase Research ran (`codebase-analysis.md` v1.1.1 reviewer_verdict=approved)
+- Synthesis ran (`synthesis.md` v1.1.0 reviewer_verdict=approved)
+- All downstream stages ran per FULL scope
+
+### Validator disposition
+
+The deliverable-archive validator should treat the absence of `research-notes/<topic>.md` as **WAIVED via Discovery shortcut**, not as BLOCKER. The waiver is anchored to `codebase-analysis.md`'s `external_research_topics_consumed: 0` frontmatter — that field is the load-bearing evidence; this Discovery shortcut is the human-readable rationale.

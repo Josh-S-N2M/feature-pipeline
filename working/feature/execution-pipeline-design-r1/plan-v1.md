@@ -1,7 +1,9 @@
 ---
 id: Plan-execution-pipeline-design-r1
 version: 1.0.0
-status: draft
+status: superseded
+superseded_by: working/feature/execution-pipeline-design-r1/plan-v2.md
+superseded_at: 2026-05-22T23:30:00Z
 feature_slug: execution-pipeline-design-r1
 derived_from: working/feature/execution-pipeline-design-r1/blueprint-v4.md
 phases: 7
@@ -16,6 +18,12 @@ agent_invocation_note: |
   discipline, dependency edges) but task-level detail may benefit from refinement
   by the authoritative Claude Code pass. Treat task descriptions as a starting
   point; verify acceptance-criterion coverage against the PRD before execution.
+supersession_note: |
+  Superseded by plan-v2.md (authoritative; non-simulated; derived from blueprint-v5
+  which passed Architecture Audit round 7). v1 was structurally correct but task-level
+  detail derived from blueprint-v4 (now superseded by v5). Per ADR-0005 append-only
+  supersession, the body of this file remains unchanged; only the frontmatter is
+  updated to reflect the supersession relationship.
 ---
 
 # Plan: Execution Pipeline Design (run r1)

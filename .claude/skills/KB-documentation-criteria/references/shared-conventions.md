@@ -218,3 +218,91 @@ Implements FR-3 from the PRD.
 - Versions are explicit when the reference is to a specific version, omitted when "the latest accepted" is implied
 
 `review-cross-artifact-auditor` checks that every reference resolves — broken references → `important` completeness issue.
+
+## v2 Amendments (per ADR-0032 + ADR-0036)
+
+This section codifies the 5 coordinated changes from **ADR-0032 (Conventions canonicalization)** plus the single-location ADR placement convention from **ADR-0036**. ADR-0032 is the authoritative source — consult it for full rationale and validation evidence. This section makes the changes load-bearing for `shared-document-reviewer` and the FR-6 frontmatter validator (`validate_pipeline_frontmatter.py`).
+
+### Change 1 — Universal required frontmatter fields
+
+In addition to `id`, `version`, `status`, `generated`, `generated_by` (already documented above), every pipeline-artifact frontmatter MUST carry:
+
+- `feature_slug: <slug>` — universal required (was: only some doc types per old spec)
+- `derived_from: <path|list>` — universal required for every non-Intent-Clarification artifact
+- `doc_type: <enum>` — universal required (per Change 4 below)
+
+Gated artifacts (per Change 3 below) additionally require after reviewer pass:
+
+- `gate_passed: <integer>` — which gate the artifact passed (1, 2, 3, ...)
+- `approved_at: <ISO-8601-UTC>` — when reviewer pass occurred
+- `reviewer_verdict: <string>` — Gate 0/1 pass + scores
+
+Optional companion fields for revised artifacts:
+
+- `revised: <ISO-8601-UTC>` — last revision timestamp
+- `revision_reason: |` — multi-line pipe-folded description of why the revision occurred
+
+### Change 2 — User-token chain pattern
+
+Each gated stage's artifact carries the prior stage's confirmation token. The pattern:
+
+| Artifact | Carries |
+|---|---|
+| `intent-clarification.md` | `user_token:` (own confirmation) |
+| `prd-v<N>.md` | `intent_user_token:` (prior) + `user_token:` (own) |
+| `research-plan.md` | `prd_user_token:` (prior) + `user_token:` (own) |
+| `codebase-analysis.md` | `research_plan_user_token:` (prior) — no own token since analysis/log artifacts are not gated |
+| `blueprint-v<N>.md` | `research_plan_user_token:` (prior chain) + `user_token:` (own) |
+| `plan-v<N>.md` | `blueprint_user_token:` (prior) + `user_token:` (own) |
+
+Downstream sub-agents reference these tokens in their rationale briefs as confirmation that the user actively gated upstream stages.
+
+### Change 3 — Per-doc-type state vocabulary (3-tier)
+
+The single 5-state vocabulary in the original spec (`draft | proposed | accepted | superseded | rejected`) is replaced with **three category vocabularies** dispatched by `doc_type`:
+
+| Category | doc_types | Vocabulary |
+|---|---|---|
+| **Gated** | `intent-clarification`, `prd`, `research-plan`, `blueprint`, `plan` | `draft → accepted → superseded \| rejected` (5-state including intermediate `proposed` for some; intermediate forms vary per type) |
+| **Analysis/log** | `codebase-analysis`, `synthesis`, `<layer>-design`, `architecture-audit-issues`, `cross-artifact-audit-issues`, `acceptance-tests`, `phase-validators`, `reconciliation-log`, `task-dag`, plus execution-phase types (`per-task-execution-result`, `phase-quality-report`, `quality-reconciliation-log`, `state-transitions-log`, `pipeline-run-summary`) | `draft → complete \| superseded` (3-state — `complete` is the post-reviewer ratified state for non-gated artifacts) |
+| **ADRs** | `adr` (single doc-type) | `proposed → accepted \| superseded \| rejected` (4-state, no `draft`) |
+
+This dispatch resolves the prior drift where `codebase-analysis.md` carried `status: complete` (invalid under the old single-vocab) and `synthesis.md` would have stayed `status: draft` indefinitely.
+
+### Change 4 — `doc_type` field as universal required (20+5 enum)
+
+Every pipeline-artifact frontmatter MUST declare `doc_type:` from the canonical enum:
+
+**Planning-side (20 values)**: `intent-clarification`, `prd`, `research-plan`, `codebase-analysis`, `synthesis`, `<layer>-design` (e.g., `claude-code-design`, `backend-design`), `blueprint`, `architecture-audit-issues`, `plan`, `acceptance-tests`, `phase-validators`, `cross-artifact-audit-issues`, `reconciliation-log`, `task-dag`, `adr`, plus suffix patterns like `*-report` and `*-result`.
+
+**Execution-side (5 values, new with this convention)**: `per-task-execution-result`, `phase-quality-report`, `quality-reconciliation-log`, `state-transitions-log`, `pipeline-run-summary`.
+
+`shared-document-reviewer` uses `doc_type` as the dispatch key for type-specific checks; `validate_pipeline_frontmatter.py` uses it to look up the per-doc-type vocabulary and required-field set.
+
+### Change 5 — Execution-phase artifact frontmatter
+
+Execution-phase artifacts (the 5 new `doc_type` values) follow the analysis/log vocabulary (3-state: `draft → complete | superseded`) and add execution-specific fields:
+
+- `task_id:` — for `per-task-execution-result` artifacts
+- `phase_id:` — for `phase-quality-report`, `quality-reconciliation-log` artifacts
+- `cycle:` — for `quality-reconciliation-log` artifacts (per ADR-0017 cap)
+- `feature_slug:` — universal
+- `derived_from:` — for state-transitions-log + pipeline-run-summary, omits this field per their nature (cumulative logs, not derived)
+
+The 5 execution-phase artifact templates live at:
+
+- `KB-documentation-criteria/references/templates/per-task-execution-result-template.md`
+- `KB-documentation-criteria/references/templates/phase-quality-report-template.md`
+- `KB-documentation-criteria/references/templates/quality-reconciliation-log-template.md`
+- `KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md`
+- `KB-documentation-criteria/references/templates/pipeline-run-summary-template.md`
+
+### ADR placement convention (per ADR-0036)
+
+ADRs live in exactly one canonical location: `adrs/ADR-NNNN-<slug>.md` at the project root. The dual-location convention from the original deliverable-archive-spec is retired. See ADR-0036 for full rationale.
+
+### Migration / enforcement
+
+- **Forward-scoped**: the FR-6 frontmatter validator enforces these conventions from this feature's ratification date forward. Historical artifacts authored before ratification are not retroactively flagged.
+- **Planning-side agents**: the ~20+ planning-side agents that author pipeline artifacts need `doc_type:` emission added to their author-prompts. This is the deferred scope of the `planning-agent-doctype-backfill-r1` feature (see `working/feature/planning-agent-doctype-backfill-r1/intent-clarification.md`). Until that feature ships, new planning-side artifacts will surface a `doc_type missing` MAJOR finding at Gate 0 — surfaced explicitly per ADR-0033 no-silent-absorption.
+- **Execution-side agents**: the 5 new `execute-*` agents author with `doc_type` from inception per Plan v2 Phase 3.

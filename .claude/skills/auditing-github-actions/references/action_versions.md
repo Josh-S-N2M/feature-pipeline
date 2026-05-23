@@ -75,7 +75,7 @@ If you find any of these in a workflow, flag for upgrade.
 
 | Action | Current major | Notes |
 |---|---|---|
-| `anthropics/claude-code-action` | v1 | Run Claude Code agent in workflows. v1.0 introduced breaking changes from beta — see `references/claude-code-cicd.md` § Beta → v1 migration. Supports direct Claude API, Amazon Bedrock (`use_bedrock: true`), Google Vertex AI (`use_vertex: true`), and Microsoft Foundry (via `CLAUDE_CODE_USE_FOUNDRY=1` env). |
+| `anthropics/claude-code-action` | v1 | Run Claude Code agent in workflows. v1.0 introduced breaking changes from beta — see `../../KB-github-actions-platform/references/claude-code-cicd.md` § Beta → v1 migration. Supports direct Claude API, Amazon Bedrock (`use_bedrock: true`), Google Vertex AI (`use_vertex: true`), and Microsoft Foundry (via `CLAUDE_CODE_USE_FOUNDRY=1` env). |
 | `actions/create-github-app-token` | v2 | Mint a GitHub App installation token for use as `github_token:` — needed when using a custom GitHub App (recommended for enterprise Claude Code setups so commits attribute to your app and trigger downstream CI). |
 
 ## Container build / publish

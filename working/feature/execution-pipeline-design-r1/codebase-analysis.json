@@ -1,0 +1,182 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "execution-pipeline-design-r1",
+  "generated": "2026-05-22T23:35:00Z",
+  "generated_by": "claude (Gate-6 packaging retroactive companion; original codebase research conducted 2026-05-22T03:16:00Z by discovery-codebase-researcher)",
+  "derived_from": "working/feature/execution-pipeline-design-r1/research-plan.md",
+  "research_plan_version": "1.1.0",
+  "primary_source": "working/feature/execution-pipeline-design-r1/codebase-analysis.md",
+  "primary_source_version": "1.1.1",
+  "primary_source_reviewer_verdict": "approved",
+  "retroactive_companion_note": "This JSON was authored at Gate-6 Deliverable Packaging to satisfy the deliverable-archive-spec §FULL scope expected-artifact set. The original codebase research was conducted as a single .md per the project convention noted in codebase-analysis.md's `companion_artifact: <none — single .md per project convention for this feature>` frontmatter. This JSON captures the structured data load-bearing for downstream consumers (Blueprint Fact Disposition Table, document-reviewer at invocation point 3); for full prose context refer to the primary_source .md.",
+
+  "research_summary": {
+    "information_needs_total": 17,
+    "information_needs_resolved": 16,
+    "information_needs_not_applicable": 1,
+    "INs_covered": ["IN-001", "IN-002", "IN-003", "IN-004", "IN-005", "IN-006", "IN-007", "IN-008", "IN-009", "IN-010", "IN-011", "IN-012", "IN-014", "IN-015", "IN-016", "IN-017"],
+    "INs_not_applicable": ["IN-013"],
+    "external_research_topics_consumed": 0,
+    "external_research_topics_budget": 6,
+    "external_research_skip_reason": "KB-gap analysis closed all six candidate topics — covered by existing KB-cc-platform / KB-cc-design / KB-documentation-criteria / KB-review-disciplines / KB-task-decomposition + ADR-0017/0021/0029/0031. See intent-clarification.md §Discovery shortcut for full rationale.",
+    "blueprint_decisions_surfaced": 14,
+    "mechanical_applications": 3,
+    "scope_deviations_surfaced": 1,
+    "adr_corrections_surfaced": 1
+  },
+
+  "touch_points": [
+    {
+      "path": ".claude/skills/auditing-shared/",
+      "role": "canonical-helper-home",
+      "purpose": "Per ADR-0031: cross-cutting audit/validation/log scripts live here. This feature adds 5 new scripts (validate_pipeline_frontmatter.py, log_state_transition.py, detect_stubs.py, run_phase_checks.py, check_pipeline_discipline.py) per Blueprint Component 10.",
+      "in_scope_for": ["FR-5", "FR-6", "FR-8-c"]
+    },
+    {
+      "path": ".claude/skills/KB-github-actions-platform/scripts/",
+      "role": "extraction-source",
+      "purpose": "audit_workflow.py + action_versions.md misplaced here per IN-002; canonical location is auditing-github-actions/ (new skill). git mv to preserve history.",
+      "in_scope_for": ["FR-8-a"]
+    },
+    {
+      "path": ".claude/skills/KB-codespaces-platform/scripts/",
+      "role": "extraction-source-stub",
+      "purpose": "No audit scripts currently exist here; per AC-FR-8-b the new auditing-codespaces skill ships as a stub.",
+      "in_scope_for": ["FR-8-b"]
+    },
+    {
+      "path": ".claude/skills/ai-development-guide/",
+      "role": "skill-install-target",
+      "purpose": "New skill to be installed per AC-FR-9-e. Source content from uploaded SKILL.md (302 lines / 9 sections; 4-phase pattern: lint → build → test → final gate).",
+      "in_scope_for": ["FR-9"]
+    },
+    {
+      "path": ".claude/agents/",
+      "role": "agent-authoring-target",
+      "purpose": "5 new execute-* agent files to be authored: execute-orchestrator, execute-task-code-producer, execute-task-quality-handler, execute-phase-quality-reviewer, execute-finalize-reconciler.",
+      "in_scope_for": ["FR-2", "FR-3", "FR-4", "FR-9-a", "FR-11"]
+    },
+    {
+      "path": ".claude/skills/recipe-feature-pipeline/",
+      "role": "orchestrator-skill",
+      "purpose": "13-stage pipeline orchestrator; the execution side designed by this feature extends from Task Decomposition through Deliverable Packaging.",
+      "in_scope_for": ["FR-1", "FR-2", "FR-12"]
+    },
+    {
+      "path": "working/feature/<slug>/",
+      "role": "deliverable-archive-target",
+      "purpose": "Each feature run's artifact archive. ADR-0023 defines scope classes; deliverable-archive-spec defines expected artifact sets.",
+      "in_scope_for": ["FR-13"]
+    },
+    {
+      "path": "adrs/",
+      "role": "project-wide-adr-registry",
+      "purpose": "Sequentially numbered ADRs across the entire project. 4 new ADRs authored in this feature run: ADR-0032, ADR-0033, ADR-0034, ADR-0035.",
+      "in_scope_for": ["FR-1", "FR-7-b", "FR-10-a"]
+    }
+  ],
+
+  "key_findings": [
+    {
+      "in_id": "IN-001",
+      "summary": "ai-development-guide is uploaded but not yet installed at .claude/skills/ai-development-guide/. Must be installed before binding agents.",
+      "resolution": "Phase 2 / T2.3 installs the skill; AC-FR-9-e enforces skill-install-before-binding sequencing.",
+      "in_scope_for": ["FR-9-e"]
+    },
+    {
+      "in_id": "IN-002",
+      "summary": "audit_workflow.py + action_versions.md misplaced under KB-github-actions-platform/scripts/ rather than auditing-github-actions/.",
+      "resolution": "Phase 2 / T2.1 git mv to auditing-github-actions/ (preserve history).",
+      "in_scope_for": ["FR-8-a"]
+    },
+    {
+      "in_id": "IN-003",
+      "summary": "Three new skills must be created/installed: ai-development-guide (install), auditing-github-actions (extract), auditing-codespaces (stub).",
+      "resolution": "Phase 2 (T2.1, T2.2, T2.3) creates/installs all three.",
+      "in_scope_for": ["FR-8", "FR-9"]
+    },
+    {
+      "in_id": "IN-005",
+      "summary": "doc_type taxonomy gap — 3rd observed instance of artifacts authored without explicit doc_type frontmatter.",
+      "resolution": "ADR-0032 Change 4 makes doc_type universal-required across all pipeline artifacts.",
+      "in_scope_for": ["FR-7-a"]
+    },
+    {
+      "in_id": "IN-006",
+      "summary": "auditing-* family has 8 skills + canonical helper auditing-shared. Symmetric structure should be adopted by GHA + Codespaces extraction.",
+      "resolution": "Phase 2 mirrors the structure: auditing-github-actions + auditing-codespaces with helpers in auditing-shared.",
+      "in_scope_for": ["FR-8"]
+    },
+    {
+      "in_id": "IN-009",
+      "summary": "Counting error in prior research — 5 (not 4) execute-* agents are introduced.",
+      "resolution": "Blueprint Component 2-6 specifies all 5: execute-orchestrator, execute-task-code-producer, execute-task-quality-handler, execute-phase-quality-reviewer, execute-finalize-reconciler.",
+      "in_scope_for": ["FR-2", "FR-3", "FR-4"]
+    },
+    {
+      "in_id": "IN-013",
+      "summary": "Not applicable — IN-013 was scoped out during research planning.",
+      "resolution": "n/a",
+      "in_scope_for": []
+    },
+    {
+      "in_id": "IN-014",
+      "summary": "auditing-cc-configs dispatch table should NOT be extended for non-cc audits; D-3 third option (thin coordinator at auditing-shared) preserves canonical-home discipline.",
+      "resolution": "Blueprint Component 10 (run_phase_checks.py) is the coordinator; auditing-cc-configs scope preserved.",
+      "in_scope_for": ["FR-3-c"]
+    },
+    {
+      "in_id": "IN-017",
+      "summary": "auditing-skills naming collision — existing validate_frontmatter.py validates SKILL.md frontmatter; new pipeline-artifact validator needs disambiguated name.",
+      "resolution": "New script named validate_pipeline_frontmatter.py at auditing-shared/scripts/ — names explicitly distinguished.",
+      "in_scope_for": ["FR-6-a"]
+    }
+  ],
+
+  "blast_radius": {
+    "files_created_count": 22,
+    "files_modified_count": 7,
+    "files_moved_count": 2,
+    "estimated_loc_added": 4500,
+    "blast_radius_layers": ["Claude Code"],
+    "blast_radius_notes": "Single-layer feature (CC only). All edits under .claude/skills/, .claude/agents/, working/feature/, adrs/. No application-code touched (no Backend, Frontend, API, DB, CICD, IaC layers activated)."
+  },
+
+  "convention_findings": [
+    {
+      "convention": "ADR-0031 canonical-helper-home",
+      "outcome": "preserved + extended",
+      "detail": "auditing-shared remains the canonical home; this feature adds 5 new scripts to it. ADR-0035 (new this feature) adds a Skill-binding-convention layer on top."
+    },
+    {
+      "convention": "ADR-0029 no-silent-scope-changes",
+      "outcome": "preserved + extended by ADR-0033",
+      "detail": "ADR-0033 extends ADR-0029 to execution-phase Scope-Deviation surfacing for execution-pipeline artifacts."
+    },
+    {
+      "convention": "ADR-0017 4-cycle reconciliation cap",
+      "outcome": "preserved + symmetric application clarified by ADR-0034",
+      "detail": "ADR-0034 corrects PRD AC-FR-6-e + AC-FR-10-b prose to cite ADR-0017 (not ADR-0021) for the 4-cycle cap; Blueprint v5 carries correction-surface footnotes."
+    }
+  ],
+
+  "scope_deviations_resolved": [
+    {
+      "from_finding": "T6.1 doc_type backfill scope (~20+ planning-side agents)",
+      "resolution": "Surfaced explicitly per ADR-0029 + ADR-0033; Plan v2 carries Posture A (defer) as default; Gate 6 user disposition is Posture A → spawn new feature for the backfill work.",
+      "resolution_path": "working/feature/execution-pipeline-design-r1/plan-v2.md §T6.1 + Open Item #5"
+    }
+  ],
+
+  "audit_invocations": {
+    "rounds_simulated": 5,
+    "rounds_authoritative": 2,
+    "verdict_progression": [
+      "r1-r5: simulated (claude.ai) — final r5 verdict: pass (narrow scope)",
+      "r6: authoritative Claude Code dispatch — verdict: needs_revision (1 BLOCKER + 5 MAJOR + 3 MINOR + 3 INFO)",
+      "r7: authoritative Claude Code dispatch (post-cycle-3 reconciliation) — verdict: pass"
+    ],
+    "reconciliation_cycles_used": 3,
+    "reconciliation_cycles_remaining": 1
+  }
+}

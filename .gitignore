@@ -1,0 +1,25 @@
+# Claude Code user-local settings — never commit.
+# Per cc-critique audit + KB-cc-platform `settings.local.json` convention:
+# this file is per-developer and may contain experimental allow-list rules.
+.claude/settings.local.json
+
+# Optional: Claude Code agent-local memory directory (per-developer).
+.claude/agent-memory-local/
+
+# Common ignores
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.idea/
+.vscode/settings.json
+*.swp
+*.swo

@@ -64,6 +64,11 @@ The body below is the router. Each substantive concern lives in `references/`.
 | Blueprint (DesignDoc) | `references/templates/blueprint-template.md` | `design-composer` (cross-cutting) + per-layer designers (per-layer subsections) |
 | ADR | `references/templates/adr-template.md` | `design-composer` (per FR-5) |
 | Plan | `references/templates/plan-template.md` | `plan-author` |
+| Per-task execution result (execution-phase) | `references/templates/per-task-execution-result-template.md` | `execute-task-code-producer` |
+| Phase quality report (execution-phase) | `references/templates/phase-quality-report-template.md` | `execute-phase-quality-reviewer` |
+| Quality reconciliation log (execution-phase) | `references/templates/quality-reconciliation-log-template.md` | `execute-finalize-reconciler` |
+| State-transitions log entry (execution-phase) | `references/templates/state-transitions-log-entry-template.md` | `execute-orchestrator` (via `auditing-shared/scripts/log_state_transition.py`) |
+| Pipeline run summary (execution-phase) | `references/templates/pipeline-run-summary-template.md` | `execute-orchestrator` |
 
 Each template defines the document's REQUIRED structural elements. `shared-document-reviewer`'s Gate 0 check uses these REQUIRED markers to determine whether a document passes structural review before quality assessment begins.
 

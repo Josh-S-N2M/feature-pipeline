@@ -510,7 +510,8 @@ class Auditor:
                         fix="Use `pull_request` instead (no secrets on fork PRs), OR add an "
                             "explicit gate: `if: github.event.label.name == 'claude-approved'` "
                             "with a label only maintainers can apply. See "
-                            "references/claude-code-cicd.md § Security: fork PR safety.",
+                            "../../KB-github-actions-platform/references/claude-code-cicd.md "
+                            "§ Security: fork PR safety.",
                     )
 
             # Check 2: comment-triggered claude without author_association gate

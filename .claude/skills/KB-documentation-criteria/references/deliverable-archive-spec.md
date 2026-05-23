@@ -135,12 +135,19 @@ Even at PATCH scope, the irreducible artifact set is six markdown files (intent 
 
 ## ADR placement convention
 
-ADRs land in two locations:
+**Amended per ADR-0036 (2026-05-22).** ADRs live in exactly one canonical location:
 
-1. **Project-wide registry:** `adrs/ADR-NNNN-<title>.md`. Numbered sequentially across the entire project's lifetime. The canonical location for cross-feature ADR reference.
-2. **Feature-scoped copy:** `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md`. Same file copied (per ADR-0005 append-only — both locations preserved). Allows the feature archive to be self-contained without forcing readers to traverse the project registry.
+- **Project-wide registry:** `adrs/ADR-NNNN-<title>.md`. Numbered sequentially across the entire project's lifetime. The canonical (and only) location for ADRs.
 
-The validator checks both locations for each ADR listed in the Blueprint's `adrs_authored` frontmatter field.
+The validator checks this single location for each ADR listed in the Blueprint's `adrs_authored` (or `adrs_added_in_this_run`) frontmatter field.
+
+ADRs are categorically cross-feature artifacts; their semantics warrant a single source of truth. Per ADR-0036, the pre-amendment dual-location convention (which also required a feature-scoped copy at `working/feature/<slug>/adrs/`) is retired because:
+
+- Duplication risks drift, especially for ADRs that are edited in-place under the ADR-0005 `proposed`-status exception.
+- Cross-feature traversal is the normal access pattern; feature archives are not expected to be self-contained for cross-feature artifacts.
+- The bulk-copy step previously documented as a Pattern was easily skipped (this surfaced as a Gate-6 BLOCKER during the `execution-pipeline-design-r1` feature run).
+
+**Backward-compat.** Pre-ADR-0036 archives that contain `working/feature/<slug>/adrs/` directories are not retroactively cleaned. The validator ignores those directories (presence or absence is not a finding). New feature runs do not create them.
 
 ## Handoff document convention
 
@@ -154,7 +161,7 @@ Versioned handoff documents at `handoff/HANDOFF-v<X.Y.Z>.md` + `handoff/CONTINUE
 
 **Pattern: justify skipped stages in `discovery_shortcut`.** When a stage is skipped, explain why in intent-clarification's `## Discovery shortcut` section. The validator reads this to disposition conditional artifacts.
 
-**Pattern: feature-scoped ADRs at both locations.** When an ADR is authored, write it once at `working/feature/<slug>/adrs/` AND copy to `adrs/`. Bulk-copy via `cp` after each ADR ratification.
+**Pattern: ADRs at the project-wide registry only (per ADR-0036).** When an ADR is authored, write it once at `adrs/ADR-NNNN-<slug>.md`. Reference the ADR by path in feature artifacts (Blueprint, Plan, etc.). Do NOT create feature-scoped duplicate copies.
 
 **Anti-pattern: archive without intent-clarification.** Without `intent-clarification.md` declaring scope class, the validator can't determine the expected-artifact set. Every feature run starts with intent-clarification; no exceptions.
 
@@ -171,5 +178,6 @@ Versioned handoff documents at `handoff/HANDOFF-v<X.Y.Z>.md` + `handoff/CONTINUE
 - **ADR-0023** — Discipline refinements from integration test (the scope-class taxonomy this spec implements).
 - **ADR-0027** — Pipeline skill-design gap (the gap discovery that motivated this spec).
 - **ADR-0028** — Skill-design fixes shipped in v4.5.0 (the implementation closure).
+- **ADR-0036** — Single-location ADR placement convention (the amendment that retired the dual-location requirement; cited from the §ADR placement convention section above).
 - **`finalize-deliverable-packager.md`** in `.claude/agents/` — the agent that invokes the validator with this spec.
 - **`shared-document-reviewer.md`** in `.claude/agents/` — the validator agent with the `DeliverableArchive` doc_type.

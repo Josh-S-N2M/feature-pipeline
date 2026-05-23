@@ -1,0 +1,129 @@
+{
+  "schema_version": "1.0.0",
+  "review_id": "deliverable-archive-review-execution-pipeline-design-r1",
+  "feature_slug": "execution-pipeline-design-r1",
+  "stage": "Deliverable Packaging (Stage 13)",
+  "doc_type_under_review": "DeliverableArchive",
+  "scope_class_declared": "FULL (via orchestrator brief; NOT declared in intent-clarification frontmatter)",
+  "spec": ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md",
+  "generated": "2026-05-22T24:15:00Z",
+  "generated_by": "finalize-deliverable-packager (invoking shared-document-reviewer with doc_type: DeliverableArchive)",
+  "agent_invocation_simulation": false,
+  "target_path": "working/feature/execution-pipeline-design-r1/",
+  "checks_performed": [
+    "scope_class_declaration_in_intent_clarification_frontmatter",
+    "required_artifact_set_for_full_scope_class",
+    "conditional_artifact_set_with_justification_check",
+    "doc_type_universal_required_adr_0032_change_4",
+    "agent_invocation_simulation_field_discipline",
+    "supersession_chain_integrity_blueprint_v1_to_v5_and_plan_v1_to_v2",
+    "adr_dual_location_placement_project_registry_and_feature_scoped",
+    "adr_status_proposed_or_accepted",
+    "reviewer_verdict_presence_on_review_gated_artifacts",
+    "lifecycle_status_consistency_draft_vs_superseded_vs_accepted_vs_complete",
+    "no_orphan_drafts_outside_lifecycle"
+  ],
+  "issues": [
+    {
+      "id": "I-DR-DA-001",
+      "category": "completeness",
+      "severity": "important",
+      "location": "working/feature/execution-pipeline-design-r1/intent-clarification.md (frontmatter)",
+      "description": "scope_class: FULL is NOT declared in intent-clarification.md frontmatter. The deliverable-archive spec §'Inference fallback (pre-v4.5.0 archives)' treats this as MINOR with inferred scope (research-plan.md + synthesis.md present → infers FULL — consistent with orchestrator brief).",
+      "suggestion": "Add `scope_class: FULL` to intent-clarification.md frontmatter so the validator's primary path applies on future re-validations. Discipline-floor compliance with ADR-0023.",
+      "verdict_impact": "MINOR (per spec line 35: inferred-scope finding is MINOR; does not block PASS)",
+      "status": "open"
+    },
+    {
+      "id": "I-DR-DA-002",
+      "category": "completeness",
+      "severity": "critical",
+      "location": "working/feature/execution-pipeline-design-r1/adrs/ (directory)",
+      "description": "Feature-scoped ADR mirror directory `working/feature/execution-pipeline-design-r1/adrs/` does NOT exist. The deliverable-archive spec §'ADR placement convention' requires ADRs to land in TWO locations: (1) project-wide registry `adrs/` (verified — all four ADR-0032..0035 present); (2) feature-scoped copy `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md` (MISSING for all four new ADRs).",
+      "affected_adrs": ["ADR-0032", "ADR-0033", "ADR-0034", "ADR-0035"],
+      "suggestion": "Create `working/feature/execution-pipeline-design-r1/adrs/` directory and copy ADR-0032, ADR-0033, ADR-0034, ADR-0035 from the project-wide registry. This is the standard `cp` step documented in the spec's Patterns section. Per ADR-0005 append-only, both locations remain.",
+      "verdict_impact": "BLOCKER per FULL-scope conditional-artifact-MAJOR-if-missing-without-justification rule, escalated because Blueprint v5 frontmatter `adrs_added_in_this_run:` declares all four ADRs were authored in this run, so the dual-location mirror is unambiguously required and no `discovery_shortcut` justification exists.",
+      "status": "open"
+    },
+    {
+      "id": "I-DR-DA-003",
+      "category": "completeness",
+      "severity": "important",
+      "location": "working/feature/execution-pipeline-design-r1/codebase-analysis.json (file)",
+      "description": "Spec §'FULL scope' line 47 requires `codebase-analysis.json + codebase-analysis-report.md` as a pair. The archive contains `codebase-analysis.md` (with reviewer_verdict=approved) but NO `codebase-analysis.json` machine-readable companion. This conflicts with ADR-0018 (codebase-analysis-schema) which specifies a JSON schema for this artifact.",
+      "suggestion": "Either (a) author the missing `codebase-analysis.json` retroactively from the .md (recommended; preserves ADR-0018 compliance) OR (b) escalate to user at Gate 6 to accept the .md-only variant as acknowledged-shortcut, with a follow-on item to add JSON for future runs.",
+      "verdict_impact": "MAJOR (conditional artifact missing without explicit `discovery_shortcut` justification in intent-clarification)",
+      "status": "open"
+    },
+    {
+      "id": "I-DR-DA-004",
+      "category": "completeness",
+      "severity": "important",
+      "location": "working/feature/execution-pipeline-design-r1/research-notes/",
+      "description": "Spec §'FULL scope' line 46 requires `research-notes/<topic>.md (at least one)` for FULL scope. No `research-notes/` subdirectory exists. Per orchestrator brief, 'external research not used (KB-gap analysis closed)' — this is plausibly an acknowledged shortcut, but intent-clarification does not contain a `discovery_shortcut` section justifying the absence.",
+      "suggestion": "Surface at Gate 6: confirm with user that 'KB-gap analysis closed; no external research needed' is the intended disposition. If confirmed, optionally add a stub `research-notes/no-external-research.md` documenting the conclusion, and add a `discovery_shortcut:` section to intent-clarification.md retroactively. Cycle-budget aware: this is in-place text addition, well within the 1 remaining cycle.",
+      "verdict_impact": "MAJOR (conditional-artifact-missing-without-justification under strict reading; can be downgraded to INFO acknowledged-skip after user confirmation at Gate 6)",
+      "status": "open"
+    },
+    {
+      "id": "I-DR-DA-005",
+      "category": "completeness",
+      "severity": "recommended",
+      "location": "working/feature/execution-pipeline-design-r1/checkpoint.json",
+      "description": "Spec §'FULL scope' line 57 lists `checkpoint.json (continuously updated)` as a required FULL-scope artifact. No checkpoint.json exists in the archive. This is a process-trail artifact that orchestrators maintain; its absence is consistent with the project's pre-v4.5.0 status (the checkpoint mechanism is among the items being designed in this very feature run — see Plan v2 Phase 0/1 tasks).",
+      "suggestion": "Acknowledge as backward-compat gap: the execution-pipeline-design-r1 feature *designs* the checkpoint mechanism; the very absence of checkpoint.json in this archive is consistent with the feature not yet being implemented (Task Decomposition produced tasks, but Phase 0-6 implementation work has not begun — that is the Gate 6 hand-off). Do NOT block on this.",
+      "verdict_impact": "RECOMMENDED (informational; no verdict change)",
+      "status": "open"
+    },
+    {
+      "id": "I-DR-DA-006",
+      "category": "completeness",
+      "severity": "recommended",
+      "location": "working/feature/execution-pipeline-design-r1/blueprint-v5.md (frontmatter)",
+      "description": "Blueprint v5 frontmatter uses key `adrs_added_in_this_run:` (with sub-bullet detail), not the canonical `adrs_authored:` field name the deliverable-archive validator and finalize-deliverable-packager expect (spec §'Conditional artifacts' + agent spec §'At task start' both refer to `adrs_authored:`). Semantically equivalent (the list of ADR IDs is parseable), but a strict validator might miss it.",
+      "suggestion": "Either (a) add a duplicate `adrs_authored: [ADR-0032, ADR-0033, ADR-0034, ADR-0035]` line alongside the more-detailed `adrs_added_in_this_run:` block for forward compatibility, OR (b) update the spec/agent to recognize either key. Track as a forward-compat item for v4.6.x.",
+      "verdict_impact": "RECOMMENDED (cosmetic taxonomy variance; current packager parses the human-readable form successfully)",
+      "status": "open"
+    },
+    {
+      "id": "I-DR-DA-007",
+      "category": "consistency",
+      "severity": "recommended",
+      "location": "tasks-summary.md vs intent-clarification.md vs PRD",
+      "description": "tasks-summary.md (line 31) explicitly enumerates ONE 'User-decision item for Gate 6' (T6.1 Posture A vs Posture B for doc_type backfill scope). The orchestrator brief also calls out 'ADR ratification status' (4 ADRs in `proposed` status) as a user touch-point. These two distinct user-decision surfaces are correctly preserved through the pipeline (no silent scope changes per ADR-0029); the deliverable archive properly surfaces both for Gate 6.",
+      "suggestion": "No action; affirmation. Surface both items in packager-report.json's `gate_6_user_decision_items` field.",
+      "verdict_impact": "RECOMMENDED (positive finding; informational)",
+      "status": "open"
+    },
+    {
+      "id": "I-DR-DA-008",
+      "category": "consistency",
+      "severity": "recommended",
+      "location": "tasks.json (frontmatter) + plan-v2.md (frontmatter)",
+      "description": "tasks.json shows total_tasks=32 (T3.1 split into T3.1.1 + T3.1.2 per tasks-summary), plan-v2.md frontmatter shows total_tasks=31. The discrepancy is documented and intentional (decomposition split one Plan task into two DAG tasks); cross-artifact audit cycle 1 already noted the related 'Plan Update History 34-task narrative drift' as a RECOMMENDED finding. Not a packager BLOCKER.",
+      "suggestion": "No action by packager. The 31-vs-32 numbering discrepancy is correctly explained in tasks-summary.md DAG visualization. Optionally fold an explanatory footnote into plan-v2 Update History in a future opportunistic edit.",
+      "verdict_impact": "RECOMMENDED (already surfaced by cross-artifact audit cycle 1)",
+      "status": "open"
+    },
+    {
+      "id": "I-DR-DA-009",
+      "category": "consistency",
+      "severity": "info",
+      "location": "all draft-status artifacts (blueprint-v5, plan-v2, acceptance-tests, phase-validators, tasks.json, tasks-summary)",
+      "description": "Six artifacts carry `status: draft` despite being authoritative and approved at their respective gates. This is the project's documented convention: artifacts remain `status: draft` through pipeline review, advancing to `status: accepted` only at Gate 6 ratification. Consistent with ADR-0005 and the Plan Update History narrative.",
+      "suggestion": "No action; affirmation. Gate 6 ratification will be the trigger to advance these to `accepted` (along with the 4 new ADRs from `proposed` to `accepted`).",
+      "verdict_impact": "INFO (positive finding; informational)",
+      "status": "open"
+    }
+  ],
+  "summary": {
+    "BLOCKER": 1,
+    "MAJOR": 2,
+    "MINOR": 1,
+    "RECOMMENDED": 4,
+    "INFO": 1
+  },
+  "verdict": "review",
+  "verdict_rationale": "Archive is substantively complete: all 13 pipeline stages produced their primary artifact; reviewer verdicts are all `approved`; cross-artifact audit returned `pass`; supersession chains (Blueprint v1->v5, plan-v1->v2) are intact with predecessor + supersedes frontmatter; agent_invocation_simulation discipline is observed (simulated v1-v4 Blueprint + plan-v1 + audits r1-r5 + reconciliation cycles 1-2 declared `true`; authoritative v5 + plan-v2 + audit r6/r7 + reconciliation cycle 3 + tests + validators + cross-audit + tasks declared `false`); all 4 new ADRs (0032-0035) present in the project-wide registry with status: proposed. However the dual-location ADR placement convention (spec §'ADR placement convention') is violated — the feature-scoped `working/feature/<slug>/adrs/` mirror does NOT exist — which the spec elevates to BLOCKER for FULL scope. Additionally, codebase-analysis.json (the JSON companion to the .md per ADR-0018) and research-notes/ are missing without `discovery_shortcut` justification (MAJOR per spec). Verdict: REVIEW — surface these gaps to the Final Approval Gate (Gate 6) so the human can either (a) direct the in-place fixes (the ADR mirror is a literal `cp` operation; the discovery_shortcut section is text-only) or (b) accept the gaps with an explicit waiver.",
+  "next_step": "Surface to Gate 6 Final Approval. Three of the four findings (I-DR-DA-002, I-DR-DA-003, I-DR-DA-004) can be remediated inside the 1 remaining reconciliation cycle without re-invoking authoring sub-agents (they are file-level operations); the fourth (I-DR-DA-001 scope_class declaration) is a one-line frontmatter add."
+}

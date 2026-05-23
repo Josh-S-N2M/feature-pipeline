@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 .claude/skills/auditing-shared/scripts/detect_stubs.py:*)",
+      "Bash(python3 .claude/skills/auditing-shared/scripts/run_phase_checks.py:*)",
+      "Bash(python3 .claude/skills/auditing-shared/scripts/log_state_transition.py:*)",
+      "Bash(python3 .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py:*)",
+      "Bash(python3 .claude/skills/auditing-shared/scripts/check_pipeline_discipline.py:*)",
+      "Bash(python3 .claude/skills/auditing-codespaces/scripts/audit_codespaces.py:*)",
+      "Bash(python3 .claude/skills/auditing-github-actions/scripts/audit_workflow.py:*)"
+    ]
+  }
+}
