@@ -59,7 +59,40 @@ def main() -> int:
     report["toxic_combinations"] = toxic
     report["findings"].extend(toxic.get("findings", []))
 
+    # OP-1..OP-10 augmented audit rules (per ADR-0042 family graduation +
+    # ADR-0043 hard-gate Gate-6 check). Per the devcontainer-mcp-provisioning-r1
+    # Phase 4 T4.3 augmentation, each OP rule is a separate script. The
+    # orchestrator dispatches all 10 and aggregates findings.
+    #
+    # OP-1 / OP-9 / OP-10 take <.mcp.json> path directly (they parse the file).
+    # OP-2..OP-8 take <repo-root> (they walk the repo structure: agents,
+    # devcontainer scripts, runtime logs, etc.).
+    repo_root = target.parent if target.is_file() and target.name == ".mcp.json" else target
+    op_rules = [
+        ("audit_op1_env_block_coverage.py", [str(target)]),
+        ("audit_op2_consumer_mapping.py", [str(repo_root)]),
+        ("audit_op3_zero_mcp_invariant.py", [str(repo_root)]),
+        ("audit_op4_primary_fallback_prose.py", [str(repo_root)]),
+        ("audit_op5_lifecycle_completeness.py", [str(repo_root)]),
+        ("audit_op6_runtime_log_redaction.py", [str(repo_root)]),
+        ("audit_op7_events_schema.py", [str(repo_root)]),
+        ("audit_op8_gitnexus.py", [str(repo_root)]),
+        ("audit_op9_url_credential_rejection.py", [str(repo_root)]),
+        ("audit_op10_argv_leakage.py", [str(repo_root)]),
+    ]
+    op_results: dict = {}
+    for script_name, args in op_rules:
+        result = run_script(script_name, args)
+        op_results[script_name] = result
+        report["findings"].extend(result.get("findings", []))
+    report["op_rules"] = op_results
+
     print(json.dumps(report, indent=2))
+
+    # ADR-0043 hard-gate semantics: exit 1 if any BLOCKER finding (this is the
+    # signal the orchestrator's Gate-6 phase-validator reads to halt or proceed).
+    if any(f.get("severity") == "BLOCKER" for f in report["findings"]):
+        return 1
     return 0
 
 

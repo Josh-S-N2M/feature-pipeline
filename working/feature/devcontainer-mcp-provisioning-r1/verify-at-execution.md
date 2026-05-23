@@ -386,6 +386,134 @@ Note: Go is **NOT** installed in this current devcontainer (`which go` returned 
 
 ---
 
+## §T5.2 — Cold-cache rebuild smoke (USER-DRIVEN; documented expected outcomes)
+
+**Status**: rebuild-dependent; CANNOT be executed from the parent orchestrator session without disrupting the user's active Codespace. Documented as user-driven exercise per Phase 5 T5.2 contract.
+
+**To execute**: open a fresh Codespace from the feature branch (or `Codespaces: Rebuild Container` in VS Code command palette). Observe:
+
+| Expected observation | Acceptance criterion |
+|---|---|
+| Features install clean: Node 20, Go 1.22, common-utils, github-cli, claude-code | AC-CS-5 (devcontainer.json builds clean) |
+| postCreate.sh runs to completion | AC-CS-1 (postCreate idempotent) |
+| 5 `install_complete` JSONL records appear in `.claude/runtime/mcp-events.jsonl` (one per OSS-local server: serena, mcp-openapi-schema, actionlint-mcp, terraform-mcp, gitnexus) | AC-X-2 (5 install records) |
+| GitNexus install completes without C++ toolchain compilation (per Phase 0 §H-4 verify-at-execution result; prebuilds for linux-x64 used) | AC-CS-9 wrapping intent |
+| postStart.sh runs to completion | AC-CS-2 (postStart idempotent) |
+| 7 `readiness_probe` JSONL records appear (one per `.mcp.json` server entry) | AC-X-2 (7 readiness records) |
+| `claude mcp list` shows the 7 named servers | AC-FR-1-a |
+| Cold-cache rebuild completes ≤~10 min (NFR-1-a target; ~7-12 min envelope per Codespaces-design rebuild-time estimate) | AC-NFR-1-a |
+
+**Recommended invocation**:
+
+```bash
+# After Codespace rebuild completes:
+claude mcp list   # should show 7 servers
+jq 'select(.event == "install_complete") | .server' .claude/runtime/mcp-events.jsonl | sort -u
+# Expect: actionlint-mcp, gitnexus, mcp-openapi-schema, serena, terraform-mcp (5 servers)
+jq 'select(.event == "readiness_probe") | .server' .claude/runtime/mcp-events.jsonl | sort -u | wc -l
+# Expect: 7
+```
+
+**Recorded outcome**: TO BE FILLED by user after rebuild.
+
+---
+
+## §T5.3 — Warm-cache rebuild smoke (USER-DRIVEN; documented expected outcomes)
+
+**Status**: rebuild-dependent; same constraints as §T5.2.
+
+**To execute**: after §T5.2 cold-cache completes, do a second rebuild without sentinel deletion (or trigger Codespace stop+resume). Observe:
+
+| Expected observation | Acceptance criterion |
+|---|---|
+| postCreate.sh short-circuits per AC-CS-2: 5 `install_complete` records each note "sentinel present; install skipped" | AC-CS-2 (sentinel+binary-presence idempotency) |
+| Warm-cache rebuild completes ≤~2 min | AC-NFR-1-b |
+| postStart.sh re-runs and writes 7 fresh `readiness_probe` records | AC-X-2 (postStart is per-cycle, not idempotent on the JSONL — each cycle appends 7 new records) |
+
+**Recorded outcome**: TO BE FILLED by user after second rebuild.
+
+---
+
+## §T5.4 — auditing-mcp Gate-6 hard-gate exercise (EXECUTED; PASS)
+
+**Status**: EXECUTED in-session by orchestrator (parent recipe-feature-pipeline), 2026-05-23T22:00 UTC. Full audit + seeded-BLOCKER simulation performed against the live repo state.
+
+**Step 1 — Clean repo audit**:
+```
+python3 .claude/skills/auditing-mcp/scripts/audit_mcp.py .mcp.json
+```
+Result: exit 0; 3 total findings; 0 BLOCKER / 0 MAJOR / 3 MINOR (the 3 MINORs are MC-3 known-publishers advisory: `gitnexus@${GITNEXUS_TAG}`, `mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}`, and a third advisory). MINORs do NOT trip the ADR-0043 hard gate. **Hard-gate verdict: PROCEED**.
+
+**Step 2 — 10 OP rules dispatched cleanly**:
+- audit_op1_env_block_coverage.py: 0B / 0M / 0other
+- audit_op2_consumer_mapping.py: 0B / 0M / 0other
+- audit_op3_zero_mcp_invariant.py: 0B / 0M / 0other
+- audit_op4_primary_fallback_prose.py: 0B / 0M / 0other
+- audit_op5_lifecycle_completeness.py: 0B / 0M / 0other
+- audit_op6_runtime_log_redaction.py: 0B / 0M / 0other
+- audit_op7_events_schema.py: 0B / 0M / 0other
+- audit_op8_gitnexus.py: 0B / 0M / 0other
+- audit_op9_url_credential_rejection.py: 0B / 0M / 0other
+- audit_op10_argv_leakage.py: 0B / 0M / 0other
+
+**Step 3 — Seeded-BLOCKER simulation (LIVE exercise of ADR-0043 hard gate)**:
+
+Seed: temporarily added `?apiKey=sk-TESTPOISON1234567890abcd` to context7's URL (OP-9 trigger).
+
+Result:
+- OP-9 detected: `[BLOCKER] credential-shaped query parameter: apiKey (server: context7)`
+- `audit_mcp.py` exit code: **1**
+- **Hard-gate verdict: HALT**
+
+**Step 4 — cleanup_required**: `.mcp.json` restored from backup; grep confirms zero `TESTPOISON` residual; post-cleanup `audit_mcp.py` run returns to 0 BLOCKER. **Seeded credential NEVER committed.**
+
+**Defect found and fixed during T5.4 execution**:
+- `validate_mcp_config.py` did not recognize `transport: "http"` (the field name in our `.mcp.json`); it was checking `server["type"]` only, defaulting to `"stdio"` which then demanded a missing `command`. Two false-positive BLOCKERs (context7, exa).
+- Fix (one-line): `server_type = server.get("type") or server.get("transport") or "stdio"`.
+- `audit_mcp.py` did not dispatch the new OP-1..OP-10 scripts. Fixed by wiring in 10 dispatch calls + a BLOCKER exit-code semantic (exit 1 on any BLOCKER per ADR-0043). After fix, the orchestrator-level audit correctly halts on seeded-BLOCKER scenarios.
+
+**Conclusion**: ADR-0043 hard-gate semantics now work end-to-end. Gate-6 phase-validator can rely on `audit_mcp.py` exit code as the HALT/PROCEED signal.
+
+---
+
+## §T5.5 — Failure-mode rehearsals (USER-DRIVEN; documented expected outcomes)
+
+**Status**: rebuild-dependent; requires actual MCP server invocations (some failure modes require a live devcontainer with active MCP servers). Documented as user-driven exercises.
+
+### Rehearsal 1 — Unset `CONTEXT7_API_KEY` (AC-X-1 + AC-FR-5-b)
+
+Unset the Codespaces secret before postStart. Expected:
+- postStart's `readiness_probe` record for `context7`: `result: "fail"`, `failure_layer: "auth"`, `message_redacted` includes `"missing env-var CONTEXT7_API_KEY"` or HTTP 401.
+- Stderr banner (per ADR-0037): one-line, names the server, points at the JSONL.
+
+### Rehearsal 2 — Shadow `terraform-mcp` off PATH (AC-FR-1-c)
+
+Move `terraform-mcp` binary out of PATH. Expected:
+- postStart's `readiness_probe` record for `terraform-mcp`: `result: "fail"`, `failure_layer: "transport"`, `message_redacted: "command not found: terraform-mcp"`.
+- Stderr banner: `[mcp:terraform-mcp] primary degraded → falling back to <no fallback>; see .claude/runtime/mcp-events.jsonl`.
+
+### Rehearsal 3 — GitNexus stdio crash mid-session (AC-FR-9-a/b/c)
+
+Kill the GitNexus stdio process (or trigger an OOM scenario). Expected:
+- Next `discovery-codebase-researcher` invocation: GitNexus call fails → `structured_failure` record emitted with `primary_degraded: true`, `fallback_invoked: false` (no fallback registered per Gate-4 OI-1), `failure_layer: "transport"`.
+- Banner emitted per ADR-0037.
+
+### Rehearsal 4 — Redaction smoke-test (AC-NFR-2-d)
+
+Send a credential-shaped string through `log-mcp-event.sh` directly:
+```bash
+echo '{"event":"structured_failure","server":"test","message":"saw sk-FAKE1234567890abcdef in payload"}' | \
+  bash .devcontainer/lib/log-mcp-event.sh --stdin
+tail -1 .claude/runtime/mcp-events.jsonl | jq .
+```
+Expected:
+- `sk-FAKE1234567890abcdef` substring replaced with `<REDACTED:sk-key>` in the JSONL record.
+- Record carries `"redaction_applied": true`.
+
+**Recorded outcomes**: TO BE FILLED by user after rebuild + manual rehearsal sequence.
+
+---
+
 ## §OI-4 — Per-agent context-overhead measurement (T4.7)
 
 **Measured by:** orchestrator (parent), 2026-05-23T21:50 UTC, post Phase 4 T4.1 (agent allowlist edits) + T2.4 (`.mcp.json` at repo root).

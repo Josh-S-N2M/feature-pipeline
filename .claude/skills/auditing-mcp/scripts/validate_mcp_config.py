@@ -42,7 +42,9 @@ DOWNLOAD_EXEC_COMMANDS = {"curl", "wget", "fetch", "bash", "sh", "zsh"}
 
 def check_server(name: str, server: dict, location: str) -> list[dict]:
     findings = []
-    server_type = server.get("type", "stdio")
+    # Recognize both `type` (older convention) and `transport` (newer per Claude Code MCP spec).
+    # An entry with `transport: "http"` (or "sse") MUST NOT require `command`.
+    server_type = server.get("type") or server.get("transport") or "stdio"
 
     # MC-8: missing command for stdio
     if server_type == "stdio" and "command" not in server:
