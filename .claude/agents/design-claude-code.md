@@ -3,7 +3,7 @@ name: design-cc
 description: Authors the Claude Code / Project Filesystem Design subsection of the Blueprint during per-layer Design. Filename `design-claude-code.md` aligns with Blueprint v4.3.1 prose; frontmatter name `design-cc` follows the Path A reserved-word workaround (the validator rejects names containing 'claude'). One invocation per pipeline run when this layer is in scope. Reads PRD + Research Plan + codebase-analysis.json + research-notes/*; produces `cc-design.md` + `cc-dependencies.json`. Surfaces architectural questions as `Q-CC-N` open items for design-composer. Does NOT author ADRs (per FR-5).
 model: opus
 effort: high
-tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
+tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate, mcp__serena__*]
 skills: [KB-cc-platform, KB-cc-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
 memory: project
 ---

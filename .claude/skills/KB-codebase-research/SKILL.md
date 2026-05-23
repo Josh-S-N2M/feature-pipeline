@@ -5,7 +5,7 @@ description: >-
   stage. Covers GitNexus MCP traversal patterns, dependency inference,
   blast-radius previewing, structural archaeology (read what's there, not what
   you'd write), and the canonical output schema for codebase-analysis.json
-  (per ADR-0018, extended for blast-radius). Loaded by the
+  (per ADR-0018 + ADR-0038; schema v1.1.0 extended for blast-radius). Loaded by the
   discovery-codebase-researcher sub-agent. Pairs with KB-cc-platform for
   Claude Code primitives observed in the codebase and the per-layer design
   KBs for layer-specific conventions to look for.
@@ -14,7 +14,7 @@ allowed-tools: Read, Grep, Glob
 
 # KB-codebase-research — Codebase Analysis Discipline
 
-Discipline KB consumed by the `discovery-codebase-researcher` sub-agent during the Discovery Research stage. The sub-agent reads the existing codebase using GitNexus MCP (or the fallback `codebase-memory-mcp`), inferring structure, dependencies, and blast-radius for a proposed change, then writes `codebase-analysis.json` (canonical schema per ADR-0018, extended for blast-radius preview) plus `codebase-analysis-report.md` (human-readable summary).
+Discipline KB consumed by the `discovery-codebase-researcher` sub-agent during the Discovery Research stage. The sub-agent reads the existing codebase using GitNexus MCP (or the fallback `codebase-memory-mcp`), inferring structure, dependencies, and blast-radius for a proposed change, then writes `codebase-analysis.json` (canonical schema per ADR-0018 + ADR-0038; v1.1.0 extended for blast-radius preview) plus `codebase-analysis-report.md` (human-readable summary).
 
 ## Contents
 
@@ -153,7 +153,7 @@ For each layer present in scope, capture:
 
 ## The canonical output schema
 
-Per ADR-0018, extended for blast-radius. The sub-agent writes `codebase-analysis.json` matching this schema:
+Per ADR-0018 + ADR-0038 (schema v1.1.0 extended for blast-radius). The sub-agent writes `codebase-analysis.json` matching this schema:
 
 ```json
 {

@@ -1,13 +1,13 @@
 ---
 name: auditing-shared
-description: Canonical home for utilities shared across the auditing-* skill family (auditing-cc-configs, auditing-skills, auditing-subagents, auditing-context-files). Hosts the single implementation of cross-audit-module helpers. Not user-invocable; loaded by the audit-module skills via subprocess dispatch. Established by ADR-0031 in v4.6.0.
+description: Canonical home for utilities shared across the auditing-* skill families (auditing-cc-configs, auditing-skills, auditing-subagents, auditing-context-files, and — as of ADR-0042 in devcontainer-mcp-provisioning-r1 — auditing-mcp as an independent graduated family). Hosts the single implementation of cross-audit-module helpers. Not user-invocable; loaded by the audit-module skills via subprocess dispatch. Established by ADR-0031 in v4.6.0; extended to support graduated auditing-mcp family per ADR-0042.
 user-invocable: false
 allowed-tools: Read, Grep, Glob, Bash(python3:*)
 ---
 
 # auditing-shared
 
-Canonical implementation home for utilities shared across the auditing-* skill family. Per ADR-0031, eliminates the 3-copy duplication of `pedagogical_marker_check.py` (and similar future duplications) that accumulated through v4.4.x.
+Canonical implementation home for utilities shared across the auditing-* skill families. Per ADR-0031, eliminates the 3-copy duplication of `pedagogical_marker_check.py` (and similar future duplications) that accumulated through v4.4.x. Per ADR-0042 (devcontainer-mcp-provisioning-r1, Gate-4 OI-2 closure), the consumer set extended from 4 sub-skills of auditing-cc-configs to 5 family coordinators: auditing-cc-configs (with its 5 remaining sub-skills) AND auditing-mcp (now its own family-coordinator).
 
 ## Contents
 

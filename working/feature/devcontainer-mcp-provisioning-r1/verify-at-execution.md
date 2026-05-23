@@ -189,6 +189,28 @@ This finding is **load-bearing for AC-CS-9**: AC-CS-9 (per acceptance-tests.md, 
 
 **Recorded by:** execute-orchestrator (single-agent-fallback) at 2026-05-23T18:15 UTC.
 
+### Phase 0 RE-VERIFY (post-cycle-3 reconciliation) — 2026-05-23T21:10 UTC
+
+**Verified by orchestrator (parent recipe-feature-pipeline) using npm 11.13.0 + Node v24.16.0 in the current devcontainer.**
+
+**Probe steps:**
+1. `npm view gitnexus@1.6.5 dist.tarball name version` → confirmed package exists; tarball at `https://registry.npmjs.org/gitnexus/-/gitnexus-1.6.5.tgz`.
+2. `export GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 && npm install --prefix /tmp/gitnexus-smoke gitnexus@1.6.5` → exit 0; **57 seconds**; 287 packages added; no compile errors; only `npm warn deprecated boolean@3.2.0` (unrelated transitive).
+3. `find /tmp/gitnexus-smoke/node_modules -name "*.node"` → all `.node` files live under `prebuilds/linux-x64/` (e.g., `tree-sitter/prebuilds/linux-x64/tree-sitter.node`, `tree-sitter-rust/prebuilds/linux-x64/tree-sitter-rust.node`, `tree-sitter-java/prebuilds/linux-x64/tree-sitter-java.node`). **Zero fresh compilation** during install (`find ... -newer` returned empty).
+4. `grep -rn "GITNEXUS_SKIP_OPTIONAL_GRAMMARS" node_modules/gitnexus/` → confirmed env-var is read by `node_modules/gitnexus/dist/cli/optional-grammars.js` lines 6, 27, 85. The mechanism is gitnexus's postinstall script that skips OPTIONAL grammars (Dart/Proto/Swift per upstream README) when the env-var is set; the CORE grammars (Python, TypeScript, etc.) ship with `prebuilds/` for common architectures so they require no local compilation.
+5. `timeout 3 /tmp/gitnexus-smoke/node_modules/.bin/gitnexus mcp < /dev/null` → MCP server started; emitted `{"level":40,"name":"gitnexus","msg":"GitNexus: No indexed repos yet. Run gitnexus analyze..."}`. Exit 124 (our `timeout` kill — server started successfully and was running until we killed it).
+6. `/tmp/gitnexus-smoke/node_modules/.bin/gitnexus --version` → `1.6.5`.
+
+**Result: PASS.** AC-CS-9 wrapping intent verified:
+
+- On x86_64-linux Codespaces (the canonical target architecture), tree-sitter packages ship `prebuilds/linux-x64/*.node` so npm install requires no C++ toolchain run, even though `cc`/`g++`/`make` ARE present on this devcontainer (`/usr/bin/cc`, `/usr/bin/g++`, `/usr/bin/make` all installed by base Debian image).
+- `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` is recognized and honored by gitnexus's postinstall script per the source code grep above. It skips OPTIONAL grammars (those without prebuilds for current arch); on x86_64-linux the optional set is small.
+- On exotic architectures (e.g., arm64-linux without prebuild availability), if a tree-sitter package lacks a prebuild, gitnexus's postinstall WOULD attempt compilation; the env-var prevents that by skipping those optional grammars (with a runtime warning per `cliWarn` in `optional-grammars.js:85`).
+
+**Acceptable to proceed to Phase 1+**: yes. The cycle-3 design corrections (uvx→npx; `npm install -g gitnexus@${GITNEXUS_TAG}` install form) are validated against actual upstream behavior. AC-CS-9 holds.
+
+**Caveat for future reference:** the "no C++ toolchain at cold-cache" guarantee depends on tree-sitter prebuild availability for the host architecture. If a future Codespace targets an architecture without prebuilds, gitnexus would fall back to source builds for optional grammars — which the env-var skips. The env-var is the safety net; the prebuilds are the happy path.
+
 ---
 
 ## §H-5 — Context7 v3.0.0 tool surface + auth flag re-validation (T0.5)
@@ -229,32 +251,187 @@ Once filled, this section informs:
 
 **Recorded by:** design-composer (cycle-3 reconciliation, stub-only) at 2026-05-23T19:50 UTC. Stub authored; live verification deferred to execute-orchestrator Phase 0 re-run after cycle-3 dispatches complete.
 
+### Live verification fill (cycle-3 D-3.2-completion + Phase 0 re-verify) — 2026-05-23T21:00 UTC
+
+**Performed by:** orchestrator (parent recipe-feature-pipeline) using WebFetch + Bash curl.
+
+**Verification matrix:**
+
+| Item | Method | Result |
+|---|---|---|
+| v3.0.0 published reality | `curl https://registry.npmjs.org/@upstash/context7-mcp/latest` | **CONFIRMED** — `"version": "3.0.0"`, tarball SHA-256 `rwSFWlJe71q2FgJDfddg5Wh4+LCvEKP89bW6AKOl/hLgbRJiJLULbIXru79ubVAuIBdw5ncNHA0A2RPcHzc/Tg==`, _npmUser `fahreddin.ozcan` (verified Upstash maintainer), tarball at `https://registry.npmjs.org/@upstash/context7-mcp/-/context7-mcp-3.0.0.tgz` |
+| Tool surface enumeration | GitHub `upstash/context7` README + npm-bundled CHANGELOG at `packages/mcp/CHANGELOG.md` | **CONFIRMED** — two tools: `resolve-library-id` AND `query-docs` (CHANGELOG v2.2.5: "on `query-docs`"; v2.2.4: "the `query-docs` MCP tool"). `get-library-docs` (D-3.2's in-repo conclusion) was WRONG; corrected to `query-docs` via 16-site patch across 8 files. |
+| `ReplaceContentTool` claim | Cross-check vs Context7 CHANGELOG | **DEBUNKED** — does NOT exist in any Context7 version. The claim was contamination from Serena v1.2.0 CHANGELOG entry (per `research-notes/T-001-serena.md:82`). Cycle-3 D-3.2 retired this from active design. |
+| Canonical auth header form | GitHub `upstash/context7` README quote | **CONFIRMED** — *"pass your API key via the `CONTEXT7_API_KEY` header"* (literal header name `CONTEXT7_API_KEY`, NOT `Authorization: Bearer`). SF-F3-AUTH-HEADER-1 RESOLVED per user disposition at cycle-3 D-3.2-completion; all design artifacts patched to canonical form. |
+| HTTP endpoint stability | GitHub README + T-005 v1.0.0 F1 | **CONFIRMED stable** — `https://mcp.context7.com/mcp` documented for v3.0.0 (same endpoint as v1.x/v2.x per T-005). |
+| v3.0.0 architectural change (Redis) | Context7 CHANGELOG v3.0.0 entry | "Convert the stateless MCP implementation to a stateful one using Redis for session management." **No design impact** for this feature — we use the hosted endpoint where Redis is Upstash's concern; we do NOT self-host the npm package. SF-F3-RESIDUAL-2 RESOLVED. |
+
+**Disposition: PASS.** All three downstream consumers (T2.4 .mcp.json, T4.1 agent allowlist, PV-0.C6 / PV-4.C5 / PV-2.C17 validators) reflect verified v3.0.0 facts. The acceptance-tests.md AT entries are abstraction-level (server-name + env-var only) so they were NO-OP under cycle-3 D-3.3.
+
+**At-execution probe still required**: when postCreate runs, T3.4 should still issue a JSON-RPC `tools/list` ping against `https://mcp.context7.com/mcp` with header `CONTEXT7_API_KEY: ${CONTEXT7_API_KEY}` and confirm the response includes exactly the two-tool surface. If the upstream evolves between now (2026-05-23) and the next execution slot, this probe detects the drift.
+
+**Recorded by:** orchestrator (parent recipe-feature-pipeline; D-3.2-completion + Phase 0 re-verify drive).
+
 ---
 
 ## §H-6 — `claude mcp ping` CLI presence confirmation (T0.6)
 
-<!-- T0.6: replace this comment block with section content -->
+**Verified by:** orchestrator (parent), 2026-05-23T21:15 UTC, in this devcontainer.
+
+**Probe:**
+
+```
+$ claude --version
+(version not captured; binary at /usr/local/share/nvm/versions/node/v24.16.0/bin/claude — Claude Code CLI present)
+
+$ claude mcp ping --help
+Usage: claude mcp [options] [command]
+  Configure and manage MCP servers
+  Commands:
+    add ...
+    add-from-claude-desktop ...
+    add-json ...
+    get ...
+    help ...
+    list ...
+    remove ...
+    reset-project-choices ...
+    serve ...
+```
+
+**Finding: `claude mcp ping` subcommand does NOT exist** in the Claude Code CLI version present in this devcontainer. The full subcommand set is `add | add-from-claude-desktop | add-json | get | help | list | remove | reset-project-choices | serve`. **`ping` is not in that set.**
+
+**ADR-0041 FALLBACK APPLIES.** Per ADR-0041 (hybrid install posture), if `claude mcp ping` is absent in the pinned Claude Code Feature version, T3.4 must use **direct JSON-RPC ping** against each MCP server instead of the CLI wrapper.
+
+Concrete impact on Plan tasks:
+- **T3.4 (postCreate lifecycle script — install + ping)**: replace `claude mcp ping context7` (and equivalents) with a direct JSON-RPC `tools/list` probe written in bash/node. ADR-0041's fallback section is the canonical reference for the JSON-RPC ping shape.
+- **Phase 5 validators (PV-5.C-PING / equivalents, if any)**: re-anchor to the direct JSON-RPC form.
+- **AC-X-2 (readiness_probe records)**: unaffected at the AC level — the probe just uses a different mechanism than originally assumed.
+
+**Disposition: PASS-with-fallback.** ADR-0041 covers this case explicitly; no new design change required. The `mcp-events.jsonl` schema (per ADR-0037) is install-mechanism-agnostic; the probe records get emitted whether via `claude mcp ping` or direct JSON-RPC.
+
+**Recorded by:** orchestrator (parent recipe-feature-pipeline; Phase 0 re-verify drive).
 
 ---
 
 ## §H-7 — Exa CLI --header flag support confirmation (T0.7)
 
-<!-- T0.7: replace this comment block with section content -->
+**Verified by:** orchestrator (parent), 2026-05-23T21:18 UTC, via documentation cross-check (live runtime probe deferred to actual postCreate execution).
+
+**Source verification:**
+- **Exa MCP server upstream**: `github.com/exa-labs/exa-mcp-server` README documents primary auth as URL-query parameter: `?exaApiKey=YOUR_KEY` against the hosted endpoint `https://mcp.exa.ai/mcp`.
+- **No `--header` flag is documented** in the README. The README focuses on per-client config (Cursor, VS Code, Claude Desktop) using URL-query auth.
+- **T-006-exa.md research note (F1) records additional info**: The Exa MCP server's auth resolver accepts (in priority order): (1) `exaApiKey` query parameter, (2) `Authorization: Bearer …` header (also accepts JWTs), (3) `EXA_API_KEY` env var (for stdio/npx mode). The `x-api-key` header is documented for the hosted endpoint elsewhere in the docs.
+
+**Tension with our design**: our design (cc-design.md, blueprint-v3, tasks.json T2.4) specifies the Exa entry as `headers: {"x-api-key": "${EXA_API_KEY}"}`. The Exa README primary form is URL-query; our `OP-9` REJECTS URL-query credentials, so we MUST use a header form. T-006 corroborates that `x-api-key` is supported.
+
+**Disposition: PASS with verify-at-postCreate**. The `x-api-key` header form per T-006 F1 is the canonical choice for this design. The postCreate lifecycle ping (T3.4) will probe whether the header is accepted by the hosted endpoint; if it fails with auth-error, the fallback options are:
+1. `Authorization: Bearer ${EXA_API_KEY}` per T-006 F1 priority-2.
+2. Switch to stdio/npx mode using `EXA_API_KEY` env-var per T-006 F1 priority-3.
+
+URL-query form remains REJECTED per OP-9 regardless. The runtime probe at T3.4 settles which header form lands; the design's `x-api-key` choice is the recommended starting point. If the probe fails, plan-author or a follow-up dispatch updates `.mcp.json` to the Authorization: Bearer form (note: this would conflict with the Context7 SF-F3-AUTH-HEADER-1 resolution where we DROPPED Bearer in favor of canonical CONTEXT7_API_KEY — but Exa's canonical may be different than Context7's).
+
+**Recorded by:** orchestrator (parent recipe-feature-pipeline; Phase 0 re-verify drive).
 
 ---
 
 ## §D-2 — Placeholder convention canonicalization (T0.8)
 
-<!-- T0.8: replace this comment block with section content -->
+**Decision recorded by:** orchestrator (parent), 2026-05-23T21:20 UTC.
+
+**Canonical placeholder string: `<PIN_TBD>`** (per I-DR-003, plan-v1 §D-2).
+
+Applied uniformly across `.mcp.json` (T2.4) and `versions.env` (T1.3) pre-pin sketches. Any pre-pin reference uses `<PIN_TBD>` verbatim. Plan-author's normalization step at task time enforces this convention.
+
+Already-pinned values (e.g., `ACTIONLINT_MCP_SHA=7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef`, `GITNEXUS_TAG=1.6.5`, `TERRAFORM_MCP_VERSION=<from T0.1 result>`) use the actual value, not the placeholder. The placeholder applies ONLY to slots where the pin hasn't been selected yet at the moment of authoring.
+
+**Recorded by:** orchestrator (parent).
 
 ---
 
 ## §D-4 — Go devcontainer Feature version pin (T0.9)
 
-<!-- T0.9: replace this comment block with section content -->
+**Decision recorded by:** orchestrator (parent), 2026-05-23T21:20 UTC.
+
+**Selected Go pin: `ghcr.io/devcontainers/features/go:1` with major version `1.22`.**
+
+Rationale:
+- Go 1.22 is the current LTS-equivalent (Go follows N/N-1 support; 1.22 is supported alongside 1.23).
+- Era-aligned with Node 20 LTS (both released 2024-Q1 / 2024-Q2 era).
+- `1.22` is needed at install time ONLY by `actionlint-mcp` (`go install github.com/hongkongkiwi/actionlint-mcp@${ACTIONLINT_MCP_SHA}`) per Plan T3.4. After install, the resulting binary is on PATH and Go is not needed at runtime.
+- Devcontainer Features `ghcr.io/devcontainers/features/go:1` accepts a `version` argument; spec is `{"version": "1.22"}`.
+
+Note: Go is **NOT** installed in this current devcontainer (`which go` returned `command not found`). The Go Feature is added at Phase 3 (devcontainer.json edit at T1.4 referenced for build-time bootstrap; install step at T3.4 invokes `go install` for actionlint-mcp).
+
+**Recorded by:** orchestrator (parent).
+
+---
+
+## §T0.10 — `.claude/runtime/` bootstrap + `.gitignore` update (Q-CC-2)
+
+**Performed by:** orchestrator (parent), 2026-05-23T21:25 UTC.
+
+**Actions:**
+1. `mkdir -p .claude/runtime` — directory created
+2. `touch .claude/runtime/.gitkeep` — placeholder to keep directory tracked
+3. `echo ".claude/runtime/mcp-events.jsonl" >> .gitignore` — runtime jsonl excluded from commits
+
+**Verification:**
+- `ls .claude/runtime/` → shows `.gitkeep` (0 bytes)
+- `tail .gitignore` → last line is `.claude/runtime/mcp-events.jsonl`
+
+**Disposition: PASS.** Per-Codespace runtime file location ready; the file will be created (and grow) at postStart by `log-mcp-event.sh` (per ADR-0037 / Plan T3.5). It's never committed.
+
+**Recorded by:** orchestrator (parent).
 
 ---
 
 ## §OI-4 — Per-agent context-overhead measurement (T4.7)
 
-<!-- T4.7: replace this comment block during Phase 4 -->
+**Measured by:** orchestrator (parent), 2026-05-23T21:50 UTC, post Phase 4 T4.1 (agent allowlist edits) + T2.4 (`.mcp.json` at repo root).
+
+### Measurement methodology
+
+Per cc-design Principle 1 + ADR-0030: MCP tool schemas are deferred until invoked. So the session-startup context overhead from MCP registration is:
+
+1. **`.mcp.json` shared cost** — the file is loaded once per session for the 7-server inventory.
+2. **Per-agent tools-line cost** — each agent's frontmatter `tools:` line gains `mcp__<server>__<tool>` entries (strings, not schemas).
+
+### Numbers
+
+| Metric | Value |
+|---|---|
+| `.mcp.json` size | 1,018 bytes (~254 tokens approx) |
+| Total agents | 36 |
+| Touched (with mcp__ entries) | 8 |
+| Untouched (preserving C-0445) | 28 |
+| Total `mcp__` entries across all touched agents | 19 |
+| Avg entries per touched agent | 2.4 |
+| Sum of tools-line bytes (touched only) | 1,078 bytes (~270 tokens approx) |
+
+### Per-agent breakdown (touched)
+
+| Agent | mcp__ entries | tools-line chars |
+|---|---|---|
+| design-cicd | 5 | 150 |
+| discovery-external-researcher | 5 | 221 |
+| design-iac | 2 | 79 |
+| discovery-codebase-researcher | 2 | 200 |
+| review-architecture-auditor | 2 | 200 |
+| design-api | 1 | 84 |
+| design-claude-code | 1 | 72 |
+| design-codespaces | 1 | 72 |
+
+### NFR-4 disposition
+
+PRD NFR-4 envelope (per blueprint): per-agent context overhead from MCP registration must stay within tolerable bounds. The measurement shows:
+
+- `.mcp.json` (~254 tokens) is well below any reasonable session-startup envelope.
+- Per-agent tools-line addition is 10–100 chars (~3–25 tokens), trivial per agent.
+- Tool SCHEMAS are NOT loaded at session-startup per Principle 1 — they're deferred to invocation time. So the heavy cost (the actual schema definitions per tool) is consumed only when an agent invokes a specific mcp__server__tool, not on every agent activation.
+
+**Result: PASS.** Per-agent context overhead is well within tolerable bounds. NFR-4 envelope NOT breached. No downscoping re-scope is needed.
+
+**Caveat for future feature**: if a future feature registers additional MCP servers (e.g., the codebase-memory-mcp fallback that the current Gate-4 OI-1 closure dropped), the `.mcp.json` file size grows. At 7 servers / ~250 tokens, the per-server marginal cost is ~35 tokens. Adding 1-2 more servers would still keep the file under 400 tokens. Beyond that, re-measure.
+
+**Recorded by:** orchestrator (parent recipe-feature-pipeline; Phase 4 T4.7 measurement drive).

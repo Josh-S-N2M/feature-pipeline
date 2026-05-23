@@ -10,6 +10,7 @@ description: >-
   credential handling, toxic capability combinations (filesystem + web,
   database + network), and (optionally) live tool descriptions. Report-only.
 allowed-tools: Read Grep Glob Bash(python3 *)
+family: auditing-mcp
 pedagogical_sections:
   - path: references/mcp-spec.md
     justification: "MCP spec reference; contains anti-pattern examples of unsafe MCP configurations the auditor flags"
@@ -27,7 +28,11 @@ pedagogical_sections:
 
 Audits MCP (Model Context Protocol) server configurations. MCP servers extend Claude Code with custom tools — filesystem access, database queries, search APIs, and so on. They are the highest-risk extensibility surface because each server brings its own tool definitions that load into Claude's context.
 
-This skill is part of the **auditing-cc-configs** family. Shared rubric, weights, thresholds, and triage live in the coordinator skill.
+This skill is the **family coordinator** for the `auditing-mcp` family — graduated from the `auditing-cc-configs` family per ADR-0042 (cycle-3 Gate-4 OI-2 closure, devcontainer-mcp-provisioning-r1). The graduation was made on failure-domain-distance grounds: MCP failures (silent silent-failure, devcontainer/docker breakage, supply-chain compromise) are operationally distinct from `.claude/`-config correctness, which is what `auditing-cc-configs` covers. Shared rubric, weights, thresholds, and triage utilities still live in `auditing-shared` per ADR-0031 (`auditing-shared` is the cross-family utility home; `auditing-mcp` now consumes it as an independent family-coordinator).
+
+## Sub-skill family
+
+This coordinator is the first member of its own family. The sub-skill list is currently empty — reserved for future MCP-audit sub-skills (e.g., a per-server-deep-dive sub-skill, a runtime-only audit sub-skill). When sub-skills are added (in future features), they'll be enumerated here and dispatched per the established `auditing-cc-configs` pattern.
 
 It writes one file: an audit report. It does not modify configs or contact servers (except in `--with-runtime` mode).
 

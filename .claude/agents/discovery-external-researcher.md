@@ -3,7 +3,7 @@ name: discovery-external-researcher
 description: "Researches one external topic at the Discovery Research stage. Per ADR-0021, this is the fan-out arm of Discovery Research: orchestrator invokes one instance per topic in the Research Plan's external-research-topics section (up to 6 in parallel). External research is conditional on documented KB-gap analysis (the Research Plan justifies each topic). Outputs a structured research note for the topic; downstream Synthesis consumes the fan-in of all notes."
 model: opus
 effort: high
-tools: [Read, Glob, Grep, WebSearch, WebFetch, Write, TaskCreate, TaskUpdate]
+tools: [Read, Glob, Grep, WebSearch, WebFetch, Write, TaskCreate, TaskUpdate, mcp__context7__resolve-library-id, mcp__context7__query-docs, mcp__exa__web_search_exa, mcp__exa__company_research_exa, mcp__exa__crawling_exa]
 skills: [KB-documentation-criteria]
 memory: project
 ---

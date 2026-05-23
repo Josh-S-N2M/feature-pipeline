@@ -21,12 +21,18 @@
       "version": "latest"
     },
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "lts"
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/go:1": {
+      "version": "1.22"
     },
     "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
   },
 
-  "onCreateCommand": "claude --version && python3 --version && node --version && gh --version",
+  "onCreateCommand": "claude --version && python3 --version && node --version && go version && gh --version",
+
+  "postCreateCommand": ".devcontainer/postCreate.sh",
+  "postStartCommand": ".devcontainer/postStart.sh",
 
   "forwardPorts": [],
 
@@ -58,7 +64,11 @@
 
   "containerEnv": {
     "EDITOR": "code --wait",
-    "PAGER": "less -R"
+    "PAGER": "less -R",
+    "CONTEXT7_API_KEY": "${localEnv:CONTEXT7_API_KEY}",
+    "EXA_API_KEY": "${localEnv:EXA_API_KEY}",
+    "TFE_TOKEN": "${localEnv:TFE_TOKEN}",
+    "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1"
   },
 
   "hostRequirements": {

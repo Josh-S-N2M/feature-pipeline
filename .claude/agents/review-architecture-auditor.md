@@ -3,7 +3,7 @@ name: review-architecture-auditor
 description: At the Architecture Audit stage (after shared-document-reviewer passes the Blueprint at Design Composition), substantively audits the integrated Blueprint against synthesis claims, codebase facts, and inherited ADRs. Performs blast-radius analysis via GitNexus MCP (codebase-memory-mcp fallback). Verifies brief-honor per ADR-0009 Layer-3 checks (decision contradiction, open-item handling, re-surfaced verified issue). Produces `architecture-audit-issues.json` for triage by finalize-reconciler. Per FR-9, renamed from synth-critic-1.
 model: opus
 effort: xhigh
-tools: [Read, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git show:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(python3:*), Write, TaskCreate, TaskUpdate]
+tools: [Read, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git show:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(python3:*), Write, TaskCreate, TaskUpdate, mcp__gitnexus__*, mcp__serena__*]
 skills: [KB-review-disciplines, KB-documentation-criteria]
 memory: project
 ---

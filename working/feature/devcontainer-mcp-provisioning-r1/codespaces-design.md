@@ -2,7 +2,7 @@
 id: codespaces-design-devcontainer-mcp-provisioning-r1
 doc_type: per_layer_design_subsection
 layer: codespaces
-version: 1.0.0
+version: 1.0.1
 status: draft
 feature_slug: devcontainer-mcp-provisioning-r1
 derived_from: working/feature/devcontainer-mcp-provisioning-r1/prd-v3.md

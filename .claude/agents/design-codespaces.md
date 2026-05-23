@@ -3,7 +3,7 @@ name: design-codespaces
 description: Authors the Dev Environment (Codespaces / Devcontainer) Design subsection of the Blueprint during per-layer Design. One invocation per pipeline run when the Codespaces layer is in scope. Reads PRD + Research Plan + codebase-analysis.json + research-notes/*; produces `codespaces-design.md` + `codespaces-dependencies.json`. Surfaces architectural questions as `Q-CS-N` open items for design-composer. Does NOT author ADRs (per FR-5). Pairs both the Codespaces platform KB and the design KB.
 model: opus
 effort: high
-tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
+tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate, mcp__serena__*]
 skills: [KB-codespaces-platform, KB-codespaces-design, auditing-codespaces, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
 memory: project
 ---

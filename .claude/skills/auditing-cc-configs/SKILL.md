@@ -143,16 +143,17 @@ File under .claude/hooks/                           auditing-hooks (hook script)
 
 ## Sub-skill family
 
-This coordinator dispatches to six sibling skills (all installable individually):
+This coordinator dispatches to five sibling skills (all installable individually):
 
 - **auditing-skills** — SKILL.md files, slash commands
 - **auditing-context-files** — CLAUDE.md, rules, auto memory
 - **auditing-subagents** — agent files, subagent persistent memory
 - **auditing-hooks** — hook configuration and hook scripts
 - **auditing-settings** — settings.json (all scopes), output styles
-- **auditing-mcp** — .mcp.json, optional runtime audit
 
 If a sub-skill is missing from the user's install, the coordinator skips that primitive type and notes it in the report ("auditing-X not installed; primitive Y skipped").
+
+**Note on auditing-mcp**: previously a sub-skill of this family, graduated to its own family-coordinator status per ADR-0042 (cycle-3 reconciliation, devcontainer-mcp-provisioning-r1 Gate-4 OI-2 closure). MCP failure-domain (silent-failure, devcontainer/docker breakage, supply-chain compromise) is operationally distinct from `.claude/`-config correctness; `auditing-mcp` now coordinates its own family at `.claude/skills/auditing-mcp/`. Project-wide audits SHOULD invoke both `auditing-cc-configs` AND `auditing-mcp` separately; the two families are now peers under the `auditing-shared` utility home (per ADR-0031). Per ADR-0005 append-only supersession discipline, this section documents the graduation rather than deleting the historical fact that `auditing-mcp` was once enumerated here.
 
 ## Verdict thresholds (v2 — tightened)
 

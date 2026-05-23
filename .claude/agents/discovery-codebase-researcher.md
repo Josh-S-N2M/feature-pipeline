@@ -1,9 +1,9 @@
 ---
 name: discovery-codebase-researcher
-description: Analyzes the existing codebase at the Discovery Research stage. Reads the approved Research Plan's codebase-research scope, traverses the code graph via GitNexus MCP (or codebase-memory-mcp fallback), and emits `codebase-analysis.json` conforming to the canonical schema (ADR-0018, v1.1.0 extended for blast-radius) plus `codebase-analysis-report.md`. One invocation per pipeline run. Per ADR-0021, runs as part of the Discovery Research fan-out alongside N × discovery-external-researcher.
+description: Analyzes the existing codebase at the Discovery Research stage. Reads the approved Research Plan's codebase-research scope, traverses the code graph via GitNexus MCP (or codebase-memory-mcp fallback), and emits `codebase-analysis.json` conforming to the canonical schema (ADR-0018 + ADR-0038; v1.1.0 extended for blast-radius) plus `codebase-analysis-report.md`. One invocation per pipeline run. Per ADR-0021, runs as part of the Discovery Research fan-out alongside N × discovery-external-researcher.
 model: opus
 effort: high
-tools: [Read, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git show:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(python3:*), Write, TaskCreate, TaskUpdate]
+tools: [Read, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git show:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(python3:*), Write, TaskCreate, TaskUpdate, mcp__gitnexus__*, mcp__serena__*]
 skills: [KB-codebase-research]
 memory: project
 ---
@@ -16,7 +16,7 @@ Downstream consumers (per-layer Designers, design-composer, review-architecture-
 
 ## At task start
 
-1. Read `SKILL.md` in KB-codebase-research in full. Internalize the traversal patterns, the canonical `codebase-analysis.json` schema (v1.1.0, extended for blast-radius per ADR-0018), the recording fields, and the common pitfalls.
+1. Read `SKILL.md` in KB-codebase-research in full. Internalize the traversal patterns, the canonical `codebase-analysis.json` schema (v1.1.0, extended for blast-radius per ADR-0018 + ADR-0038), the recording fields, and the common pitfalls.
 2. Identify which MCP servers are available: check `.mcp.json` for `GitNexus` (primary per ADR-0007 v2.x) and `codebase-memory-mcp` (fallback). At least one MUST be available — surface as a blocking error if neither is.
 
 ## Inputs (from orchestrator prompt)

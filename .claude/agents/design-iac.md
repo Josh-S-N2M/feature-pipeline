@@ -3,7 +3,7 @@ name: design-iac
 description: Authors the Infrastructure-as-Code Design subsection of the Blueprint during per-layer Design. One invocation per pipeline run when the IaC layer is in scope. Reads PRD + Research Plan + codebase-analysis.json + research-notes/*; produces `iac-design.md` + `iac-dependencies.json`. Surfaces architectural questions as `Q-IaC-N` open items for design-composer. Does NOT author ADRs (per FR-5).
 model: opus
 effort: high
-tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
+tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate, mcp__terraform-mcp__*]
 skills: [KB-iac-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
 memory: project
 ---

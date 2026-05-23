@@ -3,7 +3,7 @@ name: design-cicd
 description: Authors the CI/CD Design subsection of the Blueprint during per-layer Design. One invocation per pipeline run when the CI/CD layer is in scope. Reads PRD + Research Plan + codebase-analysis.json + research-notes/*; produces `cicd-design.md` + `cicd-dependencies.json`. Surfaces architectural questions as `Q-CICD-N` open items for design-composer. Does NOT author ADRs (per FR-5). Pairs both the GitHub Actions platform KB and the design KB.
 model: opus
 effort: high
-tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
+tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate, mcp__actionlint-mcp__lint_workflow, mcp__actionlint-mcp__check_all_workflows, mcp__serena__*]
 skills: [KB-github-actions-platform, KB-github-actions-design, auditing-github-actions, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
 memory: project
 ---

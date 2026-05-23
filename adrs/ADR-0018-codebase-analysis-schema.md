@@ -1,7 +1,18 @@
 ---
 id: ADR-0018
 version: 1.0.0
-status: Accepted
+status: Superseded by ADR-0038
+superseded_by:
+  - ADR-0038 (bumps codebase-analysis schema to v1.1.0; blast-radius extension per FR-12 / Q-CC-3)
+supersession_note: >-
+  ADR-0038 (authored in devcontainer-mcp-provisioning-r1, 2026-05-23) bumps the
+  codebase-analysis JSON schema from v1.0.0 (this ADR) to v1.1.0, extending the
+  schema with blast-radius preview data per FR-12 + Q-CC-3 per-domain breakdown.
+  ADR-0018's core decision (the canonical codebase-analysis schema posture) is
+  preserved; v1.0.0 → v1.1.0 is an additive schema extension, not a replacement.
+  Per ADR-0005 append-only supersession discipline, this frontmatter annotation
+  is the canonical supersession marker; the v1.0.0 body content remains
+  verbatim below.
 generated: 2026-05-12
 generated_by: synth-designer (new ADR for blueprint v4)
 supersedes: []
