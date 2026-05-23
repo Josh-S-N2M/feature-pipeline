@@ -1,0 +1,52 @@
+{
+  "//": [
+    ".mcp.json TEMPLATE — KB-mcp-platform/assets/templates/mcp.json.tmpl",
+    "Customized by Plan T2.4 + substituted at repo root .mcp.json.",
+    "Canonical inventory: 7 named MCP servers per Gate-4 OI-1 closure.",
+    "Credential handling: env-block indirection only (ADR-0039); env-var names from",
+    ".devcontainer/versions.env or devcontainer.json containerEnv.",
+    "Replace <PIN_TBD> with actual pin values from versions.env per Plan T1.3."
+  ],
+  "mcpServers": {
+    "actionlint-mcp": {
+      "command": "actionlint-mcp",
+      "args": []
+    },
+    "context7": {
+      "transport": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      }
+    },
+    "exa": {
+      "transport": "http",
+      "url": "https://mcp.exa.ai/mcp",
+      "headers": {
+        "x-api-key": "${EXA_API_KEY}"
+      }
+    },
+    "gitnexus": {
+      "command": "npx",
+      "args": ["-y", "gitnexus@${GITNEXUS_TAG}", "mcp"],
+      "env": {
+        "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1"
+      }
+    },
+    "mcp-openapi-schema": {
+      "command": "npx",
+      "args": ["-y", "mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}"]
+    },
+    "serena": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/oraios/serena@${SERENA_REF}", "serena"]
+    },
+    "terraform-mcp": {
+      "command": "terraform-mcp",
+      "args": [],
+      "env": {
+        "TFE_TOKEN": "${TFE_TOKEN}"
+      }
+    }
+  }
+}
