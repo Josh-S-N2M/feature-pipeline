@@ -1,0 +1,37 @@
+{
+  "task_id": "task-031",
+  "plan_anchor": "T4.4c",
+  "phase_id": "P4",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/agents/issue-capture-author.md"
+  ],
+  "files_created": [],
+  "findings_4phase": {
+    "lint": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-4 PV-4.C6",
+      "result": "PASS"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-4.C6"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 0,
+  "notes": "Update-mode workflow appended (~145 lines; final file 457 lines). 6 steps. 4 ACs satisfied (AC-FR-2-a/b/d, AC-NFR-3-a). Idempotency check on empty-diff. OLD\u2192NEW preview. F-003 invariant re-verified post-append."
+}

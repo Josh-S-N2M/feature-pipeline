@@ -1,0 +1,37 @@
+{
+  "task_id": "task-026",
+  "plan_anchor": "T4.1",
+  "phase_id": "P4",
+  "status": "COMPLETED",
+  "files_modified": [],
+  "files_created": [
+    ".claude/skills/KB-issue-capture/SKILL.md"
+  ],
+  "findings_4phase": {
+    "lint": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-4 PV-4.C2",
+      "result": "PASS"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-4.C2"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 0,
+  "notes": "Router skill; disable-model-invocation: true (project first per F-001); allowed-tools: Read, Glob, Grep; 80 lines; routes to 4 references (T4.2) by path. Discipline-only per ADR-0049."
+}

@@ -30,3 +30,8 @@ Thumbs.db
 # .gitkeep anchor is kept so the directory itself remains tracked.
 .claude/runtime/*
 !.claude/runtime/.gitkeep
+
+# Claude Code session-local audit-trail logs (issue-capture-author etc.)
+# Per Q-CC-4 + AC-NFR-7-a: runtime audit trail, regenerated each session,
+# not committable signal.
+.claude/logs/*.jsonl
