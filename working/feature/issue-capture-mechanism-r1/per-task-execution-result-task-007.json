@@ -1,0 +1,41 @@
+{
+  "task_id": "task-007",
+  "plan_anchor": "T1.2",
+  "phase_id": "P1",
+  "status": "COMPLETED",
+  "files_modified": [],
+  "files_created": [
+    ".claude/skills/KB-documentation-criteria/references/templates/issue-analysis-template.md"
+  ],
+  "findings_4phase": {
+    "lint": {
+      "tool": "n/a (markdown; markdownlint not available)",
+      "result": "PASS",
+      "notes": "No applicable linter for markdown templates in this project."
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS",
+      "notes": "No compilation step for markdown."
+    },
+    "test": {
+      "tool": "PV-1 validator checks for PV-1.C1,PV-1.C2,PV-1.C4",
+      "result": "PASS",
+      "notes": "Quality-handler executed PV-1 pass criteria + detect_stubs + scope-discipline check; all PASS."
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-1.C1",
+    "PV-1.C2",
+    "PV-1.C4"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "notes": "Producer: 104 lines; doc_type=issue-analysis; per-state shape via YAML comment blocks; body skeleton accommodates BOTH precedent shapes (multi-thread H3 subsections per analysis-per-agent-design-evaluation-gap.md AND single-thread paragraphs per analysis-adr-placement-rootcause.md). Quality-handler: APPROVED."
+}

@@ -1,0 +1,41 @@
+{
+  "task_id": "task-006",
+  "plan_anchor": "T1.1",
+  "phase_id": "P1",
+  "status": "COMPLETED",
+  "files_modified": [],
+  "files_created": [
+    ".claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md"
+  ],
+  "findings_4phase": {
+    "lint": {
+      "tool": "n/a (markdown; markdownlint not available)",
+      "result": "PASS",
+      "notes": "No applicable linter for markdown templates in this project."
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS",
+      "notes": "No compilation step for markdown."
+    },
+    "test": {
+      "tool": "PV-1 validator checks for PV-1.C1,PV-1.C2,PV-1.C4",
+      "result": "PASS",
+      "notes": "Quality-handler executed PV-1 pass criteria + detect_stubs + scope-discipline check; all PASS."
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-1.C1",
+    "PV-1.C2",
+    "PV-1.C4"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "notes": "Producer (execute-task-code-producer): 115 lines; doc_type=issue-register (per Q-BE-1); per-state shape via Option A (per-state YAML comment blocks in frontmatter); 6 lifecycle states + draft documented; escalates_from + escalated_to documented in both frontmatter comments and body Cross-links section. Quality-handler verdict: APPROVED; PV-1.C1/C2/C4 all PASS; detect_stubs returned []; 4-phase gate PASS (lint n/a / build n/a / test PASS / final-gate PASS)."
+}

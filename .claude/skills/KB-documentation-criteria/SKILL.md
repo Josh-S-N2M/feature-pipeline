@@ -53,6 +53,7 @@ The body below is the router. Each substantive concern lives in `references/`.
 | Discovery planning discipline (used by `discovery-plan-author`) | `references/disciplines/discovery-planning.md` |
 | Pedagogical marker justification spec (per ADR-0030 / FR-12) | `references/pedagogical-marker-justification-spec.md` |
 | Deliverable archive spec (audit-trail packaging) | `references/deliverable-archive-spec.md` |
+| Issue doctype structural spec (frontmatter lifecycle, body shape, cross-link fields for all 3 outside-pipeline issue doctypes; per ADR-0049) | `references/issue-doctypes-spec.md` |
 
 ## Canonical templates
 
@@ -69,6 +70,9 @@ The body below is the router. Each substantive concern lives in `references/`.
 | Quality reconciliation log (execution-phase) | `references/templates/quality-reconciliation-log-template.md` | `execute-finalize-reconciler` |
 | State-transitions log entry (execution-phase) | `references/templates/state-transitions-log-entry-template.md` | `execute-orchestrator` (via `auditing-shared/scripts/log_state_transition.py`) |
 | Pipeline run summary (execution-phase) | `references/templates/pipeline-run-summary-template.md` | `execute-orchestrator` |
+| Issue Register (outside-pipeline issue capture) | `references/templates/issue-register-template.md` | `issue-capture-author` |
+| Issue Analysis (outside-pipeline issue capture) | `references/templates/issue-analysis-template.md` | `issue-capture-author` |
+| Issue Proposal (outside-pipeline issue capture) | `references/templates/issue-proposal-template.md` | `issue-capture-author` |
 
 Each template defines the document's REQUIRED structural elements. `shared-document-reviewer`'s Gate 0 check uses these REQUIRED markers to determine whether a document passes structural review before quality assessment begins.
 
@@ -128,6 +132,7 @@ Full frontmatter spec, including supersession discipline and YAML pitfalls: `ref
 - Phase Validator authoring — uses `KB-task-decomposition` (which lives outside this KB per ADR-0020)
 - UI Spec authoring — has its own template and discipline, not housed here in v4.3 (slated for KB-frontend-design)
 - Code style / lint configuration — lives in the project's own conventions and `KB-general-coding-principles` for design-time samples
+- Triggering discipline for outside-pipeline issue capture (when to capture, doctype classification rubric, approval-prompt rubric) — lives in `KB-issue-capture`, NOT here (per ADR-0049; templates above are structural-only)
 
 ## Provenance
 
