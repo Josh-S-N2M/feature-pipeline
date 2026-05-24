@@ -1,0 +1,47 @@
+Migration Validator Result
+==========================
+Timestamp : 2026-05-24T00:00:00Z
+Purpose   : AC-FR-8-c — confirm clean validator run on all 4 migrated Issues files
+            before the post-T3.8 audit-trail commit (per AC-FR-8-d this file is
+            outside the Phase 3 commit-range).
+
+Feature   : issue-capture-mechanism-r1
+Task      : task-024 (plan anchor T3.7)
+
+
+## Check 1 — 4 migrated Issues files
+
+Command:
+  python3 .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py \
+    Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md \
+    Issues/per-agent-design-evaluation-gap/analysis.md \
+    Issues/adr-placement-rootcause/analysis.md \
+    Issues/auditing-family-graduation-review/proposal.md
+
+Output:
+  {
+    "findings": []
+  }
+
+Findings count: 0
+
+
+## Check 2 — agent-roster-impact-matrix evidence path (PV-3.C6)
+
+Command:
+  python3 .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py \
+    Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md
+
+Output:
+  {
+    "findings": []
+  }
+
+Findings count: 0
+
+
+## Verdict
+
+ALL CLEAN — zero findings across all 4 migrated Issues files and the evidence-path
+early-return check. Phase 3 migration is structurally valid per the frontmatter
+validator.

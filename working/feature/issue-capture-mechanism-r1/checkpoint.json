@@ -3,7 +3,7 @@
   "feature_slug": "issue-capture-mechanism-r1",
   "started_at": "2026-05-23T16:48:32Z",
   "completed_at": null,
-  "current_stage": "execution_phase_2_complete",
+  "current_stage": "execution_phase_3_complete",
   "stage_status": "in_progress",
   "gate_history": [
     {
@@ -120,13 +120,23 @@
       "task-013": 0,
       "task-014": 1,
       "task-015": 0,
-      "task-016": 1
+      "task-016": 1,
+      "task-017": 0,
+      "task-018": 0,
+      "task-019": 0,
+      "task-020": 0,
+      "task-021": 1,
+      "task-022": 0,
+      "task-023": 0,
+      "task-024": 0,
+      "task-025": 0
     },
     "per_phase": {
       "P0": 0,
       "P8": 0,
       "P1": 0,
-      "P2": 0
+      "P2": 0,
+      "P3": 0
     }
   },
   "execution_phase_progress": {
@@ -198,7 +208,30 @@
       "load_bearing_assertion_pv2_c7": "PASS"
     },
     "P3": {
-      "status": "pending"
+      "status": "complete",
+      "verdict": "PASS",
+      "tasks_completed": 9,
+      "tasks_total": 9,
+      "validators_passed": [
+        "PV-3.C1",
+        "PV-3.C2",
+        "PV-3.C3",
+        "PV-3.C4",
+        "PV-3.C5",
+        "PV-3.C6",
+        "PV-3.C7"
+      ],
+      "execution_mode": "specialist-dispatch",
+      "revision_cycles_used": {
+        "task-021": 1
+      },
+      "process_irregularities": [
+        {
+          "commit": "405bb23",
+          "what": "scope leak"
+        }
+      ],
+      "load_bearing_assertion_pv3_c7": "PASS"
     },
     "P4": {
       "status": "pending"
@@ -269,6 +302,16 @@
       "revision_cycles_summary": {
         "task-014": 1,
         "task-016": 1
+      }
+    },
+    {
+      "phases": [
+        "P3"
+      ],
+      "mode": "specialist-dispatch",
+      "rationale": "9 tasks; 19 specialist dispatches; 1 revision cycle (T3.4 D-13 fallback); 1 documented process irregularity (405bb23 scope leak; non-blocking).",
+      "revision_cycles_summary": {
+        "task-021": 1
       }
     }
   ]

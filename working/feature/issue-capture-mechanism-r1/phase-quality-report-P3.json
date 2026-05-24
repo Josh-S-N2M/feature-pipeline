@@ -1,0 +1,138 @@
+{
+  "phase_id": "P3",
+  "verdict_overall": "PASS",
+  "verdict_per_dimension": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "rollup_rule_applied": "All 5 dimensions PASS. PV-3.C7 load-bearing AC-FR-8-d scope assertion holds (0 extras). Per Contract 2 rollup, overall verdict PASS.",
+  "validators_passed": [
+    "PV-3.C1",
+    "PV-3.C2",
+    "PV-3.C3",
+    "PV-3.C4",
+    "PV-3.C5",
+    "PV-3.C6",
+    "PV-3.C7"
+  ],
+  "validators_failed": [],
+  "findings": [],
+  "cross_phase_invariants_checked": {
+    "CPI-1": "PASS (pipeline-isolation greps empty)",
+    "CPI-2": "PASS (PV-3.C5+C6 direct)",
+    "CPI-3": "N/A (issue-capture-author.md not yet authored; Phase 4)",
+    "CPI-4": "PASS (NFR-8 baseline reconstructed via git ls-tree -r 814924a; migrations don't affect baseline-scope diff)",
+    "CPI-5": "PASS (source-deletions are rename-halves; history preserved via git log --follow; no content+history loss)"
+  },
+  "audit_counter_delta": {
+    "baseline_type": "prior_phase",
+    "primary_baseline": "prior_phase",
+    "feature_start": {
+      "per_domain": {
+        "tests": "0 -> 0",
+        "audits": "0 -> 0",
+        "validator": "0 -> 0",
+        "discipline": "0 -> 1",
+        "scope_deviations": "0 -> 0"
+      },
+      "aggregate": "0 -> 1"
+    },
+    "prior_phase": {
+      "per_domain": {
+        "tests": "0 -> 0",
+        "audits": "0 -> 0",
+        "validator": "0 -> 0",
+        "discipline": "0 -> 1",
+        "scope_deviations": "0 -> 0"
+      },
+      "aggregate": "0 -> 1 (+1 discipline observation: 405bb23 commit scope leak; non-blocking)"
+    },
+    "gating": "informational",
+    "gating_rule": null
+  },
+  "scope_deviations": [],
+  "in_phase_process_events": [
+    {
+      "event": "revision cycle",
+      "task_id": "task-021",
+      "phase_task_id": "T3.4",
+      "cycle": 1,
+      "what": "D-13 two-commit fallback (pre-existing migration had 40% similarity below default 50% rename-detection threshold)",
+      "outcome": "APPROVED",
+      "adr_0017_cycle_cap_status": "within cap (1 of 4)"
+    },
+    {
+      "event": "process irregularity",
+      "task_id": "task-021",
+      "phase_task_id": "T3.4",
+      "commit_sha": "405bb23",
+      "what": "Producer's first commit accidentally included T3.2/T3.3/T3.5 staged migrations (git commit had no explicit paths)",
+      "impact": "audit-trail attribution imprecise; functional state correct; PV-3.C2+C7 PASS",
+      "severity": "non-blocking discipline observation",
+      "recorded_for_transparency": true
+    }
+  ],
+  "load_bearing_assertion_result": {
+    "assertion": "PV-3.C7 \u2014 AC-FR-8-d: Phase 3 commit-range diff contains EXACTLY 5 expected file pairs",
+    "verdict": "PASS",
+    "evidence_path": "working/feature/issue-capture-mechanism-r1/phase-3-scope-diff.txt",
+    "diff_counts": {
+      "actual_paths": 6,
+      "expected_union": 10,
+      "extras": 0
+    },
+    "rendering": "mixed (4 R-detected at R099/R100 + 1 A/D pair for adr-placement-rootcause)"
+  },
+  "per_task_summary": {
+    "task-017": {
+      "validator_id": "T3.0",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-018": {
+      "validator_id": "T3.1",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-019": {
+      "validator_id": "T3.2",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-020": {
+      "validator_id": "T3.3",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-021": {
+      "validator_id": "T3.4",
+      "cycles": 1,
+      "verdict": "APPROVED"
+    },
+    "task-022": {
+      "validator_id": "T3.5",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-023": {
+      "validator_id": "T3.6",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-024": {
+      "validator_id": "T3.7",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-025": {
+      "validator_id": "T3.8",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    }
+  },
+  "rationale": "Phase 3 successfully migrated 5 file pairs (4 Issues/<flat>.md \u2192 Issues/<topic>/<doctype>.md + 1 agent-roster-matrix into evidence/) with all PV-3 BLOCKER validators passing. PV-3.C7 load-bearing AC-FR-8-d assertion explicitly PASS (0 extras in commit-range scope). One revision cycle on T3.4 (D-13 two-commit fallback) preserved git rename detection on substantively-rewritten content. One process irregularity at 405bb23 (commit-scope leak swept sibling migrations into T3.4's first commit) is documented as a non-blocking discipline observation \u2014 per-commit atomicity holds, scope assertion holds via mixed rendering.",
+  "execution_mode_note": "Phase 3 executed in canonical specialist-dispatch mode per ADR-0044. 19 specialist dispatches: 9 producers (1 with revision cycle 1) + 9 handlers + 1 phase-quality-reviewer. Per-task cycle counter: task-021=1; all others=0."
+}

@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-05-24T00:00:00Z",
+  "purpose": "T3.1 dry-run of D-13 git-mv-with-similarity-index procedure. Consumed by T3.2-T3.6 producers to choose git mv (default) vs two-commit-sequence fallback.",
+  "pairs": [
+    {
+      "task": "T3.2",
+      "source": "Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md",
+      "target": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "source_exists": true,
+      "source_size_bytes": 29418,
+      "target_exists": false,
+      "target_parent_dir_exists": false,
+      "predicted_similarity_index": 100,
+      "similarity_rationale": "Pure path rename; zero content change at mv time. Git rename detection operates on content identity — 100% of bytes match. Well above 50% default threshold and 90% ideal threshold.",
+      "recommended_action": "git_mv_then_amend_frontmatter",
+      "frontmatter_backfill": {
+        "doc_type": "issue-register",
+        "id": "REGISTER-devcontainer-mcp-provisioning-r1-deferrals",
+        "version": "0.1.0",
+        "status": "open",
+        "since": "2026-05-23"
+      },
+      "dryrun_verdict": "PASS"
+    },
+    {
+      "task": "T3.3",
+      "source": "Issues/analysis-per-agent-design-evaluation-gap.md",
+      "target": "Issues/per-agent-design-evaluation-gap/analysis.md",
+      "source_exists": true,
+      "source_size_bytes": 19027,
+      "target_exists": false,
+      "target_parent_dir_exists": false,
+      "predicted_similarity_index": 100,
+      "similarity_rationale": "Pure path rename; zero content change at mv time. Git rename detection operates on content identity — 100% of bytes match. Well above 50% default threshold and 90% ideal threshold.",
+      "recommended_action": "git_mv_then_amend_frontmatter",
+      "frontmatter_backfill": {
+        "doc_type": "issue-analysis",
+        "id": "ANALYSIS-per-agent-design-evaluation-gap",
+        "version": "0.1.0",
+        "status": "open",
+        "since": "2026-05-23"
+      },
+      "dryrun_verdict": "PASS"
+    },
+    {
+      "task": "T3.4",
+      "source": "Issues/analysis-adr-placement-rootcause.md",
+      "target": "Issues/adr-placement-rootcause/analysis.md",
+      "pre_existing_migration": true,
+      "source_exists": false,
+      "source_deleted_in_working_tree": true,
+      "target_exists": true,
+      "target_parent_dir_exists": true,
+      "target_untracked": true,
+      "target_frontmatter_spec_conformant": true,
+      "validator_clean": true,
+      "recommended_action": "stage_existing_pair_as_atomic",
+      "frontmatter_backfill": null,
+      "notes": "Migration already performed by a prior session. Source deleted (unstaged) in working tree; target present as untracked file. No git mv required. Producer T3.4 must stage the deletion of source and the addition of target as a single atomic operation (git add Issues/adr-placement-rootcause/analysis.md && git rm Issues/analysis-adr-placement-rootcause.md) to allow git to detect the rename via similarity index at commit time.",
+      "dryrun_verdict": "PASS (pre-migrated; stage-only)"
+    },
+    {
+      "task": "T3.5",
+      "source": "Issues/proposal-auditing-family-graduation-review.md",
+      "target": "Issues/auditing-family-graduation-review/proposal.md",
+      "source_exists": true,
+      "source_size_bytes": 13564,
+      "target_exists": false,
+      "target_parent_dir_exists": false,
+      "predicted_similarity_index": 100,
+      "similarity_rationale": "Pure path rename; zero content change at mv time. Git rename detection operates on content identity — 100% of bytes match. Well above 50% default threshold and 90% ideal threshold.",
+      "recommended_action": "git_mv_then_amend_frontmatter",
+      "frontmatter_backfill": {
+        "doc_type": "issue-proposal",
+        "id": "PROPOSAL-auditing-family-graduation-review",
+        "version": "0.1.0",
+        "status": "open",
+        "since": "2026-05-23",
+        "proposes_future_feature": "auditing-family-structure-review-r1"
+      },
+      "frontmatter_backfill_notes": "Preserve existing proposes_future_feature shape if already present in source frontmatter. The slug above is the spec-suggested value per D-13 / Q-BE-1.",
+      "dryrun_verdict": "PASS"
+    },
+    {
+      "task": "T3.6",
+      "source": "working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md",
+      "target": "Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md",
+      "source_exists": true,
+      "source_size_bytes": 39651,
+      "target_exists": false,
+      "target_parent_dir_exists": false,
+      "predicted_similarity_index": 100,
+      "similarity_rationale": "Pure path rename; zero content change at mv time. Git rename detection operates on content identity — 100% of bytes match. Well above 50% default threshold and 90% ideal threshold.",
+      "recommended_action": "git_mv_then_amend_frontmatter",
+      "frontmatter_backfill": null,
+      "frontmatter_backfill_notes": "No frontmatter back-fill required. File lives under evidence/ per spec §2.3; not subject to frontmatter validation. Preserve file content as-is.",
+      "dryrun_verdict": "PASS"
+    }
+  ],
+  "summary": {
+    "total_pairs": 5,
+    "dryrun_pass_count": 5,
+    "dryrun_fail_count": 0,
+    "pre_existing_migrations": ["T3.4"],
+    "fallback_needed_for": [],
+    "git_mv_pairs": ["T3.2", "T3.3", "T3.5", "T3.6"],
+    "stage_only_pairs": ["T3.4"],
+    "notes": "All 4 active-rename pairs are pure path renames with no content change at mv time; similarity index will be 100% in all cases, well above both the 50% git default threshold and the 90% ideal threshold. No two-commit-sequence fallback is required for any pair. T3.4 is pre-migrated: source deleted in working tree, target exists untracked — T3.4 producer must stage both sides atomically (git rm source + git add target) rather than running git mv."
+  }
+}

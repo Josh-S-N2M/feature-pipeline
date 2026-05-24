@@ -1,0 +1,42 @@
+# Phase 3 scope diff (AC-FR-8-d enforcement per PV-3.C7)
+# Captured: 2026-05-24T19:21:45Z
+# Start commit: 8514658aeed853adadeebf0752a2dd20c0ee7e48
+# End commit:   3061323952745f80673d7a55d69dea85abec5292
+
+## git diff --name-status -M START..END
+
+A	Issues/adr-placement-rootcause/analysis.md
+D	Issues/analysis-adr-placement-rootcause.md
+R099	Issues/proposal-auditing-family-graduation-review.md	Issues/auditing-family-graduation-review/proposal.md
+R099	Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md	Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md
+R099	Issues/analysis-per-agent-design-evaluation-gap.md	Issues/per-agent-design-evaluation-gap/analysis.md
+R100	working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md	Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md
+
+## Expected union (10 paths representing 5 migration pairs):
+
+Issues/adr-placement-rootcause/analysis.md
+Issues/analysis-adr-placement-rootcause.md
+Issues/analysis-per-agent-design-evaluation-gap.md
+Issues/auditing-family-graduation-review/proposal.md
+Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md
+Issues/per-agent-design-evaluation-gap/analysis.md
+Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md
+Issues/proposal-auditing-family-graduation-review.md
+Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md
+working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md
+
+## Actual unique paths in diff:
+
+Issues/adr-placement-rootcause/analysis.md
+Issues/analysis-adr-placement-rootcause.md
+Issues/auditing-family-graduation-review/proposal.md
+Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md
+Issues/per-agent-design-evaluation-gap/analysis.md
+Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md
+
+## Extras (paths in actual NOT in expected — should be EMPTY for PASS):
+
+(none)
+
+## Verdict (AC-FR-8-d):
+PASS — all paths in scope are expected

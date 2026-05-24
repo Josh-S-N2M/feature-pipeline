@@ -1,0 +1,4 @@
+# Phase 3 end commit anchor for AC-FR-8-d scope enforcement
+# Captured: 2026-05-24T19:21:37Z
+# Feature: issue-capture-mechanism-r1
+3061323952745f80673d7a55d69dea85abec5292

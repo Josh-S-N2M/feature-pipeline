@@ -1,0 +1,38 @@
+{
+  "task_id": "task-025",
+  "plan_anchor": "T3.8",
+  "phase_id": "P3",
+  "status": "COMPLETED",
+  "files_modified": [],
+  "files_created": [
+    "working/feature/issue-capture-mechanism-r1/phase-3-end-commit.txt",
+    "working/feature/issue-capture-mechanism-r1/phase-3-scope-diff.txt"
+  ],
+  "findings_4phase": {
+    "lint": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-3 PV-3.C7",
+      "result": "PASS"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-3.C7"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 0,
+  "notes": "End commit 3061323. Scope diff: 6 actual paths (4 R-detected pairs + 1 A/D pair), 0 extras outside expected union. AC-FR-8-d PASS."
+}
