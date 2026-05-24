@@ -1,0 +1,314 @@
+{
+  "schema_version": "decision-substrate-v1",
+  "mode": "implementation-strategy",
+  "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+  "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+  "stage": "synth-substrate",
+  "substrate": "claude_code + sub-agents + skills (single substrate; implementation-strategy mode per recipe-feature-pipeline Step 6)",
+  "framer_recommendations_summary": {
+    "D-001": "(a) flatten dispatch hierarchy",
+    "D-002": "(D-002.1) two-session verification",
+    "D-003": "(D-003.1) remove Agent declaration as part of this feature",
+    "D-004": "(D-004.1) close schema gap in lockstep",
+    "D-005": "(D-005.1) defer to separate feature"
+  },
+  "mappings": [
+    {
+      "decision_id": "D-001",
+      "decision_title": "Choose §6 repair option: flatten dispatch (a) vs retire execute-orchestrator (b) vs Bash-script dispatch surface (c)",
+      "framer_recommended": "(a) flatten dispatch hierarchy",
+      "options": [
+        {
+          "label": "(a) Flatten dispatch hierarchy",
+          "recommended": true,
+          "description": "recipe-feature-pipeline/SKILL.md becomes the top-level dispatcher that invokes the 4 specialists (execute-task-code-producer, execute-task-quality-handler, execute-phase-quality-reviewer, execute-finalize-reconciler) directly via Agent at the main-conversation level (where dispatch IS supported). execute-orchestrator.md is RETAINED but re-scoped as an advisory / state-machine reference document: it documents T0..T13 transitions but is no longer the runtime dispatcher. Its YAML frontmatter Agent tool grant is removed (parallel cleanup to D-003). The 14-row state machine moves out of execute-orchestrator's runtime control flow into a 'Step 14 — Execution Phase Dispatch' (or equivalent) section in recipe-feature-pipeline/SKILL.md, which encodes the same state transitions but as parent-driven dispatch loops. checkpoint.json schema fields stay in their current location (no migration); only the OWNER of the dispatch loop changes.",
+          "affected_files": [
+            ".claude/skills/recipe-feature-pipeline/SKILL.md (NEW: Execution Phase Dispatch section, ~14-row state machine; UPDATE: list of dispatched sub-agents)",
+            ".claude/agents/execute-orchestrator.md (UPDATE: remove `Agent` from tools; reframe as advisory; preserve T0..T13 documentation; remove dispatch language)",
+            ".claude/agents/execute-finalize-reconciler.md (UPDATE: remove `Agent` from tools per D-003)",
+            "1 file outside the 8-file inventory (per CR-0095..CR-0099; specifically the recipe-feature-pipeline/SKILL.md absorption) -> triggers AC-FR-4-a with a minimal 1-item open-item list"
+          ],
+          "cost": {
+            "file_count": "3 in-inventory + 1 outside-inventory = 4 total",
+            "complexity": "medium — state-machine relocation requires careful preservation of the 14-row semantics (CR-0024, CR-0025, CR-0129, CR-0130, CR-0131); checkpoint.json field locations unchanged (NFR-6-a satisfied)",
+            "blast_radius": "tenant (per framer) but constrained because recipe-feature-pipeline is the existing canonical top-level orchestrator (CR-0027, CR-0117, CR-0138) — flattening reinforces an existing pattern rather than introducing a new one",
+            "effort_weeks": 3.0,
+            "irreversibility": "one_way per framer; mitigation is that execute-orchestrator.md is preserved (not deleted) so the documentation is still available if a future reversal is needed"
+          },
+          "rejection_rationale": null,
+          "loss_vs_pattern": "Preserves: specialist-isolation dispatch pattern (E-0042; cluster 5; 7 supporting claims) — each specialist remains a separately-dispatched sub-agent. Preserves: 14-row state machine semantics (relocated, not lost). Preserves: audit-trail (parent-driven dispatch is still per-task / per-phase). Preserves: execute-orchestrator's documentation value as state-machine reference. Loses: execute-orchestrator's runtime role (becomes advisory).",
+          "interactions": {
+            "with_D-003": "Naturally pairs with D-003.1 (Agent removal from execute-finalize-reconciler) — both are dispatch-grant cleanups; commit them together.",
+            "with_D-004": "Schema gap (checkpoint execution-phase fields) can stay documented in its current location — option (a) does not relocate schema ownership. D-004 stays a documentation-only edit. NO ADR promotion required.",
+            "with_F-7": "The 4 specialists already exist on disk and have been invocable across all prior runs; F-7 only affects newly-authored agents. No session-boundary impact from option (a) itself."
+          }
+        },
+        {
+          "label": "(b) Retire execute-orchestrator entirely",
+          "recommended": false,
+          "description": "Delete execute-orchestrator.md entirely. Fold the 14-row state machine into recipe-feature-pipeline/SKILL.md as a first-class section. Update all 5+ files outside the 8-file inventory that reference execute-orchestrator by name or by its template-generation responsibility.",
+          "affected_files": [
+            ".claude/agents/execute-orchestrator.md (DELETE)",
+            ".claude/skills/recipe-feature-pipeline/SKILL.md (UPDATE: absorb state machine + dispatch loop)",
+            ".claude/agents/execute-finalize-reconciler.md (UPDATE per D-003)",
+            ".claude/skills/KB-documentation-criteria/SKILL.md (UPDATE: template-assignment table — execute-orchestrator references need rewrite, per CR-0097)",
+            ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md (UPDATE: v1 `invoking_agent` invariant currently states 'always execute-orchestrator' per CR-0079/CR-0080/CR-0135 — must be revised, breaking the invariant)",
+            ".claude/skills/KB-documentation-criteria/references/templates/pipeline-run-summary-template.md (UPDATE: generated-by field per CR-0098)",
+            ".claude/skills/KB-documentation-criteria/references/templates/quality-reconciliation-log-template.md (UPDATE per CR-0101)",
+            ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py (UPDATE: test data references execute-orchestrator per CR-0102)",
+            ".claude/skills/auditing-codespaces/SKILL.md (UPDATE: consumer note per CR-0103)"
+          ],
+          "cost": {
+            "file_count": "3 in-inventory + 5+ outside-inventory = 8+ total (vs option (a)'s 4)",
+            "complexity": "high — state-transitions-log v1 `invoking_agent` invariant (E-0095, CR-0079/CR-0080) is a SCHEMA invariant currently hard-coded to 'execute-orchestrator'; revising it is either a v2 schema bump or a substantive de facto extension — entangles D-004 with state-transitions schema ownership",
+            "blast_radius": "tenant + breaks state-transitions log schema invariant",
+            "effort_weeks": 6.0,
+            "irreversibility": "one_way and HARDER to reverse than (a) — execute-orchestrator.md is deleted; state-machine documentation is gone; restoring requires git-archaeology"
+          },
+          "rejection_rationale": "Triggers AC-FR-4-a scope-expansion open-item gate with the widest possible operator surface (5+ outside-inventory files vs 1 for option (a)). Conflicts with PRD FR-4 8-file inventory (graph edge E-0014 conflicts_with E-0032, 4 supporting claims). Promotes D-004 from a documentation-only edit to an ADR-worthy schema-ownership transfer (state-transitions-log v1 `invoking_agent` invariant breaks). Roughly 2x effort of option (a) for equivalent functional outcome.",
+          "loss_vs_pattern": "Compared to (a): LOSES execute-orchestrator's state-machine documentation (deleted, not relocated as a unit — the 14-row table fragments into recipe-feature-pipeline/SKILL.md). LOSES v1 state-transitions schema invariant (must be revised). PRESERVES specialist-isolation dispatch pattern (same as option a). PRESERVES parent-driven audit trail (same as option a). The pattern fidelity is the SAME as option (a); the loss is purely in implementation cost and inventory escape."
+        },
+        {
+          "label": "(c) Bash-script dispatch surface",
+          "recommended": false,
+          "description": "Author a new Bash script (e.g., `.claude/skills/recipe-feature-pipeline/scripts/dispatch-execution-phase.sh`) that invokes specialists via the Bash tool from recipe-feature-pipeline. Since the Bash tool in the harness can invoke `claude` CLI sub-processes, the script orchestrates per-task / per-phase specialist invocation by shelling out. execute-orchestrator becomes either advisor (like option a) or retired (like option b).",
+          "affected_files": [
+            ".claude/skills/recipe-feature-pipeline/scripts/dispatch-execution-phase.sh (NEW)",
+            ".claude/skills/recipe-feature-pipeline/SKILL.md (UPDATE: reference the script; document Bash-mediated dispatch contract)",
+            ".claude/agents/execute-orchestrator.md (UPDATE per option a OR DELETE per option b — orthogonal)",
+            ".claude/agents/execute-finalize-reconciler.md (UPDATE per D-003)",
+            "Same 1-file outside-inventory pressure as option (a)"
+          ],
+          "cost": {
+            "file_count": "3-4 in-inventory + 1 outside-inventory + 1 NEW script = 5 total",
+            "complexity": "medium-high — introduces a NEW indirection layer (Bash-mediated invocation of `claude` CLI). The CLI-from-Bash dispatch must reconstruct the per-task context (cwd, manifest, checkpoint) and parse the sub-process output back into the checkpoint state. This is significant adapter code and is NOT a documented Claude Code primitive — it is a workaround.",
+            "blast_radius": "tenant + introduces a runtime indirection that future runs must understand",
+            "effort_weeks": 3.0,
+            "irreversibility": "two_way (script can be deleted; specialists revert to agent-graph dispatch)"
+          },
+          "rejection_rationale": "Equivalent file count to option (a) (1 outside-inventory file) but DEGRADES the specialist-isolation audit-trail (cluster 5, AN-0037: 'real audit-trail losses, not just cleanliness'): specialist invocations become Bash sub-process invocations rather than agent-graph dispatches, which means the harness's per-agent transcript / per-agent state-transitions logging mechanism is bypassed (the script becomes the audit boundary, not the agent). Anthropic's documented alternatives (Skills, chain-from-main) are stronger if indirection is desired. T-001 (T-0064) treats option (c) as physically possible but not preferred.",
+          "loss_vs_pattern": "Compared to (a): LOSES audit-trail granularity (per-agent transcript becomes per-script-invocation transcript). LOSES the harness's native agent-graph telemetry. PRESERVES specialist-isolation conceptually (each specialist still runs in its own context) but the isolation boundary is now a Bash sub-process, not an agent. PRESERVES 14-row state-machine (encoded in the script). This is the option with the LOWEST pattern fidelity for the same cost as (a)."
+        }
+      ],
+      "implementation_strategy_verdict": "CONFIRMS framer recommendation of option (a). Deepening the implementation view does NOT surface a reason to revisit: (a) has the lowest blast-radius, the highest pattern-fidelity preservation, the cleanest interaction with D-003 / D-004, and the simplest reversal path. Option (b)'s schema-invariant entanglement (state-transitions-log v1 invariant) is a NEW consideration not fully surfaced in the framer's frame — it would PROMOTE D-004 to ADR-worthy if selected — which strengthens the case AGAINST (b). Option (c)'s audit-trail loss is concrete (bypasses harness telemetry).",
+      "new_options_surfaced": [],
+      "recommendation_change": null,
+      "most_expensive_single_edit": "recipe-feature-pipeline/SKILL.md — absorbs the Execution Phase Dispatch section (~14-row state machine + dispatch loop). This is the load-bearing edit; plan-author should sequence it explicitly with careful CoVe against the existing T0..T13 documentation in execute-orchestrator.md."
+    },
+    {
+      "decision_id": "D-002",
+      "decision_title": "F-7 mid-session agent registry staleness — how to verify the FR-6 synthetic test",
+      "framer_recommended": "(D-002.1) two-session verification",
+      "options": [
+        {
+          "label": "(D-002.1) Two-session verification — author in session 1; run synthetic test in fresh session 2",
+          "recommended": true,
+          "description": "The plan-author sequences FR-6 verification with an EXPLICIT session-boundary instruction: an early phase authors any new test agents / synthetic minimal test feature files (if FR-6 requires new agents — likely, given the kill-criterion-#2 closure check needs an isolated probe); a later phase begins with a session-restart prompt to the operator (e.g., 'STOP — exit the current Claude Code session and start a fresh session before running the next task; this is required because the agent registry is loaded at session start per F-7'). The verification protocol document captures the session-restart as a discrete operator-in-the-loop step. No new harness behavior required.",
+          "affected_files": [
+            "working/feature/<feature-slug>/plan/<plan-version>.md (NEW or UPDATE: explicit phase boundary with session-restart instruction)",
+            "working/feature/<feature-slug>/synthetic-test-protocol.md (NEW: documents the F-7 constraint and the session-boundary requirement)",
+            "Potentially .claude/skills/recipe-feature-pipeline/SKILL.md (UPDATE: NFR-5-a-adjacent — formalize the F-7 session-boundary constraint as a documented pipeline constraint for future runs)"
+          ],
+          "cost": {
+            "file_count": "2-3 files (1 plan doc + 1 protocol doc + optional skill update)",
+            "complexity": "low — documentary + operator coordination only",
+            "blast_radius": "component (this feature's FR-6 step)",
+            "effort_weeks": 0.5,
+            "irreversibility": "two_way"
+          },
+          "rejection_rationale": null,
+          "loss_vs_pattern": "Preserves: F-7 constraint compliance (the only documented mechanism per T-0053/T-0054). Preserves: kill-criterion-#2 closure check fidelity. Loses: zero — this is the canonical pattern for F-7 mitigation.",
+          "interactions": {
+            "with_DISSENT-4_OI-FRAMER-2": "The synthetic test protocol SHOULD include the H-a vs H-b sub-question for the Edit-tool mechanism (OI-FRAMER-2). This adds a sub-bullet to the protocol document, not new files."
+          }
+        },
+        {
+          "label": "(D-002.2) Session-restart-in-pipeline step (pipeline-internal)",
+          "recommended": false,
+          "description": "Add a new recipe-feature-pipeline primitive that triggers a session restart from within a phase (e.g., a `session_restart_required: true` flag in checkpoint.json that the harness or operator-tooling reads and acts on).",
+          "affected_files": [
+            ".claude/skills/recipe-feature-pipeline/SKILL.md (UPDATE: new primitive)",
+            "checkpoint.json schema (UPDATE: new field — interacts with D-004)",
+            "Possibly harness-level changes (UNSUPPORTED — Claude Code does not expose a programmatic session-restart hook)"
+          ],
+          "cost": {
+            "file_count": "2 in-inventory + harness change unsupported",
+            "complexity": "high — requires either harness change (out of scope; substrate-level) or operator-in-the-loop coordination (which is exactly what D-002.1 already does)",
+            "effort_weeks": 2.0,
+            "irreversibility": "two_way"
+          },
+          "rejection_rationale": "Requires either a substrate change (harness session-restart hook — not provided by Claude Code today; would require Anthropic-side change) or an operator-in-the-loop mechanism which IS what D-002.1 already achieves with less ceremony. No incremental benefit over D-002.1. The D-002.2 framing is a more abstract version of the same operator-coordinated session boundary; adding a checkpoint field doesn't reduce the operator burden, it just relocates the signal.",
+          "loss_vs_pattern": "Compared to D-002.1: LOSES simplicity (adds a new primitive + schema field). PRESERVES same F-7 constraint mitigation. Pattern fidelity is the same; cost is higher."
+        },
+        {
+          "label": "(D-002.3) Author agents in Phase 0 of a SEPARATE fresh run (verification fragmented across 2 features)",
+          "recommended": false,
+          "description": "The current feature authors any new test agents in its execution phase; a SEPARATE follow-up feature run (a new pipeline run, fresh session by construction) executes the synthetic test in its Phase 0. The kill-criterion-#2 closure check spans 2 features.",
+          "affected_files": [
+            "Same as D-002.1 for the authoring side",
+            "Plus a NEW separate feature run (its own working/feature/<slug>/ directory tree)"
+          ],
+          "cost": {
+            "file_count": "Same as D-002.1 + a full second pipeline run",
+            "complexity": "medium — orchestration overhead doubles; cross-feature coordination required",
+            "effort_weeks": 1.0,
+            "irreversibility": "two_way"
+          },
+          "rejection_rationale": "Fragments verification across 2 features which complicates the kill-criterion-#2 closure audit (the closure now requires citing artifacts in two run directories). Equivalent F-7 mitigation to D-002.1 (both rely on session boundary) but at doubled orchestration overhead. Preserve as FALLBACK if session-boundary scheduling within ONE run proves infeasible — e.g., if the harness fails to provide a clean restart boundary within a single feature's plan sequence.",
+          "loss_vs_pattern": "Compared to D-002.1: LOSES single-feature kill-criterion closure (now spans 2 runs). PRESERVES F-7 mitigation. PRESERVES verification fidelity. Pattern is materially fragmented across feature boundaries."
+        }
+      ],
+      "implementation_strategy_verdict": "CONFIRMS framer recommendation of D-002.1. The implementation view actually STRENGTHENS the recommendation by surfacing that D-002.2 is essentially D-002.1 with extra ceremony, and D-002.3 doubles orchestration overhead for zero F-7-mitigation benefit. The framer's recommendation stands.",
+      "new_options_surfaced": [],
+      "recommendation_change": null,
+      "most_expensive_single_edit": "The synthetic-test-protocol.md document — needs to encode the F-7 constraint, the H-a/H-b sub-question (OI-FRAMER-2), and the session-boundary operator instruction in a single coherent protocol. Cost is low absolutely (~0.5 PW) but the protocol is the single load-bearing artifact for D-002."
+    },
+    {
+      "decision_id": "D-003",
+      "decision_title": "Sweep cleanup posture for execute-finalize-reconciler's `Agent` declaration",
+      "framer_recommended": "(D-003.1) Remove as part of this feature",
+      "options": [
+        {
+          "label": "(D-003.1) Remove `Agent` declaration from execute-finalize-reconciler in this feature",
+          "recommended": true,
+          "description": "Edit `.claude/agents/execute-finalize-reconciler.md` YAML frontmatter: remove `Agent` (and `Task` if present as alias) from the `tools:` array. Verify no other functionality depends on the declaration (it is a runtime no-op per T-0072). Include the edit in the same commit / PR as the execute-orchestrator repair so the FR-5 sweep result (set closed at 2) is honored end-to-end. Pair naturally with D-001 option (a)'s Agent-removal from execute-orchestrator.",
+          "affected_files": [
+            ".claude/agents/execute-finalize-reconciler.md (UPDATE: frontmatter `tools:` field — remove `Agent`)"
+          ],
+          "cost": {
+            "file_count": "1",
+            "complexity": "trivial — one frontmatter edit",
+            "blast_radius": "component (one file, no runtime behavior change since Agent is a no-op there)",
+            "effort_weeks": 0.25,
+            "irreversibility": "two_way (trivial restore)"
+          },
+          "rejection_rationale": null,
+          "loss_vs_pattern": "Preserves: FR-5 sweep result fidelity (affected set closed at 2 per CR-0001 + critique stronger_than_extractor_flagged). Preserves: cleanup-as-blocker check (T-0072). Loses: zero — the declaration is a runtime no-op being removed."
+        },
+        {
+          "label": "(D-003.2) Defer cleanup to a follow-up feature (inventory-only posture)",
+          "recommended": false,
+          "description": "Leave the `Agent` declaration in execute-finalize-reconciler.md. Document in the Blueprint / risks that the parallel defect remains pending a follow-up cleanup feature.",
+          "affected_files": [
+            "Blueprint risks section (UPDATE: document the deferred parallel defect)"
+          ],
+          "cost": {
+            "file_count": "1 (risks doc only)",
+            "complexity": "trivial",
+            "effort_weeks": 0.1,
+            "irreversibility": "two_way"
+          },
+          "rejection_rationale": "Leaves a known parallel defect on the floor while shipping the primary repair. AN-0040 explicitly recommends broader cleanup. Defers the same investigation cost into a follow-up (the follow-up has to re-discover that finalize-reconciler is also affected — losing the FR-5 sweep work). Negligible effort to include (0.25 PW) compared to follow-up overhead. Risks message in Blueprint without action = drift surface.",
+          "loss_vs_pattern": "Compared to D-003.1: LOSES FR-5 sweep closure (the set is no longer closed at 2 in practice). PRESERVES nothing of incremental value."
+        }
+      ],
+      "implementation_strategy_verdict": "CONFIRMS framer recommendation of D-003.1. The implementation cost differential is ~0.15 PW — vanishingly small — and D-003.1 closes the sweep work properly. Bundle with D-001 option (a)'s Agent-removal from execute-orchestrator in a single commit.",
+      "new_options_surfaced": [],
+      "recommendation_change": null,
+      "most_expensive_single_edit": "Trivial — one YAML frontmatter field edit. Lowest-cost decision in the synthesis."
+    },
+    {
+      "decision_id": "D-004",
+      "decision_title": "Close the recipe-feature-pipeline canonical-reference schema gap (checkpoint.json execution-phase fields)",
+      "framer_recommended": "(D-004.1) Close in lockstep with §6 implementation",
+      "conditional_on": "D-001 selection",
+      "options": [
+        {
+          "label": "(D-004.1) Close schema gap in lockstep with §6 implementation",
+          "recommended": true,
+          "description": "Edit `.claude/skills/recipe-feature-pipeline/SKILL.md` lines 96-128 (the documented checkpoint.json schema section): (1) ADD the three missing execution-phase fields: `execution_pipeline_state_transitions`, `execution_mode`, `execution_pipeline_cycle_counters` (sourced from CR-0061-CR-0080 batch B08, verified). (2) ADD documentation for the state-transitions.log v1 `invoking_agent` invariant (E-0095, CR-0079/CR-0080/CR-0135). (3) ADD documentation for `void: true` + `void_reason` and `-prime` transition-name suffixes as de facto v1 extensions (E-0094, CR-0076/CR-0077/CR-0140 — this closes OI-CR-D in lockstep). NFR-6-a (no-artifact-migration) is satisfied because this is documentation-only, not a data schema migration.",
+          "affected_files": [
+            ".claude/skills/recipe-feature-pipeline/SKILL.md (UPDATE: lines 96-128 schema section)",
+            ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md (UPDATE: document void/-prime extensions; OPTIONAL but recommended to close OI-CR-D in lockstep)"
+          ],
+          "cost": {
+            "file_count": "1-2",
+            "complexity": "medium — requires careful enumeration of the in-flight checkpoint.json fields against actual recent run artifacts (verified via Grep in critique B08); must preserve existing documentation continuity",
+            "blast_radius": "service (recipe-feature-pipeline is consumed by all 36 agents)",
+            "effort_weeks": 1.0,
+            "irreversibility": "two_way (documentation; revisable)"
+          },
+          "rejection_rationale": null,
+          "loss_vs_pattern": "Preserves: NFR-5-a lockstep requirement. Preserves: canonical-reference authority for recipe-feature-pipeline. Loses: zero. This is pure documentation drift closure.",
+          "interactions": {
+            "with_D-001": "If D-001 = (a) (recommended): schema fields STAY in their current canonical location; this edit is documentation-only. NO ADR promotion. If D-001 = (b): schema OWNERSHIP transfers (execute-orchestrator-owned -> recipe-feature-pipeline-owned), promoting D-004 to architectural with an ADR. Framer's adr_promotion_condition is correct.",
+            "with_D-001=a_implementation_pairing": "The D-001 option (a) edit to recipe-feature-pipeline/SKILL.md (new Execution Phase Dispatch section) and the D-004 edit (schema section lines 96-128) are in the SAME FILE. Plan-author should sequence them in the same task to avoid merge conflict / two-step editing churn."
+          }
+        },
+        {
+          "label": "(D-004.2) Defer schema-gap closure to a follow-up documentation feature",
+          "recommended": false,
+          "description": "Leave the documented schema in recipe-feature-pipeline/SKILL.md unchanged. Document the gap as a known issue (OI-CR-C, OI-CR-D) in this feature's risks. Schedule a follow-up documentation feature.",
+          "affected_files": [
+            "Blueprint risks section (UPDATE)"
+          ],
+          "cost": {
+            "file_count": "0 (substantive); 1 (risks-only)",
+            "complexity": "trivial",
+            "effort_weeks": 0.1,
+            "irreversibility": "two_way"
+          },
+          "rejection_rationale": "Violates NFR-5-a lockstep requirement (NFR-5-a explicitly requires the canonical reference to update in lockstep with any §6 option change — option (a) DOES touch recipe-feature-pipeline/SKILL.md, so NFR-5-a fires). Even if NFR-5-a didn't fire, the documented schema is already STALE per CR-0061-CR-0080; deferring is known-defect-on-the-floor anti-pattern. Cost differential is ~0.9 PW (option D-004.1 is 1.0 PW; D-004.2 is 0.1 PW) — small absolute, but D-004.1 closes a real defect.",
+          "loss_vs_pattern": "Compared to D-004.1: LOSES NFR-5-a lockstep compliance. LOSES canonical-reference authority. PRESERVES nothing of incremental value."
+        }
+      ],
+      "implementation_strategy_verdict": "CONFIRMS framer recommendation of D-004.1 — AND surfaces a tactical implementation insight: because D-001 = (a) and D-004 both edit recipe-feature-pipeline/SKILL.md, they should be sequenced in ONE plan task (or two tightly-coupled tasks in the same phase) to avoid two-pass editing of the same file. Plan-author should respect this.",
+      "new_options_surfaced": [],
+      "recommendation_change": null,
+      "most_expensive_single_edit": "The recipe-feature-pipeline/SKILL.md edit — BUT note that this edit is shared between D-001 option (a) and D-004; the COMBINED cost is the same file getting two coordinated section updates (~1 PW for D-004 schema + ~2 PW for D-001 dispatch section absorption)."
+    },
+    {
+      "decision_id": "D-005",
+      "decision_title": "Documentation-conventions discipline for ADR mis-attribution (already surgically corrected)",
+      "framer_recommended": "(D-005.1) Defer to a separate feature",
+      "options": [
+        {
+          "label": "(D-005.1) Defer to a separate documentation-conventions feature",
+          "recommended": true,
+          "description": "Do NOT author a documentation-conventions ADR in this feature. The DISSENT-2 surgical correction is already complete (ADR-0017 + ADR-0033 cited correctly going forward per OI-FRAMER-1). The carry-through is encoded in OI-FRAMER-1: Synthesizer, design-composer, and plan-author all cite ADR-0017 + ADR-0033 (not ADR-0034). Optionally, save a memory note in `.claude/agent-memory/` or `MEMORY.md` flagging the mis-attribution pattern for future runs (low cost, high recall value).",
+          "affected_files": [
+            "NONE in this feature (deferred)",
+            "OPTIONAL: synth-substrate memory note (`.claude/agent-memory/synth-substrate/feedback_adr_attribution_discipline.md`) — but this is agent-memory, not feature-artifact; cost negligible"
+          ],
+          "cost": {
+            "file_count": "0 (in feature); 0-1 (agent memory)",
+            "complexity": "trivial",
+            "effort_weeks": 0.0,
+            "irreversibility": "two_way"
+          },
+          "rejection_rationale": null,
+          "loss_vs_pattern": "Preserves: feature scope discipline (does not widen beyond FR-2 + FR-4 + FR-5 + FR-6 + NFR-5-a). Preserves: DISSENT-2 correction (already encoded in synthesis carry-through). Loses: a small chance the same mis-attribution pattern recurs in a future feature before the separate conventions work is scheduled (mitigated by OI-FRAMER-1 propagation).",
+          "deferral_cost": "Low — the recurrence risk is bounded because OI-FRAMER-1 explicitly instructs downstream artifacts to cite ADR-0017 + ADR-0033 consistently. The conventions ADR would only formalize what is already practiced; the deferred work is a future memo, not a load-bearing future blocker."
+        },
+        {
+          "label": "(D-005.2) Bundle a documentation-conventions ADR in this feature",
+          "recommended": false,
+          "description": "Author a new ADR (e.g., `ADR-NNNN-adr-citation-discipline.md`) in this feature that codifies the convention: 'ADR citations in PRDs / Blueprints / Plans must be verified by direct file Grep at authoring time; reviewers must check that the cited ADR's text actually contains the referenced concept.'",
+          "affected_files": [
+            "adrs/ADR-NNNN-adr-citation-discipline.md (NEW)",
+            "Possibly .claude/skills/recipe-document-review/SKILL.md or similar (UPDATE: codify the Grep-verification step)"
+          ],
+          "cost": {
+            "file_count": "1-2",
+            "complexity": "low-medium — ADR authoring + integration into review-process documentation",
+            "effort_weeks": 1.0,
+            "irreversibility": "two_way (ADRs can be superseded)"
+          },
+          "rejection_rationale": "Scope creep. The dispatch-repair feature is already committed to FR-2 + FR-4 + FR-5 + FR-6 + NFR-5-a; adding a documentation-conventions ADR widens scope without strengthening kill-criterion-#2 closure. User memory (per persistent memory note in this conversation context) confirms the preference: 'belongs in a separate feature, not bundled in dispatch-repair'.",
+          "loss_vs_pattern": "Compared to D-005.1: LOSES feature scope discipline (1 PW of unrelated documentation work bundled). PRESERVES nothing the deferral cannot preserve via OI-FRAMER-1."
+        }
+      ],
+      "implementation_strategy_verdict": "CONFIRMS framer recommendation of D-005.1. The deferral cost is genuinely small (OI-FRAMER-1 carries the correction; agent memory can flag the pattern). No new option surfaces.",
+      "new_options_surfaced": [],
+      "recommendation_change": null,
+      "most_expensive_single_edit": "None — the decision is to NOT edit anything in this feature. Lowest-cost decision."
+    }
+  ],
+  "cross_decision_observations": {
+    "shared_file_pressure": "Both D-001 option (a) (recommended) and D-004 option (D-004.1) (recommended) edit `.claude/skills/recipe-feature-pipeline/SKILL.md`. Plan-author MUST sequence these so the file is touched in a coherent, ordered way — recommend: same phase, dependent tasks (D-004 schema closure -> D-001 dispatch-section absorption) OR a single combined task with explicit sub-sections. This is the single most important cross-decision sequencing insight.",
+    "shared_pattern_with_D-001_and_D-003": "Both D-001 option (a) (recommended) and D-003 option (D-003.1) (recommended) remove `Agent` from a sub-agent's `tools:` array (execute-orchestrator + execute-finalize-reconciler respectively). Bundle in one commit; the commit message documents the FR-5 sweep closure.",
+    "F-7_constraint_for_plan_sequencing": "If any new sub-agent file is authored as part of this feature (likely for FR-6 synthetic-test verification), D-002.1's session-boundary instruction MUST appear in the plan BETWEEN the authoring task and the test-execution task. Plan-author cannot collapse these into one phase.",
+    "ADR_authorship_load": "Only D-001 is ADR-worthy (framer's adr_authorship_summary). D-004 stays Plan/Blueprint only as long as D-001 = (a). The implementation analysis confirms this routing — no ADR promotion needed for D-004 under the recommended D-001 = (a) path."
+  },
+  "registry_version": "n/a (implementation-strategy mode; no separate substrate registry consulted — single-substrate analysis per recipe-feature-pipeline Step 6)"
+}

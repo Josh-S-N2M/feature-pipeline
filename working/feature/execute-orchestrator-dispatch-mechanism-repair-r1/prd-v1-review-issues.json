@@ -1,0 +1,120 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "prd",
+    "target_path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/prd-v1.md",
+    "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+    "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+    "scope_class": "FULL",
+    "layer_scope": ["cc"],
+    "reviewer": "shared-document-reviewer",
+    "reviewed_at": "2026-05-23T20:55:00Z"
+  },
+  "gate0": {
+    "status": "pass",
+    "missing_elements": [],
+    "notes": [
+      "All required PRD template sections present: Overview, Stakeholders, User Stories, Functional Requirements, NFRs, Product Policy Decisions, Success Criteria, Technical Considerations, Rollout Plan, Undetermined Items, Appendix.",
+      "Frontmatter complete: doc_type=prd, feature_slug, version=1.0.0, status=draft, scope_class=FULL, layer_scope=[cc], derived_from points to IC, generated/generated_by present, companion_artifacts enumerated.",
+      "9-layer Layer Scope table exhaustive (all 9 layers enumerated with explicit dispositions).",
+      "Glossary defines all 8 required terms: execute-orchestrator, specialist isolation, dispatch matrix, Contract 5, ADR-0017 4-cycle cap, ADR-0034 symmetric D-12 application, kill-criterion-#1, kill-criterion-#2.",
+      "FR numbering sequential (FR-1..FR-8); AC labeling consistent (AC-FR-N-letter, AC-NFR-N-letter)."
+    ]
+  },
+  "scores": {
+    "consistency": 92,
+    "completeness": 93,
+    "rule_compliance": 90,
+    "clarity": 88
+  },
+  "verdict": {
+    "decision": "approved",
+    "conditions": [],
+    "rationale": "Gate 0 passes structurally. Gate 1: PRD faithfully reflects source analysis and IC. All six ratified IC answers honored without contradiction. All seven IC Open Items addressed (4 resolved in PRD; 3 deferred with explicit forward pointers to design-composer and plan-author). Constraint tension preserved as Constraint A / Constraint B (not pre-decided). Kill-criterion-#1 pause-and-rescope captured in FR-2. Investigation-first cadence captured in FR-1 with the IC's verbatim KB-gap justification. Synthetic-test-feature verification surface captured in FR-6 with real-feature re-run non-gating in FR-7. Affected-files inventory (8 files) matches analysis §6 plus the two schema-bearing artifacts named in the analysis frontmatter. Sweep posture inventory-only per FR-5 with cleanup-as-blocker open-item per AC-FR-5-b. In-flight artifact retrofit explicitly left as-shipped via NFR-6 + Product Policy Decisions table. EARS form is used throughout; minor compound-AC issues are non-blocking. The PRD does NOT silently pre-decide the workaround/specialist-isolation tension. No BLOCKER or MAJOR findings. Proceed to Gate 2."
+  },
+  "issues": [
+    {
+      "id": "I-DR-001",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "User Stories § Pipeline Operator, third story",
+      "description": "User Story 3 says the run terminates 'with a kill-criterion-1-triggered posture and a fresh follow-on feature opened' — implying the follow-on feature creation happens within this run. AC-FR-2-c clarifies that 'the actual creation of the follow-on feature happens outside this run's scope.' The user-story phrasing slightly oversells what this run delivers (a forward pointer, not an opened follow-on feature).",
+      "suggestion": "Reword the user story to: 'So that I am not exposed to a silent mid-run scope shrink ..., and a forward pointer to a fresh follow-on feature is recorded for later action outside this run.'"
+    },
+    {
+      "id": "I-DR-002",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "Functional Requirements § AC-FR-3-a vs. Constraints § 'Constraint tension preserved'",
+      "description": "The Constraints section states 'the chosen option's rationale (per AC-FR-3-a) must explicitly weigh both constraints' (i.e., both Constraint A workaround-acceptability AND Constraint B specialist-isolation). AC-FR-3-a, however, only requires tying the rationale to '(i) the investigation finding, (ii) the specialist-isolation invariants enumerated in the Constraints section.' Constraint A (workaround acceptability) is not explicitly named in AC-FR-3-a's rationale-tie list. Minor internal gap between the Constraints section's promise and the AC's verifiable requirement.",
+      "suggestion": "Either (a) extend AC-FR-3-a clause to read '(ii) both Constraint A (workaround acceptability) and Constraint B (specialist-isolation invariants) enumerated in the Constraints section', or (b) reword the Constraints section to say 'the chosen option's rationale must explicitly weigh the specialist-isolation invariants per AC-FR-3-a; the design SHOULD additionally weigh workaround-acceptability when relevant.' Option (a) is preferred for stronger downstream auditability."
+    },
+    {
+      "id": "I-DR-003",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Functional Requirements § AC-FR-2-a",
+      "description": "AC-FR-2-a uses If-then form but chains three distinct actions in one AC ('halt the run', 'emit a kill-criterion-1-triggered posture marker to the checkpoint and state-transitions log', 'produce an analysis artifact under Issues/'). Per EARS Mistake 5 (multiple assertions in one AC), each could pass or fail independently. Non-blocking — the assertions are tightly coupled to the same trigger and a tester would naturally check all three together — but splitting would improve testability.",
+      "suggestion": "Optionally split into three ACs (AC-FR-2-a halt; AC-FR-2-a' emit-marker; AC-FR-2-a'' produce-analysis-artifact). Lower priority than I-DR-001/002."
+    },
+    {
+      "id": "I-DR-004",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Functional Requirements § AC-FR-4-a, AC-FR-5-b, AC-FR-6-b, AC-FR-6-c, AC-FR-7-a",
+      "description": "Five ACs use semicolon to chain two shall-clauses in a single AC (e.g., AC-FR-4-a 'at most eight files; any edit outside surfaced as open item'). EARS-discipline encourages one trigger → one behavior per AC. Each compound AC is mildly less testable; non-blocking.",
+      "suggestion": "Consider splitting the compound ACs into paired ACs (e.g., AC-FR-4-a edit-budget and AC-FR-4-a' out-of-inventory-edits-as-open-item). Defer to PRD author's judgment; the meaning is clear as-is."
+    },
+    {
+      "id": "I-DR-005",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "Functional Requirements § FR-7 (Should Have)",
+      "description": "FR-7 (real-feature re-run as confidence check) has only one AC (AC-FR-7-a) which captures the recording requirement but does not explicitly state that FR-7's failure does not block feature completion. The non-gating discipline is stated in FR-7's prose body and in the Product Policy Decisions table, but is not encoded as a verifiable AC.",
+      "suggestion": "Optionally add AC-FR-7-b: 'If the real-feature re-run (FR-7) produces a failed outcome, then the system shall not retroactively invalidate the feature-complete signal issued under FR-6, provided FR-6 passed.' Non-blocking; current wording in prose is acceptable."
+    },
+    {
+      "id": "I-DR-006",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "Prior-run summary claim vs. actual PRD",
+      "description": "The prior-run / orchestrator summary describes the PRD as having '8 FRs, 7 NFRs, 32 ACs.' Actual AC count is 30 (19 FR ACs + 11 NFR ACs). Discrepancy is in the summary, not the PRD itself, so this is a meta-observation rather than a PRD defect. Recording for traceability.",
+      "suggestion": "No PRD change needed. The orchestrator's run-summary may be corrected to '30 ACs' for accuracy."
+    }
+  ],
+  "checks": {
+    "fidelity_to_source_analysis": "PASS — Problem statement and FR rationale accurately reflect analysis TL;DR + §6. Affected-files inventory (FR-4) matches analysis §6's six suggested in-scope files plus the two schemas explicitly named in the analysis frontmatter (line 17). Audit-trail losses (state-transitions logging, cycle-cap enforcement, dispatch matrix routing, ADR-0034 symmetric D-12 application) cited in PRD Background match analysis §3.2 verbatim by intent.",
+    "fidelity_to_intent_clarification": "PASS — All six ratified IC answers honored without contradiction. Q1 FULL → frontmatter scope_class: FULL. Q2 in-pipeline Discovery Research → FR-1 + KB-gap justification phrased verbatim. Q3 pause-and-rescope → FR-2. Q4 cc-only layer → frontmatter layer_scope: [cc] + 9-layer table. Q5 constraint tension preserved → Constraints A and B with no pre-decision. Q6 synthetic-minimal-test primary verification → FR-6 + FR-7 non-gating.",
+    "ic_open_items_addressed": "PASS — All 7 IC Open Items addressed in Undetermined Items section. Items #1, #2, #3, #6 resolved with location pointers. Items #4, #5, #7 deferred with explicit forward pointers (design-composer for #4 and #7; plan-author for #5). No silent drops.",
+    "constraint_tension_preserved": "PASS — Constraint A (workaround acceptability) and Constraint B (specialist-isolation load-bearing) both recorded in the Constraints section under 'Constraint tension preserved (per IC Q5 ratified — not pre-resolved in the PRD).' PRD does NOT pre-decide. AC-FR-3-a requires the design's rationale to be auditable (minor gap re Constraint A explicit naming — see I-DR-002).",
+    "kill_criterion_1_path": "PASS — FR-2 captures pause-and-rescope with three EARS ACs (AC-FR-2-a halt + marker + artifact; AC-FR-2-b no-advance; AC-FR-2-c forward-pointer). No silent scope-shrink path exists in the PRD.",
+    "investigation_first_cadence": "PASS — FR-1 captures in-pipeline Discovery Research as a fan-out topic with the KB-gap justification phrased verbatim from IC Q2: 'Claude Code harness sub-agent tool-grant semantics are not documented in our KBs.' AC-FR-1-c gates advance to per-layer cc Design on the finding artifact's existence.",
+    "verification_surface": "PASS — FR-6 names the synthetic minimal test feature as the primary verification with AC-FR-6-a (per-dispatch log entries), AC-FR-6-b (cycle-counter increments), AC-FR-6-c (verification-failed posture on dispatch-loop failure). FR-7 makes real-feature re-run non-gating.",
+    "affected_files_inventory": "PASS — FR-4 enumerates 8 files: 1 SKILL.md, 5 agent definitions, 1 checkpoint.json schema, 1 state-transitions.log schema. Matches analysis §6 (6 files) plus the two schemas named in analysis frontmatter line 17. PRD does NOT pre-decide which option touches which files (per AC-FR-4-a 'at most the eight files', allowing the per-layer Design to choose).",
+    "sweep_posture": "PASS — FR-5 captures inventory-only with AC-FR-5-a (produce inventory artifact) and AC-FR-5-b (cleanup-as-blocker surfaces as open-item user check, not silent cleanup).",
+    "schema_migration": "PASS — NFR-6 (Compatibility) and Product Policy Decisions table ('In-flight artifact retrofit') both state the in-flight devcontainer-mcp-provisioning-r1 artifacts are left as-shipped under the old format; not migrated; not formally marked legacy. AC-NFR-6-a forbids modifying them; AC-NFR-6-b requires new schema versions to be distinguishable.",
+    "glossary_completeness": "PASS — All 8 required terms defined: execute-orchestrator, specialist isolation, dispatch matrix, Contract 5, ADR-0017 4-cycle cap, ADR-0034 symmetric D-12 application, kill-criterion-#1, kill-criterion-#2. Bonus terms (the four execute-* specialists, the three §6 options, synthetic minimal test feature, cc layer) also defined.",
+    "layer_scope_consistency": "PASS — All FRs and NFRs are observable at the cc layer. No FR sneaks in a non-cc concern. The 9-layer table is exhaustive with explicit N/A rationale for each non-cc layer.",
+    "goals_non_goals_coherence": "PASS — 'Won't Have (this release)' enumerates 6 explicit non-goals consistent with IC's 'What's NOT in scope' list. No contradiction with FR scope.",
+    "success_metrics_measurability": "PASS — Quantitative Metrics table specifies metric, stakeholder, target, measurement method, and timeframe for each of 4 metrics; all are observable at log/checkpoint level."
+  },
+  "recommendations": [
+    "Proceed to Gate 2 (PRD Approval) — no blocking or major findings; the four recommended-severity findings are quality-of-life improvements that can be folded in during Gate 2 user review if the user wishes, or carried forward as known minor issues.",
+    "For the strongest downstream auditability, consider folding in I-DR-002 (AC-FR-3-a explicit Constraint A naming) before Gate 2 — it tightens the Blueprint review surface.",
+    "I-DR-006 (prior-run summary 32 ACs vs. actual 30 ACs) is purely orchestrator-summary accuracy; no PRD change required."
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": []
+  },
+  "ac_inventory": {
+    "fr_ac_total": 19,
+    "nfr_ac_total": 11,
+    "grand_total": 30,
+    "fr_ac_per_fr": {"FR-1": 3, "FR-2": 3, "FR-3": 3, "FR-4": 3, "FR-5": 2, "FR-6": 3, "FR-7": 1, "FR-8": 1},
+    "nfr_ac_per_nfr": {"NFR-1": 2, "NFR-2": 2, "NFR-3": 2, "NFR-4": 1, "NFR-5": 1, "NFR-6": 2, "NFR-7": 1}
+  }
+}

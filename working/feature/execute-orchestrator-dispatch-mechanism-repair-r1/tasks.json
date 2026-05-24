@@ -1,0 +1,732 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+  "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1",
+  "scope_class": "FULL",
+  "layer_scope": ["cc"],
+  "generated": "2026-05-24T00:00:00Z",
+  "generated_by": "finalize-task-decomposer",
+  "total_tasks": 24,
+  "total_phases": 7,
+  "source_artifacts": {
+    "prd": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/prd-v1.md",
+    "blueprint": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/blueprint-v1.md",
+    "plan": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/plan-v1.md",
+    "acceptance_tests": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md",
+    "phase_validators": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/phase-validators.md",
+    "codebase_analysis": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/codebase-analysis.json",
+    "adrs": [
+      "adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md",
+      "adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md"
+    ]
+  },
+  "decomposition_notes": [
+    "Plan v1.1.1 already presents 24 tasks across 7 phases with clear sizing; no further subdivision was required (every task is XS / S / M; the original Plan L sizes on T2.1 and T6.3 are retained — T2.1 is a single coherent section author and splitting would lose narrative coherence; T6.3 is a single end-to-end pipeline run with no meaningful internal split).",
+    "T6.5 is preserved as conditional (fires only on T6.3 FAIL). No predecessor edge was inverted.",
+    "Operator-facing tasks: T0.1 (placement verification, operator-assisted), T0.2 (waiver path documentation, operator-facing), T6.2 (fresh-session restart, operator-only), T6.3 (synthetic test run, operator-initiated + agent-driven).",
+    "T6.2 carries forced_session_boundary: true so downstream execution-side runtime knows not to dispatch T6.3 in the same session (this constraint is a tasks.json-level extension beyond the Plan's prose — surfaced in open_items_for_orchestrator)."
+  ],
+  "tasks": [
+    {
+      "id": "T0.1",
+      "phase": 0,
+      "summary": "Verify ADR-0044 + ADR-0045 placement at canonical root adrs/; no feature-scoped duplicates",
+      "target_files": [
+        "adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md",
+        "adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md"
+      ],
+      "predecessors": [],
+      "size": "XS",
+      "parallelizable_with": ["T0.3"],
+      "operator_facing": true,
+      "satisfies_acs": ["AC-FR-8-a"],
+      "verified_by_tests": [
+        "T-AC-FR-8-a-adr-0045-exists"
+      ],
+      "gated_by_validator": "PV-0",
+      "agent_dispatch_hint": null,
+      "operator_action_summary": "Verify two ADRs at canonical root and absence of feature-scoped duplicates (ls + negative-grep)."
+    },
+    {
+      "id": "T0.2",
+      "phase": 0,
+      "summary": "Document the expected Stage-13 packager BLOCKER + waiver path in open-items.md",
+      "target_files": [
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/open-items.md"
+      ],
+      "predecessors": ["T0.1"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": true,
+      "satisfies_acs": ["AC-FR-4-a"],
+      "verified_by_tests": [
+        "T-AC-FR-4-a-inventory-cap"
+      ],
+      "gated_by_validator": "PV-0",
+      "agent_dispatch_hint": null,
+      "operator_action_summary": "Operator records the Stage-13 packager BLOCKER + waiver-path text (cites Blueprint's ADR-0036 placement disposition + ADR-0036)."
+    },
+    {
+      "id": "T0.3",
+      "phase": 0,
+      "summary": "Snapshot affected-files baseline SHA for rollback to rollback-baseline.txt",
+      "target_files": [
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/rollback-baseline.txt"
+      ],
+      "predecessors": ["T0.1"],
+      "size": "XS",
+      "parallelizable_with": ["T0.2"],
+      "operator_facing": false,
+      "satisfies_acs": [],
+      "verified_by_tests": [],
+      "gated_by_validator": "PV-0",
+      "agent_dispatch_hint": "execute-task-code-producer",
+      "rationale": "Setup-only; supports Rollback Procedure. No AC tied per Plan §Task Inventory."
+    },
+    {
+      "id": "T1.1",
+      "phase": 1,
+      "summary": "Add `execution_pipeline_state_transitions` field to canonical checkpoint.json schema reference in recipe-feature-pipeline/SKILL.md",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "predecessors": ["T0.3"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-4-b", "AC-NFR-5-a", "AC-CC-2"],
+      "verified_by_tests": [
+        "T-AC-FR-4-b-schema-lockstep",
+        "T-AC-NFR-5-a-schema-reference-lockstep",
+        "T-AC-CC-2-skill-md-lockstep"
+      ],
+      "gated_by_validator": "PV-1",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T1.2",
+      "phase": 1,
+      "summary": "Add `execution_mode` (two v1 values) and `execution_pipeline_cycle_counters` (T4/T10 increment rule) fields to schema reference",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "predecessors": ["T1.1"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-4-b", "AC-NFR-5-a", "AC-NFR-6-b", "AC-CC-2"],
+      "verified_by_tests": [
+        "T-AC-FR-4-b-schema-lockstep",
+        "T-AC-NFR-5-a-schema-reference-lockstep",
+        "T-AC-NFR-6-b-new-schema-marked",
+        "T-AC-CC-2-skill-md-lockstep"
+      ],
+      "gated_by_validator": "PV-1",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T1.3",
+      "phase": 1,
+      "summary": "Author state-transitions-log per-entry schema sub-section in SKILL.md (or cross-reference state-transitions-log-entry-template.md); document `void` / `-prime` extensions",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "predecessors": ["T1.2"],
+      "size": "M",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-4-b", "AC-NFR-5-a"],
+      "verified_by_tests": [
+        "T-AC-FR-4-b-schema-lockstep",
+        "T-AC-NFR-5-a-schema-reference-lockstep"
+      ],
+      "gated_by_validator": "PV-1",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T2.1",
+      "phase": 2,
+      "summary": "Add 'Execution Phase Dispatch' section to recipe-feature-pipeline/SKILL.md after Step 14 / Gate 6 enumerating T0..T13 state machine; cite ADR-0017 + ADR-0033, NOT ADR-0034",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "predecessors": ["T1.3"],
+      "size": "L",
+      "size_rationale": "Plan classifies as L (3 h). Decomposer retains as one work unit — splitting the canonical state-machine narrative would lose coherence; multi-row 14-state narrative belongs in one section author pass.",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-3-a", "AC-FR-3-c", "AC-CC-1", "AC-CC-2", "AC-NFR-2-a", "AC-NFR-2-b", "AC-NFR-3-a", "AC-NFR-3-b"],
+      "verified_by_tests": [
+        "T-AC-FR-3-a-option-named",
+        "T-AC-FR-3-c-invariants-cited",
+        "T-AC-CC-1-adr-0034-absent-skill-md",
+        "T-AC-CC-1-adr-0033-present-skill-md",
+        "T-AC-CC-1-adr-0017-present",
+        "T-AC-CC-2-skill-md-lockstep"
+      ],
+      "gated_by_validator": "PV-2",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T2.2",
+      "phase": 2,
+      "summary": "Document the `dispatch_directives[]` Contract 6 indirection in the Execution Phase Dispatch section; document malformed-array escalation rule (surface to user, cycle-cap-equivalent)",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "predecessors": ["T2.1"],
+      "size": "M",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-CC-4"],
+      "verified_by_tests": [
+        "T-AC-CC-4-malformed-directives-handling"
+      ],
+      "gated_by_validator": "PV-2",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T2.3",
+      "phase": 2,
+      "summary": "Document the `invoking_agent: \"execute-orchestrator\"` logical-owner v1 invariant within the dispatch section (NFR-6-a preservation)",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "predecessors": ["T2.2"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-6-a", "AC-NFR-2-b", "AC-NFR-6-a"],
+      "verified_by_tests": [
+        "T-AC-FR-6-a-invoking-agent-preserved",
+        "T-AC-NFR-2-b-dispatcher-identity-preserved",
+        "T-AC-NFR-6-a-in-flight-untouched"
+      ],
+      "gated_by_validator": "PV-2",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T3.1",
+      "phase": 3,
+      "summary": "Re-scope execute-orchestrator.md to state-machine advisor: remove `Agent` + `TaskUpdate` from tools; preserve model/effort/skills/memory; re-frame body as advisor narrative",
+      "target_files": [
+        ".claude/agents/execute-orchestrator.md"
+      ],
+      "predecessors": ["T2.3"],
+      "size": "M",
+      "parallelizable_with": ["T3.3", "T3.4", "T3.5"],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-3-a", "AC-FR-5-a", "AC-CC-3"],
+      "verified_by_tests": [
+        "T-AC-FR-3-a-option-named",
+        "T-AC-FR-5-a-agent-removed-both",
+        "T-AC-CC-3-self-reference-preserved"
+      ],
+      "gated_by_validator": "PV-3",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T3.2",
+      "phase": 3,
+      "summary": "Add explicit body-prose rationale paragraph in execute-orchestrator.md for `recipe-feature-pipeline` skills:-array self-reference (AC-CC-3 file-resident evidence)",
+      "target_files": [
+        ".claude/agents/execute-orchestrator.md"
+      ],
+      "predecessors": ["T3.1"],
+      "size": "XS",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-CC-3"],
+      "verified_by_tests": [
+        "T-AC-CC-3-self-reference-rationale"
+      ],
+      "gated_by_validator": "PV-3",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T3.3",
+      "phase": 3,
+      "summary": "Re-frame execute-finalize-reconciler.md in one diff: remove `Agent` from tools; re-frame body line 76 to emit `dispatch_directives[]`; 3-occurrence ADR-0034 → ADR-0033 sweep (lines 3, 19, 82)",
+      "target_files": [
+        ".claude/agents/execute-finalize-reconciler.md"
+      ],
+      "predecessors": ["T2.3"],
+      "size": "M",
+      "parallelizable_with": ["T3.1", "T3.4", "T3.5"],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-5-a", "AC-FR-3-a", "AC-FR-3-c", "AC-CC-1"],
+      "verified_by_tests": [
+        "T-AC-FR-5-a-agent-removed-both",
+        "T-AC-FR-5-a-adr-0034-zero",
+        "T-AC-FR-5-a-adr-0033-ge-3",
+        "T-AC-FR-5-a-line-76-reframed",
+        "T-AC-FR-3-a-option-named",
+        "T-AC-FR-3-c-invariants-cited",
+        "T-AC-CC-1-adr-0034-absent-finalize",
+        "T-AC-CC-1-adr-0033-present-finalize"
+      ],
+      "gated_by_validator": "PV-3",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T3.4",
+      "phase": 3,
+      "summary": "Body-prose dispatcher-reference update on execute-task-code-producer.md (replace 'dispatched by execute-orchestrator' with 'dispatched by the `recipe-feature-pipeline` parent orchestrator at main-conversation level'); NO frontmatter changes",
+      "target_files": [
+        ".claude/agents/execute-task-code-producer.md"
+      ],
+      "predecessors": ["T2.3"],
+      "size": "XS",
+      "parallelizable_with": ["T3.1", "T3.3", "T3.5"],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-3-b", "AC-FR-4-c"],
+      "verified_by_tests": [
+        "T-AC-FR-3-b-specialist-substantive-preserved",
+        "T-AC-FR-4-c-leaf-specialists-substantive"
+      ],
+      "gated_by_validator": "PV-3",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T3.5",
+      "phase": 3,
+      "summary": "Body-prose dispatcher-reference update on execute-task-quality-handler.md and execute-phase-quality-reviewer.md (same pattern as T3.4); NO frontmatter changes",
+      "target_files": [
+        ".claude/agents/execute-task-quality-handler.md",
+        ".claude/agents/execute-phase-quality-reviewer.md"
+      ],
+      "predecessors": ["T2.3"],
+      "size": "XS",
+      "parallelizable_with": ["T3.1", "T3.3", "T3.4"],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-3-b", "AC-FR-4-c"],
+      "verified_by_tests": [
+        "T-AC-FR-3-b-specialist-substantive-preserved",
+        "T-AC-FR-4-c-leaf-specialists-substantive"
+      ],
+      "gated_by_validator": "PV-3",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T3.6",
+      "phase": 3,
+      "summary": "Bundle and commit Phase-3 edits (T3.1–T3.5) in a single git commit with the mandated FR-5-sweep-closure commit message",
+      "target_files": [
+        ".claude/agents/execute-orchestrator.md",
+        ".claude/agents/execute-finalize-reconciler.md",
+        ".claude/agents/execute-task-code-producer.md",
+        ".claude/agents/execute-task-quality-handler.md",
+        ".claude/agents/execute-phase-quality-reviewer.md"
+      ],
+      "predecessors": ["T3.1", "T3.2", "T3.3", "T3.4", "T3.5"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-5-a"],
+      "verified_by_tests": [
+        "T-AC-FR-5-a-bundled-commit-message",
+        "T-AC-FR-5-a-bundled-commit-fileset"
+      ],
+      "gated_by_validator": "PV-3",
+      "commit_constraint": {
+        "required_commit_message_substring": "FR-5 sweep closure: affected set = 2",
+        "required_full_commit_message_suggestion": "FR-5 sweep closure: affected set = 2 (execute-orchestrator.md, execute-finalize-reconciler.md). Both `Agent` declarations removed; ADR-0044 + ADR-0045 ratified at adrs/. ADR-0034 → ADR-0033 sweep (3 occurrences) on execute-finalize-reconciler.md per I-DR-001 absorption.",
+        "required_file_set_exact": [
+          ".claude/agents/execute-orchestrator.md",
+          ".claude/agents/execute-finalize-reconciler.md",
+          ".claude/agents/execute-task-code-producer.md",
+          ".claude/agents/execute-task-quality-handler.md",
+          ".claude/agents/execute-phase-quality-reviewer.md"
+        ],
+        "single_commit_required": true,
+        "rationale": "Plan §Cross-Phase Sequencing Constraints item 2 + synthesis Constraint 5.2 — bundled commit is non-negotiable."
+      },
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T4.1",
+      "phase": 4,
+      "summary": "Clarify the v1 `invoking_agent` invariant in state-transitions-log-entry-template.md (line ~63) as LOGICAL OWNER (execute-orchestrator) emitted by recipe-feature-pipeline",
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md"
+      ],
+      "predecessors": ["T1.3"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-6-a", "AC-NFR-6-a"],
+      "verified_by_tests": [
+        "T-AC-FR-6-a-invoking-agent-preserved",
+        "T-AC-NFR-6-a-in-flight-untouched"
+      ],
+      "gated_by_validator": "PV-4",
+      "agent_dispatch_hint": "execute-task-code-producer",
+      "parallel_branch_note": "Phase 4 forks off Phase 1 (T1.3) and runs concurrently with Phase 2 + Phase 3 per Plan §Cross-Phase Dependencies."
+    },
+    {
+      "id": "T4.2",
+      "phase": 4,
+      "summary": "Fold `void` / `void_reason` and `-prime` transition-name suffix extensions into v1 documentation in state-transitions-log-entry-template.md",
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md"
+      ],
+      "predecessors": ["T4.1"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-4-b", "AC-NFR-6-a", "AC-NFR-6-b"],
+      "verified_by_tests": [
+        "T-AC-FR-4-b-schema-lockstep",
+        "T-AC-NFR-6-a-in-flight-untouched",
+        "T-AC-NFR-6-b-new-schema-marked"
+      ],
+      "gated_by_validator": "PV-4",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T5.1",
+      "phase": 5,
+      "summary": "Author FR-5 sweep inventory artifact agent-tool-grant-inventory.md (36 swept; 2 violations; post-repair cleaned; ADR-0045 cross-reference; 34 out-of-scope note)",
+      "target_files": [
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/agent-tool-grant-inventory.md"
+      ],
+      "predecessors": ["T3.6"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-5-b"],
+      "verified_by_tests": [
+        "T-AC-FR-5-b-inventory-artifact",
+        "T-AC-FR-5-b-sweep-counts",
+        "T-AC-FR-5-b-codebase-sweep-now-zero"
+      ],
+      "gated_by_validator": "PV-5",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T5.2",
+      "phase": 5,
+      "summary": "Document ADR-0045 manual-review interim discipline with 4 required elements (where / who / trigger / follow-on pointer); record audit-machinery follow-on feature pointer",
+      "target_files": [
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/adr-0045-manual-review-interim.md"
+      ],
+      "predecessors": ["T5.1"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-8-a"],
+      "verified_by_tests": [
+        "T-AC-FR-8-a-manual-review-interim"
+      ],
+      "gated_by_validator": "PV-5",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T6.1",
+      "phase": 6,
+      "summary": "Design and author the synthetic minimal test feature under working/test-features/dispatch-mechanism-regression/ (1 phase, 2 tasks; NO new sub-agent files to keep F-7 AC-FR-6-d vacuously satisfied)",
+      "target_files": [
+        "working/test-features/dispatch-mechanism-regression/"
+      ],
+      "predecessors": ["T5.1", "T4.2"],
+      "size": "M",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-6-c", "AC-FR-6-d", "AC-FR-7-a", "AC-NFR-7-a"],
+      "verified_by_tests": [
+        "T-AC-FR-6-d-no-new-subagents",
+        "T-AC-NFR-7-a-synthetic-archived"
+      ],
+      "gated_by_validator": "PV-6",
+      "agent_dispatch_hint": "execute-task-code-producer",
+      "design_constraint": "Synthetic test feature MUST NOT author any new sub-agent files (per Plan T6.1 L2 verification). This keeps F-7 AC-FR-6-d vacuously satisfiable."
+    },
+    {
+      "id": "T6.2",
+      "phase": 6,
+      "summary": "Operator fresh-session gate: restart Claude Code session before invoking the synthetic test feature (F-7 fresh-session constraint operationalization)",
+      "target_files": [
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/verification-log.md"
+      ],
+      "predecessors": ["T6.1"],
+      "size": "XS",
+      "parallelizable_with": [],
+      "operator_facing": true,
+      "satisfies_acs": ["AC-FR-6-d"],
+      "verified_by_tests": [
+        "T-AC-FR-6-d-restart-task-documented",
+        "T-AC-FR-6-d-fresh-session-confirmed"
+      ],
+      "gated_by_validator": "PV-6",
+      "agent_dispatch_hint": null,
+      "forced_session_boundary": true,
+      "forced_session_boundary_rationale": "F-7 mid-session-agent-registry constraint: the agent registry is loaded at session start; the Phase-3 edits to execute-orchestrator.md + execute-finalize-reconciler.md frontmatters MUST be picked up by a new registry load. Downstream execution-side runtime MUST NOT dispatch T6.3 in the same session as the Phase-3 edits.",
+      "operator_action_summary": "Operator restarts the Claude Code session; records ISO-8601 fresh-session timestamp in verification-log.md (or t6.2-session-restart-confirmation.txt). Timestamp MUST be chronologically after the T3.6 bundled-commit timestamp."
+    },
+    {
+      "id": "T6.3",
+      "phase": 6,
+      "summary": "Run the synthetic minimal test feature end-to-end through the repaired dispatch mechanism in the fresh session; collect state-transitions.log + checkpoint.json + invoking_agent verification + cycle-cap path",
+      "target_files": [
+        "working/test-features/dispatch-mechanism-regression/state-transitions.log",
+        "working/test-features/dispatch-mechanism-regression/checkpoint.json",
+        "working/test-features/dispatch-mechanism-regression/pipeline-run-summary.json"
+      ],
+      "predecessors": ["T6.2"],
+      "size": "L",
+      "size_rationale": "Plan classifies as L (3-4 h). Retained as one work unit — the end-to-end pipeline run has no meaningful internal split point.",
+      "parallelizable_with": [],
+      "operator_facing": true,
+      "satisfies_acs": ["AC-FR-6-a", "AC-FR-6-b", "AC-FR-6-c", "AC-NFR-1-a", "AC-NFR-1-b", "AC-NFR-2-a", "AC-NFR-2-b", "AC-NFR-3-a", "AC-NFR-3-b"],
+      "verified_by_tests": [
+        "T-AC-FR-6-a-log-per-boundary",
+        "T-AC-FR-6-a-invoking-agent-preserved",
+        "T-AC-FR-6-b-per-task-counter-at-T4",
+        "T-AC-FR-6-b-per-phase-counter-at-T10",
+        "T-AC-FR-6-b-T0-T13-no-increment",
+        "T-AC-FR-6-c-cycle-cap-halt",
+        "T-AC-NFR-1-a-end-to-end-complete",
+        "T-AC-NFR-2-a-log-per-dispatch",
+        "T-AC-NFR-2-b-dispatcher-identity-preserved",
+        "T-AC-NFR-3-a-counters-increment",
+        "T-AC-NFR-3-b-cycle-cap-routes-via-reconciler"
+      ],
+      "gated_by_validator": "PV-6",
+      "agent_dispatch_hint": null,
+      "session_precondition": "MUST run in the fresh session established by T6.2; do NOT dispatch in the same session as Phase-3 edits.",
+      "operator_action_summary": "Operator invokes /feature-pipeline against the synthetic test feature directory. The parent recipe-feature-pipeline skill dispatches the 4 specialists at main-conversation level per the new Execution Phase Dispatch section."
+    },
+    {
+      "id": "T6.4",
+      "phase": 6,
+      "summary": "Author verification-log.md (FR-6 PASS/FAIL evidence; FR-6 named gating + optional FR-7 confidence check) and archive the synthetic test feature as regression artifact",
+      "target_files": [
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/verification-log.md",
+        "working/test-features/dispatch-mechanism-regression/"
+      ],
+      "predecessors": ["T6.3"],
+      "size": "S",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-7-a", "AC-NFR-7-a"],
+      "verified_by_tests": [
+        "T-AC-FR-7-a-verification-log-naming",
+        "T-AC-NFR-7-a-synthetic-archived",
+        "T-AC-FR-6-d-fresh-session-confirmed"
+      ],
+      "gated_by_validator": "PV-6",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "T6.5",
+      "phase": 6,
+      "summary": "CONDITIONAL — Verification-failure escalation: surface verification-failed posture; do NOT declare feature complete; re-engage per-layer cc Design / Blueprint reconciliation loop",
+      "target_files": [
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/verification-failed.md",
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/checkpoint.json"
+      ],
+      "predecessors": ["T6.3"],
+      "size": "M",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "condition": {
+        "predecessor_outcome": "T6.3 == FAIL",
+        "trigger": "Any of AC-FR-6-a / AC-FR-6-b / AC-FR-6-c does not hold after T6.3",
+        "skip_if": "T6.3 PASS (PV-6.C4 + C5 + C6 + C7 all pass)",
+        "description": "Conditional dispatch — fires only on T6.3 FAIL branch per Plan §Phase 6 T6.5 spec."
+      },
+      "satisfies_acs": ["AC-FR-6-c", "AC-NFR-1-b"],
+      "verified_by_tests": [
+        "T-AC-FR-6-c-no-silent-fallback",
+        "T-AC-NFR-1-b-explicit-failure-surface"
+      ],
+      "gated_by_validator": "PV-6",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    }
+  ],
+  "edges": [
+    {"from": "T0.1", "to": "T0.2", "kind": "explicit_predecessor"},
+    {"from": "T0.1", "to": "T0.3", "kind": "explicit_predecessor"},
+    {"from": "T0.3", "to": "T1.1", "kind": "phase_predecessor_and_baseline_required"},
+    {"from": "T1.1", "to": "T1.2", "kind": "explicit_predecessor"},
+    {"from": "T1.2", "to": "T1.3", "kind": "explicit_predecessor"},
+    {"from": "T1.3", "to": "T2.1", "kind": "load_bearing_schema_before_dispatch", "rationale": "D-004 schema closure precedes D-001 dispatch absorption (Blueprint Impl Plan §1→§2, synthesis Constraint 5.1, Plan Cross-Phase Sequencing Constraint 1)."},
+    {"from": "T1.3", "to": "T4.1", "kind": "parallel_phase_fork", "rationale": "T4.1 depends on T1.3 (schema cross-reference target); Phase 4 forks off Phase 1 and runs in parallel with Phases 2+3."},
+    {"from": "T2.1", "to": "T2.2", "kind": "explicit_predecessor"},
+    {"from": "T2.2", "to": "T2.3", "kind": "explicit_predecessor"},
+    {"from": "T2.3", "to": "T3.1", "kind": "explicit_predecessor"},
+    {"from": "T2.3", "to": "T3.3", "kind": "explicit_predecessor"},
+    {"from": "T2.3", "to": "T3.4", "kind": "explicit_predecessor"},
+    {"from": "T2.3", "to": "T3.5", "kind": "explicit_predecessor"},
+    {"from": "T3.1", "to": "T3.2", "kind": "explicit_predecessor"},
+    {"from": "T3.1", "to": "T3.6", "kind": "bundled_commit_convergence", "rationale": "Plan Cross-Phase Sequencing Constraint 2 — bundled `Agent`-removal commit; T3.1 + T3.3 MUST land in one git commit."},
+    {"from": "T3.2", "to": "T3.6", "kind": "bundled_commit_convergence"},
+    {"from": "T3.3", "to": "T3.6", "kind": "bundled_commit_convergence", "rationale": "Plan Cross-Phase Sequencing Constraint 2 — bundled `Agent`-removal commit."},
+    {"from": "T3.4", "to": "T3.6", "kind": "bundled_commit_convergence"},
+    {"from": "T3.5", "to": "T3.6", "kind": "bundled_commit_convergence"},
+    {"from": "T4.1", "to": "T4.2", "kind": "explicit_predecessor"},
+    {"from": "T3.6", "to": "T5.1", "kind": "explicit_predecessor", "rationale": "Bundled commit closes the post-repair state that T5.1's inventory records."},
+    {"from": "T5.1", "to": "T5.2", "kind": "explicit_predecessor"},
+    {"from": "T5.1", "to": "T6.1", "kind": "explicit_predecessor"},
+    {"from": "T4.2", "to": "T6.1", "kind": "parallel_branch_join", "rationale": "Phase 6 entry requires BOTH Phase 5 (T5.1) AND Phase 4 (T4.2)."},
+    {"from": "T6.1", "to": "T6.2", "kind": "f7_fresh_session_gate", "rationale": "Plan Cross-Phase Sequencing Constraint 3 — F-7 fresh-session gate; operator restarts session between synthetic feature authoring and synthetic feature execution."},
+    {"from": "T6.2", "to": "T6.3", "kind": "f7_fresh_session_gate", "forced_session_boundary": true},
+    {"from": "T6.3", "to": "T6.4", "kind": "explicit_predecessor"},
+    {"from": "T6.3", "to": "T6.5", "kind": "conditional_on_failure", "condition": "T6.3 == FAIL"}
+  ],
+  "dag_validation": {
+    "acyclic": true,
+    "validation_method": "Topological sort completed without back-edge detection. All 24 nodes ordered.",
+    "every_non_root_has_predecessor": true,
+    "roots": ["T0.1"],
+    "conditional_tasks_well_formed": [
+      {"task_id": "T6.5", "predecessor": "T6.3", "condition": "T6.3 == FAIL", "well_formed": true}
+    ]
+  },
+  "topological_order": [
+    "T0.1",
+    "T0.2", "T0.3",
+    "T1.1", "T1.2", "T1.3",
+    "T2.1", "T4.1",
+    "T2.2", "T4.2",
+    "T2.3",
+    "T3.1", "T3.3", "T3.4", "T3.5",
+    "T3.2",
+    "T3.6",
+    "T5.1",
+    "T5.2", "T6.1",
+    "T6.2",
+    "T6.3",
+    "T6.4", "T6.5"
+  ],
+  "critical_path": {
+    "nodes": ["T0.1", "T0.3", "T1.1", "T1.2", "T1.3", "T2.1", "T2.2", "T2.3", "T3.1", "T3.2", "T3.6", "T5.1", "T6.1", "T6.2", "T6.3", "T6.4"],
+    "length": 16,
+    "rationale": "Longest unconditional chain from T0.1 to T6.4. The Phase 4 fork (T1.3 → T4.1 → T4.2 → T6.1) is shorter than the Phase 2 + Phase 3 chain through T2.1 → T2.2 → T2.3 → T3.1 → T3.2 → T3.6 → T5.1 → T6.1. The T3.1→T3.2→T3.6 path is the critical sub-chain within Phase 3 because T3.2 depends on T3.1 and converges at T3.6 alongside the parallel T3.3/T3.4/T3.5 cluster.",
+    "size_distribution_along_critical_path": "XS×4 + S×7 + M×3 + L×2 (T2.1 + T6.3)",
+    "estimated_focused_effort_along_critical_path_hours": "~13-16 hours (excluding T6.3 multi-hour pipeline cycle time and excluding operator wait-time at T6.2 session restart)"
+  },
+  "parallelizable_clusters": [
+    {
+      "cluster_id": "PC-1-phase0-baseline-and-waiver",
+      "phase": 0,
+      "tasks": ["T0.2", "T0.3"],
+      "rationale": "Both depend only on T0.1; no shared writers (T0.2 → open-items.md; T0.3 → rollback-baseline.txt)."
+    },
+    {
+      "cluster_id": "PC-2-phase4-fork-from-phase1",
+      "phase": "1+4 (cross-phase parallel branch)",
+      "tasks": ["T2.1", "T4.1"],
+      "rationale": "After T1.3 completes, T2.1 (Phase 2 entry, edits SKILL.md) and T4.1 (Phase 4 entry, edits state-transitions-log-entry-template.md) have no shared writers. Phase 4 (T4.1 → T4.2) runs in parallel with Phase 2 (T2.1 → T2.2 → T2.3) and Phase 3."
+    },
+    {
+      "cluster_id": "PC-3-phase3-fan-out",
+      "phase": 3,
+      "tasks": ["T3.1", "T3.3", "T3.4", "T3.5"],
+      "rationale": "All four fan out from T2.3 and edit distinct files (no shared writers — T3.1: execute-orchestrator.md; T3.3: execute-finalize-reconciler.md; T3.4: execute-task-code-producer.md; T3.5: execute-task-quality-handler.md + execute-phase-quality-reviewer.md). T3.2 must follow T3.1 sequentially (same file). All four converge at T3.6 bundled commit."
+    },
+    {
+      "cluster_id": "PC-4-phase3-leaf-prose-pair",
+      "phase": 3,
+      "tasks": ["T3.4", "T3.5"],
+      "rationale": "Identical pattern, independent files; can be authored concurrently. Explicitly called out in orchestrator brief as specialist-body-prose-update pair."
+    }
+  ],
+  "parallelization_summary": {
+    "max_parallel_within_phase": {
+      "Phase 0": 2,
+      "Phase 1": 1,
+      "Phase 2": 1,
+      "Phase 3": 4,
+      "Phase 4": 1,
+      "Phase 5": 1,
+      "Phase 6": 1
+    },
+    "cross_phase_parallel_branches": [
+      {"branches": ["Phase 2 + Phase 3", "Phase 4"], "fork_at": "T1.3", "join_at": "T6.1", "rationale": "Phase 4 forks off after T1.3 and runs concurrently with Phases 2+3; both branches converge at T6.1 (which requires both T5.1 and T4.2)."}
+    ]
+  },
+  "phase_totals": {
+    "Phase 0": {"tasks": 3, "size_buckets": {"XS": 2, "S": 1, "M": 0, "L": 0}, "operator_facing_count": 2},
+    "Phase 1": {"tasks": 3, "size_buckets": {"XS": 0, "S": 2, "M": 1, "L": 0}, "operator_facing_count": 0},
+    "Phase 2": {"tasks": 3, "size_buckets": {"XS": 0, "S": 1, "M": 1, "L": 1}, "operator_facing_count": 0},
+    "Phase 3": {"tasks": 6, "size_buckets": {"XS": 3, "S": 1, "M": 2, "L": 0}, "operator_facing_count": 0},
+    "Phase 4": {"tasks": 2, "size_buckets": {"XS": 0, "S": 2, "M": 0, "L": 0}, "operator_facing_count": 0},
+    "Phase 5": {"tasks": 2, "size_buckets": {"XS": 0, "S": 2, "M": 0, "L": 0}, "operator_facing_count": 0},
+    "Phase 6": {"tasks": 5, "size_buckets": {"XS": 1, "S": 1, "M": 2, "L": 1}, "operator_facing_count": 3, "conditional_tasks": ["T6.5"]}
+  },
+  "operator_facing_tasks": ["T0.1", "T0.2", "T6.2", "T6.3"],
+  "operator_facing_count": 4,
+  "ac_coverage_summary": {
+    "total_acs_in_pipeline_artifacts": 35,
+    "acs_satisfied_by_in_plan_tasks": [
+      "AC-FR-3-a", "AC-FR-3-b", "AC-FR-3-c",
+      "AC-FR-4-a", "AC-FR-4-b", "AC-FR-4-c",
+      "AC-FR-5-a", "AC-FR-5-b",
+      "AC-FR-6-a", "AC-FR-6-b", "AC-FR-6-c", "AC-FR-6-d",
+      "AC-FR-7-a",
+      "AC-FR-8-a",
+      "AC-NFR-1-a", "AC-NFR-1-b",
+      "AC-NFR-2-a", "AC-NFR-2-b",
+      "AC-NFR-3-a", "AC-NFR-3-b",
+      "AC-NFR-5-a",
+      "AC-NFR-6-a", "AC-NFR-6-b",
+      "AC-NFR-7-a",
+      "AC-CC-1", "AC-CC-2", "AC-CC-3", "AC-CC-4"
+    ],
+    "acs_satisfied_upstream_pre_plan": [
+      "AC-FR-1-a", "AC-FR-1-b", "AC-FR-1-c", "AC-NFR-4-a"
+    ],
+    "acs_vacuous_by_kc2": [
+      "AC-FR-2-a", "AC-FR-2-b", "AC-FR-2-c"
+    ],
+    "orphan_acs": [],
+    "verification_coverage_note": "All 28 in-plan ACs have ≥ 1 task and ≥ 1 acceptance test. 4 satisfied-upstream ACs are gated by PV-0.C5 (which verifies the T-001 research note still exists with required flags). 3 vacuous-by-kc2 ACs are verified by absence-of-trigger tests (T-AC-FR-2-a/b/c)."
+  },
+  "test_coverage_summary": {
+    "total_tests_in_acceptance_tests_md": 51,
+    "tests_bound_to_at_least_one_task": "all tests bound; satisfied-upstream + vacuous-by-kc2 tests are not bound to in-plan tasks but are referenced by PV-0.C5 (upstream) and verified-by-absence at Phase 6 (vacuous)",
+    "test_implementation_tasks_required": "Not required — all tests in acceptance-tests.md are file-existence / grep / structural-parse / git-log / behavioral checks executable against artifacts produced by the 24 in-plan tasks. No separate `test-implementation` task class is required because tests are runnable as phase-validator-shell-script invocations against the existing artifacts."
+  },
+  "validator_coverage_summary": {
+    "total_validators": 7,
+    "validators_referenced_by_tasks": ["PV-0", "PV-1", "PV-2", "PV-3", "PV-4", "PV-5", "PV-6"],
+    "every_phase_has_validator_gate": true,
+    "validator_setup_tasks_required": "Not required — Phase Validators are documented as shell-script + Python one-liner checks in phase-validators.md. The validator-runbook in phase-validators.md §Validator runbook is the operator-facing invocation guide. No separate validator-setup tasks are dispatched; validator execution is the Phase boundary check performed by the parent recipe-feature-pipeline orchestrator (or by the operator running `bash phase-validator.sh PV-N`)."
+  },
+  "agent_dispatch_policy": {
+    "convention": "Per ADR-0044 (flatten dispatch hierarchy): tasks specify `agent_dispatch_hint: execute-task-code-producer` but are dispatched by the parent `recipe-feature-pipeline` skill at main-conversation level, NOT by `execute-orchestrator` (which is now an advisor per Phase 3 re-scoping).",
+    "operator_facing_tasks_have_null_dispatch_hint": true,
+    "agent_tool_grant_prohibition_reference": "ADR-0045 — sub-agents in this project MUST NOT declare `Agent` in their `tools:` array. This tasks.json's dispatch_hint values are advisory metadata, not runtime tool grants; the parent skill is the dispatcher."
+  },
+  "open_items_for_orchestrator": [
+    {
+      "id": "OI-1-forced-session-boundary-on-t6.2",
+      "description": "T6.2 carries `forced_session_boundary: true` — a tasks.json-level constraint not explicitly named in the Plan's prose. The Plan's text (Cross-Phase Sequencing Constraint 3) describes the F-7 fresh-session gate as a load-bearing operator action; the tasks.json encodes this as a machine-readable flag so the downstream execution-side runtime knows not to dispatch T6.3 in the same session as the Phase-3 edits. This is a faithful encoding of the Plan's intent, not a new constraint.",
+      "blocks": "nothing — informational; surface to user at final approval gate so they can confirm the encoding is acceptable."
+    },
+    {
+      "id": "OI-2-conditional-T6.5-execution-semantics",
+      "description": "T6.5 fires only on T6.3 FAIL. The orchestrator's scheduler MUST inspect T6.3's verdict (PASS/FAIL from PV-6) before dispatching T6.5. The condition field specifies the trigger; the downstream runtime is responsible for honoring it.",
+      "blocks": "nothing — surface as a runtime-dispatch contract for the parent orchestrator."
+    },
+    {
+      "id": "OI-3-T2.1-and-T6.3-L-sizing-retained",
+      "description": "Two tasks are sized L (T2.1 = 3h section author; T6.3 = 3-4h pipeline run). Neither was split because (a) T2.1 is a single coherent state-machine narrative section, and (b) T6.3 is an end-to-end pipeline cycle with no internal split point. Plan §Estimation Methodology explicitly notes T6.3 carries the widest variance.",
+      "blocks": "nothing — informational. Both tasks remain within the L bucket; no XL tasks exist in the DAG."
+    },
+    {
+      "id": "OI-4-plan-open-items-passthrough",
+      "description": "Plan §Open Items #1-#4 are pending cross-artifact audit (Stage-13 packager BLOCKER, ADR-0045 audit-machinery follow-on slug, synthetic NEEDS_RECONCILIATION inclusion, current_stage enumeration). None block task execution but all should be surfaced to the operator at the final approval gate.",
+      "blocks": "nothing — passthrough."
+    },
+    {
+      "id": "OI-5-test-count-cross-reference",
+      "description": "Orchestrator brief mentions 54 tests in acceptance-tests.md v1.0.1; the artifact at v1.0.0 enumerates 51 tests with `**Total tests:** 51.` near the inventory header. Either (a) acceptance-tests.md was patched to v1.0.1 after this brief was written and tests were added, or (b) the brief miscounts. The verified_by_tests bindings in this tasks.json reference only test IDs present in the artifact at read time; if the v1.0.1 patch added new test IDs, they should be back-bound to the appropriate in-plan task.",
+      "blocks": "nothing — surface to cross-artifact auditor."
+    }
+  ],
+  "update_history": [
+    {"version": "1.0.0", "date": "2026-05-24", "author": "finalize-task-decomposer", "change": "Initial tasks.json derived from plan-v1 v1.1.1 (24 tasks across 7 phases including 1 conditional T6.5). DAG validated acyclic; critical path length 16 (T0.1 → T6.4). 4 operator-facing tasks; T6.2 carries forced_session_boundary flag for F-7 sequencing. T3.6 carries commit_constraint with mandated `FR-5 sweep closure: affected set = 2` message and exact 5-file set."}
+  ]
+}

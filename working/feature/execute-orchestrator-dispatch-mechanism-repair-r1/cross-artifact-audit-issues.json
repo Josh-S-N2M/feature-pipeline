@@ -1,0 +1,176 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "cross-artifact-execute-orchestrator-dispatch-mechanism-repair-r1-r1",
+  "round_number": 1,
+  "terminal": false,
+  "audited_artifacts": [
+    "blueprint-v1.md (v1.1.0)",
+    "plan-v1.md (v1.1.0)",
+    "acceptance-tests.md (v1.0.0)",
+    "phase-validators.md (v1.0.0)"
+  ],
+  "audited_at": "2026-05-24T02:30:00Z",
+  "diff_mode": false,
+  "first_round_full_read": true,
+  "metadata": {
+    "stage": 9,
+    "auditor": "review-cross-artifact-auditor",
+    "model_posture": "opus",
+    "input_mode": "full_first_round",
+    "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1"
+  },
+  "checks_performed": [
+    "blueprint_plan_ac_coverage",
+    "blueprint_tests_ac_coverage",
+    "plan_phase_validator_coverage",
+    "cross_document_terminology_consistency",
+    "sequencing_constraint_consistency",
+    "adr_placement_consistency",
+    "ac_id_traceability",
+    "test_count_internal_consistency",
+    "version_history_consistency"
+  ],
+  "issues": [
+    {
+      "id": "I-CA-001",
+      "severity": "important",
+      "category": "consistency",
+      "artifact_pair": "Blueprint ↔ Plan ↔ Tests ↔ Phase Validators",
+      "summary": "Blueprint AC section declares only 16 ACs (FR-3/4/5/6/8 + CC) but Plan, Tests, and PVs reference 35 ACs (adding FR-1/2/7 + 9 NFR ACs) without those being declared in the Blueprint.",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "Acceptance Criteria (AC) - EARS Format", "detail": "Section enumerates AC-FR-3-a/b/c, AC-FR-4-a/b, AC-FR-5-a/b, AC-FR-6-a/b/c/d, AC-FR-8-a, AC-CC-1/2/3/4 only. No AC-FR-1-*, AC-FR-2-*, AC-FR-4-c, AC-FR-7-*, AC-NFR-*-* declared."},
+        {"artifact": "plan-v1.md", "section": "Acceptance Test Cross-Reference (lines 544-583)", "detail": "Maps tasks to 35 ACs including AC-FR-1-a/b/c (satisfied-upstream), AC-FR-2-a/b/c (vacuous-by-kc2), AC-FR-4-c, AC-FR-7-a, AC-NFR-1-a/b, AC-NFR-2-a/b, AC-NFR-3-a/b, AC-NFR-4-a, AC-NFR-5-a, AC-NFR-6-a/b, AC-NFR-7-a."},
+        {"artifact": "acceptance-tests.md", "section": "AC coverage matrix (lines 955-994)", "detail": "Lists same 35 ACs with verifying tests."},
+        {"artifact": "phase-validators.md", "section": "PV-* 'Acceptance tests scheduled for this phase' rows", "detail": "References 28 of those same downstream ACs."}
+      ],
+      "impact": "Downstream artifacts presume PRD-inherited ACs (AC-FR-1-*, AC-FR-2-*, AC-FR-7-*, AC-NFR-*) propagate to the Blueprint, but the Blueprint AC section never reproduces or explicitly inherits them. A reader cross-checking the Blueprint cannot verify that downstream tests/validators match Blueprint commitments; tooling that audits AC coverage by parsing the Blueprint AC section will report orphans for 19 ACs.",
+      "recommended_resolution": "Either (a) add an 'Inherited from PRD' subsection to the Blueprint AC section enumerating AC-FR-1/2/7 and all AC-NFR-* with their EARS text (preserving the Blueprint as the single AC source-of-truth per shared convention), OR (b) add a frontmatter / prose declaration that the Blueprint AC section is the delta-only view and PRD ACs propagate transitively, with an explicit list of inherited IDs."
+    },
+    {
+      "id": "I-CA-002",
+      "severity": "important",
+      "category": "consistency",
+      "artifact_pair": "Tests internal + Plan + orchestrator-prompt",
+      "summary": "acceptance-tests.md self-reports '51 tests covering all 30 ACs' (Update History + Total tests line 121) but actually contains 54 tests covering 35 ACs. Plan Update History row also asserts 'All 30 ACs mapped' while its own table maps 35.",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "section": "Test inventory + Per-test details", "detail": "Inventory table contains 54 rows (`grep -cE '^\\| T-AC-' = 54`); per-test detail blocks `grep -cE '^### T-AC-' = 54`; coverage matrix references 35 distinct ACs."},
+        {"artifact": "acceptance-tests.md", "section": "Total tests line 121", "detail": "States '**Total tests:** 51.'"},
+        {"artifact": "acceptance-tests.md", "section": "Verification-layer summary (lines 1001-1003)", "detail": "Claims 33 L1 + 11 L2 + 7 L3 = 51 tests; actual L-column distribution in inventory is 27 L1 + 14 L2 + 13 L3 = 54 tests."},
+        {"artifact": "acceptance-tests.md", "section": "Update History line 1127", "detail": "'51 tests covering all 30 ACs'."},
+        {"artifact": "plan-v1.md", "section": "Update History line 651", "detail": "'All 30 ACs mapped' yet the Acceptance Test Cross-Reference table contains 35 mapping rows."}
+      ],
+      "impact": "Documents present internally inconsistent self-reported counts. A consumer cross-checking 'tests cover all ACs' from headline metrics gets one number; from line-level inventory gets another. The orchestrator prompt for this audit propagated the 51 / 33 / 11 / 7 number, demonstrating downstream contamination.",
+      "recommended_resolution": "Update three locations in acceptance-tests.md: (a) line 121 '**Total tests:** 51' → 54; (b) Verification-layer summary table → 27 / 14 / 13; (c) Update History note → '54 tests covering 35 ACs'. Update plan-v1.md Update History row → 'All 35 ACs mapped' (or 30 PRD + 4 CC + 1 FR-4-c = 35 — pick a true denominator)."
+    },
+    {
+      "id": "I-CA-003",
+      "severity": "important",
+      "category": "completeness",
+      "artifact_pair": "Phase Validators ↔ Plan ↔ Tests",
+      "summary": "AC-NFR-4-a (Discovery investigation finding artifact preservation) has zero Phase Validator coverage: Plan maps it to 'satisfied-upstream' with no in-phase task; Tests provides T-AC-NFR-4-a-finding-artifact; but no PV-* schedules it. Result: an AC verified by a test that no validator gates.",
+      "evidence": [
+        {"artifact": "plan-v1.md", "section": "Acceptance Test Cross-Reference row for AC-NFR-4-a (line 572)", "detail": "'already satisfied upstream by T-001 research note ... no new task required in this Plan.'"},
+        {"artifact": "acceptance-tests.md", "section": "T-AC-NFR-4-a-finding-artifact (lines 763-773)", "detail": "L1 file-existence + grep test exists."},
+        {"artifact": "phase-validators.md", "section": "PV-0 through PV-6 'Acceptance tests scheduled for this phase' rows", "detail": "grep -c 'AC-NFR-4-a' returns 0 across all PV entries; no validator explicitly schedules the satisfied-upstream check."}
+      ],
+      "impact": "If the T-001 research note is missing, moved, or its `dispatch_supported: false` flag changes, no phase gate detects this. The test exists but never runs as part of any phase's pass criteria.",
+      "recommended_resolution": "Add a PV-0 criterion (PV-0.C5) asserting the satisfied-upstream FR-1/NFR-4 artifacts exist with the load-bearing flags — or extend PV-0.C1 to include the T-001 research-note presence check. Mirror the same pattern for AC-FR-1-a/b/c which are also satisfied-upstream but have no PV gate."
+    },
+    {
+      "id": "I-CA-004",
+      "severity": "important",
+      "category": "consistency",
+      "artifact_pair": "Plan frontmatter ↔ Plan Update History body",
+      "summary": "Plan v1.1.0 frontmatter `version_history` lists both v1.0.0 and v1.1.0 entries, but the Plan's body 'Update History' table contains only the v1.0.0 row. The v1.1.0 patch (per frontmatter: 'absorbing reviewer findings I-Plan-001/002/004') is not reflected in the human-readable Update History.",
+      "evidence": [
+        {"artifact": "plan-v1.md", "section": "frontmatter lines 6-8", "detail": "version_history lists both v1.0.0 and v1.1.0 with their notes."},
+        {"artifact": "plan-v1.md", "section": "Update History (line 649-651)", "detail": "Table contains a single row for v1.0.0; no v1.1.0 row."}
+      ],
+      "impact": "Reader checking Update History for change provenance cannot see the v1.1.0 patch was issued; only the frontmatter records it. Discrepancy violates the convention that body Update History mirrors frontmatter version_history.",
+      "recommended_resolution": "Add a v1.1.0 row to the body Update History table mirroring the frontmatter version_history note."
+    },
+    {
+      "id": "I-CA-005",
+      "severity": "recommended",
+      "category": "consistency",
+      "artifact_pair": "Acceptance Tests ↔ Phase Validators",
+      "summary": "PV documents anticipate acceptance-test IDs of the form `AT-FR-X-y-PN` (e.g., AT-FR-4-b-P1, AT-CC-2-P2) but the actual acceptance-tests.md uses `T-AC-FR-X-y-<descriptor>` IDs (e.g., T-AC-FR-4-b-schema-lockstep). The PV doc explicitly disclaims this gap ('expected nomenclature') but it remains a cross-artifact ID mismatch that hampers automated traceability.",
+      "evidence": [
+        {"artifact": "phase-validators.md", "section": "Each PV-* 'Acceptance-test IDs (parallel doc)' line", "detail": "e.g., PV-1: 'AT-FR-4-b-P1, AT-NFR-5-a-P1, AT-CC-2-P1 (expected nomenclature)'."},
+        {"artifact": "acceptance-tests.md", "section": "Test inventory IDs", "detail": "All test IDs use `T-AC-<AC-ID>-<descriptor>` form; no `AT-…-PN` IDs exist."},
+        {"artifact": "phase-validators.md", "section": "Conventions block lines 29-30", "detail": "Acknowledges parallel authoring and ID nomenclature divergence; surfaces as an open issue."}
+      ],
+      "impact": "Auto-traceability tooling that joins PV scheduling rows to Acceptance Tests by ID will fail to match. The PV authoring acknowledged the gap up front, but the gap is real.",
+      "recommended_resolution": "Either (a) PV doc updates 'Acceptance-test IDs (parallel doc)' rows to reference actual T-AC-* IDs that exist in acceptance-tests.md, OR (b) tests doc adds an alias mapping table cross-referencing T-AC-* → expected AT-…-PN names."
+    },
+    {
+      "id": "I-CA-006",
+      "severity": "recommended",
+      "category": "completeness",
+      "artifact_pair": "Tests coverage matrix ↔ Plan AC mapping",
+      "summary": "Tests doc 'Coverage status' (line 995) claims 'no orphan tests', but the AC coverage matrix shows AC-FR-4-c (referenced by Plan T3.4/T3.5 satisfaction list) has only L2 git-diff test T-AC-FR-4-c-leaf-specialists-substantive whose AC is referenced by Plan + PV but does not exist in Blueprint AC section (see I-CA-001). Marginal duplicate-coverage rows for AC-NFR-2-a/3-a explicitly shared with FR-6-a/6-b are NOT separately surfaced as 'overlapping with' in the inventory column.",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "section": "T-AC-FR-4-c-leaf-specialists-substantive (line 77 inventory + lines 312-323 detail)", "detail": "Test exists for AC-FR-4-c."},
+        {"artifact": "blueprint-v1.md", "section": "Acceptance Criteria", "detail": "Blueprint enumerates AC-FR-4-a, AC-FR-4-b only — no AC-FR-4-c declaration."},
+        {"artifact": "plan-v1.md", "section": "Cross-Reference table row for AC-FR-4-c", "detail": "Maps T3.4, T3.5 to AC-FR-4-c."}
+      ],
+      "impact": "If AC-FR-4-c truly doesn't exist in the Blueprint (rather than being inherited from PRD), the Plan/Tests/PV row referencing it points to an undeclared AC. This is a sub-finding of I-CA-001 and resolves with the same remediation.",
+      "recommended_resolution": "Resolve via I-CA-001 fix. If AC-FR-4-c is intended to be Blueprint-declared, add its EARS row to Blueprint AC section under FR-4."
+    },
+    {
+      "id": "I-CA-007",
+      "severity": "recommended",
+      "category": "consistency",
+      "artifact_pair": "Tests ↔ Phase Validators",
+      "summary": "Tests doc reports '14 operator-facing tests' in Update History row, with table at line 1019-1036 enumerating 14 such tests. PV doc 'Validator coverage summary' line 837 reports only PV-6.C3 is operator-facing among the 42 criteria (i.e., 1 operator-mediated gate). Both are technically correct under their own scoping (per-test vs per-validator-criterion), but the two views are not cross-referenced.",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "section": "Operator-facing tests (lines 1015-1036)", "detail": "14 tests enumerated as operator-facing, all gated on Phase 6 synthetic run."},
+        {"artifact": "phase-validators.md", "section": "Validator coverage summary (line 837)", "detail": "'1 criterion is operator-facing (PV-6.C3); 2 criteria are mixed automation (PV-4.C4, PV-6.C5)'."}
+      ],
+      "impact": "Reader trying to determine total operator workload may double-count or under-count depending on which document they read first.",
+      "recommended_resolution": "PV-6 description could add a footnote: 'PV-6 aggregates 14 operator-facing acceptance tests under PV-6.C3-C9; operator action is required once (the session restart + synthetic test run), and validator criteria parse the resulting artifacts.'"
+    },
+    {
+      "id": "I-CA-008",
+      "severity": "recommended",
+      "category": "consistency",
+      "artifact_pair": "Plan ↔ Phase Validators",
+      "summary": "Plan T5.2 marks AC-FR-8-a as 'interim discipline portion' but the AC text in Blueprint says 'design-composer determines a project-wide convention is warranted, the system shall produce an ADR documenting the convention'. The Blueprint AC is satisfied by ADR-0045 existing at canonical root (PV-0.C1 already verifies). PV-5.C4 then ALSO claims to verify AC-FR-8-a 'interim discipline portion'. The AC is single-trigger ('produce an ADR') but split across two validators with no clear primary/secondary marking.",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "AC-FR-8-a (line 276)", "detail": "Single 'Resolved' clause naming ADR-0045 at adrs/."},
+        {"artifact": "plan-v1.md", "section": "T0.1 + T5.2", "detail": "T0.1 verifies ADR placement; T5.2 documents interim discipline (AC-FR-8-a (interim discipline portion))."},
+        {"artifact": "phase-validators.md", "section": "PV-0.C1 + PV-5.C4", "detail": "PV-0.C1 covers ADR placement; PV-5.C4 covers interim discipline."}
+      ],
+      "impact": "Reader cannot tell which PV is the canonical gate for AC-FR-8-a. Multiple coverage is acceptable but should be marked primary/secondary.",
+      "recommended_resolution": "In PV-5.C4, add 'satisfies AC-FR-8-a (manual-review interim portion); ADR-existence portion satisfied by PV-0.C1.' Mirror in PV-0.C1."
+    }
+  ],
+  "convergence": {
+    "verdict": "first_round",
+    "prior_issue_count": null,
+    "current_issue_count": 8,
+    "persistent_issues": [],
+    "severity_weighted_delta": null
+  },
+  "summary": {
+    "critical": 0,
+    "important": 4,
+    "recommended": 4,
+    "advisory": 0
+  },
+  "verdict": "conditional_pass",
+  "verdict_rationale": "Four important consistency issues across the artifact set, no critical issues. The most consequential (I-CA-001: 19 ACs referenced downstream but undeclared in Blueprint AC section) and the related count-discrepancy issue (I-CA-002: 51-vs-54 tests, 30-vs-35 ACs) are mechanical fixes that don't require redesign — they require Blueprint AC-section expansion and document-level count corrections. The audit verifies the four artifacts tell substantially the same story on the load-bearing dimensions (ADR-0017+0033 citations, bundled-commit invariant, F-7 fresh-session gate, ADR-0034→0033 3-occurrence sweep, ADR-0036 canonical-root placement, edit ordering D-004→D-001). The auditor recommends one revision cycle via finalize-reconciler to absorb the AC enumeration and count corrections; subsequent rounds should converge quickly given the issues are textual/mechanical rather than architectural.",
+  "convergence_note": "Round 1: no prior_audit_path; convergence verdict 'first_round' applies. Hard cap at round 4 per ADR-0017.",
+  "dimensions_audited": {
+    "blueprint_plan_ac_coverage": "1 important finding (I-CA-001); 1 sub-finding (I-CA-006)",
+    "blueprint_tests_ac_coverage": "1 important finding (I-CA-001 same root cause)",
+    "plan_phase_validator_coverage": "1 important finding (I-CA-003); 1 recommended (I-CA-008)",
+    "cross_document_terminology_consistency": "PASS — ADR-0017 + ADR-0033 + ADR-0036 + F-7 + dispatch_directives[] + 'FR-5 sweep closure: affected set = 2' + 'lines 3, 19, 82' all consistent. ADR-0034 mentions are all in corrective/historical context, never as active citations.",
+    "sequencing_constraint_consistency": "PASS — D-004 → D-001 ordering (Blueprint §Implementation Plan Phase 0→1, Plan Phase 1→Phase 2, PV-2.C2 commit-time check, T-AC-CC-2-skill-md-lockstep) all aligned; bundled Agent-removal commit (Blueprint §Scope, Plan T3.6 + Cross-Phase Sequencing #2, PV-3.C7, T-AC-FR-5-a-bundled-commit-message/fileset) all aligned; F-7 fresh-session (Blueprint AC-FR-6-d, Plan T6.2 + Cross-Phase Sequencing #3, PV-6.C3, T-AC-FR-6-d-* tests) all aligned.",
+    "adr_placement_consistency": "PASS — Blueprint cites adrs/ADR-0044 + adrs/ADR-0045 at canonical root per ADR-0036; Plan T0.1 verifies placement; PV-0.C1 checks placement; T-AC-FR-8-a-adr-0045-exists verifies presence.",
+    "test_count_internal_consistency": "1 important finding (I-CA-002)",
+    "version_history_consistency": "1 important finding (I-CA-004)",
+    "operator_facing_test_accounting": "1 recommended finding (I-CA-007)",
+    "id_nomenclature_traceability": "1 recommended finding (I-CA-005)"
+  }
+}

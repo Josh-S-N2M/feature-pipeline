@@ -1,0 +1,994 @@
+{
+  "schema_version": "graph-v1",
+  "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+  "claim_id_namespacing": {
+    "note": "The three source files share the C-NNNN id namespace. To preserve global uniqueness in this graph, claim ids are prefixed by source: CR-NNNN for 01-claims-codebase-analysis-report.json, T-NNNN for 01-claims-T-001-claude-code-subagent-tool-grant-semantics.json, AN-NNNN for 01-claims-analysis-execute-orchestrator-dispatch-limitation.json. Strip the prefix to dereference the original claim.id field in the source file.",
+    "prefixes": {
+      "CR-": "01-claims-codebase-analysis-report.json",
+      "T-": "01-claims-T-001-claude-code-subagent-tool-grant-semantics.json",
+      "AN-": "01-claims-analysis-execute-orchestrator-dispatch-limitation.json"
+    }
+  },
+  "entities": [
+    {
+      "id": "E-0001",
+      "name": "execute-orchestrator",
+      "type": "service",
+      "canonical_uri": ".claude/agents/execute-orchestrator.md",
+      "aliases": ["execute-orchestrator.md", "the dispatcher", "dispatcher #1"],
+      "claims": [
+        "CR-0001", "CR-0002", "CR-0003", "CR-0020", "CR-0021", "CR-0022", "CR-0023", "CR-0024", "CR-0025", "CR-0026", "CR-0027",
+        "CR-0049", "CR-0051", "CR-0055", "CR-0058", "CR-0061", "CR-0065", "CR-0067", "CR-0079", "CR-0080", "CR-0095", "CR-0097", "CR-0098", "CR-0102", "CR-0107", "CR-0112", "CR-0114", "CR-0124", "CR-0129", "CR-0138", "CR-0141",
+        "T-0021", "T-0022", "T-0039", "T-0050",
+        "AN-0001", "AN-0002", "AN-0003", "AN-0007", "AN-0008", "AN-0010", "AN-0011", "AN-0012", "AN-0013", "AN-0014", "AN-0018", "AN-0019", "AN-0021", "AN-0031", "AN-0051", "AN-0055", "AN-0059", "AN-0071", "AN-0074"
+      ]
+    },
+    {
+      "id": "E-0002",
+      "name": "execute-finalize-reconciler",
+      "type": "service",
+      "canonical_uri": ".claude/agents/execute-finalize-reconciler.md",
+      "aliases": ["execute-finalize-reconciler.md", "dispatcher #2", "reconciler"],
+      "claims": [
+        "CR-0001", "CR-0002", "CR-0003", "CR-0046", "CR-0047", "CR-0048", "CR-0049", "CR-0050", "CR-0051", "CR-0052", "CR-0066",
+        "CR-0067", "CR-0095", "CR-0101", "CR-0112", "CR-0114", "CR-0123", "CR-0141",
+        "AN-0025"
+      ]
+    },
+    {
+      "id": "E-0003",
+      "name": "execute-task-code-producer",
+      "type": "service",
+      "canonical_uri": ".claude/agents/execute-task-code-producer.md",
+      "aliases": ["code-producer", "execute-task-code-producer.md"],
+      "claims": [
+        "CR-0028", "CR-0029", "CR-0030", "CR-0031", "CR-0032", "CR-0033", "CR-0095", "CR-0099", "CR-0120",
+        "AN-0022"
+      ]
+    },
+    {
+      "id": "E-0004",
+      "name": "execute-task-quality-handler",
+      "type": "service",
+      "canonical_uri": ".claude/agents/execute-task-quality-handler.md",
+      "aliases": ["quality-handler", "execute-task-quality-handler.md"],
+      "claims": [
+        "CR-0034", "CR-0035", "CR-0036", "CR-0037", "CR-0038", "CR-0039", "CR-0095", "CR-0121",
+        "AN-0023", "AN-0036"
+      ]
+    },
+    {
+      "id": "E-0005",
+      "name": "execute-phase-quality-reviewer",
+      "type": "service",
+      "canonical_uri": ".claude/agents/execute-phase-quality-reviewer.md",
+      "aliases": ["phase-quality-reviewer", "execute-phase-quality-reviewer.md"],
+      "claims": [
+        "CR-0040", "CR-0041", "CR-0042", "CR-0043", "CR-0044", "CR-0045", "CR-0092", "CR-0095", "CR-0100", "CR-0103", "CR-0122",
+        "AN-0024"
+      ]
+    },
+    {
+      "id": "E-0006",
+      "name": "recipe-feature-pipeline",
+      "type": "service",
+      "canonical_uri": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "aliases": ["recipe-feature-pipeline/SKILL.md", "parent skill", "parent orchestrator", "/feature-pipeline"],
+      "claims": [
+        "CR-0004", "CR-0013", "CR-0019", "CR-0027", "CR-0053", "CR-0054", "CR-0055", "CR-0057", "CR-0058", "CR-0059", "CR-0060", "CR-0061", "CR-0062", "CR-0095", "CR-0117", "CR-0130", "CR-0131", "CR-0134", "CR-0138", "CR-0139",
+        "AN-0021", "AN-0051", "AN-0052", "AN-0062", "AN-0064"
+      ]
+    },
+    {
+      "id": "E-0007",
+      "name": "Claude Code",
+      "type": "service",
+      "canonical_uri": "https://code.claude.com/docs/en/sub-agents",
+      "aliases": ["Claude Code harness", "the harness", "Claude session"],
+      "claims": [
+        "T-0001", "T-0003", "T-0004", "T-0005", "T-0007", "T-0010", "T-0013", "T-0015", "T-0025", "T-0028", "T-0033", "T-0034", "T-0035", "T-0040", "T-0041", "T-0046", "T-0048", "T-0049", "T-0050", "T-0073", "T-0076",
+        "AN-0016", "AN-0017", "AN-0041", "AN-0047"
+      ]
+    },
+    {
+      "id": "E-0008",
+      "name": "Agent tool",
+      "type": "tool",
+      "canonical_uri": "https://code.claude.com/docs/en/sub-agents",
+      "aliases": ["Agent", "Task tool (deprecated name)", "Task", "Agent(agent_type)"],
+      "claims": [
+        "CR-0021", "CR-0022", "CR-0029", "CR-0035", "CR-0041", "CR-0047", "CR-0049", "CR-0065", "CR-0067", "CR-0113", "CR-0114", "CR-0115", "CR-0141", "CR-0143", "CR-0144",
+        "T-0005", "T-0006", "T-0008", "T-0016", "T-0018", "T-0019", "T-0020", "T-0021", "T-0026", "T-0027", "T-0035", "T-0036", "T-0037", "T-0039", "T-0042", "T-0043", "T-0046", "T-0050", "T-0052", "T-0065", "T-0066",
+        "AN-0001", "AN-0003", "AN-0007", "AN-0018", "AN-0019", "AN-0020", "AN-0052"
+      ]
+    },
+    {
+      "id": "E-0009",
+      "name": "dispatch_supported: false",
+      "type": "finding",
+      "aliases": ["sub-agent dispatch is not supported", "no nested sub-agent dispatch", "kill-criterion-#2"],
+      "claims": [
+        "T-0001", "T-0002", "T-0003", "T-0004", "T-0007", "T-0011", "T-0012", "T-0014", "T-0015", "T-0017", "T-0027", "T-0037", "T-0041", "T-0059", "T-0060", "T-0061", "T-0071", "T-0075"
+      ]
+    },
+    {
+      "id": "E-0010",
+      "name": "kill-criterion-#2 triggered (FULL repair)",
+      "type": "finding",
+      "aliases": ["kill_criterion_triggered: 2", "FULL repair pathway"],
+      "claims": ["T-0002", "AN-0069"]
+    },
+    {
+      "id": "E-0011",
+      "name": "F-7 mid-session agent registry not hot-reloaded",
+      "type": "finding",
+      "aliases": ["F-7", "registry-staleness", "session-restart constraint", "agent registry loaded at session start"],
+      "claims": [
+        "T-0046", "T-0047", "T-0048", "T-0049", "T-0050", "T-0051", "T-0052", "T-0053", "T-0054", "T-0055", "T-0056", "T-0057", "T-0058"
+      ]
+    },
+    {
+      "id": "E-0012",
+      "name": "execute-orchestrator runtime tool surface [Read, Write, Bash, Edit]",
+      "type": "finding",
+      "aliases": ["observed runtime tool surface", "the 4-tool runtime surface"],
+      "claims": [
+        "CR-0022", "CR-0065",
+        "T-0021", "T-0022",
+        "AN-0002", "AN-0003", "AN-0004", "AN-0005", "AN-0006", "AN-0011", "AN-0012", "AN-0013", "AN-0049", "AN-0050"
+      ]
+    },
+    {
+      "id": "E-0013",
+      "name": "§6 option (a) flatten dispatch hierarchy",
+      "type": "pattern",
+      "aliases": ["option (a)", "option A", "flatten dispatch", "parent dispatches the 4 specialists"],
+      "claims": [
+        "CR-0009", "CR-0059", "CR-0060", "CR-0105", "CR-0108",
+        "T-0060", "T-0062",
+        "AN-0061"
+      ]
+    },
+    {
+      "id": "E-0014",
+      "name": "§6 option (b) retire execute-orchestrator",
+      "type": "pattern",
+      "aliases": ["option (b)", "option B", "retire execute-orchestrator", "fold state-machine into parent"],
+      "claims": [
+        "CR-0006", "CR-0007", "CR-0008", "CR-0061", "CR-0080", "CR-0097", "CR-0098", "CR-0102", "CR-0106", "CR-0108", "CR-0109", "CR-0131", "CR-0133",
+        "T-0051", "T-0060", "T-0063",
+        "AN-0062"
+      ]
+    },
+    {
+      "id": "E-0015",
+      "name": "§6 option (c) Bash-script dispatch surface",
+      "type": "pattern",
+      "aliases": ["option (c)", "option C", "Bash-script dispatch"],
+      "claims": [
+        "CR-0009", "CR-0062", "CR-0104", "CR-0107", "CR-0108",
+        "T-0060", "T-0064",
+        "AN-0063"
+      ]
+    },
+    {
+      "id": "E-0016",
+      "name": "ADR-0033 (ADR-0029 execution-phase extension)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0033-adr-0029-execution-extension.md",
+      "aliases": ["ADR-0033", "symmetric D-12 canonical home"],
+      "claims": [
+        "CR-0010", "CR-0011", "CR-0012", "CR-0045", "CR-0086", "CR-0132", "CR-0142",
+        "AN-0029"
+      ]
+    },
+    {
+      "id": "E-0017",
+      "name": "ADR-0034 (PRD mis-credit cleanup)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0034-prd-mis-credit-cleanup.md",
+      "aliases": ["ADR-0034"],
+      "claims": ["CR-0011", "CR-0012", "CR-0132", "CR-0142"]
+    },
+    {
+      "id": "E-0018",
+      "name": "ADR-0017 (document-reviewer + 4-cycle cap)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0017-document-reviewer.md",
+      "aliases": ["ADR-0017", "4-cycle cap", "cycle cap"],
+      "claims": [
+        "CR-0011", "CR-0012", "CR-0081", "CR-0086", "CR-0142",
+        "AN-0027", "AN-0057"
+      ]
+    },
+    {
+      "id": "E-0019",
+      "name": "ADR-0019 (naming convention)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0019-naming-convention.md",
+      "aliases": ["ADR-0019", "execute- prefix", "recipe- prefix"],
+      "claims": ["CR-0082", "CR-0116", "CR-0117", "CR-0118"]
+    },
+    {
+      "id": "E-0020",
+      "name": "ADR-0022 (sub-agent reasoning configuration)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0022-subagent-reasoning-configuration.md",
+      "aliases": ["ADR-0022", "model/effort/skills triplet"],
+      "claims": ["CR-0083", "CR-0138"]
+    },
+    {
+      "id": "E-0021",
+      "name": "ADR-0027 (deliverable-archive gap)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0027-pipeline-skill-design-gap-deliverable-archive.md",
+      "aliases": ["ADR-0027", "cwd MUST equal repo root"],
+      "claims": ["CR-0057", "CR-0084"]
+    },
+    {
+      "id": "E-0022",
+      "name": "ADR-0029 (no silent scope changes)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0029-no-silent-scope-changes-principle.md",
+      "aliases": ["ADR-0029", "no silent scope changes principle"],
+      "claims": ["CR-0085"]
+    },
+    {
+      "id": "E-0023",
+      "name": "ADR-0035 (auditing-shared skill-binding convention)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0035-auditing-shared-skill-binding.md",
+      "aliases": ["ADR-0035", "auditing-shared binding convention"],
+      "claims": ["CR-0052", "CR-0091", "CR-0094", "CR-0136"]
+    },
+    {
+      "id": "E-0024",
+      "name": "ADR-0036 (single-location ADR placement)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0036-single-location-adr-placement.md",
+      "aliases": ["ADR-0036"],
+      "claims": ["CR-0087"]
+    },
+    {
+      "id": "E-0025",
+      "name": "ADR-0037 (mcp-events.jsonl transition surfacing)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md",
+      "aliases": ["ADR-0037"],
+      "claims": ["CR-0088"]
+    },
+    {
+      "id": "E-0026",
+      "name": "ADR-0040 (Serena narrowed always-on)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0040-serena-narrowed-always-on.md",
+      "aliases": ["ADR-0040"],
+      "claims": ["CR-0089"]
+    },
+    {
+      "id": "E-0027",
+      "name": "ADR-0041 (install-mechanism hybrid)",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0041-install-mechanism-hybrid.md",
+      "aliases": ["ADR-0041"],
+      "claims": ["CR-0090"]
+    },
+    {
+      "id": "E-0028",
+      "name": "ADR-0042 (auditing-mcp family graduation)",
+      "type": "standard",
+      "aliases": ["ADR-0042"],
+      "claims": ["CR-0092", "CR-0136"]
+    },
+    {
+      "id": "E-0029",
+      "name": "ADR-0043 (auditing-mcp Gate-6 hard gate)",
+      "type": "standard",
+      "aliases": ["ADR-0043"],
+      "claims": ["CR-0093", "CR-0136"]
+    },
+    {
+      "id": "E-0030",
+      "name": "checkpoint.json schema",
+      "type": "standard",
+      "canonical_uri": ".claude/skills/recipe-feature-pipeline/SKILL.md:96-128",
+      "aliases": ["checkpoint.json", "canonical checkpoint schema"],
+      "claims": [
+        "CR-0013", "CR-0014", "CR-0015", "CR-0069", "CR-0070", "CR-0071", "CR-0072", "CR-0073", "CR-0095", "CR-0096", "CR-0128", "CR-0134", "CR-0139",
+        "AN-0034", "AN-0054", "AN-0064"
+      ]
+    },
+    {
+      "id": "E-0031",
+      "name": "state-transitions.log schema",
+      "type": "standard",
+      "canonical_uri": ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md",
+      "aliases": ["state-transitions.log", "state-transitions-log-entry-template", "v1 invoking_agent invariant"],
+      "claims": [
+        "CR-0074", "CR-0075", "CR-0076", "CR-0077", "CR-0078", "CR-0079", "CR-0080", "CR-0095", "CR-0096", "CR-0124", "CR-0127", "CR-0135", "CR-0140",
+        "AN-0054", "AN-0064"
+      ]
+    },
+    {
+      "id": "E-0032",
+      "name": "PRD FR-4 8-file inventory",
+      "type": "control",
+      "aliases": ["FR-4 inventory", "affected-files inventory", "the 8-file inventory"],
+      "claims": ["CR-0003", "CR-0007", "CR-0009", "CR-0095", "CR-0105", "CR-0106", "CR-0107", "CR-0108", "CR-0133"]
+    },
+    {
+      "id": "E-0033",
+      "name": "PRD FR-5 sub-agent inventory sweep",
+      "type": "control",
+      "aliases": ["FR-5 sweep", "FR-5 inventory", "Agent-in-tools sweep"],
+      "claims": [
+        "CR-0001", "CR-0063", "CR-0064", "CR-0067", "CR-0143", "CR-0144",
+        "T-0065", "T-0066", "T-0067", "T-0074",
+        "AN-0020"
+      ]
+    },
+    {
+      "id": "E-0034",
+      "name": "PRD FR-2 kill-criterion gating",
+      "type": "control",
+      "aliases": ["FR-2", "kill-criterion-#1 / #2"],
+      "claims": ["CR-0085", "T-0001", "T-0002"]
+    },
+    {
+      "id": "E-0035",
+      "name": "PRD FR-3-c invariant set",
+      "type": "control",
+      "aliases": ["FR-3-c", "invariant citation"],
+      "claims": ["CR-0012", "CR-0142"]
+    },
+    {
+      "id": "E-0036",
+      "name": "PRD FR-6 verification step",
+      "type": "control",
+      "aliases": ["FR-6", "synthetic minimal test feature", "verification phase"],
+      "claims": ["T-0053", "T-0054", "T-0055", "AN-0065"]
+    },
+    {
+      "id": "E-0037",
+      "name": "AC-FR-4-a scope-expansion open-item gate",
+      "type": "control",
+      "aliases": ["AC-FR-4-a", "open-item user check"],
+      "claims": ["CR-0008", "CR-0105", "CR-0106", "CR-0107", "CR-0109", "CR-0133"]
+    },
+    {
+      "id": "E-0038",
+      "name": "AC-FR-5-b cleanup-as-blocker check",
+      "type": "control",
+      "aliases": ["AC-FR-5-b"],
+      "claims": ["T-0065", "T-0066", "T-0067"]
+    },
+    {
+      "id": "E-0039",
+      "name": "NFR-5-a canonical-reference documentation gap closure",
+      "type": "control",
+      "aliases": ["NFR-5-a"],
+      "claims": ["CR-0015", "CR-0134", "CR-0139"]
+    },
+    {
+      "id": "E-0040",
+      "name": "NFR-6-a no-artifact-migration",
+      "type": "control",
+      "aliases": ["NFR-6-a"],
+      "claims": ["CR-0096"]
+    },
+    {
+      "id": "E-0041",
+      "name": "14-row state machine (T0..T13)",
+      "type": "pattern",
+      "aliases": ["state machine", "T0..T13", "execute-orchestrator state machine"],
+      "claims": ["CR-0024", "CR-0025", "CR-0061", "CR-0129", "CR-0130", "CR-0131", "AN-0021"]
+    },
+    {
+      "id": "E-0042",
+      "name": "specialist-isolation dispatch pattern",
+      "type": "pattern",
+      "aliases": ["specialist isolation", "dispatch isolation", "per-task / per-phase dispatch boundaries"],
+      "claims": [
+        "AN-0015", "AN-0021", "AN-0022", "AN-0023", "AN-0024", "AN-0025", "AN-0026", "AN-0027", "AN-0028", "AN-0029", "AN-0030"
+      ]
+    },
+    {
+      "id": "E-0043",
+      "name": "single-agent fallback mode",
+      "type": "pattern",
+      "aliases": ["single-agent-fallback", "parent-driven workaround", "fallback mode", "workaround posture"],
+      "claims": [
+        "CR-0066", "CR-0071", "CR-0073",
+        "AN-0014", "AN-0015", "AN-0030", "AN-0031", "AN-0033", "AN-0034", "AN-0035", "AN-0036", "AN-0037", "AN-0051", "AN-0053", "AN-0054", "AN-0055", "AN-0056", "AN-0057", "AN-0058", "AN-0073"
+      ]
+    },
+    {
+      "id": "E-0044",
+      "name": "fork mode (CLAUDE_CODE_FORK_SUBAGENT=1)",
+      "type": "tool",
+      "aliases": ["fork mode", "CLAUDE_CODE_FORK_SUBAGENT"],
+      "claims": ["T-0009", "T-0029", "T-0072"]
+    },
+    {
+      "id": "E-0045",
+      "name": "agent teams (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1)",
+      "type": "pattern",
+      "canonical_uri": "https://code.claude.com/docs/en/agent-teams",
+      "aliases": ["agent teams", "peer agent topology", "SendMessage"],
+      "claims": ["T-0010", "T-0030", "T-0031", "T-0032"]
+    },
+    {
+      "id": "E-0046",
+      "name": "Anthropic Claude Code sub-agent documentation",
+      "type": "standard",
+      "canonical_uri": "https://code.claude.com/docs/en/sub-agents",
+      "aliases": ["sub-agent docs", "code.claude.com/docs/en/sub-agents"],
+      "claims": [
+        "T-0003", "T-0004", "T-0006", "T-0010", "T-0012", "T-0013", "T-0014", "T-0015", "T-0017", "T-0018", "T-0024", "T-0025", "T-0026", "T-0027", "T-0028", "T-0033", "T-0040", "T-0071", "T-0073", "T-0076"
+      ]
+    },
+    {
+      "id": "E-0047",
+      "name": "Anthropic Agent SDK sub-agents documentation",
+      "type": "standard",
+      "canonical_uri": "https://code.claude.com/docs/en/agent-sdk/subagents",
+      "aliases": ["Agent SDK docs"],
+      "claims": ["T-0008", "T-0016", "T-0017", "T-0076"]
+    },
+    {
+      "id": "E-0048",
+      "name": "probe-dispatch-test-r1 / r2 (instrumentation)",
+      "type": "tool",
+      "canonical_uri": ".claude/agents/probe-dispatch-test-r1.md",
+      "aliases": ["probe-dispatch-test", "T-001 probes"],
+      "claims": ["T-0042", "T-0043", "T-0044", "T-0045", "T-0046", "T-0047", "T-0074", "T-0075"]
+    },
+    {
+      "id": "E-0049",
+      "name": "task-tracking primitives (TaskCreate / TaskUpdate)",
+      "type": "tool",
+      "aliases": ["TaskCreate", "TaskUpdate", "task-tracking primitives"],
+      "claims": ["CR-0068", "CR-0115"]
+    },
+    {
+      "id": "E-0050",
+      "name": "Edit tool (undeclared runtime addition)",
+      "type": "tool",
+      "aliases": ["Edit"],
+      "claims": ["CR-0022", "T-0022", "T-0023", "T-0024", "T-0068", "T-0069", "T-0070", "AN-0005", "AN-0049", "AN-0050"]
+    },
+    {
+      "id": "E-0051",
+      "name": "Bash(python3:*) scope restriction",
+      "type": "control",
+      "aliases": ["Bash(python3:*)", "bash scope"],
+      "claims": ["CR-0021", "CR-0022", "AN-0001", "AN-0006", "AN-0048"]
+    },
+    {
+      "id": "E-0052",
+      "name": "memory: project field (auto-enable Read/Write/Edit)",
+      "type": "control",
+      "aliases": ["memory: project", "memory auto-enable"],
+      "claims": ["CR-0023", "CR-0030", "CR-0036", "CR-0042", "CR-0048", "CR-0051", "T-0024", "T-0068", "T-0070"]
+    },
+    {
+      "id": "E-0053",
+      "name": "KB-documentation-criteria/SKILL.md template-assignment table",
+      "type": "standard",
+      "canonical_uri": ".claude/skills/KB-documentation-criteria/SKILL.md",
+      "aliases": ["template-assignment table", "KB-documentation-criteria"],
+      "claims": ["CR-0005", "CR-0097"]
+    },
+    {
+      "id": "E-0054",
+      "name": "pipeline-run-summary-template.md (T12)",
+      "type": "standard",
+      "aliases": ["pipeline-run-summary-template"],
+      "claims": ["CR-0098"]
+    },
+    {
+      "id": "E-0055",
+      "name": "per-task-execution-result template",
+      "type": "standard",
+      "aliases": ["per-task-execution-result-template.md"],
+      "claims": ["CR-0099"]
+    },
+    {
+      "id": "E-0056",
+      "name": "phase-quality-report template",
+      "type": "standard",
+      "aliases": ["phase-quality-report-template.md"],
+      "claims": ["CR-0100"]
+    },
+    {
+      "id": "E-0057",
+      "name": "quality-reconciliation-log template",
+      "type": "standard",
+      "aliases": ["quality-reconciliation-log-template.md"],
+      "claims": ["CR-0101"]
+    },
+    {
+      "id": "E-0058",
+      "name": "smoke_test_auditing_shared.py",
+      "type": "tool",
+      "canonical_uri": ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py",
+      "aliases": ["smoke_test_auditing_shared"],
+      "claims": ["CR-0102"]
+    },
+    {
+      "id": "E-0059",
+      "name": "auditing-codespaces/SKILL.md consumer note",
+      "type": "standard",
+      "canonical_uri": ".claude/skills/auditing-codespaces/SKILL.md",
+      "aliases": ["auditing-codespaces"],
+      "claims": ["CR-0103"]
+    },
+    {
+      "id": "E-0060",
+      "name": "auditing-shared skill",
+      "type": "standard",
+      "canonical_uri": ".claude/skills/auditing-shared",
+      "aliases": ["auditing-shared", "auditing-shared scripts directory"],
+      "claims": ["CR-0091", "CR-0094", "CR-0104"]
+    },
+    {
+      "id": "E-0061",
+      "name": "devcontainer-mcp-provisioning-r1 originating run",
+      "type": "finding",
+      "aliases": ["devcontainer-mcp-provisioning-r1", "originating feature"],
+      "claims": ["CR-0014", "CR-0066", "CR-0069", "AN-0009", "AN-0010", "AN-0031", "AN-0032", "AN-0051", "AN-0073"]
+    },
+    {
+      "id": "E-0062",
+      "name": "Phase 0 verify-at-execution findings (3 supply-chain drifts)",
+      "type": "finding",
+      "aliases": ["3 supply-chain drift issues", "Phase-0 findings"],
+      "claims": ["AN-0032"]
+    },
+    {
+      "id": "E-0063",
+      "name": "Hypothesis H-a: baseline tool-set inheritance",
+      "type": "finding",
+      "aliases": ["H-a", "hypothesis 4.2 simple-filter weakened"],
+      "claims": ["T-0023", "T-0040"]
+    },
+    {
+      "id": "E-0064",
+      "name": "Hypothesis H-b: memory-field auto-enable",
+      "type": "finding",
+      "aliases": ["H-b", "memory-field auto-enable hypothesis"],
+      "claims": ["T-0024", "T-0068", "T-0069", "T-0070"]
+    },
+    {
+      "id": "E-0065",
+      "name": "harness-restriction hypothesis 4.1",
+      "type": "finding",
+      "aliases": ["hypothesis 4.1", "harness-restriction"],
+      "claims": ["AN-0016", "AN-0017", "AN-0041", "AN-0042", "AN-0043", "AN-0044", "AN-0045", "AN-0046"]
+    },
+    {
+      "id": "E-0066",
+      "name": "active-harness-behavior hypothesis 4.2",
+      "type": "finding",
+      "aliases": ["hypothesis 4.2", "frontmatter rewrite hypothesis"],
+      "claims": ["AN-0047", "AN-0048", "AN-0049", "AN-0050"]
+    },
+    {
+      "id": "E-0067",
+      "name": "OI-CR-A documentary mis-attribution (ADR-0034 vs ADR-0033)",
+      "type": "finding",
+      "aliases": ["OI-CR-A"],
+      "claims": ["CR-0010", "CR-0011", "CR-0132", "CR-0142"]
+    },
+    {
+      "id": "E-0068",
+      "name": "OI-CR-B option (b) escapes 8-file inventory",
+      "type": "finding",
+      "aliases": ["OI-CR-B"],
+      "claims": ["CR-0133"]
+    },
+    {
+      "id": "E-0069",
+      "name": "OI-CR-C checkpoint.json execution-phase fields undocumented",
+      "type": "finding",
+      "aliases": ["OI-CR-C"],
+      "claims": ["CR-0134", "CR-0139"]
+    },
+    {
+      "id": "E-0070",
+      "name": "OI-CR-D template invoking_agent invariant + void/-prime undocumented",
+      "type": "finding",
+      "aliases": ["OI-CR-D"],
+      "claims": ["CR-0135", "CR-0140"]
+    },
+    {
+      "id": "E-0071",
+      "name": "OI-CR-E ADR-0035 not in Research Plan inherited-ADR list",
+      "type": "finding",
+      "aliases": ["OI-CR-E"],
+      "claims": ["CR-0091", "CR-0094", "CR-0136"]
+    },
+    {
+      "id": "E-0072",
+      "name": "OI-CR-F agent count 35 vs 36 discrepancy",
+      "type": "finding",
+      "aliases": ["OI-CR-F"],
+      "claims": ["CR-0063", "CR-0064", "CR-0137"]
+    },
+    {
+      "id": "E-0073",
+      "name": "OI-CR-G execute-orchestrator self-declared parent skill",
+      "type": "finding",
+      "aliases": ["OI-CR-G", "OQ-CR-003"],
+      "claims": ["CR-0027", "CR-0138"]
+    },
+    {
+      "id": "E-0074",
+      "name": "Task → Agent rename (v2.1.63)",
+      "type": "finding",
+      "aliases": ["Task to Agent rename", "v2.1.63 rename"],
+      "claims": ["T-0035", "T-0036", "T-0037", "T-0038", "T-0039"]
+    },
+    {
+      "id": "E-0075",
+      "name": "tools: allowlist + disallowedTools denylist semantics",
+      "type": "control",
+      "aliases": ["tools:", "disallowedTools", "allowlist semantics"],
+      "claims": ["T-0025", "T-0026", "T-0027", "CR-0110", "CR-0111", "CR-0112"]
+    },
+    {
+      "id": "E-0076",
+      "name": "ADR-0033 D-12 symmetric cycle-cap application",
+      "type": "control",
+      "aliases": ["symmetric D-12", "D-12 cap"],
+      "claims": ["CR-0010", "CR-0086", "CR-0142", "AN-0029"]
+    },
+    {
+      "id": "E-0077",
+      "name": "D-2 verdict enums (APPROVED/NEEDS_REVISION/STUB_DETECTED/BLOCKER)",
+      "type": "standard",
+      "aliases": ["D-2a/c/d", "verdict enum", "task quality verdicts"],
+      "claims": ["CR-0037", "CR-0121", "AN-0036"]
+    },
+    {
+      "id": "E-0078",
+      "name": "D-5 artifact-pair pattern (JSON + .md)",
+      "type": "pattern",
+      "aliases": ["D-5 pair pattern", "JSON + markdown companion"],
+      "claims": ["CR-0126", "CR-0127", "CR-0128"]
+    },
+    {
+      "id": "E-0079",
+      "name": "D-13 5-dimensional non-collapsed verdict",
+      "type": "control",
+      "aliases": ["D-13", "5-dimensional verdict"],
+      "claims": ["CR-0043", "CR-0044"]
+    },
+    {
+      "id": "E-0080",
+      "name": "Contract 4 / D-14 dispatch matrix",
+      "type": "control",
+      "aliases": ["Contract 4", "D-14 dispatch matrix", "8-row dispatch matrix"],
+      "claims": ["CR-0050", "CR-0123", "AN-0035"]
+    },
+    {
+      "id": "E-0081",
+      "name": "Contract 5 state-transitioned dispatches",
+      "type": "control",
+      "aliases": ["Contract 5"],
+      "claims": ["AN-0015", "AN-0033"]
+    },
+    {
+      "id": "E-0082",
+      "name": "Q-CC-4 stub-vs-real distinction",
+      "type": "control",
+      "aliases": ["Q-CC-4", "stub-vs-real"],
+      "claims": ["CR-0045", "AN-0036"]
+    },
+    {
+      "id": "E-0083",
+      "name": "KB-cc-design skill",
+      "type": "standard",
+      "aliases": ["KB-cc-design"],
+      "claims": ["CR-0023", "CR-0030", "CR-0036", "CR-0042", "CR-0048", "AN-0036", "AN-0055"]
+    },
+    {
+      "id": "E-0084",
+      "name": "ai-development-guide 4-phase pattern",
+      "type": "pattern",
+      "aliases": ["ai-development-guide", "Format/Lint -> Build -> Test -> Final Gate"],
+      "claims": ["CR-0030", "CR-0033", "CR-0036", "AN-0036"]
+    },
+    {
+      "id": "E-0085",
+      "name": "GitNexus MCP (unavailable due to unset $GITNEXUS_TAG)",
+      "type": "tool",
+      "aliases": ["GitNexus MCP", "$GITNEXUS_TAG"],
+      "claims": ["CR-0017", "CR-0019"]
+    },
+    {
+      "id": "E-0086",
+      "name": "codebase-memory-mcp (not registered)",
+      "type": "tool",
+      "aliases": ["codebase-memory-mcp"],
+      "claims": ["CR-0018", "CR-0019"]
+    },
+    {
+      "id": "E-0087",
+      "name": "manual-grep-and-read extraction method",
+      "type": "pattern",
+      "aliases": ["Read + Bash grep + Glob"],
+      "claims": ["CR-0016", "CR-0019"]
+    },
+    {
+      "id": "E-0088",
+      "name": "agent-roster-design-discipline-r1 (saved-for-later meta-feature)",
+      "type": "finding",
+      "aliases": ["agent-roster-design-discipline", "saved-for-later meta-feature"],
+      "claims": ["CR-0143", "CR-0145"]
+    },
+    {
+      "id": "E-0089",
+      "name": "per-agent design evaluation gap",
+      "type": "finding",
+      "aliases": ["per-agent design evaluation absent", "design-discipline gap"],
+      "claims": ["AN-0038", "AN-0039", "AN-0040", "CR-0143", "CR-0145"]
+    },
+    {
+      "id": "E-0090",
+      "name": "coordinator example (main-thread only)",
+      "type": "finding",
+      "aliases": ["coordinator agent example"],
+      "claims": ["T-0033", "T-0034"]
+    },
+    {
+      "id": "E-0091",
+      "name": "Plan built-in subagent",
+      "type": "service",
+      "aliases": ["Plan subagent"],
+      "claims": ["T-0014"]
+    },
+    {
+      "id": "E-0092",
+      "name": "Skills mechanism (workaround alternative)",
+      "type": "pattern",
+      "aliases": ["Skills"],
+      "claims": ["T-0010", "T-0011", "T-0013"]
+    },
+    {
+      "id": "E-0093",
+      "name": "Chain-from-main-conversation workaround",
+      "type": "pattern",
+      "aliases": ["chain sub-agents from main", "chain-from-main"],
+      "claims": ["T-0010", "T-0011", "T-0013"]
+    },
+    {
+      "id": "E-0094",
+      "name": "void + -prime de facto log extensions",
+      "type": "finding",
+      "aliases": ["void: true + void_reason", "-prime transition-name suffix"],
+      "claims": ["CR-0076", "CR-0077", "CR-0135", "CR-0140"]
+    },
+    {
+      "id": "E-0095",
+      "name": "v1 invoking_agent invariant (always execute-orchestrator)",
+      "type": "control",
+      "aliases": ["v1 invariant"],
+      "claims": ["CR-0079", "CR-0080", "CR-0135"]
+    },
+    {
+      "id": "E-0096",
+      "name": "shared-document-reviewer agent",
+      "type": "service",
+      "aliases": ["shared-document-reviewer"],
+      "claims": ["CR-0056", "CR-0111", "CR-0146"]
+    },
+    {
+      "id": "E-0097",
+      "name": "T-001 acceptance: 3 independent doc sources with verbatim quotes",
+      "type": "finding",
+      "aliases": ["T-001 acceptance criteria satisfied"],
+      "claims": ["T-0071", "T-0073", "T-0075", "T-0076"]
+    },
+    {
+      "id": "E-0098",
+      "name": "F-1 multi-source corroboration",
+      "type": "finding",
+      "aliases": ["F-1", "three-source corroboration"],
+      "claims": ["T-0003", "T-0004", "T-0012", "T-0014", "T-0015", "T-0016", "T-0017", "T-0033"]
+    },
+    {
+      "id": "E-0099",
+      "name": "F-2 grant-vs-runtime asymmetry",
+      "type": "finding",
+      "aliases": ["F-2"],
+      "claims": ["T-0019", "T-0020", "T-0021", "T-0022"]
+    },
+    {
+      "id": "E-0100",
+      "name": "F-3 inheritance semantics (allowlist behavior)",
+      "type": "finding",
+      "aliases": ["F-3"],
+      "claims": ["T-0025", "T-0026", "T-0027"]
+    },
+    {
+      "id": "E-0101",
+      "name": "F-4 no documented enable-nesting flag",
+      "type": "finding",
+      "aliases": ["F-4"],
+      "claims": ["T-0007", "T-0028", "T-0029", "T-0030", "T-0031", "T-0032"]
+    },
+    {
+      "id": "E-0102",
+      "name": "F-5 example sub-agents do not declare Agent",
+      "type": "finding",
+      "aliases": ["F-5"],
+      "claims": ["T-0033", "T-0034"]
+    },
+    {
+      "id": "E-0103",
+      "name": "F-6 Task->Agent rename informational",
+      "type": "finding",
+      "aliases": ["F-6"],
+      "claims": ["T-0035", "T-0036", "T-0037", "T-0038", "T-0039"]
+    },
+    {
+      "id": "E-0104",
+      "name": "pipeline-gap family pattern (design intent without runtime mechanism)",
+      "type": "pattern",
+      "aliases": ["pipeline-gap family"],
+      "claims": ["AN-0038", "AN-0039", "AN-0040"]
+    },
+    {
+      "id": "E-0105",
+      "name": "codebase-analysis-report (Phase-0 discovery artifact)",
+      "type": "finding",
+      "aliases": ["codebase-analysis-report.md"],
+      "claims": ["CR-0146"]
+    }
+  ],
+  "edges": [
+    {"from": "E-0001", "to": "E-0008", "relation": "requires", "claim_ids": ["CR-0021", "CR-0025", "CR-0026", "CR-0049", "AN-0003", "AN-0007", "AN-0008"]},
+    {"from": "E-0002", "to": "E-0008", "relation": "requires", "claim_ids": ["CR-0047", "CR-0049", "CR-0050", "CR-0141"]},
+    {"from": "E-0008", "to": "E-0007", "relation": "instance_of", "claim_ids": ["T-0005", "T-0006", "T-0018", "T-0035"]},
+    {"from": "E-0001", "to": "E-0007", "relation": "instance_of", "claim_ids": ["CR-0020", "AN-0001"]},
+    {"from": "E-0002", "to": "E-0007", "relation": "instance_of", "claim_ids": ["CR-0046", "CR-0047"]},
+    {"from": "E-0003", "to": "E-0007", "relation": "instance_of", "claim_ids": ["CR-0028", "CR-0029"]},
+    {"from": "E-0004", "to": "E-0007", "relation": "instance_of", "claim_ids": ["CR-0034", "CR-0035"]},
+    {"from": "E-0005", "to": "E-0007", "relation": "instance_of", "claim_ids": ["CR-0040", "CR-0041"]},
+    {"from": "E-0001", "to": "E-0009", "relation": "conflicts_with", "claim_ids": ["CR-0022", "CR-0065", "T-0021", "AN-0003", "AN-0007", "AN-0008"]},
+    {"from": "E-0002", "to": "E-0009", "relation": "conflicts_with", "claim_ids": ["CR-0049", "CR-0141"]},
+    {"from": "E-0009", "to": "E-0007", "relation": "instance_of", "claim_ids": ["T-0001", "T-0004", "T-0005", "T-0012", "T-0015", "T-0016"]},
+    {"from": "E-0009", "to": "E-0010", "relation": "requires", "claim_ids": ["T-0001", "T-0002"]},
+    {"from": "E-0010", "to": "E-0034", "relation": "implements", "claim_ids": ["T-0001", "T-0002"]},
+    {"from": "E-0012", "to": "E-0009", "relation": "implements", "claim_ids": ["CR-0022", "T-0021", "AN-0003"]},
+    {"from": "E-0012", "to": "E-0050", "relation": "requires", "claim_ids": ["AN-0005", "T-0022", "T-0023"]},
+    {"from": "E-0050", "to": "E-0052", "relation": "requires", "claim_ids": ["T-0024", "T-0068", "T-0069", "T-0070"]},
+    {"from": "E-0064", "to": "E-0050", "relation": "implements", "claim_ids": ["T-0024", "T-0068"]},
+    {"from": "E-0063", "to": "E-0050", "relation": "implements", "claim_ids": ["T-0023"]},
+    {"from": "E-0065", "to": "E-0012", "relation": "implements", "claim_ids": ["AN-0016", "AN-0017", "AN-0041"]},
+    {"from": "E-0066", "to": "E-0012", "relation": "implements", "claim_ids": ["AN-0047", "AN-0049", "AN-0050"]},
+    {"from": "E-0065", "to": "E-0066", "relation": "conflicts_with", "claim_ids": ["AN-0049", "AN-0050"]},
+    {"from": "E-0009", "to": "E-0065", "relation": "supersedes", "claim_ids": ["T-0001", "T-0003", "T-0004", "T-0050", "AN-0041"]},
+    {"from": "E-0001", "to": "E-0051", "relation": "conflicts_with", "claim_ids": ["CR-0022", "AN-0006"]},
+    {"from": "E-0001", "to": "E-0052", "relation": "requires", "claim_ids": ["CR-0023", "CR-0051"]},
+    {"from": "E-0002", "to": "E-0052", "relation": "requires", "claim_ids": ["CR-0048", "CR-0051"]},
+    {"from": "E-0013", "to": "E-0009", "relation": "requires", "claim_ids": ["T-0060", "T-0062"]},
+    {"from": "E-0014", "to": "E-0009", "relation": "requires", "claim_ids": ["T-0060", "T-0063"]},
+    {"from": "E-0015", "to": "E-0009", "relation": "requires", "claim_ids": ["T-0060", "T-0064"]},
+    {"from": "E-0013", "to": "E-0006", "relation": "requires", "claim_ids": ["CR-0059", "AN-0061"]},
+    {"from": "E-0014", "to": "E-0006", "relation": "requires", "claim_ids": ["CR-0061", "CR-0131", "AN-0062"]},
+    {"from": "E-0015", "to": "E-0006", "relation": "requires", "claim_ids": ["CR-0062"]},
+    {"from": "E-0014", "to": "E-0001", "relation": "supersedes", "claim_ids": ["CR-0061", "AN-0062", "T-0063"]},
+    {"from": "E-0014", "to": "E-0041", "relation": "supersedes", "claim_ids": ["CR-0061", "CR-0131"]},
+    {"from": "E-0001", "to": "E-0041", "relation": "implements", "claim_ids": ["CR-0024", "CR-0129"]},
+    {"from": "E-0014", "to": "E-0032", "relation": "conflicts_with", "claim_ids": ["CR-0007", "CR-0106", "CR-0133", "AN-0064"]},
+    {"from": "E-0014", "to": "E-0037", "relation": "requires", "claim_ids": ["CR-0008", "CR-0109", "CR-0133"]},
+    {"from": "E-0013", "to": "E-0032", "relation": "implements", "claim_ids": ["CR-0105"]},
+    {"from": "E-0015", "to": "E-0032", "relation": "implements", "claim_ids": ["CR-0107"]},
+    {"from": "E-0014", "to": "E-0053", "relation": "requires", "claim_ids": ["CR-0097"]},
+    {"from": "E-0014", "to": "E-0054", "relation": "requires", "claim_ids": ["CR-0098"]},
+    {"from": "E-0014", "to": "E-0057", "relation": "requires", "claim_ids": ["CR-0101"]},
+    {"from": "E-0014", "to": "E-0058", "relation": "requires", "claim_ids": ["CR-0102"]},
+    {"from": "E-0014", "to": "E-0095", "relation": "conflicts_with", "claim_ids": ["CR-0080", "CR-0135"]},
+    {"from": "E-0014", "to": "E-0031", "relation": "requires", "claim_ids": ["CR-0080", "CR-0135"]},
+    {"from": "E-0015", "to": "E-0060", "relation": "requires", "claim_ids": ["CR-0104"]},
+    {"from": "E-0011", "to": "E-0007", "relation": "instance_of", "claim_ids": ["T-0048", "T-0049"]},
+    {"from": "E-0036", "to": "E-0011", "relation": "requires", "claim_ids": ["T-0053", "T-0054", "T-0055"]},
+    {"from": "E-0011", "to": "E-0014", "relation": "conflicts_with", "claim_ids": ["T-0051"]},
+    {"from": "E-0048", "to": "E-0011", "relation": "implements", "claim_ids": ["T-0046", "T-0047"]},
+    {"from": "E-0033", "to": "E-0048", "relation": "requires", "claim_ids": ["T-0074"]},
+    {"from": "E-0033", "to": "E-0008", "relation": "requires", "claim_ids": ["CR-0001", "CR-0067", "T-0065", "T-0066"]},
+    {"from": "E-0033", "to": "E-0001", "relation": "requires", "claim_ids": ["CR-0001", "CR-0067", "AN-0019"]},
+    {"from": "E-0033", "to": "E-0002", "relation": "requires", "claim_ids": ["CR-0001", "CR-0067"]},
+    {"from": "E-0038", "to": "E-0033", "relation": "requires", "claim_ids": ["T-0065", "T-0066", "T-0067"]},
+    {"from": "E-0016", "to": "E-0017", "relation": "supersedes", "claim_ids": ["CR-0010", "CR-0011", "CR-0132", "CR-0142"]},
+    {"from": "E-0016", "to": "E-0076", "relation": "implements", "claim_ids": ["CR-0010", "CR-0086", "CR-0142", "AN-0029"]},
+    {"from": "E-0067", "to": "E-0016", "relation": "implements", "claim_ids": ["CR-0010", "CR-0132"]},
+    {"from": "E-0067", "to": "E-0017", "relation": "conflicts_with", "claim_ids": ["CR-0011", "CR-0132", "CR-0142"]},
+    {"from": "E-0035", "to": "E-0016", "relation": "requires", "claim_ids": ["CR-0012", "CR-0142"]},
+    {"from": "E-0035", "to": "E-0018", "relation": "requires", "claim_ids": ["CR-0012", "CR-0142"]},
+    {"from": "E-0076", "to": "E-0018", "relation": "requires", "claim_ids": ["CR-0086", "CR-0142"]},
+    {"from": "E-0018", "to": "E-0017", "relation": "conflicts_with", "claim_ids": ["CR-0011"]},
+    {"from": "E-0001", "to": "E-0019", "relation": "implements", "claim_ids": ["CR-0082", "CR-0117"]},
+    {"from": "E-0006", "to": "E-0019", "relation": "implements", "claim_ids": ["CR-0082", "CR-0117"]},
+    {"from": "E-0001", "to": "E-0020", "relation": "implements", "claim_ids": ["CR-0023", "CR-0083"]},
+    {"from": "E-0006", "to": "E-0021", "relation": "implements", "claim_ids": ["CR-0057", "CR-0084"]},
+    {"from": "E-0034", "to": "E-0022", "relation": "implements", "claim_ids": ["CR-0085"]},
+    {"from": "E-0016", "to": "E-0022", "relation": "implements", "claim_ids": ["CR-0086"]},
+    {"from": "E-0002", "to": "E-0023", "relation": "implements", "claim_ids": ["CR-0052", "CR-0091"]},
+    {"from": "E-0071", "to": "E-0023", "relation": "implements", "claim_ids": ["CR-0091", "CR-0094", "CR-0136"]},
+    {"from": "E-0030", "to": "E-0006", "relation": "implements", "claim_ids": ["CR-0013", "CR-0134"]},
+    {"from": "E-0030", "to": "E-0069", "relation": "conflicts_with", "claim_ids": ["CR-0014", "CR-0134", "CR-0139"]},
+    {"from": "E-0039", "to": "E-0030", "relation": "requires", "claim_ids": ["CR-0015", "CR-0134", "CR-0139"]},
+    {"from": "E-0014", "to": "E-0030", "relation": "requires", "claim_ids": ["CR-0014", "CR-0015"]},
+    {"from": "E-0031", "to": "E-0094", "relation": "conflicts_with", "claim_ids": ["CR-0076", "CR-0077", "CR-0140"]},
+    {"from": "E-0070", "to": "E-0094", "relation": "implements", "claim_ids": ["CR-0135", "CR-0140"]},
+    {"from": "E-0070", "to": "E-0095", "relation": "implements", "claim_ids": ["CR-0079", "CR-0080", "CR-0135"]},
+    {"from": "E-0001", "to": "E-0095", "relation": "implements", "claim_ids": ["CR-0079", "CR-0080"]},
+    {"from": "E-0043", "to": "E-0042", "relation": "conflicts_with", "claim_ids": ["AN-0015", "AN-0030", "AN-0033", "AN-0034", "AN-0035", "AN-0036", "AN-0037"]},
+    {"from": "E-0042", "to": "E-0001", "relation": "requires", "claim_ids": ["AN-0021"]},
+    {"from": "E-0042", "to": "E-0003", "relation": "requires", "claim_ids": ["AN-0022"]},
+    {"from": "E-0042", "to": "E-0004", "relation": "requires", "claim_ids": ["AN-0023"]},
+    {"from": "E-0042", "to": "E-0005", "relation": "requires", "claim_ids": ["AN-0024"]},
+    {"from": "E-0042", "to": "E-0002", "relation": "requires", "claim_ids": ["AN-0025"]},
+    {"from": "E-0042", "to": "E-0018", "relation": "requires", "claim_ids": ["AN-0027"]},
+    {"from": "E-0042", "to": "E-0080", "relation": "requires", "claim_ids": ["AN-0028"]},
+    {"from": "E-0042", "to": "E-0076", "relation": "requires", "claim_ids": ["AN-0029"]},
+    {"from": "E-0042", "to": "E-0081", "relation": "implements", "claim_ids": ["AN-0015", "AN-0033"]},
+    {"from": "E-0043", "to": "E-0006", "relation": "requires", "claim_ids": ["AN-0051", "AN-0053"]},
+    {"from": "E-0043", "to": "E-0061", "relation": "implements", "claim_ids": ["CR-0066", "CR-0073", "AN-0031", "AN-0051"]},
+    {"from": "E-0061", "to": "E-0030", "relation": "requires", "claim_ids": ["CR-0014", "CR-0069", "AN-0034"]},
+    {"from": "E-0061", "to": "E-0031", "relation": "requires", "claim_ids": ["AN-0054"]},
+    {"from": "E-0061", "to": "E-0062", "relation": "implements", "claim_ids": ["AN-0032"]},
+    {"from": "E-0044", "to": "E-0007", "relation": "instance_of", "claim_ids": ["T-0009", "T-0029", "T-0072"]},
+    {"from": "E-0044", "to": "E-0009", "relation": "conflicts_with", "claim_ids": ["T-0009", "T-0029"]},
+    {"from": "E-0045", "to": "E-0007", "relation": "instance_of", "claim_ids": ["T-0030", "T-0031"]},
+    {"from": "E-0045", "to": "E-0009", "relation": "supersedes", "claim_ids": ["T-0031", "T-0032"]},
+    {"from": "E-0092", "to": "E-0009", "relation": "supersedes", "claim_ids": ["T-0010", "T-0011", "T-0013"]},
+    {"from": "E-0093", "to": "E-0009", "relation": "supersedes", "claim_ids": ["T-0010", "T-0011", "T-0013"]},
+    {"from": "E-0098", "to": "E-0009", "relation": "implements", "claim_ids": ["T-0003", "T-0004", "T-0012", "T-0014", "T-0016"]},
+    {"from": "E-0098", "to": "E-0046", "relation": "requires", "claim_ids": ["T-0012", "T-0014", "T-0015"]},
+    {"from": "E-0098", "to": "E-0047", "relation": "requires", "claim_ids": ["T-0016", "T-0017"]},
+    {"from": "E-0099", "to": "E-0012", "relation": "implements", "claim_ids": ["T-0019", "T-0020", "T-0021", "T-0022"]},
+    {"from": "E-0100", "to": "E-0075", "relation": "implements", "claim_ids": ["T-0025", "T-0026", "T-0027"]},
+    {"from": "E-0101", "to": "E-0044", "relation": "requires", "claim_ids": ["T-0029", "T-0072"]},
+    {"from": "E-0101", "to": "E-0045", "relation": "requires", "claim_ids": ["T-0030", "T-0031"]},
+    {"from": "E-0102", "to": "E-0090", "relation": "implements", "claim_ids": ["T-0033", "T-0034"]},
+    {"from": "E-0091", "to": "E-0009", "relation": "implements", "claim_ids": ["T-0014"]},
+    {"from": "E-0103", "to": "E-0074", "relation": "implements", "claim_ids": ["T-0035", "T-0036", "T-0037", "T-0038", "T-0039"]},
+    {"from": "E-0097", "to": "E-0098", "relation": "requires", "claim_ids": ["T-0071", "T-0076"]},
+    {"from": "E-0097", "to": "E-0046", "relation": "requires", "claim_ids": ["T-0071", "T-0073", "T-0076"]},
+    {"from": "E-0097", "to": "E-0047", "relation": "requires", "claim_ids": ["T-0071", "T-0076"]},
+    {"from": "E-0048", "to": "E-0008", "relation": "requires", "claim_ids": ["T-0042", "T-0043"]},
+    {"from": "E-0001", "to": "E-0006", "relation": "instance_of", "claim_ids": ["CR-0027", "CR-0138"]},
+    {"from": "E-0073", "to": "E-0001", "relation": "implements", "claim_ids": ["CR-0027", "CR-0138"]},
+    {"from": "E-0001", "to": "E-0083", "relation": "implements", "claim_ids": ["CR-0023"]},
+    {"from": "E-0003", "to": "E-0083", "relation": "implements", "claim_ids": ["CR-0030"]},
+    {"from": "E-0004", "to": "E-0083", "relation": "implements", "claim_ids": ["CR-0036"]},
+    {"from": "E-0005", "to": "E-0083", "relation": "implements", "claim_ids": ["CR-0042"]},
+    {"from": "E-0002", "to": "E-0083", "relation": "implements", "claim_ids": ["CR-0048"]},
+    {"from": "E-0003", "to": "E-0084", "relation": "implements", "claim_ids": ["CR-0030", "CR-0033"]},
+    {"from": "E-0004", "to": "E-0084", "relation": "implements", "claim_ids": ["CR-0036"]},
+    {"from": "E-0004", "to": "E-0077", "relation": "implements", "claim_ids": ["CR-0037"]},
+    {"from": "E-0005", "to": "E-0079", "relation": "implements", "claim_ids": ["CR-0043", "CR-0044"]},
+    {"from": "E-0005", "to": "E-0082", "relation": "implements", "claim_ids": ["CR-0045"]},
+    {"from": "E-0082", "to": "E-0016", "relation": "implements", "claim_ids": ["CR-0045"]},
+    {"from": "E-0002", "to": "E-0080", "relation": "implements", "claim_ids": ["CR-0050", "CR-0123"]},
+    {"from": "E-0078", "to": "E-0003", "relation": "implements", "claim_ids": ["CR-0126"]},
+    {"from": "E-0078", "to": "E-0005", "relation": "implements", "claim_ids": ["CR-0043", "CR-0126"]},
+    {"from": "E-0031", "to": "E-0078", "relation": "conflicts_with", "claim_ids": ["CR-0127"]},
+    {"from": "E-0030", "to": "E-0078", "relation": "conflicts_with", "claim_ids": ["CR-0128"]},
+    {"from": "E-0006", "to": "E-0085", "relation": "requires", "claim_ids": ["CR-0017"]},
+    {"from": "E-0087", "to": "E-0085", "relation": "supersedes", "claim_ids": ["CR-0017", "CR-0019"]},
+    {"from": "E-0087", "to": "E-0086", "relation": "supersedes", "claim_ids": ["CR-0018", "CR-0019"]},
+    {"from": "E-0105", "to": "E-0087", "relation": "implements", "claim_ids": ["CR-0016", "CR-0019"]},
+    {"from": "E-0088", "to": "E-0089", "relation": "implements", "claim_ids": ["CR-0143", "CR-0145"]},
+    {"from": "E-0089", "to": "E-0104", "relation": "instance_of", "claim_ids": ["AN-0038", "AN-0039", "AN-0040"]},
+    {"from": "E-0049", "to": "E-0008", "relation": "conflicts_with", "claim_ids": ["CR-0068", "CR-0115"]},
+    {"from": "E-0001", "to": "E-0049", "relation": "implements", "claim_ids": ["CR-0021", "CR-0068"]},
+    {"from": "E-0075", "to": "E-0007", "relation": "instance_of", "claim_ids": ["T-0025", "T-0026"]},
+    {"from": "E-0001", "to": "E-0075", "relation": "implements", "claim_ids": ["CR-0021", "CR-0110", "CR-0111", "CR-0112"]},
+    {"from": "E-0002", "to": "E-0075", "relation": "implements", "claim_ids": ["CR-0047", "CR-0111", "CR-0112"]}
+  ]
+}

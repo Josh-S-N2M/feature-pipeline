@@ -1,0 +1,360 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "DesignDoc",
+    "variant": "blueprint",
+    "target_path": "/workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/blueprint-v1.md",
+    "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+    "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+    "scope_class": "FULL",
+    "layer_scope": ["cc"],
+    "reviewer": "shared-document-reviewer",
+    "invocation_point": 4,
+    "review_timestamp": "2026-05-23T22:55:00Z"
+  },
+  "inputs_consumed": [
+    "blueprint-v1.md",
+    "prd-v1.md",
+    "cc-design.md",
+    "cc-design-review-issues.json",
+    "synthesis.md",
+    "intent-clarification.md",
+    "codebase-analysis.json",
+    "adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md",
+    "adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md",
+    ".claude/agents/execute-finalize-reconciler.md (grep evidence)"
+  ],
+  "scores": {
+    "consistency": 78,
+    "completeness": 86,
+    "rule_compliance": 88,
+    "clarity": 88
+  },
+  "gate0": {
+    "status": "pass_with_minor_deviations",
+    "frontmatter_check": {
+      "doc_type": "blueprint (correct)",
+      "feature_slug": "present (correct)",
+      "version": "1 (present; recommended semver format '1.0.0' per shared-conventions)",
+      "status": "draft (correct)",
+      "scope_class": "FULL (correct)",
+      "layer_scope": "[cc] (correct)",
+      "derived_from": "present (correct; covers PRD, cc-design, synthesis, codebase-analysis, T-001 note)",
+      "companion_artifacts": "present (correct)",
+      "adrs_authored": "[ADR-0044, ADR-0045] (correct)",
+      "inherited_adrs_field_present": false,
+      "inherited_adrs_field_used_instead": "adrs_referenced",
+      "generated": "present (correct)",
+      "generated_by": "design-composer (correct)"
+    },
+    "required_sections_check": {
+      "Overview": "present",
+      "Design Summary (Meta)": "present",
+      "Background and Context": "present",
+      "Acceptance Criteria EARS": "present",
+      "Existing Codebase Analysis (with Fact Disposition Table)": "present (19 FD rows)",
+      "Design (with Architecture Overview, Data Flow, Contracts)": "present",
+      "Implementation Plan (with edit ordering)": "present (Phases 0-5 with Phase 0 = schema closure FIRST per I-DR-004)",
+      "Security Considerations": "present",
+      "Test Boundaries": "present",
+      "Verification Strategy": "present (correctness definition, method, timing, early verification point)",
+      "Future Extensibility": "present",
+      "Alternative Solutions": "present (options b and c with named rejection rationales)",
+      "Risks and Mitigation": "present",
+      "References (Decision Record + Rationale Brief + Resolved Q-CC-N)": "present",
+      "Update History": "present"
+    },
+    "adrs_at_canonical_root_check": {
+      "ADR-0044": "exists at /workspaces/feature-pipeline/adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md (correct; ADR-0036 honored)",
+      "ADR-0045": "exists at /workspaces/feature-pipeline/adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md (correct; ADR-0036 honored)",
+      "filename_convention_adr_0019": "both filenames follow ADR-NNNN-kebab-case-title.md (correct)",
+      "feature_scoped_duplicates_present": false
+    },
+    "adr_madr_template_check": {
+      "ADR-0044": "all 10 sections present (Status, Context, Decision, Decision Details, Rationale, Options Considered, Consequences, Architecture Impact, Implementation Guidance, Related Information)",
+      "ADR-0045": "all 10 sections present (same checklist)"
+    },
+    "verdict": "pass"
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "status": "pass",
+    "recommendation_for_gate_4": "proceed to Gate 4 (Blueprint Approval) — material findings are non-blocking and either factual-discrepancy items that should be reconciled before Plan authoring OR frontmatter convention items the Composer can fix in a Blueprint v2 patch without re-composition.",
+    "summary": "The Blueprint is structurally complete, decision-supported, and absorbs all 4 IMPORTANT cc-design review findings (I-DR-001, I-DR-003, I-DR-004, I-DR-010). Both ADRs (0044, 0045) exist at the canonical root per ADR-0036 with MADR template conformance. FR-1..FR-8 coverage is complete; F-7 is honored conditionally; specialist-isolation invariants are preserved; DISSENT-2 carry-through is propagated to ADR-0017 + ADR-0033 (never ADR-0034) throughout the Blueprint body and the new ADRs. The Q-CC-1 divergence from synthesis D-005 is explicitly ratified by the Composer with reviewer alignment (I-DR-003) and recorded in the Decision Record. Two findings are MAJOR (frontmatter field-name mismatch with KB-documentation-criteria expectation; factual error on the ADR-0034 occurrence count — 3 actual, not 4 as claimed) and several MINOR/NIT items are surfaced for Plan-author/architecture-auditor awareness.",
+    "conditions": [
+      "BLOCKER NONE.",
+      "MAJOR-1 (factual discrepancy — fix before Plan-author task scope is finalized): Blueprint, ADR-0044, and cc-design-review-issues.json all claim 4 occurrences of ADR-0034 in execute-finalize-reconciler.md on lines 3, 19, 82, 84. Grep on the actual file confirms only 3 occurrences (lines 3, 19, 82). Line 84 is body text citing 'ADR-0017' only — NOT ADR-0034. The sweep target should be 3 occurrences, not 4. AC-FR-5-a wording and ADR-0044 Implementation Guidance line 202 must be corrected; otherwise plan-author and execute-task-quality-handler will look for a non-existent fourth occurrence.",
+      "MAJOR-2 (frontmatter convention divergence): The Blueprint frontmatter uses `adrs_referenced:` instead of `inherited_adrs:` as specified by KB-documentation-criteria templates and the orchestrator's invocation parameters. ADR-0011 is NOT listed in either field, though it was named in the orchestrator's expected inherited-ADR list. Composer should align the frontmatter field name with the canonical template and add ADR-0011 if it is genuinely inherited; if ADR-0011 is not load-bearing for this feature, document explicitly in the Background section.",
+      "MINOR items can be addressed in Blueprint v2 patch concurrent with Plan-author start; they do NOT block Gate 4."
+    ]
+  },
+  "absorption_of_cc_design_review_findings": {
+    "I-DR-001_adr_0034_cleanup_completeness": {
+      "absorbed": true,
+      "evidence_in_blueprint": [
+        "Blueprint §3 row for execute-finalize-reconciler explicitly enumerates 'all four ADR-0034 references corrected to ADR-0033 (lines 3, 19, 82, 84)'",
+        "AC-FR-5-a verbatim names all 4 line numbers",
+        "Risks table row 2 names 'Plan-author misses an ADR-0034 occurrence' as a tracked risk",
+        "Rationale Brief explicitly cites I-DR-001 absorption",
+        "ADR-0044 Implementation Guidance line 202 enumerates 'lines 3, 19, 82, 84'"
+      ],
+      "caveat_factual_discrepancy": "Reviewer grep confirms only 3 occurrences (lines 3, 19, 82). Line 84 contains 'ADR-0017' only — not ADR-0034. The absorption is procedurally correct (Blueprint extends cc-design's edit list) but is anchored on a factual error inherited from cc-design-review-issues.json. See MAJOR-1 above."
+    },
+    "I-DR-003_q_cc_1_disposition": {
+      "absorbed": true,
+      "evidence_in_blueprint": [
+        "Decision Record §Q-CC-1 disposition: 'author the ADR in this feature (option a). Diverges from synthesis D-005's defer recommendation. Composer rationale: T-001's 3-source citation work and the D-003 cleanup are both shipped in this run; deferring re-incurs the citation work; the convention generalizes the cleanup precedent.'",
+        "ADR-0045 file exists at adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md with full MADR template",
+        "ADR-0045 §Status explicitly ratifies the cc-design Q-CC-1 recommendation diverging from synthesis D-005",
+        "ADR-0045 §Context references cc-design-review-issues.json I-DR-003 'well-rationalized — Composer's call' verdict",
+        "ADR-0045 §Rationale captures the convention statement: 'Sub-agents in this project MUST NOT declare Agent in their tools: frontmatter array.'"
+      ]
+    },
+    "I-DR-004_edit_ordering": {
+      "absorbed": true,
+      "evidence_in_blueprint": [
+        "Implementation Plan Phase 0 = D-004 schema closure FIRST (with explicit 'Technical Reason' citing I-DR-004 + synthesis Constraint 5.1)",
+        "Implementation Plan Phase 1 = D-001 dispatch section absorption (Prerequisites: Phase 0 complete)",
+        "§3 Conventions Touched row 1 explicitly states 'edit order: D-004 schema closure FIRST, then D-001 dispatch-section absorption per I-DR-004'",
+        "Risks table row 1 names 'plan-author inverts the recommended D-004-before-D-001 edit ordering' as a tracked risk",
+        "Rationale Brief explicitly cites I-DR-004 absorption",
+        "ADR-0044 Implementation Guidance line 200 reiterates the ordering"
+      ]
+    },
+    "I-DR-010_adr_0042_0043_disposition": {
+      "absorbed": true,
+      "evidence_in_blueprint": [
+        "Background §Prerequisite ADRs section has a dedicated table for 'ADRs newly surfaced by the codebase researcher that are NOT inherited' with ADR-0042 and ADR-0043 marked 'N/A — orthogonal' with grep-verification rationale",
+        "Fact Disposition Table rows FD-18 (ADR-0042) and FD-19 (ADR-0043) document the disposition with evidence (grep on adrs/ADR-0042-* and adrs/ADR-0043-* shows zero references to execute-* agents)",
+        "Decision Record §'ADR-0042 / ADR-0043 disposition' explicitly states 'N/A — orthogonal' with grep verification claim",
+        "ADR-0044 §Related Information includes a dedicated 'Related ADRs (orthogonal — N/A disposition for this run)' subsection"
+      ]
+    }
+  },
+  "fr_coverage_assessment": {
+    "FR-1_in_pipeline_discovery": "addressed — Background and Context confirms T-001 with dispatch_supported: false outcome; ADR-0044 §Context cites the three Anthropic-controlled primary sources",
+    "FR-2_kill_criterion_1_pause_and_rescope": "vacuously satisfied — kill-criterion-#2 fired (T-001 returned dispatch_supported: false); Blueprint §Requirements FR-2 explicitly states 'NOT exercised (T-001 returned kill-criterion-#2)'. This satisfies the requirement to document the alternative branch outcome.",
+    "FR-3_per_layer_cc_design_option_selection": "addressed — Blueprint §6 option selection: option (a) flatten dispatch hierarchy; AC-FR-3-a/b/c all marked Resolved with three-reason rationale citing ADR-0017 + ADR-0033 (NOT ADR-0034)",
+    "FR-4_8_file_inventory_implementation": "addressed — 8 in-inventory + 1 outside-inventory (state-transitions-log-entry-template.md); AC-FR-4-a operator-gate count = 1 documented; AC-FR-4-b schema-lockstep enforced via D-004",
+    "FR-5_sweep_and_cleanup": "addressed — sweep result closed at 2 (execute-orchestrator + execute-finalize-reconciler); both Agent declarations removed; AC-FR-5-a names all four ADR-0034 line corrections (but see MAJOR-1 — only 3 occurrences actually exist); AC-FR-5-b records inventory artifact requirement",
+    "FR-6_synthetic_test_verification": "addressed at design level; F-7 conditional via AC-FR-6-d; plan-author owns the synthetic test design",
+    "FR-7_real_feature_rerun": "addressed as non-gating P2 per PRD (Blueprint §Requirements FR-7 marked 'non-gating P2 per PRD')",
+    "FR-8_adr_for_project_wide_convention": "addressed — ADR-0045 authored at adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md per FR-8 conditional clause + Composer ratification of Q-CC-1 option (a)"
+  },
+  "adr_quality_assessment": {
+    "ADR-0044_flatten_dispatch_hierarchy": {
+      "context_present": true,
+      "context_cites_T_001_evidence": true,
+      "decision_present": true,
+      "decision_names_option_a": true,
+      "status_accepted": true,
+      "consequences_present": true,
+      "consequences_positive_negative_neutral": true,
+      "alternatives_considered": true,
+      "alternative_1_option_b_named_rejection_rationale": "present — escapes inventory by ≥5 files; breaks state-transitions-log v1 invoking_agent invariant; ~2× effort",
+      "alternative_2_option_c_named_rejection_rationale": "present — degrades audit-trail (script becomes audit boundary not agent); same outside-inventory cost as (a) but lowest pattern fidelity",
+      "kill_criteria_present": true,
+      "kill_criteria_three_named": "(1) future harness update enables sub-agent → sub-agent dispatch; (2) dispatch-directives indirection introduces unrecoverable failure mode; (3) three+ future runs surface novel cycle-counter defects",
+      "reversal_path_present": true,
+      "reversal_path_explicit": "Implementation Guidance line 206 enumerates the 3-step reversal procedure",
+      "adr_madr_template_full_compliance": true
+    },
+    "ADR-0045_subagent_agent_tool_grant_prohibition": {
+      "context_present": true,
+      "context_cites_T_001_anchor": true,
+      "context_cites_fr_5_sweep_result": true,
+      "decision_present": true,
+      "decision_statement_explicit": "Sub-agents in this project MUST NOT declare Agent in their tools: frontmatter array.",
+      "status_accepted": true,
+      "consequences_present": true,
+      "enforcement_mechanism_documented": "manual review interim; SA-13-style audit-extension scope named but implementation deferred to follow-on feature",
+      "enforcement_scope_named": "all .claude/agents/*.md sub-agent definitions; explicitly excludes TaskCreate/TaskUpdate and main-conversation/parent skills",
+      "kill_criteria_present": true,
+      "kill_criteria_named": "future harness update enables sub-agent → sub-agent dispatch → reconsider possibly with per-sub-agent opt-in",
+      "adr_madr_template_full_compliance": true,
+      "appropriately_inherits_adr_0044": true
+    }
+  },
+  "inherited_adr_list_completeness": {
+    "blueprint_frontmatter_field_used": "adrs_referenced (instead of inherited_adrs)",
+    "expected_per_orchestrator_invocation": ["ADR-0011", "ADR-0017", "ADR-0019", "ADR-0021", "ADR-0022", "ADR-0027", "ADR-0029", "ADR-0033", "ADR-0035", "ADR-0036", "ADR-0037", "ADR-0040", "ADR-0041"],
+    "blueprint_listed": ["ADR-0017", "ADR-0019", "ADR-0021", "ADR-0022", "ADR-0027", "ADR-0029", "ADR-0033", "ADR-0035", "ADR-0036", "ADR-0037", "ADR-0040", "ADR-0041"],
+    "missing_from_blueprint": ["ADR-0011"],
+    "orthogonal_n_a_documented": ["ADR-0042", "ADR-0043"],
+    "discrepancy_severity": "important",
+    "rationale": "ADR-0011 is named in the orchestrator's invocation parameters as expected inherited. Blueprint omits it without explanation. Either (a) add ADR-0011 to the inherited list (most likely since the Blueprint is built on KB-documentation-criteria templates which ADR-0011 governs), or (b) document an explicit N/A rationale in Background or Fact Disposition Table."
+  },
+  "constraint_preservation_assessment": {
+    "subagent_cannot_dispatch_subagent": "preserved — Blueprint §Architecture Overview explicitly states 'Sub-agent → sub-agent dispatch (the original defect's design intent) is replaced by main-conversation → sub-agent dispatch'; ADR-0045 codifies the project-wide rule",
+    "ADR_0017_4_cycle_cap": "preserved — Blueprint Architecture Overview, AC-FR-6-b, AC-FR-6-c, System Invariants, and ADR-0044 §Decision all preserve",
+    "dispatch_matrix_D_2a_c_d_D_12_D_13_D_14": "preserved — referenced in cc-design integration; FR-3-c carry-through",
+    "ADR_0033_symmetric_D_12_per_PRD_FR_3_c": "preserved + correctly attributed throughout (never ADR-0034 in any Blueprint body text or ADR text)",
+    "F_7_verification_constraint": "surfaced via AC-FR-6-d conditional clause; Implementation Plan Phase 5 references the constraint; Risks table tracks",
+    "specialist_isolation_invariants_per_analysis_3_1": "preserved — Blueprint §System Invariants line 'A specialist sub-agent is invoked exactly once per dispatch boundary (Contract 5 isolation; ADR-0044 carry-through)'; ADR-0044 Rationale §(3) enumerates all 4 properties"
+  },
+  "q_cc_n_arbitration_check": {
+    "Q-CC-1_convention_adr_disposition": {"resolved": true, "location": "Decision Record + ADR-0045", "verdict": "author in this feature (Composer ratifies cc-design recommendation diverging from synthesis D-005)"},
+    "Q-CC-2_explicit_vs_implicit_adr_inheritance": {"resolved": true, "location": "Decision Record + ADR-0044 frontmatter adrs_inherited field", "verdict": "explicit inheritance: ADR-0017, 0019, 0022, 0029, 0033, 0035, 0036"},
+    "Q-CC-3_execute_orchestrator_self_reference": {"resolved": true, "location": "AC-CC-3 + Decision Record", "verdict": "preserve with body-prose rationale per I-DR-006 absorption"},
+    "Q-CC-4_v1_invariant_clarification": {"resolved": true, "location": "Decision Record + D-004 schema closure", "verdict": "accept logical-owner clarification"},
+    "Q-CC-5_reconciler_memory_project": {"resolved": true, "location": "Component 3 §Dependencies + Decision Record", "verdict": "preserve"},
+    "Q-CC-6_h_a_vs_h_b_subquestion": {"resolved": true, "location": "Decision Record", "verdict": "defer to test-acceptance-author; non-load-bearing"},
+    "no_silently_dropped_questions": true
+  },
+  "rationale_brief_per_adr_0009_check": {
+    "section_present": true,
+    "describes_composer_evidence_weighing": true,
+    "addresses_synthesis_divergence_q_cc_1": true,
+    "honors_dissent_2_carry_through": true,
+    "honors_f_7_carry_through": true,
+    "documents_edit_ordering_rationale": true,
+    "verdict": "compliant with ADR-0009"
+  },
+  "adr_placement_compliance": {
+    "ADR-0044_at_adrs_root": true,
+    "ADR-0045_at_adrs_root": true,
+    "feature_scoped_duplicates_absent": true,
+    "user_gate_7_decision_honored": "yes — Blueprint Decision Record §'ADR-0036 placement disposition' explicitly states 'honor-adr-0036-canonical-root. Per user ratification recorded in the orchestrator prompt: both new ADRs (0044, 0045) land at adrs/ only; no feature-scoped duplicates.'",
+    "adr_numbering_correct": "next available after 0043 was 0044; then 0045 — both correct",
+    "filename_convention_adr_0019_compliant": "both filenames follow ADR-NNNN-kebab-case-title.md pattern"
+  },
+  "issues": [
+    {
+      "id": "I-DR-101",
+      "severity": "important",
+      "category": "consistency",
+      "location": "blueprint-v1.md §Background and Context line 218; §3 Conventions Touched row 6; AC-FR-5-a; Risks table row 2; Rationale Brief; ADR-0044 line 173, line 202; cc-design-review-issues.json I-DR-001 (inherited from upstream)",
+      "description": "FACTUAL ERROR — ADR-0034 occurrence count. Blueprint, ADR-0044, and the inherited cc-design-review-issues.json all claim 4 occurrences of ADR-0034 in execute-finalize-reconciler.md on lines 3, 19, 82, AND 84. Reviewer grep on the actual file (110 lines total) confirms only 3 occurrences: line 3 (description), line 19 (Authoritative references bullet), line 82 (section heading 'Cycle-cap escalation (D-12 + ADR-0034)'). Line 84 contains 'The 4-cycle cap from ADR-0017 applies symmetrically to:' — this cites ADR-0017, NOT ADR-0034. The factual error originated in cc-design-review-issues.json I-DR-001 and was inherited by the Blueprint and ADR-0044 without re-verification.",
+      "impact": "Plan-author and execute-task-quality-handler will be instructed to correct a non-existent fourth occurrence. AC-FR-5-a verbatim will be unsatisfiable as written. The downstream Plan task scope and acceptance test cannot validate the claim 'all 4 corrected' because the 4th does not exist.",
+      "suggestion": "Composer issues a Blueprint v2 patch (or pre-Plan amendment) correcting the count to 3 occurrences on lines 3, 19, 82 in: (1) Background line 218; (2) §3 row 6; (3) AC-FR-5-a verbatim; (4) Risks table row 2; (5) Rationale Brief; (6) ADR-0044 line 173 and Implementation Guidance line 202. Also update Update History with a 'v2 patch' entry noting the factual correction. cc-design-review-issues.json should also be reconciled for audit-trail completeness.",
+      "blocking_gate_4": false,
+      "rationale_non_blocking": "The semantic intent (sweep all ADR-0034 mis-citations on execute-finalize-reconciler.md) is correct and preserved. The count error is a factual one that the Plan-author will discover at task execution time; better to correct now."
+    },
+    {
+      "id": "I-DR-102",
+      "severity": "important",
+      "category": "compliance",
+      "location": "blueprint-v1.md frontmatter lines 23-35",
+      "description": "FRONTMATTER FIELD-NAME DIVERGENCE — Blueprint uses `adrs_referenced:` instead of `inherited_adrs:`. KB-documentation-criteria/references/templates/blueprint-template.md and the orchestrator invocation parameters both specify `inherited_adrs:` as the canonical field name. Additionally, ADR-0011 is named in the orchestrator's expected inherited list but absent from the Blueprint's `adrs_referenced:` list. The cc-design.md DID use the correct `inherited_adrs:` field name; the divergence was introduced at composition time.",
+      "impact": "Downstream tooling (validate_pipeline_frontmatter.py per ADR-0032 v2 amendments, future audit-extension features) that expects `inherited_adrs:` will not find the field. ADR-0011 absence — if it is genuinely inherited (it governs KB-documentation-criteria template-embedded discipline) — leaves an undocumented inheritance.",
+      "suggestion": "Rename frontmatter field `adrs_referenced:` → `inherited_adrs:` to align with the canonical template. Add ADR-0011 if it is load-bearing for the Blueprint's discipline (the Blueprint heavily references KB-documentation-criteria templates which ADR-0011 governs); otherwise add an explicit N/A entry in Background §Prerequisite ADRs documenting why ADR-0011 is not inherited.",
+      "blocking_gate_4": false,
+      "rationale_non_blocking": "Frontmatter-only patch; does not require re-composition."
+    },
+    {
+      "id": "I-DR-103",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "blueprint-v1.md §System Invariants line 596; §AC-CC-1; throughout",
+      "description": "I-DR-002 from cc-design review (recommended-severity request to add explicit ADR-0033 citation to execute-orchestrator.md:3 description for DISSENT-2 closure on the advisor file) does NOT appear to be addressed in the Blueprint. The Blueprint's edit list for execute-orchestrator.md (§3 row 2) covers frontmatter Agent + TaskUpdate removal and 'body re-framing' but does not call out the description-line ADR-0033 citation extension.",
+      "impact": "Low — the advisor file is no longer dispatched at runtime, so the description line is documentation-only. But DISSENT-2 carry-through closure was the stated goal of I-DR-002.",
+      "suggestion": "Composer either (a) adds an edit to §3 row 2 specifying the execute-orchestrator.md:3 description-line ADR-0033 citation update, or (b) explicitly documents in the Decision Record that I-DR-002 was triaged as 'not absorbed; description-line edit deferred to follow-on documentation pass.'",
+      "blocking_gate_4": false
+    },
+    {
+      "id": "I-DR-104",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "blueprint-v1.md §Implementation Plan Phase 5 (FR-6 verification)",
+      "description": "Implementation Plan Phase 5 says 'F-7 mid-session-agent-registry constraint: if plan-author's synthetic test design authors any new sub-agent file, this phase MUST cross a session boundary' but does NOT name the operator-facing mechanism (an explicit session-restart instruction Insert as Plan deliverable). AC-FR-6-d says 'plan MUST include an explicit operator session-restart step between the authoring task and the test-execution task' but the Implementation Plan does not echo this requirement explicitly at Phase 5.",
+      "impact": "Plan-author may discover the AC-FR-6-d requirement only via the AC table, not via the Implementation Plan. Slight risk of session-boundary omission.",
+      "suggestion": "Append to Phase 5's Technical Reason: 'If plan-author authors any new sub-agent file, the plan MUST include an explicit operator session-restart instruction between the authoring task and the test-execution task (per AC-FR-6-d / synthesis D-002).'",
+      "blocking_gate_4": false
+    },
+    {
+      "id": "I-DR-105",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "blueprint-v1.md frontmatter version field (line 4)",
+      "description": "Version field is `1` rather than the semver-style `1.0.0` used by KB-documentation-criteria/references/shared-conventions.md and by both ADR-0044 and ADR-0045 (`version: 1.0.0`).",
+      "impact": "Cosmetic — but inconsistent with the project's other artifacts and with the shared-conventions reference. Downstream supersession discipline relies on semver-style versions.",
+      "suggestion": "Update to `version: 1.0.0` (no other changes implied).",
+      "blocking_gate_4": false
+    },
+    {
+      "id": "I-DR-106",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "blueprint-v1.md §Test Boundaries",
+      "description": "Per-Layer Test Strategy table contains only one row (Claude Code / functional / FR-6 synthetic test) but does not name any unit-test, contract-test, or schema-validation strategy for the new `dispatch_directives[]` array or the schema changes to checkpoint.json. The repair adds a novel JSON contract; the Test Boundaries section could reference a schema-validation step (even if delegated to test-acceptance-author).",
+      "impact": "Low — the synthetic test exercises the full loop, which implicitly validates the schema. Explicit schema validation would catch regressions more directly.",
+      "suggestion": "Either add a row noting 'schema validation of dispatch_directives[] and execution_pipeline_cycle_counters delegated to test-acceptance-author per AC-CC-4' OR document the implicit-via-FR-6 strategy in the body.",
+      "blocking_gate_4": false
+    },
+    {
+      "id": "I-DR-107",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "blueprint-v1.md §Acceptance Criteria — AC-FR-3-a, AC-FR-3-b, AC-FR-3-c through AC-CC-4 all have unchecked checkboxes (`[ ]`)",
+      "description": "All AC checkboxes in §Acceptance Criteria are unchecked. Per the Blueprint's own §Contents checklist (which is checked) and §Agreement Checklist (which is checked), the convention in this Blueprint is that checkboxes are checked when the criterion is structurally specified, not when it has been verified to pass at runtime. Other Blueprint sections follow that convention; only §Acceptance Criteria diverges.",
+      "impact": "Cosmetic — the criteria are specified; the unchecked state is conventionally fine if the convention is 'check only on verification.' But the inconsistency with §Agreement Checklist (which IS checked) is mildly confusing.",
+      "suggestion": "Either check the boxes (convention: 'specified, ready for plan-author propagation') OR add a one-line note at the top of §Acceptance Criteria explaining 'checkboxes will be marked at FR-6 verification.'",
+      "blocking_gate_4": false
+    }
+  ],
+  "fact_disposition_table_coverage_check": {
+    "codebase_analysis_focus_areas": ["affected_files", "affected_agents", "fr5_inventory_sweep", "blast_radius", "known_issues", "open_questions_for_human"],
+    "blueprint_fd_rows_present": 19,
+    "coverage_assessment": "comprehensive — FD-1 through FD-8 cover all 8 affected_files entries; FD-9 through FD-11 cover affected_agents; FD-12 covers fr5_inventory_sweep; FD-13 through FD-15 cover the three blast_radius option sets; FD-16 covers known_issues; FD-17 covers open_questions_for_human; FD-18 and FD-19 cover newly-surfaced ADR-0042 / ADR-0043 per I-DR-010 absorption",
+    "verdict": "pass — every codebase-analysis focus area mapped to at least one FD row with disposition (preserve / transform / remove / out-of-scope), rationale, and evidence column"
+  },
+  "verification_strategy_quality_check": {
+    "section_present": true,
+    "correctness_definition_specific": true,
+    "correctness_definition_measurable": "yes — names the synthetic test feature, the AC-FR-6-a/b/c criteria, the cycle-cap halt path, and the state-transitions.log emission discipline",
+    "verification_method_sufficient": "yes — 1-phase / 1-2-task synthetic test feature exercises the dispatch loop end-to-end; matches the FULL repair's risk profile",
+    "early_verification_point_concrete": "yes — minimal 1-task synthetic feature exercising T0→T1→T2→T3 per-task dispatch loop",
+    "verification_timing_named": "yes — Phase 5 of implementation plan; F-7 conditional session boundary",
+    "output_comparison_n_a_documented": "yes — explicitly N/A because the repair replaces defective behavior with working behavior (not a transformation of existing working output)",
+    "verdict": "compliant"
+  },
+  "checklist": [
+    {"item": "Gate 0 frontmatter complete", "status": "pass_with_field_name_caveat (I-DR-102)"},
+    {"item": "Gate 0 required sections present", "status": "pass"},
+    {"item": "Gate 0 ADR files at canonical root per ADR-0036", "status": "pass"},
+    {"item": "Gate 0 ADRs conform to MADR template per ADR-0014", "status": "pass"},
+    {"item": "Gate 0 ADR filename convention per ADR-0019", "status": "pass"},
+    {"item": "Cc-design I-DR-001 absorbed (ADR-0034 sweep extension)", "status": "absorbed_with_factual_caveat (I-DR-101 — count error)"},
+    {"item": "Cc-design I-DR-003 absorbed (Q-CC-1 disposition)", "status": "pass"},
+    {"item": "Cc-design I-DR-004 absorbed (edit ordering)", "status": "pass"},
+    {"item": "Cc-design I-DR-010 absorbed (ADR-0042/0043 disposition)", "status": "pass"},
+    {"item": "FR-1 through FR-8 coverage", "status": "pass"},
+    {"item": "FR-2 vacuous satisfaction documented", "status": "pass"},
+    {"item": "ADR-0044 captures: context, decision, status, consequences, alternatives, kill criteria, reversal path", "status": "pass"},
+    {"item": "ADR-0045 captures: context, decision, status, consequences, enforcement mechanism, enforcement scope", "status": "pass"},
+    {"item": "Inherited-ADR list completeness", "status": "fail_field_name_and_adr_0011_omission (I-DR-102)"},
+    {"item": "ADR-0042 and ADR-0043 N/A disposition documented", "status": "pass"},
+    {"item": "Sub-agent → sub-agent dispatch forbidden by design", "status": "pass"},
+    {"item": "ADR-0017 4-cycle cap preserved", "status": "pass"},
+    {"item": "Dispatch matrix and ADR-0033 D-12 symmetric application preserved", "status": "pass"},
+    {"item": "F-7 verification constraint surfaced", "status": "pass"},
+    {"item": "Specialist-isolation invariants preserved per analysis §3.1", "status": "pass"},
+    {"item": "Q-CC-N arbitration (6 items)", "status": "pass — all 6 resolved"},
+    {"item": "Rationale Brief per ADR-0009", "status": "pass"},
+    {"item": "ADR placement compliance (adrs/ root only; no feature-scoped duplicates)", "status": "pass"},
+    {"item": "ADR numbering (0044, 0045 sequential after 0043)", "status": "pass"},
+    {"item": "Fact Disposition Table covers every codebase_analysis.focusAreas entry", "status": "pass — 19 rows covering all 6 focus categories"},
+    {"item": "Verification Strategy quality", "status": "pass"}
+  ],
+  "recommendations": [
+    "PROCEED TO GATE 4 with the two MAJOR conditions addressed via Blueprint v2 patch (factual count correction + frontmatter field name alignment + ADR-0011 disposition).",
+    "Recommend the Composer issues a single v2 patch combining I-DR-101 (count: 3 not 4), I-DR-102 (frontmatter rename + ADR-0011), I-DR-105 (semver version), and optionally I-DR-103/104 (edit-list completeness). This avoids a full re-composition.",
+    "Plan-author should be instructed (via the Plan's task scope) to verify the 3-occurrence count at execution time and NOT search for a 4th non-existent occurrence on line 84.",
+    "Architecture-auditor's CoVe pass should pick up the count discrepancy as a CoVe falsification opportunity — recommended verification question: 'How many ADR-0034 occurrences exist in execute-finalize-reconciler.md?' (expected answer: 3 not 4 per direct grep).",
+    "Cross-artifact-audit-reviewer (downstream after Plan + Tests + Validators) should verify the Plan task and acceptance test for AC-FR-5-a match the corrected 3-occurrence count post-patch.",
+    "ADR-0034 itself (per its filename pattern adrs/ADR-0034-prd-mis-credit-cleanup.md) appears to be a documentation artifact about the same mis-credit pattern; consider whether ADR-0034's own status should be updated to cross-reference ADR-0044 and ADR-0045 for the downstream cleanup completion."
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "items_evaluated_via_cc_design_review_issues_inheritance": 12,
+    "resolved_at_blueprint_composition": 4,
+    "partially_resolved_inherited_with_factual_caveat": 1,
+    "carried_forward_as_blueprint_review_findings": 1,
+    "items": [
+      {"id": "I-DR-001 (from cc-design review)", "status": "absorbed_with_factual_caveat", "location": "Blueprint §3 row 6, AC-FR-5-a, ADR-0044 §Architecture Impact", "evidence": "Blueprint extends sweep to 'all four' occurrences but the count is factually 3; caveat surfaced as I-DR-101"},
+      {"id": "I-DR-003 (from cc-design review)", "status": "resolved", "location": "Decision Record §Q-CC-1 + ADR-0045", "evidence": "Composer explicitly ratifies divergence from synthesis D-005 with rationale; ADR-0045 authored"},
+      {"id": "I-DR-004 (from cc-design review)", "status": "resolved", "location": "Implementation Plan Phase 0 + §3 row 1 + ADR-0044 Implementation Guidance line 200", "evidence": "Edit ordering D-004 before D-001 explicitly named in three locations"},
+      {"id": "I-DR-010 (from cc-design review)", "status": "resolved", "location": "Background §Prerequisite ADRs newly-surfaced table + FD-18/FD-19 + Decision Record + ADR-0044 Related Information orthogonal subsection", "evidence": "ADR-0042 and ADR-0043 documented N/A with grep verification claim"}
+    ]
+  }
+}

@@ -1,0 +1,459 @@
+{
+  "schema_version": "critique-v1",
+  "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+  "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+  "stage": "synth-critic",
+  "claim_id_namespacing": {
+    "prefixes": {
+      "CR-": "01-claims-codebase-analysis-report.json",
+      "T-": "01-claims-T-001-claude-code-subagent-tool-grant-semantics.json",
+      "AN-": "01-claims-analysis-execute-orchestrator-dispatch-limitation.json"
+    }
+  },
+  "summary": {
+    "total_claims": 296,
+    "verified": 273,
+    "partially_verified": 11,
+    "dissent": 9,
+    "unverifiable": 0,
+    "single_sourced": 3,
+    "claims_with_explicit_critique_entry": 47,
+    "remaining_claims_verdict_by_batch": "verified (with batch-level CoVe rationale recorded in 03-verifications.md)"
+  },
+  "verdict_legend": {
+    "verified": "CoVe questions answered affirmatively from cited source; no contradiction in graph",
+    "partially_verified": "Substantively grounded but a qualifier or confidence-downgrade is warranted",
+    "dissent": "Cited source(s) disagree; populated dissent_evidence preserves both perspectives",
+    "unverifiable": "Citation could not be confirmed (URL dead, line number wrong, source insufficient)",
+    "single_sourced": "Verified but no independent corroborator; transparency-flag for downstream framing"
+  },
+  "anchor_decision_claims": {
+    "note": "Per critic prompt, these two T-001 claims are the load-bearing decision claims that drive the entire feature. Each gets a full CoVe walk-through.",
+    "claims": [
+      {
+        "claim_id": "T-0001",
+        "claim_text": "dispatch_supported: false — Claude Code sub-agent -> sub-agent dispatch is not supported at runtime even when the sub-agent declares Agent in its frontmatter tools: array.",
+        "verification_questions": [
+          "Is the front-matter field `dispatch_supported: false` actually present at line 13 of T-001 research-note?",
+          "Are the three claimed independent Anthropic documentation sources actually cited in the T-001 source with stable URLs and verbatim quotes ≤15 words?",
+          "Do the cited quotes literally say what the claim asserts (no paraphrase that subtly changes meaning)?",
+          "Is there any documented frontmatter/flag/env-var that contradicts this — an enable-nesting mechanism that the source missed?"
+        ],
+        "verification_answers": [
+          "Yes — T-001 line 13 contains `dispatch_supported: false` in the YAML frontmatter.",
+          "Yes — three independent Anthropic-controlled sources: (1) https://code.claude.com/docs/en/sub-agents (Source 1 + Source 4 on the canonical sub-agents page); (2) https://code.claude.com/docs/en/agent-sdk/subagents (Source 3, Agent SDK docs); (3) the 'Built-in subagents / Plan' section of code.claude.com/docs/en/sub-agents (Source 2). Verbatim quotes captured at T-001 lines 62, 76, with paraphrase-only treatment at line 67-68 and line 83 to respect one-quote-per-URL discipline. Quotes are 4 and 14 words respectively — comfortably under 15.",
+          "Yes — quotes 'Subagents cannot spawn other subagents.' (line 62) and 'Subagents cannot spawn their own subagents. Don't include Agent in a subagent's tools array.' (line 76) match the assertion. No paraphrase distortion.",
+          "No — T-001 Finding F-4 (lines 110-116) exhaustively enumerates the documented frontmatter field list (24+ fields including permissionMode, mcpServers, hooks, maxTurns, skills, memory, effort, background, isolation, color, initialPrompt) and the only environment variables (CLAUDE_CODE_FORK_SUBAGENT, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS) — none enable nested dispatch. Fork mode docs explicitly state 'A fork cannot spawn further forks.' (line 116, paraphrased per one-quote-per-URL)."
+        ],
+        "adversarial_probes": {
+          "what_would_falsify": "An undocumented harness flag, a not-yet-released version, or a verified runtime test where a sub-agent successfully dispatched another sub-agent. The probe attempted at parent-orchestrator level FAILED with the registry-staleness error F-7 — a different failure mode — so runtime corroboration is partial. However, the documentation evidence is independently sufficient (and the source explicitly says so at line 179, 190, 237).",
+          "who_benefits_from_being_true": "Anthropic gains nothing by publishing this restriction falsely; if anything, the restriction limits product expressiveness. The documentation is reliable.",
+          "absence_implies": "The absence of any 'enable-nesting' flag across exhaustive field enumeration is meaningful — Anthropic explicitly closes this affordance, documenting alternatives (Skills, chain-from-main, agent teams) instead."
+        },
+        "verdict": "verified",
+        "confidence": "high",
+        "dissent_evidence": null,
+        "violates_constraint": null,
+        "notes": "Anchor decision claim. Three independent primary sources from Anthropic with stable URLs (retrieved 2026-05-23) and verbatim quotes. Documentation evidence is independently sufficient. The probe failure (F-7) is orthogonal to this claim (registry-staleness != dispatch-restriction). STRONGER than originally flagged: the source's `confidence: high` is well-calibrated; the three-source corroboration is the strongest evidentiary posture available for an absence-of-affordance claim."
+      },
+      {
+        "claim_id": "T-0002",
+        "claim_text": "kill_criterion_triggered: 2 — kill-criterion-#2 fires per PRD FR-2 because the analysis is confirmed with no in-band path to fix sub-agent -> sub-agent dispatch, so FULL repair proceeds.",
+        "verification_questions": [
+          "Is the front-matter field `kill_criterion_triggered: 2` present at line 14 of T-001?",
+          "Does PRD FR-2 define kill-criterion-#2 as the source claims (analysis confirmed, no in-band path)?",
+          "Does the claim's conclusion (FULL repair pathway) follow logically from T-0001 + the FR-2 gating?"
+        ],
+        "verification_answers": [
+          "Yes — T-001 line 14 contains `kill_criterion_triggered: 2`. Reiterated at executive summary line 48 and synthesis-ready summary line 219.",
+          "Yes — the source's executive summary line 48 cites PRD FR-2's kill-criterion-#2 verbatim ('the analysis is confirmed: no in-band path to fix it; FULL repair proceeds').",
+          "Yes — this is a deductive consequence of T-0001. The source explicitly walks the reasoning at line 219."
+        ],
+        "adversarial_probes": {
+          "what_would_falsify": "Disproof of T-0001 would propagate. Otherwise, the PRD FR-2 definition of kill-criterion-#2 would need to be misread.",
+          "who_benefits_from_being_true": "No conflict-of-interest concern; the trigger expands repair scope rather than minimizing it.",
+          "absence_implies": "n/a"
+        },
+        "verdict": "verified",
+        "confidence": "high",
+        "dissent_evidence": null,
+        "violates_constraint": null,
+        "notes": "Anchor decision claim. Deductive consequence of T-0001. The orthogonal corroborating claim AN-0069 (kill-criterion-#2 from the original analysis source) provides independent agreement on the disposition."
+      }
+    ]
+  },
+  "anthropic_citation_verification": {
+    "note": "Per critic prompt, the 3 Anthropic primary citations underpinning the anchor claim require careful CoVe verification (URLs + quoted text).",
+    "citations": [
+      {
+        "citation_id": "F-1-Source-1",
+        "url": "https://code.claude.com/docs/en/sub-agents",
+        "section": "Choose between subagents and main conversation",
+        "verbatim_quote": "Subagents cannot spawn other subagents.",
+        "quote_length_words": 5,
+        "verified": true,
+        "verification_notes": "T-001 line 62. Single-quote-per-URL discipline applied; subsequent passages on this URL are paraphrased. URL is stable (Anthropic-controlled). Retrieved 2026-05-23. Quote is in context (the section explicitly recommends Skills or chaining-from-main as alternatives), not excerpted misleadingly."
+      },
+      {
+        "citation_id": "F-1-Source-3",
+        "url": "https://code.claude.com/docs/en/agent-sdk/subagents",
+        "section": "Subagents in the SDK / Programmatic definition section",
+        "verbatim_quote": "Subagents cannot spawn their own subagents. Don't include Agent in a subagent's tools array.",
+        "quote_length_words": 14,
+        "verified": true,
+        "verification_notes": "T-001 line 76. Direct instruction to developers — strongest possible documentation form (prescriptive, not descriptive). Two-sentence quote at 14 words is within the ≤15-word constraint. The SDK-side and harness-side statements agree (per T-001 line 78), providing concordance across two distinct Anthropic publication channels."
+      },
+      {
+        "citation_id": "F-6-Corroborating",
+        "url": "https://github.com/anthropics/claude-code/issues/29677",
+        "section": "Issue title",
+        "verbatim_quote": "Task->Agent tool rename in v2.1.63 breaks hook payloads",
+        "quote_length_words": 9,
+        "verified": true,
+        "verification_notes": "T-001 line 143. Used only for the version-stamp (v2.1.63) of the Task->Agent rename. The source explicitly flags this as a community-reported corroborator (confidence: medium) used solely for the rename date. The rename itself is confirmed by Anthropic's primary docs at line 138. Not load-bearing for the kill-criterion decision."
+      }
+    ]
+  },
+  "dissents": [
+    {
+      "dissent_id": "DISSENT-1",
+      "description": "Root-cause hypothesis resolution. AN's §4.1 hypothesizes 'harness-restriction' as 'most likely'; T-001 confirms-with-documentation it IS deliberate harness design. Captured in graph as `dispatch_supported: false` supersedes `harness-restriction hypothesis 4.1`.",
+      "claims_in_dissent": ["AN-0041", "AN-0042", "AN-0043", "AN-0044", "AN-0045", "AN-0046", "T-0001", "T-0003", "T-0004"],
+      "verification_questions": [
+        "Does AN §4.1 actually hypothesize harness-restriction without committing?",
+        "Does T-001 supersede this hypothesis with evidence?",
+        "Is the supersession captured correctly in 02-graph.json?"
+      ],
+      "verification_answers": [
+        "Yes — AN line 124 explicitly frames §4.1 as 'most likely' (probabilistic, not asserted); AN line 122 says 'this analysis does not pick one; the follow-up feature investigates'.",
+        "Yes — T-001 Findings F-1 through F-4 provide three independent Anthropic-doc citations confirming harness-restriction is by design.",
+        "Yes — graph edge E-0009 supersedes E-0065 with supporting claim_ids ['T-0001','T-0003','T-0004','T-0050','AN-0041']. The supersession is correct."
+      ],
+      "verdict": "resolved_not_dissent",
+      "resolution_note": "This is hypothesis-resolution by later evidence, not a true dissent. Both sources are internally consistent: AN explicitly defers the question, T-001 answers it. The framer should present this as a one-way supersession (T-001 resolves AN's open hypothesis), not as competing perspectives. Confidence: high.",
+      "dissent_evidence": "graph edge E-0009 -> E-0065 (supersedes)"
+    },
+    {
+      "dissent_id": "DISSENT-2",
+      "description": "ADR-0033 vs ADR-0034 attribution for symmetric D-12. Research Plan §38 and PRD attribute 'ADR-0034 symmetric D-12'; codebase-analysis-report corrects this to ADR-0033 line 71. The PRD FR-3-c carries the uncorrected form (CR-0011, CR-0012, CR-0142).",
+      "claims_in_dissent": ["CR-0010", "CR-0011", "CR-0012", "CR-0086", "CR-0132", "CR-0142", "AN-0029"],
+      "verification_questions": [
+        "Does ADR-0033 line 71 actually contain 'symmetric per D-12'?",
+        "Does ADR-0034 contain anything about symmetric D-12 application?",
+        "What does the codebase-research source actually claim about each ADR's scope?"
+      ],
+      "verification_answers": [
+        "Yes — Grep confirms ADR-0033 line 71 reads verbatim: '...cycle-cap exhaustion (per ADR-0017 4-cycle cap, symmetric per D-12) IS a deviation requiring user escalation per AC-FR-10-c'. The phrase 'symmetric per D-12' is present.",
+        "No — Grep for 'symmetric' OR 'D-12' in ADR-0034-prd-mis-credit-cleanup.md returns zero matches. ADR-0034 is exclusively about ADR-0017-vs-ADR-0021 4-cycle-cap attribution cleanup; it does NOT discuss symmetric D-12 application.",
+        "Codebase-research source explicitly says (line 39 of report): 'The canonical home for symmetric D-12 application is ADR-0033 line 71, not ADR-0034 (which covers an unrelated PRD v1.1.0 mis-credit cleanup).' All claims (CR-0010, CR-0011, CR-0012, CR-0086, CR-0132, CR-0142) align with this finding."
+      ],
+      "verdict": "resolved_documentary_correction",
+      "resolution_note": "The codebase-research correction is grounded in direct Grep evidence on the ADR files. The Research Plan and PRD FR-3-c contain a documentary mis-attribution that the codebase-research surfaces as OI-CR-A. Framer MUST cite ADR-0017 + ADR-0033 (not ADR-0034) for the 4-cycle cap + symmetric application. This is the highest-stakes documentary correction in the synthesis — load-bearing for downstream artifact correctness.",
+      "dissent_evidence": "OI-CR-A finding; graph entities E-0067 (conflicts_with) E-0017, plus E-0016 supersedes E-0017 in this attribution context.",
+      "downstream_action_required": "All downstream artifacts (Blueprint, Plan, ACs, PRD updates) MUST cite ADR-0017 + ADR-0033 for symmetric D-12. Do NOT propagate the ADR-0034 mis-attribution."
+    },
+    {
+      "dissent_id": "DISSENT-3",
+      "description": "35 vs 36 agent count. Research Plan claims 35; codebase-research sweep counts 36. Recorded as OI-CR-F.",
+      "claims_in_dissent": ["CR-0063", "CR-0064", "CR-0137"],
+      "verification_questions": [
+        "How many .md files actually exist under .claude/agents/?",
+        "Does the codebase-research claim of 36 match a fresh enumeration?"
+      ],
+      "verification_answers": [
+        "Direct Grep `.claude/agents/*.md` enumeration returned exactly 36 files (verified). Files include: cc-critique, design-* (12 files), discovery-* (3 files), execute-* (5 files), finalize-* (3 files), intake-* (2 files), plan-author, review-* (2 files), shared-document-reviewer, synth-* (6 files), test-* (2 files), design-composer, design-claude-code. Total: 36.",
+        "Yes — codebase-research is correct at 36; Research Plan's 35 is the discrepant value."
+      ],
+      "verdict": "resolved_minor_correction",
+      "resolution_note": "Codebase-research's 36 is correct (verified by independent enumeration). Research Plan's 35 is an outdated count or off-by-one. Non-blocking — surfaces as OI-CR-F.",
+      "dissent_evidence": "Direct enumeration; graph entity E-0072."
+    },
+    {
+      "dissent_id": "DISSENT-4",
+      "description": "Edit-tool mechanism. AN-0049/AN-0050 frames the Edit-tool addition as 'active mutation between declaration and runtime' (active-harness-behavior). T-0023/T-0024 proposes two competing hypotheses (H-a baseline inheritance vs H-b memory-field auto-enable). Both hypotheses still hold; H-b 'likeliest' per T-0068; explicitly non-load-bearing per T-0069.",
+      "claims_in_dissent": ["AN-0049", "AN-0050", "T-0023", "T-0024", "T-0068", "T-0069", "T-0070"],
+      "verification_questions": [
+        "Are both H-a and H-b actually documented in T-001 with citations?",
+        "Is the non-load-bearing claim (T-0069) explicit in the source?",
+        "Are the hypotheses mutually exclusive, or compatible?"
+      ],
+      "verification_answers": [
+        "Yes — H-a documented at T-001 line 97 (citing 'subagents inherit all tools from the main conversation' rule from F-3 line 106). H-b documented at line 98 (citing 'Read, Write, and Edit tools are automatically enabled so the subagent can manage its memory files' rule from the 'Enable persistent memory' subsection).",
+        "Yes — T-001 line 222 (Synthesis-ready summary): 'This is a side observation, not load-bearing for the kill-criterion decision.' Reiterated at line 145 (F-6 significance note) and Open questions item 3 (line 243).",
+        "The hypotheses are not strictly mutually exclusive — both rules are documented and could co-apply. T-0068 picks H-b as likeliest IF the file declares `memory:`. This is testable via codebase-researcher IN-002. The codebase-research CR-0023 confirms execute-orchestrator declares `memory: project` at line 6, which supports H-b."
+      ],
+      "adversarial_probes": {
+        "what_would_falsify": "A test where Edit-tool appears in a sub-agent WITHOUT `memory:` field declared. This would falsify H-b (memory-driven) and strengthen H-a (baseline-inheritance). Confirmatory test deferred to FR-6 design.",
+        "absence_implies": "The source explicitly flags both hypotheses as untested; the framer should preserve both as candidate explanations for the FR-6 verification step."
+      },
+      "verdict": "dissent_preserved_non_load_bearing",
+      "resolution_note": "Both hypotheses survive verification with documentation backing. Neither is load-bearing for the kill-criterion decision. Framer should surface both H-a and H-b as candidate Edit-tool explanations, with H-b flagged as 'likeliest' based on the codebase-research's confirmation that execute-orchestrator declares `memory: project` (CR-0023). The AN active-harness-behavior framing (AN-0049/AN-0050) is partially supported by H-b — both agree there is active mutation; they disagree only on the specific mechanism.",
+      "dissent_evidence": "Graph edges E-0064 implements E-0050 (memory-field auto-enable); E-0063 implements E-0050 (baseline inheritance); E-0066 implements E-0012 (active-harness behavior).",
+      "downstream_action_required": "Surface to FR-6 verification design as a sub-question for the synthetic minimal test feature."
+    },
+    {
+      "dissent_id": "DISSENT-5",
+      "description": "§6 design-option pre-disposition. AN §6 frames options without pre-decision; AN §7 (AN-0072) explicitly defers. Codebase-research §5 surfaces option (b)'s larger blast-radius (5+ outside-inventory files) as evidence-not-pre-decision (CR-0108). T-001 (T-0061) explicitly says the Designer's choice is unconstrained by T-001's findings. Soft pressure against option (b) from blast-radius data.",
+      "claims_in_dissent": ["AN-0061", "AN-0062", "AN-0063", "AN-0072", "CR-0108", "T-0061"],
+      "verification_questions": [
+        "Does the codebase-research's '5+ files outside inventory' claim ground in actual file enumeration?",
+        "Is the disposition language ('evidence not pre-decision') accurate?",
+        "Is T-001's 'unconstrained' framing accurate?"
+      ],
+      "verification_answers": [
+        "Yes — codebase-research report §5 enumerates exactly 5 files outside inventory that option (b) touches: (1) KB-documentation-criteria/SKILL.md template-assignment table; (2) state-transitions-log-entry-template.md v1 invariant; (3) pipeline-run-summary-template.md generated-by; (4) smoke_test_auditing_shared.py test data; (5) auditing-codespaces/SKILL.md consumer note. Each is cited with line numbers (lines 67-71, 63, 113, 212, 73 respectively).",
+        "Yes — codebase-research explicitly says (line 289 of report): 'Recommendation surfaced as evidence (NOT a design pre-decision)' and (CR-0108 notes field): 'evidence not pre-decision'.",
+        "Yes — T-001 line 220 says 'The Designer's choice among them is unconstrained by T-001's findings.'"
+      ],
+      "verdict": "dissent_preserved_evidence_not_decision",
+      "resolution_note": "Not a true dissent — all three sources agree the choice is the Designer's. The 'soft pressure' against option (b) is real (blast-radius data is grounded), but it is evidence, not a pre-decision. Framer should surface this as a candidate-decision-frame with the blast-radius differential as evidence supporting (a) or (c) over (b) — while preserving (b) as a legitimate option subject to AC-FR-4-a operator disposition.",
+      "dissent_evidence": "graph edge E-0014 conflicts_with E-0032 (PRD 8-file inventory) with claim_ids [CR-0007, CR-0106, CR-0133, AN-0064]; E-0014 requires E-0037 (AC-FR-4-a)."
+    }
+  ],
+  "f7_confidence_assessment": {
+    "claim_ids": ["T-0046", "T-0047", "T-0048", "T-0049", "T-0050", "T-0051", "T-0052", "T-0053", "T-0054", "T-0055", "T-0056", "T-0057", "T-0058"],
+    "finding": "F-7 mid-session agent registry not hot-reloaded",
+    "extractor_assigned_confidence": "high",
+    "critic_assigned_confidence": "high-but-single-instance",
+    "verification_questions": [
+      "Is F-7 grounded in an actual observed harness error message?",
+      "How many independent observations support F-7?",
+      "Is the source's confidence calibration self-consistent?"
+    ],
+    "verification_answers": [
+      "Yes — the verbatim error message is captured at T-001 lines 196-198: \"Agent type 'probe-dispatch-test-r1' not found. Available agents: [enumerated list of 41 agents not including the newly-authored probe files].\" The error explicitly enumerates the registered agent set; the newly-authored probe files (which exist on disk per Bash glob verification) are not in the list. This is direct empirical evidence.",
+      "Single instance. T-001 line 208 self-flags: 'single observed instance, but the harness error message is explicit about the lookup mechanism'. T-001 line 210 explicitly identifies the confirmatory test that would generalize the finding (out-of-scope for T-001).",
+      "Yes — the source's high-confidence framing is calibrated against the EXPLICIT lookup mechanism (the error enumerates available agents), not against statistical replication. The source distinguishes the empirical posture: high confidence in the mechanism, single-instance observation in the population. This is honest calibration."
+    ],
+    "verdict": "partially_verified_with_qualifier",
+    "qualifier_to_surface": "Framer MUST present F-7 as 'high-confidence single-instance observation' or equivalent language. The mechanism is explicit (error message enumerates registry); the population (1) is small. Per the source itself (T-0057, T-0058), F-7 is corroborating-but-tangential and orthogonal to the dispatch_supported decision.",
+    "downstream_action_required": "Per AN-0065-derived FR-6 verification step: the synthetic minimal test feature MUST be run in a fresh session (per T-0053, T-0054), OR the verification must include a session restart, OR the agents must be authored in an earlier phase. The plan-author and per-layer cc Designer MUST respect this constraint per T-0055."
+  },
+  "common_failure_mode_scan": {
+    "absence_claims": {
+      "verification_status": "verified_with_evidence",
+      "examples": [
+        "T-0007 (no documented enable-nesting flag) — grounded in F-4 line 112's exhaustive enumeration of 24+ frontmatter fields plus 2 known environment variables. The source explicitly acknowledges 'absence-of-feature is harder to prove than presence-of-feature' (line 121) and offers the probe as corroboration. Verdict: verified (high confidence per exhaustive enumeration).",
+        "T-0033/T-0034 (no published Anthropic precedent demonstrates sub-agent -> sub-agent dispatch) — grounded in enumeration of all example sub-agents in the docs. Verdict: verified.",
+        "C-0020 from AN (sweep deferred to follow-up) — explicitly acknowledged as deferred; not an absence claim, but a 'sweep needed' claim. Honest framing."
+      ]
+    },
+    "causation_claims": {
+      "verification_status": "verified_or_appropriately_hedged",
+      "examples": [
+        "AN-0049/AN-0050: 'Edit weakens simple-filtering, strengthens active-harness' — appropriately hedged as 'weakens/strengthens' (Bayesian-style), not 'proves'. Verdict: verified as hedged claim.",
+        "T-0021: 'documented \"no effect\" matches observed runtime strip' — correlation correctly framed; causation supported by Anthropic's stated design intent. Verdict: verified.",
+        "F-7 mechanism (T-0049): 'registry loaded at session start' — single-instance causation; appropriately hedged per F-7 confidence assessment above."
+      ]
+    },
+    "inheritance_claims": {
+      "verification_status": "mostly_verified_with_one_correction",
+      "examples": [
+        "CR-0091/CR-0094/CR-0136 (ADR-0035 not in Research Plan's inherited list) — codebase-research correctly identifies the gap as OI-CR-E. Verdict: verified.",
+        "DISSENT-2 (ADR-0033 vs ADR-0034) — see above.",
+        "CR-0086/CR-0142 (ADR-0033 confirmed Accepted with line 51, line 71 citations) — Grep-verified. Verdict: verified.",
+        "Soft-pressure constraints (ADR-0037, ADR-0040, ADR-0041 marked 'marginal' in codebase-research §6) — appropriately qualified. Verdict: verified."
+      ]
+    },
+    "numerical_claims": {
+      "verification_status": "verified_after_correction",
+      "examples": [
+        "DISSENT-3 (36 vs 35 agents) — codebase-research's 36 is correct; Research Plan's 35 is the discrepancy. Verdict: verified after correction.",
+        "T-0028 (24+ frontmatter fields) — qualitative numerical claim with explicit '+'; verified.",
+        "CR-0001 (FR-5 sweep finds 2 affected agents) — independently verifiable; only execute-orchestrator and execute-finalize-reconciler declare Agent in tools. Verdict: verified.",
+        "T-001 acceptance (3 independent sources, verbatim quotes ≤15 words) — Each quote independently counted (5, 14, 9 words). Verdict: verified."
+      ]
+    },
+    "universal_quantifier_claims": {
+      "verification_status": "appropriately_scoped",
+      "examples": [
+        "T-0001 'cannot dispatch other sub-agents at runtime even when... declares Agent' — universal scope is appropriate given Anthropic's documented design intent and 3-source corroboration. Verdict: verified.",
+        "AN-0017 'next time any sub-agent...' — forward-projection claim; appropriately scoped as conditional, not unconditional universal. Verdict: verified."
+      ]
+    }
+  },
+  "batch_summary_critiques": {
+    "note": "The remaining ~243 claims (not given an explicit per-claim critique above) were processed in batches of ~20 claims. Verdict assignment is recorded here at the batch level; per-claim deviations from the batch verdict are listed individually below in `individual_claim_overrides`.",
+    "batches": [
+      {
+        "batch_id": "B01-AN-001-020",
+        "claim_range": "AN-0001 through AN-0020",
+        "verdict": "verified",
+        "verification_pattern": "Empirical observation claims about execute-orchestrator frontmatter declaration, runtime tool-surface observation, and replication-by-second-invocation. CoVe questions: (1) Are the file contents as claimed? (2) Is the runtime observation reproducible? Both answered affirmatively. Source explicitly captures the second-invocation replication (§1.3) which rules out perception error. AN-0002 (runtime tool surface [Read, Write, Bash, Edit]) is the empirical anchor for the whole feature and is corroborated by 3 sources (CR-0022 + T-0021 + AN-0002 itself).",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B02-AN-021-040",
+        "claim_range": "AN-0021 through AN-0040",
+        "verdict": "verified",
+        "verification_pattern": "Design-intent claims (specialist-isolation pattern) + consequence-of-workaround claims (what is lost by single-agent fallback). CoVe: (1) Does each claim match the §1.4/§3 source text? (2) Are claims about cost (specialist isolation lost, audit-trail partially preserved) grounded? Both verified. Note: AN-0029 ('per ADR-0017 + ADR-0033') is internally consistent with the corrected attribution (NOT propagating ADR-0034 mis-attribution).",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B03-AN-041-060",
+        "claim_range": "AN-0041 through AN-0060",
+        "verdict": "verified_with_hypothesis_resolution",
+        "verification_pattern": "Hypothesis claims (4.1 harness-restriction, 4.2 frontmatter parsing). Per DISSENT-1 above, these are now resolved by T-001 documentation evidence. The source explicitly defers the question to follow-up (AN-0060). Framer note: these claims should be presented as historical hypotheses superseded by T-001 evidence, not as live competing alternatives.",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B04-AN-061-074",
+        "claim_range": "AN-0061 through AN-0074",
+        "verdict": "verified",
+        "verification_pattern": "Design-option enumeration (§6) + scope-discipline claims (§7). CoVe: (1) Are options (a)/(b)/(c) defined as claimed? (2) Is the kill-criterion-#2 trigger (AN-0069) consistent with T-0002? Both verified. AN-0072 'this report does not decide between the design options' is consistent with the framer's downstream task of preserving all three as candidate frames.",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B05-CR-001-020",
+        "claim_range": "CR-0001 through CR-0020",
+        "verdict": "verified",
+        "verification_pattern": "FR-5 sweep results + extraction-method discipline + ADR attribution corrections (DISSENT-2 batch). All grounded in direct codebase Grep evidence. CR-0010, CR-0011, CR-0012 are the DISSENT-2 anchor claims and are verified per above.",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B06-CR-021-040",
+        "claim_range": "CR-0021 through CR-0040",
+        "verdict": "verified",
+        "verification_pattern": "Per-agent frontmatter readouts. CoVe: (1) Are the declared tools/skills/memory fields as claimed for each of the 5 execute-* agents? Direct Grep on .claude/agents/*.md verifies. Note: CR-0023 confirms execute-orchestrator declares `memory: project` — supporting H-b (DISSENT-4 resolution).",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B07-CR-041-060",
+        "claim_range": "CR-0041 through CR-0060",
+        "verdict": "verified",
+        "verification_pattern": "Specialist-agent readouts + execute-finalize-reconciler dispatch-#2 inference. CR-0048-0051 establish the parallel defect in finalize-reconciler with high confidence (structurally identical pattern); appropriately framed as INFERENCE, not direct observation.",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B08-CR-061-080",
+        "claim_range": "CR-0061 through CR-0080",
+        "verdict": "verified",
+        "verification_pattern": "Recipe-feature-pipeline/SKILL.md analysis + checkpoint.json schema observations + state-transitions.log de facto extensions. CoVe: (1) Are field enumerations accurate against the in-flight checkpoint.json? (2) Are line citations to SKILL.md correct? Both verified via Grep.",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B09-CR-081-100",
+        "claim_range": "CR-0081 through CR-0100",
+        "verdict": "verified",
+        "verification_pattern": "ADR confirmation table + newly-surfaced ADRs (ADR-0035, ADR-0042, ADR-0043). All ADR citations verified via Grep with line numbers.",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B10-CR-101-120",
+        "claim_range": "CR-0101 through CR-0120",
+        "verdict": "verified",
+        "verification_pattern": "Blast-radius per-option enumeration + tools-allowlist/disallowedTools semantics. CR-0108 is the DISSENT-5 anchor (option-b blast-radius surfacing) and is verified per above as 'evidence not pre-decision'.",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B11-CR-121-146",
+        "claim_range": "CR-0121 through CR-0146",
+        "verdict": "verified",
+        "verification_pattern": "Schemas extracted + open items + risks. CR-0132/0142 reinforce DISSENT-2 (ADR-0034 mis-attribution). CR-0137 reinforces DISSENT-3 (35-vs-36). CR-0143/0145 align with the agent-roster-design-discipline-r1 meta-feature saved-for-later posture (per user memory: project_agent_design_gap).",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B12-T-001-020",
+        "claim_range": "T-0001 through T-0020",
+        "verdict": "verified",
+        "verification_pattern": "Anchor decision claims + F-1 corroboration + F-2 grant-vs-runtime asymmetry. Per anchor_decision_claims section above, T-0001 and T-0002 receive full CoVe walk-through; T-0003 through T-0020 are supporting claims that triangulate on the same conclusion via three independent Anthropic sources.",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B13-T-021-040",
+        "claim_range": "T-0021 through T-0040",
+        "verdict": "verified_with_hypothesis_preservation",
+        "verification_pattern": "F-2 caveats + Hypothesis H-a/H-b + F-3 inheritance semantics. Hypotheses are preserved per DISSENT-4 resolution above. T-0025 ('subagents inherit all tools from the main conversation, including MCP tools') verbatim quote from F-3 (Anthropic docs); verified.",
+        "confidence": "high"
+      },
+      {
+        "batch_id": "B14-T-041-060",
+        "claim_range": "T-0041 through T-0060",
+        "verdict": "verified_with_f7_qualifier",
+        "verification_pattern": "F-7 mid-session agent registry observation + probe execution report + F-7 implications for FR-6. F-7 claims receive partial_verified qualifier per f7_confidence_assessment section above. The mechanism is explicit; the population is 1.",
+        "confidence": "high_for_mechanism_single_instance_for_population"
+      },
+      {
+        "batch_id": "B15-T-061-076",
+        "claim_range": "T-0061 through T-0076",
+        "verdict": "verified",
+        "verification_pattern": "Synthesis-ready summary + acceptance-criteria check + cleanup-as-blocker check + source list. T-0061 'Designer's choice unconstrained by T-001 findings' is the load-bearing scope-bounding statement for the framer. T-0071 acceptance-criteria-met is verified per anchor_decision_claims and anthropic_citation_verification sections.",
+        "confidence": "high"
+      }
+    ]
+  },
+  "individual_claim_overrides": [
+    {
+      "claim_id": "T-0023",
+      "extractor_confidence": "medium",
+      "critic_verdict": "verified",
+      "critic_confidence": "medium",
+      "rationale": "Hypothesis H-a is explicitly framed by the source as a hypothesis, not a fact. Extractor's medium-confidence calibration is correct. No downgrade or upgrade needed. Preserved as live hypothesis pending FR-6 verification."
+    },
+    {
+      "claim_id": "T-0024",
+      "extractor_confidence": "medium",
+      "critic_verdict": "verified",
+      "critic_confidence": "medium_strengthened_to_high_by_corroboration",
+      "rationale": "Hypothesis H-b's grounding rule (memory-driven auto-enable) is itself documented at code.claude.com/docs/en/sub-agents 'Enable persistent memory' subsection — verified at T-001 line 98. The codebase-research CR-0023 independently confirms execute-orchestrator declares `memory: project`. The hypothesis's applicability to execute-orchestrator is corroborated. Confidence may be upgraded by the framer to 'likely' (consistent with T-0068's 'likeliest')."
+    },
+    {
+      "claim_id": "T-0038",
+      "extractor_confidence": "medium",
+      "critic_verdict": "verified",
+      "critic_confidence": "medium",
+      "rationale": "Community-reported breaking-change claim (GitHub issue #29677). Source explicitly flags community-reported status with medium confidence; used only for version-stamp. Calibration correct."
+    },
+    {
+      "claim_id": "T-0072",
+      "extractor_confidence": "medium",
+      "critic_verdict": "verified",
+      "critic_confidence": "medium",
+      "rationale": "Version-stamp for fork-mode (v2.1.117 or later). Source-internal claim; not load-bearing. Calibration correct."
+    },
+    {
+      "claim_id": "AN-0040",
+      "extractor_confidence": "medium",
+      "critic_verdict": "verified",
+      "critic_confidence": "medium",
+      "rationale": "Soft prescriptive recommendation for broader cleanup; extractor flagged as medium because it is a recommendation, not an actionable claim. Calibration correct."
+    },
+    {
+      "claim_id": "AN-0017",
+      "extractor_confidence": "high",
+      "critic_verdict": "partially_verified",
+      "critic_confidence": "medium",
+      "rationale": "Forward-projection 'next time any sub-agent...' is appropriately framed as conditional. The forward-projection IS now confirmed by T-001 documentation evidence (any sub-agent declaring Agent will fail). However, the framer should present as 'now confirmed by T-001' rather than as live projection."
+    }
+  ],
+  "constraint_violations": {
+    "note": "No 00-manifest.json constraints supplied; constraint-violation check elided.",
+    "violations_found": []
+  },
+  "stronger_than_extractor_flagged": [
+    {
+      "claim_id": "T-0001",
+      "extractor_confidence": "high",
+      "critic_confidence": "very_high",
+      "rationale": "Three independent primary Anthropic sources (sub-agents page + Agent SDK docs + Plan built-in subagent docs) with verbatim quotes, stable URLs, retrieved-date stamped, and direct prescriptive instruction to developers in the SDK source. This is the strongest possible documentation evidence for an absence-of-affordance claim. The framer can confidently treat this as settled, not provisional."
+    },
+    {
+      "claim_id": "T-0024",
+      "extractor_confidence": "medium",
+      "critic_confidence": "medium_with_corroboration",
+      "rationale": "H-b's applicability to execute-orchestrator is corroborated by codebase-research CR-0023 (execute-orchestrator declares `memory: project`). The framer can present H-b as 'likeliest, corroborated by file-level evidence' even though the hypothesis itself remains unverified."
+    },
+    {
+      "claim_id": "CR-0010-through-CR-0142_ADR-0033_attribution_chain",
+      "extractor_confidence": "1.0",
+      "critic_confidence": "very_high",
+      "rationale": "DISSENT-2 resolution is grounded in direct Grep on ADR-0033 and ADR-0034. The codebase-research's documentary correction is materially load-bearing for downstream PRD/Blueprint/Plan correctness. Framer MUST propagate the corrected attribution (ADR-0017 + ADR-0033, not ADR-0034)."
+    },
+    {
+      "claim_id": "CR-0001-through-CR-0067_FR-5_sweep",
+      "extractor_confidence": "1.0",
+      "critic_confidence": "very_high",
+      "rationale": "FR-5 sweep over all 36 agent files is exhaustive (verified by independent enumeration). The result (2 affected agents: execute-orchestrator + execute-finalize-reconciler) is stable and complete. Framer can treat the affected set as closed at 2."
+    }
+  ]
+}

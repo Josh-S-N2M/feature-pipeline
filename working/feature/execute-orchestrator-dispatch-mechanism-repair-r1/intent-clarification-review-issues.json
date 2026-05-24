@@ -1,0 +1,156 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "IntentClarification",
+    "target_path": "/workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/intent-clarification.md",
+    "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+    "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+    "reviewer": "shared-document-reviewer",
+    "reviewed_at": "2026-05-23T20:35:00Z",
+    "invocation_point": "post-Stage-1-Intent-Clarification (before Gate 1 Intent Confirmation)"
+  },
+  "scores": {
+    "consistency": 92,
+    "completeness": 90,
+    "rule_compliance": 88,
+    "clarity": 93
+  },
+  "gate0": {
+    "status": "pass",
+    "checks": {
+      "frontmatter_yaml_parseable": "pass",
+      "id_present": "pass",
+      "doc_type_present_ADR_0032": "pass",
+      "version_present": "pass",
+      "status_present_and_in_gated_vocab": "pass",
+      "feature_slug_present": "pass",
+      "scope_class_present_ADR_0023": "pass",
+      "generated_present": "pass",
+      "generated_by_present": "pass",
+      "derived_from_present_from_analysis_run": "pass",
+      "companion_artifacts_present": "pass",
+      "user_token_present_as_pending_sentinel": "pass",
+      "section_Purpose": "pass",
+      "section_Source": "pass",
+      "section_Initial_Interpretation": "pass",
+      "section_Clarifying_Questions_and_Answers": "pass",
+      "section_Clarified_Intent": "pass",
+      "section_Scope_Posture": "pass",
+      "section_Whats_in_scope": "pass",
+      "section_Whats_NOT_in_scope": "pass",
+      "section_Whats_undecided": "pass",
+      "section_Layer_Scope_9_layer_table": "pass",
+      "section_Stakeholder_Posture": "pass",
+      "section_Success_Posture": "pass",
+      "section_Confirmation": "pass",
+      "section_Open_Items": "pass",
+      "contents_checklist_all_checked": "pass",
+      "all_9_layers_enumerated_with_disposition": "pass"
+    },
+    "missing_elements": []
+  },
+  "gate1": {
+    "status": "pass_with_minor_findings",
+    "checks": {
+      "clarified_intent_faithful_to_source_analysis_TLDR_and_section_6": "pass",
+      "clarifying_questions_genuinely_address_residual_ambiguity": "pass",
+      "proposed_answers_internally_consistent": "pass",
+      "scope_class_FULL_consistent_with_multi_file_impact": "pass",
+      "whats_undecided_honest_not_smuggling_decisions": "pass",
+      "layer_scope_cc_only_consistent_with_section_6_affected_files": "pass",
+      "deferred_to_gate_posture_authorized_by_orchestrator_brief": "pass",
+      "open_items_genuinely_under_determined": "pass",
+      "pending_token_sentinel_acceptable_at_this_stage": "pass",
+      "no_invented_requirements_absent_from_source_analysis": "pass",
+      "no_premature_PRD_or_design_work": "pass"
+    }
+  },
+  "verdict": {
+    "decision": "approved",
+    "recommendation_to_orchestrator": "Proceed to Gate 1 Intent Confirmation (AskUserQuestion loop on the six proposed answers + scope class + layer scope + deferred items). No structural or semantic blocker.",
+    "conditions": []
+  },
+  "issues": [
+    {
+      "id": "I-DR-IC-001",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "Open Items #7 (line 154) — 'Memory note candidate'",
+      "description": "Open item #7 says 'Memory-discipline decision belongs to the design-composer.' Memory discipline (persistent project memory) is typically an orchestrator/user-level concern surfaced post-feature, not a design-composer responsibility. The design-composer authors Blueprint cross-cutting sections and ADRs; memory-note authorship is outside its standard mandate.",
+      "suggestion": "Soften to 'Memory-discipline decision surfaced post-feature for user/orchestrator ratification' or 'flagged for design-composer to recommend a memory note, with final memory-write deferred to user/orchestrator.' Non-blocking; the design composer can absorb the recommendation but should not be presented as the deciding authority on memory writes."
+    },
+    {
+      "id": "I-DR-IC-002",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Scope Posture > What's in scope, bullet 'Per-layer cc Design' (line 83)",
+      "description": "The three §6 design options are quoted compactly: 'flatten dispatch hierarchy / retire execute-orchestrator into recipe-feature-pipeline / use Bash-script dispatch surface.' Comparing to analysis §6 (lines 168-171), the third option is more nuanced — execute-orchestrator stays as an agent but dispatches Bash scripts that 'invoke specialists via some other mechanism (queues, lock files, external triggers).' The IC's compressed form risks losing the 'specialists invoked via indirect mechanism' nuance, which is the actual novelty of the third option vs. the first two.",
+      "suggestion": "Either expand the third-option summary in-line, or add a footnote/parenthetical: 'use Bash-script dispatch surface (execute-orchestrator runs scripts that indirectly invoke specialists).' Non-blocking — the IC's purpose is intent capture, not design enumeration; the per-layer cc Design will fully expand the options. Tag for design-composer attention rather than re-authoring the IC."
+    },
+    {
+      "id": "I-DR-IC-003",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "Clarifying Questions table, Q5 (line 69)",
+      "description": "Q5's proposed answer is 'Defer to the per-layer Design stage — open item.' This is a legitimate deferral, but it is the only one of six questions where the proposed-answer column does not actually answer the question — it routes it onward. Some readers may find the asymmetry surprising at Gate 1. The deferral itself is sound (the constraint tension genuinely cannot be resolved without the investigation outcome), but the question's framing could be tightened to surface this as a constraint-tension declaration rather than as a question with a non-answer.",
+      "suggestion": "Optionally rephrase Q5 from 'is the parent-orchestrator workaround acceptable as a long-term fallback?' to 'how should the per-layer cc Design weigh the workaround-acceptability posture against the specialist-isolation invariants?' The proposed answer becomes 'PRD records both as constraints; per-layer cc Design resolves the tension.' Same substance, less rhetorical mismatch. Non-blocking — Gate 1 user ratification will absorb the asymmetry."
+    },
+    {
+      "id": "I-DR-IC-004",
+      "severity": "nit",
+      "category": "compliance",
+      "location": "Frontmatter `version: 0.1.0` (line 4)",
+      "description": "Shared-conventions § Versioning rules states 'Drafts use 0.1.0, 0.2.0, etc., until first acceptance' — this IC correctly uses 0.1.0. Just confirming compliance; no action.",
+      "suggestion": "No action. Recorded for traceability of the Gate-0 check."
+    }
+  ],
+  "fidelity_to_source_analysis": {
+    "tldr_alignment": "faithful — IC accurately recapitulates the frontmatter-vs-runtime tool drift and the dispatch-stranding consequence",
+    "section_6_in_scope_alignment": "faithful — investigation step, design decision, implementation, verification all carried through with appropriate IC-stage compression",
+    "section_6_out_of_scope_alignment": "faithful and extended — IC adds two explicit out-of-scope items not in analysis §6 (no changes to specialist substantive responsibilities; no changes to ADR-0017 cap or dispatch matrix). Both are reasonable extensions consistent with the analysis's intent",
+    "section_6_kill_criteria_alignment": "faithful with sharpening — IC tightens kill-criterion #1 into 'pause-and-rescope at Intent Confirmation Gate of follow-on run' rather than silent scope-shrink, which is a sound discipline addition consistent with the analysis's audit-trail-preservation theme",
+    "affected_files_alignment": "consistent — IC's six in-scope file categories (recipe-feature-pipeline SKILL.md, execute-orchestrator.md, 4 specialist files, checkpoint.json schema, state-transitions.log schema) match analysis §6 line 172",
+    "no_inventions_detected": true
+  },
+  "proposed_answers_evaluation": {
+    "Q1_scope_class_FULL": {
+      "evaluation": "sound",
+      "rationale": "Six-plus file impact, investigation requirement, and 3-way design choice clearly exceed MINOR/PATCH thresholds per ADR-0023. The PATCH carve-out for kill-criterion #1 is correctly routed via Q3's pause-and-rescope rather than a silent in-run shrink."
+    },
+    "Q2_in_pipeline_Discovery_Research": {
+      "evaluation": "sound",
+      "rationale": "KB-gap justification is genuine (no current KB documents Claude Code harness sub-agent tool-grant semantics). The audit-trail and synthesis-to-design integration arguments are correct. The alternative (pre-pipeline preflight) would create exactly the unscoped-side-quest problem the analysis surfaces elsewhere."
+    },
+    "Q3_pause_and_rescope": {
+      "evaluation": "sound",
+      "rationale": "Aligned with the project's no-silent-scope-shift discipline. A FULL→MINOR/PATCH shrink mid-run would invalidate downstream artifact assumptions (per-layer design count, ADR count, plan phase count) — the user-gating discipline is correctly preserved. The follow-on small feature for the one-flag fix is a clean pattern."
+    },
+    "Q4_cc_only_layer_scope": {
+      "evaluation": "sound",
+      "rationale": "All six affected-file categories (per analysis §6 line 172) live under .claude/, adrs/, working/feature/<slug>/. None of the other 8 engineering layers touch the dispatch surface. The 9-layer declaration table is exhaustive and correct."
+    },
+    "Q5_workaround_durability_deferred": {
+      "evaluation": "sound_but_see_I_DR_IC_003",
+      "rationale": "The constraint-tension is genuine and cannot be resolved at IC stage without the investigation outcome. The deferral to per-layer cc Design is procedurally correct. Minor framing critique surfaced as I-DR-IC-003 (recommended, not blocking)."
+    },
+    "Q6_synthetic_test_acceptable": {
+      "evaluation": "sound",
+      "rationale": "The defect is at the dispatch-primitive level; a 1-task/1-phase synthetic feature exercises the same code path as a multi-phase real feature. The cost/signal-confound argument against real-feature re-runs is correct. Archiving the synthetic feature as a regression artifact is good hygiene."
+    }
+  },
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [],
+    "note": "First-iteration review; no prior context applicable."
+  },
+  "summary_finding_counts": {
+    "blocker": 0,
+    "major": 0,
+    "minor": 0,
+    "nit": 1,
+    "recommended": 3
+  }
+}

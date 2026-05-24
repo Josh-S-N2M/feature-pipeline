@@ -1,0 +1,385 @@
+{
+  "schema_version": "decision-frame-v1",
+  "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+  "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+  "stage": "synth-framer",
+  "claim_id_namespacing": {
+    "prefixes": {
+      "CR-": "01-claims-codebase-analysis-report.json",
+      "T-": "01-claims-T-001-claude-code-subagent-tool-grant-semantics.json",
+      "AN-": "01-claims-analysis-execute-orchestrator-dispatch-limitation.json"
+    }
+  },
+  "framing_notes": {
+    "mode": "feature-pipeline",
+    "scope": "narrow_to_broad (5 anchor frames covering the load-bearing decisions surfaced by the verified graph + critique)",
+    "anchor_decisions_from_graph_summary": [
+      "dispatch_supported: false (settled)",
+      "kill-criterion-#2 triggered -> FULL repair pathway (settled)",
+      "§6 option choice (a/b/c) (LIVE - D-001)"
+    ],
+    "invariant_5_application": "No unverifiable claims in corpus (critique reports 0). All claims are eligible for inclusion. Partially_verified claims (F-7 chain) are flagged with qualifiers; single-sourced claims are flagged in risks. Two preserved dissents (DISSENT-4 H-a/H-b; DISSENT-5 §6 evidence-not-pre-decision) surface as risks / option-evidence rather than blocking framing.",
+    "dissent_carry_through": {
+      "DISSENT-1": "resolved_not_dissent (T-001 supersedes AN §4.1) — no frame needed",
+      "DISSENT-2": "resolved_documentary_correction (ADR-0033 not ADR-0034) — surfaces as an anchor risk on D-001/D-004 and as the load-bearing correction every downstream artifact must carry",
+      "DISSENT-3": "resolved_minor_correction (36 not 35) — surfaces as OI-CR-F open item, not a decision frame",
+      "DISSENT-4": "dissent_preserved_non_load_bearing — surfaces in D-002 as an FR-6 sub-question (H-a vs H-b for Edit-tool mechanism)",
+      "DISSENT-5": "evidence_not_decision — direct input to D-001 options evaluation"
+    }
+  },
+  "decisions": [
+    {
+      "id": "D-001",
+      "title": "Choose §6 repair option: flatten dispatch (a) vs retire execute-orchestrator (b) vs Bash-script dispatch surface (c)",
+      "class": "architectural",
+      "context": "T-001 confirms `dispatch_supported: false` and `kill_criterion_triggered: 2` (anchor claims T-0001, T-0002 with `verified` / `very_high` confidence over 3 independent Anthropic doc sources). FR-2 commits the feature to a FULL repair via one of the three §6 options. T-001 (T-0061) explicitly says the Designer's choice is unconstrained by T-001's findings — the choice is a true design decision, not a forced consequence. The codebase-analysis-report's per-option blast-radius enumeration is the load-bearing differentiator (verified per DISSENT-5 resolution: 'evidence not pre-decision').",
+      "anchor_claims": [
+        "T-0001", "T-0002", "T-0060", "T-0061",
+        "AN-0061", "AN-0062", "AN-0063", "AN-0069", "AN-0072",
+        "CR-0007", "CR-0095", "CR-0096", "CR-0097", "CR-0098", "CR-0099", "CR-0100", "CR-0101", "CR-0102", "CR-0103", "CR-0104", "CR-0105", "CR-0106", "CR-0107", "CR-0108", "CR-0133"
+      ],
+      "claim_cluster_ids": ["graph-cluster-1", "graph-cluster-2", "graph-cluster-5"],
+      "entities_referenced": [
+        "E-0009 dispatch_supported: false",
+        "E-0010 kill-criterion-#2 triggered",
+        "E-0013 §6 option (a) flatten dispatch hierarchy",
+        "E-0014 §6 option (b) retire execute-orchestrator",
+        "E-0015 §6 option (c) Bash-script dispatch surface",
+        "E-0032 PRD FR-4 8-file inventory",
+        "E-0037 AC-FR-4-a scope-expansion open-item gate",
+        "E-0042 specialist-isolation dispatch pattern",
+        "E-0043 single-agent fallback mode",
+        "E-0006 recipe-feature-pipeline"
+      ],
+      "reversibility": "one_way",
+      "reversibility_rationale": "Option choice commits the agent inventory (8-file inventory per FR-4), the state-machine ownership location (execute-orchestrator vs recipe-feature-pipeline), and the dispatch surface (agent vs script). Once specialists are re-wired to a new dispatcher, undoing the choice requires migrating live state schemas and re-authoring agent files — costly to reverse.",
+      "blast_radius": "tenant",
+      "blast_radius_rationale": "The choice affects every feature-pipeline run going forward (cross-service: execute-orchestrator + 4 specialists + execute-finalize-reconciler + recipe-feature-pipeline + checkpoint/state-transitions schemas). Per CR-0095..CR-0109, options touch 1-5+ files outside the 8-file inventory. Affects all agent-roster consumers of the dispatch surface.",
+      "wardley_stage": "custom",
+      "wardley_stage_rationale": "Sub-agent dispatch on Claude Code is custom/bespoke per Anthropic's published guidance (Skills, chain-from-main, agent teams are alternatives). The harness restriction is a fixed property of the substrate (Claude Code), so we are building bespoke within that constraint.",
+      "rice": {
+        "reach": 35,
+        "reach_rationale": "All 36 agent files in the roster; every feature-pipeline run consumes the dispatch surface. Source: critique DISSENT-3 verified 36 agents.",
+        "impact": 3.0,
+        "impact_rationale": "Massive — unblocks specialist-isolation pattern (currently lost to single-agent fallback per cluster 5; 7 supporting claims on `conflicts_with` edge from fallback to specialist-isolation). Without resolution, every cc-design pattern that depends on specialist isolation is degraded.",
+        "confidence": 0.8,
+        "confidence_rationale": "Anchor claims are `verified` with `very_high` per critique (3 independent Anthropic sources for T-0001). Mapped to RICE 80% per knowledge-skill rubric (verified + independent provenance). NOT 100% because the choice among (a)/(b)/(c) is itself the live decision — the constraint that forces one of them is settled, but the selection rests on blast-radius evidence + AC-FR-4-a operator disposition.",
+        "effort": 4.0,
+        "effort_rationale": "Estimate: option (a) ~3 person-weeks (1 file outside inventory + recipe-feature-pipeline state-machine reframing); option (b) ~6+ person-weeks (5+ files outside inventory + AC-FR-4-a gate); option (c) ~3 person-weeks (1 new script + dispatch indirection). Midpoint 4 PW.",
+        "score": 21.0
+      },
+      "options_summary": [
+        {
+          "label": "(a) Flatten dispatch hierarchy",
+          "recommended": true,
+          "rationale": "Lowest blast-radius outside the 8-file inventory (1 file per CR-0095..CR-0099). Preserves recipe-feature-pipeline as the top-level orchestrator (existing canonical reference per cluster 6) which dispatches the 4 specialists directly; execute-orchestrator becomes an advisor / state-machine documentation. Specialist-isolation pattern (cluster 5) is preserved. The AC-FR-4-a scope-expansion open-item count is minimized (1).",
+          "blast_radius_evidence": ["CR-0095", "CR-0096", "CR-0097", "CR-0098", "CR-0099"]
+        },
+        {
+          "label": "(b) Retire execute-orchestrator entirely",
+          "recommended": false,
+          "rejection_rationale": "Rejected — escapes the FR-4 8-file inventory by 5+ files (CR-0100..CR-0108 verified by direct file enumeration in critique DISSENT-5 resolution: KB-documentation-criteria template-assignment table, state-transitions-log-entry-template v1 invariant, pipeline-run-summary-template generated-by, smoke_test_auditing_shared.py test data, auditing-codespaces consumer note). Triggers AC-FR-4-a scope-expansion gate with the largest possible operator surface. Also conflicts with PRD FR-4 (graph edge E-0014 conflicts_with E-0032 with 4 supporting claims).",
+          "rejection_named": "rejected — fails FR-4 8-file inventory by widest margin and triggers AC-FR-4-a scope-expansion gate",
+          "blast_radius_evidence": ["CR-0100", "CR-0101", "CR-0102", "CR-0103", "CR-0104", "CR-0105", "CR-0106", "CR-0107", "CR-0108", "AN-0064"]
+        },
+        {
+          "label": "(c) Bash-script dispatch surface",
+          "recommended": false,
+          "rejection_rationale": "Rejected — execute-orchestrator's runtime tool surface (Read, Write, Bash, Edit per E-0012, three-source-corroborated) CAN run Bash, so the mechanism is physically possible, but a Bash-script dispatcher introduces a new indirection layer (specialists invoked via script, not agent-graph) that breaks the specialist-isolation pattern's audit-trail (cluster 5, AN-0037: 'real audit-trail losses, not just cleanliness'). Comparable blast-radius (1 outside-inventory file) to (a) without the audit-trail advantage. T-001's documented alternatives (Skills, chain-from-main) are stronger options if indirection is desired.",
+          "rejection_named": "rejected — degrades specialist-isolation audit-trail relative to (a) for the same 1-file outside-inventory cost",
+          "blast_radius_evidence": ["CR-0109"]
+        }
+      ],
+      "risks": [
+        "Single-sourced supporting claim: CR-0108 (option-b blast-radius framing) is single-sourced in the codebase-research, though grounded in direct file enumeration. Critique verdict: verified, but flagged.",
+        "DISSENT-2 carry-through: any artifact this decision produces (Blueprint, ADRs, Plan) MUST cite ADR-0017 + ADR-0033 (NOT ADR-0034) for the 4-cycle cap + symmetric D-12 application. Downstream-action required per critique DISSENT-2.",
+        "DISSENT-5 carry-through: the recommendation against (b) is grounded in blast-radius evidence, not a pre-decision. The Designer retains discretion subject to AC-FR-4-a operator disposition.",
+        "Recipe Step 6 anti-pattern guard: rejection rationales above are named (not straw-men) per knowledge-skill discipline.",
+        "Hard-constraint adjacency: NFR-5-a (canonical-reference documentation gap closure) — option (a) requires recipe-feature-pipeline/SKILL.md to absorb state-machine details if execute-orchestrator becomes an advisor."
+      ],
+      "routing": {
+        "primary": "ADR",
+        "secondary": "Blueprint cc-design subsection",
+        "rationale": "ADR-worthiness rule (knowledge skill): reversibility=one_way + blast_radius=tenant + cross-team coordination (recipe-feature-pipeline + agent-roster + checkpoint schema) — all 3 of 3 hold. Architectural. design-composer should author an ADR. Blueprint cc-design subsection enumerates the per-layer agent-graph implications."
+      },
+      "adr_authorship_flag": true
+    },
+    {
+      "id": "D-002",
+      "title": "How to handle F-7 (mid-session agent registry staleness) for the FR-6 synthetic-test verification step",
+      "class": "operational",
+      "context": "F-7 is a high-confidence single-instance observation (critique f7_confidence_assessment): the harness loads its agent registry at session start and does NOT hot-reload mid-session. Newly-authored sub-agent files (verified to exist on disk) are not invocable in the same session that authored them; the harness error explicitly enumerates the available agent set. This constrains FR-6's synthetic-test approach but is orthogonal to D-001's §6 selection.",
+      "anchor_claims": [
+        "T-0046", "T-0047", "T-0048", "T-0049", "T-0050", "T-0051", "T-0052", "T-0053", "T-0054", "T-0055", "T-0056", "T-0057", "T-0058",
+        "AN-0065"
+      ],
+      "claim_cluster_ids": ["graph-cluster-3"],
+      "entities_referenced": [
+        "E-0011 F-7 mid-session agent registry not hot-reloaded",
+        "E-0036 PRD FR-6 verification step",
+        "E-0048 probe-dispatch-test-r1 / r2"
+      ],
+      "reversibility": "two_way",
+      "reversibility_rationale": "The verification approach can be revised between runs; no schema or substrate commitment.",
+      "blast_radius": "component",
+      "blast_radius_rationale": "Scoped to the FR-6 verification step within the feature; does not affect production agent execution.",
+      "wardley_stage": "custom",
+      "wardley_stage_rationale": "Synthetic test harness design within a bespoke pipeline; no commodity alternative.",
+      "rice": {
+        "reach": 1,
+        "reach_rationale": "One verification step; one synthetic minimal feature run.",
+        "impact": 2.0,
+        "impact_rationale": "High — the verification is the kill-criterion-#2 closure check; if it cannot run, the feature cannot reach Gate-6.",
+        "confidence": 0.5,
+        "confidence_rationale": "F-7 is `partially_verified` per critique (mechanism explicit, population n=1). RICE confidence 50% per knowledge-skill rubric mapping for single-instance + partial verification.",
+        "effort": 0.5,
+        "effort_rationale": "Half a person-week to write the verification protocol + execute one fresh session.",
+        "score": 2.0
+      },
+      "options_summary": [
+        {
+          "label": "(D-002.1) Two-session verification (author in session 1; run in fresh session 2)",
+          "recommended": true,
+          "rationale": "Simplest path consistent with the F-7 mechanism (T-0053, T-0054 explicit: 'fresh session' suffices). Plan-author can sequence authoring in an early phase; the verification step in a later phase forces a session boundary. No new harness behavior required. Critic flags this as the downstream_action_required path."
+        },
+        {
+          "label": "(D-002.2) Session-restart-in-pipeline step",
+          "recommended": false,
+          "rejection_rationale": "Rejected — requires the pipeline to orchestrate a session restart, which is not a supported recipe-feature-pipeline primitive today (would require a separate substrate change in the harness or operator-in-the-loop). Higher effort than (D-002.1) with no incremental benefit.",
+          "rejection_named": "rejected — requires harness/operator coordination not provided by current pipeline primitives"
+        },
+        {
+          "label": "(D-002.3) Author agents in Phase 0; run synthetic test in Phase 1 of a separate fresh run",
+          "recommended": false,
+          "rejection_rationale": "Rejected as a default — equivalent to (D-002.1) for the F-7 constraint but requires a fully separate pipeline run, doubling orchestration overhead. Preserve as a fallback if session-boundary scheduling within one run proves infeasible.",
+          "rejection_named": "rejected as default — orchestration overhead higher than (D-002.1) for equivalent F-7 mitigation"
+        }
+      ],
+      "risks": [
+        "DISSENT-4 carry-through: the FR-6 synthetic-test design SHOULD include a sub-question discriminating H-a (baseline-inheritance) vs H-b (memory-field auto-enable) for the Edit-tool mechanism. Per critique DISSENT-4 downstream_action_required, this is non-load-bearing for kill-criterion but is a known open question worth resolving.",
+        "F-7 is single-instance (n=1). If the harness has any per-session caching nuance beyond what the error message suggests, the verification protocol may need additional probes. Surface to plan-author.",
+        "NFR amendment to PRD may be required to formalize the session-boundary constraint."
+      ],
+      "routing": {
+        "primary": "Blueprint constraint (verification-phase NFR)",
+        "secondary": "Plan phase-sequencing",
+        "tertiary": "PRD NFR amendment (formalize session-boundary constraint)",
+        "rationale": "ADR-worthiness rule: reversibility=two_way, blast_radius=component, no cross-team coordination — 0 of 3 hold. NOT ADR-worthy. Operational. Blueprint records the constraint; Plan phases respect the session boundary."
+      },
+      "adr_authorship_flag": false
+    },
+    {
+      "id": "D-003",
+      "title": "Sweep cleanup posture for execute-finalize-reconciler's `Agent` declaration (cleanup-as-blocker vs inventory-only)",
+      "class": "implementation",
+      "context": "FR-5 sweep (verified by critique: CR-0001-CR-0067 batch B05 + B07) found exactly 2 Agent-declaring agents: execute-orchestrator (primary defect site) and execute-finalize-reconciler (parallel defect, CR-0048-CR-0051 high-confidence inference). T-001 confirms the Agent declaration is a misleading runtime no-op (cleanup-as-blocker check at T-0072). The question is whether to remove the declaration as part of this feature or leave as inventory-only and defer cleanup.",
+      "anchor_claims": [
+        "CR-0001", "CR-0048", "CR-0049", "CR-0050", "CR-0051",
+        "T-0072",
+        "AN-0040"
+      ],
+      "claim_cluster_ids": ["graph-cluster-1", "graph-cluster-5"],
+      "entities_referenced": [
+        "E-0002 execute-finalize-reconciler",
+        "E-0008 Agent tool",
+        "E-0012 execute-orchestrator runtime tool surface"
+      ],
+      "reversibility": "two_way",
+      "reversibility_rationale": "Removing or restoring an `Agent` declaration in a YAML frontmatter is trivial.",
+      "blast_radius": "component",
+      "blast_radius_rationale": "One file (execute-finalize-reconciler.md). No schema or cross-agent coupling.",
+      "wardley_stage": "commodity",
+      "wardley_stage_rationale": "Hygiene cleanup of a misleading declaration; no design novelty.",
+      "rice": {
+        "reach": 1,
+        "reach_rationale": "Single agent file.",
+        "impact": 0.5,
+        "impact_rationale": "Low — removes a misleading-but-runtime-noop declaration. Reduces future confusion; does not change runtime behavior.",
+        "confidence": 0.8,
+        "confidence_rationale": "FR-5 sweep is exhaustive (critique stronger_than_extractor_flagged: 'affected set closed at 2'). 80% per verified-independent rubric.",
+        "effort": 0.25,
+        "effort_rationale": "Quarter person-week — one frontmatter edit + verification.",
+        "score": 1.6
+      },
+      "options_summary": [
+        {
+          "label": "(D-003.1) Remove `Agent` declaration from execute-finalize-reconciler as part of this feature (cleanup-as-blocker)",
+          "recommended": true,
+          "rationale": "FR-5 sweep already closed the affected set at 2; both agents are in scope per the feature's repair posture. Removing the declaration in lockstep with execute-orchestrator's repair eliminates the parallel defect surface and prevents future drift. Negligible effort. T-0072 cleanup-as-blocker check supports inclusion."
+        },
+        {
+          "label": "(D-003.2) Leave as inventory-only (PRD FR-5 default); cleanup deferred to follow-up",
+          "recommended": false,
+          "rejection_rationale": "Rejected — leaves a known parallel defect on the floor while shipping the primary repair. AN-0040 explicitly recommends broader cleanup; deferring re-creates the same investigation cost in the follow-up.",
+          "rejection_named": "rejected — leaves a known parallel defect in the codebase post-repair"
+        }
+      ],
+      "risks": [
+        "If execute-finalize-reconciler has any consumer that relies on the (no-op) Agent declaration for documentation/intent signaling, removal could surface a stale assumption. Mitigation: include the rationale in the commit message and the Blueprint."
+      ],
+      "routing": {
+        "primary": "Plan phase task",
+        "secondary": "inline in main report (no ADR)",
+        "rationale": "ADR-worthiness rule: 0 of 3 hold. Implementation. Plan-author adds as a task in the relevant phase."
+      },
+      "adr_authorship_flag": false
+    },
+    {
+      "id": "D-004",
+      "title": "Close the recipe-feature-pipeline canonical-reference schema gap (checkpoint.json execution-phase fields)",
+      "class": "architectural",
+      "context": "Cluster 6 (graph) surfaces a pre-existing documentation gap: recipe-feature-pipeline/SKILL.md lines 96-128 reference a checkpoint.json schema that does NOT include the execution-phase fields actually written in flight (execution_pipeline_state_transitions, execution_mode, execution_pipeline_cycle_counters). Codebase-research claims (CR-0061-CR-0080 batch B08, verified) ground this. NFR-5-a requires the canonical reference to update in lockstep with any §6 option change. Independently of D-001, this is a documentary-drift defect with downstream risk for every pipeline run.",
+      "anchor_claims": [
+        "CR-0061", "CR-0062", "CR-0065", "CR-0066", "CR-0067", "CR-0068", "CR-0069", "CR-0070", "CR-0071", "CR-0072", "CR-0073", "CR-0074", "CR-0075"
+      ],
+      "claim_cluster_ids": ["graph-cluster-6"],
+      "entities_referenced": [
+        "E-0030 checkpoint.json schema",
+        "E-0031 state-transitions.log schema",
+        "E-0039 NFR-5-a canonical-reference documentation gap closure",
+        "E-0040 NFR-6-a no-artifact-migration",
+        "E-0069 OI-CR-C checkpoint execution-phase fields undocumented",
+        "E-0070 OI-CR-D template invariant + void/-prime undocumented",
+        "E-0094 void + -prime de facto log extensions",
+        "E-0095 v1 invoking_agent invariant",
+        "E-0006 recipe-feature-pipeline"
+      ],
+      "reversibility": "two_way",
+      "reversibility_rationale": "Documentation update; revisable.",
+      "blast_radius": "service",
+      "blast_radius_rationale": "Affects recipe-feature-pipeline (the top-level orchestrator service) and every consumer of the canonical-reference (all 36 agents, plus the state-transitions consumer set).",
+      "wardley_stage": "product",
+      "wardley_stage_rationale": "Canonical schema documentation for a productized pipeline; stable expectations, not bespoke design.",
+      "rice": {
+        "reach": 36,
+        "reach_rationale": "All 36 agents in the roster consume the canonical-reference contract.",
+        "impact": 1.0,
+        "impact_rationale": "Medium — closes a real defect but is documentation, not runtime behavior. Prevents future misinterpretation.",
+        "confidence": 0.8,
+        "confidence_rationale": "Codebase-research source verified by direct Grep (critique B08). 80% per verified-independent rubric.",
+        "effort": 1.0,
+        "effort_rationale": "One person-week to enumerate the in-flight checkpoint.json fields, update SKILL.md, and add template invariants for void/-prime.",
+        "score": 28.8
+      },
+      "options_summary": [
+        {
+          "label": "(D-004.1) Close the schema gap in lockstep with the §6 option implementation",
+          "recommended": true,
+          "rationale": "NFR-5-a explicitly requires lockstep. Doing this within the same feature satisfies NFR-5-a, prevents post-merge drift, and keeps the recipe-feature-pipeline canonical-reference authoritative. Low effort relative to D-001's effort."
+        },
+        {
+          "label": "(D-004.2) Defer to a follow-up documentation feature",
+          "recommended": false,
+          "rejection_rationale": "Rejected — violates NFR-5-a if the §6 implementation touches the schema. Even if §6 option (a) does not change the schema fields, the documented schema is already stale; deferring is a known-defect-on-the-floor anti-pattern.",
+          "rejection_named": "rejected — violates NFR-5-a lockstep requirement"
+        }
+      ],
+      "risks": [
+        "OI-CR-D (template invariant + void/-prime undocumented) is the related but distinct sub-finding — the framer recommends closing OI-CR-C and OI-CR-D together to avoid splitting documentation work.",
+        "Hard-constraint adjacency: NFR-5-a (must close); NFR-6-a (no-artifact-migration — schema closure is documentation-only, not data migration, so compatible).",
+        "If D-001 selects option (b), the schema-gap closure is non-trivially entangled with the state-machine relocation and effort increases."
+      ],
+      "routing": {
+        "primary": "Plan phase task",
+        "secondary": "Blueprint constraint (NFR-5-a)",
+        "tertiary": "potential ADR if option (b) is selected and schema fields move location",
+        "rationale": "ADR-worthiness rule: reversibility=two_way, blast_radius=service, no cross-team coordination beyond the recipe-feature-pipeline owner — 1 of 3 hold. Borderline. Default to implementation/operational (Plan + Blueprint); promote to ADR only if D-001=(b) materially changes schema ownership."
+      },
+      "adr_authorship_flag": false,
+      "adr_promotion_condition": "If D-001 selects option (b), promote D-004 to architectural and author an ADR for the schema-ownership transfer."
+    },
+    {
+      "id": "D-005",
+      "title": "Establish a documentation-conventions discipline to prevent ADR mis-attribution recurrence (defer to separate feature)",
+      "class": "operational",
+      "context": "DISSENT-2 in the critique surfaces a documentary mis-attribution (PRD FR-3-c cites ADR-0034 for symmetric D-12; correct citation is ADR-0017 + ADR-0033 per direct Grep on ADR file contents). The mis-attribution has already been corrected via surgical edit + dissent_evidence in the synthesis. The open question is whether to author an ADR or convention preventing recurrence.",
+      "anchor_claims": [
+        "CR-0010", "CR-0011", "CR-0012", "CR-0086", "CR-0132", "CR-0142",
+        "AN-0029"
+      ],
+      "claim_cluster_ids": ["graph-cluster-4"],
+      "entities_referenced": [
+        "E-0016 ADR-0033",
+        "E-0017 ADR-0034",
+        "E-0018 ADR-0017",
+        "E-0067 OI-CR-A documentary mis-attribution"
+      ],
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "blast_radius_rationale": "Process discipline; affects future PRD/Blueprint authorship habits, not runtime.",
+      "wardley_stage": "commodity",
+      "rice": {
+        "reach": 5,
+        "reach_rationale": "PRD/Blueprint/Plan/ADR authors going forward (small population).",
+        "impact": 0.25,
+        "impact_rationale": "Minimal — DISSENT-2 has already been surgically corrected; the recurrence-prevention question is meta-discipline.",
+        "confidence": 0.5,
+        "confidence_rationale": "Recurrence rate is not measured; single observed instance. 50% per single-instance rubric.",
+        "effort": 1.0,
+        "effort_rationale": "One person-week to author a documentation-conventions ADR or skill.",
+        "score": 0.625
+      },
+      "options_summary": [
+        {
+          "label": "(D-005.1) Defer to a separate documentation-conventions feature (recommended)",
+          "recommended": true,
+          "rationale": "Aligned with user-memory project-feedback pattern: belongs in a separate feature, not bundled in dispatch-repair. Avoids scope creep. The corrective action (cite ADR-0017 + ADR-0033 going forward) is already encoded in the critique downstream_action_required and will be carried by D-001's Blueprint."
+        },
+        {
+          "label": "(D-005.2) Bundle a documentation-conventions ADR in this feature",
+          "recommended": false,
+          "rejection_rationale": "Rejected — scope creep. The dispatch-repair feature is committed to FR-2 + FR-4 + FR-5 + FR-6 + NFR-5-a; adding a conventions ADR widens scope without strengthening the kill-criterion-#2 closure.",
+          "rejection_named": "rejected — out of scope for kill-criterion-#2 closure"
+        }
+      ],
+      "risks": [
+        "If deferred indefinitely, the same mis-attribution pattern could recur. Mitigation: surface as an open item that downstream Synthesizer + Blueprint must respect by citing ADR-0017 + ADR-0033 consistently."
+      ],
+      "routing": {
+        "primary": "open-item (deferred to separate feature)",
+        "secondary": "Synthesizer note: downstream artifacts MUST cite ADR-0017 + ADR-0033 (carry through DISSENT-2 resolution)",
+        "rationale": "ADR-worthiness rule: 0 of 3 hold. Not ADR-worthy in this feature. Defer."
+      },
+      "adr_authorship_flag": false
+    }
+  ],
+  "open_items_for_downstream": [
+    {
+      "id": "OI-FRAMER-1",
+      "description": "DISSENT-2 carry-through: every downstream artifact (Blueprint, ADRs, Plan, PRD amendments) MUST cite ADR-0017 + ADR-0033 (not ADR-0034) for the 4-cycle cap + symmetric D-12 application. design-composer and plan-author MUST respect this.",
+      "owner": "design-composer + plan-author",
+      "source": "critique DISSENT-2 downstream_action_required"
+    },
+    {
+      "id": "OI-FRAMER-2",
+      "description": "DISSENT-4 carry-through: FR-6 synthetic-test design SHOULD include a sub-question discriminating H-a (baseline-inheritance) vs H-b (memory-field auto-enable) for the Edit-tool mechanism. Non-load-bearing for kill-criterion but valuable.",
+      "owner": "per-layer cc Designer + FR-6 test author",
+      "source": "critique DISSENT-4 downstream_action_required"
+    },
+    {
+      "id": "OI-FRAMER-3",
+      "description": "F-7 session-boundary constraint (D-002 recommendation): plan-author MUST sequence FR-6 verification in a session distinct from agent-authoring. Per critique f7_confidence_assessment downstream_action_required.",
+      "owner": "plan-author",
+      "source": "critique f7_confidence_assessment + D-002 recommendation"
+    },
+    {
+      "id": "OI-FRAMER-4",
+      "description": "DISSENT-3 (36 vs 35 agents): minor cleanup — Research Plan reference of 35 agents should be corrected to 36. Non-blocking; covered by OI-CR-F in the critique.",
+      "owner": "any documentation touching agent counts",
+      "source": "critique DISSENT-3"
+    },
+    {
+      "id": "OI-FRAMER-5",
+      "description": "D-005 deferral: the documentation-conventions ADR is explicitly deferred. Downstream MUST NOT bundle it into this feature.",
+      "owner": "synth-synthesizer + design-composer",
+      "source": "D-005 routing"
+    }
+  ],
+  "adr_authorship_summary": {
+    "adr_worthy_frames": ["D-001"],
+    "conditionally_adr_worthy": ["D-004 (promote if D-001 selects option (b))"],
+    "blueprint_only": ["D-002"],
+    "plan_task_only": ["D-003"],
+    "deferred": ["D-005"]
+  }
+}

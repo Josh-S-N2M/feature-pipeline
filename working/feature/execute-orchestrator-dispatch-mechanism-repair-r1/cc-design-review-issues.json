@@ -1,0 +1,250 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "DesignDoc",
+    "subsection": "cc",
+    "target_path": "/workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/cc-design.md",
+    "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+    "scope_class": "FULL",
+    "layer": "cc",
+    "reviewer": "shared-document-reviewer",
+    "review_timestamp": "2026-05-23T20:55:00Z"
+  },
+  "inputs_consumed": [
+    "cc-design.md",
+    "prd-v1.md",
+    "synthesis.md",
+    "codebase-analysis.json",
+    "cc-dependencies.json",
+    "synthesis/04-decision-frames.json",
+    "synthesis/05-decision-substrate.json",
+    "KB-documentation-criteria (blueprint-template, shared-conventions)",
+    "KB-cc-design (per-layer discipline)",
+    "KB-review-disciplines (Gate 0/1 procedure)"
+  ],
+  "scores": {
+    "consistency": 86,
+    "completeness": 88,
+    "rule_compliance": 90,
+    "clarity": 90
+  },
+  "gate0": {
+    "status": "pass",
+    "missing_elements": [],
+    "notes": "This is a per-layer subsection (not a full Blueprint). It is structurally complete relative to the per-layer Design contract for the cc layer: it carries frontmatter (doc_type, feature_slug, scope_class, layer_scope, derived_from, companion_artifacts, generated, generated_by, inherited_adrs); declares the chosen §6 option (§2); states rationale (§2 three reasons + §2.1 rejection rationales); enumerates conventions touched (§3 8-row table covering all 8 PRD inventory items + the 1 outside-inventory file with explicit AC-FR-4-a treatment); details implementation in cc primitives (§4 dispatch section content; §5 schema closure; §6 cleanup); presents Sub-Agents (§7), Skills (§8), Hooks (§9), CLAUDE.md (§10), MCP (§11), Naming (§12), Error states (§13); produces 10 EARS-format ACs (§14 — AC-CC-1..10); surfaces 6 Q-CC items for composer (§15) + 5 OI-CC items (§16); declares dependencies (§17) backed by cc-dependencies.json. cc-dependencies.json conforms to the per-layer dependency schema (intra_layer_dependencies, cross_decision_dependencies, inherited_adrs_consumed, f7_constraint, open_items_surfaced_to_composer)."
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "summary": "pass — proceed to Design Composition. The cc-design selects §6 option (a), grounds it in three load-bearing reasons aligned with synthesis D-001, preserves the four specialist-isolation invariants, honors F-7 via the two-session pattern, and correctly inherits ADR-0017 + ADR-0033 (not ADR-0034) for the 4-cycle cap + symmetric D-12. Two MAJOR findings (I-DR-001 incomplete ADR-0034 sweep on execute-finalize-reconciler; I-DR-002 inconsistent treatment of the execute-orchestrator description line citing 'symmetric application per D-12') and several MINOR/NIT items are flagged for design-composer awareness but do not block composition. The Q-CC-1 divergence from synthesis D-005 is well-rationalized (MINOR — composer ratifies).",
+    "conditions": [
+      "Design composer or plan-author MUST address I-DR-001: the ADR-0034 mis-citation on execute-finalize-reconciler.md appears on lines 3 (description), 19 (Authoritative references), 82 (section heading), 84 (body). cc-design §6 only corrects line 19. Per synthesis Constraint 5.4 (DISSENT-2 carry-through), all four occurrences must be corrected.",
+      "Design composer to evaluate I-DR-002: execute-orchestrator.md:3 description ends with 'symmetric application per D-12' but does NOT cite ADR-0034. This is technically correct but design-composer should confirm whether any inheriting ADR or comment elsewhere implies ADR-0034 as the source.",
+      "Design composer ratifies the Q-CC-1 divergence from synthesis D-005 (Designer recommends authoring the Agent-grant ADR in this feature vs. synthesis defer recommendation). Designer's rationale is reasonable; composer's call."
+    ]
+  },
+  "issues": [
+    {
+      "id": "I-DR-001",
+      "severity": "important",
+      "category": "consistency",
+      "location": "cc-design.md §6 (FR-5 cleanup), execute-finalize-reconciler.md lines 3, 82, 84",
+      "description": "Incomplete ADR-0034 sweep on execute-finalize-reconciler.md. cc-design §6 specifies only the line 19 correction ('Authoritative references' bullet citing ADR-0034). Grep confirms ADR-0034 also appears on: line 3 (description, 'symmetric ADR-0017 application per ADR-0034'); line 82 (section heading 'Cycle-cap escalation (D-12 + ADR-0034)'); line 84 (body 'When... ADR-0017 + ADR-0034'). Per synthesis Constraint 5.4 / OI-FRAMER-1 (DISSENT-2 carry-through), every reference to ADR-0034 as the symmetric-D-12 source must be corrected to ADR-0033.",
+      "suggestion": "Update §6 (D-003) edit list to include all 4 ADR-0034 references on execute-finalize-reconciler.md (lines 3, 19, 82, 84). Update AC-CC-5 wording to cover the full sweep. Plan-author can elect to make all 4 corrections a single atomic edit. Design-composer should confirm the same sweep was applied to plan-author's task scope."
+    },
+    {
+      "id": "I-DR-002",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "cc-design.md §2.1 carry-through; execute-orchestrator.md:3",
+      "description": "execute-orchestrator.md:3 description ends with 'symmetric application per D-12' — does NOT explicitly cite ADR-0034 (good — no mis-credit) but also does NOT cite ADR-0033. Under the §6 option (a) re-framing where execute-orchestrator becomes an advisor, the description line is a documentation surface that downstream readers will use to understand the state-machine reference; explicit ADR-0033 citation would close the propagation loop completely.",
+      "suggestion": "Consider adding an edit in §6's edit list (or §3's Conventions Touched body re-framing for execute-orchestrator) to append '(per ADR-0017 4-cycle cap + ADR-0033 symmetric D-12 application)' to execute-orchestrator.md:3. Low-cost edit; closes DISSENT-2 carry-through completely on the advisor file."
+    },
+    {
+      "id": "I-DR-003",
+      "severity": "important",
+      "category": "completeness",
+      "location": "cc-design.md §15 Q-CC-1 (divergence from synthesis D-005.1)",
+      "description": "The cc-design diverges from synthesis D-005.1 by recommending authoring the project-wide ADR ('sub-agents MUST NOT declare Agent in tools lists') in THIS feature. Synthesis explicitly defers this work (RICE=0.625; scope-creep risk; user-memory preference cited). The Designer's rationale ('T-001's 3-source citation work + D-003 cleanup are both in this run; deferring re-incurs source-citation work') is reasonable but the divergence is load-bearing for design-composer's ADR-authorship scope under FR-5 / FR-8. AC-CC-10 is explicitly conditional on Q-CC-1 disposition; if composer defers, AC-CC-10 drops.",
+      "suggestion": "This is well-rationalized divergence — MINOR for the divergence itself. Surfaced as IMPORTANT because design-composer's ADR-authorship scope (single ADR for D-001 vs. two ADRs for D-001 + the convention) determines plan-author task count and the Blueprint's adrs_authored frontmatter. Design-composer should ratify explicitly and the Blueprint should record the decision in the Fact Disposition Table or composer rationale. The divergence itself is acceptable; the open question is the composer's call."
+    },
+    {
+      "id": "I-DR-004",
+      "severity": "important",
+      "category": "completeness",
+      "location": "cc-design.md §3 row 1 (recipe-feature-pipeline/SKILL.md); §4 (dispatch section); §5 (schema closure)",
+      "description": "The cc-design specifies WHAT the new Execution Phase Dispatch section contains (§4 — 7 numbered content items) and WHAT the schema-closure edit covers (§5 — three new fields + void/-prime extensions). Both edit the same file (recipe-feature-pipeline/SKILL.md). Per synthesis Constraint 5.1, these two edits MUST be sequenced coherently — recommended D-004 schema closure first, then D-001 dispatch section absorption. The cc-design notes 'plan-author MUST sequence them coherently (synthesis Constraint 5.1)' at §5 closing but does NOT name the recommended order. plan-author may pick the inverse order.",
+      "suggestion": "Either: (a) cc-design §5 explicitly names the recommended order (schema closure first, then dispatch-section absorption) per synthesis substrate Constraint 5.1's interaction analysis (D-001 ↔ D-004); OR (b) flag this as an explicit Q-CC-N item for design-composer/plan-author arbitration. Currently the design defers the sequencing without naming the recommendation. Low-effort fix."
+    },
+    {
+      "id": "I-DR-005",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "cc-design.md §13 (Project Filesystem Error State Design)",
+      "description": "§13 covers four error states (advisor file missing, specialist missing, checkpoint malformed, log_state_transition.py failure). It does NOT cover the case where the new 'dispatch_directives[]' array in quality-reconciliation-log.json is malformed or missing under the new D-003 re-framing — which is a novel failure surface introduced by this feature. Under option (a), the parent reads dispatch_directives[] to invoke targets; if the reconciler emits an empty or malformed array, the parent has no fallback documented.",
+      "suggestion": "Add an error-state entry for malformed/empty dispatch_directives[] under §13. Plan-author can decide the parent's behavior: surface to user, fall back to a default dispatch, or treat as cycle-cap-equivalent escalation. Mentioning the constraint in this Design unblocks plan-author from inventing it ad-hoc."
+    },
+    {
+      "id": "I-DR-006",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "cc-design.md §15 Q-CC-3 (execute-orchestrator skills self-reference)",
+      "description": "Q-CC-3 surfaces execute-orchestrator.md:7 declaring 'recipe-feature-pipeline' in its own skills: array. The Designer recommends preserving with body-prose rationale. Under option (a)'s advisor re-framing this seems sensible. However, ADR-0022's SA-13 BLOCKER check (per codebase-analysis OQ-CR-003) may flag self-references; the rationale should be encoded as a body comment in execute-orchestrator.md (so future SA-13 audit passes have explicit evidence of intentionality) rather than only in the Q-CC narrative.",
+      "suggestion": "If composer ratifies preserve (option b in Q-CC-3), require an explicit body-prose comment in execute-orchestrator.md (e.g., near line 7 or as a 'Skills rationale' subsection) documenting 'recipe-feature-pipeline in skills: is intentional — this advisor file documents the state machine the parent skill orchestrates'. This converts the rationale from Q-CC-narrative to file-resident evidence for SA-13 audits."
+    },
+    {
+      "id": "I-DR-007",
+      "severity": "recommended",
+      "category": "feasibility",
+      "location": "cc-design.md §2.2 (F-7 carry-through); AC-CC-6; cc-dependencies.json f7_constraint",
+      "description": "The cc-design (§2.2) correctly notes that 'No new sub-agent files are authored by this feature. Existing sub-agents are edited only.' This makes F-7 vacuous for this feature's own implementation. However, AC-CC-6 still imposes the session-restart constraint conditionally on plan-author's synthetic test design (FR-6). The AC wording is correct but the contingency creates uncertainty: if plan-author elects a no-new-agents synthetic test (e.g., reusing existing specialists with a probe task), AC-CC-6 is vacuously satisfied; if plan-author authors a new test-specific agent, the constraint fires. Cross-artifact reviewer should verify this contingency at the plan + test-artifact stage.",
+      "suggestion": "No fix required at cc-design stage. Flag for cross-artifact-audit-reviewer (downstream): verify plan-author's synthetic-test design either declares 'no new agents' (vacuously satisfies AC-CC-6) or includes the explicit session-restart step. Recorded here for traceability."
+    },
+    {
+      "id": "I-DR-008",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "cc-design.md §3 Conventions Touched table row 8 (state-transitions.log per-entry schema)",
+      "description": "The §3 table row 8 describes the change as '(outside-inventory; 1 file → AC-FR-4-a open-item count = 1)' but the cell content describes BOTH the v1 invariant clarification AND folding in the void/-prime extensions. These are TWO distinct semantic changes packaged as one row. PRD AC-FR-4-a counts files, not edits — so 1 file is correct — but design-composer should be aware the file edit is more substantive than 'a single clarification'.",
+      "suggestion": "Either split into two rows (one for the invoking_agent invariant clarification per §5; one for the void/-prime extension folding per §5) OR add a sub-bullet under the existing row enumerating both sub-edits. This clarifies the Fact Disposition Table the design-composer will build."
+    },
+    {
+      "id": "I-DR-009",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "cc-design.md §7.1 (per-sub-agent reasoning configuration)",
+      "description": "The reasoning-configuration table preserves all 5 specialists' triplets unchanged. Under option (a)'s re-framing, execute-orchestrator becomes an advisor — it is no longer dispatched at runtime. ADR-0022 governs SA-13 audit at runtime invocation; a never-invoked agent's reasoning triplet has no operational effect. The §7.1 row for execute-orchestrator labels the verdict 'PRESERVED, but see Q-CC-3' — this is correct but does not address whether opus/high is still warranted for an advisor that is never invoked. The conservative answer is 'preserve to keep the file invocable if option (a) is reversed' — but this should be explicit.",
+      "suggestion": "Add a brief footnote under §7.1 row 1: 'Triplet preserved despite advisor role — option (a) reversal would require re-invocation; preserving the triplet keeps that reversal cheap.' One sentence. Closes the latent question."
+    },
+    {
+      "id": "I-DR-010",
+      "severity": "important",
+      "category": "consistency",
+      "location": "cc-design.md frontmatter inherited_adrs; cc-dependencies.json inherited_adrs_consumed",
+      "description": "cc-design.md frontmatter declares 12 inherited ADRs (ADR-0017, 0019, 0021, 0022, 0027, 0029, 0033, 0035, 0036, 0037, 0040, 0041). cc-dependencies.json inherited_adrs_consumed lists the same 12. Codebase-analysis.json identifies ADR-0035, ADR-0042, ADR-0043 as 'newly_surfaced_adrs_not_in_research_plan_list' for design-composer review. ADR-0035 IS inherited (good — picked up). ADR-0042 and ADR-0043 (auditing-mcp family graduation + Gate-6 hard gate) are NOT in the inherited list. Codebase-analysis notes 'These ADRs ALSO reference the execute-* agents... Likely UNLIKELY to constrain the dispatch repair, but design-composer should confirm.' The cc-design does not document its disposition of ADR-0042/0043.",
+      "suggestion": "Either (a) add a brief disposition note in cc-design (e.g., a new sub-section under §2.2 or in §15 Q-CC-N) explaining why ADR-0042/0043 are NOT inherited (likely because they constrain the auditing-mcp Gate-6 step which is orthogonal to dispatch); or (b) inherit them defensively. The cc-design subsection should not leave this gap for design-composer to resolve without context. Codebase-analysis OI-CR-E surfaces this; the cc-design should close it."
+    },
+    {
+      "id": "I-DR-011",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "cc-dependencies.json intra_layer_dependencies",
+      "description": "cc-dependencies.json lists 7 intra_layer_dependencies (parent skill → 4 specialists, parent skill → advisor reference, parent skill → log_state_transition.py). Schema conforms to the per-layer dependency schema. All targets exist in the codebase (verified via Glob). However, the dependency on auditing-shared/scripts/log_state_transition.py is correctly characterized as 'bash_invocation' — but the broader auditing-shared skill binding (which would inherit ADR-0035 discipline) is not captured. The 4 specialists currently have skills: [..., auditing-shared] (for the reviewer/handler/reconciler) which IS the binding ADR-0035 covers.",
+      "suggestion": "Optional: add a row to cc-dependencies.json's intra_layer_dependencies capturing 'specialists → auditing-shared skill' as kind: 'skill_binding'. This makes the ADR-0035 inheritance evidence-backed in the dependencies artifact rather than only frontmatter-declared. Low-priority; design-composer can elect to incorporate."
+    },
+    {
+      "id": "I-DR-012",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "cc-design.md §14 AC-CC-8, AC-CC-9 (cycle-counter behavior)",
+      "description": "AC-CC-8 and AC-CC-9 specify cycle-counter increment behavior + cap exhaustion. These are inherited from PRD NFR-3-a and NFR-3-b. The cc-design correctly identifies that under option (a), the parent orchestrator owns the counter (in checkpoint.json.execution_pipeline_cycle_counters). However, AC-CC-8 says 'parent orchestrator shall increment' but does not specify which transition increments which counter (the inherited invariant from execute-orchestrator.md:43 is that ONLY T4 and T10 increment, NOT T0/T13). This invariant is load-bearing per I-AA-609 and is documented in execute-orchestrator.md and state-transitions-log-entry-template.md but not propagated into the new AC.",
+      "suggestion": "Append to AC-CC-8: 'specifically at T4 (per-task NEEDS_REVISION) for per_task counters and T10 (phase reconciliation cycle complete) for per_phase counters — per I-AA-609 invariant 10. T0 and T13 boundary transitions are logged but do NOT increment.' This propagates the I-AA-609 invariant into the new ACs."
+    }
+  ],
+  "fr_coverage_assessment": {
+    "FR-1_investigation_already_done": "addressed — §2 / §2.2 reference T-001 as completed; correctly attributes anchor evidence",
+    "FR-2_kill_criterion_2_confirmed": "addressed — §2 confirms FULL repair pathway; design proceeds",
+    "FR-3_option_a_selected": "addressed — §2 explicitly names 'option (a) flatten dispatch hierarchy' with 3-reason rationale; FR-3-c preservation invariants cited (ADR-0017 + ADR-0033, NOT 0034)",
+    "FR-3-b_specialist_responsibilities_unchanged": "addressed — §3 table rows 3-5 and §7 table mark specialists as 'body prose only'; AC-CC-3 propagates",
+    "FR-3-c_invariants_preserved": "addressed — §2 reasons explicitly cite ADR-0017 + ADR-0033; §2.2 carry-through discipline",
+    "FR-4_8_file_inventory": "addressed with one explicit outside-inventory file (state-transitions-log-entry-template.md) and AC-FR-4-a operator-gate count = 1; §3 table row 8 documents",
+    "FR-4-a_outside_inventory_operator_gate": "addressed — AC-CC-2 propagates the 8+1 contract",
+    "FR-4-b_schema_lockstep": "addressed — §5 + AC-CC-4 enforce lockstep; D-004 fully integrated with D-001",
+    "FR-5_sweep_and_cleanup": "addressed — §6 specifies D-003 cleanup on execute-finalize-reconciler; AC-CC-5 propagates; FR-5 sweep result (set closed at 2) honored. CAVEAT per I-DR-001: incomplete ADR-0034 sweep on the same file",
+    "FR-5-b_cleanup_demands": "addressed — D-003 bundled cleanup per synthesis Constraint 5.2",
+    "FR-6_synthetic_test": "addressed — F-7 constraint propagated via AC-CC-6; D-002 two-session pattern honored; H-a/H-b sub-question surfaced as Q-CC-6 per DISSENT-4 carry-through",
+    "NFR-5-a_canonical_reference_consistency": "addressed — §5 schema closure + AC-CC-4 lockstep",
+    "NFR-6_in_flight_artifact_preservation": "addressed — §5 notes 'pre-existing in-flight artifacts left as-is' per NFR-6-a; execution_mode: 'single-agent-fallback' value preserved as v1 compatibility marker per NFR-6-b"
+  },
+  "constraint_preservation_assessment": {
+    "subagent_cannot_dispatch_subagent": "preserved — option (a) moves dispatch to parent (main-conversation level where dispatch IS supported); execute-orchestrator becomes advisor with Agent removed; reconciler emits dispatch_directives[] for parent to consume",
+    "specialist_isolation_4_invariants": "preserved — §2 reason 2 explicitly cites the 4 properties; option (a) maintains each specialist as a separately-dispatched sub-agent boundary",
+    "ADR_0017_4_cycle_cap": "preserved — §4 item 3 (per-task cycle cap) + item 5 (per-phase cycle cap); AC-CC-9 enforces",
+    "ADR_0033_symmetric_D12": "preserved + correctly attributed (not ADR-0034 mis-credit); §2.2 carry-through discipline",
+    "F_7_constraint": "honored — §2.2 documents; AC-CC-6 conditional; cc-dependencies.json f7_constraint section explicit"
+  },
+  "dependency_realizability": {
+    "verdict": "pass — all 7 intra_layer_dependencies resolve to existing files; advisor reference target preserved; all 5 inherited ADR files exist at adrs/; auditing-shared/scripts/log_state_transition.py exists with REQUIRED_FIELDS schema unchanged",
+    "verified_targets": [
+      ".claude/agents/execute-orchestrator.md (exists)",
+      ".claude/agents/execute-task-code-producer.md (exists)",
+      ".claude/agents/execute-task-quality-handler.md (exists)",
+      ".claude/agents/execute-phase-quality-reviewer.md (exists)",
+      ".claude/agents/execute-finalize-reconciler.md (exists)",
+      ".claude/skills/recipe-feature-pipeline/SKILL.md (exists)",
+      ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md (exists)",
+      ".claude/skills/auditing-shared/scripts/log_state_transition.py (referenced; existence not directly verified by this reviewer but cited in codebase-analysis)"
+    ],
+    "no_fabricated_apis": true,
+    "no_orphan_references": true
+  },
+  "execute_orchestrator_disposition_assessment": {
+    "design_choice": "repurposed as state-machine advisor / canonical reference (NOT retired entirely)",
+    "synthesis_framing_check": "synthesis §3.1 D-001 option (a) description explicitly says 'execute-orchestrator.md is RETAINED but re-scoped as an advisory / state-machine reference document' — the cc-design choice EXACTLY matches synthesis framing",
+    "implementability": "feasible — file persists; frontmatter Agent + TaskUpdate removed; body re-framed from 'what this agent does' to 'what the parent orchestrator MUST execute when invoking specialists'; no deletion required; reversal cheap (re-add Agent + TaskUpdate to restore dispatcher role)",
+    "consistency_with_F_7": "consistent — no new sub-agent file is authored; advisor remains the same file invocable from same registry; F-7 does not fire for this feature's own implementation"
+  },
+  "q_cc_n_quality_assessment": {
+    "Q-CC-1": "genuinely under-determined — divergence from synthesis D-005 requires composer ratification; Designer's rationale is reasonable but not load-bearing (RICE differential is small; both paths are defensible). Composer should decide.",
+    "Q-CC-2": "genuinely under-determined — design-composer discipline (explicit vs implicit ADR inheritance) is a composer-side judgment call",
+    "Q-CC-3": "genuinely under-determined — SA-13 audit interaction with intentional self-references is a composer-side judgment; recommended preserve with body comment per I-DR-006",
+    "Q-CC-4": "genuinely under-determined — v1 invariant clarification semantics (logical owner vs emitter vs add new field) is a composer-side schema-ownership decision; cc-design recommends (a) accept clarification which is consistent with in-flight artifact preservation",
+    "Q-CC-5": "genuinely under-determined — memory: project on reconciler under advisor-mode orchestrator is a plan-author-side state-management decision; cc-design recommends preserve",
+    "Q-CC-6": "genuinely under-determined — test-acceptance-author scope decision; H-a/H-b sub-question is non-load-bearing for kill-criterion-#2 closure but valuable for future cc-design discipline (per DISSENT-4 carry-through)",
+    "verdict": "All 6 Q-CC-N items are appropriately surfaced for composer/downstream arbitration rather than under-determined-in-this-Design. No 'should-have-been-decided-here' items observed."
+  },
+  "synthesis_alignment_assessment": {
+    "D-001_option_a": "aligned — cc-design selects option (a) with three reasons matching synthesis framer recommendation; all 3 substrate-recommended reasons (FR-4 inventory; v1 invariant preservation; specialist-isolation) propagated",
+    "D-002_two_session_F_7": "aligned — §2.2 + AC-CC-6 honor the two-session pattern; cc-dependencies.json f7_constraint captures",
+    "D-003_remove_Agent_from_reconciler": "aligned — §6 specifies the cleanup; CAVEAT per I-DR-001 (incomplete ADR-0034 sweep but the Agent removal itself is correct)",
+    "D-004_schema_closure_lockstep": "aligned — §5 + AC-CC-4 enforce; CAVEAT per I-DR-004 (sequencing within the shared file is deferred to plan-author without naming the recommended order)",
+    "D-005_defer_conventions_ADR": "DIVERGED — Designer recommends authoring in this feature (Q-CC-1 option a) vs. synthesis defer. I-DR-003 flags this for composer ratification; rationale is reasonable but not load-bearing. MINOR severity for the divergence itself.",
+    "DISSENT-2_carry_through": "PARTIAL — design subsection correctly cites ADR-0017 + ADR-0033 (not ADR-0034) throughout its body and ACs; CAVEAT per I-DR-001/I-DR-002 (the cleanup edits to execute-finalize-reconciler.md and execute-orchestrator.md description do not cover all occurrences of the mis-credit)",
+    "DISSENT-4_H_a_vs_H_b": "carried through — Q-CC-6 surfaces the H-a/H-b sub-question for test-acceptance-author per OI-FRAMER-2",
+    "F-7_session_boundary": "carried through — AC-CC-6 + cc-dependencies.json f7_constraint",
+    "Constraint_5_1_shared_file_pressure": "carried through — §5 closing notes 'plan-author MUST sequence them coherently' but does NOT name recommended order (I-DR-004)",
+    "Constraint_5_2_bundled_commit": "carried through — §6 closing 'Bundled commit: both Agent-removals SHOULD ship in one commit'"
+  },
+  "verification_strategy_assessment": {
+    "correctness_definition": "implicit — the design relies on PRD ACs (FR-6, NFR-1-a) as the correctness definition. cc-design does not introduce its own Verification Strategy section because the per-layer Design template here is the cc subsection of a Blueprint (the full Verification Strategy lives at the cross-cutting Blueprint level, authored by design-composer)",
+    "verification_method": "implicit — FR-6 synthetic minimal test + optional FR-7 real-feature re-run; AC-CC-7 specifies the observable signal (one state-transitions.log entry per specialist dispatch boundary)",
+    "early_verification_point": "implicit — FR-6 synthetic test is the early verification target; AC-CC-6 enforces session-boundary constraint",
+    "output_comparison": "N/A at this Design subsection — the repair replaces a defective behavior with a working one (rather than transforming output of an existing working behavior). Verification is functional (dispatch loop completes) not output-comparison-based.",
+    "verdict": "Appropriate for a per-layer subsection. Design-composer's cross-cutting Verification Strategy section will absorb these into the Blueprint's L1/L2/L3 framing."
+  },
+  "fact_disposition_table_check": {
+    "applicability": "design-composer scope — Fact Disposition Tables live at the Blueprint cross-cutting level per KB-documentation-criteria templates/blueprint-template.md §Existing Codebase Analysis → Fact Disposition Table. Not required at per-layer subsection level.",
+    "verdict": "N/A for cc-design subsection. Design-composer should compose the Fact Disposition Table at the Blueprint level using codebase-analysis.json focusAreas (note: codebase-analysis.json uses 'affected_files' / 'affected_agents' / 'fr5_inventory_sweep' / 'blast_radius' / 'known_issues' / 'open_questions_for_human' rather than literal 'focusAreas' — design-composer should map these to Fact Disposition Table rows)."
+  },
+  "checklist": [
+    {"item": "Frontmatter complete (doc_type, feature_slug, layer, derived_from, companion_artifacts, scope_class, generated, generated_by)", "status": "pass"},
+    {"item": "§2 Decision Summary names §6 choice with one-sentence rationale", "status": "pass"},
+    {"item": "§2 Rationale evidence-cited; addresses why this option vs. others (§2.1 rejection rationales)", "status": "pass"},
+    {"item": "Implementation plan in cc primitives (§3 + §4 + §5 + §6 + §7-§12)", "status": "pass"},
+    {"item": "Affected files inventory matches PRD FR-4 8-file inventory + 1 outside-inventory disclosure", "status": "pass"},
+    {"item": "Schema changes documented (§5, D-004)", "status": "pass"},
+    {"item": "Cleanup actions documented (§6, D-003)", "status": "pass — caveat I-DR-001 incomplete ADR-0034 sweep"},
+    {"item": "F-7 verification approach documented (§2.2 + AC-CC-6)", "status": "pass"},
+    {"item": "Q-CC-N open items genuine for composer (6 items)", "status": "pass"},
+    {"item": "Cross-references to inherited ADRs", "status": "pass — caveat I-DR-010 ADR-0042/0043 disposition not documented"},
+    {"item": "Dependencies match cc-dependencies.json", "status": "pass"},
+    {"item": "cc-dependencies.json conforms to per-layer dependency schema", "status": "pass"},
+    {"item": "ADR-0017 + ADR-0033 cited (NOT ADR-0034) throughout body and ACs", "status": "pass — but I-DR-001/I-DR-002 flag incomplete cleanup of mis-credits IN OTHER FILES the design intends to edit"},
+    {"item": "Specialist-isolation 4 invariants preserved", "status": "pass"},
+    {"item": "Sub-agent-cannot-dispatch-sub-agent constraint honored", "status": "pass"}
+  ],
+  "recommendations": [
+    "Pass to design-composer for Blueprint composition.",
+    "Design-composer to address I-DR-001 (extend ADR-0034 sweep to cover all 4 occurrences on execute-finalize-reconciler.md) — either by adjusting plan-author's task scope or amending the cc-design before composition.",
+    "Design-composer to ratify Q-CC-1 disposition explicitly (author convention ADR in this feature vs. defer per synthesis D-005); record the decision in Blueprint frontmatter (adrs_authored count).",
+    "Design-composer to close the I-DR-010 ADR-0042/0043 disposition gap — either inherit defensively or document N/A rationale in the Blueprint.",
+    "Plan-author to honor synthesis Constraint 5.1 sequencing (recommended: schema closure first, then dispatch-section absorption — I-DR-004 surfaces this).",
+    "Cross-artifact-audit-reviewer (downstream) to verify the plan-author's synthetic test design handles AC-CC-6 contingency (I-DR-007)."
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": []
+  }
+}

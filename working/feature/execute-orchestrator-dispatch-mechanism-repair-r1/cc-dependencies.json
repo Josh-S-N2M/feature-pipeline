@@ -1,0 +1,146 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+  "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+  "generated": "2026-05-23T20:22:35Z",
+  "generated_by": "design-cc",
+  "layer": "cc",
+  "layer_scope_declared": ["cc"],
+  "summary": "Single-layer (cc-only) feature. No cross-layer dependencies — neither inbound nor outbound. The only dependency relationships are intra-cc between the parent orchestrator skill, the 4 execution-side specialists, the re-scoped advisor file, and the existing auditing-shared Bash hook.",
+  "depends_on": {
+    "ci_cd": [],
+    "iac": [],
+    "codespaces": [],
+    "backend": [],
+    "frontend": [],
+    "api": [],
+    "query": [],
+    "database": [],
+    "mcp_servers": [],
+    "external_services": [],
+    "rationale": "This feature touches sub-agent definitions, the parent orchestrator skill, and pipeline-internal state artifacts only. No external surface is invoked or read."
+  },
+  "provides_to": {
+    "ci_cd": [],
+    "iac": [],
+    "codespaces": [],
+    "backend": [],
+    "frontend": [],
+    "api": [],
+    "query": [],
+    "database": [],
+    "mcp_servers": [],
+    "rationale": "No CI/CD job invokes the execution-phase dispatch loop today. claude-code-action does not run feature-pipeline executions. If a future CI/CD feature were to invoke the pipeline headlessly, it would consume the repaired parent skill — but that future consumer is not in this feature's scope."
+  },
+  "intra_layer_dependencies": [
+    {
+      "from": ".claude/skills/recipe-feature-pipeline/SKILL.md (Execution Phase Dispatch section, new)",
+      "to": ".claude/agents/execute-task-code-producer.md",
+      "kind": "subagent_dispatch_via_Agent",
+      "lifecycle": "execution-phase per-task loop (T1)",
+      "contract": "Parent passes task spec from tasks.json (id, description, type, target_files, satisfies_ac, tests, per_task_skills, revision_context); specialist returns per-task-execution-result.{json,md} pair per Contract 1"
+    },
+    {
+      "from": ".claude/skills/recipe-feature-pipeline/SKILL.md (Execution Phase Dispatch section, new)",
+      "to": ".claude/agents/execute-task-quality-handler.md",
+      "kind": "subagent_dispatch_via_Agent",
+      "lifecycle": "execution-phase per-task loop (T2)",
+      "contract": "Parent passes pointer to per-task-execution-result.json + task spec + modified-files list; specialist returns Contract 1 verdict object (APPROVED|NEEDS_REVISION|STUB_DETECTED|BLOCKER)"
+    },
+    {
+      "from": ".claude/skills/recipe-feature-pipeline/SKILL.md (Execution Phase Dispatch section, new)",
+      "to": ".claude/agents/execute-phase-quality-reviewer.md",
+      "kind": "subagent_dispatch_via_Agent",
+      "lifecycle": "execution-phase per-phase loop (T7)",
+      "contract": "Parent passes phase identifier + feature slug + list of phase artifacts + optional scope-deviations input; specialist returns Contract 2 phase-quality-report (5-dimensional verdict: tests, audits, validator, discipline, scope_deviations)"
+    },
+    {
+      "from": ".claude/skills/recipe-feature-pipeline/SKILL.md (Execution Phase Dispatch section, new)",
+      "to": ".claude/agents/execute-finalize-reconciler.md",
+      "kind": "subagent_dispatch_via_Agent",
+      "lifecycle": "execution-phase per-phase reconciliation loop (T9)",
+      "contract": "Parent passes phase-quality-report.json (NEEDS_RECONCILIATION verdict) + current cycle counter + feature artifacts pointers; specialist returns quality-reconciliation-log.{json,md} pair containing a dispatch_directives[] array (NEW under option (a) — the reconciler emits routing intent; the parent dispatches the rows)"
+    },
+    {
+      "from": ".claude/skills/recipe-feature-pipeline/SKILL.md (Execution Phase Dispatch section, new)",
+      "to": ".claude/agents/execute-task-code-producer.md (revision cycles)",
+      "kind": "subagent_dispatch_via_Agent",
+      "lifecycle": "execution-phase per-phase reconciliation loop (T10)",
+      "contract": "Parent reads dispatch_directives[] from quality-reconciliation-log.json (per Contract 4 8-row matrix) and re-invokes the named target with revision_context payload"
+    },
+    {
+      "from": ".claude/skills/recipe-feature-pipeline/SKILL.md (Execution Phase Dispatch section, new)",
+      "to": ".claude/agents/execute-orchestrator.md (advisor reference)",
+      "kind": "documentation_reference",
+      "lifecycle": "Step 15 entry (parent skill reads the advisor file for the canonical state-machine narrative)",
+      "contract": "Read-only reference; advisor file is not dispatched at runtime"
+    },
+    {
+      "from": ".claude/skills/recipe-feature-pipeline/SKILL.md (Execution Phase Dispatch section, new)",
+      "to": ".claude/skills/auditing-shared/scripts/log_state_transition.py",
+      "kind": "bash_invocation",
+      "lifecycle": "every state transition (T0..T13)",
+      "contract": "Contract 5 payload passed via stdin; script writes one JSONL line to working/feature/<slug>/state-transitions.log; failure is observer-only per D-16"
+    }
+  ],
+  "cross_decision_dependencies": [
+    {
+      "decision_id": "D-001",
+      "depends_on_decision": "D-003",
+      "kind": "bundled_commit",
+      "rationale": "Per synthesis Constraint 5.2: both Agent-removals (execute-orchestrator + execute-finalize-reconciler) SHOULD ship in one commit, with commit message documenting 'FR-5 sweep closure: affected set = 2'."
+    },
+    {
+      "decision_id": "D-001",
+      "depends_on_decision": "D-004",
+      "kind": "shared_file_pressure",
+      "rationale": "Per synthesis Constraint 5.1: both D-001 (new Execution Phase Dispatch section) and D-004 (canonical checkpoint.json schema-reference closure at lines 96-128) edit the same file (.claude/skills/recipe-feature-pipeline/SKILL.md). plan-author MUST sequence these coherently — recommended: same phase, dependent tasks (schema closure first to stabilize the documented schema, then dispatch-section addition), OR a single combined task with explicit sub-sections."
+    },
+    {
+      "decision_id": "FR-6 verification",
+      "depends_on_decision": "D-002 (F-7 mitigation)",
+      "kind": "session_boundary",
+      "rationale": "Per synthesis Constraint 5.3 / §4: if plan-author's synthetic minimal test feature design authors any new sub-agent file, the plan MUST place an operator-facing session-restart instruction between the authoring task and the test-execution task. Two-session verification is the recommended path; F-7 cannot be mitigated within a single session."
+    },
+    {
+      "decision_id": "Q-CC-1 (project-wide Agent-grant prohibition ADR)",
+      "depends_on_decision": "design-composer disposition",
+      "kind": "composer_decision",
+      "rationale": "Recommendation in cc-design §15 is option (a) — author the ADR in this feature, because T-001's source-citation work is already done and a follow-on feature would re-incur it. Composer ratifies per FR-5 ADR-authoring authority."
+    },
+    {
+      "decision_id": "DISSENT-2 attribution discipline",
+      "depends_on_decision": "every downstream artifact",
+      "kind": "carry_through",
+      "rationale": "Per synthesis Constraint 5.4 / OI-FRAMER-1: every downstream artifact (Blueprint, ADRs, Plan, test artifacts, finalize-reconciler updates) MUST cite ADR-0017 + ADR-0033 for the 4-cycle cap + symmetric D-12 application. The PRD's FR-3-c phrase 'ADR-0034 symmetric D-12' was a mis-credit, surgically corrected post-Gate-2. This Design subsection has propagated the correction; downstream authors verify their own outputs."
+    }
+  ],
+  "inherited_adrs_consumed": [
+    {"adr": "ADR-0017", "load_bearing_invariant": "4-cycle cap (per-task + per-phase, symmetric per D-12)"},
+    {"adr": "ADR-0019", "load_bearing_invariant": "sub-agent / skill / ADR naming conventions (execute-*, recipe-*, KB-*, auditing-*)"},
+    {"adr": "ADR-0021", "load_bearing_invariant": "KB-and-ADR-first discipline (governs this Design subsection)"},
+    {"adr": "ADR-0022", "load_bearing_invariant": "sub-agent reasoning configuration is intentional and audited (model/effort/skills triplet)"},
+    {"adr": "ADR-0027", "load_bearing_invariant": "cwd MUST equal repo root for parent skill invocation"},
+    {"adr": "ADR-0029", "load_bearing_invariant": "no silent scope changes (PRD FR-2 kill-criterion-#1 is the application; not exercised since kill-criterion-#2 fired)"},
+    {"adr": "ADR-0033", "load_bearing_invariant": "ADR-0029 execution-phase extension; symmetric D-12 application at per-task + per-phase boundaries; canonical home for the symmetric application"},
+    {"adr": "ADR-0035", "load_bearing_invariant": "auditing-shared skill-binding convention (execute-finalize-reconciler's auditing-shared dependency)"},
+    {"adr": "ADR-0036", "load_bearing_invariant": "single-location ADR placement (any new ADR composer authors under FR-8 lands at adrs/ only)"},
+    {"adr": "ADR-0037", "load_bearing_invariant": "mcp-events.jsonl transition surfacing (CONDITIONALLY applicable — not exercised by option (a))"},
+    {"adr": "ADR-0040", "load_bearing_invariant": "Serena narrowed always-on (marginally applicable — no execute-* agent on Serena allowlist)"},
+    {"adr": "ADR-0041", "load_bearing_invariant": "install-mechanism hybrid (marginally applicable — no new install script under option (a))"}
+  ],
+  "f7_constraint": {
+    "applies": "yes",
+    "description": "Claude Code harness loads its agent registry at session start and does not hot-reload mid-session. Newly-authored sub-agent files are not invocable in the same session that authored them. Documented by T-001 (n=1, partially_verified).",
+    "this_features_authoring_impact": "This feature MODIFIES existing sub-agent files; it does NOT author new ones. Therefore F-7 does NOT block this feature's own implementation phase. However, if plan-author's FR-6 synthetic-test design authors a new sub-agent (e.g., a test-feature-specific specialist), F-7 fires at that point.",
+    "remediation": "Two-session verification (synthesis D-002.1). plan-author MUST sequence the synthetic-test authoring tasks and the synthetic-test execution tasks across a session boundary with an explicit operator session-restart instruction."
+  },
+  "open_items_surfaced_to_composer": [
+    {"id": "Q-CC-1", "summary": "Author a project-wide ADR for sub-agent Agent-grant prohibition in this feature (recommended) vs. defer", "owner": "design-composer"},
+    {"id": "Q-CC-2", "summary": "Explicit inheritance of ADR-0017/0033/0019/0022 in the primary ADR's Related-ADRs section", "owner": "design-composer"},
+    {"id": "Q-CC-3", "summary": "execute-orchestrator's skills: array self-reference to recipe-feature-pipeline (preserve with rationale recommended)", "owner": "design-composer"},
+    {"id": "Q-CC-4", "summary": "Clarify the state-transitions-log v1 invoking_agent invariant as 'logical owner' (recommended)", "owner": "design-composer"},
+    {"id": "Q-CC-5", "summary": "Shared cycle-counter state — preserve execute-finalize-reconciler's memory: project (recommended)", "owner": "design-composer"},
+    {"id": "Q-CC-6", "summary": "FR-6 synthetic test SHOULD include H-a vs H-b Edit-tool sub-question (DISSENT-4 carry-through)", "owner": "test-acceptance-author (via design-composer)"}
+  ]
+}

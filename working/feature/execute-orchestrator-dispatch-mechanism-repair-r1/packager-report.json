@@ -1,0 +1,153 @@
+{
+  "schema_version": "1.0.0",
+  "report_id": "PKG-execute-orchestrator-dispatch-mechanism-repair-r1",
+  "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+  "scope_class": "FULL",
+  "scope_class_source": "intent-clarification.md frontmatter (explicit declaration)",
+  "version_tag": null,
+  "handoff_drafted": false,
+  "handoff_drafted_reason": "No version_tag provided; this is a feature pipeline run, not a project semver release.",
+  "generated_at": "2026-05-24T00:00:00Z",
+  "generated_by": "finalize-deliverable-packager",
+  "verdict": "PASS",
+  "verdict_rationale": "All 25 expected FULL-scope artifacts present and non-empty. Both authored ADRs (ADR-0044, ADR-0045) present at canonical root per ADR-0036. The historical dual-location requirement has been retired per ADR-0036 (2026-05-22); the canonical-only placement chosen by the operator at Gate 7 (checkpoint.adr_placement_disposition.choice == 'honor-adr-0036-canonical-root') is fully spec-conformant under the current deliverable-archive-spec.md (lines 136-150).",
+
+  "expected_artifact_count": 25,
+  "present_artifact_count": 25,
+  "missing_required_count": 0,
+  "missing_conditional_unjustified_count": 0,
+
+  "artifacts_present": [
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/checkpoint.json", "category": "orchestrator", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/intent-clarification.md", "category": "intent-clarification (ratified)", "status": "present", "notes": "user_token: gate-1-approved-as-is-2026-05-23T20:32:00Z; status: ratified; scope_class: FULL"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/intent-clarification-review-issues.json", "category": "review-issues", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/prd-v1.md", "category": "prd (highest N=1)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/prd-v1-review-issues.json", "category": "review-issues", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/research-plan.md", "category": "research-plan", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/codebase-analysis.json", "category": "codebase-analysis", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/codebase-analysis-report.md", "category": "codebase-analysis-report", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/research-notes/T-001-claude-code-subagent-tool-grant-semantics.md", "category": "research-notes (>=1)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis.md", "category": "synthesis", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis/01-claims-analysis-execute-orchestrator-dispatch-limitation.json", "category": "synthesis-intermediate (extractor)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis/01-claims-T-001-claude-code-subagent-tool-grant-semantics.json", "category": "synthesis-intermediate (extractor)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis/01-claims-codebase-analysis-report.json", "category": "synthesis-intermediate (extractor)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis/02-graph.json", "category": "synthesis-intermediate (grapher)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis/02-graph-summary.md", "category": "synthesis-intermediate (grapher)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis/03-critique.json", "category": "synthesis-intermediate (critic)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis/03-verifications.md", "category": "synthesis-intermediate (critic)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis/04-decision-frames.json", "category": "synthesis-intermediate (framer)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis/05-decision-substrate.json", "category": "synthesis-intermediate (substrate)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/cc-design.md", "category": "per-layer-design (cc layer; activated_layers==['cc'])", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/cc-dependencies.json", "category": "per-layer-dependencies", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/cc-design-review-issues.json", "category": "review-issues", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/blueprint-v1.md", "category": "blueprint (highest N=1; v1.1.0 internal version absorbing I-CA-001 patch)", "status": "present", "notes": "adrs_authored: [ADR-0044, ADR-0045]"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/blueprint-v1-review-issues.json", "category": "review-issues", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/architecture-audit-issues.json", "category": "architecture-audit", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/plan-v1.md", "category": "plan (highest N=1; v1.1.1 internal version)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/plan-v1-review-issues.json", "category": "review-issues", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md", "category": "acceptance-tests (v1.0.1)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/phase-validators.md", "category": "phase-validators (with PV-0.C5 added)", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/cross-artifact-audit-issues.json", "category": "cross-artifact-audit", "status": "present"},
+    {"path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/tasks.json", "category": "tasks (24 tasks; acyclic DAG)", "status": "present"}
+  ],
+
+  "artifacts_missing_required": [],
+  "artifacts_missing_conditional_unjustified": [],
+  "artifacts_unexpected": [],
+
+  "adr_cross_location_findings": [
+    {
+      "adr_id": "ADR-0044",
+      "canonical_root_path": "/workspaces/feature-pipeline/adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md",
+      "canonical_root_present": true,
+      "feature_scoped_path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/adrs/ADR-0044-*.md",
+      "feature_scoped_present": false,
+      "verdict": "PASS",
+      "rationale": "Per ADR-0036 (2026-05-22) and deliverable-archive-spec.md lines 136-150, ADRs live in exactly ONE canonical location: the project-wide registry. Feature-scoped duplicates are explicitly retired (the dual-location convention was removed because duplication risks drift). Canonical placement only is the correct conformant pattern."
+    },
+    {
+      "adr_id": "ADR-0045",
+      "canonical_root_path": "/workspaces/feature-pipeline/adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md",
+      "canonical_root_present": true,
+      "feature_scoped_path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/adrs/ADR-0045-*.md",
+      "feature_scoped_present": false,
+      "verdict": "PASS",
+      "rationale": "Same as ADR-0044 — canonical-only placement is spec-conformant per ADR-0036."
+    }
+  ],
+
+  "acknowledged_known_issues": [
+    {
+      "id": "PKG-BLOCKER-001-INVERSE",
+      "severity_as_briefed": "BLOCKER (waivable)",
+      "actual_severity_under_current_spec": "INFO (not a finding)",
+      "description": "The packager task brief instructed acknowledgment of a 'PKG-BLOCKER-001-INVERSE' for canonical-only ADR placement, framed as the inverse of the devcontainer-mcp-provisioning-r1 PKG-BLOCKER-001 (feature-scoped only). The brief cited a partial-amendment defect documented in Issues/analysis-adr-placement-rootcause.md §2.3, claiming the spec at lines 56-63 still required both locations.",
+      "actual_status": "On inspection, the spec at lines 136-150 has been fully amended per ADR-0036 (2026-05-22). The amendment is complete: 'ADRs live in exactly one canonical location' — no dual-location requirement remains. The 'partial-amendment defect' referenced by the brief appears to have been resolved between Issues/analysis-adr-placement-rootcause.md being authored and the current packager run. The canonical-only placement chosen by the operator at Gate 7 is straightforwardly conformant; no waiver is needed.",
+      "waiver_pointer": "checkpoint.json.adr_placement_disposition.user_ratified_at == '2026-05-23T22:30:00Z' (still recorded as audit-trail provenance, even though no waiver is technically required under current spec)",
+      "recommendation_for_followup": "adr-placement-mechanism-repair-r1 (or equivalent follow-on) should verify the analysis-adr-placement-rootcause.md document is itself up-to-date relative to the amended spec, and confirm that the cross-feature inventory tracking referenced by the brief has been retired or migrated to track only genuine non-conformances under the new spec.",
+      "blocks_gate_6": false
+    }
+  ],
+
+  "reviewer_findings": {
+    "doc_type": "DeliverableArchive",
+    "target_path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/",
+    "invocation_mode": "embedded (packager performs spec-validation inline against KB-documentation-criteria/references/deliverable-archive-spec.md)",
+    "gate_0_structural": {
+      "verdict": "PASS",
+      "checks": [
+        {"check": "intent-clarification.md present with scope_class declared", "result": "PASS", "value": "FULL"},
+        {"check": "All FULL-scope required artifacts present", "result": "PASS", "count": "25/25"},
+        {"check": "Versioned files follow *-v<N>.md convention", "result": "PASS", "notes": "prd-v1, blueprint-v1, plan-v1 all present at highest N=1; internal version-history captures sub-version patches (blueprint v1.1.0; plan v1.1.1)"},
+        {"check": "tasks.json present with schema_version + scope_class", "result": "PASS"},
+        {"check": "ADRs at canonical root per ADR-0036", "result": "PASS", "notes": "ADR-0044 and ADR-0045 both present"}
+      ]
+    },
+    "gate_1_quality": {
+      "verdict": "PASS",
+      "checks": [
+        {"check": "Conditional artifacts justified or present", "result": "PASS", "notes": "Single layer activated (cc); only cc-design.md + cc-dependencies.json required; both present. blueprint.adrs_authored populated; both ADRs present at canonical root."},
+        {"check": "No orphan artifacts (everything traces to an expected slot)", "result": "PASS"},
+        {"check": "Reconciliation cycles disposition", "result": "PASS", "notes": "checkpoint.reconciliation_cycles: {blueprint: 0, cross_artifact: 0} — no reconciliation needed; explains absence of higher-N versions"},
+        {"check": "post_gate_corrections recorded", "result": "PASS", "notes": "Single correction logged (ADR-0034 -> ADR-0033 attribution fix) with method + timestamp"}
+      ]
+    },
+    "issues_emitted": []
+  },
+
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 0,
+    "INFO": 1
+  },
+
+  "recommendations": [
+    {
+      "id": "PKG-REC-001",
+      "severity": "recommended",
+      "target": "Issues/analysis-adr-placement-rootcause.md",
+      "recommendation": "Refresh or sunset the analysis-adr-placement-rootcause.md document. The 'partial-amendment defect' it documented at §2.3 appears to have been resolved by the time of this packager run — the deliverable-archive-spec.md is now fully amended per ADR-0036 with no residual dual-location requirement. The PKG-BLOCKER-001 / PKG-BLOCKER-001-INVERSE cross-feature inventory may no longer be load-bearing.",
+      "blocks_gate_6": false
+    },
+    {
+      "id": "PKG-REC-002",
+      "severity": "recommended",
+      "target": "Final Approval Gate (Gate 6) deliberation",
+      "recommendation": "Acknowledge that this feature ran cleanly: zero BLOCKER, zero MAJOR, zero MINOR findings under the current spec; reconciliation_cycles == 0 for both blueprint and cross-artifact; kill_criterion_2 confirmed early; FULL-scope artifact set complete; both ADRs at canonical root. The single INFO entry is documentary, not actionable.",
+      "blocks_gate_6": false
+    },
+    {
+      "id": "PKG-REC-003",
+      "severity": "recommended",
+      "target": "Post-Gate-6 follow-on planning",
+      "recommendation": "The follow-on feature referenced in the brief (adr-placement-mechanism-repair-r1) should re-scope to verify whether a 'mechanism repair' is still warranted, given that the spec amendment has landed. If only the analysis document is stale, a documentation-only PATCH may suffice instead of a FULL feature run.",
+      "blocks_gate_6": false
+    }
+  ],
+
+  "gate_6_input": {
+    "recommended_verdict_to_human": "READY-TO-APPROVE",
+    "rationale": "Complete artifact set, conformant ADR placement under current spec, zero blocking findings, clean reconciliation history. The brief-instructed acknowledgment (PKG-BLOCKER-001-INVERSE) is preserved in this report for audit-trail continuity but does not block."
+  }
+}

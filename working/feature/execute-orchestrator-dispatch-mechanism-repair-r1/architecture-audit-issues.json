@@ -1,0 +1,183 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-execute-orchestrator-dispatch-mechanism-repair-r1-round-1",
+  "audited_artifact": "blueprint-v1.md (v1.1.0)",
+  "audited_at": "2026-05-23T23:30:00Z",
+  "audited_by": "review-architecture-auditor",
+  "code_graph_used": "manual-grep-and-read",
+  "code_graph_degradation_rationale": "GitNexus MCP unavailable in this session per discovery-codebase-researcher's recorded extraction_method ($GITNEXUS_TAG unset; codebase-memory-mcp not registered). Auditor used Read + Grep + Glob against the affected files declared in the Blueprint and the inherited ADR set. Same fallback posture recorded in codebase-analysis.json.",
+  "checks_performed": [
+    "brief_honor_L3_decision_contradiction",
+    "brief_honor_L3_open_item_handling",
+    "brief_honor_L3_resurfaced_verified_issue",
+    "cove_substantive_claim_verification",
+    "blast_radius_analysis",
+    "cross_section_consistency"
+  ],
+  "metadata": {
+    "stage": 6,
+    "blueprint_version": "v1.1.0",
+    "cove_sample_rate": 1.0,
+    "cove_sampling_strategy": "exhaustive — Blueprint is small (~950 lines) and load-bearing claims are concentrated; verified every substantive claim flagged in the orchestrator prompt plus a sweep of the Fact Disposition Table.",
+    "blast_radius_method": "manual",
+    "blast_radius_targets_checked": 8,
+    "prior_audit_path": null
+  },
+  "issues": [
+    {
+      "id": "I-AA-001",
+      "severity": "recommended",
+      "category": "consistency",
+      "lens": "cove",
+      "location": "blueprint-v1.md § Existing Codebase Analysis → Code Inspection Evidence (line 314)",
+      "summary": "Annotation-level mismatch: row reads 'Four ADR-0033 occurrences — all corrected to ADR-0033' but enumerates only three line numbers (3, 19, 82) and the source-citation direction is reversed (ADR-0034 → ADR-0033, not ADR-0033 → ADR-0033).",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "location": "line 314", "verbatim": "| `.claude/agents/execute-finalize-reconciler.md:3,19,82` | Four ADR-0033 occurrences — all corrected to ADR-0033 per I-DR-001 extension. |"},
+        {"artifact": ".claude/agents/execute-finalize-reconciler.md", "location": "lines 3, 19, 82", "verbatim": "grep ADR-0034 returned exactly 3 hits — lines 3, 19, 82 — all naming ADR-0034 (the doc to be corrected to ADR-0033)."}
+      ],
+      "verification_question": "Does execute-finalize-reconciler.md have 3 or 4 ADR-0034 occurrences? Are they corrected to ADR-0033 or to ADR-0033?",
+      "independent_answer": "Three occurrences (lines 3, 19, 82), each citing ADR-0034 and to be corrected to ADR-0033. The Blueprint correctly enumerates the three line numbers in every other location (line 264 AC-FR-5-a, line 296 Implementation Path Mapping, line 332 FD-6, line 360 Change Impact Map, line 617 Conventions Touched, line 653 Sub-Agents table, line 870 Risks). Only line 314 has the annotation drift.",
+      "comparison": "Blueprint contradicts itself: 'Four' on line 314, 'three' / '3' / 'all three' / '3 occurrences' on lines 264, 296, 332, 360, 617, 653, 870.",
+      "recommended_resolution": "Edit line 314 to read 'Three ADR-0034 occurrences — all corrected to ADR-0033 per I-DR-001 extension.' This is an annotation-level numeric-consistency drift per the KB-review-disciplines §architecture-audit guidance (xhigh-reasoning-budget exclusion) — downgrade-to-MINOR rationale applies and Gate 1's Numeric internal consistency check should have caught it; surfacing here for finalize-reconciler absorption without revision.",
+      "lens_rationale": "cove — independent grep of execute-finalize-reconciler.md re-grounds the Blueprint claim and detects the contradiction.",
+      "severity_history": []
+    },
+    {
+      "id": "I-AA-002",
+      "severity": "recommended",
+      "category": "consistency",
+      "lens": "cove",
+      "location": "blueprint-v1.md § Fact Disposition Table → FD-6 (line 332)",
+      "summary": "FD-6 row reads 'Correct all 4 ADR-0033 occurrences to ADR-0033' — two defects in one cell: (a) '4' contradicts the three enumerated line numbers and contradicts the v1.1.0 patch note (which says '3-occurrence count correction'), and (b) the citation direction is reversed (ADR-0034 → ADR-0033, not ADR-0033 → ADR-0033).",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "location": "line 332", "verbatim": "Correct all 4 ADR-0033 occurrences to ADR-0033 (lines 3, 19, 82)"},
+        {"artifact": "blueprint-v1.md", "location": "line 39 (version_history)", "verbatim": "I-DR-101 (3-occurrence count correction on execute-finalize-reconciler.md; line 84 cites ADR-0017 not ADR-0034)"}
+      ],
+      "verification_question": "Does the v1.1.0 patch's stated correction (3 occurrences) match every Fact Disposition row?",
+      "independent_answer": "No — FD-6 still says '4 ADR-0033 occurrences' and the citation direction is wrong (should be 'all 3 ADR-0034 occurrences corrected to ADR-0033').",
+      "comparison": "Same annotation-level drift as I-AA-001, in a different section.",
+      "recommended_resolution": "Edit FD-6 'Disposition' cell to read 'Remove `Agent` from `tools:`. Correct all 3 ADR-0034 occurrences to ADR-0033 (lines 3, 19, 82) — Blueprint extends cc-design edit list per I-DR-001. Re-frame line 76 prose to emit `dispatch_directives[]`.' Downgrade-to-MINOR rationale per KB-review-disciplines §architecture-audit guidance applies — Gate 1 should have caught.",
+      "lens_rationale": "cove — independent grep re-grounds; reveals patch was incomplete (the I-DR-101 correction landed in some sections but not all).",
+      "severity_history": []
+    }
+  ],
+  "checks_passed": [
+    {
+      "check_id": "CK-AA-001",
+      "check": "T-0001 dispatch_supported: false anchor — three Anthropic primary-source URLs",
+      "verification": "Synthesis §2.1 table cited three URLs with verbatim quotes (≤15 words each per discipline). T-001 research note frontmatter confirms verdict 'verified, confidence: high'. The third URL (issues/29677) is corroborator-only for the v2.1.63 Task→Agent rename date. CoVe-rechecked the Blueprint's Background and Context §Current Challenges (line 218) — the substrate constraint is correctly attributed to T-001 with exhaustive-enumeration framing (Finding F-4).",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-002",
+      "check": "ADR-0033 contains 'symmetric per D-12' application — Blueprint's load-bearing citation throughout",
+      "verification": "Direct read of adrs/ADR-0033-adr-0029-execution-extension.md line 71: 'cycle-cap exhaustion (per ADR-0017 4-cycle cap, symmetric per D-12) IS a deviation requiring user escalation per AC-FR-10-c'. Additional symmetric-application context at lines 79, 119, 154. The Blueprint's repeated citation of ADR-0017 + ADR-0033 for the 4-cycle cap + symmetric D-12 application is honored by the actual ADR contents. DISSENT-2 carry-through (synthesis §5.4 / OI-FRAMER-1) is honored throughout the Blueprint and ADR-0044.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-003",
+      "check": "ADR-0044 and ADR-0045 exist at canonical adrs/ root and conform to MADR template",
+      "verification": "ls -la confirms adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md (26989 bytes) and adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md (16043 bytes) both present at the canonical root per ADR-0036. Read of each ADR's first 50 lines confirms full MADR structure with id, status, supersedes, adrs_inherited, applies_to, template_format, change_summary frontmatter plus all required sections (Status, Context, Decision, Decision Details, Rationale, Options Considered, Consequences, Architecture Impact, Implementation Guidance, Related Information).",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-004",
+      "check": "Inherited-ADR list (13 ADRs) — each exists at adrs/ canonical root",
+      "verification": "ls -la of all 13 inherited ADRs (0011, 0017, 0019, 0021, 0022, 0027, 0029, 0033, 0035, 0036, 0037, 0040, 0041) — all present. ADR-0011 explicitly verified after v1.1.0 patch added it per I-DR-102.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-005",
+      "check": "Frontmatter uses inherited_adrs (not adrs_referenced); post-patch state",
+      "verification": "grep 'adrs_referenced\\|inherited_adrs' on blueprint-v1.md returned only 'inherited_adrs:' at line 23 — zero occurrences of the deprecated field name. I-DR-102 absorption confirmed.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-006",
+      "check": "Post-patch: no leftover 'line 84' references claiming ADR-0034 mis-cite",
+      "verification": "grep '84\\|line 84' on blueprint-v1.md surfaced only the version_history note (line 39) explaining the v1.1.0 patch's correction. No body-text claim that line 84 contains an ADR-0034 mis-cite. I-DR-101 absorption confirmed.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-007",
+      "check": "Affected-files inventory exists at declared paths (8 in-inventory + 1 outside)",
+      "verification": "ls -la confirms each of the 8 inventory files exists: recipe-feature-pipeline/SKILL.md, execute-orchestrator.md, execute-task-code-producer.md, execute-task-quality-handler.md, execute-phase-quality-reviewer.md, execute-finalize-reconciler.md, and the new ADRs 0044/0045. The 1 outside-inventory file (state-transitions-log-entry-template.md) also exists at the declared path with line 63 indeed containing the v1 'invoking_agent always execute-orchestrator' invariant the Blueprint clarifies.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-008",
+      "check": "Option (b) rejection rationale — '≥5 outside-inventory files' + 'breaks v1 state-transitions-log invariant'",
+      "verification": "Synthesis §3.1 enumerates six specific outside-inventory files for option (b): KB-documentation-criteria/SKILL.md, state-transitions-log-entry-template.md, pipeline-run-summary-template.md, quality-reconciliation-log-template.md, smoke_test_auditing_shared.py, auditing-codespaces/SKILL.md. Codebase-analysis.json blast_radius.option_b_retire confirms files_outside_prd_8_file_inventory list (5+ entries). Blueprint Alternative Solutions §Alternative 1 (lines 851-856) restates this correctly. v1 invariant break: ADR-0044 §Rationale + ADR-0045 confirm the invariant is real (template line 63) and would change ownership under option (b). Both rejection grounds are evidentially solid.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-009",
+      "check": "Edit ordering D-004-before-D-001 — consistent across Blueprint, synthesis, ADR-0044",
+      "verification": "Synthesis Constraint 5.1 (line 174) recommends 'D-004 schema closure first to stabilize the documented schema, then D-001 dispatch-section absorption'. Blueprint Implementation Plan §Required Implementation Order (lines 727-738) places Phase 0 = D-004 schema closure, Phase 1 = D-001 dispatch absorption. Blueprint Risks table (line 869) flags the inverted-ordering risk explicitly. ADR-0044 §Implementation Guidance also documents the ordering. Consistent.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-010",
+      "check": "F-7 confidence framing — single-instance empirical observation",
+      "verification": "Synthesis §4 (lines 152-168) describes F-7 as single-instance (n=1), partially_verified, with explicit population framing in §8 Limitations. Blueprint §Design Summary (Meta) complexity_rationale (line 109) names F-7 as 'novel single-instance observation'. AC-FR-6-d (line 272) is conditional ('if plan-author authors no new sub-agents, this AC is vacuously satisfied'). The Blueprint preserves the F-7 confidence posture correctly — does not over-claim certainty.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-011",
+      "check": "ADR-0045 enforcement scope — applies to all .claude/agents/*.md (project-wide convention)",
+      "verification": "ADR-0045 frontmatter line 11: 'applies_to: all .claude/agents/*.md sub-agent definitions; any future sub-agent authored under this project'. Body §Decision (read first 50 lines) confirms project-wide scope. Blueprint §Conventions Touched (line 673) restates: 'Applies to all .claude/agents/*.md'. Explicit scope statement present — no ambiguity. The pre-existing 34 sub-agents NOT in the FR-5 sweep are explicitly named in Change Impact Map §No Ripple Effect — meaning the convention applies retroactively (any agent must comply) but enforcement against existing roster is the FR-5 sweep + manual-review interim per ADR-0045 §Implementation Guidance. Scope is explicit.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-012",
+      "check": "Blast-radius coverage — Blueprint Change Impact Map vs codebase-analysis blast_radius enumeration",
+      "verification": "Codebase-analysis.json blast_radius entries for execute-orchestrator (touch_point 1) enumerate 6 direct dependents + 7 transitive 2-hop. The Blueprint's Change Impact Map (lines 351-374) and Code Inspection Evidence (lines 308-320) cover: parent skill, 4 specialists, state-transitions-log-entry-template (the outside-inventory file = 1 AC-FR-4-a open item), checkpoint.json in-flight artifact. The codebase-analysis flags 5 outside-inventory files for option (b); Blueprint explicitly rejects option (b) AND reduces the option-(a) outside-inventory count to 1 by intentional non-touch of KB-documentation-criteria/SKILL.md, pipeline-run-summary-template.md, smoke_test_auditing_shared.py (each of which is unaffected under option a because execute-orchestrator is RETAINED as advisor, not retired). Coverage is sound; no 1-hop dependent uncovered.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-013",
+      "check": "Open-item handling — every Q-CC-N has a disposition",
+      "verification": "Synthesis surfaces six Q-CC items (Q-CC-1 through Q-CC-6). Blueprint §Resolved Q-CC-N Items table (lines 919-926) dispositions all six with location pointers. Q-CC-1 (ADR-0045 in this feature vs defer) diverges from synthesis D-005 with explicit Composer rationale and reviewer (I-DR-003) verdict cited. Q-CC-6 explicitly defers to test-acceptance-author with rationale ('non-load-bearing for kill-criterion-#2 closure'). No silent drops.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-014",
+      "check": "DISSENT-2 carry-through — every reference to 4-cycle cap + symmetric D-12 cites ADR-0017 + ADR-0033 (not ADR-0034)",
+      "verification": "Grep on blueprint-v1.md: every body-text citation of the 4-cycle cap + symmetric D-12 references ADR-0017 + ADR-0033. ADR-0034 appears only in: (a) the FR-5 sweep edit-list context (correctly framed as a citation TO BE CORRECTED), and (b) the version_history note for I-DR-101. No surviving body-text mis-attribution. ADR-0044 §Rationale (line 104) explicitly states the carry-through is honored. Annotation-level slippage in I-AA-001/I-AA-002 surfaces in the table-cell prose but does NOT mis-cite ADR-0034 for the symmetric D-12 application itself.",
+      "outcome": "verified"
+    },
+    {
+      "check_id": "CK-AA-015",
+      "check": "Performance / migration / idempotency cross-section reconciliation (KB-review-disciplines Phase 5)",
+      "verification": "No performance budgets are declared (PRD NFR Performance is 'human-timescale operation' — no quantitative budget). No migration with NOT-NULL columns (no DB schema). Idempotency is not a contract surface (single-tenant pipeline operator). Migration safety is implicit: NFR-6-a preserves in-flight artifacts as-shipped — Blueprint honors this via FD-7, FD-8 disposition (out-of-scope) and §Migration Strategy explicit statement. No cross-section math errors.",
+      "outcome": "verified"
+    }
+  ],
+  "scores": {
+    "consistency": 92,
+    "completeness": 90,
+    "rule_compliance": 95,
+    "clarity": "n/a (not scored by architecture auditor; clarity is shared-document-reviewer's concern)"
+  },
+  "prior_context_check": {
+    "prior_audit_present": false,
+    "rationale": "First Architecture Audit round on this Blueprint. The Blueprint has had ONE prior review cycle (shared-document-reviewer Gate 0/1 → approved_with_conditions → v1.1.0 patch absorbed I-DR-101 + I-DR-102), but no prior Architecture Audit. CoVe and brief-honor checks were exhaustive (sample_rate 1.0) given the small Blueprint size and concentrated load-bearing claims."
+  },
+  "summary": {
+    "critical": 0,
+    "important": 0,
+    "recommended": 2,
+    "advisory": 0
+  },
+  "verdict": {
+    "decision": "pass",
+    "rationale": "No BLOCKER and no MAJOR (critical/important) findings. Two RECOMMENDED (annotation-level numeric consistency drift in single table cells: line 314 in Code Inspection Evidence and line 332 FD-6 cell) surfaced — both are residue of the v1.1.0 patch that fixed I-DR-101 in most sections but missed these two cells. Per KB-review-disciplines §architecture-audit explicit guidance, annotation-level numeric-consistency drift is downgraded to MINOR/RECOMMENDED (the auditor's xhigh-reasoning budget is not the right place for count-vs-enumeration micro-checks; Gate 1's Numeric Internal Consistency check should have caught). The substantive architecture — option (a) selection rationale, the 8-file + 1-outside inventory honoring FR-4, the dispatch_directives[] indirection (Contract 6), the v1 invoking_agent invariant clarification, the F-7 conditional AC, the ADR-0044/0045 authorship, the DISSENT-2 carry-through, the D-004-before-D-001 edit ordering, the inheritance of 13 prior ADRs — are sound, evidentially anchored, and consistent across the Blueprint and the new ADRs. The Blueprint advances to Plan Authoring; the two RECOMMENDED items can be absorbed in finalize-reconciler's next sweep or surface as a v1.2.0 polish patch at the user's discretion."
+  },
+  "downstream_notes": [
+    "Plan-author: honor synthesis Constraint 5.1 D-004-before-D-001 edit ordering on recipe-feature-pipeline/SKILL.md as scheduled by Phases 0 and 1 of the Implementation Plan.",
+    "Plan-author: honor synthesis Constraint 5.2 bundled Agent-removal commit per AC-FR-5-a.",
+    "Plan-author: honor F-7 conditional session-boundary for FR-6 synthetic test per AC-FR-6-d — only fires if synthetic test design authors new sub-agent files.",
+    "Test-acceptance-author: Q-CC-6 H-a vs H-b sub-question is at your discretion per the Composer's deferral.",
+    "finalize-reconciler: two RECOMMENDED annotation-level drift items (I-AA-001, I-AA-002) may be absorbed in your next sweep; not blocking."
+  ]
+}

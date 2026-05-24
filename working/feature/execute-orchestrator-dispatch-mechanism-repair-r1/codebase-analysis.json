@@ -1,0 +1,893 @@
+{
+  "schema_version": "1.1.0",
+  "feature_slug": "execute-orchestrator-dispatch-mechanism-repair-r1",
+  "run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+  "pipeline_run_id": "execute-orchestrator-dispatch-mechanism-repair-r1-20260523-202235",
+  "generated": "2026-05-23T20:35:00Z",
+  "generated_at": "2026-05-23T20:35:00Z",
+  "generated_by": "discovery-codebase-researcher",
+  "extraction_method": "manual-grep-and-read",
+  "extraction_method_rationale": "GitNexus MCP is configured in .mcp.json but $GITNEXUS_TAG environment variable is unset, so no mcp__gitnexus__* tools are exposed in this session. codebase-memory-mcp is not registered. Fell back to Read + Grep + Glob; same fallback recorded in devcontainer-mcp-provisioning-r1's checkpoint.json (line 67: \"extraction_method\":\"manual-grep-and-read\"). Provenance preserved per recipe-feature-pipeline/SKILL.md:44 hard exclusion #4.",
+  "scope": {
+    "repo": "Josh-S-N2M/feature-pipeline",
+    "branch": "main",
+    "paths": [
+      ".claude/agents/execute-*.md",
+      ".claude/agents/*.md (sweep for Agent in tools)",
+      ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md",
+      ".claude/skills/auditing-shared/scripts/log_state_transition.py",
+      "working/feature/devcontainer-mcp-provisioning-r1/checkpoint.json",
+      "working/feature/devcontainer-mcp-provisioning-r1/state-transitions.log",
+      "adrs/*.md"
+    ]
+  },
+  "affected_files": [
+    {
+      "path": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "role": "parent orchestrator skill; the 13-stage taxonomy lives here; user-invocable via /feature-pipeline",
+      "size_lines": 414,
+      "change_type_expected": "EDIT (under §6 option a or b); UNCHANGED (under §6 option c)",
+      "key_observations": [
+        "Has ZERO references to execute-orchestrator or any execute-* specialist (verified by grep at line 1-414).",
+        "The skill's 13-stage taxonomy stops at Stage 13 (Deliverable Packaging) + Gate 6. Execution-phase agents are NOT documented here.",
+        "The skill enumerates 27 pipeline sub-agents (line 353) — execution-side specialists are EXCLUDED from this count.",
+        "Hard exclusion #4 (line 44): 'No silent fallback from GitNexus to codebase-memory-mcp.' Cross-referenced by ADR-0007/ADR-0018 — relevant to extraction_method discipline.",
+        "Working-directory precondition (lines 47-53): cwd MUST equal repo root (ADR-0027). Constrains how the execution-pipeline is invoked.",
+        "Step 14 (line 286) ends with Gate 6; the orchestrator skill DOES NOT specify what runs after Gate 6.",
+        "Canonical schema reference for checkpoint.json is partially documented at lines 96-128 — but it ONLY covers planning-side fields (current_stage, gate_history, artifact_versions, reconciliation_cycles, activated_layers, extraction_method, params). The execution-phase fields (execution_pipeline_state_transitions, execution_mode, execution_pipeline_cycle_counters) observed in devcontainer-mcp-provisioning-r1/checkpoint.json are NOT documented here."
+      ],
+      "citations": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md:1-414"
+      ]
+    },
+    {
+      "path": ".claude/agents/execute-orchestrator.md",
+      "role": "execution-side state-machine driver; defective per source analysis",
+      "size_lines": 121,
+      "change_type_expected": "EDIT or DELETE depending on §6 option chosen",
+      "key_observations": [
+        "Frontmatter line 6: tools: [Read, Glob, Grep, Write, Bash(python3:*), Agent, TaskUpdate] — 7 tools declared, Agent included.",
+        "Per source analysis §1.2, runtime tool surface contains only [Read, Write, Bash, Edit] — Agent, Glob, Grep, TaskUpdate missing; Edit present despite undeclared; Bash(python3:*) scope stripped.",
+        "Frontmatter declares: name=execute-orchestrator, model=opus, effort=high, skills=[KB-cc-platform, KB-cc-design, recipe-feature-pipeline, auditing-shared, KB-review-disciplines], memory=project.",
+        "Body documents the 12-substantive-state machine + 2 boundary states (lines 24-43) with 14 transitions T0..T13.",
+        "Body documents per-task loop (lines 56-71) and per-phase loop (lines 73-82) — these are exactly the dispatches that require Agent.",
+        "Body line 91-94 explicit hard-exclusions: 'You do NOT author code. That's code-producer.' / 'You do NOT issue quality verdicts.' / 'You do NOT classify findings.' — meaning without Agent, the orchestrator can do NOTHING."
+      ],
+      "citations": [
+        ".claude/agents/execute-orchestrator.md:6 (tools declaration)",
+        ".claude/agents/execute-orchestrator.md:24-43 (state machine)",
+        ".claude/agents/execute-orchestrator.md:56-82 (dispatch loops)",
+        ".claude/agents/execute-orchestrator.md:91-94 (hard exclusions)"
+      ]
+    },
+    {
+      "path": ".claude/agents/execute-task-code-producer.md",
+      "role": "execution-side specialist — authors code per single task spec",
+      "size_lines": 110,
+      "change_type_expected": "EDIT only if dispatch interface changes (parameters or invocation contract). Substantive responsibilities OUT OF SCOPE per PRD FR-3-b/FR-4-c.",
+      "key_observations": [
+        "Frontmatter line 6: tools: [Read, Glob, Grep, Write, Edit, Bash] — 6 tools; NO Agent (correct — leaf agent).",
+        "Frontmatter: name=execute-task-code-producer, model=sonnet, effort=medium, skills=[ai-development-guide, KB-cc-design]. NO memory: field.",
+        "Input contract (lines 20-37): a task spec from tasks.json (id, description, type, target_files, satisfies_ac, tests, per_task_skills, revision_context).",
+        "Output contract (lines 42-57): per-task-execution-result.{json,md} pair pattern with status enum COMPLETED|INCOMPLETE|BLOCKED.",
+        "Applies the ai-development-guide 4-phase pattern: Format/Lint → Build/Compile → Test → Final Quality Gate (lines 60-66).",
+        "ADR-0033 Scope-Deviation surfacing in scope_deviations field (line 79)."
+      ],
+      "citations": [
+        ".claude/agents/execute-task-code-producer.md:6 (tools)",
+        ".claude/agents/execute-task-code-producer.md:42-57 (output)"
+      ]
+    },
+    {
+      "path": ".claude/agents/execute-task-quality-handler.md",
+      "role": "execution-side specialist — per-task quality verdict issuer",
+      "size_lines": 104,
+      "change_type_expected": "EDIT only if dispatch interface changes. Substantive responsibilities OUT OF SCOPE per PRD FR-3-b/FR-4-c.",
+      "key_observations": [
+        "Frontmatter line 6: tools: [Read, Glob, Grep, Bash] — 4 tools; NO Agent (correct — leaf agent).",
+        "Frontmatter: name=execute-task-quality-handler, model=sonnet, effort=medium, skills=[ai-development-guide, KB-cc-design, auditing-shared]. NO memory: field.",
+        "Verdict enum D-2c/d (line 33): APPROVED | NEEDS_REVISION | STUB_DETECTED | BLOCKER.",
+        "Output is Contract 1 verdict object (lines 30-48) — read by execute-orchestrator at T3/T4/T5.",
+        "STUB_DETECTED is distinct per D-2d (lines 53-54): the stub check runs FIRST, before quality checks, to prevent the silent-success failure mode.",
+        "Bash is unrestricted (line 73) — accommodates pytest/npm/cargo/go/dotnet/mvn test commands across language stacks per FR-2 + D-11."
+      ],
+      "citations": [
+        ".claude/agents/execute-task-quality-handler.md:6 (tools)",
+        ".claude/agents/execute-task-quality-handler.md:30-48 (verdict schema)",
+        ".claude/agents/execute-task-quality-handler.md:51-70 (verdict logic)"
+      ]
+    },
+    {
+      "path": ".claude/agents/execute-phase-quality-reviewer.md",
+      "role": "execution-side specialist — phase-level 5-dimensional quality verdict",
+      "size_lines": 97,
+      "change_type_expected": "EDIT only if dispatch interface changes. Substantive responsibilities OUT OF SCOPE per PRD FR-3-b/FR-4-c.",
+      "key_observations": [
+        "Frontmatter line 6: tools: [Read, Glob, Grep, Bash(python3:*), Write] — 5 tools; NO Agent (correct — leaf agent).",
+        "Frontmatter: name=execute-phase-quality-reviewer, model=opus, effort=high, skills=[KB-cc-design, KB-review-disciplines, auditing-shared]. NO memory: field.",
+        "Output Contract 2 (lines 32-48): 5-dimensional verdict per_dimension_status: {tests, audits, validator, discipline, scope_deviations} with PASS|NEEDS_RECONCILIATION|BLOCKER per dimension.",
+        "Per D-13 reframing (line 85), the agent does NOT collapse 5 dimensions into a single number.",
+        "Invokes auditing-shared/scripts/run_phase_checks.py (line 53-57) as primary input source.",
+        "Honors Q-CC-4 stub-vs-real distinction (line 69) — auditing-codespaces stub returns {stub: true, findings: []} per ADR-0033 cross-link."
+      ],
+      "citations": [
+        ".claude/agents/execute-phase-quality-reviewer.md:6 (tools)",
+        ".claude/agents/execute-phase-quality-reviewer.md:32-48 (Contract 2)",
+        ".claude/agents/execute-phase-quality-reviewer.md:51-71 (workflow)"
+      ]
+    },
+    {
+      "path": ".claude/agents/execute-finalize-reconciler.md",
+      "role": "execution-side specialist — finding classifier + dispatch matrix router; ALSO declares Agent in tools (second affected agent per FR-5 sweep)",
+      "size_lines": 110,
+      "change_type_expected": "EDIT — declares Agent in tools (line 6) so the same defect manifests if/when this agent dispatches; under §6 options the dispatch responsibility may move or be re-mechanism-ed.",
+      "key_observations": [
+        "Frontmatter line 6: tools: [Read, Glob, Grep, Write, Agent] — 5 tools, Agent INCLUDED.",
+        "Frontmatter: name=execute-finalize-reconciler, model=opus, effort=high, skills=[KB-cc-design, KB-review-disciplines, auditing-shared], memory=project (cycle counter shared with execute-orchestrator).",
+        "Body line 76: 'Dispatch via Agent — invoke the target subagent with the revision_context payload.' Same defect would manifest if/when this dispatch path executes.",
+        "Contract 4 (lines 57-69): 8-row dispatch matrix (D-14 6-row base + 2 additions for D-13 5th-dimension scope-deviations).",
+        "Tracks 4-cycle cap per D-12 (lines 82-88) — symmetric application per ADR-0033 line 71 (NOT ADR-0034 as the Research Plan claims).",
+        "Output: quality-reconciliation-log.{json,md} with cycle, budget_used, budget_remaining, dispatches array, cycle_cap_reached boolean."
+      ],
+      "citations": [
+        ".claude/agents/execute-finalize-reconciler.md:6 (tools — Agent declared)",
+        ".claude/agents/execute-finalize-reconciler.md:57-69 (Contract 4 dispatch matrix)",
+        ".claude/agents/execute-finalize-reconciler.md:76 (Dispatch via Agent)",
+        ".claude/agents/execute-finalize-reconciler.md:82-88 (cycle-cap escalation)"
+      ]
+    },
+    {
+      "path": "working/feature/devcontainer-mcp-provisioning-r1/checkpoint.json",
+      "role": "in-flight artifact carrying execution_pipeline_state_transitions + execution_mode fields (FR-4 inventory item 7)",
+      "size_lines": 104,
+      "change_type_expected": "UNCHANGED per NFR-6-a (in-flight artifact left as-shipped under old format).",
+      "key_observations": [
+        "Top-level keys observed in this in-flight artifact: run_id, feature_slug, started_at, current_stage, stage_status, next_action, execution_pipeline_state_transitions (array; line 8), cycle_3_closure, phase_0_findings, execution_mode ('single-agent-fallback'; line 37), execution_mode_rationale, execution_pipeline_cycle_counters ({per_task: {}, per_phase: {Phase-0: 0, ..., Phase-5: 0}}; line 39), gate_6_decision, gate_history, artifact_versions, adrs_authored, reconciliation_cycles ({blueprint: 2, cross_artifact: 2, prd_research_gate: 2}; line 62), cross_artifact_audit, architecture_audit, deliverable_packaging, activated_layers, extraction_method ('manual-grep-and-read'; line 67), scope_class ('FULL'), synthesis_stats, reviewer_invocations, plan_stats, open_items, q3_closure, systemic_followup, params.",
+        "execution_pipeline_state_transitions field is an array of objects with keys: transition, from, to, timestamp, trigger, plus optional void + void_reason flags. SEPARATE schema from the state-transitions.log JSONL entry schema (which uses transition_name + from_state + to_state + invoking_agent + task_id + phase_id + cycle_counter + artifact_paths_affected + context).",
+        "execution_mode field is a free-form string; observed value 'single-agent-fallback' (line 37) corresponds to the workaround posture per source analysis §5.",
+        "execution_pipeline_cycle_counters is a nested object: {per_task: {<task-id>: <int>}, per_phase: {<phase-id>: <int>}}; observed all-zero because the workaround did not exercise the counters.",
+        "The schema is documented NOWHERE — neither in recipe-feature-pipeline/SKILL.md nor in KB-documentation-criteria. Both 'execution_pipeline_state_transitions' and 'execution_mode' fields are de facto schema, not documented schema (PRD NFR-5-a gap)."
+      ],
+      "citations": [
+        "working/feature/devcontainer-mcp-provisioning-r1/checkpoint.json:1-104",
+        "working/feature/devcontainer-mcp-provisioning-r1/checkpoint.json:8-16 (execution_pipeline_state_transitions array)",
+        "working/feature/devcontainer-mcp-provisioning-r1/checkpoint.json:37-39 (execution_mode + counters)"
+      ]
+    },
+    {
+      "path": "working/feature/devcontainer-mcp-provisioning-r1/state-transitions.log",
+      "role": "in-flight artifact carrying per-dispatch state-transition log (FR-4 inventory item 8)",
+      "size_lines": "12+ entries observed",
+      "change_type_expected": "UNCHANGED per NFR-6-a.",
+      "key_observations": [
+        "Format: JSONL, one object per line.",
+        "Per-entry schema (verified by reading first 12 entries): timestamp (ISO-8601 UTC), transition_name (T0|T13|T0-prime|T1|T5|...; allows custom suffix like '-prime' for void re-entry), from_state, to_state, trigger (free-form string), invoking_agent ('execute-orchestrator' verbatim across all 12 entries), task_id (string or null), phase_id (string; observed 'Phase-0' rather than 'phase-0' — case mismatch with template line 88 which uses 'phase-0' lowercase), cycle_counter (int or null), artifact_paths_affected (array of strings), context (object; free-form, includes optional keys like blocker_class, tools_available, tools_required, escalation_options, dispatch_wave, total_phase_0_tasks).",
+        "T13 void semantics observed at line 2: a transition entry carries `void: true` + `void_reason` string when a subsequent corrective brief invalidates it. The template at state-transitions-log-entry-template.md does NOT document this 'void' field — it is de facto but not documented schema.",
+        "T0-prime semantics observed at line 3: re-entry from TERMINATED back to pending when a prior T13 is voided. The template does not document the '-prime' suffix convention.",
+        "invoking_agent value 'execute-orchestrator' is the template's documented v1 invariant (state-transitions-log-entry-template.md:63). Note: this invariant is INCOMPATIBLE with §6 options that retire execute-orchestrator (option b) or change the invoker (options a/c)."
+      ],
+      "citations": [
+        "working/feature/devcontainer-mcp-provisioning-r1/state-transitions.log:1-12 (entries)",
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md:34-54 (canonical schema)",
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md:63 (v1 invariant — invoking_agent always execute-orchestrator)"
+      ]
+    }
+  ],
+  "affected_agents": [
+    {
+      "name": "execute-orchestrator",
+      "path": ".claude/agents/execute-orchestrator.md",
+      "frontmatter_tool_surface_declared": ["Read", "Glob", "Grep", "Write", "Bash(python3:*)", "Agent", "TaskUpdate"],
+      "frontmatter_tool_surface_runtime_observed": ["Read", "Write", "Bash", "Edit"],
+      "tool_surface_drift": {
+        "missing_from_runtime": ["Glob", "Grep", "Agent", "TaskUpdate"],
+        "added_at_runtime": ["Edit"],
+        "scope_restriction_stripped": "Bash(python3:*) -> Bash (unrestricted)"
+      },
+      "model": "opus",
+      "effort": "high",
+      "skills": ["KB-cc-platform", "KB-cc-design", "recipe-feature-pipeline", "auditing-shared", "KB-review-disciplines"],
+      "memory": "project",
+      "dispatch_role": "DISPATCHER — drives the 12-substantive-state machine; invokes the 4 execution-side specialists per task/phase loops; emits state-transition log entries.",
+      "agents_it_dispatches": ["execute-task-code-producer", "execute-task-quality-handler", "execute-phase-quality-reviewer", "execute-finalize-reconciler"],
+      "agents_that_dispatch_it": ["recipe-feature-pipeline parent orchestrator (per recipe-feature-pipeline/SKILL.md — but the skill does NOT document this; the dispatch is implied by the post-Gate-6 execution phase)"],
+      "parameter_contract_inputs": "tasks.json (DAG); phase-validators.md; acceptance-tests.md; blueprint-v<N>.md Components 2-6 contracts; deliverable archive validated at Gate-6.",
+      "parameter_contract_outputs": "state-transitions.log (one JSONL line per transition via log_state_transition.py); pipeline-run-summary.json (at T12); checkpoint.json execution_pipeline_state_transitions array (updated on each transition).",
+      "same_defect_would_manifest_if_dispatch_attempted": "YES — confirmed by source analysis §1 (two invocations, same runtime tool surface)."
+    },
+    {
+      "name": "execute-task-code-producer",
+      "path": ".claude/agents/execute-task-code-producer.md",
+      "frontmatter_tool_surface_declared": ["Read", "Glob", "Grep", "Write", "Edit", "Bash"],
+      "model": "sonnet",
+      "effort": "medium",
+      "skills": ["ai-development-guide", "KB-cc-design"],
+      "memory_field": "ABSENT",
+      "dispatch_role": "LEAF — dispatched by execute-orchestrator at T1; does NOT dispatch.",
+      "agents_it_dispatches": [],
+      "agents_that_dispatch_it": ["execute-orchestrator (at T1)", "execute-finalize-reconciler (via Contract 4 dispatch matrix for revision cycles)"],
+      "parameter_contract_inputs": "task spec from tasks.json: {id, description, type, target_files, satisfies_ac, tests, per_task_skills, revision_context}.",
+      "parameter_contract_outputs": "per-task-execution-result.{json,md} pair: {task_id, status: COMPLETED|INCOMPLETE|BLOCKED, files_modified, files_created, scope_deviations, phase_4_gate_passed, notes}.",
+      "same_defect_would_manifest_if_dispatch_attempted": "N/A — does not declare Agent; is a leaf agent."
+    },
+    {
+      "name": "execute-task-quality-handler",
+      "path": ".claude/agents/execute-task-quality-handler.md",
+      "frontmatter_tool_surface_declared": ["Read", "Glob", "Grep", "Bash"],
+      "model": "sonnet",
+      "effort": "medium",
+      "skills": ["ai-development-guide", "KB-cc-design", "auditing-shared"],
+      "memory_field": "ABSENT",
+      "dispatch_role": "LEAF — dispatched by execute-orchestrator at T2; does NOT dispatch.",
+      "agents_it_dispatches": [],
+      "agents_that_dispatch_it": ["execute-orchestrator (at T2)"],
+      "parameter_contract_inputs": "pointer to per-task-execution-result.json + original task spec + list of files code-producer modified.",
+      "parameter_contract_outputs": "Contract 1 verdict object: {task_id, status: APPROVED|NEEDS_REVISION|STUB_DETECTED|BLOCKER, findings, scope_drift_observed, verdict_rationale}.",
+      "same_defect_would_manifest_if_dispatch_attempted": "N/A — does not declare Agent; is a leaf agent."
+    },
+    {
+      "name": "execute-phase-quality-reviewer",
+      "path": ".claude/agents/execute-phase-quality-reviewer.md",
+      "frontmatter_tool_surface_declared": ["Read", "Glob", "Grep", "Bash(python3:*)", "Write"],
+      "model": "opus",
+      "effort": "high",
+      "skills": ["KB-cc-design", "KB-review-disciplines", "auditing-shared"],
+      "memory_field": "ABSENT",
+      "dispatch_role": "LEAF — dispatched by execute-orchestrator at T7; does NOT dispatch.",
+      "agents_it_dispatches": [],
+      "agents_that_dispatch_it": ["execute-orchestrator (at T7)"],
+      "parameter_contract_inputs": "phase identifier; feature slug; list of pipeline artifacts authored in the phase; optional scope-deviations input JSON.",
+      "parameter_contract_outputs": "phase-quality-report.{json,md} pair conforming to Contract 2: {verdict: PASS|NEEDS_RECONCILIATION|BLOCKER, per_dimension_status: {tests, audits, validator, discipline, scope_deviations}, findings, audit_counter_delta, phase}.",
+      "same_defect_would_manifest_if_dispatch_attempted": "N/A — does not declare Agent; is a leaf agent."
+    },
+    {
+      "name": "execute-finalize-reconciler",
+      "path": ".claude/agents/execute-finalize-reconciler.md",
+      "frontmatter_tool_surface_declared": ["Read", "Glob", "Grep", "Write", "Agent"],
+      "model": "opus",
+      "effort": "high",
+      "skills": ["KB-cc-design", "KB-review-disciplines", "auditing-shared"],
+      "memory": "project",
+      "dispatch_role": "DISPATCHER — dispatched by execute-orchestrator at T9; classifies findings + dispatches upstream agents via Contract 4 8-row matrix.",
+      "agents_it_dispatches": ["execute-task-code-producer (revision cycles)", "any upstream authoring agent named by Contract 4 row match"],
+      "agents_that_dispatch_it": ["execute-orchestrator (at T9)"],
+      "parameter_contract_inputs": "phase-quality-report.json (NEEDS_RECONCILIATION verdict); current cycle counter (from memory: project shared with orchestrator); pointers to feature artifacts.",
+      "parameter_contract_outputs": "quality-reconciliation-log.{json,md} pair: {phase, cycle, budget_used, budget_remaining, dispatches[], consolidated_by_target, scope_deviations_resolved, cycle_cap_reached}.",
+      "same_defect_would_manifest_if_dispatch_attempted": "YES — by parity with execute-orchestrator. Same harness, same Agent-tool grant pattern. Not directly observed (the workaround in devcontainer-mcp-provisioning-r1 never reached T9 because phase quality never returned NEEDS_RECONCILIATION — execution halted at T5 escalation), but the defect is structurally identical.",
+      "potentially_applies_to_others_finding": "This is the second agent in the project declaring Agent in tools. Both execute-* dispatchers are affected. The §6 design must address BOTH or explicitly leave execute-finalize-reconciler's Agent declaration as a known-stranded posture."
+    }
+  ],
+  "fr5_inventory_sweep": {
+    "sweep_target": ".claude/agents/*.md",
+    "total_files_swept": 36,
+    "research_plan_claimed_count": 35,
+    "discrepancy_note": "Research Plan §codebase-research-scope claims 35 files; actual count is 36. Discrepancy is minor and does not affect the FR-5 finding.",
+    "agents_declaring_Agent_in_tools_array": [
+      {
+        "agent": "execute-orchestrator",
+        "path": ".claude/agents/execute-orchestrator.md",
+        "tools_line": ".claude/agents/execute-orchestrator.md:6",
+        "exact_declaration": "tools: [Read, Glob, Grep, Write, Bash(python3:*), Agent, TaskUpdate]",
+        "intended_dispatch_targets": ["execute-task-code-producer", "execute-task-quality-handler", "execute-phase-quality-reviewer", "execute-finalize-reconciler"],
+        "currently_dispatching_in_codebase": "NO — runtime tool surface excludes Agent per source analysis §1.2.",
+        "would_same_defect_manifest_if_attempted": "YES (confirmed observed)",
+        "design_impact_under_each_section_6_option": {
+          "option_a_flatten": "DELETE the dispatch responsibility from this agent; either retire the file or restructure as state-machine documentation per source analysis §6 option (a). The Agent declaration becomes irrelevant.",
+          "option_b_retire": "DELETE the file entirely; state-machine logic folds into recipe-feature-pipeline/SKILL.md. The Agent declaration goes away with the file.",
+          "option_c_bash_script": "REPLACE Agent with Bash(<script-name>:*); the agent dispatches Bash scripts which then trigger specialists via another mechanism. Agent declaration is removed."
+        }
+      },
+      {
+        "agent": "execute-finalize-reconciler",
+        "path": ".claude/agents/execute-finalize-reconciler.md",
+        "tools_line": ".claude/agents/execute-finalize-reconciler.md:6",
+        "exact_declaration": "tools: [Read, Glob, Grep, Write, Agent]",
+        "intended_dispatch_targets": ["execute-task-code-producer (revision cycles)", "any upstream authoring agent named by Contract 4 dispatch matrix row match"],
+        "currently_dispatching_in_codebase": "NO — never reached at runtime in devcontainer-mcp-provisioning-r1 (workaround halted before T9).",
+        "would_same_defect_manifest_if_attempted": "YES (structurally identical to execute-orchestrator; not directly observed but inferred with HIGH confidence — same Claude Code harness, same Agent-tool grant pattern, same sub-agent role).",
+        "design_impact_under_each_section_6_option": {
+          "option_a_flatten": "If the parent recipe-feature-pipeline orchestrator directly dispatches the 4 specialists, the reconciler's Contract 4 dispatch matrix routing ALSO must move up to the parent OR run as a separate dispatch from the parent. The Agent declaration here is similarly defective.",
+          "option_b_retire": "Reconciler stays as a verdict-classifier but loses its dispatch responsibility; routing-target outputs to a dispatch JSON consumed by the parent. Agent declaration is removed.",
+          "option_c_bash_script": "Replace Agent with Bash(<dispatch-script>:*); reconciler emits dispatch JSON; the script consumes it and invokes specialists via the alternate mechanism."
+        }
+      }
+    ],
+    "agents_with_only_Bash_or_other_tool_grants_no_Agent": "34 of 36 files. All other agents declare leaf-agent tool surfaces (no Agent). No further FR-5 work required for those.",
+    "note_on_TaskCreate_pattern": "Several agents (intake-, design-, plan-, finalize-, test-, review-) declare TaskCreate + TaskUpdate. TaskCreate is a Claude Code-built-in agent-task-tracking primitive — semantically distinct from the Agent dispatch tool. NOT flagged as affected; out of scope for FR-5."
+  },
+  "dependencies": [
+    {
+      "from": "recipe-feature-pipeline/SKILL.md",
+      "to": "execute-orchestrator (implicit; post-Gate-6 execution phase)",
+      "kind": "implicit_invocation",
+      "confidence": "low",
+      "evidence": "The SKILL.md ends at Gate 6 (line 299) without specifying execution-phase invocation. The state-transitions-log-entry-template.md and the auditing-shared script signatures imply execute-orchestrator is invoked after tasks.json is ratified, but the parent skill does NOT documentation this dispatch.",
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md:299"]
+    },
+    {
+      "from": "execute-orchestrator",
+      "to": "execute-task-code-producer",
+      "kind": "subagent_dispatch_via_Agent_tool",
+      "confidence": "high",
+      "evidence": "execute-orchestrator body lines 60-63 documents the T1 dispatch sequence. The dispatch FAILS at runtime per source analysis §1.2.",
+      "representative_files": [".claude/agents/execute-orchestrator.md:60-63"]
+    },
+    {
+      "from": "execute-orchestrator",
+      "to": "execute-task-quality-handler",
+      "kind": "subagent_dispatch_via_Agent_tool",
+      "confidence": "high",
+      "evidence": "execute-orchestrator body line 64 (T2 dispatch). FAILS at runtime per source analysis §1.2.",
+      "representative_files": [".claude/agents/execute-orchestrator.md:64"]
+    },
+    {
+      "from": "execute-orchestrator",
+      "to": "execute-phase-quality-reviewer",
+      "kind": "subagent_dispatch_via_Agent_tool",
+      "confidence": "high",
+      "evidence": "execute-orchestrator body line 77 (T7 dispatch). FAILS at runtime per source analysis §1.2.",
+      "representative_files": [".claude/agents/execute-orchestrator.md:77"]
+    },
+    {
+      "from": "execute-orchestrator",
+      "to": "execute-finalize-reconciler",
+      "kind": "subagent_dispatch_via_Agent_tool",
+      "confidence": "high",
+      "evidence": "execute-orchestrator body line 80 (T9 dispatch). FAILS at runtime per source analysis §1.2.",
+      "representative_files": [".claude/agents/execute-orchestrator.md:80"]
+    },
+    {
+      "from": "execute-finalize-reconciler",
+      "to": "execute-task-code-producer",
+      "kind": "subagent_dispatch_via_Agent_tool",
+      "confidence": "high",
+      "evidence": "execute-finalize-reconciler body line 76 ('Dispatch via Agent — invoke the target subagent...') + Contract 4 (lines 57-69). Same defect structurally; not observed in devcontainer-mcp-provisioning-r1 (workaround never reached T9).",
+      "representative_files": [".claude/agents/execute-finalize-reconciler.md:57-69", ".claude/agents/execute-finalize-reconciler.md:76"]
+    },
+    {
+      "from": "execute-orchestrator",
+      "to": "auditing-shared/scripts/log_state_transition.py",
+      "kind": "bash_invocation",
+      "confidence": "high",
+      "evidence": "execute-orchestrator body lines 49-52 documents `bash echo '<contract-5-payload>' | python3 .claude/skills/auditing-shared/scripts/log_state_transition.py --feature-slug <slug>`. This is the actual mechanism for state-transitions.log writes.",
+      "representative_files": [".claude/agents/execute-orchestrator.md:49-52", ".claude/skills/auditing-shared/scripts/log_state_transition.py:1-40"]
+    },
+    {
+      "from": "execute-phase-quality-reviewer",
+      "to": "auditing-shared/scripts/run_phase_checks.py",
+      "kind": "bash_invocation",
+      "confidence": "high",
+      "evidence": "execute-phase-quality-reviewer body lines 53-57 documents the run_phase_checks.py coordinator invocation as the primary input source.",
+      "representative_files": [".claude/agents/execute-phase-quality-reviewer.md:53-57"]
+    },
+    {
+      "from": "execute-task-quality-handler",
+      "to": "auditing-shared/scripts/detect_stubs.py",
+      "kind": "bash_invocation",
+      "confidence": "high",
+      "evidence": "execute-task-quality-handler body line 54 (D-2d stub check).",
+      "representative_files": [".claude/agents/execute-task-quality-handler.md:54"]
+    },
+    {
+      "from": "KB-documentation-criteria",
+      "to": "execute-* agents (5 templates author by them)",
+      "kind": "template_authoring_assignment",
+      "confidence": "high",
+      "evidence": "KB-documentation-criteria/SKILL.md lines 67-71 enumerate per-task-execution-result-template, phase-quality-report-template, quality-reconciliation-log-template, state-transitions-log-entry-template, pipeline-run-summary-template — assigned to the 4 specialists + execute-orchestrator.",
+      "representative_files": [".claude/skills/KB-documentation-criteria/SKILL.md:67-71"]
+    },
+    {
+      "from": "state-transitions-log-entry-template.md",
+      "to": "execute-orchestrator (v1 invariant)",
+      "kind": "documented_invariant",
+      "confidence": "high",
+      "evidence": "Template line 63: 'invoking_agent — always execute-orchestrator in v1 (other agents may emit events via the orchestrator)'. INCOMPATIBLE with §6 option (b) retire-execute-orchestrator unless the invariant is updated in lockstep.",
+      "representative_files": [".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md:63"]
+    }
+  ],
+  "blast_radius": [
+    {
+      "touch_point": "execute-orchestrator (file: .claude/agents/execute-orchestrator.md)",
+      "direct_dependents": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md (implicit; line 299+)",
+        ".claude/skills/KB-documentation-criteria/SKILL.md (lines 70-71; assigns 2 templates)",
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md (line 63; v1 invariant)",
+        ".claude/skills/KB-documentation-criteria/references/templates/pipeline-run-summary-template.md (line 113)",
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py (line 212; test data uses 'execute-orchestrator' as invoking_agent)",
+        "Issues/analysis-execute-orchestrator-dispatch-limitation.md (the source analysis itself)"
+      ],
+      "transitive_dependents_3_hop": [
+        "all 4 execute-* specialists (direct dispatch targets)",
+        "auditing-shared/scripts/log_state_transition.py (consumes Contract 5 payload from the orchestrator)",
+        "working/feature/*/checkpoint.json (execution_pipeline_state_transitions field)",
+        "working/feature/*/state-transitions.log (JSONL stream)",
+        "working/feature/*/pipeline-run-summary.json (final summary at T12)",
+        "ADR-0033 (line 51 names execute-orchestrator as one of the execution-phase agents requiring Scope-Deviation surfacing)",
+        "ADR-0035 (auditing-shared skill-binding convention)"
+      ],
+      "test_files": [
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py:212"
+      ],
+      "hop_tier_distribution": {"1": 6, "2": 7, "3": 0},
+      "files_outside_prd_8_file_inventory": [
+        ".claude/skills/KB-documentation-criteria/SKILL.md (lines 67-71 assignment table — section names execute-orchestrator as the template author for state-transitions-log-entry-template AND pipeline-run-summary-template; §6 options b/c require updates to these assignments)",
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md (line 63 v1 invariant 'invoking_agent always execute-orchestrator'; §6 option b retire-orchestrator REQUIRES updating this invariant)",
+        ".claude/skills/KB-documentation-criteria/references/templates/pipeline-run-summary-template.md (line 113 'Authored by execute-orchestrator at T12')",
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py (line 212 test data; §6 option b retire-orchestrator may need test data update)",
+        ".claude/skills/auditing-codespaces/SKILL.md (line 73; references execute-phase-quality-reviewer in a consumer note)"
+      ],
+      "open_item_blast_radius_escape": "YES — at least 4 files outside the PRD's 8-file inventory may need edits under §6 option (b) retire-execute-orchestrator. Surfacing per AC-FR-4-a."
+    },
+    {
+      "touch_point": "execute-task-code-producer (file: .claude/agents/execute-task-code-producer.md)",
+      "direct_dependents": [
+        ".claude/agents/execute-orchestrator.md (dispatch target at T1)",
+        ".claude/agents/execute-finalize-reconciler.md (Contract 4 dispatch target for revision cycles)",
+        ".claude/skills/KB-documentation-criteria/SKILL.md (line 67; assigns per-task-execution-result-template)",
+        ".claude/skills/KB-documentation-criteria/references/templates/per-task-execution-result-template.md (line 10; generated_by)",
+        ".claude/skills/KB-documentation-criteria/references/templates/quality-reconciliation-log-template.md (lines 47, 56; named as dispatch target in Contract 4 example)"
+      ],
+      "transitive_dependents_3_hop": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md (implicit; via execute-orchestrator)",
+        "working/feature/*/tasks.json (specialist consumes one task entry)",
+        "working/feature/*/per-task-execution-result.{json,md} (produced output)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 5, "2": 3, "3": 0},
+      "files_outside_prd_8_file_inventory": [
+        ".claude/skills/KB-documentation-criteria/SKILL.md (template assignment table)",
+        ".claude/skills/KB-documentation-criteria/references/templates/per-task-execution-result-template.md (frontmatter generated_by)",
+        ".claude/skills/KB-documentation-criteria/references/templates/quality-reconciliation-log-template.md (Contract 4 example references)"
+      ]
+    },
+    {
+      "touch_point": "execute-task-quality-handler (file: .claude/agents/execute-task-quality-handler.md)",
+      "direct_dependents": [
+        ".claude/agents/execute-orchestrator.md (dispatch target at T2)"
+      ],
+      "transitive_dependents_3_hop": [
+        ".claude/skills/auditing-shared/scripts/detect_stubs.py (invoked)",
+        ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py (invoked when pipeline artifacts modified)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 1, "2": 2, "3": 0},
+      "files_outside_prd_8_file_inventory": [
+        ".claude/skills/auditing-shared/scripts/detect_stubs.py (no edits expected unless the quality-handler's invocation interface changes)",
+        ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py (same — no edits expected)"
+      ]
+    },
+    {
+      "touch_point": "execute-phase-quality-reviewer (file: .claude/agents/execute-phase-quality-reviewer.md)",
+      "direct_dependents": [
+        ".claude/agents/execute-orchestrator.md (dispatch target at T7)",
+        ".claude/skills/auditing-shared/scripts/run_phase_checks.py (invoked)",
+        ".claude/skills/auditing-codespaces/SKILL.md (line 73; documents how this agent consumes auditing-codespaces stub output)",
+        ".claude/skills/KB-documentation-criteria/SKILL.md (line 68; template assignment)",
+        ".claude/skills/KB-documentation-criteria/references/templates/phase-quality-report-template.md (line 9; generated_by)"
+      ],
+      "transitive_dependents_3_hop": [
+        "adrs/ADR-0033-adr-0029-execution-extension.md (line 51, 70 — names this agent for Scope-Deviation surfacing)",
+        "adrs/ADR-0042-auditing-mcp-family-graduation.md (consumer references)",
+        "adrs/ADR-0043-auditing-mcp-gate-6-hard-gate.md (consumer references)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 5, "2": 3, "3": 0},
+      "files_outside_prd_8_file_inventory": [
+        ".claude/skills/auditing-shared/scripts/run_phase_checks.py",
+        ".claude/skills/auditing-codespaces/SKILL.md:73",
+        ".claude/skills/KB-documentation-criteria/SKILL.md:68",
+        ".claude/skills/KB-documentation-criteria/references/templates/phase-quality-report-template.md:9"
+      ]
+    },
+    {
+      "touch_point": "execute-finalize-reconciler (file: .claude/agents/execute-finalize-reconciler.md)",
+      "direct_dependents": [
+        ".claude/agents/execute-orchestrator.md (dispatch target at T9)",
+        ".claude/skills/KB-documentation-criteria/SKILL.md (line 69; template assignment)",
+        ".claude/skills/KB-documentation-criteria/references/templates/quality-reconciliation-log-template.md (line 13; generated_by)",
+        "adrs/ADR-0033-adr-0029-execution-extension.md (line 71 — names this agent for Scope-Deviation surfacing including cycle-cap exhaustion symmetric per D-12)",
+        "adrs/ADR-0035-auditing-shared-skill-binding-convention.md (skill-binding convention for execute-finalize-reconciler's auditing-shared dependency)"
+      ],
+      "transitive_dependents_3_hop": [
+        ".claude/agents/execute-task-code-producer.md (dispatch target via Contract 4)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 5, "2": 1, "3": 0},
+      "files_outside_prd_8_file_inventory": [
+        ".claude/skills/KB-documentation-criteria/SKILL.md:69",
+        ".claude/skills/KB-documentation-criteria/references/templates/quality-reconciliation-log-template.md:13"
+      ]
+    },
+    {
+      "touch_point": "recipe-feature-pipeline/SKILL.md",
+      "direct_dependents": [
+        "(user-invocable via /feature-pipeline slash command)",
+        "/workspaces/feature-pipeline/CLAUDE.md (if it references the skill — not verified)",
+        "Every working/feature/<slug>/checkpoint.json (the skill specifies the schema)"
+      ],
+      "transitive_dependents_3_hop": [
+        "All 36 sub-agents under .claude/agents/ (the skill orchestrates 27 of them; lines 354-373 enumerate)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 3, "2": 1, "3": 0},
+      "files_outside_prd_8_file_inventory": [
+        "Per AC-FR-4-a, no other files are touched if §6 option (b) folds the state-machine ONLY into this skill — but the canonical schema reference for checkpoint.json (lines 96-128) does NOT currently document execution_pipeline_state_transitions or execution_mode fields. Updating the canonical schema reference (per NFR-5-a) would be in-scope (same file). NO escape from inventory observed for option (b)."
+      ]
+    },
+    {
+      "touch_point": "checkpoint.json schema (execution_pipeline_state_transitions + execution_mode fields)",
+      "direct_dependents": [
+        "recipe-feature-pipeline/SKILL.md lines 96-128 (the documented canonical schema; CURRENTLY MISSING the execution-phase fields)",
+        "working/feature/devcontainer-mcp-provisioning-r1/checkpoint.json (in-flight artifact — NOT migrated per NFR-6-a)"
+      ],
+      "transitive_dependents_3_hop": [
+        "All future feature runs' checkpoint.json (de facto schema is propagated by sub-agents writing per the in-flight pattern)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 2, "2": 1, "3": 0},
+      "files_outside_prd_8_file_inventory": []
+    },
+    {
+      "touch_point": "state-transitions.log format",
+      "direct_dependents": [
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md (canonical per-entry schema; line 63 invoking_agent invariant is INCOMPATIBLE with §6 option b)",
+        ".claude/skills/auditing-shared/scripts/log_state_transition.py (the script that writes the log; lines 24-31 enumerate REQUIRED_FIELDS)"
+      ],
+      "transitive_dependents_3_hop": [
+        "All future feature runs' state-transitions.log"
+      ],
+      "test_files": [
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py (line 212)"
+      ],
+      "hop_tier_distribution": {"1": 2, "2": 1, "3": 0},
+      "files_outside_prd_8_file_inventory": [
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md (the canonical per-entry schema — likely needs update under §6 option b)",
+        ".claude/skills/auditing-shared/scripts/log_state_transition.py (REQUIRED_FIELDS includes 'invoking_agent' but doesn't constrain its value — script-level change MAY not be needed)",
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py (test data string; minor update)"
+      ]
+    }
+  ],
+  "blast_radius_summary": {
+    "files_outside_prd_8_file_inventory_aggregated": [
+      ".claude/skills/KB-documentation-criteria/SKILL.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/pipeline-run-summary-template.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/per-task-execution-result-template.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/phase-quality-report-template.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/quality-reconciliation-log-template.md",
+      ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py",
+      ".claude/skills/auditing-codespaces/SKILL.md"
+    ],
+    "per_section_6_option_impact": {
+      "option_a_flatten_dispatch_hierarchy": {
+        "files_touched_inside_inventory": "All 8 PRD inventory files; execute-orchestrator becomes state-machine documentation (no Agent declaration); the 4 specialists' dispatch interfaces likely UNCHANGED.",
+        "files_touched_outside_inventory": "Likely NONE for the templates (specialists still emit per-task-execution-result, phase-quality-report, etc.); state-transitions-log-entry-template.md invoking_agent v1 invariant MAY need update if the parent dispatches (parent becomes invoking_agent) — TEMPLATE EDIT REQUIRED for accuracy.",
+        "open_item_count_under_ac_fr_4_a": 1
+      },
+      "option_b_retire_execute_orchestrator": {
+        "files_touched_inside_inventory": "8 PRD inventory files; recipe-feature-pipeline/SKILL.md absorbs the state-machine; execute-orchestrator.md is DELETED; the 4 specialists' frontmatter unchanged but their dispatcher reference shifts in body prose.",
+        "files_touched_outside_inventory": "KB-documentation-criteria/SKILL.md lines 70-71 (template assignments naming execute-orchestrator); state-transitions-log-entry-template.md line 63 (invoking_agent invariant); pipeline-run-summary-template.md line 113 (Authored by execute-orchestrator); smoke_test_auditing_shared.py:212 (test data); KB-documentation-criteria/SKILL.md lines 67-71 (entire execution-phase template assignment table).",
+        "open_item_count_under_ac_fr_4_a": "5+ (NEEDS USER CHECK)"
+      },
+      "option_c_bash_script_dispatch": {
+        "files_touched_inside_inventory": "All 8 PRD inventory files; execute-orchestrator.md Agent -> Bash(<script>:*); a new dispatch script lives somewhere (possibly under .claude/skills/auditing-shared/scripts/ — adding a 9th file outside inventory).",
+        "files_touched_outside_inventory": "A new script under auditing-shared/scripts/ (or equivalent); the script invocation mechanism for sub-agents requires further harness design (uncertain how Bash can invoke sub-agents — this is precisely the open question T-001 investigates from a different angle).",
+        "open_item_count_under_ac_fr_4_a": 1
+      }
+    },
+    "consolidated_open_item_for_synthesis": "Under §6 option (b) retire-execute-orchestrator, at least 5 files outside the PRD 8-file inventory require edits. Per AC-FR-4-a, this needs operator disposition before per-layer cc Design selects option (b). Options (a) and (c) require only minor template adjustments and stay within the inventory + 1 new script (option c)."
+  },
+  "inherited_adrs": [
+    {
+      "adr_id": "ADR-0017",
+      "title": "document-reviewer integration — five invocation points + critic renames",
+      "status": "Accepted (2026-05-12)",
+      "path": "adrs/ADR-0017-document-reviewer-integration.md",
+      "constraint_imposed_on_this_feature": "Establishes the 4-cycle reconciliation cap. Per PRD FR-3-c this is a load-bearing invariant the §6 design must preserve. Cited verbatim at ADR-0017:155: 'Iteration cap: 4 cycles (matching the pipeline's broader fixed-point iteration discipline from blueprint v3 §3.7). After 4 cycles, escalate to Cycle-Cap Escalation Gate.'",
+      "citation_line": "adrs/ADR-0017-document-reviewer-integration.md:155",
+      "research_plan_confirmation": "CONFIRMED on Research Plan §Inherited ADRs"
+    },
+    {
+      "adr_id": "ADR-0019",
+      "title": "Naming convention — phase-prefixed sub-agents, KB-prefixed knowledge skills, recipe-prefixed orchestrator",
+      "status": "Accepted (2026-05-19)",
+      "path": "adrs/ADR-0019-naming-convention.md",
+      "constraint_imposed_on_this_feature": "Any new sub-agent introduced under §6 option (b) (e.g., to fold the state machine elsewhere) MUST follow phase-prefix `execute-` for execution-phase agents. The orchestrator skill stays `recipe-feature-pipeline`. Cited at ADR-0019:43-49.",
+      "citation_line": "adrs/ADR-0019-naming-convention.md:43-49",
+      "research_plan_confirmation": "CONFIRMED"
+    },
+    {
+      "adr_id": "ADR-0022",
+      "title": "Sub-agent reasoning configuration is intentional and audited",
+      "status": "Accepted (2026-05-20)",
+      "path": "adrs/ADR-0022-subagent-reasoning-configuration.md",
+      "constraint_imposed_on_this_feature": "Any sub-agent the §6 design introduces or modifies MUST carry intentional model/effort/skills triplet per the audited convention. Cited at ADR-0022:54-60. NOTE per ADR-0022 itself: it does NOT govern the `tools:` field runtime behavior — only the reasoning-configuration triplet. The T-001 investigation question is OUTSIDE ADR-0022's scope.",
+      "citation_line": "adrs/ADR-0022-subagent-reasoning-configuration.md:54-60",
+      "research_plan_confirmation": "CONFIRMED"
+    },
+    {
+      "adr_id": "ADR-0027",
+      "title": "Pipeline skill-design gap — feature artifacts didn't land in deliverable archive",
+      "status": "Accepted (2026-05-21)",
+      "path": "adrs/ADR-0027-pipeline-skill-design-gap-deliverable-archive.md",
+      "constraint_imposed_on_this_feature": "Working-directory precondition: cwd MUST equal repo root. The execution-phase invocation (post-Gate-6) inherits this precondition implicitly. Cited at ADR-0027:14-44.",
+      "citation_line": "adrs/ADR-0027-pipeline-skill-design-gap-deliverable-archive.md:30-44",
+      "research_plan_confirmation": "CONFIRMED"
+    },
+    {
+      "adr_id": "ADR-0029",
+      "title": "No-silent-scope-changes principle — every scope deviation must surface",
+      "status": "Accepted (2026-05-21)",
+      "path": "adrs/ADR-0029-no-silent-scope-changes-principle.md",
+      "constraint_imposed_on_this_feature": "The kill-criterion-#1 pause-and-rescope discipline (PRD FR-2) IS the project-wide application of this principle. Cited at ADR-0029:26-29.",
+      "citation_line": "adrs/ADR-0029-no-silent-scope-changes-principle.md:26-29",
+      "research_plan_confirmation": "CONFIRMED"
+    },
+    {
+      "adr_id": "ADR-0033",
+      "title": "ADR-0029 execution-phase extension — Scope-Deviation surfacing for execution-pipeline artifacts",
+      "status": "Accepted (2026-05-22)",
+      "path": "adrs/ADR-0033-adr-0029-execution-extension.md",
+      "constraint_imposed_on_this_feature": "Names execute-orchestrator + the 4 specialists explicitly as the execution-phase agents whose deviation-surfacing locations are canonical. Line 71 specifies: 'cycle-cap exhaustion (per ADR-0017 4-cycle cap, symmetric per D-12) IS a deviation requiring user escalation per AC-FR-10-c.' This is the source of the 'symmetric D-12' attribution.",
+      "citation_line": "adrs/ADR-0033-adr-0029-execution-extension.md:51 (names all 5 agents), :71 (symmetric D-12), :77-83 (execution-side audit-stage enforcement)",
+      "research_plan_confirmation": "CONFIRMED",
+      "important_correction": "The Research Plan §38 and the orchestrator dispatch prompt §6 attribute 'ADR-0034 symmetric D-12 application' as the inherited ADR for the symmetric application. The CORRECT attribution is ADR-0033 line 71 (which itself cites ADR-0017 for the cap and D-12 for the symmetric application). ADR-0034 is a separate, unrelated PRD-mis-credit cleanup ADR (it documents that ADR-0017 is the canonical home for the 4-cycle cap and that PRD v1.1.0 mis-credited ADR-0021). The Research Plan's '(ADR-0034 symmetric D-12 application)' phrase is itself a documentary mis-attribution. See Open Items §1 below."
+    },
+    {
+      "adr_id": "ADR-0034",
+      "title": "PRD v1.1.0 narrative housekeeping — ADR-0017 is canonical home for the 4-cycle reconciliation cap",
+      "status": "Accepted (2026-05-22)",
+      "path": "adrs/ADR-0034-prd-mis-credit-cleanup.md",
+      "constraint_imposed_on_this_feature": "Canonical attribution rule: any artifact referencing the 4-cycle cap MUST cite ADR-0017, NOT ADR-0021. This feature's PRD (line 53, line 124, line 277 etc.) correctly cites ADR-0017. Cited at ADR-0034:46-51.",
+      "citation_line": "adrs/ADR-0034-prd-mis-credit-cleanup.md:46-51",
+      "research_plan_confirmation": "RESEARCH PLAN MIS-ATTRIBUTES THIS ADR. ADR-0034 does NOT cover symmetric D-12 application — that's ADR-0033. The Research Plan §38 phrase 'ADR-0034 — PRD mis-credit cleanup; symmetric D-12' conflates two unrelated ADRs. Surfaced as Open Item §1."
+    },
+    {
+      "adr_id": "ADR-0036",
+      "title": "Single-location ADR placement convention — adrs/ project-wide registry only",
+      "status": "Accepted (2026-05-22)",
+      "path": "adrs/ADR-0036-single-location-adr-placement.md",
+      "constraint_imposed_on_this_feature": "Any ADR design-composer authors under FR-8 lands at adrs/ADR-NNNN-<title>.md ONLY. No feature-scoped copy in working/feature/<slug>/adrs/. Cited at ADR-0036:13-21.",
+      "citation_line": "adrs/ADR-0036-single-location-adr-placement.md:13-21",
+      "research_plan_confirmation": "CONFIRMED"
+    },
+    {
+      "adr_id": "ADR-0037",
+      "title": "MCP transition surfacing — mcp-events.jsonl + stderr banner (UI-15)",
+      "status": "Accepted (2026-05-23)",
+      "path": "adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md",
+      "constraint_imposed_on_this_feature": "Execution-side event surface for MCP primary->fallback transitions. CONSTRAINS this feature only IF a §6 option introduces a new MCP-dispatch mechanism (e.g., option c Bash-script invocation of an MCP-mediated dispatch). Likely NOT applicable for options a/b. Cited at ADR-0037:42-50.",
+      "citation_line": "adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md:42-50",
+      "research_plan_confirmation": "CONFIRMED but applicability is conditional on §6 option choice."
+    },
+    {
+      "adr_id": "ADR-0040",
+      "title": "Serena MCP — narrowed always-on; Python-audit-surface allowlist",
+      "status": "Accepted (2026-05-23)",
+      "path": "adrs/ADR-0040-serena-narrowed-always-on.md",
+      "constraint_imposed_on_this_feature": "Serena MCP available to specific agent allowlist. None of the execute-* agents in the current allowlist reference Serena. UNLIKELY constraint for this feature. Cited at ADR-0040:42-49.",
+      "citation_line": "adrs/ADR-0040-serena-narrowed-always-on.md:42-49",
+      "research_plan_confirmation": "CONFIRMED but applicability is marginal."
+    },
+    {
+      "adr_id": "ADR-0041",
+      "title": "Install-mechanism strategy — hybrid Features + idempotent postCreate + verified binary fetch",
+      "status": "Accepted (2026-05-23)",
+      "path": "adrs/ADR-0041-install-mechanism-hybrid.md",
+      "constraint_imposed_on_this_feature": "Install-path discipline for MCP servers. UNLIKELY constraint unless §6 option (c) introduces a new script. Cited at ADR-0041:43-49.",
+      "citation_line": "adrs/ADR-0041-install-mechanism-hybrid.md:43-49",
+      "research_plan_confirmation": "CONFIRMED but applicability is marginal."
+    }
+  ],
+  "newly_surfaced_adrs_not_in_research_plan_list": [
+    {
+      "adr_id": "ADR-0035",
+      "title": "auditing-shared skill-binding convention",
+      "path": "adrs/ADR-0035-auditing-shared-skill-binding-convention.md",
+      "why_relevant": "execute-finalize-reconciler skills array includes auditing-shared (per its frontmatter line 7: skills: [KB-cc-design, KB-review-disciplines, auditing-shared]). The §6 design must respect this skill-binding convention. The execute-finalize-reconciler file body line 110 references ADR-0035 explicitly: 'The auditing-shared binding is the new convention per ADR-0035 (cycle 3 of this design feature run).'",
+      "design_composer_disposition_recommended": "Consider inheriting at the Blueprint."
+    },
+    {
+      "adr_id": "ADR-0042 + ADR-0043",
+      "title": "auditing-mcp family graduation + auditing-mcp Gate-6 hard gate",
+      "path": "adrs/ADR-0042-auditing-mcp-family-graduation.md, adrs/ADR-0043-auditing-mcp-gate-6-hard-gate.md",
+      "why_relevant": "These ADRs ALSO reference the execute-* agents (per the file grep). Likely UNLIKELY to constrain the dispatch repair, but design-composer should confirm whether the auditing-mcp Gate-6 discipline applies in any §6 option's verification step.",
+      "design_composer_disposition_recommended": "Read for cross-impact; likely no constraint."
+    }
+  ],
+  "conventions": {
+    "cc_layer": {
+      "subagent_frontmatter_canonical_shape": {
+        "required_fields_observed": ["name", "description", "tools"],
+        "common_optional_fields_observed": ["model", "effort", "skills", "memory"],
+        "frontmatter_examples_in_scope": "All 36 .claude/agents/*.md files use YAML frontmatter delimited by ---. tools: is consistently expressed as a YAML inline array [a, b, c] across 33 of 36 files; 3 files use bare comma-separated lists (cc-critique.md:13, finalize-deliverable-packager.md:6, shared-document-reviewer.md:4). The two affected agents (execute-orchestrator + execute-finalize-reconciler) both use the array form."
+      },
+      "agent_tool_grant_taxonomy_observed": {
+        "leaf_agents_no_Agent": "34 of 36 (e.g., all 4 execute-* specialists below the dispatcher, all design-*, all synth-*, all intake-*, all plan-/test-/review-/finalize-* except execute-finalize-reconciler).",
+        "dispatcher_agents_declare_Agent": "2 of 36 (execute-orchestrator, execute-finalize-reconciler). Both belong to the execution-phase family.",
+        "task_tracking_primitives_TaskCreate_TaskUpdate": "27 of 36 agents declare TaskCreate or TaskUpdate (semantically distinct from Agent — the task-tracking primitive)."
+      },
+      "skill_naming_conventions_per_ADR_0019": "All knowledge KBs prefix KB-; the parent orchestrator prefixes recipe-; auditing skills prefix auditing-. No deviation observed.",
+      "test_file_conventions": "Auditing-shared scripts ship a smoke_test_auditing_shared.py colocated. No dedicated pytest framework setup observed at the project root.",
+      "error_handling_convention_in_specialists": "Status enums (COMPLETED|INCOMPLETE|BLOCKED; APPROVED|NEEDS_REVISION|STUB_DETECTED|BLOCKER; PASS|NEEDS_RECONCILIATION|BLOCKER) — errors-as-values pattern, NOT exception-throwing. Consistent across all 5 execute-* agents.",
+      "audit_trail_convention": "Pair-pattern artifacts (per-task-execution-result.{json,md}, phase-quality-report.{json,md}, quality-reconciliation-log.{json,md}, pipeline-run-summary.json) per D-5; JSON for machine consumption + .md companion for human review. state-transitions.log is JSONL-only (no .md companion — it's a stream).",
+      "state_machine_documentation_convention": "Documented in execute-orchestrator.md body (lines 24-43) as a 14-row table (T0..T13) with from/to/trigger columns. NOT documented in recipe-feature-pipeline/SKILL.md. Option (b) folding the state-machine into the parent skill requires moving this table OR re-creating it in the parent skill.",
+      "schema_documentation_for_checkpoint_json": "PARTIAL: planning-side fields documented at recipe-feature-pipeline/SKILL.md:96-128; execution-phase fields (execution_pipeline_state_transitions, execution_mode, execution_pipeline_cycle_counters) NOT documented anywhere — de facto schema only. Per NFR-5-a this is the canonical reference gap the design must close."
+    }
+  },
+  "schemas": {
+    "checkpoint_json_observed_in_devcontainer_mcp_provisioning_r1": {
+      "top_level_keys": [
+        "run_id", "feature_slug", "started_at", "current_stage", "stage_status", "next_action",
+        "execution_pipeline_state_transitions",
+        "cycle_3_closure", "phase_0_findings",
+        "execution_mode", "execution_mode_rationale",
+        "execution_pipeline_cycle_counters",
+        "gate_6_decision", "gate_history",
+        "artifact_versions", "adrs_authored",
+        "reconciliation_cycles", "cross_artifact_audit", "architecture_audit", "deliverable_packaging",
+        "activated_layers", "extraction_method", "scope_class",
+        "synthesis_stats", "reviewer_invocations", "plan_stats",
+        "open_items", "q3_closure", "systemic_followup", "params"
+      ],
+      "execution_pipeline_state_transitions_shape": {
+        "type": "array of objects",
+        "object_keys": ["transition", "from", "to", "timestamp", "trigger"],
+        "optional_keys": ["void", "void_reason"],
+        "example_row_observed": "{\"transition\": \"T0\", \"from\": \"INIT\", \"to\": \"pending\", \"timestamp\": \"2026-05-23T03:20:00Z\", \"trigger\": \"execution-pipeline-invocation; gate-6-approved at 2026-05-23T03:15:00Z; tasks.json + deliverable archive validated\"}"
+      },
+      "execution_mode_shape": {
+        "type": "free-form string",
+        "values_observed": ["single-agent-fallback"]
+      },
+      "execution_pipeline_cycle_counters_shape": {
+        "type": "nested object",
+        "keys": ["per_task: { <task-id>: <int> }", "per_phase: { <phase-id>: <int> }"],
+        "values_observed_all_zero": true,
+        "rationale": "Workaround did not exercise the counters (collapsed into a single agent context per source analysis §3.2)."
+      },
+      "documentation_gap": "These execution-phase fields are NOT documented in recipe-feature-pipeline/SKILL.md:96-128 (the canonical checkpoint.json schema reference). The de facto schema in devcontainer-mcp-provisioning-r1/checkpoint.json IS the schema."
+    },
+    "state_transitions_log_observed_in_devcontainer_mcp_provisioning_r1": {
+      "format": "JSONL (one object per line, no enclosing array)",
+      "per_entry_required_fields": ["timestamp", "transition_name", "from_state", "to_state", "trigger", "invoking_agent"],
+      "per_entry_optional_fields": ["task_id", "phase_id", "cycle_counter", "artifact_paths_affected", "context"],
+      "documented_in_template": ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md",
+      "documented_schema_lines": "34-54 (per-entry JSONL schema); 56-71 (required + optional field semantics)",
+      "v1_invariant_documented": "invoking_agent — always 'execute-orchestrator' in v1 (template line 63). INCOMPATIBLE with §6 option (b) unless updated in lockstep.",
+      "de_facto_extension_observed_NOT_in_template": ["void: true + void_reason: string (used to invalidate a prior T13)", "transition_name suffix '-prime' (used to re-enter pending from TERMINATED after void)"],
+      "case_inconsistency_observed": "Template line 88 example uses 'phase-0' (lowercase); actual artifact uses 'Phase-0' (capitalized). Minor cosmetic gap."
+    }
+  },
+  "known_issues": [
+    {
+      "description": "The recipe-feature-pipeline/SKILL.md canonical schema reference for checkpoint.json (lines 96-128) is missing the execution-phase fields (execution_pipeline_state_transitions, execution_mode, execution_pipeline_cycle_counters). The in-flight devcontainer-mcp-provisioning-r1/checkpoint.json contains these de facto. Per NFR-5-a, any §6 option that touches the checkpoint.json schema must update the canonical reference in lockstep.",
+      "files": [".claude/skills/recipe-feature-pipeline/SKILL.md:96-128"],
+      "severity": "important",
+      "blocks": "schema-consistency under any §6 option that changes the schema"
+    },
+    {
+      "description": "The state-transitions-log-entry-template.md (line 63) declares invoking_agent='execute-orchestrator' as a v1 invariant. Under §6 option (b) retire-execute-orchestrator, this invariant is violated unless updated. Also, the template does NOT document the 'void' field or '-prime' suffix convention observed in the in-flight log.",
+      "files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md:63",
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md:34-54 (per-entry schema)",
+        "working/feature/devcontainer-mcp-provisioning-r1/state-transitions.log:2-3 (void + -prime observed)"
+      ],
+      "severity": "important",
+      "blocks": "template accuracy under §6 option (b)"
+    },
+    {
+      "description": "ADR-0033 §line 71 attributes the symmetric D-12 application to a 'D-12' decision. The Research Plan (§38) and orchestrator dispatch prompt (§6) attribute symmetric D-12 to ADR-0034. ADR-0034 actually covers the unrelated PRD v1.1.0 mis-credit cleanup. Documentary mis-attribution traceable through the Research Plan and PRD references. Per ADR-0034's own discipline (no perpetuating mis-credits), this should be cleaned up in this feature's Blueprint/Plan/ACs to cite ADR-0033 (or ADR-0017 + ADR-0033) for symmetric D-12.",
+      "files": [
+        "adrs/ADR-0033-adr-0029-execution-extension.md:71 (canonical location)",
+        "adrs/ADR-0034-prd-mis-credit-cleanup.md (the mis-attributed ADR)",
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/research-plan.md:38 (the mis-attribution)",
+        "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/prd-v1.md (multiple mis-attributions of 'ADR-0034 symmetric D-12')"
+      ],
+      "severity": "minor (documentary; no behavioral impact)",
+      "blocks": "nothing — but should be corrected during Synthesis or per-layer Design to avoid propagating the mis-credit"
+    },
+    {
+      "description": "recipe-feature-pipeline/SKILL.md does NOT mention execute-orchestrator or the 4 specialists at all. The execution phase is invoked entirely outside this skill's documented surface (post-Gate-6). The skill's 'Activated Sub-Agents Inventory' (lines 354-373) lists 27 pipeline sub-agents EXCLUDING the 5 execute-* agents. §6 option (b) folding the state-machine into this skill REQUIRES adding the execution-phase to the skill's stage taxonomy (currently 13 stages; would become 13 + execution).",
+      "files": [".claude/skills/recipe-feature-pipeline/SKILL.md (entire file)"],
+      "severity": "important",
+      "blocks": "scope clarity for §6 option (b)"
+    },
+    {
+      "description": "Source analysis §1.2 reports runtime tool surface adds 'Edit' to execute-orchestrator despite NOT being declared in frontmatter. This is harness-level mutation behavior — central to T-001's research question. No evidence in the codebase explains the source of 'Edit'.",
+      "files": [".claude/agents/execute-orchestrator.md:6 (declared)", "Issues/analysis-execute-orchestrator-dispatch-limitation.md:54-58 (observed)"],
+      "severity": "central to T-001 investigation",
+      "blocks": "nothing (informational)"
+    }
+  ],
+  "open_questions_for_human": [
+    {
+      "id": "OQ-CR-001",
+      "question": "The Research Plan §Inherited ADRs (line 38) and the orchestrator dispatch prompt §6 attribute 'ADR-0034 — PRD mis-credit cleanup; symmetric D-12' as the inherited ADR for symmetric D-12 application. ADR-0034 actually covers an unrelated PRD v1.1.0 mis-credit cleanup; the symmetric D-12 application is canonical in ADR-0033 line 71. Should the design-composer correct this attribution downstream (in the Blueprint/Plan), or should we surface it as a Research Plan revision before Synthesis?",
+      "context": "ADR-0034's own discipline (Risk of over-application section) flags exactly this kind of perpetuated mis-attribution. Correcting it during Synthesis or Per-layer Design (rather than re-running Discovery Planning) is the lighter move.",
+      "blocks": "nothing immediately; but propagating the mis-credit through the Blueprint/Plan/ACs perpetuates ADR-0034's own discipline failure."
+    },
+    {
+      "id": "OQ-CR-002",
+      "question": "Per AC-FR-4-a, any edit outside the PRD's 8-file inventory triggers an open-item user check. Under §6 option (b) retire-execute-orchestrator, at least 5 files outside the inventory require edits (KB-documentation-criteria/SKILL.md:67-71 template assignments; state-transitions-log-entry-template.md:63 v1 invariant; pipeline-run-summary-template.md:113 generated-by; smoke_test_auditing_shared.py:212 test data; auditing-codespaces/SKILL.md:73 consumer note). Options (a) and (c) require fewer (1 file each). Does the operator want the codebase researcher to flag option (b) as scope-expanding ahead of the per-layer Design decision, or treat it as a normal AC-FR-4-a open-item to be surfaced when option (b) is chosen?",
+      "context": "Research Plan Open Items §3 explicitly asks the operator about the threshold. This is the first concrete instance.",
+      "blocks": "per-layer cc Design's evaluation of option (b)"
+    },
+    {
+      "id": "OQ-CR-003",
+      "question": "The execute-orchestrator file (line 7) declares `skills: [KB-cc-platform, KB-cc-design, recipe-feature-pipeline, auditing-shared, KB-review-disciplines]`. recipe-feature-pipeline is the parent orchestrator skill — a sub-agent declaring its own parent's skill in skills: looks unusual. Under §6 option (b) (retire execute-orchestrator into the parent), this self-reference goes away. Under options (a)/(c), should the design preserve or trim this skill binding?",
+      "context": "ADR-0022 governs sub-agent reasoning-configuration audit (SA-13 BLOCKER check); a skill that references its own parent may already be a SA-13 finding. Worth verifying with KB-cc-design author judgment.",
+      "blocks": "nothing — surfaced for design-composer awareness"
+    },
+    {
+      "id": "OQ-CR-004",
+      "question": "execute-orchestrator and execute-finalize-reconciler share cycle counters via `memory: project` (per execute-finalize-reconciler.md:8 and the orchestrator's body line 24-43 referencing cycle counters). Under §6 option (b), if execute-orchestrator is retired into the parent skill, where does the shared cycle-counter state live? Memory of which agent? Or the parent orchestrator's memory (which is the user's auto-memory at ~/.claude/projects/...)?",
+      "context": "The cycle-counter discipline is load-bearing per PRD FR-3-c. The retiring option needs an explicit re-home for this shared state. The parent skill's 'Memory' section (line 376-383) addresses agent memory but does NOT specify how shared cross-agent state works."
+    },
+    {
+      "id": "OQ-CR-005",
+      "question": "The state-transitions-log-entry-template.md line 63 documents the v1 invariant 'invoking_agent — always execute-orchestrator in v1'. The in-flight artifact at devcontainer-mcp-provisioning-r1/state-transitions.log was emitted by the parent recipe-feature-pipeline orchestrator (per the workaround in source analysis §5) but every entry's invoking_agent is still 'execute-orchestrator'. Is this a bug (workaround mis-labeling) or intentional discipline (the orchestrator is the logical owner even if the parent emitted on its behalf)?",
+      "context": "Per source analysis §5 the workaround was the parent emitting. If the value should reflect actual emitter, the template invariant is wrong. If the value should reflect logical owner, the in-flight log is correct. This affects how §6 options should treat the field."
+    }
+  ],
+  "risks_observed": [
+    {
+      "risk": "Schema drift between recipe-feature-pipeline/SKILL.md canonical reference and the actual checkpoint.json/state-transitions.log artifacts is ALREADY PRESENT (the canonical reference lacks execution-phase fields). Any §6 option that touches the schema must close this gap. Otherwise the gap perpetuates.",
+      "severity": "important",
+      "for_design_composer": "NFR-5-a is the relevant AC. The Blueprint/Plan must specify the canonical-reference update in lockstep with any schema change."
+    },
+    {
+      "risk": "The 'void' field and '-prime' transition-name suffix used in devcontainer-mcp-provisioning-r1/state-transitions.log are de facto schema not documented anywhere. They worked once (during the workaround) but are not in the canonical template. A future workaround or repair might re-invent them differently, breaking forward compatibility.",
+      "severity": "minor",
+      "for_design_composer": "Consider documenting the void + -prime convention OR explicitly rejecting them as repair-time-only patches."
+    },
+    {
+      "risk": "Both execute-orchestrator AND execute-finalize-reconciler declare Agent. The PRD's affected-files inventory (FR-4) lists both. Source analysis §1 directly observed the defect in execute-orchestrator only. The defect in execute-finalize-reconciler is INFERRED with high confidence. If the harness has agent-specific behavior, the assumption may not hold. T-001's probe must exercise BOTH agents OR generalize from one.",
+      "severity": "important",
+      "for_design_composer": "If §6 option chosen does NOT retire execute-finalize-reconciler's Agent declaration, ensure the design either confirms the agent works OR explicitly handles the parallel defect."
+    },
+    {
+      "risk": "PRD FR-3-c names ADR-0017 4-cycle cap + dispatch matrix definitions (D-2a/c/d, D-12, D-13, D-14) + ADR-0034 symmetric D-12 application as load-bearing invariants. The ADR-0034 mis-attribution (OQ-CR-001) means the PRD's stated invariant set may be incomplete — if the real symmetric D-12 ADR is ADR-0033, then ADR-0033 is implicitly load-bearing. Per AC-FR-3-c, the design must preserve these.",
+      "severity": "minor (documentary)",
+      "for_design_composer": "Cite both ADR-0017 and ADR-0033 for the 4-cycle cap + symmetric application; drop the ADR-0034 reference to symmetric D-12."
+    },
+    {
+      "risk": "The 'potentially-applies-to-others' finding (per Research Plan special discipline note): both execute-* dispatchers are the affected SET. No other agent in the project declares Agent. So 'the others' does NOT extend beyond these 2 agents in the FR-5 sweep. The systemic-followup memory cluster (per-agent design discipline gap, Issues/analysis-per-agent-design-evaluation-gap.md) suggests the pipeline lacks a demand-driven per-agent sweep — but the sweep performed for THIS feature is mechanical (FR-5) and complete: 2 affected agents.",
+      "severity": "informational",
+      "for_design_composer": "The FR-5 sweep result is unambiguous. The broader per-agent-design-discipline gap is a separate feature (agent-roster-design-discipline-r1, saved-for-later per memory cluster)."
+    }
+  ],
+  "open_items": [
+    {
+      "id": "OI-CR-A",
+      "summary": "Documentary mis-attribution of symmetric D-12 to ADR-0034 (canonical home is ADR-0033)",
+      "see": "OQ-CR-001 + known_issues entry 3"
+    },
+    {
+      "id": "OI-CR-B",
+      "summary": "Blast-radius escapes the PRD 8-file inventory for §6 option (b) only (5+ files outside inventory)",
+      "see": "blast_radius_summary.per_section_6_option_impact.option_b_retire_execute_orchestrator"
+    },
+    {
+      "id": "OI-CR-C",
+      "summary": "Canonical checkpoint.json schema reference at recipe-feature-pipeline/SKILL.md:96-128 lacks execution-phase fields — pre-existing gap that any §6 schema-change option must close",
+      "see": "schemas.checkpoint_json_observed_in_devcontainer_mcp_provisioning_r1.documentation_gap + NFR-5-a"
+    },
+    {
+      "id": "OI-CR-D",
+      "summary": "v1 invariant 'invoking_agent — always execute-orchestrator' in state-transitions-log-entry-template.md:63 is INCOMPATIBLE with §6 option (b)",
+      "see": "known_issues entry 2"
+    },
+    {
+      "id": "OI-CR-E",
+      "summary": "Newly-surfaced ADRs NOT in Research Plan's inherited list — ADR-0035 (auditing-shared skill-binding), ADR-0042/ADR-0043 (auditing-mcp); design-composer to determine whether to inherit",
+      "see": "newly_surfaced_adrs_not_in_research_plan_list"
+    },
+    {
+      "id": "OI-CR-F",
+      "summary": "Agent count discrepancy: Research Plan claims 35 sub-agent files; actual is 36 (one extra). Minor and non-blocking.",
+      "see": "fr5_inventory_sweep.discrepancy_note"
+    }
+  ]
+}
