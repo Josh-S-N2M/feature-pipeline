@@ -1,0 +1,337 @@
+{
+  "schema_version": "1.0.0",
+  "design_id": "DESIGN-CC-issue-capture-mechanism-r1",
+  "feature_slug": "issue-capture-mechanism-r1",
+  "layer": "cc",
+  "generated_at": "2026-05-23T21:00:00Z",
+  "generated_by": "design-cc",
+  "predecessor_design": null,
+
+  "provides": [
+    {
+      "id": "PROVIDES-CC-01",
+      "category": "skill_kb_new",
+      "artifact": ".claude/skills/KB-issue-capture/SKILL.md + references/{non-pollution-contract,approval-prompt-rubric,triage-criteria,examples}.md",
+      "purpose": "Discipline + triage criteria for outside-pipeline issue capture",
+      "frontmatter_flags": {"disable-model-invocation": true, "allowed-tools": "Read, Glob, Grep"},
+      "consumers": ["issue-capture-author (via runtime Read/Glob, NOT via skills: preload per F-003)"],
+      "principles_invoked": [1, 3, 5, 6]
+    },
+    {
+      "id": "PROVIDES-CC-02",
+      "category": "skill_entrypoint_new",
+      "artifact": ".claude/skills/capture-issue/SKILL.md",
+      "purpose": "User-invocable entry point that spawns issue-capture-author via Task",
+      "frontmatter_flags": {
+        "disable-model-invocation": true,
+        "allowed-tools": "Task, AskUserQuestion",
+        "argument-hint": "<one-line-hint> | --update <path>"
+      },
+      "consumers": ["End user (Josh-S-N2M) via `/capture-issue` slash command"],
+      "principles_invoked": [1, 3, 6, 8]
+    },
+    {
+      "id": "PROVIDES-CC-03",
+      "category": "subagent_new",
+      "artifact": ".claude/agents/issue-capture-author.md",
+      "purpose": "Outside-pipeline doctype classifier + drafter + writer",
+      "frontmatter_flags": {
+        "tools": "Read, Glob, Grep, Write, AskUserQuestion",
+        "model": "sonnet",
+        "effort": "medium",
+        "permissionMode": "default",
+        "skills_array_absent": true,
+        "memory_absent": true
+      },
+      "consumers": ["capture-issue entry-point skill (via Task spawn)"],
+      "principles_invoked": [4, 6, 9],
+      "blast_radius_local": "Zero at creation; auditing-cc-configs + auditing-subagents will scrutinize at pre-merge per U-5"
+    },
+    {
+      "id": "PROVIDES-CC-04",
+      "category": "hook_script_new",
+      "artifact": ".claude/hooks/intercept-issue-capture-agent.sh",
+      "purpose": "PreToolUse on Task; emits permissionDecision=ask for issue-capture-author spawns, allow otherwise",
+      "language": "bash + jq",
+      "fail_mode": "fail-open per NFR-2 (all paths exit 0)",
+      "latency_target_ms": 100,
+      "latency_metric": "p95 wall-clock on standard devcontainer",
+      "ratification_protocol": "1000-iteration benchmark at plan stage per D-11",
+      "consumers": ["Claude Code platform hook event loader (PreToolUse on Task)"],
+      "principles_invoked": [3]
+    },
+    {
+      "id": "PROVIDES-CC-05",
+      "category": "settings_patch_additive",
+      "artifact": ".claude/settings.json",
+      "purpose": "Register hooks.PreToolUse[matcher=Task] pointing at intercept-issue-capture-agent.sh",
+      "additive_only": true,
+      "fields_added": ["hooks.PreToolUse"],
+      "fields_modified": [],
+      "fields_removed": [],
+      "consumers": ["Claude Code platform settings loader at session start"]
+    },
+    {
+      "id": "PROVIDES-CC-06",
+      "category": "settings_notes_append",
+      "artifact": ".claude/SETTINGS-NOTES.md",
+      "purpose": "Audit trail for hook policy + user authorization + project precedents established (FR-15)",
+      "additive_only": true,
+      "consumers": ["Humans / auditors / cc-critique"]
+    },
+    {
+      "id": "PROVIDES-CC-07",
+      "category": "template_new",
+      "artifact": ".claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md",
+      "purpose": "Structural skeleton for issue-register doctype (CP-004 register shape)",
+      "doctype": "issue-register",
+      "consumers": ["issue-capture-author (runtime Read)", "shared-document-reviewer (Gate 0 structural check)"]
+    },
+    {
+      "id": "PROVIDES-CC-08",
+      "category": "template_new",
+      "artifact": ".claude/skills/KB-documentation-criteria/references/templates/issue-analysis-template.md",
+      "purpose": "Structural skeleton for issue-analysis doctype (CP-004 analysis shape)",
+      "doctype": "issue-analysis",
+      "consumers": ["issue-capture-author (runtime Read)", "shared-document-reviewer (Gate 0)"]
+    },
+    {
+      "id": "PROVIDES-CC-09",
+      "category": "template_new",
+      "artifact": ".claude/skills/KB-documentation-criteria/references/templates/issue-proposal-template.md",
+      "purpose": "Structural skeleton for issue-proposal doctype (CP-004 proposal shape)",
+      "doctype": "issue-proposal",
+      "consumers": ["issue-capture-author (runtime Read)", "shared-document-reviewer (Gate 0)"]
+    },
+    {
+      "id": "PROVIDES-CC-10",
+      "category": "spec_new",
+      "artifact": ".claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md",
+      "purpose": "Structural-only spec: frontmatter shape + 5-state vocabulary + per-state companion-field rules + id derivation",
+      "structural_only": true,
+      "triggering_discipline_absent": true,
+      "consumers": [
+        "Templates 7/8/9 (cross-reference)",
+        "issue-capture-author (runtime Read)",
+        "design-backend's FR-7 validator extension (consumes the enum values + per-state field rules verbatim)"
+      ],
+      "principles_invoked": [5]
+    },
+    {
+      "id": "PROVIDES-CC-11",
+      "category": "kb_index_edit_additive",
+      "artifact": ".claude/skills/KB-documentation-criteria/SKILL.md",
+      "purpose": "FR-14 additive index update: 3 new template rows + 1 spec row + 1 'Where this KB is NOT used' bullet",
+      "additive_only": true,
+      "fields_modified": [],
+      "fields_removed": []
+    },
+    {
+      "id": "PROVIDES-CC-12",
+      "category": "agent_edit_additive",
+      "artifact": ".claude/agents/intake-intent-clarifier.md",
+      "purpose": "FR-11: Phase 0 proposal-seed detection branch (~15-line addition; D-14)",
+      "additive_only": true,
+      "signature_change": false,
+      "downstream_pipeline_isolation_check": "PASS — addition is ADDITIVE in procedure section; does NOT reference KB-issue-capture or issue-capture-author by name (preserves FR-13 invariant)"
+    },
+    {
+      "id": "PROVIDES-CC-13",
+      "category": "template_edit_additive",
+      "artifact": ".claude/skills/KB-documentation-criteria/references/templates/intent-clarification-template.md",
+      "purpose": "FR-12a: Source-section guidance for proposal-seeded runs (~5-line addition)",
+      "additive_only": true
+    },
+    {
+      "id": "PROVIDES-CC-14",
+      "category": "skill_edit_additive",
+      "artifact": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "purpose": "FR-12b: Document proposal-seed invocation pattern (one bullet)",
+      "additive_only": true,
+      "no_new_stage": true,
+      "no_new_gate": true,
+      "no_bypass": true
+    },
+    {
+      "id": "PROVIDES-CC-15",
+      "category": "migration_atomic",
+      "artifact": "FR-8 migration: 4 Issues/*.md → Issues/<topic>/<doctype>.md (git mv + frontmatter back-fill, single atomic commit per file per D-13)",
+      "migration_map": [
+        {"from": "Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md", "to": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md", "doc_type_rename": "deferral-register → issue-register"},
+        {"from": "Issues/analysis-per-agent-design-evaluation-gap.md", "to": "Issues/per-agent-design-evaluation-gap/analysis.md", "doc_type_rename": "analysis → issue-analysis"},
+        {"from": "Issues/analysis-adr-placement-rootcause.md", "to": "Issues/adr-placement-rootcause/analysis.md", "doc_type_rename": "analysis → issue-analysis"},
+        {"from": "Issues/proposal-auditing-family-graduation-review.md", "to": "Issues/auditing-family-graduation-review/proposal.md", "doc_type_rename": "proposal → issue-proposal"}
+      ],
+      "frontmatter_backfill_per_file": ["version: 0.1.0", "status: open", "since: <ISO-8601-UTC>"],
+      "history_preservation": "AC-FR-8-b: git log --follow returns pre-migration history"
+    },
+    {
+      "id": "PROVIDES-CC-16",
+      "category": "migration_atomic",
+      "artifact": "FR-9 migration: agent-roster-impact-matrix.md (no doc_type change)",
+      "migration_map": [
+        {"from": "working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md", "to": "Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md"}
+      ]
+    },
+    {
+      "id": "PROVIDES-CC-17",
+      "category": "log_destination_new",
+      "artifact": ".claude/logs/capture-issue.jsonl",
+      "purpose": "D-09 observability destination — append-only JSONL log of write-path + selected-option per AC-NFR-7-a",
+      "format_per_line": {"ts": "ISO-8601-UTC", "path": "string", "option": "string", "mode": "create|update", "topic_slug": "string", "doctype": "issue-register|issue-analysis|issue-proposal"},
+      "fail_mode": "graceful — stderr-warning if append fails; do not block user-visible result",
+      "gitignore_recommendation": "yes (surfaced as Q-CC-4 for design-composer)"
+    }
+  ],
+
+  "consumes": [
+    {
+      "id": "CONSUMES-PRD-01",
+      "kind": "PRD-FR",
+      "ids": ["FR-1", "FR-2", "FR-3", "FR-4", "FR-5", "FR-6", "FR-8", "FR-9", "FR-10", "FR-11", "FR-12", "FR-13", "FR-14", "FR-15"],
+      "description": "Functional requirements driving this CC design (FR-7 routed to design-backend, not consumed here)"
+    },
+    {
+      "id": "CONSUMES-PRD-02",
+      "kind": "PRD-NFR",
+      "ids": ["NFR-1", "NFR-2", "NFR-3", "NFR-4", "NFR-5", "NFR-6", "NFR-7", "NFR-9"],
+      "description": "Non-functional requirements (NFR-8 routed to design-backend)"
+    },
+    {
+      "id": "CONSUMES-PRD-03",
+      "kind": "PRD-Undetermined-Items",
+      "ids": ["U-1", "U-2", "U-3", "U-4 (shared with backend)", "U-5 (passthrough to phase-quality-reviewer)", "U-7 (passthrough to plan/test)", "U-8", "U-9", "U-11"],
+      "description": "PRD undetermined items resolved by this design (or routed onward)"
+    },
+    {
+      "id": "CONSUMES-SYNTH-01",
+      "kind": "synthesis-decision-frames",
+      "ids": ["D-01", "D-02", "D-03", "D-04", "D-05 (shared with design-backend; per-state required companion fields)", "D-07 (shared with plan+test)", "D-08", "D-09", "D-11", "D-12 (shared with composer)", "D-13", "D-14"],
+      "description": "Decision frames routed to design-cc per synthesis §Per-layer Design Routing. D-05 added in cycle 1 reconciliation (blueprint v2; per I-DR-BP-003) to mirror the Blueprint's shared-mechanism listing — D-05 is authored canonically in issue-doctypes-spec.md (CC-owned) and consumed verbatim by design-backend's FR-7 validator extension."
+    },
+    {
+      "id": "CONSUMES-CODEBASE-01",
+      "kind": "codebase-finding",
+      "ids": ["F-001", "F-002", "F-003 (BLOCKER mitigation)", "F-004", "F-005", "F-006", "F-007", "F-010", "F-013", "F-014", "F-015", "F-016"],
+      "description": "Codebase findings consumed in mechanism designs and project-precedents section"
+    },
+    {
+      "id": "CONSUMES-CODEBASE-02",
+      "kind": "codebase-convention-pattern",
+      "ids": ["CP-001 (cc-critique structural template)", "CP-002 (stderr discipline)", "CP-003 (Issues frontmatter shape)", "CP-004 (Issues body shapes)", "CP-005 (settings.json permission shape)", "CP-006 (smoke-test harness pattern)", "CP-007 (feature_slug universal)"],
+      "description": "Convention patterns matched in the design (not invented)"
+    },
+    {
+      "id": "CONSUMES-CODEBASE-03",
+      "kind": "codebase-verbatim-extract",
+      "ids": ["VE-001 (4-state intra-pipeline vocabulary for contrast)", "VE-002 (finding-dict shape; for backend layer awareness)", "VE-003 (current GATED/ANALYSIS/ADR enums)", "VE-004 (current path dispatch — preserved by backend)"]
+    },
+    {
+      "id": "CONSUMES-KB-01",
+      "kind": "skill-knowledge-base",
+      "ids": ["KB-cc-platform/SKILL.md", "KB-cc-platform/references/extensions.md (hook contract; PRD Assumption 2 verification flagged)", "KB-cc-design/SKILL.md", "KB-cc-design/references/principles.md (Principles 1, 3, 5, 6, 8, 9)", "KB-cc-design/references/patterns-and-anti-patterns.md", "KB-documentation-criteria/SKILL.md", "KB-documentation-criteria/references/templates/blueprint-template.md", "KB-documentation-criteria/references/shared-conventions.md", "KB-review-disciplines/references/issue-lifecycle.md"]
+    },
+    {
+      "id": "CONSUMES-ADR-01",
+      "kind": "adrs-constrained-by",
+      "ids": ["ADR-0005 (superseded-by enforcement — pattern mirrored)", "ADR-0008 (intra-pipeline 4-state ledger — parallel-but-distinct)", "ADR-0017 (5 invocation points of shared-document-reviewer)", "ADR-0023 (FULL scope class)", "ADR-0032 (universal-required feature_slug + 3-tier per-doc-type state vocabulary; this design introduces a fourth tier)", "ADR-0036 (single-location ADR placement at adrs/)"]
+    }
+  ],
+
+  "cross_layer": [
+    {
+      "id": "CROSS-CC-BACKEND-01",
+      "to_layer": "backend",
+      "kind": "spec_consumption",
+      "what_we_provide": "Three new doc_type enum values + 5-state vocabulary + per-state companion-field rules, codified in issue-doctypes-spec.md (PROVIDES-CC-10)",
+      "what_backend_does_with_it": "Translates into ISSUE_DOC_TYPES and ISSUE_STATES constants in validate_pipeline_frontmatter.py; implements validate_issue_artifact() as fourth category branch per D-10",
+      "design_routing": "design-backend owns D-10 architecture and the regression-corpus baseline capture per D-10 BLAST-RADIUS note",
+      "blocking_dependency": true
+    },
+    {
+      "id": "CROSS-CC-BACKEND-02",
+      "to_layer": "backend",
+      "kind": "migration_sequencing",
+      "what_we_provide": "Migration map per D-13 (5 files; doc_type renames to new canonical enum)",
+      "what_backend_does_with_it": "FR-7 validator extension must accept the new canonical doc_type values; AC-FR-8-c (validator-clean post-back-fill) gates the migration",
+      "sequencing_note": "plan-author sequences: validator extension lands BEFORE migration verification, OR migration occurs AFTER validator extension is in place"
+    },
+    {
+      "id": "CROSS-CC-BACKEND-03",
+      "to_layer": "backend",
+      "kind": "advisory_field_decision",
+      "what_we_provide": "proposes_future_feature: field is declared as ADVISORY on issue-proposal doctype (per D-06 routed to design-backend)",
+      "what_backend_does_with_it": "Validator extension: presence-only check (not format-enforced); info-severity finding on absence on issue-proposal"
+    }
+  ],
+
+  "principles_summary": {
+    "principle_1_lowest_cost_primitive": "Every new artifact uses the lowest-cost mechanism: skills with disable-model-invocation: true cost zero context until invoked; hook costs zero context; templates live under existing KB; no new CLAUDE.md content.",
+    "principle_2_path_gating": "N/A — no new rules introduced; no path-gated mechanisms used.",
+    "principle_3_enforce_when_safety_critical": "Three-layer enforcement: Layer 1 (skill-loader policy via disable-model-invocation) + Layer 2 (agent-body AskUserQuestion mandate) + Layer 3 (PreToolUse hook). Each layer independently prevents unintended writes.",
+    "principle_4_subagent_isolation_pays_off": "issue-capture-author isolates KB-loading + classification + drafting + write into a fresh context window; main session sees only the spawn approval and the written path. Isolation pays for the multi-file read + KB-reference loading.",
+    "principle_5_one_source_of_truth": "Templates land in KB-documentation-criteria (structural); discipline lives in KB-issue-capture (triggering); approval prompts live in KB-issue-capture/references/approval-prompt-rubric.md (no duplication in agent body). CLAUDE.md untouched.",
+    "principle_6_permissions_safety_net": "Per-primitive allowed-tools narrowing: KB-issue-capture (Read/Glob/Grep — knowledge-only), capture-issue (Task/AskUserQuestion — spawn-only), issue-capture-author (Read/Glob/Grep/Write/AskUserQuestion — writer-scoped, no Bash, no Edit, no Task). Hook + permissions are safety net not primary control.",
+    "principle_7_plugins_for_distribution": "Not applicable — single-project; no plugin packaging. Q-CC-3 records future reconsideration.",
+    "principle_8_skills_over_commands": "Entry point capture-issue is a skill (not a .claude/commands/*.md file) — skills can bundle references, define allowed-tools, be auto-invoked. No migration needed (no legacy command exists).",
+    "principle_9_subagent_reasoning_intentional": "issue-capture-author: model=sonnet (bounded transformation, not cross-cutting), effort=medium (low reasoning load per invocation). Diverges from pipeline-uniform opus/high deliberately. skills: array ABSENT (per F-003; runtime Read/Glob substitutes)."
+  },
+
+  "open_items_routed_onward": [
+    {"id": "U-1", "owner": "plan-author", "what": "Verify PreToolUse stdin event subagent_type field name against live Claude Code platform docs"},
+    {"id": "U-2", "owner": "plan-author", "what": "Author exact AskUserQuestion archetype text in approval-prompt-rubric.md"},
+    {"id": "U-3", "owner": "plan-author", "what": "Sequence examples.md authoring AFTER FR-8 migration"},
+    {"id": "U-5", "owner": "phase-quality-reviewer", "what": "Pre-stage auditing-hooks/auditing-skills/auditing-subagents/auditing-settings cc-critique passes"},
+    {"id": "U-7", "owner": "plan-author + test-acceptance-author", "what": "Hook test strategy: shellcheck + golden-file unit + integration smoke (per D-07 recommendation)"},
+    {"id": "U-9", "owner": "RESOLVED", "what": ".claude/logs/capture-issue.jsonl + stderr per D-09"},
+    {"id": "U-11", "owner": "plan-author + test-acceptance-author", "what": "1000-iteration p95 measurement; ratify or replace AC-NFR-1-a"},
+    {"id": "OI-1", "owner": "design-backend", "what": "Capture pre/post regression corpus baseline BEFORE FR-7 implementation"},
+    {"id": "Q-CC-1", "owner": "design-composer", "what": "Audit-trail ADR consolidation: one ADR or multiple?"},
+    {"id": "Q-CC-2", "owner": "design-composer (advisory)", "what": "permissions.deny rule for Issues/ writes from non-issue-capture-author agents — defer to future feature"},
+    {"id": "Q-CC-3", "owner": "design-composer (advisory)", "what": "Future plugin-packaging consideration"},
+    {"id": "Q-CC-4", "owner": "design-composer", "what": ".claude/logs/*.jsonl gitignore decision"},
+    {"id": "Q-CC-5", "owner": "design-composer", "what": "permissionMode strictening on issue-capture-author — keep default or tighten?"}
+  ],
+
+  "blast_radius_self": {
+    "pre_existing_artifacts_modified": [
+      ".claude/settings.json (additive only — hooks block added; existing 7 allow entries untouched)",
+      ".claude/SETTINGS-NOTES.md (append only)",
+      ".claude/agents/intake-intent-clarifier.md (~15-line addition under ## Procedure)",
+      ".claude/skills/KB-documentation-criteria/SKILL.md (additive rows only)",
+      ".claude/skills/KB-documentation-criteria/references/templates/intent-clarification-template.md (~5-line addition to Source section)",
+      ".claude/skills/recipe-feature-pipeline/SKILL.md (one bullet addition under --raw-request documentation)"
+    ],
+    "new_artifacts_created": [
+      ".claude/skills/KB-issue-capture/SKILL.md",
+      ".claude/skills/KB-issue-capture/references/non-pollution-contract.md",
+      ".claude/skills/KB-issue-capture/references/approval-prompt-rubric.md",
+      ".claude/skills/KB-issue-capture/references/triage-criteria.md",
+      ".claude/skills/KB-issue-capture/references/examples.md",
+      ".claude/skills/capture-issue/SKILL.md",
+      ".claude/agents/issue-capture-author.md",
+      ".claude/hooks/intercept-issue-capture-agent.sh",
+      ".claude/hooks/test_intercept_issue_capture_agent.py (per D-07 layer B)",
+      ".claude/hooks/test_fixtures/01-issue-capture-author-spawn.json (and 4 other fixtures)",
+      ".claude/logs/ (directory; first content written at runtime)",
+      ".claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/issue-analysis-template.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/issue-proposal-template.md",
+      ".claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md"
+    ],
+    "files_migrated": [
+      "Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md → Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "Issues/analysis-per-agent-design-evaluation-gap.md → Issues/per-agent-design-evaluation-gap/analysis.md",
+      "Issues/analysis-adr-placement-rootcause.md → Issues/adr-placement-rootcause/analysis.md",
+      "Issues/proposal-auditing-family-graduation-review.md → Issues/auditing-family-graduation-review/proposal.md",
+      "working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md → Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md"
+    ],
+    "pipeline_isolation_preserved": {
+      "invariant_AC_FR_13_a": "Zero matches for 'KB-issue-capture' across .claude/agents/{intake,discovery,design,plan,test,review,finalize,execute,synth}-*.md",
+      "invariant_AC_FR_13_b": "Zero matches for 'subagent_type:\\s*issue-capture-author' across same set",
+      "zero_baseline_confirmed_at": "2026-05-23T18:55Z (HEAD cf48e5e) per codebase-analysis §pipeline_isolation_check",
+      "post_design_check": "PROVIDES-CC-12 (intake-intent-clarifier edit) does NOT reference KB-issue-capture or issue-capture-author by name; FR-13 invariant preserved"
+    },
+    "broader_blast": "The new PreToolUse hook fires on EVERY Task spawn across the project. Mitigations: NFR-1 fast-path (~100ms target) + NFR-2 fail-open. Per codebase-analysis blast_radius for settings.json: every pipeline sub-agent spawn (~30-100 per pipeline run) passes through the hook's discriminator. The fast-path is the load-bearing performance protection."
+  }
+}

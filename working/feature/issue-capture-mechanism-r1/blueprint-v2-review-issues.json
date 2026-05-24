@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "DesignDoc",
+    "doc_variant": "Blueprint",
+    "target_path": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md",
+    "predecessor_path": "working/feature/issue-capture-mechanism-r1/blueprint-v1.md",
+    "cycle": 1,
+    "review_round": "post-reconciliation-cycle-1",
+    "prior_review_issues_source": "working/feature/issue-capture-mechanism-r1/blueprint-v1-review-issues.json (not on disk; reconstructed from dispatch-r1.json must_apply + may_apply blocks)",
+    "reviewed_at": "2026-05-23T00:00:00Z"
+  },
+  "scores": {
+    "consistency": 96,
+    "completeness": 94,
+    "rule_compliance": 95,
+    "clarity": 93
+  },
+  "gate0": {
+    "status": "pass",
+    "checks_performed": [
+      "frontmatter present with id/version/status/feature_slug/derived_from/predecessor/generated/generated_by",
+      "version bump 1.0.0 -> 1.1.0 (MINOR) per dispatch",
+      "predecessor field references blueprint-v1.md",
+      "change_summary enumerates all 10 absorbed findings (I-DR-BP-001..010)",
+      "all REQUIRED Blueprint template sections present (Overview, Design Summary (Meta), Background and Context, Acceptance Criteria, Existing Codebase Analysis, Design, Implementation Plan, Security Considerations, Test Boundaries, Verification Strategy, Future Extensibility, Alternative Solutions, Risks and Mitigation, References, Update History)",
+      "Applicable Standards section present with explicit/implicit classification",
+      "Field propagation map present",
+      "Verification Strategy present with correctness definition, verification method, verification timing, early verification point",
+      "Fact Disposition Table covers all 16 codebase-analysis focusAreas (F-001..F-016)",
+      "7 ADRs from v1 remain in adrs/; no new ADRs (per FR-5)"
+    ],
+    "missing_elements": []
+  },
+  "verdict": {
+    "decision": "approved",
+    "conditions": [],
+    "summary": "v2 absorbs all 2 important + all 8 recommended findings from v1. Cross-document edits (cc-dependencies.json D-05 add per I-DR-BP-003; backend-design.md SUPERSEDED-NOTE per I-DR-BP-004) are confirmed present. F-003 BLOCKER mitigation language is preserved unchanged. ADR slate (ADR-0044..ADR-0050) unchanged; no new ADRs introduced this cycle (consistent with FR-5 and dispatch posture). No regressions detected; no new defects introduced."
+  },
+  "issues": [],
+  "recommendations": [
+    "Observation (not blocking, not a regression): the v2 wording at the §Design Summary (Meta) 5th precedent line 138-140 expanded the dispatch-mandated qualifier 'distinct from ADR-0032's 3-tier per-doc-type vocabulary' to 'distinct from ADR-0008's 4-state intra-pipeline ledger and ADR-0032's 3-tier per-doc-type vocabulary'. This is a strict improvement — aligns with cc-design.md line 63 canonical wording and with the §Project Precedents Established subsection item 5 and Q-CC-1 enumeration. Calling out as transparency, not as a finding.",
+    "Observation (carry-forward; not a regression): the Blueprint frontmatter does not declare `doc_type:` explicitly. Per shared-conventions §v2 Amendments, doc_type is universal-required. This was also absent in v1; v1 passed reviewer as PASS_WITH_RECOMMENDATIONS so this is a pre-existing condition, not introduced by v2. May be folded into a future cycle if shared-conventions v2 enforcement is tightened.",
+    "Implementation Plan Phase 5 cleanly absorbed the .gitignore step per I-DR-BP-008; Phase numbering remains 0-6 with no renumber needed.",
+    "ADR-0050 clarification per I-DR-BP-010 lives inline in the Blueprint's §New ADRs Authored row (italicized note) rather than amending the ADR file itself — this is explicitly called out and is the right minimal-touch resolution for cycle 1."
+  ],
+  "prior_context_check": {
+    "items_received": 10,
+    "resolved": 10,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [
+      {
+        "id": "I-DR-BP-001",
+        "severity": "important",
+        "category": "consistency",
+        "status": "resolved",
+        "location": "Blueprint v2 §Design Summary (Meta) > complexity_rationale lines 136-140",
+        "evidence": "v2 line 136 reads 'Five project firsts (first disable-model-invocation skills; first .claude/hooks/ directory; first hooks block in settings.json; first runtime KB-load sub-agent; first 5-state lifecycle vocabulary distinct from ADR-0008's 4-state intra-pipeline ledger and ADR-0032's 3-tier per-doc-type vocabulary) introduced together'. Count now agrees with the four reference points (line 195 'five project firsts', line 213 'FIVE project precedents', line 1039 'five project firsts', line 1254 Q-CC-1 enumerating 5 facts). The 5th item required by the dispatch is appended; the qualifier was expanded to also reference ADR-0008 (transparency note in recommendations)."
+      },
+      {
+        "id": "I-DR-BP-002",
+        "severity": "important",
+        "category": "completeness",
+        "status": "resolved",
+        "location": "Blueprint v2 §Background and Context > Project Precedents Established (new subsection, lines 191-203)",
+        "evidence": "New §Project Precedents Established subsection added inside §Background and Context (per dispatch option A). Enumerates all 5 precedents with the same numbering and content as cc-design.md lines 55-65. Italicized header note cites cc-design.md as the canonical layer-level source and explicitly states the Agreement Checklist row 'SETTINGS-NOTES audit-trail append' (line 213) now cross-references this subsection in place of v1's dangling '(see I-DR-002 resolution below)' forward reference. The dangling phrase no longer appears in the body of the document — only in the frontmatter change_summary (describing the fix) and in the new subsection's italicized header (describing what was replaced)."
+      },
+      {
+        "id": "I-DR-BP-003",
+        "severity": "recommended",
+        "category": "consistency",
+        "status": "resolved",
+        "location": "cc-dependencies.json line 209 (PROVIDES-CC > CONSUMES-SYNTH-01 > ids list)",
+        "evidence": "ids list now includes 'D-05 (shared with design-backend; per-state required companion fields)'. Description field at line 210 documents the addition with rationale tying back to I-DR-BP-003. Mirrors the Blueprint's shared-mechanism listing at §Mechanism Designs (D-01..D-14) line 835."
+      },
+      {
+        "id": "I-DR-BP-004",
+        "severity": "recommended",
+        "category": "consistency",
+        "status": "resolved",
+        "location": "backend-design.md §5 line 112 SUPERSEDED-NOTE; blueprint-v2.md §Corrected Pseudocode Reference lines 883-921",
+        "evidence": "backend-design.md §5 carries a SUPERSEDED-NOTE block (line 112) explicitly stating the `field_present(fm, field)` references at §2, §5, and §Decision Summary are superseded by the Blueprint's Corrected Pseudocode Reference subsection (which uses `field in fm` per the actual codebase idiom at lines 314-323). Notes 'no new ADR is required'. Blueprint v2 §Backend Design lines 866-870 mirror the disposition with a SUPERSEDED-NOTE pointing in the opposite direction. Reader resolution is unambiguous."
+      },
+      {
+        "id": "I-DR-BP-005",
+        "severity": "recommended",
+        "category": "clarity",
+        "status": "resolved",
+        "location": "Blueprint v2 §References > ADR placement note lines 1298-1302",
+        "evidence": "Explicit cross-link to `Issues/adr-placement-rootcause/analysis.md` bolded in line 1302: 'The canonical root-cause analysis of the drift lives at Issues/adr-placement-rootcause/analysis.md'. Notes the file is itself one of the four FR-8 migration targets and gives the pre-migration path for traceability. Reader has a single discoverable destination."
+      },
+      {
+        "id": "I-DR-BP-006",
+        "severity": "recommended",
+        "category": "completeness",
+        "status": "resolved",
+        "location": "Blueprint v2 §Acceptance Criteria lines 294",
+        "evidence": "One-line Note (line 294) enumerates FR-8 (D-13 git-mv migration history), FR-9 (agent-roster-impact-matrix migration), FR-11 (intake-intent-clarifier Phase 0 detection per D-14), FR-12 (intent-clarification-template.md + recipe edits per D-14) as the additional design-coupled AC families. Notes 'test-acceptance-author (Stage 8) produces the complete acceptance-tests.md covering all FRs'. The compact PRD-canonical-source disposition is preserved."
+      },
+      {
+        "id": "I-DR-BP-007",
+        "severity": "recommended",
+        "category": "completeness",
+        "status": "resolved",
+        "location": "Blueprint v2 §Verification Strategy > Early Verification Points > 'CC layer — Phase 3 hook shellcheck + single-fixture golden-file dry-run' lines 1139-1146",
+        "evidence": "New CC-layer early-verification target added in parallel to the existing Backend constants-only target. Two steps: (1) shellcheck against intercept-issue-capture-agent.sh; (2) single canonical 'subagent_type: issue-capture-author' golden-file fixture. Defines success criteria, failure response, and ties to Open Items U-1 (jq schema verification). Parallels the Backend target's spirit of 'smallest commit that proves the load-bearing structural property'."
+      },
+      {
+        "id": "I-DR-BP-008",
+        "severity": "recommended",
+        "category": "completeness",
+        "status": "resolved",
+        "location": "Blueprint v2 §Implementation Plan > Phase 5 line 990; §Change Impact Map line 451; §Resolved Q-CC-N row line 1257",
+        "evidence": "Phase 5 bullet list now includes '.gitignore append for .claude/logs/*.jsonl (Q-CC-4 resolution; per I-DR-BP-008)' as the sixth additive edit. Change Impact Map line 451 lists '.gitignore (append .claude/logs/*.jsonl per Q-CC-4)' under edited. Q-CC-4 row at line 1257 references 'Plan-author owns the .gitignore edit step in Phase 5 (per I-DR-BP-008)'. Three-point consistency."
+      },
+      {
+        "id": "I-DR-BP-009",
+        "severity": "recommended",
+        "category": "clarity",
+        "status": "resolved",
+        "location": "Blueprint v2 §Design > Architecture Overview ASCII diagram lines 527-533",
+        "evidence": "Diagram now carries an inline annotation: 'DISJOINT from the intra-pipeline issues-ledger.json (per ADR-0008): [annotated per I-DR-BP-009]' on line 527, followed by an explicit box (lines 528-533) showing 'working/feature/<slug>/issues-ledger.json (4-state vocabulary) IDs: I-<DR|AA|CA>-NNN' and a parenthetical 'Issues/ and issues-ledger.json are DISJOINT surfaces — no shared IDs; no automated cross-reference; parallel-but-distinct vocabularies per ADR-0050.' The disjoint relationship is now visually explicit in the diagram, not only narrative."
+      },
+      {
+        "id": "I-DR-BP-010",
+        "severity": "recommended",
+        "category": "clarity",
+        "status": "resolved",
+        "location": "Blueprint v2 §Cross-References > New ADRs Authored > ADR-0050 row line 1248",
+        "evidence": "Italicized note on ADR-0050 row reads: 'Per I-DR-BP-010 clarification: the \"5-state\" label in this ADR's title and Decision section refers to the 5 substantive lifecycle states (open, adopted, complete, superseded, wontfix-with-rationale); draft is the universal initial state per ADR-0032 and is not counted in the \"5\" but is present as a sixth key in the ISSUE_PER_STATE_REQUIRED_FIELDS dict (with an empty tuple — universal-required only). The dict has 6 keys total; the lifecycle has 5 substantive states plus the universal draft initial state. ADR-0050's §Decision Details should be amended in a future revision to carry this clarification inline; for this cycle the clarification lives here in the Blueprint cross-reference row.' Reconciles the 5-state label with the 6 dict keys."
+      }
+    ]
+  },
+  "regression_checks": {
+    "f003_blocker_mitigation_preserved": {
+      "status": "preserved",
+      "evidence": "v2 lines 133, 164, 195, 200, 393, 394, 406, 502, 594, 613 all carry F-003 references intact; issue-capture-author frontmatter shape 'skills: ABSENT' remains documented at Component 3 line 613"
+    },
+    "v1_content_preserved_except_where_required": {
+      "status": "preserved",
+      "evidence": "v2 line count 1309 vs v1 1237 = +72 lines, consistent with: (1) new §Project Precedents Established subsection (~13 lines incl. spacing); (2) §Verification Strategy CC-layer early-verification block (~10 lines); (3) inline notes for I-DR-BP-003..010 (~5 lines across); (4) frontmatter change_summary expansion (~32 lines); (5) Update History row 1.1.0 (~1 line). No removal of v1 substance detected."
+    },
+    "adr_slate_unchanged": {
+      "status": "preserved",
+      "evidence": "adrs/ directory contains exactly 7 files: ADR-0044..ADR-0050 (matches v1 adrs_authored frontmatter). v1 vs v2 ADR id mentions diff returns empty set differential. No new ADR file authored this cycle, consistent with FR-5 and dispatch's no-new-ADR-expected posture."
+    },
+    "no_new_internal_contradictions": {
+      "status": "clean",
+      "evidence": "Count of 'five precedents' / 'FIVE precedents' / 'five project firsts' now consistent across lines 136, 195, 213, 1039, 1254. No remaining occurrence of 'Four project firsts' in v2 body or in companion frontmatter. Dangling '(see I-DR-002 resolution below)' phrase eliminated from body; only appears in frontmatter change_summary describing the fix and in the new subsection's italicized header describing the replacement."
+    },
+    "madr_conformance_on_7_adrs": {
+      "status": "not_reviewed_this_cycle",
+      "evidence": "ADRs were not regenerated this cycle. No edits to adrs/*.md detected per dispatch (only blueprint-v1.md, cc-dependencies.json, backend-design.md were targets). MADR conformance carried forward from v1 review baseline."
+    },
+    "frontmatter_discipline": {
+      "status": "compliant",
+      "evidence": "version: 1.1.0 (MINOR bump per dispatch supersession block); predecessor: blueprint-v1.md; change_summary enumerates all 10 absorbed findings with their resolution mechanism; companion_artifacts unchanged (cc-design.md, cc-dependencies.json, backend-design.md, backend-dependencies.json, synthesis.md, codebase-analysis.json, codebase-analysis-report.md). All required shared-conventions fields present (id, version, status, feature_slug, derived_from, generated, generated_by). doc_type field absent — noted in recommendations as carry-forward, not a regression."
+    }
+  }
+}

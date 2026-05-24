@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "IntentClarification",
+    "target_path": "working/feature/issue-capture-mechanism-r1/intent-clarification.md",
+    "reviewer": "shared-document-reviewer",
+    "review_iteration": 1,
+    "review_date": "2026-05-23",
+    "feature_slug": "issue-capture-mechanism-r1",
+    "context_note": "Stage 1 of feature-pipeline per ADR-0017. Special case: source raw_request was a doc_type:issue-proposal at Issues/issue-capture-mechanism/proposal.md (planning-mode design work). Clarifier surfaced 7 ambiguities as proposed defaults rather than via AskUserQuestion (no tool available); defaults bind at Gate 1 user confirmation. The proposal-as-prior-context handoff pattern is itself the subject of this feature run."
+  },
+  "scores": {
+    "consistency": 90,
+    "completeness": 92,
+    "rule_compliance": 88,
+    "clarity": 85
+  },
+  "gate0": {
+    "status": "pass",
+    "checks": {
+      "required_sections_present": "pass — all 10 H2 sections present (Purpose, Source, Initial Interpretation, Clarifying Questions and Answers, Clarified Intent, Scope Posture, Stakeholder Posture (Preliminary), Success Posture (Preliminary), Confirmation, Open Items)",
+      "contents_checklist_present_and_all_checked": "pass — '## Contents' heading present; all 10 boxes [x]",
+      "scope_posture_three_subsections": "pass — 'What's in scope', 'What's NOT in scope', 'What's undecided' all present and substantive",
+      "clarifying_questions_all_resolved": "pass — all 7 rows show Resolved? [x] (proposed-defaults pattern explicitly accommodated for proposal-as-prior-context handoff per orchestrator context)",
+      "frontmatter_required_fields": "pass — id, version, status, generated, generated_by, feature_slug, user_token, doc_type, derived_from, scope_class all present",
+      "frontmatter_v2_compliance": "pass — doc_type:intent-clarification present per ADR-0032 Change 4; derived_from present per Change 1; scope_class:FULL declared"
+    },
+    "missing_elements": []
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "summary": "PASS_WITH_RECOMMENDATIONS — structurally complete; logically consistent; substantively well-grounded in the proposal+plan prior context. Two important findings concern over-reach into PRD-territory authoring (extensive FR/NFR/AC seed lists, 9-layer table at intent stage) and one borderline layer-disposition judgment. None are blockers; all are appropriately framed as 'seed' / 'preliminary' and explicitly accommodate the proposal-as-prior-context pattern. The user may want to confirm at Gate 1 that the seed-list extent is acceptable as Open-Item framing rather than premature requirements authoring.",
+    "conditions": [
+      "User confirms at Gate 1 that the 7 proposed defaults (recorded in 'Clarifying Questions and Answers') are correctly resolved. Per the orchestrator note and the doc's §Confirmation, any rejected default reopens that row before PRD authoring begins.",
+      "User confirms at Gate 1 that the extensive 'Open Items (Pending PRD Authoring)' content (FR seeds, NFR seeds, EARS AC seeds, 9-layer table) is acceptable as Open-Item framing inherited from the proposal+plan prior context, rather than premature PRD authoring forbidden by the template's authoring-notes.",
+      "PRD author treats Layer 3 (Backend) disposition for the validator-extension as a soft signal — Discovery may reassign to Layer 1 (Claude Code / Project Filesystem) given the script is project-tooling, not a service."
+    ]
+  },
+  "issues": [
+    {
+      "id": "I-DR-001",
+      "severity": "important",
+      "category": "compliance",
+      "location": "§Open Items (Pending PRD Authoring), subsections 'Functional capabilities to formalize as FRs', 'Non-functional concerns to formalize as NFRs', 'Acceptance criteria to formalize in EARS at PRD time', 'Exhaustive 9-layer scope declaration' (lines ~304–403)",
+      "description": "The Open Items section contains ~12 FR seed bullets, ~8 NFR seed bullets, ~12 EARS-format AC seeds (with full WHEN…SHALL syntax), and a fully-populated 9-layer disposition table. The template's authoring-notes explicitly state that intake-intent-clarifier 'MUST NOT' author Functional Requirements (PRD's job), Acceptance Criteria (PRD/Blueprint's job), or make design decisions (per-layer Design's job). The doc partially mitigates this by framing items as 'seed list' / 'preliminary' / 'the PRD author may renumber / split / combine' and by titling the section 'Pending PRD Authoring'.",
+      "evidence_for": "Template authoring-notes section in intent-clarification-template.md, lines 117–122: 'What this sub-agent MUST NOT do: Author Functional Requirements (that's the PRD), Author Acceptance Criteria (that's the PRD/Blueprint), Make design decisions (that's per-layer Design)'.",
+      "evidence_against": "Orchestrator context note explicitly accommodates proposal-as-prior-context pattern; the proposal+companion plan supply substantive pre-decided content; clarifier framed work as 'seed' rather than 'final'; deferring this content forces the PRD author to re-derive from the same proposal.",
+      "suggestion": "Surface explicitly to user at Gate 1: 'The proposal+plan pre-loaded substantial structural content. The intent-clarifier carried that forward as seeds in Open Items rather than re-elicit. Confirm this framing is acceptable; if not, the PRD author will start from the proposal directly.' If user agrees, this finding becomes wontfix-with-rationale (explicit accommodation). If not, the Open Items subsections should be reduced to bullet-summaries with pointers to the proposal."
+    },
+    {
+      "id": "I-DR-002",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "§Scope Posture > Exhaustive 9-layer scope declaration, Layer 3 row (line ~392)",
+      "description": "Layer 3 (Backend) is marked 'IN scope (secondary)' on grounds that the validator-script extension at .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py is a 'Python script — tooling/infra logic, not a service, but lives in the backend layer per the taxonomy.' The 9-layer taxonomy defines Backend as 'services, domain logic, background jobs, schedulers' (KB-documentation-criteria layer-taxonomy.md). The validator is a pre-commit / Gate-0 audit utility under .claude/skills/auditing-shared/, which is arguably Layer 1 (Claude Code / Project Filesystem) territory — Layer 1's description includes 'skills, MCP configuration, project conventions'.",
+      "suggestion": "Flag for PRD/Discovery to confirm: is the validator-script extension a Layer 1 concern (lives under .claude/skills/, project tooling) or a Layer 3 concern (Python codebase logic)? Either is defensible; the call belongs to Discovery+Design Composition. Worst case: the per-layer design fanout invokes design-backend unnecessarily, which is recoverable."
+    },
+    {
+      "id": "I-DR-003",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Document overall length (423 lines)",
+      "description": "Template authoring-notes specify length budget of 60–150 lines; this document is 423 lines. The overage is principally in §Open Items (~120 lines) and §Scope Posture > What's in scope (~55 lines), reflecting the proposal+plan pre-decided content carry-forward.",
+      "suggestion": "Acceptable in this special-case run (proposal-as-prior-context absorbs ~80% of normal elicitation work into structural carry-forward). For future intent-clarification runs that load a doc_type:issue-proposal, the proposal-as-prior-context template-amendment in scope here should clarify whether this length overshoot is the expected pattern or an outlier. Resolve in the in-scope template edit to intent-clarification-template.md."
+    },
+    {
+      "id": "I-DR-004",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "§Clarifying Questions and Answers, row 3 (validator status vocabulary)",
+      "description": "Row 3's answer states the plan has 'an internal inconsistency' between a '3-state' cell in the EDIT file-list row and the '5-state' Issue lifecycle section, and resolves to 5-state, calling the 3-state cell 'stale wording to be corrected in Design.' This is a load-bearing decision (the validator's enforcement vocabulary) that propagates to multiple downstream artifacts (templates, validator extension, agent body). The resolution is correct per orchestrator user-instruction context, but the doc should make clear that the 'correction' is itself a Design-stage deliverable (not just plan-comment cleanup).",
+      "suggestion": "PRD author should ensure the FR list explicitly includes 'Update KB-issue-capture / KB-documentation-criteria source-of-truth language so the 5-state vocabulary is canonical and the 3-state mention is removed' so the plan-comment cleanup doesn't get dropped silently. Already partially captured by FR seed 'Validator extension recognising 3 new doc_type values + 5-state vocabulary' — but make the source-of-truth language cleanup an explicit deliverable, not implicit."
+    },
+    {
+      "id": "I-DR-005",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "§Scope Posture > What's in scope, 'ADR authorship by Design Composition' (line ~187)",
+      "description": "Lists 7 tentative ADR subjects for Design Composition to author. This is forward-leaning for an intent-clarification (ADRs are Stage-5 deliverables), but the listing is appropriately framed as 'tentative'. The 7 listed subjects mirror the 7 ADR-worthy decisions in the proposal §'Multiple ADR-worthy decisions (none yet ratified)' (lines 50–57 of proposal.md), so the carry-forward is faithful.",
+      "suggestion": "PRD author and design-composer should treat this list as a hand-off from the proposal — not as authoritative. Final ADR slate is determined at Design Composition. If a subject is later subsumed or split, that's expected and not a regression."
+    },
+    {
+      "id": "I-DR-006",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "Frontmatter, user_token field (line 8)",
+      "description": "user_token: pending-gate1 is a placeholder. Per ADR-0032 Change 2, the gated-artifact frontmatter token chain populates user_token AT Gate confirmation, not pre-Gate. 'pending-gate1' is a reasonable placeholder that signals the value is gate-derived.",
+      "suggestion": "Orchestrator must replace 'pending-gate1' with the actual confirmation token at Gate 1 acceptance and re-write the frontmatter. Confirm the orchestrator's Gate 1 step includes this frontmatter update — it's mechanical but easy to skip. No change to doc needed pre-Gate."
+    },
+    {
+      "id": "I-DR-007",
+      "severity": "recommended",
+      "category": "feasibility",
+      "location": "§Clarifying Questions and Answers, row 6 (back-fill status:open and since: on 4 existing files)",
+      "description": "Row 6's proposed default back-fills status:open and a since: companion field on the 4 existing Issues/*.md files. The original plan-mode design back-fills only version:0.1.0. Adding status:open and since: at this row is the clarifier inferring from the new 5-state vocabulary requirement. The since: companion field's semantics (file's 'earliest known authoring timestamp') is sensible but introduces a new frontmatter field whose definition is not yet specified in any template.",
+      "suggestion": "PRD author should formalize the since: field semantics in the issue-doctype templates being authored. Confirm at Gate 1 that the user is comfortable with retroactively assigning since: based on git-history first-commit timestamp of each file (or a clarifier-determined fallback if git-blame is ambiguous)."
+    }
+  ],
+  "recommendations": [
+    "User should explicitly confirm at Gate 1: (a) acceptance of the 7 proposed-default resolutions to clarifying questions; (b) acceptance of the Open Items section extent (FR/NFR/AC seeds, 9-layer table) as appropriate carry-forward from the proposal-as-prior-context handoff, rather than premature PRD work.",
+    "Orchestrator should update frontmatter user_token from 'pending-gate1' to the confirmation token upon Gate 1 pass.",
+    "PRD author should: (1) treat the Open Items seeds as proposal-derived starting points, not finalized requirements; (2) re-check Layer 3 (Backend) disposition for the validator extension — Layer 1 may be the more accurate home; (3) ensure the 5-state-vocabulary canonicalization (per Q3 resolution) is an explicit FR, not just plan-comment cleanup; (4) ensure the since: companion field semantics get formal specification in the new issue-doctype templates."
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [],
+    "note": "First-iteration review; no prior context."
+  }
+}

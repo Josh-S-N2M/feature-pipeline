@@ -1,0 +1,1064 @@
+{
+  "feature_slug": "issue-capture-mechanism-r1",
+  "schema_version": "1.0.0",
+  "generated": "2026-05-23T00:00:00Z",
+  "generated_by": "finalize-task-decomposer",
+  "derived_from": {
+    "prd": "working/feature/issue-capture-mechanism-r1/prd-v2.md",
+    "blueprint": "working/feature/issue-capture-mechanism-r1/blueprint-v3.md",
+    "plan": "working/feature/issue-capture-mechanism-r1/plan-v2.md",
+    "acceptance_tests": "working/feature/issue-capture-mechanism-r1/acceptance-tests.md",
+    "phase_validators": "working/feature/issue-capture-mechanism-r1/phase-validators.md",
+    "adrs": [
+      "ADR-0044",
+      "ADR-0045",
+      "ADR-0046",
+      "ADR-0047",
+      "ADR-0048",
+      "ADR-0049",
+      "ADR-0050"
+    ],
+    "codebase_analysis": "working/feature/issue-capture-mechanism-r1/codebase-analysis.json"
+  },
+  "total_tasks": 52,
+  "phases": ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7"],
+  "tasks": [
+    {
+      "id": "task-001",
+      "plan_anchor": "T0.1",
+      "phase": "P0",
+      "title": "Capture validator findings baseline against L1+L2 corpus",
+      "description": "Run validate_pipeline_frontmatter.py against existing-pipeline regression corpus and persist findings JSON as the NFR-8 load-bearing baseline-of-record.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/validator-baseline-l1-l2.json"
+      ],
+      "dependencies": [],
+      "parallelizable_with": ["task-002", "task-003", "task-004", "task-005"],
+      "acceptance_criteria": [],
+      "validators": ["PV-0.C1"],
+      "estimated_complexity": "small",
+      "risk_level": "blocker-risk",
+      "notes": "NFR-8 load-bearing artifact. PV-2.C7 + PV-7.C5 diff against this file. Must be captured BEFORE any validator change."
+    },
+    {
+      "id": "task-002",
+      "plan_anchor": "T0.2",
+      "phase": "P0",
+      "title": "Capture pipeline-isolation zero-baseline (AC-FR-13-a/b)",
+      "description": "Run verbatim grep commands from AC-FR-13-a/b against pipeline agents; persist (expected-empty) output as F-010/F-015 zero-baseline.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/pipeline-isolation-baseline.txt"
+      ],
+      "dependencies": [],
+      "parallelizable_with": ["task-001", "task-003", "task-004", "task-005"],
+      "acceptance_criteria": [],
+      "validators": ["PV-0.C2"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "CPI-1 zero-baseline anchor. Already captured 2026-05-23T18:55Z at HEAD cf48e5e; this re-runs at Plan-stage HEAD."
+    },
+    {
+      "id": "task-003",
+      "plan_anchor": "T0.3",
+      "phase": "P0",
+      "title": "Capture pre-change cc-critique health snapshot",
+      "description": "Run cc-critique against current .claude/ tree (no new components yet); persist verdict + findings as PV-7 comparison anchor.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/cc-critique-baseline.json"
+      ],
+      "dependencies": [],
+      "parallelizable_with": ["task-001", "task-002", "task-004", "task-005"],
+      "acceptance_criteria": [],
+      "validators": ["PV-0.C3"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "Distinct from T0.2 (which is a grep-empty assertion); this is a cc-critique verdict snapshot."
+    },
+    {
+      "id": "task-004",
+      "plan_anchor": "T0.4",
+      "phase": "P0",
+      "title": "Stage test-fixture directory skeleton",
+      "description": "Create .claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/ with .gitkeep; populated in Phase 2 by T2.4.",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/.gitkeep"
+      ],
+      "dependencies": [],
+      "parallelizable_with": ["task-001", "task-002", "task-003", "task-005"],
+      "acceptance_criteria": [],
+      "validators": ["PV-0.C4"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "Empty directory + .gitkeep only; no fixtures yet."
+    },
+    {
+      "id": "task-005",
+      "plan_anchor": "T0.5",
+      "phase": "P0",
+      "title": "Verify devenv dependencies (shellcheck, jq) for Phase 5",
+      "description": "Confirm shellcheck + jq present in devcontainer; document versions for hook authoring in Phase 5.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/devenv-prereqs.txt"
+      ],
+      "dependencies": [],
+      "parallelizable_with": ["task-001", "task-002", "task-003", "task-004"],
+      "acceptance_criteria": [],
+      "validators": ["PV-0.C6"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "If missing, surface as Open Item; D-07 layer A toolchain prerequisite."
+    },
+    {
+      "id": "task-006",
+      "plan_anchor": "T1.1",
+      "phase": "P1",
+      "title": "Author issue-register-template.md (structural-only)",
+      "description": "Create register doctype template at canonical path; structural-only per ADR-0049 (no triggering discipline); covers 4 ADR-0050 per-state frontmatter shapes.",
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md"
+      ],
+      "dependencies": ["task-001", "task-002", "task-003", "task-004", "task-005"],
+      "parallelizable_with": ["task-007", "task-008", "task-009"],
+      "acceptance_criteria": ["AC-FR-6-a", "AC-FR-6-b"],
+      "validators": ["PV-1.C1", "PV-1.C2", "PV-1.C4", "PV-1.C6", "AT-021", "AT-022"],
+      "estimated_complexity": "medium",
+      "risk_level": "low",
+      "notes": "doc_type literal: issue-register (per Q-BE-1). Empirical precedent: Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md."
+    },
+    {
+      "id": "task-007",
+      "plan_anchor": "T1.2",
+      "phase": "P1",
+      "title": "Author issue-analysis-template.md (structural-only)",
+      "description": "Create analysis doctype template; structural-only; body shape includes Root cause / Evidence / Implications sections.",
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/issue-analysis-template.md"
+      ],
+      "dependencies": ["task-001", "task-002", "task-003", "task-004", "task-005"],
+      "parallelizable_with": ["task-006", "task-008", "task-009"],
+      "acceptance_criteria": ["AC-FR-6-a", "AC-FR-6-b"],
+      "validators": ["PV-1.C1", "PV-1.C2", "PV-1.C4", "PV-1.C6", "AT-021", "AT-022"],
+      "estimated_complexity": "medium",
+      "risk_level": "low",
+      "notes": "doc_type literal: issue-analysis. Empirical precedents: Issues/analysis-per-agent-design-evaluation-gap.md + Issues/analysis-adr-placement-rootcause.md."
+    },
+    {
+      "id": "task-008",
+      "plan_anchor": "T1.3",
+      "phase": "P1",
+      "title": "Author issue-proposal-template.md (structural-only)",
+      "description": "Create proposal doctype template; carries proposes_future_feature: field (advisory per D-06); body shape includes Proposed feature / Motivation / Open questions.",
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/issue-proposal-template.md"
+      ],
+      "dependencies": ["task-001", "task-002", "task-003", "task-004", "task-005"],
+      "parallelizable_with": ["task-006", "task-007", "task-009"],
+      "acceptance_criteria": ["AC-FR-6-a", "AC-FR-6-b"],
+      "validators": ["PV-1.C1", "PV-1.C2", "PV-1.C4", "PV-1.C6", "AT-021", "AT-022"],
+      "estimated_complexity": "medium",
+      "risk_level": "low",
+      "notes": "doc_type literal: issue-proposal. Empirical precedents: Issues/proposal-auditing-family-graduation-review.md + Issues/issue-capture-mechanism/proposal.md."
+    },
+    {
+      "id": "task-009",
+      "plan_anchor": "T1.4",
+      "phase": "P1",
+      "title": "Author issue-doctypes-spec.md (canonical structural spec)",
+      "description": "Create source-of-truth structural spec codifying ADR-0045 3 doc_types, ADR-0050 5-state vocab, ADR-0046 cross-link fields, per-state companion-field table verbatim from Blueprint Backend authoritative table. NO triggering discipline.",
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md"
+      ],
+      "dependencies": ["task-001", "task-002", "task-003", "task-004", "task-005"],
+      "parallelizable_with": ["task-006", "task-007", "task-008"],
+      "acceptance_criteria": ["AC-FR-6-a", "AC-FR-6-b", "AC-FR-14-a"],
+      "validators": ["PV-1.C1", "PV-1.C2", "PV-1.C3", "PV-1.C4"],
+      "estimated_complexity": "large",
+      "risk_level": "medium",
+      "notes": "Per-state companion-field table MUST byte-match Blueprint authoritative table (D-05). Consumed by Phase 2 T2.1 constants AND Phase 4 agent body."
+    },
+    {
+      "id": "task-010",
+      "plan_anchor": "T1.5",
+      "phase": "P1",
+      "title": "Additively update KB-documentation-criteria/SKILL.md index",
+      "description": "Add 3 template rows + 1 spec row + 1 'Where this KB is NOT used' bullet pointing to KB-issue-capture. Strict additive-only edit; no removals; no restructure.",
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/SKILL.md"
+      ],
+      "dependencies": ["task-006", "task-007", "task-008", "task-009"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-14-a"],
+      "validators": ["PV-1.C5", "AT-041"],
+      "estimated_complexity": "small",
+      "risk_level": "medium",
+      "notes": "Additive-only enforced by PV-1.C5 (FR-14 strict). Any removal/restructure is BLOCKER."
+    },
+    {
+      "id": "task-011",
+      "plan_anchor": "T2.1",
+      "phase": "P2",
+      "title": "Add module-level validator constants + extend doc_type_category",
+      "description": "Add ISSUE_DOC_TYPES, ISSUE_STATES, ISSUE_PER_STATE_REQUIRED_FIELDS, ISSUE_NON_VALIDATED_PATH_PREFIXES constants and extend doc_type_category to return 'issue'. Isolated constants+categorization commit — DO NOT add dispatch branch or function body yet (early-verification target per Blueprint Verification Strategy).",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py"
+      ],
+      "dependencies": ["task-009"],
+      "parallelizable_with": [],
+      "acceptance_criteria": [],
+      "validators": ["PV-2.C1", "PV-2.C2", "PV-2.C3"],
+      "estimated_complexity": "small",
+      "risk_level": "high",
+      "notes": "Early-verification target: re-running validator against L1+L2 corpus must yield findings byte-identical to validator-baseline-l1-l2.json. If any existing doc_type is reclassified, this task is defective; reassess before task-012."
+    },
+    {
+      "id": "task-012",
+      "plan_anchor": "T2.2",
+      "phase": "P2",
+      "title": "Add outer-dispatch path-prefix early-return + 'issue' branch (stub)",
+      "description": "Inside validate_pipeline_artifact, add (a) path-prefix early-return guard for ISSUE_NON_VALIDATED_PATH_PREFIXES BEFORE doc_type_category dispatch (per I-AA-002/ADR-0044 §4); (b) `elif category == 'issue'` branch dispatching to stub validate_issue_artifact returning [].",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py"
+      ],
+      "dependencies": ["task-011"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-BE-7", "AC-BE-8", "AC-BE-10"],
+      "validators": ["PV-2.C3", "PV-2.C5"],
+      "estimated_complexity": "small",
+      "risk_level": "high",
+      "notes": "Path-prefix early-return MUST NOT alter findings on any non-Issues path (NFR-8 verified by T2.6 regression diff)."
+    },
+    {
+      "id": "task-013",
+      "plan_anchor": "T2.3",
+      "phase": "P2",
+      "title": "Implement validate_issue_artifact function",
+      "description": "Implement per Blueprint Corrected Pseudocode Reference. Uses make_finding verbatim (no parallel construction per VE-002). Uses `field in fm` idiom (resolves I-DR-BE-001). Checks status validity, per-state required companion fields, issue-proposal advisory, cross-link syntactic shape.",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py"
+      ],
+      "dependencies": ["task-012"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-BE-1", "AC-BE-2", "AC-BE-3", "AC-BE-4", "AC-BE-5", "AC-BE-9", "AC-FR-7-a", "AC-FR-7-c", "AC-FR-7-d"],
+      "validators": ["PV-2.C3", "PV-2.C4"],
+      "estimated_complexity": "medium",
+      "risk_level": "high",
+      "notes": "MUST use make_finding helper (AC-BE-9). is_valid_id_syntax helper may be introduced if absent."
+    },
+    {
+      "id": "task-014",
+      "plan_anchor": "T2.4",
+      "phase": "P2",
+      "title": "Author 28 L3 test fixtures (positive + negative + advisory)",
+      "description": "Populate test_fixtures/issue_doc_types/ with 18 positive (3 doc_types × 6 states) + 6 missing-companion-field + 3 invalid-status + 1 advisory (issue-proposal missing proposes_future_feature) fixtures.",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/"
+      ],
+      "dependencies": ["task-009", "task-013"],
+      "parallelizable_with": [],
+      "acceptance_criteria": [],
+      "validators": ["PV-2.C6"],
+      "estimated_complexity": "large",
+      "risk_level": "medium",
+      "notes": "28 fixtures total. Per-state required fields sourced from issue-doctypes-spec.md (task-009)."
+    },
+    {
+      "id": "task-015",
+      "plan_anchor": "T2.5",
+      "phase": "P2",
+      "title": "Extend smoke_test_auditing_shared.py with new test cases + AC-BE-10 L4 fixture + positive control",
+      "description": "Add per-fixture tests for the 28 fixtures from T2.4; add AC-BE-10 L4 fixture (agent-roster-impact-matrix copy under Issues/<topic>/evidence/); add positive control (non-Issues file with unknown doc_type continues to produce minor finding — verifies path-prefix skip doesn't over-silence).",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py"
+      ],
+      "dependencies": ["task-013", "task-014"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-BE-1", "AC-BE-2", "AC-BE-3", "AC-BE-4", "AC-BE-5", "AC-BE-10", "AC-FR-7-a", "AC-FR-7-c", "AC-FR-7-d"],
+      "validators": ["PV-2.C6", "PV-2.C8", "AT-058", "AT-059", "AT-060", "AT-061", "AT-062", "AT-067"],
+      "estimated_complexity": "medium",
+      "risk_level": "medium",
+      "notes": "Positive control fixture is load-bearing for blueprint Verification Strategy mandate. Test suite must complete in <30s for pre-merge gate ergonomics."
+    },
+    {
+      "id": "task-016",
+      "plan_anchor": "T2.6",
+      "phase": "P2",
+      "title": "Final NFR-8 regression diff (load-bearing)",
+      "description": "Re-run validator against same L1+L2 corpus as T0.1; field-by-field diff; ANY new finding line is a regression (BLOCKER). Persist result.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/validator-postextension-l1-l2-diff.json"
+      ],
+      "dependencies": ["task-011", "task-012", "task-013"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-BE-6", "AC-NFR-8-a", "AC-FR-7-b"],
+      "validators": ["PV-2.C7", "AT-024", "AT-055", "AT-063"],
+      "estimated_complexity": "small",
+      "risk_level": "blocker-risk",
+      "notes": "BLOCKER (NFR-8 highest-blast-radius assertion). Empty-diff contract. Phase 3 MUST NOT start while diff non-empty. Cross-phase invariant CPI-4."
+    },
+    {
+      "id": "task-017",
+      "plan_anchor": "T3.0",
+      "phase": "P3",
+      "title": "Record Phase 3 start commit (commit-range anchor)",
+      "description": "Capture `git rev-parse HEAD` to phase-3-start-commit.txt as lower bound of Phase 3 commit range used by T3.8 + Phase Validator scope assertion (resolves I-DR-PL-002).",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/phase-3-start-commit.txt"
+      ],
+      "dependencies": ["task-016"],
+      "parallelizable_with": [],
+      "acceptance_criteria": [],
+      "validators": ["PV-3.C1"],
+      "estimated_complexity": "small",
+      "risk_level": "medium",
+      "notes": "Must run IMMEDIATELY BEFORE any Phase 3 migration work. Used by task-025 + PV-3.C7 git diff --name-only scope assertion."
+    },
+    {
+      "id": "task-018",
+      "plan_anchor": "T3.1",
+      "phase": "P3",
+      "title": "Dry-run D-13 git-mv-with-similarity-index on all 5 files",
+      "description": "Execute D-13 dry-run in scratch worktree for each of 5 migration pairs; verify similarity-index ≥90% + git log --follow preservation. Fallback to two-commit-sequence per D-13 if any file fails.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/migration-dryrun.json"
+      ],
+      "dependencies": ["task-017"],
+      "parallelizable_with": [],
+      "acceptance_criteria": [],
+      "validators": [],
+      "estimated_complexity": "medium",
+      "risk_level": "high",
+      "notes": "Load-bearing dry-run for AC-FR-8-b / AC-FR-9-b history preservation. Blocks T3.2..T3.6."
+    },
+    {
+      "id": "task-019",
+      "plan_anchor": "T3.2",
+      "phase": "P3",
+      "title": "Migrate register-devcontainer-mcp-provisioning-r1-deferrals.md (atomic commit)",
+      "description": "git mv source → Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md; back-fill frontmatter (doc_type: issue-register; version: 0.1.0; status: open; since: 2026-05-23); single atomic commit.",
+      "target_files": [
+        "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md"
+      ],
+      "dependencies": ["task-018"],
+      "parallelizable_with": ["task-020", "task-021", "task-022"],
+      "acceptance_criteria": ["AC-FR-8-a", "AC-FR-8-b", "AC-FR-8-c", "AC-FR-8-d"],
+      "validators": ["PV-3.C2", "PV-3.C3", "PV-3.C4", "PV-3.C5", "AT-027", "AT-028", "AT-029"],
+      "estimated_complexity": "small",
+      "risk_level": "high",
+      "notes": "commit_strategy: atomic (per ADR-0044 D-13). Commit message references FR-8 + ADR-0044. Single commit = git mv + frontmatter back-fill."
+    },
+    {
+      "id": "task-020",
+      "plan_anchor": "T3.3",
+      "phase": "P3",
+      "title": "Migrate analysis-per-agent-design-evaluation-gap.md (atomic commit)",
+      "description": "git mv source → Issues/per-agent-design-evaluation-gap/analysis.md; back-fill frontmatter (doc_type: issue-analysis; version: 0.1.0; status: open; since: 2026-05-23); single atomic commit.",
+      "target_files": [
+        "Issues/per-agent-design-evaluation-gap/analysis.md"
+      ],
+      "dependencies": ["task-018"],
+      "parallelizable_with": ["task-019", "task-021", "task-022"],
+      "acceptance_criteria": ["AC-FR-8-a", "AC-FR-8-b", "AC-FR-8-c"],
+      "validators": ["PV-3.C2", "PV-3.C3", "PV-3.C4", "PV-3.C5", "AT-027", "AT-028", "AT-029"],
+      "estimated_complexity": "small",
+      "risk_level": "high",
+      "notes": "commit_strategy: atomic. Creates Issues/per-agent-design-evaluation-gap/ topic folder used by task-023 (evidence/ subdirectory)."
+    },
+    {
+      "id": "task-021",
+      "plan_anchor": "T3.4",
+      "phase": "P3",
+      "title": "Migrate analysis-adr-placement-rootcause.md (atomic commit)",
+      "description": "git mv source → Issues/adr-placement-rootcause/analysis.md; back-fill frontmatter (doc_type: issue-analysis; version: 0.1.0; status: open; since: 2026-05-23); single atomic commit.",
+      "target_files": [
+        "Issues/adr-placement-rootcause/analysis.md"
+      ],
+      "dependencies": ["task-018"],
+      "parallelizable_with": ["task-019", "task-020", "task-022"],
+      "acceptance_criteria": ["AC-FR-8-a", "AC-FR-8-b", "AC-FR-8-c"],
+      "validators": ["PV-3.C2", "PV-3.C3", "PV-3.C4", "PV-3.C5", "AT-027", "AT-028", "AT-029"],
+      "estimated_complexity": "small",
+      "risk_level": "high",
+      "notes": "commit_strategy: atomic. Migrated file is cited verbatim in task-049 packager-input-notes.md as the I-AA-001 root-cause evidence."
+    },
+    {
+      "id": "task-022",
+      "plan_anchor": "T3.5",
+      "phase": "P3",
+      "title": "Migrate proposal-auditing-family-graduation-review.md (atomic commit)",
+      "description": "git mv source → Issues/auditing-family-graduation-review/proposal.md; back-fill frontmatter (doc_type: issue-proposal; version: 0.1.0; status: open; since: 2026-05-23); preserve existing proposes_future_feature: field per F-006; single atomic commit.",
+      "target_files": [
+        "Issues/auditing-family-graduation-review/proposal.md"
+      ],
+      "dependencies": ["task-018"],
+      "parallelizable_with": ["task-019", "task-020", "task-021"],
+      "acceptance_criteria": ["AC-FR-8-a", "AC-FR-8-b", "AC-FR-8-c"],
+      "validators": ["PV-3.C2", "PV-3.C3", "PV-3.C4", "PV-3.C5", "AT-027", "AT-028", "AT-029"],
+      "estimated_complexity": "small",
+      "risk_level": "high",
+      "notes": "commit_strategy: atomic. Target file used by task-042 (update-mode smoke test)."
+    },
+    {
+      "id": "task-023",
+      "plan_anchor": "T3.6",
+      "phase": "P3",
+      "title": "Migrate agent-roster-impact-matrix.md to evidence subdirectory (atomic commit)",
+      "description": "git mv working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md → Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md; NO back-fill (validator skips path per AC-BE-10); single atomic commit.",
+      "target_files": [
+        "Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md"
+      ],
+      "dependencies": ["task-018", "task-020"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-9-a", "AC-FR-9-b", "AC-BE-10"],
+      "validators": ["PV-3.C2", "PV-3.C3", "PV-3.C4", "PV-3.C6", "AT-031", "AT-032", "AT-067"],
+      "estimated_complexity": "small",
+      "risk_level": "high",
+      "notes": "commit_strategy: atomic. Depends on task-020 (per-agent-design-evaluation-gap topic folder created by task-020's git mv). NO frontmatter back-fill (path-prefix skip). Commit message references FR-9 + ADR-0044 §Decision §4."
+    },
+    {
+      "id": "task-024",
+      "plan_anchor": "T3.7",
+      "phase": "P3",
+      "title": "Confirm validator clean-run on all 4 migrated Issues files",
+      "description": "Run validate_pipeline_frontmatter.py against the 4 migrated Issues files; expected zero findings (AC-FR-8-c).",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/migration-validator-result.txt"
+      ],
+      "dependencies": ["task-019", "task-020", "task-021", "task-022"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-8-c"],
+      "validators": ["PV-3.C5", "AT-029"],
+      "estimated_complexity": "small",
+      "risk_level": "medium",
+      "notes": "Any finding indicates back-fill defect; correct in-place + re-commit."
+    },
+    {
+      "id": "task-025",
+      "plan_anchor": "T3.8",
+      "phase": "P3",
+      "title": "Record Phase 3 end commit + assert scope (AC-FR-8-d enforcement)",
+      "description": "Capture git rev-parse HEAD to phase-3-end-commit.txt; run `git diff --name-only $(cat phase-3-start-commit.txt)..$(cat phase-3-end-commit.txt)` and assert output set is EXACTLY the 5 expected file pairs (resolves I-DR-PL-002). ANY extra path is BLOCKER per AC-FR-8-d.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/phase-3-end-commit.txt",
+        "working/feature/issue-capture-mechanism-r1/phase-3-scope-diff.txt"
+      ],
+      "dependencies": ["task-024"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-8-d"],
+      "validators": ["PV-3.C1", "PV-3.C7", "AT-030"],
+      "estimated_complexity": "small",
+      "risk_level": "blocker-risk",
+      "notes": "BLOCKER: AC-FR-8-d direct machine-checkable enforcement. Any path outside 5 expected pairs forces hard rollback of non-migration commits."
+    },
+    {
+      "id": "task-026",
+      "plan_anchor": "T4.1",
+      "phase": "P4",
+      "title": "Author KB-issue-capture/SKILL.md (router; project first disable-model-invocation)",
+      "description": "Create discipline-router skill declaring `disable-model-invocation: true` (project first per F-001). allowed-tools: Read, Glob, Grep. Body is router (~80–120 lines) referencing the 4 references; cites KB-documentation-criteria templates + spec by path (NOT inlined per ADR-0049).",
+      "target_files": [
+        ".claude/skills/KB-issue-capture/SKILL.md"
+      ],
+      "dependencies": ["task-025"],
+      "parallelizable_with": ["task-028"],
+      "acceptance_criteria": ["AC-FR-3-a"],
+      "validators": ["PV-4.C2", "AT-010"],
+      "estimated_complexity": "medium",
+      "risk_level": "medium",
+      "notes": "Project first: first `disable-model-invocation: true` declaration. Without this flag, main Claude can auto-load and bypass Layer 1 enforcement."
+    },
+    {
+      "id": "task-027",
+      "plan_anchor": "T4.2",
+      "phase": "P4",
+      "title": "Author KB-issue-capture references (4 files)",
+      "description": "Create 4 references: (a) non-pollution-contract.md (structural invariant + pipeline-isolation rationale); (b) approval-prompt-rubric.md (4 AskUserQuestion archetypes per D-03); (c) triage-criteria.md (doctype classification rubric); (d) examples.md (3 worked examples paired to post-migration files per D-04).",
+      "target_files": [
+        ".claude/skills/KB-issue-capture/references/non-pollution-contract.md",
+        ".claude/skills/KB-issue-capture/references/approval-prompt-rubric.md",
+        ".claude/skills/KB-issue-capture/references/triage-criteria.md",
+        ".claude/skills/KB-issue-capture/references/examples.md"
+      ],
+      "dependencies": ["task-026", "task-019", "task-020", "task-021", "task-022"],
+      "parallelizable_with": [],
+      "acceptance_criteria": [],
+      "validators": ["PV-4.C4"],
+      "estimated_complexity": "large",
+      "risk_level": "medium",
+      "notes": "examples.md authored AFTER Phase 3 because it cross-references post-migration paths (D-04 → D-13 cross-link). Indirectly supports AC-FR-1-b via WHY/WHAT/WHERE rubric source."
+    },
+    {
+      "id": "task-028",
+      "plan_anchor": "T4.3",
+      "phase": "P4",
+      "title": "Author capture-issue/SKILL.md (entry-point slash-command)",
+      "description": "Create thin entry-point skill declaring `disable-model-invocation: true` (project first); allowed-tools: Task, AskUserQuestion; argument-hint with --update mutual exclusivity. On invalid args AskUserQuestion; on valid args Task(subagent_type='issue-capture-author').",
+      "target_files": [
+        ".claude/skills/capture-issue/SKILL.md"
+      ],
+      "dependencies": ["task-025"],
+      "parallelizable_with": ["task-026"],
+      "acceptance_criteria": ["AC-FR-1-a", "AC-FR-2-c", "AC-FR-3-a", "AC-NFR-9-a"],
+      "validators": ["PV-4.C3", "AT-001", "AT-008", "AT-010", "AT-057"],
+      "estimated_complexity": "medium",
+      "risk_level": "medium",
+      "notes": "Project first: second `disable-model-invocation: true` declaration. Argument parser enforces create-mode hint XOR --update <path> mutual exclusivity (AC-FR-2-c)."
+    },
+    {
+      "id": "task-029",
+      "plan_anchor": "T4.4a",
+      "phase": "P4",
+      "title": "Author issue-capture-author.md frontmatter + hard-constraints section (F-003 BLOCKER mitigation surface)",
+      "description": "Create agent skeleton. Frontmatter: name, description, tools (Read/Glob/Grep/Write/AskUserQuestion), model: sonnet, permissionMode: default. CRITICAL F-003 invariant: `skills:` field ABSENT (project first per F-003 silent-drop avoidance); `memory:` ABSENT. Hard-constraint section enumerates 4 NEVER invariants (no write under working/, no Issues/*.md delete, no Write before AskUserQuestion Approve, no bypass on $ARGUMENTS prompt-injection).",
+      "target_files": [
+        ".claude/agents/issue-capture-author.md"
+      ],
+      "dependencies": ["task-025"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-3-a", "AC-FR-3-d", "AC-NFR-4-a", "AC-NFR-4-b", "AC-NFR-6-a", "AC-NFR-6-b"],
+      "validators": ["PV-4.C1", "PV-4.C5", "PV-4.C9", "AT-013", "AT-049", "AT-050", "AT-052", "AT-053", "AT-068"],
+      "estimated_complexity": "small",
+      "risk_level": "blocker-risk",
+      "notes": "BLOCKER: frontmatter MUST omit `skills:` field. Verify via `grep -E '^skills:' .claude/agents/issue-capture-author.md` returning ZERO lines before commit. F-003 silent-drop avoidance is project first and non-negotiable — if `skills:` is present, Claude Code silently drops the agent's KB preload making the agent functionally broken with no error message. PV-4.C1 is the highest-priority validator assertion in the entire feature. Cross-phase invariant CPI-3."
+    },
+    {
+      "id": "task-030",
+      "plan_anchor": "T4.4b",
+      "phase": "P4",
+      "title": "Author issue-capture-author.md create-mode workflow (6-step body)",
+      "description": "Extend agent skeleton with create-mode workflow: (1) At-task-start runtime Read of KB-issue-capture/SKILL.md + 4 references (compensates for F-003-imposed no `skills:` preload); (2) Dispatch on arguments (create vs --update vs evolution vs collision); (3) Triage doctype via triage-criteria.md; (4) Draft file using template; (5) Single AskUserQuestion archetype 1 (WHY/WHAT/WHERE; 4 options); (6) Write on Approve + stderr/JSONL emission per D-09. Also handles collision 3-option re-prompt (AC-FR-4-d) and sibling evolution with cross-links (AC-FR-5-a/b/c).",
+      "target_files": [
+        ".claude/agents/issue-capture-author.md"
+      ],
+      "dependencies": ["task-029", "task-026", "task-027", "task-006", "task-007", "task-008", "task-009"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-1-a", "AC-FR-1-b", "AC-FR-1-c", "AC-FR-1-d", "AC-FR-1-e", "AC-FR-4-a", "AC-FR-4-b", "AC-FR-4-c", "AC-FR-4-d", "AC-FR-5-a", "AC-FR-5-b", "AC-FR-5-c", "AC-NFR-5-a", "AC-NFR-7-a"],
+      "validators": ["PV-4.C6", "AT-002", "AT-003", "AT-004", "AT-005", "AT-014", "AT-015", "AT-016", "AT-017", "AT-018", "AT-019", "AT-020", "AT-051", "AT-054"],
+      "estimated_complexity": "large",
+      "risk_level": "high",
+      "notes": "Runtime KB-load via Read tool calls — NOT via skills: preload (F-003 mitigation strategy). 6 named workflow steps must be grep-discoverable for PV-4.C6."
+    },
+    {
+      "id": "task-031",
+      "plan_anchor": "T4.4c",
+      "phase": "P4",
+      "title": "Author issue-capture-author.md update-mode workflow (--update branch)",
+      "description": "Extend agent body with update-mode workflow: (1) Validate path (exists, frontmatter parses, doc_type ∈ 3 issue doctypes, status ∈ 5-state vocab); (2) Determine target state via AskUserQuestion; (3) Idempotency check (no Write if proposed=current AND no companion-field changes); (4) Compute OLD→NEW preview; (5) AskUserQuestion archetype 2 (OLD→NEW; 2 options: Approve/Cancel); (6) Write on Approve + stderr/JSONL emission.",
+      "target_files": [
+        ".claude/agents/issue-capture-author.md"
+      ],
+      "dependencies": ["task-029", "task-030", "task-019", "task-020", "task-021", "task-022"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-2-a", "AC-FR-2-b", "AC-FR-2-d", "AC-NFR-3-a"],
+      "validators": ["PV-4.C6", "AT-006", "AT-007", "AT-009", "AT-048"],
+      "estimated_complexity": "medium",
+      "risk_level": "medium",
+      "notes": "Idempotency check (step 3) is load-bearing for AC-NFR-3-a; primarily exercised against Phase 3 migrated files."
+    },
+    {
+      "id": "task-032",
+      "plan_anchor": "T4.5",
+      "phase": "P4",
+      "title": "Add .gitignore entry for .claude/logs/*.jsonl",
+      "description": "Append `.claude/logs/*.jsonl` to .gitignore (per Q-CC-4). Logs are session-local audit trail; gitignoring preserves signal-to-noise.",
+      "target_files": [
+        ".gitignore"
+      ],
+      "dependencies": [],
+      "parallelizable_with": ["task-026", "task-027", "task-028", "task-029", "task-030", "task-031"],
+      "acceptance_criteria": [],
+      "validators": ["PV-4.C8"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "Setup for AC-NFR-7-a observability log destination. Plan note I-DR-PL-005 considered Phase 5 placement but declined per scope hygiene."
+    },
+    {
+      "id": "task-033",
+      "plan_anchor": "T5.1",
+      "phase": "P5",
+      "title": "Create .claude/hooks/ + author intercept-issue-capture-agent.sh",
+      "description": "Create directory (project first per F-002). Author bash + jq hook script: `set -u` (no -e); reads stdin event JSON; extracts .tool_input.subagent_type; if 'issue-capture-author' → emit permissionDecision: ask with prompt preview; else allow; ALL paths exit 0 (fail-open per NFR-2); on error → stderr + allow. Header comment documents idempotency + concurrency posture per I-DR-010. ~40–60 lines.",
+      "target_files": [
+        ".claude/hooks/intercept-issue-capture-agent.sh"
+      ],
+      "dependencies": ["task-005"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-3-b", "AC-FR-3-c", "AC-NFR-2-a", "AC-NFR-2-b"],
+      "validators": ["PV-5.C1", "AT-011", "AT-012", "AT-046", "AT-047"],
+      "estimated_complexity": "medium",
+      "risk_level": "high",
+      "notes": "Project first: first `.claude/hooks/` directory. Must be chmod +x with `#!/usr/bin/env bash` shebang. NO `set -e` — fail-open requires every path to exit 0."
+    },
+    {
+      "id": "task-034",
+      "plan_anchor": "T5.2",
+      "phase": "P5",
+      "title": "Run shellcheck on hook script (early-verification target Step 1)",
+      "description": "Run shellcheck against hook script; expected zero warnings + portability-clean. Fix in-place before T5.3 if any warning surfaces. CC-layer early-verification target per I-DR-BP-007.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/hook-shellcheck.txt"
+      ],
+      "dependencies": ["task-033"],
+      "parallelizable_with": [],
+      "acceptance_criteria": [],
+      "validators": ["PV-5.C2"],
+      "estimated_complexity": "small",
+      "risk_level": "medium",
+      "notes": "ANY shellcheck warning is BLOCKER per Phase 5 Exit Criteria. D-07 layer A."
+    },
+    {
+      "id": "task-035",
+      "plan_anchor": "T5.3",
+      "phase": "P5",
+      "title": "Author single-fixture golden-file harness + run (early-verification target Step 2)",
+      "description": "Author test_intercept_issue_capture_agent.py — Python harness piping canonical stdin JSON fixture into hook + asserting expected stdout JSON. Run only fixture #1 initially (issue-capture-author spawn → ask).",
+      "target_files": [
+        ".claude/hooks/test_intercept_issue_capture_agent.py"
+      ],
+      "dependencies": ["task-034"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-3-b"],
+      "validators": ["PV-5.C3"],
+      "estimated_complexity": "small",
+      "risk_level": "medium",
+      "notes": "If fails, defect is localized to hook jq path or stdout shape. CC-layer early-verification target step 2."
+    },
+    {
+      "id": "task-036",
+      "plan_anchor": "T5.4",
+      "phase": "P5",
+      "title": "Extend harness to full 5-fixture golden-file suite",
+      "description": "Add 4 remaining canonical fixtures: (b) non-issue-capture-author spawn → allow; (c) malformed JSON → allow + stderr; (d) missing tool_input → allow + stderr; (e) empty stdin → allow + stderr. All 5 pass.",
+      "target_files": [
+        ".claude/hooks/test_intercept_issue_capture_agent.py",
+        "working/feature/issue-capture-mechanism-r1/hook-golden-results.json"
+      ],
+      "dependencies": ["task-035"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-3-b", "AC-FR-3-c", "AC-NFR-2-a", "AC-NFR-2-b"],
+      "validators": ["PV-5.C3", "AT-011", "AT-012", "AT-046", "AT-047"],
+      "estimated_complexity": "medium",
+      "risk_level": "medium",
+      "notes": "D-07 layer B. ANY fixture failure is BLOCKER."
+    },
+    {
+      "id": "task-037",
+      "plan_anchor": "T5.5",
+      "phase": "P5",
+      "title": "1000-iteration p95 latency benchmark (D-11; resolves U-11)",
+      "description": "Run hook script 1000 times with fast-path fixture via hyperfine. Compute p50/p95/p99 ms. Apply D-11 algorithm: ≤100ms → ratify AC-NFR-1-a; 100–200ms → replace target with measured+20% safety; >200ms → escalate to design iteration (re-author hook in faster language).",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/hook-latency-results.json"
+      ],
+      "dependencies": ["task-036"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-NFR-1-a", "AC-NFR-1-c"],
+      "validators": ["PV-5.C4", "PV-5.C8", "AT-043", "AT-045"],
+      "estimated_complexity": "small",
+      "risk_level": "high",
+      "notes": "p95 > 200ms escalates to design (re-author hook in faster language; e.g., python or compiled). This is NOT a code-fix scenario — it is a design-level decision that HALTS Phase 5 until resolved. Closes U-11 deferral."
+    },
+    {
+      "id": "task-038",
+      "plan_anchor": "T5.6",
+      "phase": "P5",
+      "title": "Patch .claude/settings.json additively with hooks.PreToolUse block",
+      "description": "Add top-level `hooks` object with PreToolUse block matching Task and pointing to ${CLAUDE_PROJECT_DIR}/.claude/hooks/intercept-issue-capture-agent.sh. The existing 13-line permissions.allow array (7 entries) MUST remain UNCHANGED — no new permission entry for hook (runs via platform mechanism, not via Bash). No permissions.deny rules added (Q-CC-2 deferred).",
+      "target_files": [
+        ".claude/settings.json"
+      ],
+      "dependencies": ["task-033"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-3-b", "AC-FR-3-c"],
+      "validators": ["PV-5.C5"],
+      "estimated_complexity": "small",
+      "risk_level": "blocker-risk",
+      "notes": "BLOCKER: permissions.allow array MUST be byte-identical to pre-Phase-5 state. CPI-6 cross-phase invariant. Project first: first `hooks` block in settings.json."
+    },
+    {
+      "id": "task-039",
+      "plan_anchor": "T5.7",
+      "phase": "P5",
+      "title": "Append note to .claude/SETTINGS-NOTES.md (FR-15)",
+      "description": "Append note documenting (a) hook policy (PreToolUse on Task; discriminator on subagent_type; fail-open per NFR-2); (b) user authorization timestamp `approved-2026-05-23T16:51:00Z` (sourced from Intent Clarification approval token); (c) the 5 project firsts (disable-model-invocation skills; .claude/hooks/ directory; hooks block in settings.json; runtime KB-load sub-agent; 5-state lifecycle vocabulary). Append-only.",
+      "target_files": [
+        ".claude/SETTINGS-NOTES.md"
+      ],
+      "dependencies": ["task-038"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-15-a"],
+      "validators": ["PV-5.C6", "AT-042"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "Append-only; do NOT modify prior content. I-DR-BP-002 resolution requires inline enumeration of 5 project firsts."
+    },
+    {
+      "id": "task-040",
+      "plan_anchor": "T6.1",
+      "phase": "P6",
+      "title": "Edit intake-intent-clarifier.md — add Phase 0 proposal-as-prior-context detection",
+      "description": "Add ~15-line 'Phase 0 — Proposal-as-prior-context detection' sub-section BEFORE existing Phase 1 (per ADR-0048 + D-14). Branch: (a) check --raw-request; (b) Read frontmatter; (c) if doc_type: issue-proposal, treat body as authoritative prior context; (d) elicit only Stage-1 fields the proposal lacks (FR-11-b).",
+      "target_files": [
+        ".claude/agents/intake-intent-clarifier.md"
+      ],
+      "dependencies": ["task-039"],
+      "parallelizable_with": ["task-041", "task-042"],
+      "acceptance_criteria": ["AC-FR-11-a", "AC-FR-11-b"],
+      "validators": ["PV-6.C1", "PV-6.C2", "AT-034", "AT-035"],
+      "estimated_complexity": "medium",
+      "risk_level": "medium",
+      "notes": "Additive-only. Checklist itself lives in intent-clarification-template.md (task-041) to prevent drift."
+    },
+    {
+      "id": "task-041",
+      "plan_anchor": "T6.2",
+      "phase": "P6",
+      "title": "Edit intent-clarification-template.md — add Source-section proposal-seed guidance",
+      "description": "Append ~5 lines of guidance to existing Source section explaining proposal-path-verbatim citation when proposal seeds the run (per ADR-0048). Include proposal-checklist (what fields the clarifier expects).",
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/intent-clarification-template.md"
+      ],
+      "dependencies": [],
+      "parallelizable_with": ["task-040", "task-042"],
+      "acceptance_criteria": ["AC-FR-12-a"],
+      "validators": ["PV-6.C1", "PV-6.C3", "AT-036"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "Additive-only ~5 lines in Source section. No removals."
+    },
+    {
+      "id": "task-042",
+      "plan_anchor": "T6.3",
+      "phase": "P6",
+      "title": "Edit recipe-feature-pipeline/SKILL.md — add proposal-seed invocation bullet",
+      "description": "Append one bullet documenting `recipe-feature-pipeline <slug> --raw-request Issues/<topic>/proposal.md` invocation pattern (per FR-12b). NO new pipeline stage; NO new gate; NO bypass path (AC-FR-12-b strict).",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "dependencies": [],
+      "parallelizable_with": ["task-040", "task-041"],
+      "acceptance_criteria": ["AC-FR-12-b"],
+      "validators": ["PV-6.C1", "PV-6.C4", "AT-037"],
+      "estimated_complexity": "small",
+      "risk_level": "blocker-risk",
+      "notes": "BLOCKER: ANY new stage/gate/bypass language in this edit is `blocker` per Phase 6 Exit Criteria. The recipe is load-bearing for pipeline orchestration."
+    },
+    {
+      "id": "task-043",
+      "plan_anchor": "T7.1",
+      "phase": "P7",
+      "title": "Integration smoke test — /capture-issue create-mode happy path",
+      "description": "Manually invoke /capture-issue <test-hint> in Claude Code session. Verify: (a) hook fires + ask prompt with spawn-prompt preview; (b) on approve, agent classifies doctype + drafts + presents WHY/WHAT/WHERE AskUserQuestion; (c) on approve, exactly one file written at Issues/<topic>/<doctype>.md; (d) path reported to user; (e) stderr line + JSONL append observable. Capture transcript. Clean up test file via /capture-issue --update to wontfix-with-rationale (NOT delete; NFR-6).",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/smoke-test-create-mode.txt"
+      ],
+      "dependencies": ["task-019", "task-020", "task-021", "task-022", "task-023", "task-030", "task-039"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-1-a", "AC-FR-1-b", "AC-FR-1-c", "AC-FR-3-b", "AC-FR-3-d", "AC-FR-4-a", "AC-FR-4-b", "AC-NFR-4-a", "AC-NFR-7-a", "AC-NFR-9-a"],
+      "validators": ["PV-7.C1", "AT-001", "AT-002", "AT-003", "AT-049", "AT-054", "AT-057", "AT-070"],
+      "estimated_complexity": "medium",
+      "risk_level": "medium",
+      "notes": "End-to-end create-mode dogfood. Clean-up via supersession (NOT delete) per AC-NFR-6-a."
+    },
+    {
+      "id": "task-044",
+      "plan_anchor": "T7.2",
+      "phase": "P7",
+      "title": "Negative integration smoke test — cancel + non-issue-capture fast-path",
+      "description": "(a) Invoke /capture-issue with test-hint; on AskUserQuestion select Cancel; verify NO file written (AC-FR-1-d). (b) Invoke non-issue-capture-author agent (e.g., cc-critique) via Task; verify hook silently allows; verify no `ask` prompt surfaces (AC-FR-3-c).",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/smoke-test-cancel-and-fastpath.txt"
+      ],
+      "dependencies": ["task-043"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-1-d", "AC-FR-3-c"],
+      "validators": ["PV-7.C2", "AT-004", "AT-012"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "Re-confirms PV-5.C3 fixtures end-to-end."
+    },
+    {
+      "id": "task-045",
+      "plan_anchor": "T7.3",
+      "phase": "P7",
+      "title": "Update-mode smoke test (AC-FR-2-a/b + AC-NFR-3-a idempotency)",
+      "description": "Invoke /capture-issue --update against Issues/auditing-family-graduation-review/proposal.md. Verify (a) OLD→NEW preview AskUserQuestion; (b) on approve, in-place transition + new status reported; (c) re-invoke with same target state — 'no change' (idempotency). Restore file at end of test.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/smoke-test-update-mode.txt"
+      ],
+      "dependencies": ["task-043"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-FR-2-a", "AC-FR-2-b", "AC-NFR-3-a"],
+      "validators": ["PV-7.C3", "AT-006", "AT-007", "AT-048"],
+      "estimated_complexity": "small",
+      "risk_level": "medium",
+      "notes": "Use auditing-family-graduation-review/proposal.md to avoid disturbing others. Restore via re-update to original state at test end."
+    },
+    {
+      "id": "task-046",
+      "plan_anchor": "T7.4",
+      "phase": "P7",
+      "title": "Pipeline-isolation invariant grep (AC-FR-13-a/b)",
+      "description": "Re-run verbatim greps from AC-FR-13-a/b against pipeline agents. Compare against Phase 0 baseline (pipeline-isolation-baseline.txt). Expected: still empty. CPI-1 end-to-end re-confirmation.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/pipeline-isolation-final.txt"
+      ],
+      "dependencies": ["task-030", "task-039", "task-040", "task-041", "task-042"],
+      "parallelizable_with": ["task-047", "task-048", "task-050"],
+      "acceptance_criteria": ["AC-FR-13-a", "AC-FR-13-b"],
+      "validators": ["PV-7.C4", "AT-038", "AT-039"],
+      "estimated_complexity": "small",
+      "risk_level": "blocker-risk",
+      "notes": "BLOCKER: ANY non-empty result is blocker per Phase 7 Exit Criteria. CPI-1."
+    },
+    {
+      "id": "task-047",
+      "plan_anchor": "T7.5",
+      "phase": "P7",
+      "title": "Final validator regression diff (NFR-8 + AC-NFR-8-a)",
+      "description": "Re-run validator against L1+L2 corpus from T0.1; field-by-field diff. Expected empty post-Phase-3 (migrated files validated cleanly per AC-FR-8-c; corpus no longer contains pre-migration paths). Persist re-confirmation.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/validator-final-l1-l2-diff.json"
+      ],
+      "dependencies": ["task-025"],
+      "parallelizable_with": ["task-046", "task-048", "task-050"],
+      "acceptance_criteria": ["AC-BE-6", "AC-NFR-8-a", "AC-FR-7-b"],
+      "validators": ["PV-7.C5", "AT-024", "AT-055", "AT-063"],
+      "estimated_complexity": "small",
+      "risk_level": "blocker-risk",
+      "notes": "BLOCKER: ANY new finding is blocker per Phase 7 Exit Criteria. CPI-4 end-to-end re-confirmation."
+    },
+    {
+      "id": "task-048",
+      "plan_anchor": "T7.6",
+      "phase": "P7",
+      "title": "Migration history verification — git log --follow on all 5 destinations",
+      "description": "Run git log --follow against each of 5 Phase-3 destination paths. Each MUST return ≥1 pre-migration commit per AC-FR-8-b / AC-FR-9-b.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/migration-history-confirmation.txt"
+      ],
+      "dependencies": ["task-025"],
+      "parallelizable_with": ["task-046", "task-047", "task-050"],
+      "acceptance_criteria": ["AC-FR-8-b", "AC-FR-9-b"],
+      "validators": ["PV-7.C6", "AT-028", "AT-032"],
+      "estimated_complexity": "small",
+      "risk_level": "medium",
+      "notes": "Re-confirms PV-3.C4. Truncated history indicates similarity-index failure — fall back to D-13 two-commit-sequence."
+    },
+    {
+      "id": "task-049",
+      "plan_anchor": "T7.7",
+      "phase": "P7",
+      "title": "Run cc-critique against new components (Success Criteria #5)",
+      "description": "Run cc-critique against new agent / skills / hook / settings.json patch. Compare against Phase 0 baseline (cc-critique-baseline.json). Expected PASS or PASS-WITH-MINOR-FIXES (zero BLOCKER) per PRD §Success Criteria #5.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/cc-critique-final.json"
+      ],
+      "dependencies": ["task-030", "task-039"],
+      "parallelizable_with": [],
+      "acceptance_criteria": [],
+      "validators": ["PV-7.C7"],
+      "estimated_complexity": "small",
+      "risk_level": "medium",
+      "notes": "ANY BLOCKER finding is blocker per Phase 7 Exit Criteria. MINOR findings with remediation plan acceptable."
+    },
+    {
+      "id": "task-050",
+      "plan_anchor": "T7.8",
+      "phase": "P7",
+      "title": "Run full auditing-* family (hooks/skills/subagents/settings/cc-configs)",
+      "description": "Run all 5 auditing-* checks against staged feature work as canonical pre-merge gate. Expected zero BLOCKER findings; ≤2 MINOR findings each.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/auditing-final.json"
+      ],
+      "dependencies": ["task-030", "task-039", "task-040", "task-041", "task-042"],
+      "parallelizable_with": ["task-046", "task-047", "task-048"],
+      "acceptance_criteria": [],
+      "validators": ["PV-7.C8"],
+      "estimated_complexity": "small",
+      "risk_level": "high",
+      "notes": "ANY BLOCKER across the 5 audits is blocker per Phase 7 Exit Criteria. Cross-cutting pre-merge gate."
+    },
+    {
+      "id": "task-051",
+      "plan_anchor": "T7.9",
+      "phase": "P7",
+      "title": "Clean up test artifacts + verify working tree clean for merge",
+      "description": "Verify (a) .gitignore contains .claude/logs/*.jsonl and capture-issue.jsonl is untracked; (b) integration-test artifacts cleaned up or moved to working/feature/<slug>/; restore test issue from T7.1 via supersession (NOT delete; NFR-6).",
+      "target_files": [],
+      "dependencies": ["task-043", "task-044", "task-045"],
+      "parallelizable_with": [],
+      "acceptance_criteria": ["AC-NFR-6-a"],
+      "validators": ["PV-7.C9", "AT-052"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "CPI-5: no Issues/*.md deletion verified end-to-end. Test issue from T7.1 restored via /capture-issue --update to wontfix-with-rationale."
+    },
+    {
+      "id": "task-052",
+      "plan_anchor": "T7.10",
+      "phase": "P7",
+      "title": "Author packager-input-notes.md (I-AA-001 user-accepted deviation handoff)",
+      "description": "Author packager handoff note (~30–50 lines) with 5 sections: (1) Deviation summary (7 new ADRs stay at working/feature/<slug>/adrs/ not /adrs/); (2) Authoritative evidence (cites Issues/adr-placement-rootcause/analysis.md verbatim); (3) User acceptance (cites Architecture Audit cycle 1 I-AA-001 Option A); (4) Packager direction (do NOT relocate ADRs; do NOT flag); (5) Future remediation scope (separate drift-remediation feature). Resolves I-DR-PL-004.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/packager-input-notes.md"
+      ],
+      "dependencies": ["task-021"],
+      "parallelizable_with": ["task-043", "task-044", "task-045", "task-046", "task-047", "task-048", "task-049", "task-050"],
+      "acceptance_criteria": [],
+      "validators": ["PV-7.C10"],
+      "estimated_complexity": "small",
+      "risk_level": "medium",
+      "consumed_by": "finalize-deliverable-packager",
+      "notes": "Stage 13 (finalize-deliverable-packager) consumes this file directly. Cites task-021's migrated path Issues/adr-placement-rootcause/analysis.md as authoritative evidence. Absence is MAJOR (warns; packager handoff still possible via Open Items fallback) but presence is preferred per I-DR-PL-004."
+    }
+  ],
+  "parallelizable_groups": [
+    {
+      "phase": "P0",
+      "tasks": ["task-001", "task-002", "task-003", "task-004", "task-005"],
+      "rationale": "All Phase 0 tasks are independent baseline captures + directory staging; no shared writers."
+    },
+    {
+      "phase": "P1",
+      "tasks": ["task-006", "task-007", "task-008", "task-009"],
+      "rationale": "4 new file authoring tasks; no shared writers. task-010 (SKILL.md index update) must follow these 4."
+    },
+    {
+      "phase": "P3",
+      "tasks": ["task-019", "task-020", "task-021", "task-022"],
+      "rationale": "4 Issues migration tasks each touch a distinct file pair. task-023 (agent-roster-matrix) depends on task-020 because task-020 creates the Issues/per-agent-design-evaluation-gap/ topic folder."
+    },
+    {
+      "phase": "P4",
+      "tasks": ["task-026", "task-028"],
+      "rationale": "KB-issue-capture/SKILL.md and capture-issue/SKILL.md are independent skill files."
+    },
+    {
+      "phase": "P4",
+      "tasks": ["task-032"],
+      "rationale": ".gitignore edit is independent of the Phase 4 KB/agent authoring work; can run anytime in Phase 4."
+    },
+    {
+      "phase": "P6",
+      "tasks": ["task-040", "task-041", "task-042"],
+      "rationale": "3 independent file edits; no shared writers. task-040 depends on Phase 5 (documents now-deployed mechanism) but task-041 and task-042 are independent."
+    },
+    {
+      "phase": "P7",
+      "tasks": ["task-046", "task-047", "task-048", "task-050"],
+      "rationale": "End-to-end re-checks; all read-only validations against independent surfaces (grep, validator diff, git log, audits)."
+    },
+    {
+      "phase": "P7",
+      "tasks": ["task-052"],
+      "rationale": "packager-input-notes.md authoring is independent of T7.1..T7.9 verification work; can run in parallel with the entire smoke-test/audit cluster."
+    }
+  ],
+  "critical_path": [
+    "task-001",
+    "task-009",
+    "task-011",
+    "task-012",
+    "task-013",
+    "task-014",
+    "task-015",
+    "task-016",
+    "task-017",
+    "task-018",
+    "task-020",
+    "task-023",
+    "task-024",
+    "task-025",
+    "task-027",
+    "task-029",
+    "task-030",
+    "task-031",
+    "task-033",
+    "task-034",
+    "task-035",
+    "task-036",
+    "task-037",
+    "task-038",
+    "task-039",
+    "task-040",
+    "task-043",
+    "task-045",
+    "task-051"
+  ],
+  "blocker_risks": [
+    {
+      "task_id": "task-016",
+      "concern": "NFR-8 regression diff must be EMPTY against Phase 0 baseline (T2.6). ANY new finding line forces hard-block — Phase 3 must NOT start while diff non-empty.",
+      "validator": "PV-2.C7",
+      "cross_phase_invariant": "CPI-4"
+    },
+    {
+      "task_id": "task-025",
+      "concern": "AC-FR-8-d direct enforcement: Phase 3 commit-range diff MUST contain EXACTLY the 5 expected file pairs. ANY extra path forces hard rollback of non-migration commits in the range.",
+      "validator": "PV-3.C7"
+    },
+    {
+      "task_id": "task-029",
+      "concern": "F-003 BLOCKER: frontmatter MUST omit `skills:` field. Verify via `grep -E '^skills:' .claude/agents/issue-capture-author.md` returning ZERO lines before commit. If `skills:` is present, Claude Code silently drops the agent's KB preload — the agent is functionally broken with no error message. This is the project's HIGHEST-PRIORITY task-level discipline assertion.",
+      "validator": "PV-4.C1",
+      "cross_phase_invariant": "CPI-3"
+    },
+    {
+      "task_id": "task-038",
+      "concern": "settings.json `permissions.allow` array MUST remain byte-identical to pre-Phase-5 state. Only the additive `hooks` block may change.",
+      "validator": "PV-5.C5",
+      "cross_phase_invariant": "CPI-6"
+    },
+    {
+      "task_id": "task-042",
+      "concern": "recipe-feature-pipeline/SKILL.md edit MUST NOT introduce any new pipeline stage, gate, or bypass language (AC-FR-12-b strict). One additive bullet only.",
+      "validator": "PV-6.C4"
+    },
+    {
+      "task_id": "task-046",
+      "concern": "Pipeline-isolation grep (AC-FR-13-a/b) MUST return empty end-to-end. ANY match is blocker per Phase 7 Exit Criteria.",
+      "validator": "PV-7.C4",
+      "cross_phase_invariant": "CPI-1"
+    },
+    {
+      "task_id": "task-047",
+      "concern": "Final NFR-8 regression diff MUST be empty end-to-end. CPI-4 re-confirmation at acceptance.",
+      "validator": "PV-7.C5",
+      "cross_phase_invariant": "CPI-4"
+    },
+    {
+      "task_id": "task-051",
+      "concern": "No Issues/*.md file deleted by any /capture-issue invocation (CPI-5). Test issue from T7.1 must be restored via supersession (NOT delete).",
+      "validator": "PV-7.C9",
+      "cross_phase_invariant": "CPI-5"
+    }
+  ],
+  "phase_totals": {
+    "P0": {"tasks": 5, "complexity_buckets": {"small": 5, "medium": 0, "large": 0}},
+    "P1": {"tasks": 5, "complexity_buckets": {"small": 1, "medium": 3, "large": 1}},
+    "P2": {"tasks": 6, "complexity_buckets": {"small": 3, "medium": 2, "large": 1}},
+    "P3": {"tasks": 9, "complexity_buckets": {"small": 8, "medium": 1, "large": 0}},
+    "P4": {"tasks": 7, "complexity_buckets": {"small": 2, "medium": 3, "large": 2}},
+    "P5": {"tasks": 7, "complexity_buckets": {"small": 5, "medium": 2, "large": 0}},
+    "P6": {"tasks": 3, "complexity_buckets": {"small": 2, "medium": 1, "large": 0}},
+    "P7": {"tasks": 10, "complexity_buckets": {"small": 9, "medium": 1, "large": 0}}
+  },
+  "ac_coverage_summary": {
+    "total_acs": 67,
+    "ac_to_task_mapping_confirmed": true,
+    "notes": "Every PRD/Blueprint AC maps to ≥1 task (verified by AC field across tasks). AT-NNN cross-references verified via validators field. Critical traceability path: PRD ACs → Plan task IDs (T*.* in plan_anchor) → tasks.json id → acceptance-tests.md AT-NNN (via validators) → phase-validators.md PV-N.CN (via validators)."
+  },
+  "cross_phase_invariants_to_enforce": [
+    {"id": "CPI-1", "description": "Pipeline-isolation grep returns empty", "primary_tasks": ["task-002", "task-046"]},
+    {"id": "CPI-2", "description": "validate_pipeline_frontmatter.py clean-runs on current state of Issues/", "primary_tasks": ["task-024", "task-047"]},
+    {"id": "CPI-3", "description": "issue-capture-author.md has NO `skills:` frontmatter field (F-003)", "primary_tasks": ["task-029"]},
+    {"id": "CPI-4", "description": "NFR-8 regression diff against Phase 0 baseline is empty", "primary_tasks": ["task-001", "task-016", "task-047"]},
+    {"id": "CPI-5", "description": "No Issues/*.md file is ever deleted (AC-NFR-6-a)", "primary_tasks": ["task-051"]},
+    {"id": "CPI-6", "description": ".claude/settings.json permissions.allow array unchanged from pre-Phase-5", "primary_tasks": ["task-038"]}
+  ],
+  "open_items_for_orchestrator": [
+    "All Plan v2 tasks (50) map 1:1 to tasks.json entries 002..052 (task-001 reserved for T0.1; 52 sequential IDs total but 50 distinct Plan task anchors). Wait — re-check: 5 (P0) + 5 (P1) + 6 (P2) + 9 (P3) + 7 (P4) + 7 (P5) + 3 (P6) + 10 (P7) = 52 tasks. Plan v2 declares 50 tasks; the +2 discrepancy comes from T3.0 + T3.8 (commit-range anchors added by I-DR-PL-002) and T4.4a/b/c (single T4.4 decomposed into 3 sub-tasks by I-DR-PL-003); T7.10 added by I-DR-PL-004. Re-counting Plan v2 task IDs explicitly: P0=5, P1=5, P2=6, P3=9 (T3.0/3.1/3.2/3.3/3.4/3.5/3.6/3.7/3.8), P4=7 (T4.1/4.2/4.3/4.4a/4.4b/4.4c/4.5), P5=7, P6=3, P7=10 = 52. Plan v2's `total_tasks: 50` in frontmatter is the count from v1 + 3 (T4.4 split = +2; T7.10 = +1) = 50, but the Plan body explicitly enumerates 52 task headings after the I-DR-PL-002 commit-range anchors (T3.0 + T3.8) were added. Surfacing as orchestrator note: Plan frontmatter `total_tasks: 50` is a stale count; the body enumerates 52 distinct task headings. Recommend Plan author re-affirms total_tasks count in next pass.",
+    "No XL-sized tasks unresolved. task-014 (28 fixtures) and task-030 (create-mode 6-step workflow) are the largest at L; both are decomposable further if execution-phase reveals they exceed one work-unit session, but the Plan's L1/L2/L3 verification structure already accommodates one-pass execution.",
+    "task-052 (packager-input-notes.md) is the sole task with `consumed_by` field set — finalize-deliverable-packager Stage 13 reads it directly. Orchestrator should ensure Stage 13 dispatch carries this file in its input set."
+  ]
+}

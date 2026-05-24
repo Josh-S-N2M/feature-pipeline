@@ -1,0 +1,250 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "Plan",
+    "target_path": "working/feature/issue-capture-mechanism-r1/plan-v2.md",
+    "predecessor_path": "working/feature/issue-capture-mechanism-r1/plan-v1.md",
+    "prior_review_issues_path": "working/feature/issue-capture-mechanism-r1/plan-v1-review-issues.json",
+    "reviewer": "shared-document-reviewer",
+    "invocation": "ADR-0017 Stage 9 / Invocation 5 — re-review after plan-v1 PASS_WITH_RECOMMENDATIONS conditions absorbed",
+    "generated": "2026-05-24T01:05:00Z",
+    "prior_context_count": 7,
+    "prior_context_source": "plan-v1-review-issues.json: 4 important + 3 recommended"
+  },
+  "scores": {
+    "consistency": 93,
+    "completeness": 96,
+    "rule_compliance": 95,
+    "clarity": 92
+  },
+  "gate0": {
+    "status": "pass",
+    "checked": [
+      {"item": "Frontmatter complete (id, version 1.1.0, predecessor set to plan-v1.md, status, feature_slug, derived_from, phases, total_tasks=50, generated, generated_by, change_summary enumerating all 4 findings)", "result": "pass"},
+      {"item": "Section completion checklist (Contents) present and all rows checked", "result": "pass"},
+      {"item": "Purpose section present", "result": "pass"},
+      {"item": "Source section present (Blueprint, PRD, ADRs, codebase analysis, Predecessor enumerated)", "result": "pass"},
+      {"item": "Phases enumerated (Phase 0 through Phase 7; 8 phases total)", "result": "pass"},
+      {"item": "Tasks numbered within phases (50 total: T0.1..T0.5; T1.1..T1.5; T2.1..T2.6; T3.0..T3.8; T4.1..T4.5 incl. T4.4a/b/c; T5.1..T5.7; T6.1..T6.3; T7.1..T7.10)", "result": "pass"},
+      {"item": "Each task carries Layer, Description, Dependencies, Estimate, Satisfies AC, L1/L2/L3 verification", "result": "pass"},
+      {"item": "Per-phase Exit Criteria present", "result": "pass"},
+      {"item": "Per-phase Phase Validator one-liner present", "result": "pass"},
+      {"item": "Per-phase blocking-severity threshold present (ADR-0023 FULL)", "result": "pass"},
+      {"item": "Cross-Phase Dependencies section with critical path + parallelizability (updated for T3.0/T3.8/T4.4a-b-c/T7.10)", "result": "pass"},
+      {"item": "L1/L2/L3 Verification Discipline section (updated to call out T4.4a F-003 grep as LOAD-BEARING)", "result": "pass"},
+      {"item": "Acceptance Test Cross-Reference table (50 ACs + dogfooded/structural rows; AC-FR-8-d mapping updated with T3.0/T3.8)", "result": "pass"},
+      {"item": "Estimation Methodology (Phase 4 envelope updated to ~12h with I-DR-PL-003 rationale; Phase 3 ~6h; Phase 7 ~6h)", "result": "pass"},
+      {"item": "Resourcing Posture", "result": "pass"},
+      {"item": "Open Items (9 items; OI-PLAN-9 references T7.10 explicitly)", "result": "pass"},
+      {"item": "Update History row for 1.1.0 enumerating the 4 absorbed findings and rationale for declined recommendations", "result": "pass"}
+    ],
+    "missing_elements": []
+  },
+  "verdict": {
+    "decision": "approved",
+    "verdict_label": "PASS",
+    "rationale": "Plan v2 cleanly absorbs all 4 important-severity findings from plan-v1 (I-DR-PL-001..004) with concrete, machine-checkable assertions added to the document. The F-003 silent-drop mitigation is now directly enforced via verbatim grep at four redundant surfaces (T4.4a L1, Phase 4 Exit Criteria BLOCKER, Phase 4 blocking-severity threshold, Phase Validator step 1) rather than relying on auditing-subagents cross-derivation. AC-FR-8-d (no other files migrated) is now enforced via T3.0/T3.8 commit-range anchors + `git diff --name-only <start>..<end>` returning EXACTLY the 5 expected file pairs as a Phase 3 Phase Validator step. T4.4 (22 ACs — too coarse) is decomposed into T4.4a/b/c (6 + 13 + 4 ACs) with each sub-task carrying its own L1/L2/L3 + AC mapping. T7.10 authors packager-input-notes.md binding the I-AA-001 deviation to a deliverable that finalize-deliverable-packager (Stage 13) will read, replacing the OI-PLAN-9 visibility risk. No regressions detected: v1 substance preserved unchanged, NFR-8 verification chain (T0.1 -> T2.1 -> T2.6 -> T7.5) intact, D-13 atomic-migration discipline (T3.1 dry-run + T3.2..T3.6 atomic commits + T3.7 clean-run) intact, AC coverage 67/67 with no orphans either direction, phase ordering respects every Blueprint dependency requirement. Recommended-severity I-DR-PL-005 declined with rationale in OI-PLAN-5; I-DR-PL-006 absorbed via T0.3 disambiguation note; I-DR-PL-007 addressed in Estimation Methodology. Zero new important+ defects introduced. Path to PASS met.",
+    "conditions": []
+  },
+  "prior_context_check": {
+    "items_received": 7,
+    "items_received_breakdown": {"important": 4, "recommended": 3},
+    "resolved": 6,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "declined_with_rationale": 1,
+    "items": [
+      {
+        "id": "I-DR-PL-001",
+        "severity_v1": "important",
+        "status": "resolved",
+        "location_in_v2": "T4.4a L1 verification (line 491); Phase 4 Exit Criteria (line 549, marked BLOCKER); Phase 4 blocking-severity threshold (line 553); Phase 4 Phase Validator step 1 (line 557)",
+        "evidence": "The verbatim command `grep -E '^skills:' .claude/agents/issue-capture-author.md` appears at four reinforcing surfaces. Phase 4 Exit Criteria line 549 reads: 'BLOCKER if grep -E ^skills: .claude/agents/issue-capture-author.md returns any line — F-003 silent-drop avoidance non-negotiable. (Direct, Plan-level enforcement of the F-003 invariant; resolves I-DR-PL-001 by no longer relying on auditing-subagents cross-derivation alone.)' Phase 4 blocking-severity threshold line 553 reads: 'ANY skills: line in .claude/agents/issue-capture-author.md frontmatter is a blocker (F-003 silent-drop mitigation, project first per F-003).' Phase Validator step 1 reads: 'Direct F-003 grep enforcement: runs grep -E ^skills: .claude/agents/issue-capture-author.md and asserts the output is empty (exit code 1 from grep with no matches). Any match -> blocker.' Resolution is direct, atomic, and machine-checkable.",
+        "regression_check": "T4.4a frontmatter still declares the 5 expected tools, model: sonnet, permissionMode: default; the F-003 invariant is reinforced rather than replacing any prior content."
+      },
+      {
+        "id": "I-DR-PL-002",
+        "severity_v1": "important",
+        "status": "resolved",
+        "location_in_v2": "T3.0 (line 312-321, record start commit); T3.8 (line 400-414, record end commit + assert scope via git diff); Phase 3 Exit Criteria (line 423-424); Phase 3 Phase Validator step 7 (line 434)",
+        "evidence": "T3.0 captures `phase-3-start-commit.txt` (40-char SHA); T3.8 captures `phase-3-end-commit.txt` and runs `git diff --name-only $(cat phase-3-start-commit.txt)..$(cat phase-3-end-commit.txt)` asserting the output is EXACTLY the 5 expected file pairs (10 add/delete entries OR 5 rename entries; both renderings handled). T3.8 description enumerates the 5 expected pairs verbatim. Phase 3 Exit Criteria line 423 reads: 'phase-3-scope-diff.txt shows the diff between Phase 3 start and end commits contains ONLY the 5 expected file pairs (AC-FR-8-d enforced as a machine-checkable assertion, not by inference).' Phase 3 blocking-severity threshold line 424: 'any path in phase-3-scope-diff.txt outside the 5 expected file pairs -> blocker (AC-FR-8-d direct enforcement; resolves I-DR-PL-002).' Phase Validator step 7 codifies the diff command and the EXACTLY-5-file-pairs assertion. AC Cross-Reference table (line 1000) updated: 'AC-FR-8-d (no other files migrated) | T3.2..T3.6 (positive); T3.0 + T3.8 (negative: commit-range diff enforces scope per I-DR-PL-002).'",
+        "regression_check": "T3.1..T3.7 sequence unchanged; T3.0 inserted before T3.1; T3.8 inserted after T3.7. Dependencies tight (T3.0 deps Phase 2 complete; T3.1 deps T3.0; T3.8 deps T3.7). No alteration of the D-13 atomic-migration commits."
+      },
+      {
+        "id": "I-DR-PL-003",
+        "severity_v1": "important",
+        "status": "resolved",
+        "location_in_v2": "T4.4a (line 483-494, frontmatter + hard constraints, 6 ACs); T4.4b (line 495-512, create-mode 6-step workflow, 13 ACs); T4.4c (line 514-531, update-mode 6-step workflow, 4 ACs)",
+        "evidence": "v1's T4.4 (22 ACs in one L-sized block) is decomposed into 3 sub-tasks each with its own L1/L2/L3 verification + AC mapping. T4.4a (frontmatter + hard-constraint section; F-003 mitigation surface) covers AC-FR-3-d, AC-NFR-4-a/b, AC-NFR-6-a/b, AC-FR-3-a partial (6 ACs). T4.4b (create-mode 6-step workflow + runtime KB-load) covers AC-FR-1-a/b/c/d/e, AC-FR-4-a/b/c/d, AC-FR-5-a/b/c, AC-NFR-5-a, AC-NFR-7-a (13 ACs). T4.4c (update-mode --update branch + OLD->NEW preview + idempotency) covers AC-FR-2-a/b/d, AC-NFR-3-a (4 ACs). Total 23 (v1's 22 + AC-FR-3-a partial reaffirmation in T4.4a). Each sub-task has its own AC mapping for downstream test-phase-validator-author consumability. Cross-references in AC Cross-Reference table (lines 971-1037) reflect the decomposition (e.g., 'AC-FR-1-a | T4.3, T4.4b, T7.1'; 'AC-NFR-3-a | T4.4c, T7.3'). Dependencies sequential (a -> b -> c).",
+        "regression_check": "No v1 T4.4 AC dropped: all 22 v1 ACs mapped to T4.4a/b/c with no orphans. Distribution differs slightly from v1 reviewer's illustrative suggestion (suggested ~7/10/5; actual is 6/13/4) but the suggestion was non-prescriptive — the v2 distribution respects the natural seams (frontmatter F-003 invariant; create-mode workflow; update-mode workflow). T4.4b at 13 ACs is denser than T4.4a/c but matches T2.5's similar density and is justified by the create-mode workflow being a single coherent 6-step sequence."
+      },
+      {
+        "id": "I-DR-PL-004",
+        "severity_v1": "important",
+        "status": "resolved",
+        "location_in_v2": "T7.10 (line 826-840, authors packager-input-notes.md); Phase 7 Exit Criteria (line 851); Phase 7 blocking-severity threshold (line 852); OI-PLAN-9 updated (line 1096)",
+        "evidence": "T7.10 authors `working/feature/issue-capture-mechanism-r1/packager-input-notes.md` with 5 enumerated sections: (1) Deviation summary citing the 7 ADRs remain at working/feature/<slug>/adrs/; (2) Authoritative evidence citing the post-migration Issues/adr-placement-rootcause/analysis.md; (3) User acceptance citing the Architecture Audit cycle 1 I-AA-001 acceptance; (4) Packager direction (follow current operational convention; do not relocate; do not flag); (5) Future remediation scope. Phase 7 Exit Criteria adds: 'packager-input-notes.md authored, ready for finalize-deliverable-packager Stage 13 consumption (T7.10; I-DR-PL-004 resolution).' Phase 7 blocking threshold line 852: 'absence of packager-input-notes.md post-T7.10 is important (warns; packager handoff is still possible via Open Items fallback but loses visibility per I-DR-PL-004 rationale).' OI-PLAN-9 (line 1096) updated to: 'this Plan does include T7.10 to author packager-input-notes.md (resolves I-DR-PL-004) so the deferral is bound to a deliverable read by the packager rather than left only in this Open Items section.' Resolution elevates the deferral from passive (Open Items) to active (binding deliverable).",
+        "regression_check": "T7.10 parallel to T7.4..T7.8 (independent of verification work). Does not block any other Phase 7 task. Cross-Phase Dependencies diagram (line 932) places T7.10 correctly."
+      },
+      {
+        "id": "I-DR-PL-005",
+        "severity_v1": "recommended",
+        "status": "declined_with_rationale",
+        "location_in_v2": "OI-PLAN-5 (line 1088); Update History row for 1.1.0 (line 1105); T4.5 description (line 536)",
+        "evidence": "Recommendation was to relocate T4.5 (.gitignore append) from Phase 4 to Phase 5 per Blueprint's Required Implementation Order. Declined with explicit one-liner rationale in OI-PLAN-5: 'Decision in v1.1.0: declined I-DR-PL-005 recommendation to relocate to Phase 5 — scope-hygiene rationale: the work is unchanged whether labeled Phase 4 or Phase 5; relocating would invalidate the existing cross-references without adding correctness.' Update History row corroborates. T4.5 description line 536 also references the declined recommendation. Acceptable per the user's stated path (recommended-severity items can be deferred or declined with rationale).",
+        "regression_check": "OI-PLAN-5 still surfaces the phase-placement deviation to cross-artifact-auditor for ratification; the deviation is not hidden."
+      },
+      {
+        "id": "I-DR-PL-006",
+        "severity_v1": "recommended",
+        "status": "resolved",
+        "location_in_v2": "T0.3 description (line 99) and T0.2 description (line 88)",
+        "evidence": "Recommendation was to add a one-line disambiguation between T0.2 (pipeline-isolation grep baseline) and T0.3 (cc-critique baseline). T0.3 description now reads: '(Distinct from T0.2 pipeline-isolation baseline — that is a grep-empty assertion on existing agents; this is a cc-critique verdict snapshot on the .claude/ tree.)' T0.2 description also includes: 'Note: this baseline is distinct from the T0.3 cc-critique baseline.' Bidirectional disambiguation.",
+        "regression_check": "No semantic change to either task's verification chain."
+      },
+      {
+        "id": "I-DR-PL-007",
+        "severity_v1": "recommended",
+        "status": "resolved",
+        "location_in_v2": "Estimation Methodology (line 1058-1066)",
+        "evidence": "Recommendation was to refine the Phase 4 envelope (v1 listed ~10h but aggregate of T4.1..T4.5 high-end was ~12h). Estimation Methodology table line 1060 now shows Phase 4 = 7 tasks, ~12h with explicit rationale (line 1066): 'Phase 4 envelope tightened from v1 ~10h to ~12h reflecting the I-DR-PL-003 decomposition of T4.4 into T4.4a/b/c with realistic aggregate ... = ~14 h high-end (the table rounds to 12 h for sizing).' Phase 3 increased from ~5h to ~6h (T3.0 + T3.8). Phase 7 increased from ~5h to ~6h (T7.10). Total envelope updated to ~53h.",
+        "regression_check": "Estimation is sizing-only per plan-authoring.md anti-pattern; not a velocity contract. No downstream binding."
+      }
+    ]
+  },
+  "regression_checks": {
+    "v1_substance_preserved": {
+      "status": "verified",
+      "checks": [
+        "NFR-8 verification chain (T0.1 -> T2.1 -> T2.6 -> T7.5) unchanged; load-bearing assertions intact",
+        "D-13 atomic-migration discipline (T3.1 dry-run + T3.2..T3.6 atomic commits + T3.7 clean-run) intact; T3.0/T3.8 added as scope-enforcement anchors without altering atomic-commit shape",
+        "F-003 mitigation chain strengthened (4 surfaces) rather than weakened; T4.4a frontmatter discipline preserved",
+        "Phase ordering: Phase 0 (baselines) -> Phase 1 (templates) -> Phase 2 (validator) -> Phase 3 (migration) -> Phase 4 (KB+agent) -> Phase 5 (hook+settings) -> Phase 6 (handoff) -> Phase 7 (verification) unchanged",
+        "Per-phase Exit Criteria + blocking-severity thresholds + Phase Validator anchors present for all 8 phases (none removed; some strengthened)",
+        "Critical path updated (T0.1 -> T1.4 -> T2.1 -> T2.2 -> T2.3 -> T2.5 -> T2.6 -> T3.0 -> T3.1 -> T3.2 -> T3.7 -> T3.8 -> T4.4a -> T4.4b -> T4.4c -> T5.1 -> T5.4 -> T5.5 -> T5.6 -> T6.1 -> T7.1 -> T7.5) coherently extended with new commit-range and decomposed agent-authoring tasks"
+      ]
+    },
+    "no_new_phase_ordering_defects": {
+      "status": "verified",
+      "checks": [
+        "T3.0 inserted before T3.1 (dependency: Phase 2 complete) — correct, allows the commit anchor before any migration work",
+        "T3.8 inserted after T3.7 (dependency: T3.7 validator clean-run) — correct, captures end commit after all migrations + back-fill verified",
+        "T4.4a -> T4.4b -> T4.4c sequential within Phase 4; T4.4b depends on T4.4a; T4.4c depends on T4.4a + T4.4b — correct, each sub-task builds on the previous skeleton",
+        "T7.10 parallel to T7.4..T7.8; independent of verification work; does not block T7.9 cleanup — correct",
+        "Cross-Phase Dependencies diagram (line 893-936) updated with new tasks in the correct positions"
+      ]
+    },
+    "ac_coverage_preserved": {
+      "ac_total_v1": 67,
+      "ac_total_v2": 67,
+      "ac_mapped_v2": 67,
+      "orphan_ac_count": 0,
+      "orphan_task_count": 0,
+      "verification": "All 22 ACs that T4.4 satisfied in v1 are mapped to T4.4a/b/c in v2 with no orphans. AC-FR-8-d mapping updated to include T3.0 + T3.8 (negative scope assertion). All other AC mappings unchanged. The 50-task plan has 13 setup-tagged tasks (T0.1..T0.5, T2.1, T2.4, T3.0, T3.1, T4.2, T4.5, T5.2, T5.3, T7.10) and 37 AC-mapped tasks; T7.10 is setup-tagged because it's a handoff artifact (no PRD/Blueprint AC) per the I-DR-PL-004 resolution."
+    },
+    "frontmatter_compliance": {
+      "version_bump": "1.0.0 -> 1.1.0 (correct minor-version bump per supersession discipline; not a major rewrite)",
+      "predecessor_set": "predecessor: working/feature/issue-capture-mechanism-r1/plan-v1.md (correct)",
+      "change_summary_present": "enumerates all 4 important findings + recommended-severity dispositions",
+      "total_tasks_updated": "47 -> 50 (correct: +2 from T4.4 decomposition + +1 from T7.10 + 0 net from T3.0/T3.8 since they replace implicit anchor in v1)",
+      "phases_unchanged": "8 (correct; no phase added or removed)"
+    }
+  },
+  "issues": [],
+  "ac_coverage_check": {
+    "ac_total": 67,
+    "ac_mapped": 67,
+    "ac_orphan_count": 0,
+    "task_total": 50,
+    "task_setup_tagged": 13,
+    "task_ac_mapped": 37,
+    "task_unmapped_non_setup": 0,
+    "breakdown": {
+      "AC-FR-*": {"total": 42, "mapped": 42},
+      "AC-NFR-*": {"total": 15, "mapped": 15},
+      "AC-BE-*": {"total": 10, "mapped": 10}
+    },
+    "notes": [
+      "AC-FR-10-a remains 'dogfooded by this run' — unchanged from v1.",
+      "AC-FR-13-c remains 'structurally satisfied by design' — unchanged from v1.",
+      "AC-FR-8-d now has a direct enforcement path via T3.0 + T3.8 (commit-range diff) — strengthened from v1's 'T3.2..T3.6 (negative — Phase 3 PV enumerates)'.",
+      "The 22 ACs from v1's T4.4 are redistributed across T4.4a (6) + T4.4b (13) + T4.4c (4) with no orphans."
+    ]
+  },
+  "phase_4_f003_invariant_enforcement_check": {
+    "status": "quadruply_enforced",
+    "surfaces": [
+      "T4.4a L1 verification (line 491): 'grep -E ^skills: .claude/agents/issue-capture-author.md returns NO lines (F-003 absence verified directly)'",
+      "Phase 4 Exit Criteria (line 549): 'BLOCKER if grep -E ^skills: ... returns any line — F-003 silent-drop avoidance non-negotiable'",
+      "Phase 4 blocking-severity threshold (line 553): 'ANY skills: line in .claude/agents/issue-capture-author.md frontmatter is a blocker'",
+      "Phase 4 Phase Validator step 1 (line 557): 'Direct F-003 grep enforcement: runs grep ... asserts output is empty. Any match -> blocker.'"
+    ],
+    "v1_to_v2_change": "v1 relied on auditing-subagents X3 cross_file_checks cross-derivation. v2 lifts the assertion to a direct Plan-level grep at four reinforcing surfaces. test-phase-validator-author can author the Phase 4 Validator from this Plan alone without re-deriving from auditing-subagents."
+  },
+  "phase_3_acfr8d_enforcement_check": {
+    "status": "machine_checkable",
+    "mechanism": "T3.0 captures phase-3-start-commit.txt; T3.8 captures phase-3-end-commit.txt and runs `git diff --name-only $(cat phase-3-start-commit.txt)..$(cat phase-3-end-commit.txt)` asserting output is EXACTLY the 5 expected file pairs (10 add/delete entries OR 5 rename entries; both renderings handled)",
+    "expected_5_pairs_enumerated_in_t38": true,
+    "phase_validator_step_7_codifies_assertion": true,
+    "v1_to_v2_change": "v1 Phase Validator description said 'enumerates 5 source paths; asserts each is absent; enumerates 5 destination paths; asserts each is present' which proved positive scope but not the negative 'no other files migrated'. v2 adds the commit-range diff as a direct, machine-checkable negative assertion. Resolves I-DR-PL-002 cleanly."
+  },
+  "t44_decomposition_check": {
+    "v1_t44_ac_count": 22,
+    "v2_distribution": {
+      "T4.4a (frontmatter + hard constraints; F-003 mitigation surface)": {"ac_count": 6, "acs": ["AC-FR-3-d", "AC-NFR-4-a", "AC-NFR-4-b", "AC-NFR-6-a", "AC-NFR-6-b", "AC-FR-3-a (partial)"], "plus_invariant": "F-003 skills:-ABSENT"},
+      "T4.4b (create-mode 6-step workflow + runtime KB-load + AskUserQuestion archetypes)": {"ac_count": 13, "acs": ["AC-FR-1-a", "AC-FR-1-b", "AC-FR-1-c", "AC-FR-1-d", "AC-FR-1-e", "AC-FR-4-a", "AC-FR-4-b", "AC-FR-4-c", "AC-FR-4-d", "AC-FR-5-a", "AC-FR-5-b", "AC-FR-5-c", "AC-NFR-5-a", "AC-NFR-7-a"]},
+      "T4.4c (update-mode --update branch + OLD->NEW preview + idempotency)": {"ac_count": 4, "acs": ["AC-FR-2-a", "AC-FR-2-b", "AC-FR-2-d", "AC-NFR-3-a"]}
+    },
+    "natural_seam_check": "T4.4a is the F-003 mitigation surface (independently testable via verbatim grep); T4.4b is the create-mode workflow (one coherent 6-step sequence); T4.4c is the update-mode workflow (distinct AC footprint from create-mode). Each sub-task is consumable by test-phase-validator-author as a focused Phase Validator anchor.",
+    "highest_ac_density_now": "T4.4b at 13 ACs — comparable to T2.5 (12 ACs) and acceptable for a coherent 6-step workflow",
+    "verdict": "decomposition_clean"
+  },
+  "t710_packager_handoff_check": {
+    "status": "elevated_from_open_item_to_deliverable",
+    "binding_mechanism": "T7.10 authors packager-input-notes.md with 5 enumerated sections; finalize-deliverable-packager (Stage 13) reads this note rather than the Plan's Open Items section",
+    "five_sections_present": ["Deviation summary", "Authoritative evidence (citing Issues/adr-placement-rootcause/analysis.md post-migration path)", "User acceptance (citing Architecture Audit cycle 1 I-AA-001 verdict)", "Packager direction (do not relocate; do not flag)", "Future remediation scope"],
+    "phase_7_exit_criteria_updated": true,
+    "blocking_threshold_includes_t710": "absence of packager-input-notes.md post-T7.10 is important (warns)",
+    "v1_to_v2_change": "v1 left the I-AA-001 deferral in OI-PLAN-9 (Open Items) where downstream packager could miss it. v2 binds it to T7.10 + an artifact read by the packager at Stage 13."
+  },
+  "load_bearing_chains": {
+    "nfr_8_verification_chain": {
+      "status": "intact",
+      "chain": "T0.1 baseline -> T2.1 early-verification (constants only; diff must be empty) -> T2.6 regression diff (full extension landed; LOAD-BEARING) -> T7.5 final post-migration diff",
+      "unchanged_from_v1": true
+    },
+    "f_003_mitigation_chain": {
+      "status": "strengthened",
+      "v1_chain": "T4.4 description bold language + Phase 4 Exit Criteria + Phase 4 Validator (relying on auditing-subagents X3 cross-derivation for the blocking threshold)",
+      "v2_chain": "T4.4a L1 verbatim grep + Phase 4 Exit Criteria BLOCKER + Phase 4 blocking-severity threshold + Phase Validator step 1 direct grep (4 surfaces)"
+    },
+    "d_13_atomic_migration_chain": {
+      "status": "intact",
+      "chain": "T3.1 dry-run -> T3.2..T3.6 atomic commits -> T3.7 validator clean-run",
+      "unchanged_from_v1": true,
+      "v2_additions": "T3.0 + T3.8 commit-range anchors added as scope-enforcement scaffolding; do not alter the atomic-commit discipline"
+    },
+    "ac_fr_8_d_negative_scope_chain": {
+      "status": "newly_machine_checkable",
+      "v1_chain": "Phase Validator inferred from enumeration of 5 paths",
+      "v2_chain": "T3.0 records start commit -> Phase 3 work -> T3.8 records end commit + runs `git diff --name-only` asserting EXACTLY 5 expected file pairs -> Phase Validator step 7 codifies the assertion"
+    }
+  },
+  "minor_observations": [
+    "T4.4a description bullet 'AC count: 6 (5 normative ACs + the F-003 invariant)' (line 490) cites 6 ACs in the Satisfies AC list including 'AC-FR-3-a partial' — the count reads 6 normative + F-003 invariant rather than '5 normative + F-003 invariant'. Cosmetic; the AC list is correctly populated. Not a defect; no review issue raised.",
+    "Estimation Methodology total of ~53h (line 1064) represents the sum of high-end estimates and respects plan-authoring.md's sizing-only discipline (not a velocity contract). No issue.",
+    "T4.4b description (line 506) states 'each with its own L1/L2/L3 + AC mapping' which is satisfied; for completeness the L3 verification could optionally cross-reference the specific Phase 7 acceptance test (T7.1) rather than 'all 13 ACs above pass' phrasing. Cosmetic; not raised as a finding.",
+    "OI-PLAN-9 (line 1096) correctly references T7.10 as the resolution mechanism; the Open Item remains as cross-artifact-auditor surface, which is appropriate."
+  ],
+  "recommendations": [
+    "Plan v2 is ready for Gate 5 conditional approval to be lifted (the user-stated conditions in the Gate 5 approval are met).",
+    "Downstream test-phase-validator-author should consume the Phase 3 PV step 7 (git diff --name-only commit-range assertion) and the Phase 4 PV step 1 (verbatim grep) directly — both are explicit machine-checkable assertions requiring no derivation from other artifacts.",
+    "Downstream test-acceptance-author should map AC-FR-8-d to a test that asserts the post-merge git diff between phase-3-start-commit.txt and phase-3-end-commit.txt contains EXACTLY the 5 expected file pairs (the T3.8 assertion is reproducible).",
+    "Downstream finalize-deliverable-packager (Stage 13) should read working/feature/issue-capture-mechanism-r1/packager-input-notes.md as the canonical handoff for the I-AA-001 deviation — the Plan binds this expectation."
+  ],
+  "approval_recommendation": {
+    "verdict_label": "PASS",
+    "status_recommendation": "draft -> accepted (no further conditions; Gate 5 conditional approval can be lifted)",
+    "rationale": "Plan v2 absorbs all 4 important-severity findings from plan-v1 with concrete, machine-checkable assertions. No regressions detected. No new important+ issues. v1 substance preserved unchanged except where a finding required edit. Frontmatter version 1.0.0 -> 1.1.0, predecessor set, change_summary enumerates all 4 findings, total_tasks 47 -> 50. The Plan now carries direct, Plan-level enforcement of the F-003 silent-drop mitigation (4 reinforcing surfaces) and the AC-FR-8-d negative scope assertion (commit-range diff). T4.4 decomposition into T4.4a/b/c gives downstream test-phase-validator-author 3 focused Phase Validator anchors. T7.10 binds the I-AA-001 deferral to a deliverable that finalize-deliverable-packager reads. The 3 recommended-severity items from v1 are appropriately handled: I-DR-PL-005 declined with explicit rationale; I-DR-PL-006 resolved via bidirectional T0.2/T0.3 disambiguation; I-DR-PL-007 addressed in Estimation Methodology. Path to PASS (zero new important+ issues; all 4 v1 important findings resolved) met."
+  }
+}

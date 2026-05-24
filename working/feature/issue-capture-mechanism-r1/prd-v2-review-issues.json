@@ -1,0 +1,158 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "PRD",
+    "target_path": "working/feature/issue-capture-mechanism-r1/prd-v2.md",
+    "prior_doc_path": "working/feature/issue-capture-mechanism-r1/prd-v1.md",
+    "prior_review_issues_path": "working/feature/issue-capture-mechanism-r1/prd-v1-review-issues.json",
+    "feature_slug": "issue-capture-mechanism-r1",
+    "reviewer": "shared-document-reviewer",
+    "review_timestamp": "2026-05-23T18:45:00Z",
+    "stage": "Stage 2 PRD Re-Review (v2 polish-cycle following v1 PASS_WITH_RECOMMENDATIONS)",
+    "review_kind": "polish_cycle_followup"
+  },
+  "scores": {
+    "consistency": 97,
+    "completeness": 95,
+    "rule_compliance": 96,
+    "clarity": 94
+  },
+  "gate0": {
+    "status": "pass",
+    "checks": {
+      "contents_section_present": true,
+      "all_required_h2_sections_present": true,
+      "layer_scope_uses_9_layer_taxonomy": true,
+      "frontmatter_yaml_parses": true,
+      "frontmatter_universal_fields_present": true,
+      "frontmatter_prd_specific_fields_present": true,
+      "supersession_discipline_predecessor_present": true,
+      "supersession_discipline_change_summary_present": true,
+      "user_token_chain_present": true,
+      "doc_type_present": true,
+      "scope_class_present": true,
+      "ears_keyword_shall_intact": true
+    },
+    "missing_elements": []
+  },
+  "gate1": {
+    "status": "pass",
+    "ears_compliance": {
+      "total_acs_examined": 57,
+      "delta_vs_v1": "+1 (AC-NFR-1-c appended per I-DR-003 resolution)",
+      "acs_matching_canonical_patterns": 57,
+      "bare_prose_acs": 0,
+      "new_acs_in_v2": {
+        "AC-NFR-1-c": {
+          "text": "Where the per-layer Design phase finalizes hook implementation, the system shall ratify or replace the ~100ms threshold of AC-NFR-1-a with the design-time measured baseline; see U-11 in §Undetermined Items.",
+          "pattern": "Pattern 3 (Optional/Where) with shall",
+          "verdict": "canonical EARS shape; well-formed; isolates the deferral cleanly as I-DR-003 requested"
+        }
+      },
+      "rewritten_acs_in_v2": {
+        "AC-NFR-1-a": "Trailing 'precise threshold finalized at Design when the exact hook runtime is decided' qualifier removed; AC now reads as a clean Pattern 1 (Event/When) target. The deferral content moved to AC-NFR-1-c and U-11."
+      },
+      "verdict": "All 57 ACs canonical-pattern-compliant with shall. EARS discipline preserved across the polish cycle. No regressions."
+    },
+    "preservation_check": {
+      "fr_count_preserved": "15 FRs (FR-1..FR-15) — identical to v1",
+      "nfr_count_preserved": "9 NFRs (NFR-1..NFR-9) — identical to v1",
+      "layer_scope_preserved": "9-layer disposition table verbatim from v1",
+      "wont_have_preserved": "11 Won't-Have items identical to v1",
+      "undetermined_items_delta": "10 → 11 items (U-11 added per I-DR-003 resolution; U-9 amended to add cross-reference to NFR-7 inline note per I-DR-004 resolution)",
+      "product_policy_decisions_preserved": "12 rows identical to v1",
+      "success_criteria_preserved": "Quantitative + Qualitative + Operational + DX metrics tables identical to v1",
+      "technical_considerations_preserved": "Dependencies / Constraints / Assumptions (6) / Risks (7) identical to v1",
+      "rollout_plan_preserved": "identical to v1",
+      "verdict": "Zero substantive content regressions. All edits trace to one of the 6 v1 findings."
+    },
+    "frontmatter_check": {
+      "version_bumped": "1.0.0 → 1.1.0 (minor — polish-level, additive AC + additive Undetermined Item)",
+      "predecessor_set": "working/feature/issue-capture-mechanism-r1/prd-v1.md",
+      "change_summary_set": "Multi-line >- folded scalar; enumerates all 6 finding IDs (I-DR-001..I-DR-006) and explicitly affirms no substantive content changes outside those resolutions",
+      "intent_user_token_preserved": "approved-2026-05-23T16:51:00Z (unchanged — no new Gate-1 token needed for polish cycle)",
+      "verdict": "Supersession discipline correctly applied per KB-documentation-criteria/references/shared-conventions.md."
+    },
+    "cross_reference_consistency": {
+      "AC-NFR-1-c_to_U-11": "present and reciprocated",
+      "U-11_to_AC-NFR-1-c": "present and reciprocated",
+      "AC-NFR-7-a_to_U-9": "present (parenthetical '(destination to be finalized per U-9)')",
+      "U-9_to_NFR-7_inline_note": "present ('see NFR-7 inline note for I-DR-004')",
+      "NFR-7_inline_note_to_U-9": "present ('tracked as U-9 in §Undetermined Items')",
+      "Appendix_References_predecessor_pointer": "present — explicit Predecessor PRD line citing prd-v1.md superseded status",
+      "Appendix_References_v1_review_issues_pointer": "present — explicit pointer to prd-v1-review-issues.json",
+      "verdict": "All cross-section linkages are bidirectional and well-formed."
+    }
+  },
+  "verdict": {
+    "decision": "approved",
+    "summary": "PRD v2 substantively resolves all 6 recommended-severity findings from prd-v1-review-issues.json with no regressions and no new defects. EARS discipline preserved (57/57 ACs canonical-pattern-compliant with shall). Frontmatter applies supersession discipline correctly (version bump, predecessor, change_summary). Cross-section linkages are bidirectional. Score improvements (consistency 96→97, completeness 93→95, rule_compliance 95→96, clarity 90→94) reflect the targeted polish. Ready for Gate 2 (PRD Approval Gate) immediately as the user requested.",
+    "conditions": []
+  },
+  "issues": [],
+  "recommendations": [
+    "PRD v2 is ready to proceed to PRD Approval Gate (Gate 2 per ADR-0017).",
+    "The user's stated path — approve after the 6 fixes land — is fully satisfied: zero new important+ issues, all 6 findings substantively resolved.",
+    "Design-composer (Stage 5) inherits an unchanged ADR slate (U-10): 7 ADR-worthy decisions. Per FR-5 of the pipeline, design-composer is the exclusive ADR author.",
+    "test-acceptance-author (Stage 9) is now explicitly cued by the NFR-7 inline note that AC-NFR-7-a's destination wording defers to U-9 closure (resolution of I-DR-004 makes the cue load-bearing on the document itself, not only in the v1 review record).",
+    "test-acceptance-author should likewise treat AC-NFR-1-a's ~100ms as the load-bearing measurable target until AC-NFR-1-c / U-11 ratifies or replaces it at per-layer Design.",
+    "No further PRD-stage rework is recommended; further refinements (if any) belong at per-layer Design or Plan."
+  ],
+  "prior_context_check": {
+    "items_received": 6,
+    "items_extracted_from_prompt": 6,
+    "source": "working/feature/issue-capture-mechanism-r1/prd-v1-review-issues.json (all 6 findings were severity: recommended)",
+    "resolved": 6,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [
+      {
+        "id": "I-DR-001",
+        "status": "resolved",
+        "location": "PRD v2 §Stakeholders — §Stakeholder Inventory (lines 110-111)",
+        "evidence": "Explicit table-shape preamble added: 'The columns below extend the template's canonical 3-column (Role | Interest | Influence) shape with two additional columns... The mapping is: Stakeholder ≈ Role; Description fuses Role + Interest for compactness; Volume / Importance ≈ Influence. Primary Layer(s) and Relationship are additive context...' Matches I-DR-001 suggestion (b) verbatim."
+      },
+      {
+        "id": "I-DR-002",
+        "status": "resolved",
+        "location": "PRD v2 §Functional Requirements → §Could Have (P3) (line 374)",
+        "evidence": "P3 entry expanded from bare 'None for r1.' to 'None for r1 — no candidate capability is small enough to be \"nice to have but droppable\" relative to the load-bearing structural invariant. Every in-scope item either ships as part of the multi-primitive subsystem... or it defeats the non-pollution contract the feature exists to enforce. (Addresses I-DR-002 — adds parallel rationale to match P2.)' Matches I-DR-002 suggestion verbatim."
+      },
+      {
+        "id": "I-DR-003",
+        "status": "resolved",
+        "location": "PRD v2 §Non-Functional Requirements → §Performance / NFR-1 (lines 397-401) and §Undetermined Items / U-11 (line 575)",
+        "evidence": "AC-NFR-1-a rewritten to remove the trailing 'precise threshold finalized at Design when the exact hook runtime is decided' qualifier; the qualifier moved into a new AC-NFR-1-c ('Where the per-layer Design phase finalizes hook implementation, the system shall ratify or replace the ~100ms threshold of AC-NFR-1-a with the design-time measured baseline; see U-11...'). New Undetermined Item U-11 ('Hook latency threshold finalization') added with owner design-claude-code and cross-reference back to AC-NFR-1-c. Inline blockquote at NFR-1 explains the split. Matches I-DR-003 suggestion (a) verbatim and isolates the deferral so AC-NFR-1-a is now an unambiguously testable load-bearing target."
+      },
+      {
+        "id": "I-DR-004",
+        "status": "resolved",
+        "location": "PRD v2 §Non-Functional Requirements → §Observability / NFR-7 (line 435), AC-NFR-7-a (line 437), and §Undetermined Items / U-9 (line 573)",
+        "evidence": "Explicit '> Note for test-acceptance-author (addresses I-DR-004): AC-NFR-7-a's observability destination is intentionally placeholder-shaped at PRD time and is tracked as U-9...' blockquote added under NFR-7. AC-NFR-7-a appended with '(destination to be finalized per U-9)' parenthetical. U-9 expanded with cross-reference 'see NFR-7 inline note for I-DR-004'. The downstream cue is now load-bearing on the document itself (no longer only in the prior review record). Matches I-DR-004 suggestion (no PRD content change beyond an inline note) plus a small additional cross-reference enhancement to U-9."
+      },
+      {
+        "id": "I-DR-005",
+        "status": "resolved",
+        "location": "PRD v2 §User Stories → US-3 (line 166)",
+        "evidence": "Explicit cross-section preamble added: '**Acceptance Criteria (cross-section note — addresses I-DR-005):** This user story spans both functional behavior and security-NFR coverage; protection against accidental capture writes requires both the structural three-layer enforcement mechanism (FR-3) and the NFR-4 prompt-injection security posture. The ACs are therefore drawn from both layers — see ACs in both FR-3 and NFR-4.' Matches I-DR-005 suggestion (one-line preamble; here expanded to two sentences for clarity)."
+      },
+      {
+        "id": "I-DR-006",
+        "status": "resolved",
+        "location": "PRD v2 §Functional Requirements → FR-3 (line 295)",
+        "evidence": "Explicit '> User-confirmed-primitive note (addresses I-DR-006): Primitive choices (skill disable-model-invocation: true, agent-body AskUserQuestion step, PreToolUse hook on Task) are prescribed at requirement-level because user-confirmed at Intent Clarification (Gate 1, 2026-05-23T16:51:00Z — see Intent Clarification §\"What's in scope\" and §\"Clarified Intent\" which name all three layers as scope-bearing). This is the PRD-authoring discipline's allowed exception (\"user explicitly requested specific implementation\"). Design-composer retains authority over implementation specifics (hook stdin/stdout schema, AskUserQuestion prompt text, agent-body sequencing); see U-1, U-2 in §Undetermined Items.' blockquote added. Matches I-DR-006 suggestion verbatim with explicit Intent Clarification Gate 1 timestamp citation."
+      }
+    ]
+  },
+  "regression_check": {
+    "fr_diff": "FR-1..FR-15 bodies and ACs identical to v1 except FR-3 gained an inline blockquote (I-DR-006 resolution) — no AC text changed; descriptive paragraph unchanged.",
+    "nfr_diff": "NFR-1..NFR-9 identical to v1 except NFR-1 gained an inline blockquote and AC-NFR-1-c (I-DR-003 resolution), and NFR-7 gained an inline blockquote with AC-NFR-7-a parenthetical (I-DR-004 resolution).",
+    "us_diff": "US-1..US-6 identical to v1 except US-3 gained a cross-section preamble before its AC list (I-DR-005 resolution).",
+    "stakeholders_diff": "Inventory table identical to v1 except for the preceding table-shape note (I-DR-001 resolution).",
+    "p3_diff": "P3 line expanded with rationale (I-DR-002 resolution).",
+    "u_items_diff": "U-1..U-10 preserved; U-9 amended with cross-reference (I-DR-004 resolution); U-11 added (I-DR-003 resolution).",
+    "wont_have_diff": "11 items identical to v1.",
+    "appendix_diff": "References section gained two additional pointers: Predecessor PRD (prd-v1.md superseded) and v1 Review issues (prd-v1-review-issues.json). Glossary identical to v1.",
+    "verdict": "Zero unintended content drift. All edits trace to a v1 finding with explicit attribution in the surrounding prose."
+  }
+}

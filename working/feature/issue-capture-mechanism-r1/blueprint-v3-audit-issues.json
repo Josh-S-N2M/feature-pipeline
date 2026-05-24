@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-issue-capture-mechanism-r1-round2",
+  "audited_artifact": "blueprint-v3.md",
+  "predecessor_artifact": "blueprint-v2.md",
+  "prior_audit": "architecture-audit-issues.json (cycle-2 audit of blueprint-v2.md)",
+  "dispatch_input": "dispatch-r2.json (cycle-2 design-composer dispatch + I-AA-001 user-escalation; user-accepted Option A)",
+  "reconciliation_log": "reconciliation-log-r2.md",
+  "audited_at": "2026-05-24T00:30:00Z",
+  "cycle": "2 of 4",
+  "audit_posture": "convergence-focused re-verification per ADR-0017; not a full re-audit",
+  "code_graph_used": "direct-read-grep-glob (no GitNexus and no codebase-memory-mcp available; consistent with prior audit)",
+  "checks_performed": [
+    "prior_context_resolution_check (5 prior items: I-AA-001 user-accepted-deviation documentation; I-AA-002 MAJOR; I-AA-003/004/005 MINORs)",
+    "regression_check (substantive v2 content preserved in v3 except where finding required edit)",
+    "new_defect_check (changes did not introduce new contradictions or break MADR conformance)",
+    "i_aa_001_user_acceptance_documentation_check (per dispatch Option A: §References ADR placement note + cross-cuts to Background, Agreement Checklist, Risks, Inherited ADRs; no file moves; no superseding ADR)",
+    "filesystem_state_verification (7 ADRs remain at working/feature/<slug>/adrs/; not moved to /adrs/)"
+  ],
+  "scope_acknowledged": {
+    "convergence_focused": "Per ADR-0017 convergence rules, this re-audit is scoped to verifying the 4 reconciled findings + I-AA-001 user-acceptance documentation; not a full re-audit of all CoVe/blast-radius/brief-honor lenses",
+    "audit_positive_findings_carried_forward": "I-AA-007..I-AA-010 (audit-positive INFO) from cycle-2 are re-verified by direct preservation check (no substantive content removed from v2 → v3); not re-audited substantively",
+    "i_aa_006_deferred_carry_forward": "I-AA-006 (Blueprint frontmatter doc_type omission) remains pre-existing template drift; deferred per the cycle-2 auditor's own recommended_resolution"
+  },
+  "prior_context_check": {
+    "items_received": 5,
+    "resolved": 4,
+    "partially_resolved": 1,
+    "unresolved": 0,
+    "items": [
+      {
+        "id": "I-AA-001",
+        "status": "resolved",
+        "location": "blueprint-v3.md §References > ADR placement note (lines 1404-1422); §Cross-References > Inherited ADRs (line 1327); §Background > Prerequisite ADRs (line 194); §Agreement Checklist > Non-Scope (line 238); §Risks table (line 1314)",
+        "evidence": "User-accepted Option A (Gate 4 escalation) is documented across five Blueprint sections with consistent rationale: (a) §References ADR placement note (~18 lines) records the user disposition with explicit rationale citing PRD §Won't-Have, cross-link to Issues/adr-placement-rootcause/analysis.md (the captured project-wide drift tracker), and explicit statement that no file moves and no superseding ADR are performed; (b) §Cross-References > Inherited ADRs row for ADR-0036 cites the user disposition; (c) §Background > Prerequisite ADRs row for ADR-0036 cites the user disposition; (d) §Agreement Checklist > Non-Scope row records the deviation as out-of-scope; (e) §Risks table includes a row tagged 'ADR-placement drift across 7 new ADRs (v3 user-accepted deviation per I-AA-001)' with probability 'Accepted'. Filesystem verification confirms no file moves: 7 ADRs remain at working/feature/issue-capture-mechanism-r1/adrs/; /adrs/ADR-0044 through ADR-0050 still absent. No superseding ADR authored in this cycle. Honors Option A exactly per the dispatch and the reconciliation log."
+      },
+      {
+        "id": "I-AA-002",
+        "status": "resolved",
+        "location": "blueprint-v3.md §Backend Design §Service/Module Layout (line 891); §Corrected Pseudocode Reference (lines 921-997); §Contract Definitions (ISSUE_NON_VALIDATED_PATH_PREFIXES at lines 687-691); §Field Propagation Map (new row at line 761); §Interface Change Matrix (new row at line 481); §Acceptance Criteria > FR-7 > AC-BE-10 (line 351); §Implementation Plan > Phase 2/4/6 (lines 1050, 1061, 1069); §Verification Strategy > NFR-8 + table (lines 1179, 1194); §Test Boundaries (lines 1141, 1153, 1164); §Risks (line 1313); §Error Handling (line 1014)",
+        "evidence": "Path-prefix skip mechanism is now specified canonically and consistently across all relevant Blueprint sections. (a) New module-level constants list ISSUE_NON_VALIDATED_PATH_PREFIXES = ('Issues/*/evidence/', 'Issues/*/updates/') declared in §Contract Definitions + §Backend Design §Service/Module Layout. (b) 3-line early-return guard at the head of validate_pipeline_artifact added in §Corrected Pseudocode Reference (line 938-942) BEFORE the existing doc_type_category dispatch (preserves AC-BE-8). (c) New AC-BE-10 codifies the behavior testably: 'When validator processes any file under Issues/<topic-slug>/evidence/ or Issues/<topic-slug>/updates/, return empty list with zero findings regardless of frontmatter shape.' (d) New Field Propagation Map row records the skipped path family. (e) Interface Change Matrix new row records the outer-dispatch additive prefix. (f) §Implementation Plan Phase 2 explicitly references the constants list + early-return; Phase 6 verification step covers AC-BE-10. (g) §Verification Strategy NFR-8 expansion: positive control (a non-Issues file with doc_type-not-in-known-category continues to produce minor finding) verifies non-interference; AC-BE-10 fixture verifies positive case. (h) Mechanism choice (outer-dispatch early-return rather than unknown-category branch) is consistent with the dispatch feedback_brief recommendation. (i) ADR-0044 §Decision §4 commitment is now fully implemented by FR-7 (per Blueprint claim). All four ratchet-points (Backend Design §Service/Module Layout; §Corrected Pseudocode Reference; §Data Contract; §Field Propagation Map) per the dispatch's required changes are present."
+      },
+      {
+        "id": "I-AA-003",
+        "status": "resolved",
+        "location": "blueprint-v3.md §Interface Change Matrix line 480 (first dispatcher row)",
+        "evidence": "Stale 'or'-wording replaced with the single chosen mechanism. v3 line 480 now reads: 'Extends doc_type_category (lines 147-154) to return \"issue\" when doc_type ∈ ISSUE_DOC_TYPES; adds an elif category == \"issue\" branch inside validate_pipeline_artifact. (v3 per I-AA-003: single chosen mechanism — removes the v2 or-wording ambiguity that left two options open; the alternative fourth-elif-on-doc_type was the rejected option.)' The false-options ambiguity is removed. The phrasing aligns with Backend Design §Service/Module Layout line 893 ('Mechanism for dispatch (per I-DR-BE-005 precision): extend doc_type_category... then add an elif category == \"issue\" branch'). No remaining ambiguity at the Interface Change Matrix."
+      },
+      {
+        "id": "I-AA-004",
+        "status": "partially_resolved",
+        "location": "ADR-0047-three-layer-enforcement.md frontmatter applies_to line 14 (resolved); ADR-0047 prose at lines 60, 80, 126 (still says 'four project firsts')",
+        "evidence": "ADR-0047 frontmatter line 14 (applies_to) is corrected from 'four project firsts' to 'five project firsts' with the 5-state lifecycle vocabulary item enumerated verbatim: 'the five project firsts this run introduces (disable-model-invocation skill, .claude/hooks/ directory, settings.json hooks block, runtime Read/Glob KB-load pattern for sub-agents, 5-state lifecycle vocabulary distinct from ADR-0008'\\''s 4-state intra-pipeline ledger and ADR-0032'\\''s 3-tier per-doc-type vocabulary)'. This now aligns with ADR-0047 §Decision §5 (line 73) and Blueprint complexity_rationale (line 147-149). The dispatch was explicitly scoped to 'Amend line 14' (single-line frontmatter edit) per the feedback_brief.",
+        "remaining": "ADR-0047 prose retains three remaining 'four project firsts' phrasings: Context line 60 ('This run introduces four project firsts (codebase-analysis F-001, F-002, F-003)...'), Decision Details Why-now line 80 ('The four project firsts arrive together...'), and Options Considered Option 3 cons line 126 ('Introduces four project firsts (no in-project precedent)...'). These were OUTSIDE the dispatch's scoped edit (dispatch said 'Amend line 14'). The frontmatter applies_to and Decision §5 are now five-firsts-consistent, but the ADR's internal prose is not. This is a new MINOR inconsistency within ADR-0047 itself (same kind of issue I-AA-004 originally flagged: four-vs-five mismatch within one ADR file).",
+        "remaining_severity_recommendation": "MINOR — same severity as the original I-AA-004 finding because it is the same kind of internal inconsistency within ADR-0047 (now between frontmatter applies_to + Decision §5 [five] and Context + Decision Details + Options Considered [four]); see new issue I-AA-011 below"
+      },
+      {
+        "id": "I-AA-005",
+        "status": "resolved",
+        "location": "blueprint-v3.md §Acceptance Criteria line 304 (Note paragraph)",
+        "evidence": "Citation corrected from 'AC-FR-11-a/b/c' to 'AC-FR-11-a/b'. The corrected note reads: '**Note (resolving I-DR-BP-006 recommended; corrected per I-AA-005):** ... **FR-11** (intake-intent-clarifier Phase 0 detection branch per D-14 — AC-FR-11-a/b)...'. Direct grep of blueprint-v3 confirms no 'AC-FR-11-c' citation remains in any AC-enumeration context (line 54 in change_summary and line 1347 in §Cross-References > Resolved-findings table reference the prior incorrect citation in past tense as the original error; the canonical AC enumeration at line 304 cites only AC-FR-11-a/b). Aligns with PRD-v2 which defines only AC-FR-11-a and AC-FR-11-b."
+      }
+    ]
+  },
+  "issues": [
+    {
+      "id": "I-AA-011",
+      "severity": "MINOR",
+      "category": "internal_adr_inconsistency_residual_four_vs_five",
+      "lens": "brief_honor",
+      "summary": "ADR-0047 prose still says 'four project firsts' in three places (Context line 60; Decision Details Why-now line 80; Options Considered Option 3 cons line 126) — incomplete propagation of the cycle-2 I-AA-004 fix into the ADR's body prose; same kind of internal-ADR inconsistency I-AA-004 originally flagged",
+      "description": "Cycle-2's I-AA-004 dispatch scoped the ADR-0047 fix to 'Amend line 14' (frontmatter applies_to). Line 14 is now correctly amended to enumerate FIVE project firsts. ADR-0047 §Decision §5 (line 73) also already enumerates FIVE firsts. However, the ADR's prose at three other locations still says FOUR firsts: (a) Context line 60: 'This run introduces four project firsts (codebase-analysis F-001, F-002, F-003): the first SKILL.md files declaring disable-model-invocation: true, the first .claude/hooks/ directory, the first hooks block in settings.json, and the first sub-agent that loads its KB at runtime via Read/Glob'; (b) Decision Details Why-now line 80: 'The four project firsts arrive together because the layers are interdependent'; (c) Options Considered Option 3 (Selected) cons line 126: 'Introduces four project firsts (no in-project precedent)'. This creates a new internal inconsistency within ADR-0047 itself: frontmatter applies_to says FIVE, Decision §5 says FIVE, but Context + Decision Details + Options Considered all say FOUR. This is the same kind of internal-ADR four-vs-five inconsistency that I-AA-004 originally flagged — just at different lines. The dispatch's narrow scope ('Amend line 14') technically resolved I-AA-004 at the cited line but the propagation through the rest of the ADR's prose was not in the dispatch's MUST-apply set, so design-composer did not edit those lines.",
+      "evidence": [
+        {"artifact": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md", "section": "Context line 60", "excerpt": "This run introduces four project firsts (codebase-analysis F-001, F-002, F-003): the first SKILL.md files declaring `disable-model-invocation: true`, the first `.claude/hooks/` directory, the first `hooks` block in `settings.json`, and the first sub-agent that loads its KB at runtime via Read/Glob"},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md", "section": "Decision Details > Why now (line 80)", "excerpt": "The four project firsts arrive together because the layers are interdependent"},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md", "section": "Options Considered > Option 3 (Selected) > Cons (line 126)", "excerpt": "Introduces four project firsts (no in-project precedent)"},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md", "section": "Frontmatter applies_to (line 14)", "excerpt": "the five project firsts this run introduces (..., 5-state lifecycle vocabulary distinct from ADR-0008's 4-state intra-pipeline ledger and ADR-0032's 3-tier per-doc-type vocabulary)"},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md", "section": "Decision §5 (line 73)", "excerpt": "The five firsts captured: first disable-model-invocation: true skills; first .claude/hooks/ directory; first hooks block in settings.json; first runtime Read/Glob KB-load sub-agent; first 5-state lifecycle vocabulary (per ADR-0050)."}
+      ],
+      "recommended_resolution": "Amend three prose locations in ADR-0047 to align with the now-five firsts in frontmatter applies_to + Decision §5: (a) line 60: change 'This run introduces four project firsts...' to 'This run introduces five project firsts...' and add the 5-state lifecycle vocabulary item to the enumeration; (b) line 80: change 'The four project firsts arrive together...' to 'The five project firsts arrive together...'; (c) line 126: change 'Introduces four project firsts (no in-project precedent)...' to 'Introduces five project firsts (no in-project precedent)...'. All three are single-word + enumeration-item edits. Per FR-5, only design-composer authors/amends ADRs; finalize-reconciler should dispatch this to design-composer if pursued. Alternative (deferral): MINOR severity could be deferred to acceptance with rationale that the dispatch's scoped edit ('line 14') honored the dispatch's literal scope and the propagation cost is one more cycle (cycle 3 of 4) for a single ADR's internal prose alignment. Recommendation: defer to acceptance OR fold into the same cycle-3 dispatch if any other revision is needed. Status: MINOR is below the verdict threshold for `fail`; this finding alone does not block convergence."
+    },
+    {
+      "id": "I-AA-012",
+      "severity": "INFO",
+      "category": "audit_observation_user_acceptance_documentation_completeness",
+      "lens": "brief_honor",
+      "summary": "I-AA-001 user-accepted deviation (Option A) is documented thoroughly across five Blueprint sections with consistent rationale; honors the dispatch's no-file-moves + no-superseding-ADR requirements exactly",
+      "description": "Brief-honor verification of the I-AA-001 user-acceptance documentation: (a) §References > ADR placement note (lines 1404-1422) provides the canonical disposition with full rationale (PRD §Won't-Have citation; project-wide drift cross-link; deliverable-packager handling; explicit no-superseding-ADR statement); (b) §Cross-References > Inherited ADRs (line 1327) cites the user disposition with cross-link; (c) §Background > Prerequisite ADRs (line 194) cites the user disposition; (d) §Agreement Checklist > Non-Scope (line 238) records the deviation as out-of-scope; (e) §Risks table (line 1314) includes a row with probability 'Accepted'. The five sections are mutually consistent and triangulate to the same disposition: 7 ADRs remain at working/feature/<slug>/adrs/; no file moves; no superseding ADR; future migration is the separate drift-remediation feature's responsibility. Filesystem state confirms: /adrs/ADR-0044 through ADR-0050 still absent; working/feature/issue-capture-mechanism-r1/adrs/ still contains all 7 ADRs. The documentation honors Option A of the I-AA-001 escalation exactly per the dispatch.",
+      "evidence": [
+        {"artifact": "blueprint-v3.md", "section": "§References > ADR placement note (lines 1404-1422)", "excerpt": "User disposition. The user accepted Option A of the I-AA-001 escalation (Gate 4 user decision): the 7 new ADRs (ADR-0044..ADR-0050) remain at working/feature/issue-capture-mechanism-r1/adrs/ for this run."},
+        {"artifact": "blueprint-v3.md", "section": "§Cross-References > Inherited ADRs (line 1327)", "excerpt": "ADR-0036 (single-location ADR placement) — applies; the 7 new ADRs land per current operational convention per the user-accepted Option A resolution of I-AA-001"},
+        {"artifact": "blueprint-v3.md", "section": "§Background > Prerequisite ADRs (line 194)", "excerpt": "The user accepted a documented deviation in this run; see §References > ADR placement note for the user disposition (per I-AA-001 reconciliation)"},
+        {"artifact": "blueprint-v3.md", "section": "§Agreement Checklist > Non-Scope (line 238)", "excerpt": "No resolution of the ADR-placement drift for the 7 new ADRs (out of scope per PRD §Won't-Have; user accepted Option A in the Gate 4 escalation of I-AA-001"},
+        {"artifact": "blueprint-v3.md", "section": "§Risks table (line 1314)", "excerpt": "ADR-placement drift across 7 new ADRs (v3 user-accepted deviation per I-AA-001) ... Probability: Accepted ... User explicitly accepted Option A in the Gate 4 escalation"},
+        {"artifact": "filesystem state at audit time", "section": "ls /workspaces/feature-pipeline/adrs/ADR-{0044..0050}*", "excerpt": "No such file or directory — confirms no file moves; ADRs remain at working/feature/<slug>/adrs/"}
+      ],
+      "recommended_resolution": "No action required. The user-acceptance documentation is thorough, consistent, and honors Option A exactly. Forward to Plan Authoring (Stage 9) preserves the documentation; deliverable-packager (Stage 13) follows current operational behavior per the disposition."
+    },
+    {
+      "id": "I-AA-013",
+      "severity": "INFO",
+      "category": "audit_observation_regression_check",
+      "lens": "brief_honor",
+      "summary": "No regressions in v3: substantive content of v2 preserved except where finding required edit; v2's INFO findings (I-AA-006..I-AA-010 audit-positives) remain valid in v3",
+      "description": "Direct comparison check between v2 and v3: (a) §Mechanism Designs (D-01..D-14) preserved verbatim from v2 — all 14 decision frames remain addressed (re-validates I-AA-009); (b) §Resolved Q-CC-N / Q-BE-N + §Unresolved Items deferral table preserved verbatim from v2 — Q-CC-1..5 + Q-BE-1..5 + U-1/2/5/7/11 + OI-1/2 still all dispositioned (re-validates I-AA-010); (c) §Project Precedents Established preserved + 5-precedent enumeration preserved (re-validates I-DR-BP-002 cycle-1 fix); (d) Component 3 issue-capture-author frontmatter (skills: ABSENT) and §Sub-Agent Patterns (NEVER Write before AskUserQuestion) preserved (re-validates I-AA-007 F-003 mitigation rigor); (e) AC-FR-13-a/b verbatim grep commands preserved (re-validates I-AA-008 pipeline-isolation invariant); (f) blueprint-v3 frontmatter still omits doc_type (re-validates I-AA-006 carry-forward as pre-existing template drift). All cycle-2 audit-positive observations (I-AA-007/008/009/010) carry through unchanged in v3. The v3 edits are additive (new constants, new AC, new Field Propagation Map row, new Risks row, new Test Boundaries row, new Implementation Plan phase notes, new §References ADR placement note) and do not remove or contradict any pre-existing v2 content.",
+      "evidence": [
+        {"artifact": "blueprint-v3.md", "section": "§Mechanism Designs (D-01..D-14)", "excerpt": "Identical to v2; all 14 frames addressed (I-AA-009 carry-forward)"},
+        {"artifact": "blueprint-v3.md", "section": "§Resolved Q-CC-N / Q-BE-N items (10 rows)", "excerpt": "Identical to v2; all 10 layer-design open items dispositioned (I-AA-010 carry-forward)"},
+        {"artifact": "blueprint-v3.md", "section": "Component 3 + §Sub-Agent Patterns (Hard constraints)", "excerpt": "skills: ABSENT; NEVER Write before AskUserQuestion — preserved from v2 (I-AA-007 carry-forward)"},
+        {"artifact": "blueprint-v3.md", "section": "§Acceptance Criteria > FR-13 > AC-FR-13-a/b", "excerpt": "Verbatim grep commands preserved from v2 (I-AA-008 carry-forward)"},
+        {"artifact": "blueprint-v3.md", "section": "Frontmatter (lines 1-79)", "excerpt": "doc_type field absent (I-AA-006 carry-forward as pre-existing template drift)"}
+      ],
+      "recommended_resolution": "No action required. Regression check passes; no audit-positive observation from cycle 2 has been invalidated by the cycle-2 reconciliation edits."
+    }
+  ],
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 1,
+    "INFO": 2
+  },
+  "convergence_signal": {
+    "issues_received_from_prior_cycle": 5,
+    "issues_resolved_in_v3": 4,
+    "issues_partially_resolved_in_v3": 1,
+    "issues_unresolved_in_v3": 0,
+    "new_issues_surfaced_in_this_audit": 1,
+    "new_issue_severity": "MINOR",
+    "new_issue_type": "incomplete_propagation_of_cycle_2_fix_into_ADR-0047_prose",
+    "verdict_trend": "strong_convergence",
+    "rationale": "Cycle 1 produced 10 reviewer findings; cycle 2's audit on v2 produced 2 MAJOR + 3 MINOR + 5 INFO; cycle 2's reconciliation + audit on v3 produces 0 BLOCKER + 0 MAJOR + 1 MINOR + 2 INFO. The single MINOR (I-AA-011) is the same kind of internal-ADR four-vs-five inconsistency I-AA-004 originally flagged, just at three other lines in the same ADR (Context, Decision Details Why-now, Options Considered Option 3 cons) that were outside the dispatch's explicitly scoped 'Amend line 14' instruction. This is incomplete propagation of the cycle-2 fix, not strict persistence. Severity trend: MAJOR x 2 → MINOR x 1. No BLOCKER, no MAJOR, no contradiction with synthesis or inherited ADRs."
+  },
+  "verdict": "pass",
+  "verdict_rationale": "No BLOCKER. No MAJOR. One MINOR (I-AA-011 incomplete propagation of cycle-2 I-AA-004 fix into ADR-0047 prose at three additional lines outside the dispatch's scoped 'Amend line 14' edit). Two INFO (I-AA-012 audit-positive on I-AA-001 user-acceptance documentation completeness; I-AA-013 audit-positive on regression check). Per severity rules in KB-review-disciplines/references/severity-taxonomy.md: 'No critical; only recommended → Consistency > 90 AND Completeness > 85 AND no rule violations → APPROVED.' Generalizing to this auditor's BLOCKER/MAJOR/MINOR/INFO mapping: no BLOCKER and no MAJOR → no `fail`; only one MINOR (a residual prose inconsistency within a single ADR's body, mechanical to fix, severity-bounded to 'recommended' equivalent) → verdict can be `pass` rather than `conditional_pass`. The MINOR finding alone is below the verdict threshold for `fail` per the prior cycle's severity rule (BLOCKER → fail; MAJOR without BLOCKER → conditional_pass; only MINOR/INFO → pass). I-AA-011 is mechanical, localized to a single ADR file (ADR-0047), and is the same class of issue I-AA-004 — the propagation is incomplete but not divergent. Recommended: advance to Plan Authoring (Stage 9). I-AA-011 may be folded into a separate ADR-0047-only revision dispatch if the user wants ADR-0047 internally consistent before Gate 4 ratification, or deferred to acceptance with rationale (the ADR's frontmatter applies_to + Decision §5 — the load-bearing fields for the audit-trail — are five-firsts-consistent; only narrative prose is four-firsts). Convergence signal is strong (4/5 prior items fully resolved; 1/5 partially resolved with a single new MINOR that is a same-kind propagation, not divergence)."
+}

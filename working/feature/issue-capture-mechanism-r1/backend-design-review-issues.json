@@ -1,0 +1,164 @@
+{
+  "metadata": {
+    "review_mode": "composite",
+    "doc_type": "DesignDoc",
+    "layer": "backend",
+    "target_path": "working/feature/issue-capture-mechanism-r1/backend-design.md",
+    "feature_slug": "issue-capture-mechanism-r1",
+    "reviewed_at": "2026-05-23T20:45:00Z",
+    "reviewer": "shared-document-reviewer",
+    "invocation_context": "Stage 6 / Invocation 3 per ADR-0017 — Backend per-layer Design review (sibling to design-cc)"
+  },
+  "scores": {
+    "consistency": 88,
+    "completeness": 86,
+    "rule_compliance": 90,
+    "clarity": 92
+  },
+  "gate0": {
+    "status": "pass",
+    "missing_elements": [],
+    "checks_performed": [
+      "Frontmatter present with required fields (id, doc_type, version, status, feature_slug, derived_from, generated, generated_by)",
+      "doc_type 'backend-design' matches ANALYSIS_DOC_TYPE_SUFFIXES (-design) — vocab analysis/log 3-state {draft|complete|superseded}; status:draft VALID",
+      "Layer Responsibility Scope present",
+      "Service Granularity / Module Layout present",
+      "Approach Decision documented (D-10) with options table + chosen rationale",
+      "Error Model section present",
+      "Concurrency Model section present",
+      "External Calls section present (N/A documented)",
+      "Auth/Authz section present (N/A documented)",
+      "Observability section present",
+      "Patterns Chosen section present",
+      "EARS-format Acceptance Criteria contribution present (AC-BE-1..AC-BE-9)",
+      "Dependencies on Other Layers section present (lists 7 design-cc dependencies)",
+      "Architectural Questions for Composer present (Q-BE-1..Q-BE-5)",
+      "Open Items section present",
+      "References section present with comprehensive cross-references"
+    ],
+    "notes": "All KB-backend-design template required sections present. Backend-relevant principle applicability (2/3/4/6/7/8 vs. N/A) explicitly addressed. Fact Disposition Table not applicable — the codebase-analysis.json (schema 1.1.0) does not carry a focusAreas field; the Fact Disposition completeness check is conditional on focusAreas presence."
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "decision_short": "PASS_WITH_RECOMMENDATIONS",
+    "conditions": [
+      "I-DR-BE-001: Remove or replace the 'field_present' helper reference in the §5 pseudocode (the function does NOT exist in the validator; only 'in fm' is used). Either (a) replace pseudocode 'field_present(fm, field)' with 'field in fm' to match the actual codebase idiom; or (b) declare 'field_present' as a NEW helper to be introduced by the extension. The current text implies it is pre-existing, which is a fabricated-API risk per KB-general-coding-principles Dimension 4.",
+      "I-DR-BE-002: Correct the codebase citation that 'field_present exists in the existing file per VE-002 and lines 145-155'. VE-002 documents make_finding only; lines 145-155 contain the closing portion of parse_frontmatter (not field_present). Either remove the line citation or replace with an accurate one."
+    ],
+    "rationale": "Gate 0 passes cleanly. Gate 1 quality is strong overall — consistency with PRD/synthesis/codebase-analysis is high, NFR-8 backward-compatibility treatment is rigorous (pre/post empirical regression corpus baseline-capture procedure is explicit and well-grounded), the 4th-category dispatch decision is well-rationalized against two rejected alternatives, EARS ACs are testable. Two narrow but concrete issues attach to a single illustrative code block in §5 (fabricated/misattributed helper reference). Neither blocks acceptance — the validator dispatch design is correct independent of the helper-name choice — but they should be corrected before lock so plan-author and the implementer do not import the fabricated reference into the implementation step. No critical issues; no Gate 1 score below 80.",
+    "approved_for_blueprint_composition": true
+  },
+  "issues": [
+    {
+      "id": "I-DR-BE-001",
+      "severity": "important",
+      "category": "feasibility",
+      "subcategory": "fabricated-api-detection",
+      "location": "backend-design.md §5 — pseudocode at lines 130 and 147 (calls `field_present(fm, field)` and treats it as pre-existing)",
+      "description": "The pseudocode in §5 calls `field_present(fm, field)` as if it were an existing helper in `validate_pipeline_frontmatter.py`. Verification against the actual file shows no such function exists. The validator uses bare `in` checks throughout (e.g., line 315: `if status == \"superseded\" and \"superseded_by\" not in fm`). The design's §5 explanatory footnote also claims 'field_present exists in the existing file per VE-002 and lines 145-155' — but VE-002 is the make_finding shape (not field_present), and lines 145-155 contain the tail of parse_frontmatter.",
+      "evidence": "grep -n 'def ' .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py returns only: parse_frontmatter, doc_type_category, make_finding, validate_agent_frontmatter, validate_pipeline_artifact, validate_skill_frontmatter, validate_file, parse_args, main. No field_present.",
+      "why_important": "KB-general-coding-principles Dimension 4 (no fabricated APIs) — even in an 'illustrative' sample, a helper named as if it exists in the project sets up the implementer to import a non-existent dependency. The footnote acknowledges this is illustrative pseudocode but explicitly justifies it by claiming the helper exists, which is incorrect.",
+      "suggestion": "Either (a) replace `field_present(fm, field)` with `field in fm` (the actual idiom — keeps the sample faithful to the existing validator and removes the fabricated reference), OR (b) declare `field_present` as a NEW helper this extension introduces and add a one-line note in §5 stating 'helper introduced by this extension' (legitimate if there is a compelling reason, e.g., distinguishing presence-with-empty-value from absence). Option (a) is recommended — the existing validator gets along without such a helper.",
+      "blocking": false
+    },
+    {
+      "id": "I-DR-BE-002",
+      "severity": "recommended",
+      "category": "consistency",
+      "subcategory": "citation-accuracy",
+      "location": "backend-design.md §5 (footnote after pseudocode, around line 158): 'no fabricated APIs — `make_finding` and `field_present` exist in the existing file per VE-002 and lines 145-155'",
+      "description": "Even if I-DR-BE-001 is resolved via Option (a) and the field_present reference is removed, the citation linking 'lines 145-155' to a helper-existence claim should be corrected. VE-002 (in codebase-analysis.json) documents only the make_finding shape at validator lines 157-167. Lines 145-155 of the validator are the tail of parse_frontmatter, not a helper definition site.",
+      "evidence": "Read of validate_pipeline_frontmatter.py lines 144-167: line 144 is the closing of parse_frontmatter; lines 147-154 are doc_type_category; lines 157-167 are make_finding (matches VE-002).",
+      "suggestion": "Update the footnote citation to: 'no fabricated APIs — `make_finding` exists per VE-002 at lines 157-167; companion-field presence is checked with `in fm` per the existing pattern at lines 314-323 (the superseded_by enforcement)'.",
+      "blocking": false
+    },
+    {
+      "id": "I-DR-BE-003",
+      "severity": "recommended",
+      "category": "completeness",
+      "subcategory": "verification-strategy",
+      "location": "backend-design.md §7 (Backward Compatibility and Regression-Test Corpus)",
+      "description": "§7 specifies the regression-corpus layers (L1/L2/L3/L4) and the pre/post diff procedure, satisfying the reviewer's 'Output comparison defined when design replaces/modifies existing behavior' check. However, the corpus enumeration commits to '27 files minimum' for L2 and '27 synthetic fixtures minimum' for L3 without specifying how the count is verified — and Q-BE-5 explicitly defers the L2 storage decision (checked-in vs. snapshot-of-findings-only) to composer + plan-author. If composer adopts Q-BE-5 Option (c) (findings-only snapshot), the L2 fixture count is moot — what matters is the findings-JSON shape. This is consistent and not a defect, but plan-author and test-acceptance-author may benefit from a one-line note in §7 reconciling 'minimum 27 L2 files' with the Q-BE-5 Option (c) alternative.",
+      "evidence": "§7 L2 row: '27 files minimum'; §16 Q-BE-5: 'capture findings JSON only (not the source files)'.",
+      "suggestion": "Add a one-line note to §7's L2 row: 'If Q-BE-5 Option (c) is adopted (findings-JSON snapshot), the 27-file minimum applies only to the corpus the snapshot was captured against; the artifact-of-record becomes the findings JSON, not the source files.' This avoids implementer confusion at plan-execution time.",
+      "blocking": false
+    },
+    {
+      "id": "I-DR-BE-004",
+      "severity": "recommended",
+      "category": "consistency",
+      "subcategory": "minor-line-citation-drift",
+      "location": "backend-design.md §1: '422-line file' and §3: 'lines 365-371' (and similar)",
+      "description": "The design cites the validator as '422 lines' (§2) but the actual file is 421 lines as of HEAD cf48e5e. The 'lines 365-371' citation for the outer dispatch is correct. The 'lines 314-323' citation for the ADR-0005 superseded_by enforcement is correct. The 'lines 145-155' citation (see I-DR-BE-002) is incorrect. These minor drifts do not affect the design's correctness but are worth tightening.",
+      "evidence": "wc -l validate_pipeline_frontmatter.py → 421. Line 365-371 contains the dispatch (verified). Line 314-323 contains the superseded_by enforcement (verified). Line 145-155 does NOT contain a helper definition (verified).",
+      "suggestion": "Replace '422-line file' with '421-line file as of cf48e5e' (or remove the line count, which is not load-bearing). Other line citations: verify lines 314-323 (correct), 365-371 (correct), 157-167 for make_finding (per VE-002).",
+      "blocking": false
+    },
+    {
+      "id": "I-DR-BE-005",
+      "severity": "recommended",
+      "category": "completeness",
+      "subcategory": "dispatch-mechanism-precision",
+      "location": "backend-design.md §2 paragraph 'One new branch inside `validate_pipeline_artifact` that delegates ... Branch order: GATED → ANALYSIS → ADR → ISSUE → unknown'",
+      "description": "The current validator's dispatch inside validate_pipeline_artifact does not use a sequential elif chain at the same level — it uses `doc_type_category(doc_type)` returning one of {'gated', 'adr', 'analysis', 'unknown'} and then branches on the returned category. The cleanest extension is to add 'issue' as a fourth return value of doc_type_category (when doc_type ∈ ISSUE_DOC_TYPES), then add a fourth `elif category == 'issue'` branch inside validate_pipeline_artifact. The design's 'Branch order' phrasing is consistent with this mechanism but reads as if a new elif chain is being introduced. A one-line clarification would tighten alignment with the existing mechanism.",
+      "evidence": "validate_pipeline_frontmatter.py lines 147-154 (doc_type_category function); lines 274-312 (validate_pipeline_artifact uses category branching).",
+      "suggestion": "Refine §2 item 4 to: 'One new branch inside `validate_pipeline_artifact` keyed on `category == \"issue\"` (where `doc_type_category` is extended to return \"issue\" when `doc_type ∈ ISSUE_DOC_TYPES`). Branch evaluation order parallels the existing gated/adr/analysis branches.'",
+      "blocking": false
+    },
+    {
+      "id": "I-DR-BE-006",
+      "severity": "recommended",
+      "category": "completeness",
+      "subcategory": "verification-strategy-early-target",
+      "location": "backend-design.md §7 (Verification Strategy / Empirical regression test)",
+      "description": "Verification Strategy quality check: §7 defines correctness ('diff baseline.json post-extension.json must be empty'), verification method (pre/post diff on L1+L2+L4), and timing (immediately after implementation). However, the 'early verification point' — the smallest concrete first target to validate the design — is not named explicitly. A natural early-verification target would be: 'Add ISSUE_DOC_TYPES + ISSUE_STATES constants only (no validate_issue_artifact yet); run the existing test corpus and confirm zero changes; this verifies the doc_type_category extension does not accidentally re-classify any existing doc_type.' Naming this would close the reviewer's 'Early verification point identifies a concrete first target' check.",
+      "evidence": "§7 specifies 4 steps (baseline / implement / re-run / diff) but does not decompose 'Implement extension' into a smallest-first-target sub-step.",
+      "suggestion": "Add a one-bullet 'Early verification target' note to §7 between steps 1 and 2: 'Step 1.5 (smallest first commit): Add the three new constants only (ISSUE_DOC_TYPES, ISSUE_STATES, ISSUE_PER_STATE_REQUIRED_FIELDS) and extend doc_type_category to return \"issue\" when doc_type ∈ ISSUE_DOC_TYPES. Re-run validator against L1+L2 corpus; diff against baseline; expect empty. This isolates the doc_type_category extension from the validate_issue_artifact function and surfaces any accidental re-classification of existing doc_types in the smallest possible diff.'",
+      "blocking": false
+    }
+  ],
+  "checklist": [
+    {"item": "All KB-backend-design template REQUIRED sections present", "status": "pass"},
+    {"item": "Frontmatter complete and well-formed per shared-conventions.md", "status": "pass"},
+    {"item": "doc_type carries -design suffix (matches ANALYSIS category)", "status": "pass"},
+    {"item": "status:draft valid for analysis/log 3-state vocab", "status": "pass"},
+    {"item": "Derives_from chain traces to PRD-v2 + synthesis + codebase-analysis", "status": "pass"},
+    {"item": "KB-backend-design principle applicability mapped (Principles 2/3/4/6/7/8 vs N/A)", "status": "pass"},
+    {"item": "Design decision (D-10) presents options with rejection rationale (3 options table)", "status": "pass"},
+    {"item": "Dependencies declared in companion JSON (backend-dependencies.json present + valid)", "status": "pass"},
+    {"item": "Algorithm sketch matches validator_extension_surface from codebase-analysis", "status": "pass_with_minor_issue", "note": "Algorithm shape correct; one helper (field_present) referenced as pre-existing but does not exist — see I-DR-BE-001"},
+    {"item": "Preserves existing 21-value doc_type enum untouched", "status": "pass", "note": "Extension is purely additive to ISSUE_DOC_TYPES; GATED/ANALYSIS/ADR sets unchanged. AC-BE-7 makes this testable."},
+    {"item": "Preserves existing 3 per-category state vocabularies untouched", "status": "pass", "note": "GATED_STATES, ANALYSIS_STATES, ADR_STATES unchanged. ISSUE_STATES is a new fourth set consulted only inside validate_issue_artifact."},
+    {"item": "NFR-8 backward compatibility addressed structurally + empirically", "status": "pass", "note": "§3 structural argument + §7 empirical regression corpus + AC-BE-6/AC-BE-7"},
+    {"item": "Output comparison method defined (pre/post diff)", "status": "pass"},
+    {"item": "Verification Strategy section present with concrete correctness definition", "status": "pass"},
+    {"item": "Verification Strategy includes early verification point", "status": "partial", "note": "Strategy is concrete but does not name a single smallest-first target — see I-DR-BE-006 (recommended only)"},
+    {"item": "Fact Disposition Table coverage", "status": "na", "note": "Not applicable — codebase-analysis.json schema 1.1.0 does not carry focusAreas field; conditional check does not fire"},
+    {"item": "Implementation samples comply with KB-general-coding-principles", "status": "pass_with_minor_issue", "note": "Dimensions 1-3, 5-10 pass; Dimension 4 has one fabricated-API issue (field_present) — see I-DR-BE-001"},
+    {"item": "EARS ACs present and testable", "status": "pass", "note": "AC-BE-1..AC-BE-9 are concrete and testable"},
+    {"item": "Dependencies on design-cc explicitly enumerated", "status": "pass", "note": "7 dependencies named in §15 + 7 in companion JSON depends_on array"},
+    {"item": "Open architectural questions surfaced for composer (not pre-decided)", "status": "pass", "note": "Q-BE-1..Q-BE-5 with options and recommendations"},
+    {"item": "Respects FR-5 (only design-composer authors ADRs)", "status": "pass", "note": "No ADRs authored; architectural surface raised as Q-BE-* per design-composer routing"},
+    {"item": "Respects FR-13 (pipeline-isolation invariant)", "status": "pass", "note": "Touches only validate_pipeline_frontmatter.py — not a sub-agent; no KB-issue-capture or issue-capture-author references introduced"},
+    {"item": "CP-002 sibling-script CLI idiom honored", "status": "pass", "note": "No new CLI surface, no new dependencies, finding shape preserved"},
+    {"item": "VE-004 outer dispatch preserved unchanged", "status": "pass", "note": "§3 explicit; AC-BE-8 testable"},
+    {"item": "Prior-context items addressed", "status": "na", "note": "No prior context provided to this review (first review of backend-design)"}
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [],
+    "note": "Step 0 scan found no prior_context block in the invocation prompt. This is the first review of backend-design.md."
+  },
+  "recommendations": [
+    "Address I-DR-BE-001 (fabricated field_present reference) before Blueprint composition lock — Option (a): replace with 'field in fm' to match the existing validator idiom.",
+    "Tighten the §5 footnote citation (I-DR-BE-002) to accurately attribute make_finding to lines 157-167 and the in-fm pattern to lines 314-323.",
+    "Optional polish: address I-DR-BE-003 (Q-BE-5 reconciliation note), I-DR-BE-004 (line count drift), I-DR-BE-005 (dispatch-mechanism precision), I-DR-BE-006 (early verification target). None are blocking.",
+    "The design is otherwise well-grounded: D-10 rationale is strong (cohesion with existing per-category dispatch; preserves outer dispatch; trivially preserves NFR-8); §7 regression corpus design is empirically rigorous; §15 dependency declaration to design-cc is exhaustive; Q-BE-1..Q-BE-5 surface the right architectural surface for composer.",
+    "Plan-author can safely consume this design's BE-PROV-PLAN-1 (capture regression baseline BEFORE implementing) and BE-PROV-PLAN-2 (extend smoke_test_auditing_shared.py) — both are concrete and actionable.",
+    "Test-acceptance-author can safely consume BE-PROV-TEST-1 (pre/post diff assertion) and BE-PROV-TEST-2 (per-state positive/negative fixtures). AC-BE-1..AC-BE-9 give a complete EARS-format starting point."
+  ],
+  "summary": "Backend Design for issue-capture-mechanism-r1 — narrow scope (single Python script extension), high blast radius (NFR-8 backward compatibility). Gate 0 passes cleanly. Gate 1 quality is strong: D-10 (validator extension) rationale matches synthesis recommendation and codebase-analysis evidence; existing 21-value doc_type enum and 3 per-category state vocabularies preserved untouched (verified by reading validate_pipeline_frontmatter.py lines 38-68); NFR-8 backward-compat addressed both structurally (additive 4th branch) and empirically (pre/post regression diff with explicit L1+L2+L3+L4 corpus layers); EARS ACs (AC-BE-1..AC-BE-9) are testable; dependencies on design-cc explicitly named in both prose and companion JSON. Two recommended-severity corrections relate to a single illustrative code block in §5 (a helper named as if pre-existing — field_present — does not exist in the validator). Four additional polish recommendations. No critical issues; no blocking issues. Verdict: PASS_WITH_RECOMMENDATIONS — approved with conditions to clear before Blueprint composition lock."
+}

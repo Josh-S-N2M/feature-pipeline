@@ -1,0 +1,203 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "Plan",
+    "target_path": "working/feature/issue-capture-mechanism-r1/plan-v1.md",
+    "reviewer": "shared-document-reviewer",
+    "invocation": "ADR-0017 Stage 9 / Invocation 5 (final Plan review)",
+    "generated": "2026-05-23T23:59:30Z",
+    "prior_context_count": 0
+  },
+  "scores": {
+    "consistency": 88,
+    "completeness": 93,
+    "rule_compliance": 92,
+    "clarity": 87
+  },
+  "gate0": {
+    "status": "pass",
+    "checked": [
+      {"item": "Frontmatter complete (id, version, status, feature_slug, derived_from, phases, total_tasks, generated, generated_by)", "result": "pass"},
+      {"item": "Section completion checklist (Contents) present and all rows checked", "result": "pass"},
+      {"item": "Purpose section present", "result": "pass"},
+      {"item": "Source section present (Blueprint, PRD, ADRs, codebase analysis enumerated)", "result": "pass"},
+      {"item": "Phases enumerated (Phase 0 through Phase 7; 8 phases total)", "result": "pass"},
+      {"item": "Tasks numbered within phases (T0.1..T0.5, T1.1..T1.5, ... T7.1..T7.9; 47 total)", "result": "pass"},
+      {"item": "Each task carries Layer, Description, Dependencies, Estimate, Satisfies AC, L1/L2/L3 verification", "result": "pass"},
+      {"item": "Per-phase Exit Criteria present", "result": "pass"},
+      {"item": "Per-phase Phase Validator one-liner present", "result": "pass"},
+      {"item": "Per-phase blocking-severity threshold present (ADR-0023 FULL)", "result": "pass"},
+      {"item": "Cross-Phase Dependencies section with critical path + parallelizability", "result": "pass"},
+      {"item": "L1/L2/L3 Verification Discipline section", "result": "pass"},
+      {"item": "Acceptance Test Cross-Reference table", "result": "pass"},
+      {"item": "Estimation Methodology", "result": "pass"},
+      {"item": "Resourcing Posture", "result": "pass"},
+      {"item": "Open Items (surfaced for downstream consumers)", "result": "pass"},
+      {"item": "Update History", "result": "pass"}
+    ],
+    "missing_elements": []
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "verdict_label": "PASS_WITH_RECOMMENDATIONS",
+    "rationale": "Plan v1 passes Gate 0 cleanly (all required structural elements present, all 47 tasks fully described with L1/L2/L3 verifications, all 8 phases have exit criteria + blocking thresholds + Phase Validator anchors). Gate 1 quality is strong: NFR-8 verification chain (T0.1 baseline -> T2.1 early-verification -> T2.6 regression diff -> T7.5 final diff) is explicit, continuous, and load-bearing. Phase ordering (baseline -> templates -> validator -> migration -> CC primitives -> hook -> handoff -> verification) respects every Blueprint dependency requirement. F-003 silent-drop mitigation is correctly encoded in T4.4 (skills: ABSENT). D-13 atomic git-mv-with-similarity-index discipline is correctly applied in Phase 3 (T3.1 dry-run + T3.2..T3.6 atomic commits + T3.7 validator clean-run). AC coverage is comprehensive (all 67 ACs mapped: 42 AC-FR-*, 15 AC-NFR-*, 10 AC-BE-*). Conditions: address the four important-severity issues below before plan-author finalizes -> accepted. No critical issues; no Gate 0 failures.",
+    "conditions": [
+      "I001: Strengthen Phase 4 blocking-severity threshold to explicitly call out 'skills: field present in issue-capture-author.md frontmatter is a blocker' (currently the threshold only cites the downstream auditing-subagents check, not the direct Plan-level normative requirement).",
+      "I002: Phase 3 exit criteria should explicitly bound the AC-FR-8-d negative scope assertion (no other files migrated) with a concrete enumeration check; Phase Validator should enumerate the 5 source paths and assert nothing else under Issues/ has moved.",
+      "I003: T4.4 satisfies an unusually large AC set (22 ACs); decompose into 2-3 sub-tasks for downstream test-phase-validator-author consumability (e.g., T4.4a frontmatter + hard constraints; T4.4b body sections; T4.4c integration smoke prerequisites).",
+      "I004: OI-PLAN-9 (deliverable-packaging consideration per I-AA-001) should be flagged to finalize-deliverable-packager more visibly; consider promoting from Open Items to a Phase 7 cleanup task that documents the deferral in writing."
+    ]
+  },
+  "issues": [
+    {
+      "id": "I-DR-PL-001",
+      "severity": "important",
+      "category": "compliance",
+      "location": "Phase 4 Exit Criteria, blocking-severity threshold (lines 459-462)",
+      "description": "The Phase 4 blocking threshold (ADR-0023 FULL) for the F-003 silent-drop mitigation depends on a downstream check ('auditing-subagents blocker on F-003 silent-drop') rather than asserting the direct, Plan-level invariant 'issue-capture-author.md frontmatter MUST NOT contain a skills: field'. The user prompt's focus point explicitly requires T4.4 to state the frontmatter MUST OMIT skills:. T4.4's description does state 'skills: ABSENT (F-003 silent-drop avoidance...)' with bolded emphasis (line 436), and Phase 4 Exit Criteria line 459 says 'frontmatter has NO skills: field'. But the blocking-severity threshold (the formal gate the Phase Validator enforces) does not raise the skills:-presence-in-frontmatter directly to blocker status. test-phase-validator-author would need to read both the body discipline + the auditing-subagents X3 cross_file_checks rule together to derive the assertion; making it explicit in the Plan removes a hop.",
+      "suggestion": "Append to Phase 4 blocking-severity threshold (line 462): 'any skills: field present in issue-capture-author.md frontmatter is a blocker (F-003 silent-drop mitigation, project first per F-003)'. This makes the assertion directly testable from the Plan without requiring the validator to re-derive it from auditing-subagents X3."
+    },
+    {
+      "id": "I-DR-PL-002",
+      "severity": "important",
+      "category": "completeness",
+      "location": "Phase 3 Exit Criteria + Phase Validator description (lines 379-388)",
+      "description": "AC-FR-8-d (no other files migrated) is mapped to 'T3.2..T3.6 (negative — Phase 3 PV enumerates)' in the cross-reference table (line 878), but the Phase 3 Phase Validator description (line 388) does not explicitly state the enumeration discipline. The Phase Validator one-liner says 'enumerates 5 source paths; asserts each is absent; enumerates 5 destination paths; asserts each is present' — which proves the 5 expected migrations happened but does NOT prove no OTHER Issues/*.md files have been touched. AC-FR-8-d requires the negative assertion. The Plan needs to specify HOW the Phase Validator confirms no out-of-scope migration occurred (e.g., git diff stat over the Phase 3 commit range constrained to Issues/ + the working/feature/devcontainer-mcp-provisioning-r1/ source path).",
+      "suggestion": "Extend Phase 3 Phase Validator (line 388) to add: 'asserts the Phase 3 commit range touches ONLY the 5 expected source paths under Issues/ + working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md, and no other paths under Issues/*.md (AC-FR-8-d negative assertion via git diff --name-only over the Phase 3 commit range)'."
+    },
+    {
+      "id": "I-DR-PL-003",
+      "severity": "important",
+      "category": "clarity",
+      "location": "T4.4 — issue-capture-author.md authoring (lines 433-442)",
+      "description": "T4.4 is a single L-sized task (3-4 h) that satisfies 22 ACs (AC-FR-1-b/c/d/e, AC-FR-2-a/b/d, AC-FR-3-d, AC-FR-4-a/b/c/d, AC-FR-5-a/b/c, AC-NFR-3-a, AC-NFR-4-a/b, AC-NFR-5-a, AC-NFR-6-a/b, AC-NFR-7-a). This is the highest AC-satisfaction count in the entire Plan and significantly exceeds the next-highest (T2.5 satisfies 11 ACs). For downstream test-phase-validator-author consumption, having a single task whose validator must check 22 ACs makes the Phase Validator brittle and large. Per plan-authoring.md discipline, large tasks should decompose into sub-tasks each with a smaller AC footprint.",
+      "suggestion": "Decompose T4.4 into 3 sub-tasks: (a) T4.4a — frontmatter + hard-constraint section (covers AC-FR-3-d, AC-NFR-4-a/b, AC-NFR-6-a/b; the F-003 mitigation surface); (b) T4.4b — Phase 1 dispatch + AskUserQuestion archetypes (covers AC-FR-1-*, AC-FR-2-*, AC-FR-4-*, AC-FR-5-*, AC-NFR-3-a, AC-NFR-5-a); (c) T4.4c — observability + runtime KB-load mechanism (covers AC-NFR-7-a). Each sub-task gets its own L1/L2/L3 verification + AC mapping. T4.4's L3 (integration smoke) remains the integration gate referenced from Phase 7."
+    },
+    {
+      "id": "I-DR-PL-004",
+      "severity": "important",
+      "category": "completeness",
+      "location": "OI-PLAN-9 (lines 974)",
+      "description": "OI-PLAN-9 surfaces the I-AA-001 user-accepted deviation: the 7 ADRs remain at working/feature/<slug>/adrs/ rather than the canonical adrs/ root-level location (per ADR-0036). The Open Item correctly identifies this as a future drift-remediation feature's responsibility, but Phase 7's verification + cleanup phase does NOT include any task that documents this deferral or surfaces it to finalize-deliverable-packager. Per ADR-0028 + ADR-0036, finalize-deliverable-packager (Stage 13) is the canonical handoff point for ADR placement. The deferral risks being lost in the handoff if it lives only in Open Items.",
+      "suggestion": "Either (a) add a small T7.10 task explicitly producing a 'adr-placement-deferral-note.md' that finalize-deliverable-packager reads at Stage 13 (binding the deferral to the deliverable archive); or (b) elevate OI-PLAN-9 to a recommended action in the Plan's Update History, signaling test-acceptance-author / test-phase-validator-author / finalize-deliverable-packager downstream that the ADR-0036 location-canonical assertion is suspended for this run."
+    },
+    {
+      "id": "I-DR-PL-005",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "T4.5 — .gitignore append (lines 444-453); also OI-PLAN-5",
+      "description": "T4.5 places the .gitignore append under Phase 4 while the Blueprint Implementation Plan §Required Implementation Order (line 1065) places this work under Phase 5 (per I-DR-BP-008 resolution). OI-PLAN-5 acknowledges the divergence and flags it for cross-artifact-auditor verification. This is correct discipline (surface deviation, don't suppress it). However, the deviation rationale ('it's a sub-task of the observability surface introduced by T4.4') is reasonable but not strictly forced — T4.5 could equally live in Phase 5 (where it's a sub-task of the hook/settings deployment). The current placement is defensible but the cross-artifact-auditor will need to ratify or replace it. No corrective action required from the Plan author; ensure the audit can find OI-PLAN-5 cleanly.",
+      "suggestion": "No change required to T4.5; OI-PLAN-5 already discloses the phase-placement refinement. Confirm the cross-artifact-auditor (downstream) reads Open Items and routes the verification accordingly. Optional: add a one-line cross-reference in the Cross-Phase Dependencies diagram noting 'T4.5 placed in Phase 4 per OI-PLAN-5; alternative placement Phase 5 (Blueprint canonical) preserved as deferred resolution'."
+    },
+    {
+      "id": "I-DR-PL-006",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "T0.2 vs T0.3 — pipeline-isolation grep task numbering",
+      "description": "The user prompt's focus block referenced 'T0.3 (or equivalent) must perform the zero-baseline grep check'. The Plan correctly performs this check, but at T0.2 (lines 75-84), not T0.3 (which is the cc-critique baseline at lines 86-95). This is a labeling/ordering convention question, not a defect — but a future cross-artifact-auditor or test-phase-validator-author reading the user prompt + Plan side-by-side may briefly wonder whether the right baseline was captured. The L3 verification at T0.2 explicitly cross-references AC-FR-13-a/b and T7.4 (the post-implementation grep comparison), so the chain is provable. Optional clarification.",
+      "suggestion": "No change required; the chain is correct. Optionally add a one-line forward reference from T0.3 saying 'cc-critique baseline (distinct from T0.2 pipeline-isolation baseline)' to disambiguate at a glance."
+    },
+    {
+      "id": "I-DR-PL-007",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "Estimation Methodology — Phase 5 envelope (line 939)",
+      "description": "The Estimation Methodology table shows Phase 5 = 7 tasks, ~7 h. But Phase 5 contains 7 tasks (T5.1..T5.7) where the high-end estimates aggregate to: T5.1 M (120) + T5.2 XS (15) + T5.3 S (60) + T5.4 M (90) + T5.5 S (45) + T5.6 S (45) + T5.7 S (45) = ~6.5 h. Close to ~7 h but not exact; the table rounds. This is acceptable per the 'sizing-only, not for velocity tracking' anti-pattern note. The phase 4 line shows 5 tasks, ~10 h: T4.1 M (120) + T4.2 L (240) + T4.3 M (90) + T4.4 L (240) + T4.5 XS (15) = ~12 h. The Plan envelope rounds favorably; not load-bearing.",
+      "suggestion": "No corrective action required. If the Plan is revised for other reasons, consider re-running the aggregation to tighten the envelope by ~2 h on Phase 4. Sizing-only discipline; not a velocity contract."
+    }
+  ],
+  "ac_coverage_check": {
+    "ac_total": 67,
+    "ac_mapped": 67,
+    "ac_orphan_count": 0,
+    "task_total": 47,
+    "task_setup_tagged": 13,
+    "task_ac_mapped": 34,
+    "task_unmapped_non_setup": 0,
+    "breakdown": {
+      "AC-FR-*": {"total": 42, "mapped": 42},
+      "AC-NFR-*": {"total": 15, "mapped": 15},
+      "AC-BE-*": {"total": 10, "mapped": 10}
+    },
+    "notes": [
+      "AC-FR-10-a is correctly marked 'dogfooded by this run' — intent-clarification was authored in Stage 1 and already cites the proposal verbatim; no Plan task needed.",
+      "AC-FR-13-c (no automated cross-reference) is correctly marked 'structurally satisfied by design' — a negative AC for which the absence of any cross-referencing task is the proof.",
+      "AC-FR-8-d (no other files migrated) is mapped to T3.2..T3.6 with the Phase Validator carrying the negative assertion — but the Phase Validator description does not yet specify HOW (see I-DR-PL-002)."
+    ]
+  },
+  "nfr_8_verification_chain": {
+    "status": "explicit_and_continuous",
+    "chain": [
+      {"step": "T0.1", "role": "baseline", "artifact": "validator-baseline-l1-l2.json", "verified": true},
+      {"step": "T2.1", "role": "early-verification (constants + categorization only; diff must be empty)", "artifact": "(re-run validator; diff vs baseline)", "verified": true},
+      {"step": "T2.6", "role": "regression diff (full extension landed; LOAD-BEARING)", "artifact": "validator-postextension-l1-l2-diff.json", "verified": true},
+      {"step": "T7.5", "role": "final post-migration diff (end-to-end NFR-8)", "artifact": "validator-final-l1-l2-diff.json", "verified": true}
+    ],
+    "load_bearing_assertions": [
+      "T2.6 L3: 'Blocker if any new finding line is present.' (line 278) — highest-blast-radius assertion of the feature",
+      "T7.5 L3: 'Diff confirmed empty; no regression on existing pipeline doc_types.' (line 682)"
+    ]
+  },
+  "f_003_mitigation_check": {
+    "status": "explicit",
+    "location": "T4.4 description (line 436)",
+    "language": "**`skills:` ABSENT (F-003 silent-drop avoidance — project first per F-003);**",
+    "reinforcement_phase_4_exit": "line 459: 'frontmatter has NO `skills:` field'",
+    "reinforcement_phase_4_validator": "line 464: 'greps for absence of `skills:` field in issue-capture-author.md'",
+    "weakness": "Phase 4 blocking-severity threshold (line 462) does not name the skills:-present-in-frontmatter case directly; it cites the downstream auditing-subagents check instead. See I-DR-PL-001."
+  },
+  "d_13_atomic_migration_check": {
+    "status": "correctly_applied",
+    "tasks": ["T3.1 (dry-run all 5)", "T3.2..T3.6 (one atomic commit per file)", "T3.7 (validator clean-run)"],
+    "fallback_documented": "two-commit-sequence fallback per D-13 — T3.1 detects and routes",
+    "git_log_follow_verification": "T3.2..T3.6 each include L2: 'git log --follow ... returns history'; T7.6 final cross-check"
+  },
+  "pipeline_isolation_baseline_check": {
+    "status": "present",
+    "task": "T0.2 (lines 75-84; not T0.3 — user prompt approximated)",
+    "verification_chain": "T0.2 baseline -> T7.4 post-implementation comparison; expected byte-identical (both empty)"
+  },
+  "phase_ordering_check": {
+    "status": "respects_blueprint",
+    "plan_order": "Phase 0 baseline -> Phase 1 templates -> Phase 2 validator -> Phase 3 migration -> Phase 4 CC skills/agent -> Phase 5 hook/settings -> Phase 6 handoff edits -> Phase 7 verification",
+    "blueprint_required_order": "Phase 0 baseline -> Phase 1 templates -> Phase 2 validator -> Phase 3 three-layer enforcement primitives -> Phase 4 migrations -> Phase 5 cross-cutting edits -> Phase 6 verification",
+    "deviation_note": "The Plan splits Blueprint Phase 3 ('three-layer enforcement primitives' = KB+skills+agent+hook+settings) into Plan Phase 4 (KB+skills+agent) + Plan Phase 5 (hook+settings), and moves migration BEFORE the CC primitives (Plan Phase 3 < Plan Phases 4-5; Blueprint had migrations AFTER three-layer primitives). The dependency analysis is preserved: Blueprint requirements (templates before validator; validator before migration; primitives before integration) are all honored. The Plan's reordering is defensible because: (a) the Blueprint's Phase 4 migration depended only on Phase 2 validator being ready (not on Phase 3 primitives); (b) the Plan splits Phase 3 along its natural seam (KB+agent vs. hook+settings) for blocking-threshold granularity; (c) T4.2 examples.md correctly cross-references post-migration paths (depends on Phase 3 migrations being landed first). No defect — the reordering is consistent with the dependency requirements."
+  },
+  "per_phase_exit_criteria_quality": {
+    "phase_0": {"exit_criteria_present": true, "blocking_threshold_present": true, "phase_validator_anchor": true},
+    "phase_1": {"exit_criteria_present": true, "blocking_threshold_present": true, "phase_validator_anchor": true},
+    "phase_2": {"exit_criteria_present": true, "blocking_threshold_present": true, "phase_validator_anchor": true},
+    "phase_3": {"exit_criteria_present": true, "blocking_threshold_present": true, "phase_validator_anchor": true, "note": "AC-FR-8-d negative assertion needs HOW-clarification — see I-DR-PL-002"},
+    "phase_4": {"exit_criteria_present": true, "blocking_threshold_present": true, "phase_validator_anchor": true, "note": "F-003 skills:-absence assertion should be a direct blocker — see I-DR-PL-001"},
+    "phase_5": {"exit_criteria_present": true, "blocking_threshold_present": true, "phase_validator_anchor": true},
+    "phase_6": {"exit_criteria_present": true, "blocking_threshold_present": true, "phase_validator_anchor": true},
+    "phase_7": {"exit_criteria_present": true, "blocking_threshold_present": true, "phase_validator_anchor": true, "note": "Phase 7 is effectively the Plan-wide acceptance gate; correctly structured"}
+  },
+  "open_items_downstream_handoff_check": {
+    "items_total": 9,
+    "owners_assigned": 9,
+    "for_test_acceptance_author": "OI-PLAN-4 (T5.5 latency threshold), OI-PLAN-6 (one test per AC; naming convention)",
+    "for_test_phase_validator_author": "OI-PLAN-7 (8 Phase Validators bound to per-phase exit criteria)",
+    "for_finalize_deliverable_packager": "OI-PLAN-9 (ADR placement deferral) — see I-DR-PL-004 for visibility improvement",
+    "for_cross_artifact_auditor": "OI-PLAN-1 (hook stdin schema field), OI-PLAN-5 (T4.5 phase placement)"
+  },
+  "recommendations": [
+    "Resolve I-DR-PL-001 (Phase 4 blocking threshold) and I-DR-PL-002 (Phase 3 Phase Validator AC-FR-8-d HOW) before Plan v1 is marked accepted; both are surface-level edits to the exit-criteria language.",
+    "Consider I-DR-PL-003 (T4.4 decomposition) as a quality-of-life improvement for test-phase-validator-author — not blocking but high-value.",
+    "Surface OI-PLAN-9 to finalize-deliverable-packager more visibly per I-DR-PL-004; can be done via a Phase 7 cleanup task or via a note in the Update History referencing finalize-deliverable-packager.",
+    "Confirm cross-artifact-auditor (downstream) reads Open Items section and routes OI-PLAN-1 + OI-PLAN-5 ratification.",
+    "Estimation envelope is sizing-only per plan-authoring.md anti-pattern — no corrective action."
+  ],
+  "approval_recommendation": {
+    "verdict_label": "PASS_WITH_RECOMMENDATIONS",
+    "status_recommendation": "draft -> accepted (after the 4 important-severity conditions in verdict.conditions are addressed; the 3 recommended-severity items can be deferred or addressed as a polish pass)",
+    "rationale": "Plan v1 is a strong decomposition of Blueprint v3. It passes Gate 0 cleanly, the NFR-8 verification chain is explicit and load-bearing, the F-003 mitigation is correctly encoded in T4.4, D-13 atomic-migration discipline is correctly applied in Phase 3, AC coverage is 67/67 with no orphans either direction, phase ordering respects all Blueprint dependency requirements, and per-phase exit criteria + blocking thresholds + Phase Validator anchors are present for all 8 phases (suitable for test-phase-validator-author consumption). The 4 important-severity issues are all surface-level (exit-criteria language refinements, T4.4 decomposition); they do not affect Plan correctness or downstream pipeline progress. No critical issues; no Gate 0 failures."
+  },
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": []
+  }
+}

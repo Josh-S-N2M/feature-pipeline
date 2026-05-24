@@ -1,0 +1,806 @@
+{
+  "schema_version": "1.1.0",
+  "pipeline_run_id": "issue-capture-mechanism-r1",
+  "generated_at": "2026-05-23T19:00:00Z",
+  "extraction_method": "direct-read-grep-glob (no GitNexus MCP available in environment; no .mcp.json at project root and no codebase-memory-mcp configured)",
+  "scope": {
+    "repo": "feature-pipeline",
+    "branch": "main",
+    "commit": "cf48e5e (HEAD at task start)",
+    "paths": [
+      ".claude/agents/",
+      ".claude/skills/auditing-shared/scripts/",
+      ".claude/skills/KB-documentation-criteria/",
+      ".claude/skills/KB-review-disciplines/",
+      ".claude/skills/KB-cc-platform/references/",
+      ".claude/skills/KB-cc-design/references/",
+      ".claude/skills/auditing-hooks/",
+      ".claude/skills/auditing-skills/references/",
+      ".claude/skills/auditing-subagents/references/",
+      ".claude/skills/auditing-settings/",
+      ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      ".claude/settings.json",
+      ".claude/SETTINGS-NOTES.md",
+      "Issues/",
+      "adrs/",
+      "adrs-migrated/"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "agent.intake-intent-clarifier",
+      "type": "agent",
+      "path": ".claude/agents/intake-intent-clarifier.md",
+      "language": "markdown+yaml",
+      "framework": "claude-code-subagent",
+      "layer": "claude-code",
+      "loc": 93,
+      "notes": "Existing pipeline agent. FR-11 target for ~15-line 'Proposal-as-prior-context' insertion. Frontmatter: model=opus, effort=high, tools include AskUserQuestion + Write, skills=[KB-documentation-criteria, KB-review-disciplines], memory=project. Already accepts optional 'prior_context' input parameter (line 28) and 'raw_request' (line 25) — the insertion locus is in §Inputs (between current prior_context and Phase 1) and in §Procedure Phase 1.",
+      "entry_points": ["Task spawn from recipe-feature-pipeline orchestrator at Stage 1"]
+    },
+    {
+      "id": "agent.shared-document-reviewer",
+      "type": "agent",
+      "path": ".claude/agents/shared-document-reviewer.md",
+      "language": "markdown+yaml",
+      "framework": "claude-code-subagent",
+      "layer": "claude-code",
+      "loc": 715,
+      "notes": "Group B precedent (non-pipeline, multi-stage-invoked agent). Frontmatter shape: tools as comma-separated string with Bash(<scoped>:*) entries; skills as comma-separated string (NOT list); model=opus, effort=high. Calls validate_pipeline_frontmatter.py at line 460 as Gate-0 mechanical first pass. Has a long HTML comment header documenting version evolution (v4.3.0 → v4.5.0). PRESERVES NO PIPELINE-AGENT NAMING-PREFIX (no intake-, no discovery-, no synth-, etc.) — uses shared- prefix per ADR-0019.",
+      "entry_points": ["Invoked 5 times per pipeline run per ADR-0017"]
+    },
+    {
+      "id": "agent.cc-critique",
+      "type": "agent",
+      "path": ".claude/agents/cc-critique.md",
+      "language": "markdown+yaml",
+      "framework": "claude-code-subagent",
+      "layer": "claude-code",
+      "loc": 95,
+      "notes": "Group B precedent (other non-pipeline agent). Frontmatter shape: tools as comma-separated string with multiple Bash(<scoped>:*) entries; model=opus, effort=high, permissionMode=default. No 'memory' field declared (so no persistent memory; explicit body section: 'You do not use persistent memory.'). No 'skills:' field declared (delegates to auditing-cc-configs skill family discovered at runtime). 95 lines of body. THIS is the closest structural template for issue-capture-author.",
+      "entry_points": ["User-invoked manually"]
+    },
+    {
+      "id": "script.validate_pipeline_frontmatter",
+      "type": "python_script",
+      "path": ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py",
+      "language": "python3",
+      "framework": "stdlib-only (argparse, json, re, sys, pathlib, typing)",
+      "layer": "backend-tooling",
+      "loc": 422,
+      "notes": "FR-7 extension target. Hand-rolled YAML parser (no PyYAML). Three doc-type categories: GATED_DOC_TYPES (5 entries: intent-clarification, prd, research-plan, blueprint, plan), ANALYSIS_DOC_TYPES (15 entries + suffix patterns including -design/-report/-log/-issues/-result/-summary), ADR ('adr' single value). Per-category state vocabularies: GATED_STATES={draft,accepted,superseded,rejected}, ANALYSIS_STATES={draft,complete,superseded}, ADR_STATES={proposed,accepted,superseded,rejected}. Findings shape is JSON with fields {domain,severity,source_activity,file_path,message,dispatch_hint,depth_level}. Severity levels: blocker/major/minor/info. CLI: positional paths or stdin newline-separated. Exit-on-blocker flag (default exit 0). NO existing test fixtures directory; smoke_test_auditing_shared.py exercises it. Dispatch (line 365-371): SKILL.md → validate_skill_frontmatter; .claude/agents/ → validate_agent_frontmatter; else → validate_pipeline_artifact.",
+      "entry_points": ["CLI", "stdin", "smoke_test_auditing_shared.py", "run_phase_checks.py (line 40)", "shared-document-reviewer (line 460)", "execute-task-quality-handler (line 62)"]
+    },
+    {
+      "id": "script.check_pipeline_discipline",
+      "type": "python_script",
+      "path": ".claude/skills/auditing-shared/scripts/check_pipeline_discipline.py",
+      "language": "python3",
+      "framework": "stdlib-only",
+      "layer": "backend-tooling",
+      "loc": 144,
+      "notes": "Sibling-idiom reference. Same finding shape as validator. Argparse with positional paths or stdin. Generator pattern (find_findings yields). Recursive scan with rglob('*.md') on directory args. Backtick-span suppression for false-positive avoidance. Exit-code 0 (informational only)."
+    },
+    {
+      "id": "script.detect_stubs",
+      "type": "python_script",
+      "path": ".claude/skills/auditing-shared/scripts/detect_stubs.py",
+      "language": "python3",
+      "framework": "stdlib-only (uses ast for Python AST)",
+      "layer": "backend-tooling",
+      "loc": 246,
+      "notes": "Sibling-idiom reference. Per-finding domain='stub-detection'. Path-aware patterns (test paths vs impl paths). AST-based body analysis for Python. Same JSON output shape as validator."
+    },
+    {
+      "id": "script.log_state_transition",
+      "type": "python_script",
+      "path": ".claude/skills/auditing-shared/scripts/log_state_transition.py",
+      "language": "python3",
+      "framework": "stdlib-only",
+      "layer": "backend-tooling",
+      "loc": 106,
+      "notes": "Sibling-idiom reference. Reads stdin JSON. argparse with --feature-slug --log-root --strict. Observer-only by default (exit 0 even on validation failure; stderr warning). Appends JSONL to working/feature/<slug>/state-transitions.log. Stderr discipline: 'log_state_transition: <reason>'."
+    },
+    {
+      "id": "script.smoke_test_auditing_shared",
+      "type": "python_script",
+      "path": ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py",
+      "language": "python3",
+      "layer": "backend-tooling",
+      "loc": 332,
+      "notes": "The only existing test surface that exercises validate_pipeline_frontmatter.py. References the validator at line 29 as VALIDATOR path. Regression fixture surface — NFR-8 backward-compatibility test should likely extend this file (or add a sibling test_validate_pipeline_frontmatter.py)."
+    },
+    {
+      "id": "script.run_phase_checks",
+      "type": "python_script",
+      "path": ".claude/skills/auditing-shared/scripts/run_phase_checks.py",
+      "language": "python3",
+      "layer": "backend-tooling",
+      "loc": "n/a (read line 40)",
+      "notes": "Direct caller of validate_pipeline_frontmatter.py (line 40: VALIDATOR = SCRIPTS_DIR / 'validate_pipeline_frontmatter.py')."
+    },
+    {
+      "id": "kb.documentation-criteria",
+      "type": "skill_kb",
+      "path": ".claude/skills/KB-documentation-criteria/SKILL.md",
+      "layer": "claude-code",
+      "loc": 140,
+      "notes": "FR-14 additive index target. Shape: routing table at top; 'What's in this KB' table; 'Canonical templates' table (currently 11 rows); 'Routing: which reference do I need?' table; 'Where this KB is NOT used' (3 bullets). pedagogical_sections frontmatter declares 2 paths. FR-6 templates land in references/templates/; FR-7 spec lands in references/. Insertion: add rows to 'Canonical templates' for 3 issue-doctype templates + add 'issue-doctypes-spec.md' row; add bullet to 'Where this KB is NOT used' pointing at KB-issue-capture."
+    },
+    {
+      "id": "kb.template.intent-clarification",
+      "type": "template",
+      "path": ".claude/skills/KB-documentation-criteria/references/templates/intent-clarification-template.md",
+      "layer": "claude-code",
+      "notes": "FR-12 small-edit target. Has 'Source' section (line 36-38) — the proposal-seed guidance lands here. Currently a single-line directive: 'One sentence: the user's original request, quoted or near-verbatim.' Insertion adds ~5 lines noting that when --raw-request seeds the run with a doc_type:issue-proposal file, the Source cites the proposal path verbatim."
+    },
+    {
+      "id": "kb.shared-conventions",
+      "type": "kb_reference",
+      "path": ".claude/skills/KB-documentation-criteria/references/shared-conventions.md",
+      "layer": "claude-code",
+      "loc": 308,
+      "notes": "Frontmatter inheritance source for FR-6 new templates. Documents: universal required fields (id,version,status,generated,generated_by per top; doc_type+feature_slug+derived_from universal per ADR-0032 Change 1+4); status vocabularies; supersession discipline (ADR-0005); intent_user_token chain (ADR-0032 Change 2); per-doc-type 3-tier state vocabulary (ADR-0032 Change 3): GATED 5-state, ANALYSIS/LOG 3-state, ADR 4-state-no-draft. The new issue-* 5-state vocabulary is a FOURTH category that does not currently exist."
+    },
+    {
+      "id": "kb.recipe-feature-pipeline",
+      "type": "skill",
+      "path": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "layer": "claude-code",
+      "loc": 414,
+      "notes": "FR-12 small-edit target. Already documents --raw-request flag (line 14): '<text-or-path> (optional) — the user's raw feature request. If omitted, the orchestrator prompts via AskUserQuestion at Stage 1.' Already passes prior_context through to intake-intent-clarifier (line 145: 'prior_context (empty on fresh run)'). Example invocation at line 402 uses inline text. Insertion: one bullet documenting the proposal-seed invocation pattern '<feature-pipeline> <slug> --raw-request Issues/<topic>/proposal.md'. 'Hard exclusions' list at lines 39-45 includes 'No stage advance without gate pass' (#1) — confirms no new gates may be introduced."
+    },
+    {
+      "id": "kb.issue-lifecycle",
+      "type": "kb_reference",
+      "path": ".claude/skills/KB-review-disciplines/references/issue-lifecycle.md",
+      "layer": "claude-code",
+      "loc": 176,
+      "notes": "INTRA-PIPELINE 4-state issue-ledger discipline (per ADR-0008). The verbatim 4-state vocabulary is captured in verbatim_extracts below. This is the PARALLEL-BUT-DISTINCT artifact the new 5-state issue-* vocabulary must remain separate from. ID prefix scheme I-<DR|AA|CA>-NNN is also documented here. ADR for 5-state distinction (per PRD U-10) must cite this file."
+    },
+    {
+      "id": "kb.cc-platform-extensions",
+      "type": "kb_reference",
+      "path": ".claude/skills/KB-cc-platform/references/extensions.md",
+      "layer": "claude-code",
+      "notes": "Hook contract: PreToolUse fires before any tool call. hookSpecificOutput.permissionDecision accepts 'allow'/'deny'/'ask'. Matcher is a regex against tool name (use 'Task' for the new hook). Conditional 'if:' field exists for sub-discrimination (line 271). ${CLAUDE_PROJECT_DIR} env var is the canonical path-prefix in commands. http-transport alternative exists. NO documented contract for inspecting tool_input.subagent_type specifically inside the Task tool — the assumption (PRD Assumption 2) is that subagent_type appears in the stdin event JSON's tool_input field. This is consistent with the Claude Code documented schema (tool_input mirrors the Task tool's parameter shape) but not explicitly demonstrated in this KB; design-claude-code may need to verify against the live platform docs."
+    },
+    {
+      "id": "kb.cc-design-principles",
+      "type": "kb_reference",
+      "path": ".claude/skills/KB-cc-design/references/principles.md",
+      "layer": "claude-code",
+      "notes": "Principle 1 (skill-localized knowledge) — the new templates land under KB-documentation-criteria; the triggering discipline lives in KB-issue-capture; per the user's split decision. Skills with disable-model-invocation: true cost zero context until invoked (cited line 26). Slash commands superseded by skills with disable-model-invocation: true (line 162) — confirms the capture-issue skill IS the slash-command surface."
+    },
+    {
+      "id": "kb.auditing-hooks",
+      "type": "skill_audit",
+      "path": ".claude/skills/auditing-hooks/",
+      "layer": "claude-code",
+      "notes": "references/: hook-spec.md, security-checklist.md, anti-patterns.md, common-failures.md. NOTE: examples/good-hook-annotated.md and examples/bad-hook-annotated.md mentioned in the Research Plan do NOT exist in this skill — the references/ directory contains 4 files only. design-claude-code should be aware that the precedent for 'good annotated hook' lives in hook-spec.md content itself or in security-checklist.md, not in a separate examples directory."
+    },
+    {
+      "id": "kb.auditing-skills.frontmatter-spec",
+      "type": "kb_reference",
+      "path": ".claude/skills/auditing-skills/references/frontmatter-spec.md",
+      "layer": "claude-code",
+      "notes": "Authoritative on disable-model-invocation: true (line 58 in field table). 'bool, default false. If true, only user can invoke (no auto-trigger).' Document also notes: tools: vs allowed-tools: gotcha — SKILL.md uses allowed-tools:, .claude/agents/*.md uses tools:. user-invocable defaults true. NO existing SKILL.md in this repo declares disable-model-invocation: true — the new capture-issue skill and KB-issue-capture skill would be the first."
+    },
+    {
+      "id": "kb.auditing-subagents.subagent-spec",
+      "type": "kb_reference",
+      "path": ".claude/skills/auditing-subagents/references/subagent-spec.md",
+      "layer": "claude-code",
+      "notes": "Line 110: 'Skills with disable-model-invocation: true cannot be preloaded into subagents → BLOCKER (these are silently dropped).' CRITICAL CONSTRAINT for the new issue-capture-author agent: it MUST NOT list KB-issue-capture or capture-issue in its frontmatter 'skills:' field, because they will carry disable-model-invocation: true. Instead, the agent body must Read/Glob/Grep the skill files at runtime. This is a load-bearing structural constraint discoverable via the existing audit corpus."
+    },
+    {
+      "id": "config.settings-json",
+      "type": "config",
+      "path": ".claude/settings.json",
+      "layer": "claude-code",
+      "loc": 13,
+      "notes": "Current shape: ONLY a permissions.allow array with 7 entries, all of pattern 'Bash(python3 .claude/skills/auditing-shared/scripts/<name>.py:*)' OR 'Bash(python3 .claude/skills/auditing-<family>/scripts/<name>.py:*)'. NO hooks block currently exists. NO settings.local.json content of note. FR-3 / FR-15 additive insertion: add an 8th allow entry for the hook script (if registered) and add a NEW top-level 'hooks' object with a PreToolUse array matching 'Task'. THIS IS THE FIRST HOOK IN THE PROJECT (zero precedent at .claude/hooks/ or in any settings file)."
+    },
+    {
+      "id": "config.settings-notes",
+      "type": "doc",
+      "path": ".claude/SETTINGS-NOTES.md",
+      "layer": "claude-code",
+      "loc": 30,
+      "notes": "FR-15 append target. Sections: Purpose, Permission policy, User authorization, Reserved future-extensibility, Why this file exists separately. Existing authorization dated 2026-05-22 by Josh. The new note appends after the existing structure documenting the hook policy + the additional permission entry."
+    },
+    {
+      "id": "issue.register-devcontainer-deferrals",
+      "type": "issue_md",
+      "path": "Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md",
+      "layer": "claude-code",
+      "loc": ">200",
+      "notes": "Group B precedent — REGISTER doctype empirical sample. Frontmatter: id=REGISTER-<slug>, doc_type=deferral-register, status=draft, generated/generated_by, feature_slug, scope='feature-specific (registers what THIS feature deferred)', mode=report-only, companion_artifacts as YAML list. NOTE doc_type is 'deferral-register' — NOT 'issue-register' as PRD FR-7 calls for. The migration (FR-8) renames or substitutes the doc_type. Body shape: TL;DR; section-by-section deferred-items in tabular form with columns ID/Item/Source/Why deferred/Re-examination trigger/Forgetting risk."
+    },
+    {
+      "id": "issue.analysis-per-agent-design-evaluation-gap",
+      "type": "issue_md",
+      "path": "Issues/analysis-per-agent-design-evaluation-gap.md",
+      "layer": "claude-code",
+      "notes": "Group B precedent — ANALYSIS doctype empirical sample. Frontmatter: id=ANALYSIS-<slug>, doc_type=analysis, status=draft, generated/generated_by, feature_slug, scope='pipeline-wide (not feature-scoped)', mode=report-only, companion_artifacts. Body: TL;DR; numbered sections (1. Evidence; subsections 1.1, 1.2, 1.3...). doc_type='analysis' aligns with PRD FR-7's 'issue-analysis' modulo naming convention."
+    },
+    {
+      "id": "issue.analysis-adr-placement-rootcause",
+      "type": "issue_md",
+      "path": "Issues/analysis-adr-placement-rootcause.md",
+      "layer": "claude-code",
+      "notes": "Group B precedent — ANALYSIS doctype empirical sample. Same frontmatter shape as the per-agent-design-evaluation-gap analysis. Body opens with TL;DR + 1. Evidence section. Critically — this file IS THE ANALYSIS that confirms the ADR-placement drift (ADR-0008 in adrs-migrated/, not adrs/). The current PRD U-10 ADR slate must land in adrs/ per ADR-0036; this drift is captured here as out-of-scope-for-this-run."
+    },
+    {
+      "id": "issue.proposal-auditing-family-graduation-review",
+      "type": "issue_md",
+      "path": "Issues/proposal-auditing-family-graduation-review.md",
+      "layer": "claude-code",
+      "notes": "Group B precedent — PROPOSAL doctype empirical sample. Frontmatter: id=PROPOSAL-<slug>, doc_type=proposal, status=draft, generated/generated_by, feature_slug, scope, mode=report-only, companion_artifacts, proposes_future_feature=<future-slug>. The 'proposes_future_feature' field IS present here (line 15) — IN-021 of the Research Plan asks whether this field has precedent. CONFIRMED: it has 2 precedents — this file AND Issues/issue-capture-mechanism/proposal.md (the seed). It is NOT a generic, but it IS used. Validator extension should allow but not enforce its presence on issue-proposal doc_type."
+    },
+    {
+      "id": "issue.issue-capture-mechanism-proposal",
+      "type": "issue_md",
+      "path": "Issues/issue-capture-mechanism/proposal.md",
+      "layer": "claude-code",
+      "notes": "Group B precedent — the SEED proposal for THIS run. Already in per-issue folder model. Frontmatter doc_type=issue-proposal (uses the canonical PRD FR-7 name, unlike the older 'proposal' doctype on the auditing-family-graduation file). Carries proposes_future_feature=issue-capture-mechanism-r1. companion_artifacts list paths under POST-MIGRATION layout — the proposal anticipated FR-8."
+    },
+    {
+      "id": "adr.0008-issue-ledger-scope",
+      "type": "adr",
+      "path": "adrs-migrated/ADR-0008-issue-ledger-scope.md",
+      "layer": "claude-code",
+      "notes": "ADR-0008 canonical location is adrs-migrated/ (NOT adrs/) per the captured drift in Issues/analysis-adr-placement-rootcause.md. PRD §Product Policy Decisions references this ADR's 4-state intra-pipeline ledger vocabulary. Two prior version files also exist: ADR-0008-issue-ledger-scope-pre-naming-convention.md, ADR-0008-issue-ledger-scope-pre-template-migration.md. ADR-0036 (single-location placement) is at adrs/ — both these ADRs co-exist with the drift. Per Research Plan §Risks 2 and PRD U-10, this run does NOT migrate ADR-0008. The 7 new ADRs of this run go to adrs/ per ADR-0036."
+    },
+    {
+      "id": "hook.intercept-issue-capture-agent",
+      "type": "hook_script_NEW",
+      "path": ".claude/hooks/intercept-issue-capture-agent.sh",
+      "layer": "claude-code",
+      "notes": "NEW — does not yet exist. .claude/hooks/ directory does not yet exist (confirmed by ls). PRD §Risks #5 flags this; PRD U-1 leaves implementation language open. THIS IS THE FIRST HOOK IN THE PROJECT. design-claude-code must choose bash vs python vs other; auditing-hooks coverage applies."
+    }
+  ],
+  "edges": [
+    {
+      "from": "agent.shared-document-reviewer",
+      "to": "script.validate_pipeline_frontmatter",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/agents/shared-document-reviewer.md (line 460)"],
+      "confidence": "high"
+    },
+    {
+      "from": "agent.execute-task-quality-handler",
+      "to": "script.validate_pipeline_frontmatter",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/agents/execute-task-quality-handler.md (line 62)"],
+      "confidence": "high"
+    },
+    {
+      "from": "script.run_phase_checks",
+      "to": "script.validate_pipeline_frontmatter",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/skills/auditing-shared/scripts/run_phase_checks.py (line 13, line 40)"],
+      "confidence": "high"
+    },
+    {
+      "from": "script.smoke_test_auditing_shared",
+      "to": "script.validate_pipeline_frontmatter",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py (line 29)"],
+      "confidence": "high"
+    },
+    {
+      "from": "config.settings-json",
+      "to": "script.validate_pipeline_frontmatter",
+      "kind": "permission_grant",
+      "count": 1,
+      "representative_files": [".claude/settings.json (line 7)"],
+      "confidence": "high"
+    },
+    {
+      "from": "agent.intake-intent-clarifier",
+      "to": "kb.documentation-criteria",
+      "kind": "skill_load",
+      "count": 1,
+      "representative_files": [".claude/agents/intake-intent-clarifier.md (frontmatter line 7)"],
+      "confidence": "high"
+    },
+    {
+      "from": "agent.intake-intent-clarifier",
+      "to": "kb.template.intent-clarification",
+      "kind": "read",
+      "count": 1,
+      "representative_files": [".claude/agents/intake-intent-clarifier.md (line 19)"],
+      "confidence": "high"
+    },
+    {
+      "from": "agent.intake-prd-author",
+      "to": "agent.intake-intent-clarifier",
+      "kind": "consumes-output",
+      "count": 1,
+      "representative_files": [".claude/agents/intake-prd-author.md (lines 3, 27)"],
+      "confidence": "high",
+      "notes": "intake-prd-author reads intent-clarification.md as derived_from input"
+    },
+    {
+      "from": "agent.finalize-deliverable-packager",
+      "to": "agent.intake-intent-clarifier",
+      "kind": "consumes-output",
+      "count": 1,
+      "representative_files": [".claude/agents/finalize-deliverable-packager.md (lines 20, 27, 40)"],
+      "confidence": "high",
+      "notes": "Reads scope_class: from intent-clarification.md frontmatter"
+    },
+    {
+      "from": "agent.shared-document-reviewer",
+      "to": "agent.intake-intent-clarifier",
+      "kind": "consumes-output",
+      "count": 1,
+      "representative_files": [".claude/agents/shared-document-reviewer.md (lines 20, 57, 343)"],
+      "confidence": "high",
+      "notes": "Reviews intent-clarification.md (doc_type=IntentClarification) at Gate 0/1; reads scope_class for DeliverableArchive review."
+    },
+    {
+      "from": "kb.recipe-feature-pipeline",
+      "to": "agent.intake-intent-clarifier",
+      "kind": "spawns",
+      "count": 1,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md (lines 60, 144, 148)"],
+      "confidence": "high"
+    },
+    {
+      "from": "kb.documentation-criteria",
+      "to": "kb.template.intent-clarification",
+      "kind": "indexes",
+      "count": 1,
+      "representative_files": [".claude/skills/KB-documentation-criteria/SKILL.md (line 61)"],
+      "confidence": "high"
+    },
+    {
+      "from": "kb.documentation-criteria",
+      "to": "kb.shared-conventions",
+      "kind": "indexes",
+      "count": 1,
+      "representative_files": [".claude/skills/KB-documentation-criteria/SKILL.md (line 47)"],
+      "confidence": "high"
+    }
+  ],
+  "blast_radius": [
+    {
+      "touch_point": "script.validate_pipeline_frontmatter (FR-7 extension target)",
+      "direct_dependents_1_hop": [
+        "agent.shared-document-reviewer",
+        "agent.execute-task-quality-handler",
+        "script.run_phase_checks",
+        "script.smoke_test_auditing_shared",
+        "config.settings-json (permission allow-list entry pinning to this script)"
+      ],
+      "transitive_dependents_2_hop": [
+        "All 5 ADR-0017 invocation points of shared-document-reviewer (intake-prd-author output, discovery-plan-author output, per-layer Design outputs, design-composer output, plan-author output)",
+        "All execute-* agents that consume run_phase_checks via execute-phase-quality-reviewer",
+        "ADR-0033 (cites the script as the canonical schema location for the AC-FR-7 frontmatter-validation report)",
+        "ADR-0035 (auditing-shared skill binding convention)",
+        "ADR-0032 (script implements the per-doc-type vocabulary defined here)"
+      ],
+      "transitive_dependents_3_hop": [
+        "ALL pipeline artifacts produced by ALL 28+ pipeline sub-agents — because every artifact eventually passes through shared-document-reviewer at Gate 0",
+        "Every pipeline run's deliverable-archive review (via finalize-deliverable-packager → shared-document-reviewer)",
+        "All execution-phase artifacts (per-task-execution-result, phase-quality-report, quality-reconciliation-log, state-transitions-log, pipeline-run-summary)"
+      ],
+      "test_files": [
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py"
+      ],
+      "hop_tier_distribution": {"1": 5, "2": 5, "3": "broad — touches every artifact in every pipeline run"},
+      "regression_corpus_baseline": "The set of files .claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py exercises today PLUS every working/feature/<slug>/*.md and working/feature/<slug>/*.json that the validator's CLI is run against in any pipeline-run iteration. NFR-8 requires post-extension diff against this baseline to return zero new findings.",
+      "notes": "HIGH BLAST RADIUS. The validator is load-bearing for every Gate-0 pass. NFR-8 (zero false positives, zero false negatives on existing doc_types) is structurally critical. Backward-compatibility test corpus should be enumerable BEFORE the extension is implemented (Research Plan §Risks #3). Recommend: design-backend extends smoke_test_auditing_shared.py with a regression fixture set capturing the current GATED_DOC_TYPES / ANALYSIS_DOC_TYPES / ADR_STATES expected-output shape BEFORE adding the new issue-* doc_types and 5-state vocabulary."
+    },
+    {
+      "touch_point": "agent.intake-intent-clarifier (FR-11 small-edit target)",
+      "direct_dependents_1_hop": [
+        "kb.recipe-feature-pipeline (orchestrator spawns this agent at Stage 1)",
+        "agent.intake-prd-author (consumes intent-clarification.md as derived_from input)",
+        "agent.shared-document-reviewer (reviews intent-clarification.md at Gate 0/1)"
+      ],
+      "transitive_dependents_2_hop": [
+        "agent.finalize-deliverable-packager (reads scope_class: from intent-clarification.md frontmatter)",
+        "All downstream pipeline agents that carry intent_user_token forward in the user-token chain (per ADR-0032 Change 2) — this chain reaches blueprint, plan, all derivative artifacts"
+      ],
+      "transitive_dependents_3_hop": [
+        "Every artifact downstream of intent-clarification.md in the user-token chain — covers the entire pipeline run"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 3, "2": 2, "3": "transitive across whole pipeline via user_token chain"},
+      "notes": "The FR-11 edit is ADDITIVE: ~15 lines documenting how to detect doc_type:issue-proposal in --raw-request and treat as authoritative prior context. The edit cannot break existing behavior because Layer Scope OUT covers non-issue-proposal raw requests (status quo). Risk: if the agent body changes the semantics of when AskUserQuestion fires, downstream Stage-1 timing assumptions could shift. Mitigation: the edit must be a NEW branch in the procedure, not a replacement of existing logic."
+    },
+    {
+      "touch_point": "config.settings-json (FR-3 / FR-15 additive permission + hooks block)",
+      "direct_dependents_1_hop": [
+        "Claude Code platform loader (parses settings.json at session start)",
+        "auditing-settings skill family (audits this file structurally)",
+        "auditing-cc-configs (consumes auditing-settings findings)"
+      ],
+      "transitive_dependents_2_hop": [
+        "cc-critique (consumes auditing-cc-configs report at pre-merge)",
+        "Every Task tool spawn in every Claude Code session in this project — because the new PreToolUse hook fires globally on Task (NFR-1 motivates the fast-path discriminator)"
+      ],
+      "transitive_dependents_3_hop": [
+        "Every pipeline sub-agent spawn (estimated 30-100 Task spawns per pipeline run) — all pass through the new hook's discriminator path"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 3, "2": 2, "3": "every Task spawn in every session"},
+      "notes": "Additive permission entry is low-risk (just expands the allow-list). The hooks.PreToolUse block is HIGH-RISK because it fires globally; NFR-1 (fast-path overhead) and NFR-2 (fail-open) are the load-bearing protections. NO existing precedent for a hooks block in this project — the new one is structural. auditing-settings will scrutinize the merge."
+    },
+    {
+      "touch_point": "kb.recipe-feature-pipeline (FR-12 one-bullet edit)",
+      "direct_dependents_1_hop": [
+        "The orchestrator (Claude main session loads this skill when /feature-pipeline is invoked)",
+        "All 28+ pipeline sub-agents (referenced from this SKILL.md's stage table)"
+      ],
+      "transitive_dependents_2_hop": [
+        "Every pipeline run's Stage-1 invocation"
+      ],
+      "transitive_dependents_3_hop": [
+        "Every artifact produced by every pipeline run"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 2, "2": 1, "3": "broad"},
+      "notes": "Edit is one bullet. SKILL.md body is human-readable (no orchestrator code parses it). The edit cannot break existing behavior because the existing --raw-request flag and prior_context parameter are already in the contract; the bullet just documents the proposal-seed convention. ZERO TOOLING parses this file's body — purely descriptive."
+    },
+    {
+      "touch_point": "kb.documentation-criteria (FR-14 additive index update)",
+      "direct_dependents_1_hop": [
+        "intake-intent-clarifier",
+        "intake-prd-author",
+        "design-frontend / design-backend / design-api / design-query / design-database / design-cicd / design-iac / design-codespaces / design-claude-code",
+        "design-composer",
+        "plan-author",
+        "test-acceptance-author",
+        "shared-document-reviewer"
+      ],
+      "transitive_dependents_2_hop": [],
+      "transitive_dependents_3_hop": [],
+      "test_files": [],
+      "hop_tier_distribution": {"1": "all 9 pipeline-document authors + reviewer", "2": 0, "3": 0},
+      "notes": "Edit is additive (new rows in tables; new bullet in 'Where this KB is NOT used'). No existing row is altered. The 9 callers consume the routing-table rows by reading; adding rows does not break any existing read path."
+    },
+    {
+      "touch_point": "Three new templates (FR-6) + new KB-issue-capture + new capture-issue skill + new issue-capture-author agent + new hook script — all CREATE-mode artifacts",
+      "direct_dependents_1_hop": [],
+      "transitive_dependents_2_hop": [],
+      "transitive_dependents_3_hop": [],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 0, "2": 0, "3": 0},
+      "notes": "Blast radius is ZERO at creation. BUT: auditing-cc-configs and auditing-skills enumerate all SKILL.md files when running their walkers (per auditing-cc-configs/scripts/audit_project.py). The new skills MUST register cleanly. Specifically: auditing-skills will check that disable-model-invocation: true is correctly applied on the two new skills, and auditing-subagents will check that the new agent's frontmatter does NOT list disable-model-invocation skills in its skills: field (per subagent-spec.md line 110 — silent-drop BLOCKER risk)."
+    },
+    {
+      "touch_point": "Four flat Issues/*.md files + agent-roster-impact-matrix.md (FR-8 / FR-9 migration)",
+      "direct_dependents_1_hop": [
+        "Any document or agent that references these files by their flat path"
+      ],
+      "transitive_dependents_2_hop": [],
+      "transitive_dependents_3_hop": [],
+      "test_files": [],
+      "hop_tier_distribution": {"1": "see notes", "2": 0, "3": 0},
+      "notes": "Migration touch-points have non-trivial reference graph. Files referencing the pre-migration paths (sample, not exhaustive): the PRD itself (lines 56-59, 593-595), the seed proposal at Issues/issue-capture-mechanism/proposal.md (lines 14-17, 138-142 — already anticipates POST-migration paths in companion_artifacts!), Issues/proposal-auditing-family-graduation-review.md (frontmatter and body refs). The migration must either: (a) update all referrers to the new path AS PART OF the same atomic change; OR (b) accept short-term stale references while the migration proceeds. Recommend (a). git mv preserves history per AC-FR-8-b — the structural-presence assumption is git's mv tracking, which works for direct moves but is heuristic for content-changing moves."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-001",
+      "severity": "important",
+      "title": "NO existing SKILL.md declares disable-model-invocation: true",
+      "evidence": "Grep across all .claude/skills/*/SKILL.md frontmatter blocks for the literal 'disable-model-invocation: true' returns zero matches. The 20+ files that mention this flag are documentation/audit references, not actual declarations.",
+      "implications": "The two new skills (KB-issue-capture, capture-issue) will be the FIRST in this project to use this flag. design-claude-code should treat the auditing-skills and auditing-subagents checks against this flag as untested in the project corpus — there is no working example to template against. Design must rely on KB-cc-platform/references/extensions.md (line 104) and the skill-SKILL.md.example template at .claude/skills/KB-cc-platform/assets/templates/skill-SKILL.md.example.",
+      "for_consumer": "design-claude-code, design-composer"
+    },
+    {
+      "id": "F-002",
+      "severity": "important",
+      "title": "NO hook directory and NO hooks block in settings.json — this IS the first hook",
+      "evidence": "ls /workspaces/feature-pipeline/.claude/hooks/ → 'No such file or directory'. grep '\"hooks\"' .claude/settings.json /.claude/settings.local.json → no matches. The current settings.json contains ONLY a permissions.allow array (13 lines, 7 entries).",
+      "implications": "The PRD's Risk #5 is REAL: the first hook in this project. design-claude-code must establish the hook discipline (bash vs python vs node; fail-open posture; stderr conventions; ${CLAUDE_PROJECT_DIR} usage) with no project-internal precedent — only auditing-hooks references and KB-cc-platform/extensions.md guidance. cc-critique findings against this addition will be the first hook audit in this project.",
+      "for_consumer": "design-claude-code, design-composer, cc-critique (pre-merge)"
+    },
+    {
+      "id": "F-003",
+      "severity": "important",
+      "title": "Skills with disable-model-invocation cannot be in subagent's skills: field — silent drop",
+      "evidence": ".claude/skills/auditing-subagents/references/subagent-spec.md line 110: 'Skills with disable-model-invocation: true cannot be preloaded into subagents → BLOCKER (these are silently dropped).' AND .claude/skills/auditing-cc-configs/references/common-failures.md lines 101-103 reinforce this.",
+      "implications": "Load-bearing structural constraint for the new issue-capture-author agent. Its frontmatter MUST NOT list KB-issue-capture or capture-issue in 'skills:'. Instead, the agent body must Read/Glob the skill files at runtime. cc-critique's auditing-cc-configs walker has cross-file check X3 (cross_file_checks.py line 410) that catches this exact bug.",
+      "for_consumer": "design-claude-code, design-composer (ADR for three-layer enforcement)"
+    },
+    {
+      "id": "F-004",
+      "severity": "important",
+      "title": "ADR-0008 lives in adrs-migrated/, not adrs/ — known drift, NOT migrated this run",
+      "evidence": "ls adrs-migrated/ shows three ADR-0008 files (canonical + 2 prior-version archives). ls adrs/ contains NO ADR-0008. Issues/analysis-adr-placement-rootcause.md (its own file in the precedent set) documents this drift as an open issue NOT scheduled for resolution by this run.",
+      "implications": "Per PRD U-10, the 7 new ADRs of this run land in adrs/ per ADR-0036. They MAY reference ADR-0008's 4-state vocabulary by citing its current adrs-migrated/ location. Per PRD §Risks #2, design-composer's slate must NOT attempt to migrate ADR-0008. Per the user's Gate 3 confirmation (Research Plan §Open Questions #2): explicit non-migration.",
+      "for_consumer": "design-composer, cc-critique, review-architecture-auditor"
+    },
+    {
+      "id": "F-005",
+      "severity": "important",
+      "title": "doc_type naming inconsistency between existing precedent files and PRD FR-7 target enum",
+      "evidence": "Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md uses doc_type: deferral-register (not 'issue-register'). Issues/analysis-per-agent-design-evaluation-gap.md uses doc_type: analysis (not 'issue-analysis'). Issues/analysis-adr-placement-rootcause.md uses doc_type: analysis. Issues/proposal-auditing-family-graduation-review.md uses doc_type: proposal (not 'issue-proposal'). Issues/issue-capture-mechanism/proposal.md ALONE uses the new canonical doc_type: issue-proposal.",
+      "implications": "FR-8 migration must back-fill doc_type values to the new canonical enum (issue-register, issue-analysis, issue-proposal) as part of the same atomic git mv operation. NFR-8 (validator backward-compatibility) requires that the OLD doc_type values (deferral-register, analysis, proposal) either (a) continue to validate cleanly because the migration back-fills them, or (b) become unknown-doc_type minor findings as a TRANSITION SIGNAL. Design-backend decides — recommend (a).",
+      "for_consumer": "design-claude-code (FR-8 migration), design-backend (FR-7 validator extension), plan-author"
+    },
+    {
+      "id": "F-006",
+      "severity": "informational",
+      "title": "proposes_future_feature field has TWO existing precedents",
+      "evidence": "Issues/proposal-auditing-family-graduation-review.md frontmatter line 15: proposes_future_feature=auditing-family-structure-review-r1 (suggested slug). Issues/issue-capture-mechanism/proposal.md frontmatter line 11: proposes_future_feature=issue-capture-mechanism-r1.",
+      "implications": "Research Plan IN-021 asks whether this field has precedent. ANSWER: yes, two precedents — both on issue-proposal-shaped files. The PRD FR-7 validator extension should allow this field on issue-proposal doc_type. PRD U-6 asks whether its presence/format is enforced or advisory — recommend advisory (presence-only, no format-enforcement) given the precedents use a 'suggested slug' annotation in one and a fixed slug in the other.",
+      "for_consumer": "design-backend (FR-7), design-composer"
+    },
+    {
+      "id": "F-007",
+      "severity": "important",
+      "title": "auditing-hooks references/ has 4 files, NOT 6 — no examples/ subdirectory",
+      "evidence": "ls .claude/skills/auditing-hooks/references/ → anti-patterns.md, common-failures.md, hook-spec.md, security-checklist.md. The Research Plan §Codebase Research Scope Group C cited examples/good-hook-annotated.md and examples/bad-hook-annotated.md — these do NOT exist.",
+      "implications": "design-claude-code should not expect a 'good annotated hook' to template against. The hook-spec.md and security-checklist.md are the substantive references. Design must compose the new hook from KB-cc-platform/references/extensions.md primary guidance + auditing-hooks safety patterns, without a worked annotated example in-project.",
+      "for_consumer": "design-claude-code"
+    },
+    {
+      "id": "F-008",
+      "severity": "informational",
+      "title": "Validator's hand-rolled YAML parser tolerates pipe-folded values but parses inline-list and bullet-list separately",
+      "evidence": "validate_pipeline_frontmatter.py lines 86-144 implement parse_frontmatter. Handles simple key:value, inline lists [a,b], multi-line bullet lists, and pipe-folded (|) text blocks. Does NOT use PyYAML.",
+      "implications": "FR-7 extension does not need to handle new YAML shapes; the parser is sufficient. Per-state companion-field rules can be added to validate_pipeline_artifact by branching on doc_type prefix (e.g., doc_type.startswith('issue-')) and dispatching to a new validate_issue_artifact function. Pattern fits existing dispatch shape (line 365-371).",
+      "for_consumer": "design-backend"
+    },
+    {
+      "id": "F-009",
+      "severity": "informational",
+      "title": "Existing analysis-/proposal-/register- precedents do NOT include status field in current frontmatter",
+      "evidence": "All four pre-migration files declare status: draft in their frontmatter. The 5-state vocabulary (draft → open → adopted | complete | superseded | wontfix-with-rationale) is novel; the existing files are all at the initial 'draft' state.",
+      "implications": "FR-8 migration back-fills status: open per AC-FR-8-a (PRD line 330). Per the PRD, the migration moves files from status:draft to status:open. Validator extension (FR-7) must validate this transition AND validate that all four post-migration files pass with status:open + required per-state companion fields. PRD §Success Criteria 'Validator clean-run on migrated files' (4-of-4 zero findings).",
+      "for_consumer": "design-claude-code (FR-8), design-backend (FR-7)"
+    },
+    {
+      "id": "F-010",
+      "severity": "important",
+      "title": "Pipeline-isolation invariant VERIFIED — zero matches across all pipeline-agent files",
+      "evidence": "Three independent grep commands all return ZERO MATCHES across .claude/agents/{intake,discovery,design,plan,test,review,finalize,execute,synth}-*.md AND across the broader /workspaces/feature-pipeline/.claude/ tree (excluding working/ and Issues/). Detail: see pipeline_isolation_check section.",
+      "implications": "AC-FR-13-a and AC-FR-13-b are at zero-baseline pre-merge. The structural invariant holds at the start of this run; design must preserve it post-merge. test-acceptance-author should make this baseline part of the acceptance test corpus.",
+      "for_consumer": "design-claude-code, test-acceptance-author, review-cross-artifact-auditor"
+    },
+    {
+      "id": "F-011",
+      "severity": "informational",
+      "title": "Existing sibling-script CLI idiom is consistent and reusable",
+      "evidence": "check_pipeline_discipline.py, detect_stubs.py, log_state_transition.py all use argparse with positional paths or stdin (or named --feature-slug), emit JSON to stdout, surface errors to stderr, default to exit 0 (observer-only) with optional --strict flag for fail-fast. validate_pipeline_frontmatter.py uses --exit-on-blocker for the same purpose.",
+      "implications": "The FR-7 extension should preserve the existing argparse + JSON-stdout + observer-only-default discipline. Per Research Plan IN-020, this is the idiom design-backend should match.",
+      "for_consumer": "design-backend"
+    },
+    {
+      "id": "F-012",
+      "severity": "important",
+      "title": "Validator dispatch already branches on path — adding issue-* requires branching on doc_type prefix",
+      "evidence": "validate_file (lines 347-371) dispatches: SKILL.md or /skills/ path → validate_skill_frontmatter; /agents/ path → validate_agent_frontmatter; else → validate_pipeline_artifact. The Issues/<topic>/<doctype>.md files would fall to validate_pipeline_artifact by default.",
+      "implications": "The cleanest FR-7 implementation: extend validate_pipeline_artifact to additionally branch on doc_type.startswith('issue-') and dispatch to a new validate_issue_artifact function. This preserves the existing per-doc-type category dispatch (gated/analysis/adr) without disturbing it, and introduces a FOURTH category (issue) with its 5-state vocabulary. Backward compatibility: existing pre-migration files (doc_type=analysis|proposal|deferral-register) continue to use the existing dispatch unless migrated.",
+      "for_consumer": "design-backend"
+    },
+    {
+      "id": "F-013",
+      "severity": "informational",
+      "title": "intake-intent-clarifier already supports prior_context — FR-11 edit can document the explicit 'doc_type:issue-proposal' branch without changing the parameter signature",
+      "evidence": "intake-intent-clarifier.md line 28 declares: 'prior_context — optional. If the user has had earlier conversations about this feature, the orchestrator passes a digest. Use this to avoid re-asking what you already know.'",
+      "implications": "FR-11's ~15-line insertion is purely body-level (procedure documentation), not signature-level. The existing prior_context parameter accommodates the new branch. The recipe-feature-pipeline orchestrator (kb.recipe-feature-pipeline) already passes prior_context (line 145), so the wire is in place. The new branch: when raw_request is a path AND the file at that path has doc_type:issue-proposal, treat the file body as authoritative prior context.",
+      "for_consumer": "design-claude-code (FR-11)"
+    },
+    {
+      "id": "F-014",
+      "severity": "informational",
+      "title": "The 'Source' section in intent-clarification-template.md is already structured to receive the proposal-citation edit",
+      "evidence": "intent-clarification-template.md lines 36-38: '## Source\\n\\n[One sentence: the user's original request, quoted or near-verbatim. Do NOT rephrase to sound more technical or more polished — the user's framing matters.]'",
+      "implications": "FR-12 edit (~5 lines) adds a sub-paragraph or bullet noting that when --raw-request is a path to a file with doc_type:issue-proposal, the Source section MUST cite the proposal path verbatim (per AC-FR-10-a). Structurally additive; does not alter the existing one-sentence guidance for non-proposal-seeded runs.",
+      "for_consumer": "design-claude-code (FR-12)"
+    },
+    {
+      "id": "F-015",
+      "severity": "important",
+      "title": "PRD §Risks #4 (prose matches in pipeline-agent files) — confirmed absent in current state",
+      "evidence": "Three independent greps (KB-issue-capture, issue-capture-author, capture-issue) all return ZERO matches across .claude/agents/. Per the user's Gate 3 confirmation, prose matches are disallowed; the grep was performed without anchoring (literal substring match) so prose mentions are included in the zero count.",
+      "implications": "The structural invariant is intact at run start. Design must ensure no pipeline-agent FILE introduces prose mentions of KB-issue-capture, issue-capture-author, or capture-issue (even in 'see also' or example sections). FR-13 ACs are testable as flat-grep against the slug-list.",
+      "for_consumer": "design-composer, test-acceptance-author"
+    },
+    {
+      "id": "F-016",
+      "severity": "important",
+      "title": "No GitNexus MCP and no codebase-memory-mcp configured — extraction is direct-read",
+      "evidence": "ls /workspaces/feature-pipeline/ → no .mcp.json. .claude/SETTINGS-NOTES.md does not document an MCP configuration. Direct file reads via Read/Grep/Glob were the only available extraction methods.",
+      "implications": "All blast-radius and dependency edges in this analysis were computed by grep + textual citation, NOT by graph traversal. Confidence is HIGH for direct text-citable claims but LOWER for transitive (multi-hop) claims. Consumers should treat the transitive_dependents_2/3_hop fields as upper-bound estimates derived from agent-name patterns rather than verified call graphs.",
+      "for_consumer": "all downstream consumers"
+    }
+  ],
+  "convention_patterns": [
+    {
+      "id": "CP-001",
+      "scope": "agent-frontmatter-non-pipeline",
+      "pattern": "Non-pipeline agents (cc-critique, shared-document-reviewer) use: tools as comma-separated string (with Bash(...:*) scoped entries); model: opus; effort: high; OPTIONAL skills as comma-separated string (shared-document-reviewer) or omitted (cc-critique); OPTIONAL permissionMode: default; NO memory field (no persistent memory) OR memory: project (shared-document-reviewer); NO disable-model-invocation field on agents (that's a skill-only flag).",
+      "implications": "New issue-capture-author agent should mirror cc-critique structurally: tools as comma-separated string, model opus, effort high, NO 'skills:' field (the disable-model-invocation skills cannot be preloaded per F-003), NO persistent memory section (or explicit 'You do not use persistent memory.' body section per cc-critique line 92-94).",
+      "for_consumer": "design-claude-code, design-composer"
+    },
+    {
+      "id": "CP-002",
+      "scope": "auditing-shared-script-cli",
+      "pattern": "All 7 scripts in auditing-shared/scripts/ use argparse, accept positional paths or stdin, emit JSON to stdout (typically wrapped in {findings: [...]}), use a finding dict shape with fields {domain, severity, source_activity, file_path, message, dispatch_hint, depth_level}, default to exit 0 (observer-only), optionally accept --strict or --exit-on-blocker for fail-fast.",
+      "implications": "FR-7 extension must preserve this idiom — no new top-level CLI shape, no PyYAML dependency, finding shape unchanged.",
+      "for_consumer": "design-backend"
+    },
+    {
+      "id": "CP-003",
+      "scope": "Issues-frontmatter-pre-migration",
+      "pattern": "Four pre-migration Issues/*.md files share frontmatter shape: id=<DOCTYPE>-<slug>, doc_type=<varying>, status: draft, generated: <date>, generated_by: <free-form actor>, feature_slug: <string>, scope: <free-form descriptor>, mode: report-only, companion_artifacts: <YAML list>. id values are uppercase doc_type + kebab-case slug.",
+      "implications": "FR-6 templates codify this shape. FR-8 migration back-fills version:0.1.0 (PRD §Background ACs) and status:open and any per-state required companion fields per FR-7's new 5-state vocabulary. The id-derivation rule (uppercase doctype + kebab topic) matches AC-FR-4-c.",
+      "for_consumer": "design-claude-code, design-backend"
+    },
+    {
+      "id": "CP-004",
+      "scope": "Issues-body-structure",
+      "pattern": "Existing Issues files lead with '# <Title>' then TL;DR section then numbered top-level sections (1. <Topic> with subsections 1.1, 1.2, ...). The register-* file uses a tabular structure with columns ID/Item/Source/Why deferred/Re-examination trigger/Forgetting risk. The analysis-* files use prose+evidence. The proposal-* files use prose+adoption.",
+      "implications": "Three doctypes have three distinct body shapes — confirming the PRD's 'three doctypes preserved' policy (PRD §Product Policy Decisions). Templates codify these as three distinct structural skeletons; do NOT attempt to unify.",
+      "for_consumer": "design-claude-code"
+    },
+    {
+      "id": "CP-005",
+      "scope": "settings-json-permission-shape",
+      "pattern": "All 7 existing permission entries are pinned to a specific script path with the wildcard pattern 'Bash(python3 .claude/skills/<family>/scripts/<name>.py:*)'. The trailing ':*' permits arbitrary arguments. No glob beyond named scripts.",
+      "implications": "FR-3's optional 8th allow entry for the hook script (if it is invoked from Bash anywhere — likely NOT, as hooks run via Claude Code's hook event mechanism) should follow this same shape. The new hooks block under settings.json's top-level 'hooks' key is independent of permissions.allow.",
+      "for_consumer": "design-claude-code, cc-critique"
+    },
+    {
+      "id": "CP-006",
+      "scope": "kb-documentation-criteria-routing-shape",
+      "pattern": "SKILL.md uses tables for indexing references and routing callers. Each table has 2-3 columns: 'Concern | Reference' or 'Caller | When | Purpose' or 'Document type | Template | Authored by'. New entries are simply additional rows.",
+      "implications": "FR-14's additive index update is straightforward: add 4 rows to 'Canonical templates' table (3 new templates + 1 new spec) and add a bullet to the 'Where this KB is NOT used' list. The 'What's in this KB' table also needs a row for issue-doctypes-spec.md.",
+      "for_consumer": "design-claude-code"
+    },
+    {
+      "id": "CP-007",
+      "scope": "user-token-chain-and-feature_slug",
+      "pattern": "ADR-0032 Change 2 + Change 4 require feature_slug on every pipeline artifact + intent_user_token chain forward. The four pre-migration Issues files declare feature_slug (one feature-specific, three pipeline-wide). The new templates' frontmatter must define how feature_slug applies to pipeline-wide-scope issue captures (per the existing pattern: 'feature_slug: pipeline-wide').",
+      "implications": "FR-6 templates should set feature_slug: pipeline-wide as the default for issue captures; or, for feature-specific issue captures, feature_slug: <slug>. Validator must accept both. Note that ADR-0032's universal-required-feature_slug applies — the existing analysis-/proposal-/register- files all declare it.",
+      "for_consumer": "design-claude-code, design-backend"
+    }
+  ],
+  "verbatim_extracts": [
+    {
+      "id": "VE-001",
+      "label": "Intra-pipeline 4-state issue-ledger vocabulary (per ADR-0008) — for the 5-state ADR's parallel-but-distinct citation",
+      "source_file": ".claude/skills/KB-review-disciplines/references/issue-lifecycle.md",
+      "source_lines": "82-105",
+      "text": "## Lifecycle states\n\n| Status | Meaning | Set by |\n|---|---|---|\n| `open` | Issue is active; needs resolution | Reviewer that surfaces it |\n| `resolved` | Issue is fixed; reviewer confirmed | Reviewer at iteration N+1 after fix at iteration N |\n| `wontfix-with-rationale` | Issue acknowledged but deliberately not fixed; rationale recorded | User (via orchestrator AskUserQuestion) only |\n| `superseded` | Issue replaced by a different one (typically because the underlying design changed) | Reviewer; references the superseding issue ID |\n\n`wontfix-with-rationale` requires user approval — a reviewer alone cannot move an issue to this status. The orchestrator surfaces the issue to user, captures the rationale, and updates the ledger.\n\n## Transitions\n\n```\n                ┌────────────┐\n   created  ───►│    open    │───► resolved\n                └────────────┘     (terminal)\n                       │\n                       ├────────► wontfix-with-rationale (user-approved)\n                       │           (terminal)\n                       │\n                       └────────► superseded (by issue I-XX-NNN)\n                                   (terminal)\n```\n\nNo transition out of any terminal state. If a \"resolved\" issue re-appears, it gets a NEW ID — and the reviewer must reference the prior ID as `references_prior: I-XX-NNN` in the new issue.",
+      "implications_for_design": "The 4 states are: open, resolved, wontfix-with-rationale, superseded. The new 5-state issue-* vocabulary (draft → open → adopted | complete | superseded | wontfix-with-rationale) shares THREE state-name strings (open, superseded, wontfix-with-rationale) with this intra-pipeline vocabulary BUT operates on a distinct entity (Issues/<topic>/<doctype>.md files vs. issues-ledger.json records) with distinct ID prefixes (I-<DR|AA|CA>-NNN vs. <DOCTYPE>-<topic-slug>). The PRD §Product Policy Decisions row 2 establishes the parallel-but-distinct policy; the ADR for the 5-state vocabulary (per PRD U-10) must transcribe THIS verbatim text and contrast against it."
+    },
+    {
+      "id": "VE-002",
+      "label": "Validator finding dict shape — required by the sibling-script idiom",
+      "source_file": ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py",
+      "source_lines": "157-167",
+      "text": "def make_finding(severity: str, file_path: Path, message: str, depth: str = \"0\") -> dict:\n    return {\n        \"domain\": \"validator\",\n        \"severity\": severity,\n        \"source_activity\": \"frontmatter-validator\",\n        \"file_path\": str(file_path),\n        \"message\": message,\n        \"dispatch_hint\": \"the agent that authored the artifact\",\n        \"depth_level\": depth,\n    }",
+      "implications_for_design": "FR-7's new issue-doctype-specific findings should reuse this make_finding shape; the dispatch_hint default ('the agent that authored the artifact') applies to Issues files authored by issue-capture-author."
+    },
+    {
+      "id": "VE-003",
+      "label": "Current GATED_DOC_TYPES, ANALYSIS_DOC_TYPES, ANALYSIS_DOC_TYPE_SUFFIXES, and per-category state vocabularies",
+      "source_file": ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py",
+      "source_lines": "38-68",
+      "text": "GATED_DOC_TYPES = {\n    \"intent-clarification\",\n    \"prd\",\n    \"research-plan\",\n    \"blueprint\",\n    \"plan\",\n}\nANALYSIS_DOC_TYPES = {\n    \"codebase-analysis\",\n    \"synthesis\",\n    \"architecture-audit-issues\",\n    \"cross-artifact-audit-issues\",\n    \"acceptance-tests\",\n    \"phase-validators\",\n    \"reconciliation-log\",\n    \"task-dag\",\n    \"per-task-execution-result\",\n    \"phase-quality-report\",\n    \"quality-reconciliation-log\",\n    \"state-transitions-log\",\n    \"pipeline-run-summary\",\n    \"architecture-audit-report\",\n    \"deliverable-archive-review\",\n}\nANALYSIS_DOC_TYPE_SUFFIXES = (\"-design\", \"-report\", \"-log\", \"-issues\", \"-result\", \"-summary\")\n\nGATED_STATES = {\"draft\", \"accepted\", \"superseded\", \"rejected\"}\nANALYSIS_STATES = {\"draft\", \"complete\", \"superseded\"}\nADR_STATES = {\"proposed\", \"accepted\", \"superseded\", \"rejected\"}",
+      "implications_for_design": "FR-7 extension adds a FOURTH category. Recommended shape: ISSUE_DOC_TYPES = {issue-register, issue-analysis, issue-proposal}; ISSUE_STATES = {draft, open, adopted, complete, superseded, wontfix-with-rationale}; plus per-state required-companion-field rules to be designed (PRD U-4)."
+    },
+    {
+      "id": "VE-004",
+      "label": "Current validator dispatch — line 365-371 path-based dispatch",
+      "source_file": ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py",
+      "source_lines": "365-371",
+      "text": "    # Dispatch: skill file vs agent file vs pipeline artifact vs ADR.\n    str_path = str(path)\n    if path.name == \"SKILL.md\" or \"/.claude/skills/\" in str_path:\n        return validate_skill_frontmatter(fm, path)\n    if \"/.claude/agents/\" in str_path or \".claude/agents/\" in str_path:\n        return validate_agent_frontmatter(fm, path)\n    return validate_pipeline_artifact(fm, path)",
+      "implications_for_design": "FR-7 extension can preserve this dispatch and add an Issue-path branch (e.g., 'Issues/' in str_path) routing to a new validate_issue_artifact, OR can add doc_type-prefix-based branching INSIDE validate_pipeline_artifact. The latter is more cohesive with the existing per-category dispatch (gated/analysis/adr inside validate_pipeline_artifact)."
+    }
+  ],
+  "pipeline_isolation_check": {
+    "invariant": "AC-FR-13-a + AC-FR-13-b: Zero matches for 'KB-issue-capture' and 'issue-capture-author' (and prose mentions of either) across all pipeline-agent files at .claude/agents/{intake,discovery,design,plan,test,review,finalize,execute,synth}-*.md.",
+    "grep_commands_run": [
+      "grep -r 'KB-issue-capture' /workspaces/feature-pipeline/.claude/agents/",
+      "grep -r 'issue-capture-author' /workspaces/feature-pipeline/.claude/agents/",
+      "grep -r 'capture-issue' /workspaces/feature-pipeline/.claude/agents/",
+      "grep -r 'KB-issue-capture\\|issue-capture-author' /workspaces/feature-pipeline/ --include='*.md' --include='*.json' --include='*.py' --include='*.sh' --exclude-dir=working --exclude-dir=Issues --exclude-dir=.git"
+    ],
+    "results": {
+      "KB-issue-capture in pipeline-agent files": 0,
+      "issue-capture-author in pipeline-agent files": 0,
+      "capture-issue in pipeline-agent files": 0,
+      "KB-issue-capture or issue-capture-author across entire .claude/ tree (excluding working/, Issues/, .git/)": 0
+    },
+    "verdict": "PASS — Zero-baseline confirmed. The structural invariant is intact at run start. Both AC-FR-13-a and AC-FR-13-b are at the required zero-match state. The grep was performed without anchoring (literal substring match), so prose mentions are also included in the zero count per the user's Gate 3 confirmation that prose mentions are disallowed (Research Plan §Open Questions #3 resolution).",
+    "notes": "Greps performed at 2026-05-23T18:55Z against HEAD commit cf48e5e. No reset or branch change between the grep and this report; the result is the canonical pre-merge baseline."
+  },
+  "validator_extension_surface": {
+    "current_doc_type_enum_explicit": [
+      "intent-clarification",
+      "prd",
+      "research-plan",
+      "blueprint",
+      "plan",
+      "codebase-analysis",
+      "synthesis",
+      "architecture-audit-issues",
+      "cross-artifact-audit-issues",
+      "acceptance-tests",
+      "phase-validators",
+      "reconciliation-log",
+      "task-dag",
+      "per-task-execution-result",
+      "phase-quality-report",
+      "quality-reconciliation-log",
+      "state-transitions-log",
+      "pipeline-run-summary",
+      "architecture-audit-report",
+      "deliverable-archive-review",
+      "adr"
+    ],
+    "current_doc_type_suffix_match": ["-design", "-report", "-log", "-issues", "-result", "-summary"],
+    "current_state_vocabulary": {
+      "gated_5_doc_types": ["draft", "accepted", "superseded", "rejected"],
+      "analysis_log_n_doc_types": ["draft", "complete", "superseded"],
+      "adr_single_doc_type": ["proposed", "accepted", "superseded", "rejected"]
+    },
+    "current_per_state_required_companion_fields": {
+      "superseded": ["superseded_by (back-link required per ADR-0005 — enforced at line 314-323)"]
+    },
+    "agent_frontmatter_checks_unaffected_by_extension": [
+      "memory enum check (line 174-193)",
+      "tools known-base check (line 196-212)",
+      "effort enum check (line 215-224)",
+      "skills directory-existence check (line 228-250)"
+    ],
+    "skill_frontmatter_check_unaffected_by_extension": [
+      "name and description required (line 328-344)"
+    ],
+    "current_severity_levels_used": ["blocker", "major", "minor", "info"],
+    "current_finding_shape": "{domain, severity, source_activity, file_path, message, dispatch_hint, depth_level}",
+    "recommended_extension_shape": {
+      "new_category": "issue",
+      "new_doc_type_enum_values": ["issue-register", "issue-analysis", "issue-proposal"],
+      "new_state_vocabulary": ["draft", "open", "adopted", "complete", "superseded", "wontfix-with-rationale"],
+      "new_per_state_companion_fields_TBD": "PRD U-4 defers the per-state required-companion-field set to design-claude-code + design-backend at Stage 5; the validator extension must accept the design output without further validator-internal decisions.",
+      "regression_test_corpus_required_by_NFR_8": "All files currently passing validate_pipeline_frontmatter.py (the GATED + ANALYSIS + ADR corpus) must produce IDENTICAL findings after extension. Use smoke_test_auditing_shared.py as the harness; extend with a regression suite covering each existing doc_type at each valid state."
+    }
+  },
+  "known_issues": [
+    {
+      "description": "doc_type drift in existing Issues files: pre-migration files use 'deferral-register', 'analysis', 'proposal' as doc_type values, but PRD FR-7 canonicalizes to 'issue-register', 'issue-analysis', 'issue-proposal'. FR-8 migration must back-fill the new canonical values.",
+      "files": [
+        "Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md:3",
+        "Issues/analysis-per-agent-design-evaluation-gap.md:3",
+        "Issues/analysis-adr-placement-rootcause.md:3",
+        "Issues/proposal-auditing-family-graduation-review.md:3"
+      ],
+      "severity": "medium",
+      "for_consumer": "design-claude-code (FR-8), design-backend (FR-7)"
+    },
+    {
+      "description": "ADR-0008 placement drift — ADR lives at adrs-migrated/, not adrs/ canonical. This run does NOT fix the drift (per PRD §Risks #2 and Research Plan §Open Questions #2). The 7-ADR slate authored this run lands in adrs/ per ADR-0036.",
+      "files": [
+        "adrs-migrated/ADR-0008-issue-ledger-scope.md",
+        "Issues/analysis-adr-placement-rootcause.md (the captured analysis)"
+      ],
+      "severity": "informational (out-of-scope for this run; captured for context)",
+      "for_consumer": "design-composer (cite from adrs-migrated/ when authoring ADRs that reference ADR-0008)"
+    },
+    {
+      "description": "auditing-hooks references/examples/ does not exist (only the 4 reference .md files do). Design-claude-code cannot template the hook script against an in-project 'good annotated example'.",
+      "files": [
+        ".claude/skills/auditing-hooks/references/ (4 files only; no examples/ subdir)"
+      ],
+      "severity": "informational",
+      "for_consumer": "design-claude-code"
+    }
+  ],
+  "open_questions_for_human": []
+}

@@ -1,0 +1,36 @@
+{
+  "run_id": "issue-capture-mechanism-r1-20260523-164832",
+  "feature_slug": "issue-capture-mechanism-r1",
+  "started_at": "2026-05-23T16:48:32Z",
+  "completed_at": "2026-05-24T02:30:00Z",
+  "current_stage": "complete",
+  "stage_status": "passed",
+  "gate_history": [
+    {"gate": "intent_confirmation", "decision": "approved", "timestamp": "2026-05-23T16:51:00Z", "user_notes": "Approve all 7 proposed defaults."},
+    {"gate": "prd_approval", "decision": "approved_with_revision", "timestamp": "2026-05-23T17:05:00Z", "user_notes": "v1 conditional; v2 PASS."},
+    {"gate": "research_plan_approval", "decision": "approved", "timestamp": "2026-05-23T17:25:00Z", "user_notes": "0 external topics + 5 defaults accepted."},
+    {"gate": "blueprint_approval", "decision": "approved_with_revision", "timestamp": "2026-05-23T23:55:00Z", "user_notes": "v1 conditional; v2 PASS; v3 from audit reconciliation."},
+    {"gate": "i_aa_001_user_escalation", "decision": "accepted_deviation", "timestamp": "2026-05-24T00:30:00Z", "user_notes": "Option A: Accept ADR placement deviation."},
+    {"gate": "plan_approval", "decision": "approved_with_revision", "timestamp": "2026-05-24T01:20:00Z", "user_notes": "v1 conditional on 4 important findings; v2 PASS ratified."},
+    {"gate": "final_approval", "decision": "approved", "timestamp": "2026-05-24T02:30:00Z", "user_notes": "Approve — mark run complete. 52-task DAG ready for execution-pipeline consumption."}
+  ],
+  "artifact_versions": {
+    "intent_clarification": 1, "prd": 2, "research_plan": 1, "codebase_analysis": 1,
+    "synthesis": 1, "decision_frames": 1, "cc_design": 1, "backend_design": 1,
+    "blueprint": 3, "adrs": [44, 45, 46, 47, 48, 49, 50], "plan": 2,
+    "acceptance_tests": 1, "phase_validators": 1, "cross_artifact_audit": 1,
+    "tasks": 1, "packager_report": 1
+  },
+  "reconciliation_cycles": {"blueprint": 2, "cross_artifact": 0},
+  "activated_layers": ["cc", "backend"],
+  "extraction_method": "direct-read-grep-glob",
+  "deferred_findings": ["I-AA-011 (ADR-0047 prose Four→Five propagation; below verdict-fail threshold)"],
+  "user_accepted_deviations": ["I-AA-001 (7 new ADRs at working/feature/<slug>/adrs/ per Option A; resolution deferred to future feature per Issues/adr-placement-rootcause/)"],
+  "params": {
+    "max_external_research_topics": 6, "reconciliation_cap": 4,
+    "raw_request_source": "Issues/issue-capture-mechanism/proposal.md",
+    "prior_context_source": "/home/vscode/.claude/plans/i-am-noticing-as-reflective-wilkes.md",
+    "external_topics_authorized": 0,
+    "synthesis_chain": "streamlined (synth-framer + synth-synthesizer only)"
+  }
+}

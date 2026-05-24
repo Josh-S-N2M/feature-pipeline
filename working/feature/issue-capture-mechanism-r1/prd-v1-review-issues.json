@@ -1,0 +1,152 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "PRD",
+    "target_path": "working/feature/issue-capture-mechanism-r1/prd-v1.md",
+    "prior_doc_path": "working/feature/issue-capture-mechanism-r1/intent-clarification.md",
+    "feature_slug": "issue-capture-mechanism-r1",
+    "reviewer": "shared-document-reviewer",
+    "review_timestamp": "2026-05-23T17:15:00Z",
+    "stage": "Stage 2 PRD Review (per ADR-0017 invocation point 2)"
+  },
+  "scores": {
+    "consistency": 96,
+    "completeness": 93,
+    "rule_compliance": 95,
+    "clarity": 90
+  },
+  "gate0": {
+    "status": "pass",
+    "checks": {
+      "contents_section_present": true,
+      "all_required_h2_sections_present": true,
+      "layer_scope_uses_9_layer_taxonomy": true,
+      "frontmatter_yaml_parses": true,
+      "frontmatter_universal_fields_present": true,
+      "frontmatter_prd_specific_fields_present": true,
+      "user_token_chain_present": true,
+      "doc_type_present": true,
+      "scope_class_present": true,
+      "ears_keyword_shall_intact": true
+    },
+    "missing_elements": []
+  },
+  "gate1": {
+    "status": "pass_with_recommendations",
+    "ears_compliance": {
+      "total_acs_examined": 51,
+      "acs_matching_canonical_patterns": 51,
+      "bare_prose_acs": 0,
+      "pattern_distribution": {
+        "pattern_1_event_when": 31,
+        "pattern_2_state_while": 4,
+        "pattern_3_optional_where": 0,
+        "pattern_4_unwanted_if_then": 11,
+        "pattern_5_ubiquitous": 5
+      },
+      "verdict": "All 51 ACs across 15 FRs and 9 NFRs use a canonical EARS pattern with shall."
+    },
+    "layer_scope_consistency": {
+      "intent_clarification_in_layers": [1, 3],
+      "prd_in_layers": [1, 3],
+      "exhaustive_9_layer_table_present": true,
+      "rationale_present_for_each_layer": true,
+      "verdict": "Exhaustive 9-layer disposition matches Intent Clarification verbatim."
+    },
+    "intent_clarification_seven_defaults_carried": {
+      "scope_class_FULL": "preserved (frontmatter + Product Policy Decisions)",
+      "update_mode_in_scope_for_r1": "preserved (FR-2 + ACs)",
+      "5_state_vocabulary": "preserved (Product Policy Decisions + FR-7)",
+      "agent_roster_matrix_migration": "preserved (FR-9)",
+      "mutual_exclusivity_create_vs_update": "preserved (Product Policy Decisions + AC-FR-2-c)",
+      "back_fill_version_status_since": "preserved (FR-8)",
+      "hook_fail_open_with_stderr": "preserved (NFR-2)",
+      "verdict": "All 7 confirmed Intent Clarification defaults faithfully carried through with high fidelity."
+    },
+    "adr_authorship_check": {
+      "prd_authors_no_adrs": true,
+      "adr_slate_enumerated_for_design_composer": true,
+      "explicit_forward_pointer_to_design_composer": "U-10 cites design-composer (Stage 5) as ADR author per FR-5 of the pipeline",
+      "verdict": "PRD correctly defers ADR authorship to design-composer."
+    },
+    "ai_prd_failure_modes": {
+      "fabricated_customer_reactions": "none detected — only quote present is the user's own statement carried verbatim from Intent Clarification with attribution",
+      "over_precise_specs_without_rationale": "minor — see I003",
+      "implementation_suggestions_in_requirements": "the FRs are highly specific about Claude Code-layer primitives (skill names, hook path, settings.json keys); this is acceptable because the feature IS the addition of those specific primitives — the Intent Clarification confirmed them as scope. Not a failure mode in this context."
+    }
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "summary": "PRD is structurally and substantively sound. EARS discipline is excellent (51/51 ACs canonical-pattern-compliant). Layer Scope and 7 Intent Clarification defaults are carried with high fidelity. ADR authorship correctly deferred. Three minor recommendations below are non-blocking and may be addressed at PRD Approval Gate or carried forward.",
+    "conditions": [
+      "Consider tightening AC-NFR-1-a to either commit to the ~100ms target or remove the parenthetical 'precise threshold finalized at Design' (see I003).",
+      "Consider clarifying AC-NFR-7-a observability destination instead of 'consistent with project conventions' (see I004); already tracked as U-9 which is acceptable."
+    ]
+  },
+  "issues": [
+    {
+      "id": "I-DR-001",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "PRD §Stakeholders — Stakeholder Inventory table",
+      "description": "The Stakeholder Inventory uses a 5-column shape (Stakeholder | Description | Primary Layer(s) | Relationship | Volume / Importance) that differs from the canonical template's 3-column (Role | Interest | Influence) shape. The intent of the template section (capture who has skin in the game) is met or exceeded, and the richer table is arguably more useful for this feature's many small stakeholder categories. Flagged as recommended only so the deviation is conscious.",
+      "suggestion": "Either (a) leave as-is — the template's intent is met and the richer shape adds value; or (b) add a column mapping note in the section preamble that 'Description' fuses 'Role + Interest' for compactness. No content change required."
+    },
+    {
+      "id": "I-DR-002",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "PRD §Functional Requirements — Should Have (P2) / Could Have (P3)",
+      "description": "Both P2 and P3 are 'None for r1.' This is internally consistent with the Intent Clarification (everything ships in P1 or is explicitly deferred to 'Won't Have'). However, the template implies these tiers serve trade-off conversations. A brief one-line rationale already appears for P2 ('absorbed into P1 or deferred'); P3 could carry a parallel sentence.",
+      "suggestion": "Optional: add a one-liner to P3 along the lines of 'None for r1 — no candidate capability is small enough to be 'nice to have but droppable' relative to the load-bearing structural invariant.' Non-blocking."
+    },
+    {
+      "id": "I-DR-003",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "PRD §Non-Functional Requirements / Performance — NFR-1 / AC-NFR-1-a",
+      "description": "AC-NFR-1-a sets the hook fast-path latency target as 'under ~100ms wall-clock per invocation on the standard devcontainer; precise threshold finalized at Design when the exact hook runtime is decided.' The PRD-authoring discipline advises using round numbers with rationale (acceptable here — ~100ms is round + tied to perceptible-latency rationale via NFR-1's rationale paragraph) BUT the trailing 'precise threshold finalized at Design' qualifier mixes a target with an explicit deferral, which weakens the AC's testability slightly. The other anchor AC-NFR-1-b ('no measurable regression vs baseline') is fully testable and arguably carries the load.",
+      "suggestion": "Either (a) commit to ~100ms as the target and move the 'finalize at Design' note to Undetermined Items as a follow-up; or (b) drop AC-NFR-1-a entirely and rely on AC-NFR-1-b which is the operationally meaningful test ('any regression beyond noise is itself a finding'). Non-blocking; current form is defensible."
+    },
+    {
+      "id": "I-DR-004",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "PRD §Non-Functional Requirements / Observability — NFR-7 / AC-NFR-7-a",
+      "description": "AC-NFR-7-a defers the observability destination ('stderr vs. project-relative file vs. other') to Design via U-9. The assertion 'the system shall record the written path and the user's selected option in an observability destination consistent with project conventions' is testable in principle but the destination ambiguity makes the test harness uncertain at PRD time. Tracking via U-9 is the right pattern; flagging here only so the reviewer's downstream agent (test-acceptance-author) knows the assertion is intentionally placeholder-shaped.",
+      "suggestion": "No PRD change required — U-9 correctly carries the open item. Document for test-acceptance-author that AC-NFR-7-a's destination will be resolved at Stage 5 (per-layer Design)."
+    },
+    {
+      "id": "I-DR-005",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "PRD §User Stories — US-3 / Acceptance Criteria",
+      "description": "US-3 cross-references both FR-3 ACs (AC-FR-3-a/b/c) and one NFR AC (AC-NFR-4-a). This cross-section linkage is valid traceability but unusual — most user stories map cleanly to a single FR. The linkage is correct (US-3 is about prompt-injection protection, which spans FR-3's three-layer enforcement and NFR-4's agent-body resistance), so this is a 'documented pattern' note rather than a defect.",
+      "suggestion": "No change required. If desired, add a one-line preamble to US-3's ACs explaining the cross-section linkage ('protection spans both the structural enforcement mechanism FR-3 and the NFR-4 prompt-injection security posture')."
+    },
+    {
+      "id": "I-DR-006",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "PRD §Functional Requirements — FR-3 (Three-layer approval enforcement)",
+      "description": "FR-3's descriptive paragraph names highly specific implementation primitives (disable-model-invocation: true, AskUserQuestion step, PreToolUse hook, subagent_type discriminator). The PRD-authoring discipline normally prefers PRDs to describe observable behavior and defer HOW to the Blueprint. In this case the primitives ARE the user's confirmed mechanism design (Intent Clarification §What's in scope explicitly lists all three layers), so this is the discipline's allowed exception ('user explicitly requested specific implementation'). Flagged as recommended so the design-composer at Stage 5 is aware FR-3's body is intentionally prescriptive.",
+      "suggestion": "No content change. Optional: add a one-line note to FR-3's preamble acknowledging the prescriptive shape and citing the Intent Clarification confirmation as the source ('per Intent Clarification §What's in scope, this enforcement architecture is user-confirmed as part of the scope statement; the Blueprint will refine but not re-litigate')."
+    }
+  ],
+  "recommendations": [
+    "PRD is ready to proceed to PRD Approval Gate (Gate 2 per ADR-0017).",
+    "All 6 issues are 'recommended' severity (non-blocking). Authoring team may absorb or carry forward at user's discretion.",
+    "Design-composer (Stage 5) should treat the ADR slate enumerated in U-10 as the authoritative seed list (7 ADR-worthy decisions). Per FR-5 of the pipeline, all ADR authorship is design-composer's exclusive responsibility.",
+    "test-acceptance-author (Stage 9) should be aware that AC-NFR-7-a defers observability destination to U-9 → per-layer Design.",
+    "U-2 (AskUserQuestion prompt text), U-1 (hook script schema), U-7 (hook test strategy), and U-9 (observability destination) are all design-stage open items; Plan-stage open items are limited and well-scoped."
+  ],
+  "prior_context_check": {
+    "items_received": 0,
+    "items_extracted_from_prompt": 0,
+    "note": "This is the first review pass on prd-v1. The Intent Clarification's open items and seed material are upstream context (faithfully carried through), not prior-review findings — they are evaluated as part of consistency-with-upstream checks, not as prior_context items.",
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": []
+  }
+}

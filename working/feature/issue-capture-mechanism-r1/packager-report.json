@@ -1,0 +1,202 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "issue-capture-mechanism-r1",
+  "scope_class": "FULL",
+  "scope_class_source": "intent-clarification.md frontmatter (declared); confirmed at Gate 1 on 2026-05-23T16:51:00Z",
+  "generated": "2026-05-23T00:00:00Z",
+  "generated_by": "finalize-deliverable-packager",
+  "spec_consulted": ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md",
+  "version_tag": null,
+  "handoff_drafts_produced": false,
+  "handoff_drafts_reason": "version_tag was null at invocation; this is an internal feature-design run, not a release tag bump (per orchestrator briefing).",
+
+  "present_artifacts": [
+    {"path": "working/feature/issue-capture-mechanism-r1/intent-clarification.md", "category": "intent-clarification", "stage": "Intent Clarification"},
+    {"path": "working/feature/issue-capture-mechanism-r1/intent-clarification-review-issues.json", "category": "review-issues", "stage": "Intent Clarification"},
+    {"path": "working/feature/issue-capture-mechanism-r1/prd-v1.md", "category": "prd (superseded predecessor)", "stage": "PRD Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/prd-v1-review-issues.json", "category": "review-issues", "stage": "PRD Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/prd-v2.md", "category": "prd (current, Gate-2 approved)", "stage": "PRD Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/prd-v2-review-issues.json", "category": "review-issues", "stage": "PRD Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/research-plan.md", "category": "research-plan", "stage": "Discovery Planning"},
+    {"path": "working/feature/issue-capture-mechanism-r1/codebase-analysis.json", "category": "codebase-analysis", "stage": "Discovery Research"},
+    {"path": "working/feature/issue-capture-mechanism-r1/codebase-analysis-report.md", "category": "codebase-analysis-report", "stage": "Discovery Research"},
+    {"path": "working/feature/issue-capture-mechanism-r1/synthesis.md", "category": "synthesis (streamlined chain: synth-framer + synth-synthesizer only)", "stage": "Synthesis"},
+    {"path": "working/feature/issue-capture-mechanism-r1/04-decision-frames.json", "category": "synthesis-decision-frames", "stage": "Synthesis (synth-framer output)"},
+    {"path": "working/feature/issue-capture-mechanism-r1/cc-design.md", "category": "per-layer design (Claude Code)", "stage": "per-layer Design"},
+    {"path": "working/feature/issue-capture-mechanism-r1/cc-dependencies.json", "category": "per-layer dependencies", "stage": "per-layer Design"},
+    {"path": "working/feature/issue-capture-mechanism-r1/cc-design-review-issues.json", "category": "review-issues", "stage": "per-layer Design"},
+    {"path": "working/feature/issue-capture-mechanism-r1/backend-design.md", "category": "per-layer design (Backend)", "stage": "per-layer Design"},
+    {"path": "working/feature/issue-capture-mechanism-r1/backend-dependencies.json", "category": "per-layer dependencies", "stage": "per-layer Design"},
+    {"path": "working/feature/issue-capture-mechanism-r1/backend-design-review-issues.json", "category": "review-issues", "stage": "per-layer Design"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v1.md", "category": "blueprint (superseded predecessor; cycle 1)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "category": "blueprint (superseded predecessor; pre-audit)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v2-review-issues.json", "category": "review-issues", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v3.md", "category": "blueprint (current, Gate-4 approved)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-diff-v3.patch", "category": "diff (v2->v3)", "stage": "Reconciliation cycle 2 dispatch evidence"},
+    {"path": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md", "category": "ADR (feature-scoped; I-AA-001 user-accepted deviation)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0045-three-doctypes-preserved.md", "category": "ADR (feature-scoped; I-AA-001 user-accepted deviation)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-add-new-sibling-file-evolution.md", "category": "ADR (feature-scoped; I-AA-001 user-accepted deviation)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md", "category": "ADR (feature-scoped; I-AA-001 user-accepted deviation)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0048-prior-context-handoff.md", "category": "ADR (feature-scoped; I-AA-001 user-accepted deviation)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0049-structural-vs-discipline-kb-split.md", "category": "ADR (feature-scoped; I-AA-001 user-accepted deviation)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0050-5-state-issues-vocabulary.md", "category": "ADR (feature-scoped; I-AA-001 user-accepted deviation)", "stage": "Design Composition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/architecture-audit-issues.json", "category": "architecture-audit (cycle 1)", "stage": "Architecture Audit"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v3-audit-issues.json", "category": "architecture-audit (cycle 2, PASS)", "stage": "Architecture Audit"},
+    {"path": "working/feature/issue-capture-mechanism-r1/reconciliation-log-r1.md", "category": "reconciliation-log (cycle 1)", "stage": "Reconciliation"},
+    {"path": "working/feature/issue-capture-mechanism-r1/dispatch-r1.json", "category": "reconciliation-dispatch (cycle 1)", "stage": "Reconciliation"},
+    {"path": "working/feature/issue-capture-mechanism-r1/reconciliation-log-r2.md", "category": "reconciliation-log (cycle 2; closes audit MAJOR/MINOR; surfaces I-AA-001 to user)", "stage": "Reconciliation"},
+    {"path": "working/feature/issue-capture-mechanism-r1/dispatch-r2.json", "category": "reconciliation-dispatch (cycle 2)", "stage": "Reconciliation"},
+    {"path": "working/feature/issue-capture-mechanism-r1/plan-v1.md", "category": "plan (superseded predecessor)", "stage": "Plan Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/plan-v1-review-issues.json", "category": "review-issues", "stage": "Plan Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/plan-v2.md", "category": "plan (current, Gate-5 approved)", "stage": "Plan Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/plan-v2-review-issues.json", "category": "review-issues", "stage": "Plan Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/acceptance-tests.md", "category": "acceptance-tests", "stage": "Acceptance Test Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/phase-validators.md", "category": "phase-validators", "stage": "Phase Validator Authoring"},
+    {"path": "working/feature/issue-capture-mechanism-r1/cross-artifact-audit-issues.json", "category": "cross-artifact-audit (Round 1 PASS)", "stage": "Cross-Artifact Audit"},
+    {"path": "working/feature/issue-capture-mechanism-r1/tasks.json", "category": "tasks", "stage": "Task Decomposition"},
+    {"path": "working/feature/issue-capture-mechanism-r1/checkpoint.json", "category": "checkpoint", "stage": "(continuously updated)"}
+  ],
+
+  "present_artifact_count": 43,
+
+  "expected_artifact_check": {
+    "required_artifacts_present": {
+      "intent-clarification.md": true,
+      "prd-v<N>.md (highest N=v2)": true,
+      "research-plan.md": true,
+      "codebase-analysis.json": true,
+      "codebase-analysis-report.md": true,
+      "synthesis.md": true,
+      "at-least-one <layer>-design.md + <layer>-dependencies.json": true,
+      "blueprint-v<N>.md (highest N=v3)": true,
+      "architecture-audit-issues.json": true,
+      "plan-v<N>.md (highest N=v2)": true,
+      "acceptance-tests.md": true,
+      "phase-validators.md": true,
+      "cross-artifact-audit-issues.json": true,
+      "tasks.json": true,
+      "checkpoint.json": true
+    },
+    "all_required_present": true
+  },
+
+  "missing_artifacts": [],
+
+  "skipped_with_rationale": [
+    {
+      "artifact": "research-notes/<topic>.md",
+      "spec_required_under": "FULL scope (at least one research note expected)",
+      "rationale": "research-plan.md authorized 0 external research topics (checkpoint.params.external_topics_authorized=0). All design-load-bearing external research (Dual-Track Agile, Spotify decision-tree, RFC-to-spec) was already performed in the companion plan-mode session and is cited at /home/vscode/.claude/plans/i-am-noticing-as-reflective-wilkes.md (per research-plan IN-032). Codebase research was performed and persisted to codebase-analysis.json + codebase-analysis-report.md. Gate-3 approval (2026-05-23T17:25:00Z) explicitly ratified the 0-external-topics posture.",
+      "severity": "INFO (acknowledged justified skip)"
+    },
+    {
+      "artifact": "01-claims.json / 02-graph.json / 03-critique.json / 05-substrate-map.json (synthesis intermediates)",
+      "spec_required_under": "Not a hard-required spec item, but expected by the canonical synth chain (extractor / grapher / critic / substrate-mapper)",
+      "rationale": "Streamlined synthesis chain was authorized per checkpoint.params.synthesis_chain='streamlined (synth-framer + synth-synthesizer only)'. The single-source rationale is documented in synthesis.md §Limitations (line 377+): 'No synth-extractor / synth-grapher / synth-critic / synth-substrate-mapper ran. Per single-source pipeline contract.' ADR provenance footers cite decision-frame IDs (D-NN) rather than claim-cluster IDs to honor this.",
+      "severity": "INFO (acknowledged justified skip)"
+    },
+    {
+      "artifact": "packager-input-notes.md",
+      "spec_required_under": "Plan T7.10 (execution-phase task-049 deliverable)",
+      "rationale": "This file is authored AT EXECUTION TIME (Phase 7 of the Plan), not during pipeline-design completion. Per Plan T7.10 / tasks.json task-049 target_files. Its absence now is by design; the orchestrator briefing explicitly instructed not to block on it.",
+      "severity": "INFO (deferred-to-execution; not in design-stage scope)"
+    }
+  ],
+
+  "adr_cross_location_check": {
+    "blueprint_adrs_authored": ["ADR-0044", "ADR-0045", "ADR-0046", "ADR-0047", "ADR-0048", "ADR-0049", "ADR-0050"],
+    "feature_scoped_present": {
+      "ADR-0044": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md",
+      "ADR-0045": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0045-three-doctypes-preserved.md",
+      "ADR-0046": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-add-new-sibling-file-evolution.md",
+      "ADR-0047": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md",
+      "ADR-0048": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0048-prior-context-handoff.md",
+      "ADR-0049": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0049-structural-vs-discipline-kb-split.md",
+      "ADR-0050": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0050-5-state-issues-vocabulary.md"
+    },
+    "project_registry_present": {
+      "ADR-0044": false,
+      "ADR-0045": false,
+      "ADR-0046": false,
+      "ADR-0047": false,
+      "ADR-0048": false,
+      "ADR-0049": false,
+      "ADR-0050": false
+    },
+    "disposition": "User-accepted deviation per I-AA-001 (Gate decision: i_aa_001_user_escalation = accepted_deviation, 2026-05-24T00:30:00Z, Option A). The 7 ADRs (0044-0050) ship at the feature-scoped location only; the project-wide registry path required by ADR-0036 is INTENTIONALLY NOT POPULATED for this run. Root-cause analysis is tracked at Issues/adr-placement-rootcause/ (per the user's Option A disposition). Packager MUST NOT auto-move these files — that boundary is part of the user-accepted scope decision. Reported here for audit-trail visibility only; no severity assigned because the deviation was ratified by the user before this stage."
+  },
+
+  "unexpected_artifacts": [],
+
+  "reviewer_findings": {
+    "doc_type": "DeliverableArchive",
+    "verdict": "approved_with_conditions",
+    "summary": "Archive is structurally complete for FULL scope. All 15 required artifacts present. Three skipped categories (research-notes, synth intermediates, packager-input-notes) each have explicit rationale in either the research-plan, checkpoint params, synthesis.md §Limitations, or the Plan T7.10 execution-phase scope. The I-AA-001 user-accepted deviation (7 ADRs at feature-scoped location only) is correctly handled across the cycle and surfaced in the §ADR cross-location check section above. Two MINOR consistency findings (see below) do not block.",
+    "issues": [
+      {
+        "id": "I-PKG-001",
+        "severity": "MINOR",
+        "category": "internal-consistency",
+        "location": "working/feature/issue-capture-mechanism-r1/tasks.json line 23",
+        "description": "tasks.json declares 'total_tasks: 50' but contains 52 distinct task-NNN entries in the 'tasks' array (counted by `\"id\": \"task-` matches). The manifest count is off by 2.",
+        "suggestion": "Update total_tasks to 52, OR if the intent was 50, audit which two task IDs are spurious. Non-blocking for Gate 6; surface at execution kickoff so task-count metrics start from a correct baseline.",
+        "blocking": false
+      },
+      {
+        "id": "I-PKG-002",
+        "severity": "INFO",
+        "category": "audit-trail-completeness",
+        "location": "working/feature/issue-capture-mechanism-r1/",
+        "description": "Archive contains both blueprint-v1.md and blueprint-v2.md as superseded predecessors to blueprint-v3.md, plus prd-v1.md as predecessor to prd-v2.md, plus plan-v1.md as predecessor to plan-v2.md. This is correct per ADR-0005 append-only / supersession discipline. Validator confirms highest-N file is the canonical version. Recording for audit trail.",
+        "suggestion": "No action.",
+        "blocking": false
+      },
+      {
+        "id": "I-PKG-003",
+        "severity": "INFO",
+        "category": "deviation-handoff",
+        "location": "working/feature/issue-capture-mechanism-r1/adrs/ + adrs/ (project registry)",
+        "description": "I-AA-001 user-accepted ADR placement deviation is correctly threaded across Blueprint v3, Plan T7.10, phase-validators (PV-7.C10), and cross-artifact-audit (audit-positive evidence at issue line 180). The packager-input-notes.md execution-phase task (task-049) is staged to deliver the 5-section content shape at execution. No remedial action required during pipeline-design completion.",
+        "suggestion": "Verify packager-input-notes.md is authored during Phase 7 of execution per Plan T7.10.",
+        "blocking": false
+      }
+    ],
+    "score": {
+      "structural_completeness": 5,
+      "audit_trail_integrity": 5,
+      "deviation_handling": 5,
+      "internal_consistency": 4,
+      "weighted_total": 4.85
+    }
+  },
+
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 1,
+    "INFO": 2
+  },
+
+  "verdict": "PASS",
+  "verdict_rationale": "All required FULL-scope artifacts present. All three skipped categories (research-notes, synth intermediates, packager-input-notes.md) have documented rationale or are deferred to execution per Plan T7.10. The 7 ADRs at the feature-scoped location only (rather than the project-wide registry) is the user-accepted I-AA-001 deviation per Gate i_aa_001_user_escalation = accepted_deviation; packager respects the user-set boundary and does not auto-move. One MINOR internal-consistency finding (tasks.json total_tasks=50 vs 52 actual IDs) is non-blocking. No BLOCKER or MAJOR findings. Gate 6 readiness can be signaled.",
+
+  "gate_6_readiness": {
+    "ready": true,
+    "blocking_findings_count": 0,
+    "items_to_surface_to_human": [
+      "I-PKG-001: tasks.json total_tasks count mismatch (50 declared vs 52 actual). Fix or acknowledge before execution kickoff.",
+      "I-AA-001 acknowledged deviation: 7 ADRs (0044-0050) at working/feature/<slug>/adrs/ only. User has already approved this scope boundary (Option A, 2026-05-24T00:30:00Z) and root-causing happens via Issues/adr-placement-rootcause/. Surface for final-approval visibility only.",
+      "packager-input-notes.md not present — by design; authored at execution-phase task-049 per Plan T7.10."
+    ]
+  },
+
+  "notes": [
+    "scope_class FULL declared explicitly in intent-clarification.md frontmatter (no inference required).",
+    "Activated layers per checkpoint: cc (Claude Code), backend. Both have <layer>-design.md and <layer>-dependencies.json.",
+    "Reconciliation cycles: blueprint=2 (cycle 1 produced v2; cycle 2 produced v3 and converged), cross_artifact=0 (Round 1 PASS, no re-author needed).",
+    "Gate history shows 6 gates closed: intent_confirmation, prd_approval, research_plan_approval, blueprint_approval, i_aa_001_user_escalation, plan_approval. Gate 6 (Final Approval) is the next stop.",
+    "Per the orchestrator briefing: version_tag=null, so no handoff/HANDOFF-v*.md or handoff/CONTINUE_PROMPT-v*.md drafts were produced. This is an internal feature-design run, not a release tag bump.",
+    "Synthesis chain was streamlined (synth-framer + synth-synthesizer only); documented in synthesis.md §Limitations and checkpoint.params.synthesis_chain. ADR provenance footers cite decision-frame IDs (D-NN) rather than claim-cluster IDs.",
+    "I-AA-001 root-cause tracker (Issues/adr-placement-rootcause/) is intentionally outside the feature archive — it is a project-wide observation captured in the new Issues/ topic-folder discipline that this very feature designs."
+  ]
+}

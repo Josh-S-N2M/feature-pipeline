@@ -1,0 +1,923 @@
+{
+  "schema_version": "1.0.0",
+  "pipeline_run_id": "issue-capture-mechanism-r1",
+  "generated_at": "2026-05-23T19:30:00Z",
+  "generated_by": "synth-framer",
+  "derived_from": [
+    "working/feature/issue-capture-mechanism-r1/codebase-analysis.json",
+    "working/feature/issue-capture-mechanism-r1/codebase-analysis-report.md",
+    "working/feature/issue-capture-mechanism-r1/prd-v2.md",
+    "working/feature/issue-capture-mechanism-r1/intent-clarification.md",
+    "Issues/issue-capture-mechanism/proposal.md"
+  ],
+  "notes": [
+    "Single-source synthesis: 0 external research topics; codebase-analysis.json is the substantive Discovery deliverable.",
+    "RICE confidence calibration: 'single_sourced' (codebase-only) ⇒ 0.5 across all frames; codebase claims with multiple file citations + verbatim extracts (F-001, F-002, F-003, F-008, F-012, VE-003, VE-004) treated as high-quality single-source ⇒ 0.6.",
+    "Per orchestrator note: options enumerated as the GENUINE option space (1–N); no straw-men. Each option marked recommended | rejected with rationale.",
+    "The 7-item ADR slate (PRD U-10) is meta-decisions about how decisions get recorded; not framed as standalone decisions here. They are listed under adr_slate_routing at the end and routed to design-composer at Stage 7.",
+    "Scope: 12 explicit + 2 discovered = 14 decision frames. Aligns with 'broad' scope (8–15) per decision-framing-knowledge."
+  ],
+  "decisions": [
+    {
+      "id": "D-01",
+      "decision_class": "architecture",
+      "summary": "How does `issue-capture-author` agent load `KB-issue-capture` content given that `disable-model-invocation: true` skills are silently dropped from sub-agent `skills:` preloads?",
+      "context_claims": [
+        "F-001 — no existing SKILL.md in this project declares `disable-model-invocation: true`; this run introduces the first two",
+        "F-003 — auditing-subagents/references/subagent-spec.md line 110: skills with `disable-model-invocation: true` cannot be preloaded into subagents; SILENT DROP",
+        "CP-001 — non-pipeline agent frontmatter precedent (cc-critique) omits `skills:` entirely; structural template",
+        "F-013 — intake-intent-clarifier already supports prior_context-style runtime injection; sibling pattern",
+        "Issues/issue-capture-mechanism/proposal.md §Cross-references — KB-cc-design Principle 1 (skill-localised knowledge)",
+        "PRD FR-3 AC-FR-3-a — KB-issue-capture must refuse description-match auto-load"
+      ],
+      "reversibility": "low",
+      "blast_radius": "per-feature",
+      "wardley_evolution": "custom",
+      "rice_score": { "reach": 1, "impact": 3.0, "confidence": 0.6, "effort": 0.5 },
+      "options": [
+        {
+          "option_name": "Runtime Read/Glob in agent body",
+          "description": "issue-capture-author frontmatter omits `skills:` entirely (mirroring cc-critique precedent). The agent body contains an explicit 'Read these reference files' step that uses Read/Glob to load `.claude/skills/KB-issue-capture/SKILL.md` and its `references/*.md` at runtime as part of its procedure.",
+          "pros": [
+            "Sidesteps the silent-drop BLOCKER (F-003) — the constraint cannot be violated because no skills: entry exists",
+            "Matches cc-critique structural precedent (CP-001 — closest existing agent template)",
+            "auditing-subagents and auditing-cc-configs cross-file checks will pass cleanly (F-003 references the exact check)",
+            "Composable with the same pattern for the entry-point `capture-issue` skill if it also gets disable-model-invocation"
+          ],
+          "cons": [
+            "Reading skill files in the agent body burns context tokens at every spawn (vs. skill-system caching). Mitigation: small KB (~4 reference files)",
+            "Discovery of the skill files relies on convention paths in the agent body — refactors that rename `.claude/skills/KB-issue-capture/` must update the agent body string"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Declare KB-issue-capture in skills: anyway (do NOT set disable-model-invocation on the KB)",
+          "description": "Drop the disable-model-invocation constraint on KB-issue-capture so the standard skill-preload mechanism works. The capture-issue entry-point skill retains disable-model-invocation; the KB does not.",
+          "pros": [
+            "Lets the standard skill-loading mechanism work without runtime Read",
+            "Smaller agent body"
+          ],
+          "cons": [
+            "Violates user-confirmed intent: PRD §Product Policy Decisions row 5 names KB-issue-capture's disable-model-invocation as part of Layer 1 of three-layer enforcement",
+            "Allows main Claude (and pipeline sub-agents whose descriptions partially match) to auto-load the KB — defeats the non-pollution invariant (FR-13 / Risk #5)",
+            "Reduces three-layer enforcement to two-layer; downgrades NFR-4 prompt-injection resistance"
+          ],
+          "recommendation": "rejected — undoes user-confirmed Layer 1 of FR-3"
+        }
+      ],
+      "recommendation": "Option 1 (Runtime Read/Glob in agent body). Per F-003 + CP-001 the architecturally clean answer is to omit `skills:` and read at runtime; this is also the only option that preserves all three enforcement layers.",
+      "risks": [
+        "Single-source claim base: F-003 derives from auditing-subagents spec — no executable test in-project demonstrates the silent-drop yet (F-001 — first in project to exercise it)",
+        "If the agent body's Read step is itself reachable by prompt-injection, the runtime injection vector is wider than skill-preload; mitigated by NFR-4 (mandatory AskUserQuestion before Write)"
+      ],
+      "routed_to": "design-claude-code"
+    },
+    {
+      "id": "D-02",
+      "decision_class": "mechanism",
+      "summary": "What is the PreToolUse hook's stdin event schema, stdout JSON response shape, exit-code semantics, and error/log destination?",
+      "context_claims": [
+        "PRD U-1 — explicit deferral to design-claude-code",
+        "F-002 — NO `.claude/hooks/` directory exists; NO hooks block in settings.json; this IS the first hook in the project",
+        "F-007 — auditing-hooks references/ contains 4 files (anti-patterns.md, common-failures.md, hook-spec.md, security-checklist.md); NO examples/good-hook-annotated.md exists",
+        "node: kb.cc-platform-extensions — documents hookSpecificOutput.permissionDecision = allow|deny|ask; matcher regex; ${CLAUDE_PROJECT_DIR}",
+        "PRD Assumption 2 — tool_input.subagent_type discrimination is assumed but not demonstrated in this KB",
+        "PRD FR-3 AC-FR-3-b — emit permissionDecision: 'ask' with spawn-prompt preview in message field",
+        "PRD NFR-2 — fail-open on script error; stderr log",
+        "PRD §Risks #5 — first hook in project; no in-project precedent"
+      ],
+      "reversibility": "medium",
+      "blast_radius": "pipeline-wide",
+      "wardley_evolution": "custom",
+      "rice_score": { "reach": 100, "impact": 2.0, "confidence": 0.5, "effort": 1.5 },
+      "options": [
+        {
+          "option_name": "Bash script + jq, JSON stdin event → JSON stdout permissionDecision",
+          "description": "Hook at `.claude/hooks/intercept-issue-capture-agent.sh`. Reads stdin JSON event (Claude Code-supplied), extracts `tool_input.subagent_type` via jq, branches: if equals 'issue-capture-author' → emit `{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"<WHY/WHAT/WHERE-preview>\"}}` and exit 0; else emit `{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"allow\"}}` and exit 0. Errors (missing jq, malformed stdin) → write `intercept-issue-capture-agent: <reason>` to stderr, emit `{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"allow\"}}`, exit 0 (fail-open per NFR-2).",
+          "pros": [
+            "Minimal dependencies (bash + jq, both standard in devcontainer)",
+            "Single-file, easy to audit",
+            "Sub-100ms wall-clock plausible (jq parse of small JSON ≪ 10ms) — satisfies AC-NFR-1-a",
+            "Mirrors sibling auditing-shared scripts' stderr discipline (log_state_transition.py style)"
+          ],
+          "cons": [
+            "Bash + jq compose is harder to unit-test than Python (D-07 hook test strategy)",
+            "Shellcheck-clean is required (cc-critique will flag)"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Python script (python3 .claude/hooks/intercept-issue-capture-agent.py)",
+          "description": "Python stdlib-only (json, sys). Same I/O contract as Option 1 but written in Python. Pattern matches auditing-shared/scripts/*.py.",
+          "pros": [
+            "Idiomatic with auditing-shared sibling scripts (CP-002 — argparse, JSON stdin, fail-open default)",
+            "Easier unit testing (smoke_test_auditing_shared.py harness style)",
+            "Type-safe JSON parsing without jq"
+          ],
+          "cons": [
+            "Python startup cost (~50-150ms on cold start) puts AC-NFR-1-a's ~100ms target at risk per F-002 (no measured baseline yet)",
+            "Adds another permissions.allow entry for python3 invocation (CP-005 shape)",
+            "Heavier than bash for a sub-100ms discriminator"
+          ],
+          "recommendation": "rejected — python3 startup risks AC-NFR-1-a fast-path target on a hook that fires on every Task spawn (NFR-1)"
+        },
+        {
+          "option_name": "Node script via npx",
+          "description": "Node.js script; uses native JSON parsing.",
+          "pros": [
+            "Native JSON; no jq dependency"
+          ],
+          "cons": [
+            "Node not currently used in any auditing-shared script — introduces a new runtime",
+            "Node startup also ~50-200ms; same fast-path risk as Python",
+            "No project precedent (F-002 — first hook; F-007 — no annotated example)"
+          ],
+          "recommendation": "rejected — introduces new runtime with no project precedent and same startup-cost risk"
+        }
+      ],
+      "recommendation": "Option 1 (bash + jq). Lowest startup cost (best chance of meeting AC-NFR-1-a's ~100ms target), single-file, stderr discipline matches sibling auditing-shared idiom. Test strategy is D-07's concern.",
+      "risks": [
+        "PRD Assumption 2 (subagent_type lives in tool_input field) is unverified in-project (kb.cc-platform-extensions caveats this); design must verify against live Claude Code platform docs",
+        "First hook in the project (F-002) — no precedent to template from; cc-critique pre-merge findings will be load-bearing (PRD U-5)",
+        "Hook fires on EVERY Task spawn (NFR-1 blast radius); a regression here breaks ~28 pipeline agents (PRD §Risks #1)"
+      ],
+      "routed_to": "design-claude-code"
+    },
+    {
+      "id": "D-03",
+      "decision_class": "validation",
+      "summary": "What is the exact text/structure of the `AskUserQuestion` approval prompt — WHY/WHAT/WHERE rendering and the 4 fixed options (Approve / Approve-with-edits / Change-doctype / Cancel)?",
+      "context_claims": [
+        "PRD U-2 — explicit deferral; lands in KB-issue-capture/references/approval-prompt-rubric.md",
+        "PRD FR-1 AC-FR-1-b — exactly one AskUserQuestion with WHY/WHAT/WHERE before any Write",
+        "PRD FR-2 AC-FR-2-a — OLD→NEW preview in update-mode",
+        "PRD FR-4 AC-FR-4-d — collision re-prompt with 3 options (supersede / rename / cancel)",
+        "PRD FR-5 — single AskUserQuestion gates two writes in evolution-transaction case",
+        "PRD NFR-4 — agent-body AskUserQuestion is the prompt-injection guard (Layer 2)",
+        "intent-clarification.md §What's undecided — 'final wording... lands in approval-prompt-rubric.md at design time'"
+      ],
+      "reversibility": "high",
+      "blast_radius": "contained",
+      "wardley_evolution": "custom",
+      "rice_score": { "reach": 1, "impact": 1.5, "confidence": 0.6, "effort": 0.5 },
+      "options": [
+        {
+          "option_name": "Structured rubric in approval-prompt-rubric.md with 4 prompt-archetypes",
+          "description": "Author `KB-issue-capture/references/approval-prompt-rubric.md` codifying four archetype prompts: (a) create-mode WHY/WHAT/WHERE with 4 options; (b) update-mode OLD→NEW diff with Approve/Approve-with-edits/Cancel options; (c) filename-collision re-prompt with supersede/rename/cancel; (d) evolution-transaction with both-files preview and single Approve. Each archetype gives canonical question text + the exact AskUserQuestion options array. The agent body cites the rubric at the relevant Step.",
+          "pros": [
+            "Skill-localised (KB-cc-design Principle 1) — the discipline lives in KB-issue-capture, not the agent body",
+            "Four archetypes cover the four distinct flows (PRD FR-1, FR-2, NFR-5, FR-5) — no fifth needed",
+            "Rubric file is testable: acceptance tests can grep the rendered prompt against expected substrings",
+            "Allows wording polish without agent-file edits"
+          ],
+          "cons": [
+            "Adds a fourth reference file under KB-issue-capture (already had triage-criteria, examples, non-pollution-contract per intent-clarification.md §What's in scope — actually approval-prompt-rubric IS already one of the 4 named files; this is on-plan)"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Embed prompt text directly in agent body",
+          "description": "Hard-code the four prompt archetypes inline in `.claude/agents/issue-capture-author.md`.",
+          "pros": [
+            "Single-file source of truth for the agent",
+            "No additional reference file"
+          ],
+          "cons": [
+            "Violates KB-cc-design Principle 1 (skill-localised knowledge) — prompt-rubric is discipline content",
+            "Conflicts with intent-clarification.md §What's in scope which names `approval-prompt-rubric.md` as one of the 4 KB-issue-capture reference files",
+            "Edits to prompt wording require agent-file edits; harder to iterate"
+          ],
+          "recommendation": "rejected — violates structural-vs-discipline KB split (one of the 7 ADRs in U-10)"
+        }
+      ],
+      "recommendation": "Option 1 (rubric file with 4 archetypes). The PRD scope already names approval-prompt-rubric.md as a KB-issue-capture reference file; this design decision finalizes its internal structure.",
+      "risks": [
+        "Prompt wording itself is a UX surface; the recommendation here is structural (where + shape), not the final wording",
+        "Single-source: PRD wording for the 4 options is descriptive only — design-claude-code must verify Claude Code's AskUserQuestion 4-option max constraint matches PRD's 4 named options"
+      ],
+      "routed_to": "design-claude-code"
+    },
+    {
+      "id": "D-04",
+      "decision_class": "naming",
+      "summary": "Which of the four migrated `Issues/*.md` files demonstrates which doctype in `KB-issue-capture/references/examples.md`, given the doc_type rename from {deferral-register, analysis, proposal} to {issue-register, issue-analysis, issue-proposal}?",
+      "context_claims": [
+        "PRD U-3 — defers worked-example pairing to design-claude-code",
+        "F-005 — pre-migration doc_type drift: `deferral-register`, `analysis` (×2), `proposal` do not match PRD FR-7 canonical enum",
+        "known_issues[0] — FR-8 migration must back-fill doc_type to canonical enum atomically with git mv",
+        "Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md — REGISTER precedent (sweep-style tabular: ID/Item/Source/Why deferred/Re-examination trigger/Forgetting risk)",
+        "Issues/analysis-per-agent-design-evaluation-gap.md — ANALYSIS precedent (prose + evidence)",
+        "Issues/analysis-adr-placement-rootcause.md — ANALYSIS precedent (prose + evidence; second of two analyses)",
+        "Issues/proposal-auditing-family-graduation-review.md — PROPOSAL precedent (prose + adoption + proposes_future_feature field)",
+        "CP-004 — three doctypes have three distinct body shapes (confirmed)"
+      ],
+      "reversibility": "high",
+      "blast_radius": "contained",
+      "wardley_evolution": "custom",
+      "rice_score": { "reach": 1, "impact": 1.0, "confidence": 0.6, "effort": 0.5 },
+      "options": [
+        {
+          "option_name": "1:1 pairing — one example per doctype, picking the strongest exemplar of the two analyses",
+          "description": "examples.md presents exactly 3 worked examples: (1) register doctype → `Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md` (the only register precedent); (2) analysis doctype → `Issues/per-agent-design-evaluation-gap/analysis.md` (richest evidence-based body, includes the agent-roster-impact-matrix evidence migration per FR-9); (3) proposal doctype → `Issues/auditing-family-graduation-review/proposal.md` (the only proposal precedent in the migration set). Each example shows post-migration frontmatter shape (canonical doc_type, status: open, version: 0.1.0) and explains why this file is shape-defining for its doctype.",
+          "pros": [
+            "Each doctype gets exactly one canonical exemplar — clearest pedagogical mapping",
+            "All four migrated files are referenced (register-1, analysis-2 either as primary or 'see also', proposal-1)",
+            "The chosen analysis (per-agent-design-evaluation-gap) is also the one that gets FR-9 evidence/ subdirectory treatment — demonstrates that pattern simultaneously"
+          ],
+          "cons": [
+            "Treats adr-placement-rootcause/analysis as a second-class example (mentioned as 'see also' rather than canonical)"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "All-four pairing — two analysis examples shown",
+          "description": "examples.md presents 4 examples: register, analysis-A, analysis-B, proposal. Both analyses get equal treatment.",
+          "pros": [
+            "All four migrated files canonicalized equally"
+          ],
+          "cons": [
+            "Adds noise; two analysis exemplars dilute the structural signal (CP-004 shows shape is essentially the same)",
+            "Bloats examples.md without proportional value"
+          ],
+          "recommendation": "rejected — three doctypes warrant three exemplars; CP-004 confirms analyses share one shape"
+        }
+      ],
+      "recommendation": "Option 1 (1:1 pairing). Pick the per-agent-design-evaluation-gap analysis as the canonical analysis exemplar (richest evidence + drives FR-9 evidence/ subdirectory demonstration). Cite adr-placement-rootcause as 'second analysis in the precedent set' without re-rendering it.",
+      "risks": [
+        "Examples.md must use POST-migration paths (Issues/<topic>/<doctype>.md) and POST-rename doc_type values — must be authored AFTER FR-8 migration completes (or paired write in same change-set)",
+        "Single-source: codebase analysis enumerates the four files but doesn't independently validate that per-agent-design-evaluation-gap is the 'richest' analysis — design-claude-code should read both before pairing"
+      ],
+      "routed_to": "design-claude-code"
+    },
+    {
+      "id": "D-05",
+      "decision_class": "validation",
+      "summary": "For each of the 5 terminal/lifecycle states (`open`, `adopted`, `complete`, `superseded`, `wontfix-with-rationale`), which companion frontmatter fields are MANDATORY vs. OPTIONAL in the validator extension?",
+      "context_claims": [
+        "PRD U-4 — defers per-state required-companion-field set to design-claude-code + design-backend",
+        "PRD FR-7 AC-FR-7-c — `status: adopted` without per-state required companion field(s) MUST flag",
+        "VE-001 — intra-pipeline 4-state vocabulary: `superseded` requires references to superseding ID (per ADR-0005 in current validator at lines 314-323)",
+        "validator_extension_surface.current_per_state_required_companion_fields — superseded already enforces superseded_by",
+        "F-009 — pre-migration files all at status:draft; migration back-fills status:open + since: companion",
+        "CP-007 — feature_slug universal-required per ADR-0032 Change 4; new templates may set 'pipeline-wide' or '<slug>'",
+        "intent-clarification.md Q6 — back-fill status:open + since: on the 4 migrated files",
+        "Issues/issue-capture-mechanism/proposal.md frontmatter — uses status:draft + proposes_future_feature: (specific to proposal doctype)"
+      ],
+      "reversibility": "medium",
+      "blast_radius": "per-feature",
+      "wardley_evolution": "custom",
+      "rice_score": { "reach": 4, "impact": 2.0, "confidence": 0.5, "effort": 1.0 },
+      "options": [
+        {
+          "option_name": "Minimal-mandatory per state, with one back-link field universal across terminal states",
+          "description": "Companion-field rules:\n- `draft`: MANDATORY {id, version, doc_type, feature_slug, generated, generated_by}; OPTIONAL {since, scope, mode, companion_artifacts}.\n- `open`: MANDATORY draft set + {since}. (Aligns with migration back-fill per intent-clarification.md Q6.)\n- `adopted`: MANDATORY open set + {adopted_by_feature_slug} (back-link to the slug that adopted this issue, e.g., 'issue-capture-mechanism-r1' on its own seed proposal).\n- `complete`: MANDATORY open set + {completed_in_feature_slug} (back-link to the slug that closed this).\n- `superseded`: MANDATORY open set + {superseded_by_issue_id} (parallel to existing ADR-0005 enforcement for ADRs; VE-001 confirms intra-pipeline vocabulary has the same constraint).\n- `wontfix-with-rationale`: MANDATORY open set + {wontfix_rationale} (free-text rationale field).\n- Doctype-specific: `issue-proposal` files in `draft` or `open` MAY (advisory, see D-06) carry `proposes_future_feature`; `issue-proposal` files in `adopted` SHOULD carry `proposes_future_feature` (used to derive adopted_by_feature_slug if absent).\n- Evolution: `escalates_from` / `escalated_to` are OPTIONAL on any doctype + state; presence required only when FR-5 evolution has occurred.",
+          "pros": [
+            "Mirrors existing ADR-0005 superseded_by enforcement (already in validator at line 314-323) — no new dispatch mechanism needed, just new field names",
+            "Each terminal state has exactly one back-link field — symmetric and learnable",
+            "Aligns with migration back-fill plan (intent-clarification.md Q6) — status:open + since: passes cleanly",
+            "AC-FR-7-c is satisfiable: validator can name the specific missing field per state",
+            "Distinguishes from intra-pipeline 4-state (VE-001) via different field NAMES while sharing the back-link DISCIPLINE"
+          ],
+          "cons": [
+            "Six new field names introduced (since, adopted_by_feature_slug, completed_in_feature_slug, superseded_by_issue_id, wontfix_rationale, plus advisory proposes_future_feature) — onboarding overhead",
+            "wontfix_rationale is free-text and structurally unbounded; validator can only check presence, not quality"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Maximal-mandatory: every state requires evidence_paths[] and decision_authority fields",
+          "description": "Adds evidence_paths[] (list of cited files) as MANDATORY on `open` onwards; adds decision_authority (who approved transition) as MANDATORY on terminal states.",
+          "pros": [
+            "More structural rigor; audit trail richer"
+          ],
+          "cons": [
+            "Bloats frontmatter beyond what the 4 pre-migration files contain — migration would back-fill these speculatively",
+            "decision_authority duplicates generated_by intent",
+            "Not supported by PRD scope — no FR requires evidence_paths[]"
+          ],
+          "recommendation": "rejected — scope creep beyond PRD; over-rigid for empirical precedent shape"
+        },
+        {
+          "option_name": "Minimal: only superseded requires a companion field (mirror current ADR rule exactly)",
+          "description": "Only `superseded` state has a mandatory companion (superseded_by_issue_id). All other states require only the universal frontmatter fields.",
+          "pros": [
+            "Smallest validator-extension surface",
+            "Lowest backward-compatibility risk for any post-r1 captures"
+          ],
+          "cons": [
+            "AC-FR-7-c specifically requires `status: adopted` to flag without per-state companion fields — this option contradicts the AC",
+            "Loses audit-trail back-link discipline for adopted/complete/wontfix — defeats the purpose of the 5-state vocabulary"
+          ],
+          "recommendation": "rejected — directly contradicts AC-FR-7-c"
+        }
+      ],
+      "recommendation": "Option 1 (minimal-mandatory per state with one back-link field). This is the smallest design that satisfies AC-FR-7-c, mirrors existing ADR-0005 superseded discipline (VE-001 + validator line 314-323), and aligns with the migration back-fill plan.",
+      "risks": [
+        "Single-source: design has no independent validation that adopted_by_feature_slug / completed_in_feature_slug are the right names — design-backend should verify against any other ADR-0032-related conventions before locking the field names",
+        "Once mandated, these fields are structurally one-way (relaxing later means existing files become non-validating); deserves the ADR slot already implicit in U-10's 5-state vocabulary ADR"
+      ],
+      "routed_to": "design-claude-code + design-backend"
+    },
+    {
+      "id": "D-06",
+      "decision_class": "validation",
+      "summary": "Is the `proposes_future_feature:` frontmatter field validator-enforced (presence required on `issue-proposal` doctype) or advisory?",
+      "context_claims": [
+        "PRD U-6 — defers to design-backend",
+        "F-006 — TWO existing precedents: Issues/proposal-auditing-family-graduation-review.md (suggested-slug format) and Issues/issue-capture-mechanism/proposal.md (fixed-slug format)",
+        "Both precedents are on issue-proposal-shaped files (the only doctype where the field is relevant)",
+        "Issues/issue-capture-mechanism/proposal.md frontmatter line 11 — the field IS used for the orchestrator's `--raw-request` proposal-seed pattern (FR-11, FR-12)",
+        "FR-10 / FR-11 — intake-intent-clarifier detects `doc_type: issue-proposal` (not `proposes_future_feature:`) — so the field is NOT load-bearing for handoff detection",
+        "The two precedents use DIFFERENT slug formats (suggested vs. fixed) — no precedent for format enforcement"
+      ],
+      "reversibility": "high",
+      "blast_radius": "contained",
+      "wardley_evolution": "custom",
+      "rice_score": { "reach": 1, "impact": 1.0, "confidence": 0.6, "effort": 0.25 },
+      "options": [
+        {
+          "option_name": "Advisory: validator notes absence as `info` severity finding on issue-proposal doctype; does not block",
+          "description": "On `doc_type: issue-proposal`, validator checks if `proposes_future_feature:` is present. If absent, emit a single `info`-severity finding ('issue-proposal lacks proposes_future_feature: — consider adding the target feature slug'). Does not flag format; does not block validation. If present, accept any string value.",
+          "pros": [
+            "Honors both existing precedents (F-006) — neither would have been blocked",
+            "Adds a forward-pointer hint without coercion",
+            "Aligns with sibling-script idiom (CP-002 — observer-only default, info-level findings)",
+            "Easy to upgrade later if real-world use shows the field becomes load-bearing"
+          ],
+          "cons": [
+            "Two info findings on a freshly-migrated proposal file pair (the existing two proposals do carry it, so this is no-op for them)",
+            "Info findings can be ignored — discipline is soft"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Mandatory presence on issue-proposal doctype",
+          "description": "On `doc_type: issue-proposal`, validator emits a `major`-severity finding if `proposes_future_feature:` is absent, blocking acceptance.",
+          "pros": [
+            "Stronger discipline; ties proposal doctype to its sole purpose (proposing a future feature)"
+          ],
+          "cons": [
+            "Both existing precedents pass either way (F-006), so the strictness gains no immediate value",
+            "Forces authors to name a future slug at proposal time when they may not yet know it",
+            "Conflicts with the design discipline that the field is OPTIONAL on `draft` and SHOULD on `adopted` (D-05 Option 1)"
+          ],
+          "recommendation": "rejected — strictness without empirical demand; conflicts with D-05's adopted-state shoulder"
+        },
+        {
+          "option_name": "Not validated at all (ignore the field)",
+          "description": "Validator does not check for the field. It's purely documentary.",
+          "pros": [
+            "Zero validator-extension surface"
+          ],
+          "cons": [
+            "Loses the forward-pointer signal entirely",
+            "Means design-stage tooling cannot rely on validator to surface absence"
+          ],
+          "recommendation": "rejected — wastes the cheap-to-add info signal"
+        }
+      ],
+      "recommendation": "Option 1 (advisory info-severity finding). Matches sibling auditing-shared idiom, honors both precedents, adds zero blocking risk.",
+      "risks": [
+        "If future FRs assume `proposes_future_feature:` is reliably present (e.g., auto-derived adopted_by_feature_slug per D-05), this advisory posture leaves a gap; mitigation: D-05 makes adopted_by_feature_slug independently mandatory on adopted state"
+      ],
+      "routed_to": "design-backend"
+    },
+    {
+      "id": "D-07",
+      "decision_class": "validation",
+      "summary": "What is the test strategy for the new PreToolUse hook script — shellcheck, bash test harness, golden-file dry-run, integration test via real Task spawn, or some combination?",
+      "context_claims": [
+        "PRD U-7 — defers to test-acceptance-author + plan-author",
+        "F-002 — first hook in the project; F-007 — no annotated example to template",
+        "F-016 — direct-read extraction only; no GitNexus MCP; tooling baseline matches sibling scripts",
+        "CP-002 — sibling auditing-shared scripts use stdlib-only + the smoke_test_auditing_shared.py harness pattern",
+        "PRD NFR-1 — hook fires ~30-100 spawns/run; latency matters",
+        "PRD NFR-2 — fail-open posture must be testable",
+        "PRD §Risks #1 — hook regression blocks ~28 pipeline agents; high-blast-radius failure mode"
+      ],
+      "reversibility": "high",
+      "blast_radius": "per-feature",
+      "wardley_evolution": "product",
+      "rice_score": { "reach": 1, "impact": 2.0, "confidence": 0.5, "effort": 1.0 },
+      "options": [
+        {
+          "option_name": "Layered: shellcheck (lint) + golden-file dry-run (unit) + one integration test (smoke)",
+          "description": "Three layers: (a) `shellcheck .claude/hooks/intercept-issue-capture-agent.sh` as a pre-merge lint (zero warnings); (b) golden-file test harness: a Python or bash test script that pipes 4-5 canonical stdin JSON events through the hook and diffs stdout against committed golden files (one each for: issue-capture-author spawn → ask, non-issue spawn → allow, malformed JSON → allow + stderr, missing field → allow + stderr, empty stdin → allow + stderr); (c) one integration smoke test that invokes `/capture-issue dummy` end-to-end during acceptance phase and verifies the AskUserQuestion prompt appears. The unit-layer harness lives at `.claude/hooks/test_intercept_issue_capture_agent.sh` (or .py) mirroring smoke_test_auditing_shared.py.",
+          "pros": [
+            "Three layers map cleanly to NFR-1 (lint catches syntax), NFR-2 (golden-file covers fail-open), AC-FR-3-b/c (integration covers the real-spawn path)",
+            "Golden-file diff is the fastest unit-test pattern for stdin/stdout scripts",
+            "shellcheck enforces bash discipline at zero runtime cost",
+            "Integration test (one only) avoids the cost of spawning Claude Code repeatedly in CI"
+          ],
+          "cons": [
+            "Three distinct test mechanisms — slightly heavier than a single-layer choice",
+            "Golden files need to be regenerated when the JSON event schema changes (mitigated: D-02 locks the schema)"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "shellcheck only",
+          "description": "Only static lint; no runtime test.",
+          "pros": ["Smallest test surface"],
+          "cons": ["Does not exercise fail-open (NFR-2) or the discriminator logic", "Hook regressions land in production"],
+          "recommendation": "rejected — does not cover NFR-2 or AC-FR-3-b/c behavior"
+        },
+        {
+          "option_name": "Integration test only (real /capture-issue invocation)",
+          "description": "Skip unit tests; rely on full integration test in acceptance phase.",
+          "pros": ["Tests the real path"],
+          "cons": [
+            "Cannot test malformed-stdin / fail-open branch without a way to inject malformed events",
+            "Slow feedback loop (must spawn Claude Code)",
+            "Cannot run in pre-merge CI gates without Claude Code itself in the loop"
+          ],
+          "recommendation": "rejected — fail-open branch (NFR-2) is essentially untestable from outside Claude Code"
+        },
+        {
+          "option_name": "bats-style bash test harness",
+          "description": "Bash-specific test framework (bats-core).",
+          "pros": ["Bash-idiomatic"],
+          "cons": [
+            "Introduces a new external dependency (bats) — not currently used anywhere in the project",
+            "Golden-file diff (Option 1's middle layer) achieves the same coverage with no new dependency"
+          ],
+          "recommendation": "rejected — new dependency without proportional benefit"
+        }
+      ],
+      "recommendation": "Option 1 (shellcheck + golden-file + one integration smoke). Maps to NFR coverage cleanly, uses no new dependencies, sub-100ms unit-test loop.",
+      "risks": [
+        "Golden-file format is tied to D-02's stdin/stdout schema; schema changes invalidate goldens",
+        "The integration smoke requires a working Claude Code session — gating it behind 'manual acceptance' rather than CI is acceptable per recipe-feature-pipeline §Hard exclusions (no automated gate beyond the 6 human gates)"
+      ],
+      "routed_to": "test-acceptance-author + plan-author"
+    },
+    {
+      "id": "D-08",
+      "decision_class": "mechanism",
+      "summary": "How does `/capture-issue --update <path>` detect a no-op (idempotency) — content-diff, frontmatter-state-diff, file-hash, or some other mechanism?",
+      "context_claims": [
+        "PRD U-8 — defers to design-claude-code",
+        "PRD NFR-3 + AC-NFR-3-a — re-running with empty diff is a no-op, no prompt, no write",
+        "PRD FR-2 — update-mode reads file, drafts proposed transition, presents OLD→NEW preview",
+        "FR-5 evolution case — only escalated_to: appended to older file (frontmatter-only mutation)",
+        "Audit-trail discipline (NFR-6) — terminal-state files never deleted; supersession via frontmatter only"
+      ],
+      "reversibility": "medium",
+      "blast_radius": "contained",
+      "wardley_evolution": "custom",
+      "rice_score": { "reach": 1, "impact": 1.5, "confidence": 0.6, "effort": 0.5 },
+      "options": [
+        {
+          "option_name": "Frontmatter-state-diff: compare proposed-new-frontmatter to current-frontmatter; empty diff ⇒ no-op",
+          "description": "Update-mode flow: (a) Read file at <path>; (b) parse current frontmatter into dict; (c) draft proposed new frontmatter (apply transition: new status value + companion-field additions per D-05); (d) compute diff between current and proposed frontmatter dicts; (e) IF diff is empty (no key added/removed/changed), THEN report 'no change — file already at proposed state' to user, exit without AskUserQuestion or Write; ELSE present OLD→NEW preview in AskUserQuestion. Body content is not compared (per FR-5 audit-trail discipline, body is not mutated by status transitions).",
+          "pros": [
+            "Frontmatter-only diff matches the actual mutation surface (status transitions touch frontmatter only; FR-5 evolution touches only the escalated_to: field)",
+            "No false-positives from body whitespace differences or line-ending variations",
+            "Cheap to compute (small dict comparison)",
+            "Symmetric: a user re-running --update with the same target state correctly reports no-op",
+            "Naturally extends to FR-5 transactional case (both files' frontmatter diffs computed independently; if both empty, no-op)"
+          ],
+          "cons": [
+            "If a future update needs to modify body (out of current PRD scope), this diff would miss it (acceptable; PRD does not require body-mutation in update-mode)"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "File-hash equality",
+          "description": "Compute SHA of the proposed file (frontmatter + body re-serialized) and compare to current file's SHA.",
+          "pros": ["Most strict — any byte difference triggers a write"],
+          "cons": [
+            "Whitespace/line-ending differences in YAML re-serialization can produce false positives even when the LOGICAL state is unchanged",
+            "Requires a deterministic frontmatter serializer; the validator's hand-rolled parser (F-008) doesn't have a canonical writer",
+            "Overengineered for the actual mutation surface"
+          ],
+          "recommendation": "rejected — false-positive prone with non-canonical YAML formatter"
+        },
+        {
+          "option_name": "Status-field-only diff",
+          "description": "Compare only the `status:` field; if equal, no-op.",
+          "pros": ["Simplest"],
+          "cons": [
+            "Misses transitions that add a companion field without changing status (e.g., back-filling adopted_by_feature_slug on an already-adopted file)",
+            "Misses FR-5 evolution case (escalated_to: addition with no status change on older file would be incorrectly no-op'd)"
+          ],
+          "recommendation": "rejected — too narrow; misses FR-5 and back-fill cases"
+        }
+      ],
+      "recommendation": "Option 1 (frontmatter-state-diff). Correctly handles status transitions, companion-field back-fills, and the FR-5 transactional case; cheap to compute; matches the actual mutation surface.",
+      "risks": [
+        "If D-05's per-state companion-field rules change between runs, an old file may diff against the new rule set — design-claude-code should specify that the proposed-frontmatter is computed against the LIVE D-05 rules, not the file's authoring-time rules"
+      ],
+      "routed_to": "design-claude-code"
+    },
+    {
+      "id": "D-09",
+      "decision_class": "validation",
+      "summary": "Where does observability logging (write-path + user's selected option per AC-NFR-7-a) go — stderr only, project-relative file, both, or some other destination?",
+      "context_claims": [
+        "PRD U-9 — defers to design-claude-code",
+        "PRD NFR-7 / AC-NFR-7-a — record must exist; destination deferred",
+        "PRD I-DR-004 note — test-acceptance-author should defer destination-specific assertions until U-9 closes",
+        "log_state_transition.py — sibling-script precedent: appends JSONL to working/feature/<slug>/state-transitions.log (project-relative file); stderr only on errors",
+        "auditing-hooks security-checklist.md — stderr is canonical for hook diagnostics (per F-007 and the auditing-hooks corpus)",
+        "PRD §Won't Have — no UI surface, no notifications system"
+      ],
+      "reversibility": "high",
+      "blast_radius": "contained",
+      "wardley_evolution": "product",
+      "rice_score": { "reach": 1, "impact": 1.0, "confidence": 0.6, "effort": 0.25 },
+      "options": [
+        {
+          "option_name": "stderr + project-relative JSONL log at .claude/logs/capture-issue.jsonl",
+          "description": "Every approved write emits two records: (a) one human-readable line to stderr (`capture-issue: wrote <path> (user selected: <option>)`); (b) one JSONL line appended to `.claude/logs/capture-issue.jsonl` with structured fields {ts, path, option, mode (create|update), topic_slug, doctype}. Matches log_state_transition.py's append-only JSONL pattern. Failure to append to JSONL falls back to stderr-only with a stderr warning (`capture-issue: log append failed: <reason>`).",
+          "pros": [
+            "Matches sibling-script precedent (log_state_transition.py) — append-only JSONL is the established pattern",
+            "stderr line provides immediate session-tail visibility (AC-NFR-2-b's discipline)",
+            "JSONL log enables later analysis without re-running greps",
+            "Separates the log file from any pipeline working/ directory — outside-pipeline mechanism stores its observability OUTSIDE pipeline state (matches FR-13 isolation invariant)",
+            "Creating `.claude/logs/` is additive and zero-blast-radius"
+          ],
+          "cons": [
+            "Adds a new directory (`.claude/logs/`) to the project — small structural addition",
+            "JSONL append failure modes need design (filesystem-full, permissions); fail-open to stderr-only is the safe posture"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "stderr only",
+          "description": "Single stderr line per approved write; no persistent log file.",
+          "pros": [
+            "Zero file-creation; smallest footprint"
+          ],
+          "cons": [
+            "Loses post-hoc analyzability — stderr is session-scoped",
+            "Recipe-feature-pipeline §Won't Have lists only UI/notifications as excluded; persistent observability is not excluded",
+            "Lower fidelity than the sibling-script precedent (log_state_transition.py keeps a project-relative JSONL)"
+          ],
+          "recommendation": "rejected — loses post-hoc analyzability without proportional benefit"
+        },
+        {
+          "option_name": "Project-relative JSONL only (no stderr)",
+          "description": "Only JSONL log; no stderr line.",
+          "pros": [
+            "Single destination; no duplication"
+          ],
+          "cons": [
+            "Silent in the active session — Josh would have no immediate confirmation the write succeeded beyond the AskUserQuestion result reporting (FR-1 AC-FR-1-c reports the path inline anyway, but that's the agent's report, not the observability record)",
+            "Failures to write to the JSONL go unnoticed without a stderr fallback"
+          ],
+          "recommendation": "rejected — no immediate session visibility on observability failures"
+        }
+      ],
+      "recommendation": "Option 1 (stderr + project-relative JSONL). Matches log_state_transition.py precedent, provides both immediate and post-hoc visibility, fails open to stderr-only.",
+      "risks": [
+        "Creating `.claude/logs/` is new — auditing-settings or auditing-cc-configs may flag the new directory; mitigated by additive documentation in .claude/SETTINGS-NOTES.md per FR-15",
+        ".gitignore semantics for `.claude/logs/capture-issue.jsonl` need a plan-stage decision (gitignore vs commit-as-audit-trail); recommend gitignore (logs are session-local)"
+      ],
+      "routed_to": "design-claude-code"
+    },
+    {
+      "id": "D-10",
+      "decision_class": "architecture",
+      "summary": "What is the shape of the `validate_pipeline_frontmatter.py` extension — fourth `issue` category branch inside `validate_pipeline_artifact`, separate dispatch on path prefix, or a separate validator file?",
+      "context_claims": [
+        "F-012 — validator dispatch already branches on path (line 365-371); recommends adding doc_type-prefix branching INSIDE validate_pipeline_artifact",
+        "F-008 — hand-rolled YAML parser is sufficient; no new YAML shapes needed",
+        "F-011 — sibling-script CLI idiom is consistent; preserve argparse + JSON-stdout + observer-only-default",
+        "VE-003 — current GATED_DOC_TYPES + ANALYSIS_DOC_TYPES + ADR shape is well-defined; pattern to mirror",
+        "VE-004 — current dispatch shape at line 365-371",
+        "validator_extension_surface.recommended_extension_shape — new category 'issue' with ISSUE_DOC_TYPES + ISSUE_STATES",
+        "PRD FR-7 + AC-FR-7-b + NFR-8 — backward compatibility is load-bearing; zero new findings on pre-existing pipeline doc_types",
+        "blast_radius.touch_point[0] — HIGH BLAST RADIUS; validator is load-bearing for every Gate-0 pass; 3-hop transitive dependents = every artifact in every pipeline run"
+      ],
+      "reversibility": "low",
+      "blast_radius": "pipeline-wide",
+      "wardley_evolution": "product",
+      "rice_score": { "reach": 100, "impact": 2.5, "confidence": 0.6, "effort": 2.0 },
+      "options": [
+        {
+          "option_name": "Fourth `issue` category branch inside validate_pipeline_artifact (F-012 recommendation)",
+          "description": "Inside `validate_pipeline_artifact`, add a fourth doc_type-category branch alongside the existing GATED / ANALYSIS / ADR branches:\n```\nif doc_type in ISSUE_DOC_TYPES:\n    return validate_issue_artifact(fm, path)\nelif doc_type in GATED_DOC_TYPES:\n    ...\nelif doc_type in ANALYSIS_DOC_TYPES or any(doc_type.endswith(s) for s in ANALYSIS_DOC_TYPE_SUFFIXES):\n    ...\nelif doc_type == 'adr':\n    ...\n```\nDefine:\n- `ISSUE_DOC_TYPES = {'issue-register', 'issue-analysis', 'issue-proposal'}`\n- `ISSUE_STATES = {'draft', 'open', 'adopted', 'complete', 'superseded', 'wontfix-with-rationale'}`\n- `validate_issue_artifact(fm, path)`: checks doc_type ∈ ISSUE_DOC_TYPES, status ∈ ISSUE_STATES, applies per-state companion-field rules per D-05.\nThe outer path dispatch (line 365-371) is unchanged. Reuses `make_finding` (VE-002) shape verbatim.",
+          "pros": [
+            "Matches existing per-category dispatch pattern (gated/analysis/adr) — cohesive with the codebase's mental model",
+            "Outer path dispatch (SKILL.md vs agents vs pipeline-artifact) is preserved exactly — zero risk to skill/agent validation paths",
+            "Backward compatibility (AC-FR-7-b, NFR-8) trivially preserved: existing GATED/ANALYSIS/ADR doc_types continue to flow through their existing branches, unchanged",
+            "Issue files are placed under `Issues/` but doc_type-based dispatch (not path-based) keeps the validator agnostic to file location",
+            "Existing tests (smoke_test_auditing_shared.py) continue to work without modification; new tests are additive"
+          ],
+          "cons": [
+            "Adds one more enum and one more function to validate_pipeline_frontmatter.py — file grows by ~80-120 lines",
+            "Per-state companion-field rules (D-05) introduce a state→field-set map that must be kept in sync with templates (FR-6)"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Path-based dispatch at line 365-371 (add `if 'Issues/' in str_path: return validate_issue_artifact`)",
+          "description": "Add a new path branch in the outer dispatch alongside SKILL.md / agents / pipeline-artifact.",
+          "pros": [
+            "Symmetric with existing path-based dispatch"
+          ],
+          "cons": [
+            "Conflates location with shape — a doc_type:issue-* file placed outside Issues/ (e.g., during migration intermediate state) would mis-dispatch",
+            "doc_type-based dispatch (Option 1) is more semantic and matches how GATED/ANALYSIS/ADR already work",
+            "Couples to the Issues/ filesystem layout (FR-4) more tightly than necessary"
+          ],
+          "recommendation": "rejected — location is not the right discriminator; doc_type is"
+        },
+        {
+          "option_name": "Separate validator file (validate_issue_frontmatter.py)",
+          "description": "Add a new sibling script under auditing-shared/scripts/ that handles only issue-doctypes; existing validate_pipeline_frontmatter.py is unchanged.",
+          "pros": [
+            "Maximum isolation; zero risk to existing validator's existing behavior"
+          ],
+          "cons": [
+            "Doubles the number of validator invocation points — every caller of validate_pipeline_frontmatter.py (6 known callers per `node.script.validate_pipeline_frontmatter.entry_points`) must add a second invocation",
+            "shared-document-reviewer (Gate 0) would need to invoke both — adds gate-pass complexity",
+            "Loses the single-validator architecture; new permissions.allow entry required; new smoke-test entry required",
+            "PRD §Dependencies + §Technical Considerations name validate_pipeline_frontmatter.py SINGULAR as the extension target"
+          ],
+          "recommendation": "rejected — bloats caller surface for marginal isolation benefit; conflicts with PRD scope"
+        }
+      ],
+      "recommendation": "Option 1 (fourth `issue` category branch inside validate_pipeline_artifact). Confirms F-012's recommendation. Single-validator, doc_type-keyed, mirrors GATED/ANALYSIS/ADR pattern, trivially backward-compatible.",
+      "risks": [
+        "HIGH BLAST RADIUS (3-hop transitive: every artifact in every pipeline run; see blast_radius.touch_point[0]) — NFR-8 regression-test is load-bearing; design-backend MUST run pre/post diff against the existing-pipeline corpus and treat ANY new finding as a regression",
+        "Per-state companion-field rules (D-05) interact with this design — design-backend should keep the state→field-set map in a dedicated module-level constant for testability"
+      ],
+      "routed_to": "design-backend"
+    },
+    {
+      "id": "D-11",
+      "decision_class": "validation",
+      "summary": "What is the concrete hook-latency threshold for AC-NFR-1-a (currently ~100ms target, deferred per U-11)?",
+      "context_claims": [
+        "PRD U-11 — explicit deferral to design-claude-code once hook runtime (bash vs python vs other) is decided",
+        "PRD AC-NFR-1-a — '~100ms wall-clock per invocation on the standard devcontainer' is the PRD-time approximation",
+        "PRD AC-NFR-1-c — ratify or replace at design time",
+        "PRD NFR-1 — hook fires ~30-100 spawns/run; cumulative latency = N × per-spawn",
+        "D-02 recommends bash + jq (sub-100ms plausible)",
+        "kb.cc-platform-extensions — no documented benchmark in the KB for hook execution overhead",
+        "F-002 — no in-project baseline (first hook); design-time measurement must establish it"
+      ],
+      "reversibility": "high",
+      "blast_radius": "per-feature",
+      "wardley_evolution": "product",
+      "rice_score": { "reach": 100, "impact": 1.5, "confidence": 0.5, "effort": 0.5 },
+      "options": [
+        {
+          "option_name": "Confirm ~100ms per-invocation; measure at design time on the standard devcontainer; ratify if achieved",
+          "description": "Process: (a) at design-claude-code Stage 5, run the bash + jq hook script (per D-02) 1000 times against synthetic stdin events; (b) measure 50th/95th/99th-percentile wall-clock; (c) if p95 ≤ 100ms, ratify AC-NFR-1-a unchanged; (d) if p95 > 100ms but ≤ 200ms, replace AC-NFR-1-a with the measured p95; (e) if p95 > 200ms, escalate to a design-iteration (revisit D-02 — possibly use a different language or pre-warmed daemon).",
+          "pros": [
+            "Empirical; tied to actual implementation rather than guess",
+            "Symmetric thresholds (50th/95th/99th) match performance-test idiom",
+            "200ms ceiling matches user-perceptible-latency rule of thumb",
+            "Provides a clear escalation path back to D-02 if the implementation language fails"
+          ],
+          "cons": [
+            "Requires a measurement step at design time — small but real effort",
+            "Devcontainer baseline may not match GitHub Codespaces or other environments (only devcontainer is mentioned in AC-NFR-1-a — acceptable scope)"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Lower the threshold to 50ms",
+          "description": "Tighten the target to 50ms p95.",
+          "pros": ["Stricter performance bar"],
+          "cons": [
+            "No baseline data supports 50ms as achievable for bash + jq",
+            "Tightening without measurement risks an unmet AC; better to measure first, then tighten if warranted"
+          ],
+          "recommendation": "rejected — speculative without baseline data"
+        },
+        {
+          "option_name": "Remove the latency threshold; rely on AC-NFR-1-b only (no end-to-end regression)",
+          "description": "Drop the per-invocation latency target; keep only the end-to-end no-regression test.",
+          "pros": ["No per-invocation measurement needed"],
+          "cons": [
+            "End-to-end regression may not catch a per-invocation latency that's individually tolerable but accumulates over 100 spawns",
+            "PRD I-DR-003 explicitly split the AC into measurable (1-a) + end-to-end (1-b) to address an earlier review finding; removing 1-a undoes that"
+          ],
+          "recommendation": "rejected — undoes deliberate PRD review-resolution"
+        }
+      ],
+      "recommendation": "Option 1 (~100ms target, measure to ratify at design time). Provides empirical grounding and an escalation path back to D-02.",
+      "risks": [
+        "If p95 > 200ms, the design-iteration triggers — D-02's option-2 (Python) and option-3 (Node) were rejected partly on this risk; if bash also fails, design-claude-code must propose a new option (pre-warmed daemon? compiled binary?)",
+        "Single-source: no in-project benchmark exists yet (F-002)"
+      ],
+      "routed_to": "design-claude-code"
+    },
+    {
+      "id": "D-12",
+      "decision_class": "naming",
+      "summary": "Where does the 'first hook in the project' audit-trail / changelog placement live (F-001/F-002 noted that this run introduces the first hooks block, first `.claude/hooks/` directory, and first `disable-model-invocation: true` skills)?",
+      "context_claims": [
+        "F-001 — first SKILL.md to declare disable-model-invocation: true in this project",
+        "F-002 — first hook in .claude/hooks/; first hooks block in settings.json",
+        "node.config.settings-notes — .claude/SETTINGS-NOTES.md is the existing append-only audit doc for settings.json changes",
+        "PRD FR-15 + AC-FR-15-a — append a note to .claude/SETTINGS-NOTES.md documenting the new hook policy and user authorization",
+        "PRD U-10 — 7-item ADR slate is the canonical decision-record vehicle (routed to design-composer)",
+        "intent-clarification.md §What's in scope — 'Append-only note in .claude/SETTINGS-NOTES.md'"
+      ],
+      "reversibility": "high",
+      "blast_radius": "contained",
+      "wardley_evolution": "commodity",
+      "rice_score": { "reach": 5, "impact": 0.5, "confidence": 0.6, "effort": 0.25 },
+      "options": [
+        {
+          "option_name": "Three-surface audit-trail: SETTINGS-NOTES.md append (FR-15) + three-layer-enforcement ADR (U-10 #4) + KB-issue-capture/references/non-pollution-contract.md cite",
+          "description": "Distribute the audit trail across three surfaces, each playing its existing role:\n1. `.claude/SETTINGS-NOTES.md` — append per FR-15: 'Hook policy: this is the first hook in the project. The PreToolUse block matches Task tool spawns; the discriminator path emits permissionDecision:allow for non-issue-capture-author spawns. User authorized 2026-05-23 (intent-clarification.md user_token). See `.claude/hooks/intercept-issue-capture-agent.sh` and ADR-NNNN (three-layer enforcement).' Includes the additive permissions.allow entry's rationale.\n2. ADR-NNNN (three-layer enforcement, one of U-10's 7) — authored by design-composer. Mentions F-001 + F-002 as 'first-of-kind' status, citing the precedent-setting nature.\n3. `KB-issue-capture/references/non-pollution-contract.md` — cites the three-layer enforcement design and notes that the disable-model-invocation flag on KB-issue-capture is the first in the project.",
+          "pros": [
+            "Each surface plays its existing audit role (SETTINGS-NOTES = settings-level change history; ADR = decision record; KB reference = discipline content)",
+            "FR-15 already mandates the SETTINGS-NOTES append — this option just specifies its content",
+            "ADR carries the architectural rationale; SETTINGS-NOTES carries the operational policy",
+            "Cross-references are bidirectional and resilient — readers entering at any surface can navigate to the others"
+          ],
+          "cons": [
+            "Three surfaces means three small writes; pre-merge auditors will check all three"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Single CHANGELOG.md at repo root",
+          "description": "Create a new CHANGELOG.md at the project root documenting first-of-kind events.",
+          "pros": ["Single audit surface"],
+          "cons": [
+            "PRD §Won't Have explicitly forbids 'New CLAUDE.md or .claude/rules/ directory at repo root' — CHANGELOG.md at root would be analogous discouraged surface",
+            "KB-cc-design Principle 1 (skill-localised knowledge) — audit content should live where the change lives, not in a root-level catch-all",
+            "Adds a new file with no existing precedent in this project"
+          ],
+          "recommendation": "rejected — conflicts with KB-cc-design Principle 1 and PRD's structural-discipline posture"
+        },
+        {
+          "option_name": "SETTINGS-NOTES.md only (no ADR citation needed)",
+          "description": "Only append to SETTINGS-NOTES.md; skip the ADR cross-references.",
+          "pros": ["Smallest surface"],
+          "cons": [
+            "U-10 already mandates the 7-ADR slate (including three-layer enforcement) — that ADR exists regardless; adding the F-001/F-002 first-of-kind context costs nothing",
+            "Audit trail is single-point-of-failure for readers searching from the ADR side"
+          ],
+          "recommendation": "rejected — under-utilizes the already-planned ADR"
+        }
+      ],
+      "recommendation": "Option 1 (three-surface audit trail). Each surface plays its existing audit role; FR-15 and U-10's ADR slate already cover surfaces 1 and 2 at zero marginal cost; surface 3 is a small KB reference cite.",
+      "risks": [
+        "Three surfaces means three places to keep in sync; mitigated by the fact that the 'first-of-kind' fact is static (it does not change after this run lands)"
+      ],
+      "routed_to": "design-claude-code + design-composer"
+    },
+    {
+      "id": "D-13",
+      "decision_class": "lifecycle",
+      "summary": "Should FR-8 migration of doc_type values (from {deferral-register, analysis, proposal} to {issue-register, issue-analysis, issue-proposal}) happen atomically with `git mv` or as a separate frontmatter back-fill commit?",
+      "context_claims": [
+        "F-005 — doc_type naming inconsistency confirmed in all 4 pre-migration files",
+        "F-009 — pre-migration files at status:draft; migration back-fills status:open + since:",
+        "PRD AC-FR-8-a — paths to be migrated are enumerated",
+        "PRD AC-FR-8-b — `git log --follow` must return pre-migration history",
+        "PRD AC-FR-8-c — validator post-back-fill returns zero findings on migrated files",
+        "PRD AC-FR-9-a/b — agent-roster-impact-matrix.md migration via git mv with history preservation",
+        "blast_radius.touch_point[5] — referrers must update atomically or accept short-term stale references",
+        "known_issues[0] — FR-8 must back-fill values atomically",
+        "DISCOVERED-IN-FRAMING: not explicitly framed by any U-NN but implicit in the FR-8 procedure"
+      ],
+      "reversibility": "low",
+      "blast_radius": "per-feature",
+      "wardley_evolution": "product",
+      "rice_score": { "reach": 4, "impact": 1.5, "confidence": 0.6, "effort": 0.5 },
+      "options": [
+        {
+          "option_name": "Single atomic commit: `git mv` + frontmatter back-fill (doc_type rename + status:open + since: + version:0.1.0) in one commit",
+          "description": "For each of the 4 Issues files + the agent-roster-impact-matrix file, a single commit performs: (a) `git mv` from flat path to per-issue folder path; (b) edit the moved file's frontmatter to change doc_type to the canonical enum, add status:open, add since: <derived-from-file-history>, add version:0.1.0. All 5 file-moves can be in one commit, or one commit per file — either way, each move is atomic with its back-fill. Cross-references in other documents (PRD, proposal, etc.) are updated in the same commit.",
+          "pros": [
+            "git log --follow preserves history through the move-with-edit (git mv tracks history; the edit is a content change recorded on top of the rename)",
+            "Validator (post-FR-7) sees the migrated files in their final canonical state from commit 1 — no intermediate-state validation failures",
+            "No referrer-stale window: PRD/proposal references move from flat-path to folder-path in the same commit",
+            "Matches PRD §Dependencies posture (the migration is named as a one-time event)"
+          ],
+          "cons": [
+            "Larger single commit; harder to bisect if a back-fill turns out wrong",
+            "git mv + content-change in same commit is technically a heuristic move-detection by git (per blast_radius.touch_point[5] note) — but it works for content-changing moves at the default similarity-index"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Two-step: `git mv` first, then frontmatter back-fill in a follow-up commit",
+          "description": "Commit 1: pure `git mv` (no content change). Commit 2: edit frontmatter on the moved files.",
+          "pros": [
+            "Cleaner per-commit semantics (rename vs. content change separated)",
+            "Easier git bisect; smaller individual commits"
+          ],
+          "cons": [
+            "Between commits 1 and 2, the validator (running pre-merge) would see files with pre-migration doc_type values at their new paths — produces transient validation findings",
+            "Cross-reference updates in PRD/proposal would land in one of the two commits; the other would have stale references",
+            "PRD AC-FR-8-c expects validator-clean post-back-fill, but the staged approach means the back-fill commit is the validating commit and the rename commit alone is not validator-clean — adds ambiguity to the AC's measurement point"
+          ],
+          "recommendation": "rejected — introduces a transient invalid state that the AC framing does not anticipate"
+        }
+      ],
+      "recommendation": "Option 1 (single atomic commit per file or as a small commit-group). Preserves git log --follow, avoids transient invalid states, matches PRD AC-FR-8-c semantics.",
+      "risks": [
+        "git's move-detection heuristic may classify a content-changing move as delete+add if the similarity falls below threshold — design-claude-code (FR-8 owner) should verify with a dry-run `git mv && edit && git diff -M` that detection holds; if not, fall back to a `git mv`-then-edit two-commit sequence ACKNOWLEDGED as an explicit risk-mitigation choice",
+        "FR-9's agent-roster-impact-matrix.md is a moved-but-not-renamed file (no doc_type change); single-atomic commit covers it trivially"
+      ],
+      "routed_to": "design-claude-code"
+    },
+    {
+      "id": "D-14",
+      "decision_class": "integration",
+      "summary": "When `intake-intent-clarifier` detects `doc_type: issue-proposal` in the `--raw-request` file (FR-11), how does it surface 'no re-elicitation needed' vs. 'partial re-elicitation needed' to the orchestrator and user at Stage 1?",
+      "context_claims": [
+        "PRD FR-11 + AC-FR-11-a + AC-FR-11-b — treat body as authoritative; elicit only missing fields",
+        "F-013 — intake-intent-clarifier already supports prior_context parameter (signature unchanged)",
+        "F-014 — Source section in intent-clarification-template.md is structured to receive proposal-citation",
+        "Issues/issue-capture-mechanism/proposal.md — THIS very run is the dogfood test (intent-clarification.md §Source confirms the pattern works)",
+        "intent-clarification.md §Initial Interpretation — 'reads the proposal body as authoritative prior context and elicits ONLY what the proposal lacks'",
+        "intent-clarification.md Clarifying Questions table — the proposal supplied ~80% of the elicitation work; 7 ambiguities required user confirmation",
+        "DISCOVERED-IN-FRAMING: not an explicit U-NN but implicit in FR-11's procedure for future runs"
+      ],
+      "reversibility": "high",
+      "blast_radius": "contained",
+      "wardley_evolution": "custom",
+      "rice_score": { "reach": 3, "impact": 1.5, "confidence": 0.6, "effort": 0.5 },
+      "options": [
+        {
+          "option_name": "Procedure-section edit: add 'Phase 0 — Detect proposal seed' branch to intake-intent-clarifier procedure, with a documented elicitation-checklist",
+          "description": "The ~15-line insertion (per FR-11 scope) adds:\n- An §Inputs note clarifying that --raw-request may be a path AND that the file at that path may carry doc_type:issue-proposal in its frontmatter.\n- A 'Phase 0' (before existing Phase 1) procedure step: 'If --raw-request is a path and the file has doc_type:issue-proposal: (a) read the entire file; (b) treat the body as authoritative prior context — DO NOT re-elicit decisions explicitly recorded in the proposal; (c) cite the path verbatim in the §Source section; (d) build a missing-fields checklist by comparing the proposal's content against the canonical intent-clarification.md outline (FRs, NFRs, EARS ACs, 9-layer scope, stakeholder table, scope class per ADR-0023, success posture); (e) elicit ONLY the missing fields via AskUserQuestion, with each question naming WHICH section it fills.'\n- The §Procedure Phase 1 retains its current behavior for non-proposal raw-requests.",
+          "pros": [
+            "F-013 confirms the signature is already correct; this is body-level addition only",
+            "Names a canonical missing-fields checklist — gives future runs a deterministic checklist (FRs, NFRs, EARS ACs, 9-layer scope, stakeholder table, scope class, success posture) that intent-clarification.md itself confirmed works (its Clarifying Questions table is the exact pattern)",
+            "Treats this very run's intent-clarification.md as the canonical example — proven to work end-to-end",
+            "F-014's Source section is structurally ready (one-line addition to the template per FR-12)"
+          ],
+          "cons": [
+            "The 7-element checklist needs to live somewhere stable — either in the agent body (risks drift from the canonical intent-clarification structure) or in the intent-clarification template (better — F-014's edit can include the checklist as a §-anchor list)"
+          ],
+          "recommendation": "recommended"
+        },
+        {
+          "option_name": "Signature-level edit: add a new --proposal-seed flag to intake-intent-clarifier",
+          "description": "Add a new explicit parameter (e.g., `--proposal-seed <path>`) instead of detecting from --raw-request.",
+          "pros": [
+            "More explicit; orchestrator decides whether to treat the raw-request as proposal"
+          ],
+          "cons": [
+            "Requires recipe-feature-pipeline edit beyond FR-12's one-bullet scope (PRD AC-FR-12-b forbids adding new stages/gates/bypass paths)",
+            "F-013 confirms the existing prior_context + raw_request signature already supports this; signature change is unnecessary",
+            "Adds invocation-pattern variance for the orchestrator — currently single --raw-request invocation works for both seed types"
+          ],
+          "recommendation": "rejected — exceeds FR-11/FR-12 scope; signature change unnecessary"
+        }
+      ],
+      "recommendation": "Option 1 (procedure-section Phase 0 detection + checklist). Stays within FR-11's ~15-line scope; piggybacks on F-014's template edit for the missing-fields checklist; treats this very run's intent-clarification.md as the validating example.",
+      "risks": [
+        "If a future proposal's body has gaps the checklist doesn't anticipate (e.g., a wholly new section), the intent-clarifier would silently miss them — mitigated by the AskUserQuestion at Stage 1's existing Gate 1 confirmation (user reviews the intent-clarification before approval)",
+        "FR-11 and FR-12 are paired edits; if FR-12's template addition fails review, the checklist needs an alternate home (e.g., in the agent body)"
+      ],
+      "routed_to": "design-claude-code"
+    }
+  ],
+  "adr_slate_routing": {
+    "note": "The 7-item ADR slate from PRD U-10 represents META-DECISIONS about how the architectural decisions of this run get RECORDED. They are not framed as standalone decision-frames here because per PRD FR-5 and the synth-framer's discipline, only design-composer authors ADRs. The 7 ADR subjects (decided at PRD time, ratified at Intent Gate 1) are listed here for routing only.",
+    "routed_to": "design-composer (Stage 7)",
+    "adrs": [
+      { "subject": "Per-issue folder model (Issues/<topic-slug>/<doctype>.md with fixed canonical doctype filenames)", "ratifies_decisions": ["PRD FR-4", "PRD §Product Policy Decisions row 'Doctype preservation'"] },
+      { "subject": "Three doctypes preserved as distinct (register / analysis / proposal), not unified", "ratifies_decisions": ["PRD §Product Policy row 3", "CP-004 — three distinct body shapes confirmed"] },
+      { "subject": "Add-new-file evolution pattern (never mutate older doctype's state; bidirectional cross-links via escalates_from / escalated_to)", "ratifies_decisions": ["PRD FR-5", "PRD §Product Policy row 4"] },
+      { "subject": "Three-layer enforcement (disable-model-invocation + agent-body AskUserQuestion + PreToolUse hook)", "ratifies_decisions": ["PRD FR-3", "D-01", "D-02", "D-03", "PRD §Product Policy row 5", "F-001 + F-002 first-of-kind in project"] },
+      { "subject": "Prior-context handoff via existing --raw-request parameter (no new pipeline stage, no gate skip)", "ratifies_decisions": ["PRD FR-10", "PRD FR-11", "PRD FR-12", "D-14", "F-013"] },
+      { "subject": "Structural-vs-discipline KB split inside KB-documentation-criteria (templates here; triggering discipline in KB-issue-capture)", "ratifies_decisions": ["PRD FR-6", "PRD FR-14", "D-03's option-1 placement of approval-prompt-rubric.md inside KB-issue-capture"] },
+      { "subject": "5-state vocabulary distinct from intra-pipeline 4-state ledger (draft → open → adopted | complete | superseded | wontfix-with-rationale); never share IDs with issues-ledger.json", "ratifies_decisions": ["PRD FR-7", "PRD §Product Policy row 2", "D-05 per-state companion fields", "VE-001 parallels-but-distinct relationship to ADR-0008"] }
+    ],
+    "placement_constraint": "All 7 ADRs land in /workspaces/feature-pipeline/adrs/ per ADR-0036. They MAY cite ADR-0008 in its current adrs-migrated/ location per F-004 (this run does NOT migrate ADR-0008)."
+  },
+  "framing_summary": {
+    "total_decisions_framed": 14,
+    "by_class": {
+      "architecture": 3,
+      "mechanism": 2,
+      "naming": 2,
+      "validation": 5,
+      "lifecycle": 1,
+      "integration": 1,
+      "scope": 0
+    },
+    "by_reversibility": {
+      "high": 8,
+      "medium": 4,
+      "low": 3
+    },
+    "by_blast_radius": {
+      "contained": 6,
+      "per-feature": 5,
+      "cross-feature": 0,
+      "pipeline-wide": 3
+    },
+    "high_blast_radius_decisions": ["D-02 (hook protocol — fires on every Task spawn)", "D-10 (validator extension — every Gate-0 pass; 3-hop transitive to every artifact)", "D-11 (hook latency — same blast as D-02)"],
+    "low_reversibility_decisions": ["D-01 (skill-load mechanism — undoing requires re-architecting three-layer enforcement)", "D-10 (validator extension — undoing breaks backward-compatibility on issue-* files)", "D-13 (atomic migration commit — git history changes are effectively permanent)"],
+    "routed_to_design_cc": ["D-01", "D-02", "D-03", "D-04", "D-05 (shared with design-backend)", "D-07 (shared with plan-author)", "D-08", "D-09", "D-11", "D-12 (shared with design-composer)", "D-13", "D-14"],
+    "routed_to_design_backend": ["D-05 (shared with design-cc)", "D-06", "D-10"],
+    "routed_to_design_composer": ["D-12 (shared with design-cc)", "and the 7-ADR slate per U-10"],
+    "routed_to_test_acceptance_author": ["D-07 (shared with plan-author)"]
+  }
+}

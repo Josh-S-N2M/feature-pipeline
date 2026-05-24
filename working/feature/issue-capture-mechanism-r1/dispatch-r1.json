@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0.0",
+  "slug": "issue-capture-mechanism-r1",
+  "cycle_number": 1,
+  "is_terminal_cycle": false,
+  "trigger": {
+    "reviewer_verdict": "PASS_WITH_RECOMMENDATIONS",
+    "user_gate4_disposition": "approved_conditional_on_important_findings_applied_before_advancing",
+    "issues_input_paths": [
+      "working/feature/issue-capture-mechanism-r1/blueprint-v1-review-issues.json"
+    ]
+  },
+  "dispatches": [
+    {
+      "order": 1,
+      "target_agent": "design-composer",
+      "target_artifact_input": "working/feature/issue-capture-mechanism-r1/blueprint-v1.md",
+      "target_artifact_output": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md",
+      "supersession": {
+        "predecessor": "working/feature/issue-capture-mechanism-r1/blueprint-v1.md",
+        "version_bump": "1.0.0 -> 1.1.0",
+        "change_class": "MINOR (additive content; no contract change)"
+      },
+      "rationale": "Both important findings localize to blueprint-v1.md and to cross-cutting Blueprint sections owned by design-composer. The fix is internal-to-Blueprint: lift the 5-precedent enumeration from cc-design.md (which already enumerates them correctly) and reconcile the count in complexity_rationale. No layer-design re-author needed; no PRD revision needed; no dependency JSON change needed.",
+      "issues_referenced": [
+        "I-DR-BP-001",
+        "I-DR-BP-002",
+        "I-DR-BP-003",
+        "I-DR-BP-004",
+        "I-DR-BP-005",
+        "I-DR-BP-006",
+        "I-DR-BP-007",
+        "I-DR-BP-008",
+        "I-DR-BP-009",
+        "I-DR-BP-010"
+      ],
+      "must_apply": [
+        {
+          "issue_id": "I-DR-BP-001",
+          "severity": "important",
+          "category": "internal consistency",
+          "location": "blueprint-v1.md §Design Summary (Meta) -> complexity_rationale block, lines 102-104",
+          "current_text_excerpt": "Four project firsts (first disable-model-invocation skills; first .claude/hooks/ directory; first hooks block in settings.json; first runtime KB-load sub-agent) introduced together; no in-project precedent",
+          "required_change": "Replace 'Four project firsts' with 'Five project firsts' and append the fifth item: 'first 5-state lifecycle vocabulary distinct from ADR-0032\\'s 3-tier per-doc-type vocabulary'. The fifth precedent is the same one enumerated as item 5 in cc-design.md line 63.",
+          "verification": "After edit, the count in line 102-104 must agree with line 160 ('FIVE project precedents established this run'), line 981 ('the five project firsts'), and line 1185 (Q-CC-1 resolution row reasoning, which lists all five interlocking facts)."
+        },
+        {
+          "issue_id": "I-DR-BP-002",
+          "severity": "important",
+          "category": "completeness",
+          "location": "blueprint-v1.md — currently the Blueprint references 'FIVE precedents' at lines 160, 981, 1185 but never enumerates them inline; line 160 contains a forward reference '(see I-DR-002 resolution below)' that has no corresponding resolution block elsewhere in the document",
+          "preferred_resolution": "Adopt option A: add a new §Project Precedents Established subsection inside Background and Context (or as a peer of Agreement Checklist). Lift cc-design.md lines 55-65 verbatim — the 5-numbered-precedent block plus the trailing 'bundled because they are inseparable' rationale paragraph. Replace the forward reference at line 160 ('(see I-DR-002 resolution below)') with a cross-link to the new subsection. Cite cc-design.md as the canonical layer-level source.",
+          "alternative_resolution": "Option B (acceptable if the author prefers a smaller insertion): draft the proposed SETTINGS-NOTES.md append text inline in the Blueprint (since FR-15 commits to such an append) listing all 5 precedents. Either option resolves the completeness gap.",
+          "verification": "After edit, every reference to 'five' / 'FIVE' precedents in blueprint-v2.md resolves to an inline enumeration the reader can find without leaving the Blueprint. Forward reference to 'I-DR-002 resolution' is replaced."
+        }
+      ],
+      "may_apply": [
+        {
+          "scope": "I-DR-BP-003 through I-DR-BP-010",
+          "severity": "recommended",
+          "posture": "opportunistic — since design-composer is already editing blueprint-v1.md for the MUST items, apply each recommended finding that the author judges to improve the artifact AT THE SAME TIME. For each MAY item that the author chooses NOT to apply, record a one-line rationale (e.g., 'declined — would expand scope beyond the conditional Gate 4 approval' or 'declined — best handled at plan stage')",
+          "constraint": "Do NOT block the dispatch on MAY items. If applying a MAY item would require substantive design rework, defer it with a one-line rationale rather than expanding cycle 1's scope.",
+          "note": "The user did not request these be applied. Folding them in is a discretionary author judgment, NOT a reconciler mandate."
+        }
+      ],
+      "feedback_brief": "Re-author blueprint-v1.md -> blueprint-v2.md addressing 2 MUST findings and 8 MAY findings. (1) MUST I-DR-BP-001: fix the 'Four' -> 'Five' inconsistency in complexity_rationale (lines 102-104) and append the fifth precedent (5-state lifecycle vocabulary) so the count agrees with lines 160, 981, 1185. (2) MUST I-DR-BP-002: add an inline §Project Precedents Established subsection lifting cc-design.md lines 55-65 verbatim (option A preferred) or, alternatively, draft the proposed SETTINGS-NOTES.md append text inline. Replace the dangling forward reference '(see I-DR-002 resolution below)' at line 160 with a cross-link to the new subsection. (3) MAY I-DR-BP-003..010: apply opportunistically; record one-line rationale for any declined items. (4) Bump version 1.0.0 -> 1.1.0; predecessor field references blueprint-v1.md. (5) No companion-artifact changes; cc-design.md remains canonical source for the 5-precedent text.",
+      "depends_on_dispatch_order": []
+    }
+  ],
+  "user_escalations": [],
+  "deferrals": [],
+  "post_dispatch_actions": [
+    {
+      "order": 1,
+      "action": "re_invoke_reviewer",
+      "target_agent": "shared-document-reviewer",
+      "target_artifact": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md",
+      "scope": "Gate 0/1 pass focused on I-DR-BP-001 and I-DR-BP-002 resolution; include prior_context referencing this dispatch and the original blueprint-v1-review-issues.json so the reviewer can perform a prior_context_check.",
+      "expected_outcome": "approved or approved_with_conditions (with any remaining recommended items as conditions, not blockers)"
+    }
+  ],
+  "convergence_assessment": {
+    "verdict": "regular",
+    "persistent_issues": [],
+    "new_issues_this_cycle": 10,
+    "recommended_next_posture": "regular",
+    "cycle_cap_status": "1 of 4 (not at cap)"
+  },
+  "notes": [
+    "All issues localize to a single artifact (blueprint-v1.md) with a single owning author (design-composer). One consolidated dispatch.",
+    "The fifth precedent is already documented in cc-design.md line 63 — no upstream layer-design revision required.",
+    "No PRD revision implicated; the upstream is consistent.",
+    "No dependency JSON revision implicated.",
+    "User-gate posture: Gate 4 conditional approval is preserved; pipeline advances after the v2 blueprint passes its post-revision reviewer pass."
+  ]
+}

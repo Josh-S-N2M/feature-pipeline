@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.0.0",
+  "cycle_number": 2,
+  "max_cycle_cap": 4,
+  "is_terminal_cycle": false,
+  "slug": "issue-capture-mechanism-r1",
+  "trigger": {
+    "source": "review-architecture-auditor",
+    "verdict": "conditional_pass",
+    "audited_artifact": "blueprint-v2.md",
+    "issues_input": "working/feature/issue-capture-mechanism-r1/architecture-audit-issues.json",
+    "severity_counts": {"BLOCKER": 0, "MAJOR": 2, "MINOR": 3, "INFO": 5}
+  },
+  "convergence_assessment": {
+    "verdict": "converging",
+    "persistent_issues": [],
+    "incomplete_propagations": [
+      {
+        "issue_id": "I-AA-004",
+        "originating_cycle_fix": "I-DR-BP-001 (cycle 1) — Blueprint complexity_rationale four→five",
+        "where_propagation_was_missed": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md frontmatter applies_to (line 14)",
+        "note": "Not strict-persistence; mechanical drift detected by auditor and resolved in this cycle's dispatch"
+      }
+    ],
+    "divergence_indicators": [],
+    "next_cycle_posture": "regular"
+  },
+  "dispatches": [
+    {
+      "order": 1,
+      "target_agent": "design-composer",
+      "rationale": "Four findings (I-AA-002 MAJOR, I-AA-003 MINOR, I-AA-004 MINOR, I-AA-005 MINOR) all target artifacts owned by design-composer per FR-5 (Blueprint cross-cutting sections + ADR-0047 amendment). All edits mechanical and localized; bundling into one dispatch avoids artifact-version churn.",
+      "issues_referenced": ["I-AA-002", "I-AA-003", "I-AA-004", "I-AA-005"],
+      "must_apply": ["I-AA-002", "I-AA-003", "I-AA-004", "I-AA-005"],
+      "may_apply": [],
+      "depends_on_dispatch_order": [],
+      "depends_on_user_escalation": [
+        {
+          "escalation_id": "I-AA-001",
+          "dependency_type": "conditional_inclusion",
+          "note": "If the user's chosen resolution for I-AA-001 requires design-composer artifact changes (Options B or C in the escalation), the orchestrator should fold that work into this same dispatch retroactively. Option A (frontmatter token + §References paragraph) is also a design-composer edit and should likewise be bundled if selected."
+        }
+      ],
+      "target_outputs": [
+        {
+          "artifact": "working/feature/issue-capture-mechanism-r1/blueprint-v3.md",
+          "predecessor": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md",
+          "version_bump": "MINOR (additive correction; no contract change) — v2.x → v3.0 or v2.1 at composer discretion"
+        },
+        {
+          "artifact": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md",
+          "edit_type": "in_place_frontmatter_amendment",
+          "note": "Single-line applies_to edit; in-place amendment is acceptable for in-cycle design-phase ADR refinement. If ADR-0047 has been marked 'accepted' externally, a superseding ADR is required instead; reconciler defers that determination to design-composer."
+        }
+      ],
+      "feedback_brief": "Apply four mechanical corrections, all localized:\n\n1. I-AA-002 (MAJOR) — Backend Design evidence/updates validator-exclusion mechanism. ADR-0044 §Decision §4 + §Implementation Guidance commit that files under Issues/<topic>/evidence/ and Issues/<topic>/updates/ are explicitly excluded from FR-7's validator extension. Blueprint v2 Backend Design does NOT specify the mechanism. Verified empirically: validate_pipeline_frontmatter.py currently emits a minor finding on agent-roster-impact-matrix.md; the same finding will persist post-FR-9 migration into Issues/per-agent-design-evaluation-gap/evidence/ unless the validator extension adds a path-prefix skip.\n\nRequired changes:\n- Blueprint §Backend Design §Service/Module Layout (around line 856): add a sentence specifying the path-prefix skip — e.g., 'Before doc_type_category dispatch, the validator early-returns an empty finding list for any path matching Issues/<topic>/(evidence|updates)/, honoring ADR-0044 §Decision §4.'\n- Blueprint §Backend Design §Corrected Pseudocode Reference (lines 887-921): add a 2-3 line pseudocode block at the top of validate_pipeline_frontmatter.py's outer dispatch (currently lines 365-371) — e.g., 'if \"/Issues/\" in str(path) and (\"/evidence/\" in str(path) or \"/updates/\" in str(path)): return []'. The pseudocode should match the chosen mechanism (recommended: outer-dispatch early-return at lines 365-371, rather than unknown-category branch at lines 304-312, because the former is unambiguous and does not require doc_type_category to know about the path).\n- Blueprint §Data Contract OR §Field Propagation Map: add a one-line entry — e.g., 'Skipped path family: Issues/<topic-slug>/(evidence|updates)/** — emit no findings regardless of frontmatter shape (per ADR-0044 §Decision §4).'\n- Verify that ADR-0044's claim 'fully implemented by FR-7' is now true after this fix; if not, escalate.\n\n2. I-AA-003 (MINOR) — Interface Change Matrix 'or'-wording stale. Blueprint line 469 currently reads: 'Adds fourth elif branch keyed on doc_type ∈ ISSUE_DOC_TYPES (or extends doc_type_category to return \"issue\" per Q-BE-5 / I-DR-BE-005 resolution)'. Backend Design §Service/Module Layout line 856 already chose the second mechanism. Replace the line-469 phrasing with: 'extends doc_type_category (lines 147-154) to return \"issue\" when doc_type ∈ ISSUE_DOC_TYPES; adds an elif category == \"issue\" branch inside validate_pipeline_artifact'. Removes the false-options ambiguity.\n\n3. I-AA-004 (MINOR) — ADR-0047 frontmatter applies_to four-vs-five. ADR-0047 frontmatter line 14 currently reads: 'the four project firsts this run introduces (disable-model-invocation skill, .claude/hooks/ directory, settings.json hooks block, runtime Read/Glob KB-load pattern for sub-agents)'. The ADR's own Decision §5 (line 73) enumerates five firsts (adding 'first 5-state lifecycle vocabulary'). This is incomplete propagation of cycle-1's I-DR-BP-001 fix (Blueprint complexity_rationale was updated to five but ADR-0047 was not). Amend line 14 to enumerate five firsts: 'the five project firsts this run introduces (disable-model-invocation skill, .claude/hooks/ directory, settings.json hooks block, runtime Read/Glob KB-load pattern for sub-agents, 5-state lifecycle vocabulary distinct from ADR-0008's 4-state intra-pipeline ledger and ADR-0032's 3-tier per-doc-type vocabulary)'. Aligns ADR-0047 frontmatter with its own Decision §5 and with the Blueprint's complexity_rationale.\n\n4. I-AA-005 (MINOR) — Blueprint AC-FR-11-c citation error. Blueprint line 294 (the I-DR-BP-006 resolution note) cites 'AC-FR-11-a/b/c'. PRD-v2 defines only AC-FR-11-a and AC-FR-11-b (verified by grep). Replace 'AC-FR-11-a/b/c' with 'AC-FR-11-a/b' at line 294. One-character drop.\n\nDO NOT modify:\n- The ADR placement of the 7 new ADRs (I-AA-001 is a user-escalation; await orchestrator's user-decision result before touching ADR locations or authoring any superseding ADR).\n- The Blueprint frontmatter doc_type field (I-AA-006 is deferred per the auditor's own resolution).\n- Any audit-positive observation (I-AA-007..I-AA-010 are INFO; no action).\n\nAFTER all four edits, ensure the supersession discipline is honored: new blueprint version filename and predecessor field updated; ADR-0047 edit captured in the ADR's change history or a one-line amendment note in the ADR body (if the ADR template supports it)."
+    }
+  ],
+  "user_escalations": [
+    {
+      "issue_id": "I-AA-001",
+      "severity": "MAJOR",
+      "summary": "Seven new ADRs (ADR-0044..0050) authored at working/feature/<slug>/adrs/ contradict ADR-0036 (accepted) which mandates single-location placement at repo-root /adrs/. The same drift is acknowledged as a pipeline-wide issue tracked separately in Issues/adr-placement-rootcause/analysis.md; the PRD's Won't-Have section excludes resolving this drift in this run.",
+      "why_user_judgment_required": "Choosing among the three resolution paths is a scope-trade-off question (resolve the drift inline vs maintain the boundary of this feature's intent), not an artifact-quality question. The reconciler cannot decide whether resolving the drift here expands scope beyond the user's Gate-2 intent approval. The user previously acknowledged this drift as a separate feature concern.",
+      "options": [
+        {
+          "label": "Option A — accept drift with explicit user-token",
+          "description": "Leave the 7 ADRs at working/feature/<slug>/adrs/. Add a user_token_for_adr_placement_deviation: \"<token>\" field to Blueprint frontmatter. Add a one-paragraph rationale in Blueprint §References explaining the deviation references the separate drift-remediation feature and the user-approved deferral.",
+          "scope_impact": "lowest",
+          "trade_off": "Preserves the Won't-Have boundary cleanly. Leaves a documented inconsistency between Blueprint and ADR-0036 until the separate drift-remediation feature runs.",
+          "downstream_agent_work": "design-composer adds frontmatter field + §References paragraph (bundle into the existing cycle-2 dispatch)."
+        },
+        {
+          "label": "Option B — move the 7 ADRs to /adrs/",
+          "description": "Move ADR-0044..0050 from working/feature/<slug>/adrs/ to /adrs/ at repo root. Update cross-references in Blueprint, synthesis, and any layer doc that points to working-feature ADR paths.",
+          "scope_impact": "moderate",
+          "trade_off": "Clean brief-honor resolution; honors ADR-0036 verbatim. Partially pre-empts the separate drift-remediation feature (this run will have resolved the drift for its own ADRs but not for prior runs' ADRs).",
+          "downstream_agent_work": "design-composer (or orchestrator) moves files; updates Blueprint cross-references and synthesis claim; re-runs reviewer Gate 0 on the moved ADRs to confirm no metadata regression."
+        },
+        {
+          "label": "Option C — author superseding ADR amending ADR-0036",
+          "description": "design-composer authors a new ADR (e.g., ADR-0051) per ADR-0005 explicitly permitting feature-scoped ADR authoring during pipeline runs, with deliverable-packager canonicalizing to /adrs/ at run completion. ADR-0036 supersedes to the new ADR; the 7 new ADRs remain in place.",
+          "scope_impact": "highest",
+          "trade_off": "Most architecturally satisfying; aligns the operational convention with the formal record. Pre-empts the separate drift-remediation feature entirely by absorbing it into this run, expanding scope beyond Gate-2 intent.",
+          "downstream_agent_work": "design-composer authors ADR-0051 (per FR-5); Blueprint and synthesis claim updated to cite ADR-0051; reviewer Gate 0 on the new ADR; full re-validation cascade."
+        }
+      ],
+      "reconciler_recommendation_priority": "no_recommendation",
+      "reconciler_recommendation_rationale": "Per discipline (Phase 2 categorization rule: 'When in doubt: escalate'), the reconciler does not recommend among options where each has materially different scope-impact and the user has previously expressed scope boundaries via PRD Won't-Have. The orchestrator should surface all three options to the user via AskUserQuestion at the orchestrator level."
+    }
+  ],
+  "deferrals": [
+    {
+      "issue_id": "I-AA-006",
+      "severity": "INFO",
+      "rationale": "Blueprint frontmatter omits doc_type. Pre-existing template drift — the canonical blueprint-template.md itself omits doc_type. Auditor's own recommended_resolution scopes this for a future templates-consolidation run, not this feature. Defer."
+    },
+    {
+      "issue_id": "I-AA-007",
+      "severity": "INFO",
+      "rationale": "Audit-positive observation: F-003 BLOCKER mitigation rigorous (issue-capture-author skills: ABSENT; runtime Read/Glob KB-load pattern; structural sequence honored). No action required."
+    },
+    {
+      "issue_id": "I-AA-008",
+      "severity": "INFO",
+      "rationale": "Audit-positive observation: pipeline-isolation invariant verified at zero-baseline at audit time (grep returns 0 matches for KB-issue-capture / issue-capture-author across .claude/agents/). No action required."
+    },
+    {
+      "issue_id": "I-AA-009",
+      "severity": "INFO",
+      "rationale": "Audit-positive observation: all 14 synthesis decision frames (D-01..D-14) addressed in Blueprint with defensible resolutions; no synthesis claim left dangling. No action required."
+    },
+    {
+      "issue_id": "I-AA-010",
+      "severity": "INFO",
+      "rationale": "Audit-positive observation: all Q-CC-1..5 + Q-BE-1..5 layer-design open items have explicit dispositions in Blueprint §Resolved Q-CC-N / Q-BE-N items table; U-1, U-2, U-5, U-7, U-11, OI-1, OI-2 also all routed. No open item silently dropped. No action required."
+    }
+  ],
+  "post_dispatch_recommended_actions": [
+    {
+      "order": 1,
+      "action": "Surface I-AA-001 to user via AskUserQuestion at orchestrator level with the three options enumerated above. Capture user choice in a state-transitions log entry.",
+      "owner": "orchestrator"
+    },
+    {
+      "order": 2,
+      "action": "If user chose Option A: bundle frontmatter token + §References paragraph into the cycle-2 design-composer dispatch. If user chose Option B: schedule file moves + cross-reference updates as a separate orchestrator step before the design-composer dispatch (so the Blueprint citations are accurate when design-composer edits land). If user chose Option C: schedule design-composer to author the superseding ADR; this expands the cycle-2 dispatch scope.",
+      "owner": "orchestrator"
+    },
+    {
+      "order": 3,
+      "action": "After design-composer produces blueprint-v3.md and amends ADR-0047, re-invoke review-architecture-auditor for a scoped pass on the four addressed findings (I-AA-002, I-AA-003, I-AA-004, I-AA-005) plus the I-AA-001 resolution. Expect pass verdict in cycle 3.",
+      "owner": "orchestrator"
+    }
+  ],
+  "audit_trail": {
+    "cycle_1_log": "working/feature/issue-capture-mechanism-r1/reconciliation-log-r1.md",
+    "cycle_1_dispatch": "working/feature/issue-capture-mechanism-r1/dispatch-r1.json",
+    "cycle_2_log": "working/feature/issue-capture-mechanism-r1/reconciliation-log-r2.md",
+    "audited_artifact_this_cycle": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md",
+    "auditor_verdict_source": "working/feature/issue-capture-mechanism-r1/architecture-audit-issues.json",
+    "outside_pipeline_scope_reference_for_I_AA_001": "Issues/adr-placement-rootcause/analysis.md"
+  }
+}

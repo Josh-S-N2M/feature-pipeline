@@ -1,0 +1,171 @@
+{
+  "metadata": {
+    "review_mode": "comprehensive",
+    "doc_type": "DesignDoc",
+    "layer": "cc",
+    "target_path": "/workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/cc-design.md",
+    "dependencies_path": "/workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/cc-dependencies.json",
+    "codebase_analysis_path": "/workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/codebase-analysis.json",
+    "reviewer": "shared-document-reviewer",
+    "invocation_point": "ADR-0017 Stage 6 / Invocation 3 (per-layer Design)",
+    "reviewed_at": "2026-05-23T22:30:00Z",
+    "feature_slug": "issue-capture-mechanism-r1"
+  },
+  "scores": {
+    "consistency": 88,
+    "completeness": 87,
+    "rule_compliance": 91,
+    "clarity": 89
+  },
+  "gate0": {
+    "status": "pass",
+    "evaluation": "Required structural elements for a per-layer (CC) Design subsection are present: Layer Responsibility Scope; Inventory of CC primitives (covers blueprint-template's Conventions Touched + CLAUDE.md Updates + Slash Commands + Hooks + Skills + Sub-Agents + MCP Servers tables substantively, though under different headings); per-primitive design (Skill Patterns, Sub-Agent Patterns, Hook Patterns, Permission Policy, MCP Server Policy, Plugin Packaging, Command-to-Skill Migration); Mechanism Designs covering all 11 routed decisions (D-01, D-02, D-03, D-04, D-07, D-08, D-09, D-11, D-12, D-13, D-14); Acceptance Criteria Contribution; Dependencies on Other Layers; Architectural Questions for Composer (Q-CC-1..5); Open Items; References. Code inspection evidence is implicit via extensive file:line citations. Applicable Standards classification is satisfied via Principle citations (1, 3, 4, 5, 6, 8, 9 of KB-cc-design) throughout the body and in cc-dependencies.json principles_summary. Frontmatter complete (id, doc_type, version, status, feature_slug, derived_from, generated, generated_by, companion_artifacts).",
+    "missing_elements": []
+  },
+  "verdict": {
+    "decision": "approved_with_conditions",
+    "verdict_label": "PASS_WITH_RECOMMENDATIONS",
+    "conditions": [
+      "Reconcile D-05 ownership: synthesis routes D-05 as shared (design-cc + design-backend); cc-design Contents line excludes D-05 from CC's mechanism section but the body uses D-05's per-state companion-field rules throughout (templates §issue-doctypes-spec.md and §Sub-Agent Patterns body workflow). Add a brief D-05 section (or fold a 'shared input authored here' note into §issue-doctypes-spec.md) so the design-backend reviewer can locate the authoritative per-state table.",
+      "Update §SETTINGS-NOTES append (lines 524-531) to list FIVE project precedents to match §Project Precedents Established (currently lists four; missing item 5 — the 5-state lifecycle vocabulary).",
+      "Consider extracting a labelled 'Verification Strategy' subsection that consolidates D-07 (hook test strategy), D-11 (latency measurement protocol), and D-13 (migration dry-run) into one place so design-composer can lift it into the cross-cutting Verification Strategy section verbatim. Current verification material is scattered across the Mechanism Designs section."
+    ],
+    "rationale": "Design is substantively complete and architecturally sound. All 11 routed decisions are addressed with concrete options + rationale + risk; F-003 BLOCKER (skills disable-model-invocation silent-drop) is mitigated by the runtime Read/Glob pattern (D-01) consistent with the cc-critique structural template (CP-001). The three-layer enforcement architecture (FR-3) is well-articulated and each layer's independence is shown explicitly. All four ACs the PRD routes to the CC layer are explicitly tied to design elements. No critical issues; minor consistency gaps remain."
+  },
+  "prior_context_check": {
+    "items_received": 0,
+    "resolved": 0,
+    "partially_resolved": 0,
+    "unresolved": 0,
+    "items": [],
+    "note": "First review of cc-design.md v1.0.0; no prior context."
+  },
+  "issues": [
+    {
+      "id": "I-DR-001",
+      "severity": "important",
+      "category": "consistency",
+      "location": "Contents (line 35) and §Layer Responsibility Scope (line 53)",
+      "description": "D-05 ownership inconsistency. Contents lists 'D-01, D-02, D-03, D-04, D-07, D-08, D-09, D-11, D-12, D-13, D-14' (11 decisions, excluding D-05/D-06/D-10). Layer Responsibility Scope says 'D-05 shared, D-06 owned, D-10 owned' by design-backend — implying D-05 is fully routed away. However: (a) synthesis §Per-layer Design Routing (line 336) explicitly routes D-05 as shared between design-cc + design-backend; (b) the cc-design body authors the D-05 per-state companion-field table inside §Templates and KB Edits → §issue-doctypes-spec.md §3 (lines 996-1005); (c) the §Sub-Agent Patterns body workflow cites D-05 directly (lines 273-282, line 310-311, 704); (d) cc-dependencies.json CONSUMES-SYNTH-01 includes D-05 in the consumed-decisions list NO — actually it does not (it lists 'D-01, D-02, D-03, D-04, D-07, D-08, D-09, D-11, D-12, D-13, D-14'). The body and the spec authoring contradict the routing declaration.",
+      "evidence": "synthesis.md line 336: 'design-claude-code (12 decisions): D-01, D-02, D-03, D-04, D-05 (shared with design-backend), D-07 ..., D-14.' cc-design.md line 35: 'Mechanism Designs (D-01, D-02, D-03, D-04, D-07, D-08, D-09, D-11, D-12, D-13, D-14)'. cc-design.md lines 996-1005: per-state companion-field table is authored here. cc-dependencies.json line 209: D-05 omitted from CONSUMES-SYNTH-01.",
+      "suggestion": "Add D-05 to the Contents list as '(shared with backend)' and add a short §D-05 subsection under Mechanism Designs that says: 'The per-state required-companion-field table is the canonical input from CC to Backend; it is authored in §issue-doctypes-spec.md §3 and consumed verbatim by design-backend's FR-7 validator extension.' Also add D-05 to cc-dependencies.json CONSUMES-SYNTH-01 ids list. Cost: ~5 lines of doc + 1 line of JSON."
+    },
+    {
+      "id": "I-DR-002",
+      "severity": "important",
+      "category": "consistency",
+      "location": "§Permission Policy → SETTINGS-NOTES.md append, lines 524-531",
+      "description": "The SETTINGS-NOTES append documents FOUR project precedents established this run, but §Project Precedents Established (lines 57-65) lists FIVE. Specifically, the SETTINGS-NOTES draft omits 'First introduction of a 5-state lifecycle vocabulary' (item 5 in §Project Precedents Established). FR-15 AC depends on the SETTINGS-NOTES audit trail being complete; missing one precedent weakens the audit trail.",
+      "evidence": "cc-design.md lines 58-64 enumerate five firsts. cc-design.md lines 524-531 (SETTINGS-NOTES append draft) enumerate only four bullets (omits the 5-state vocabulary).",
+      "suggestion": "Add a fifth bullet to the SETTINGS-NOTES append: 'First 5-state lifecycle vocabulary (draft → open → adopted | complete | superseded | wontfix-with-rationale) distinct from the existing ADR-0032 per-doc-type 3-tier vocabulary. See ADR-<TBD-at-Stage-7> for the architectural rationale and the parallel-but-distinct relationship to the intra-pipeline 4-state ledger (ADR-0008).' Cost: 3 lines."
+    },
+    {
+      "id": "I-DR-003",
+      "severity": "important",
+      "category": "completeness",
+      "location": "Design body globally — no consolidated 'Verification Strategy' subsection",
+      "description": "Per the Gate 1 Verification Strategy quality check (per KB-review-disciplines): when a design replaces or modifies existing behavior, a concrete output comparison method must be defined; correctness definition must be specific and measurable; verification method must be sufficient for the change's risk; an early verification point must be identified. The cc-design DOES contain all this material — D-07 specifies the hook test strategy (shellcheck + golden-file fixtures + integration smoke), D-11 specifies the 1000-iteration p95 latency-measurement protocol with explicit thresholds (ratify ≤100ms; replace if ≤200ms; escalate if >200ms), D-13 specifies a migration dry-run with git-mv similarity-index verification — but these are scattered across §Mechanism Designs subsections. For a high-blast-radius change (the first hook in the project, the first PreToolUse interceptor that fires on every Task spawn), the verification posture should be locatable in one place.",
+      "evidence": "cc-design.md §D-07 (lines 675-696): hook test strategy. cc-design.md §D-11 (lines 736-754): latency measurement protocol. cc-design.md §D-13 (lines 768-797): migration dry-run. No labelled 'Verification Strategy' subsection. blueprint-template.md line 30 (Contents) and line 883 (body) require Verification Strategy in the Blueprint — design-composer can lift this material into the cross-cutting Blueprint subsection.",
+      "suggestion": "Add a short §Verification Strategy subsection (10-20 lines) at the end of the body (before §Open Items) that summarises: (a) correctness definition for each NFR (NFR-1 latency, NFR-2 fail-open, NFR-4 Write-gating, NFR-5 collision-handling); (b) verification method per primitive (shellcheck for hook; golden-file fixtures for fail-open branches; integration smoke for end-to-end; 1000-iteration p95 for latency; git-mv similarity-index dry-run for migration); (c) early verification point (recommend: hook script + shellcheck + golden-file fixtures land FIRST in the plan, since they catch the highest-blast-radius regression at lowest cost). This consolidation costs ~15-25 lines and gives design-composer a copy-source for the cross-cutting Verification Strategy."
+    },
+    {
+      "id": "I-DR-004",
+      "severity": "recommended",
+      "category": "compliance",
+      "location": "§Sub-Agent Patterns → issue-capture-author body workflow (lines 235-380)",
+      "description": "Per KB-general-coding-principles Dimension 10 (Sample is minimal — one block ≤ 40 lines): the agent-body workflow pseudocode block is ~145 lines and contains four sub-procedures (Create-mode, Update-mode, Evolution-transaction, Filename-collision branch). This is over the 40-line guideline. Score would be ~70 on Dimension 10. The block is documentation-pseudocode rather than runtime code, but it is presented as a single fenced block intended to be copy-paste into the agent file.",
+      "evidence": "cc-design.md lines 234-380 (~145 lines in one fenced block under '## Procedure').",
+      "suggestion": "Split into 4 named fenced blocks with prose between: (1) 'At task start' (~10 lines), (2) 'Phase 1: Dispatch by mode → Create-mode' (~40 lines), (3) 'Update-mode' (~15 lines), (4) 'Evolution-transaction' (~20 lines), (5) 'Filename-collision branch' (~15 lines), plus 'Observability' and 'Hard constraints' as separate blocks. This improves readability for plan-author at Stage 8 (Plan Authoring) when porting these blocks into the actual agent file."
+    },
+    {
+      "id": "I-DR-005",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "§Mechanism Designs / D-02 example stdin event (lines 569-580)",
+      "description": "The example PreToolUse stdin event JSON is documented as 'per KB-cc-platform/references/extensions.md hook contract; assumption-verification flagged in §Open Items'. The Open Item U-1 (lines 1111) correctly identifies this as unverified against live Claude Code platform docs and routes verification to plan-author. However, the design proceeds to use this assumption in D-02 (script structure that depends on `.tool_input.subagent_type`), D-03 (hook stdout schema), and D-11 (latency-measurement protocol). If the field is named differently in the live platform (e.g., `subAgentType`, `agent_type`, nested under a different key), the hook script's jq path AND the test-fixture authoring would need to change. This is correctly flagged but no fallback strategy is documented.",
+      "evidence": "cc-design.md lines 569-580 (example stdin); lines 1111 (U-1 verification deferred to plan-author).",
+      "suggestion": "Add a brief 'If verification at plan stage reveals the field is named differently' note to U-1, stating: (a) the jq path becomes `.tool_input.<actual-field-name>` and only that one line of the hook script changes; (b) the golden-file fixtures (D-07 layer B) must be updated; (c) the architecture (three-layer enforcement, fail-open posture, latency target) is unaffected. Cost: 3 lines, prevents loop-back at plan stage."
+    },
+    {
+      "id": "I-DR-006",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "§Acceptance Criteria Contribution (lines 1056-1081)",
+      "description": "The section enumerates 17 AC mappings. Several PRD ACs are not referenced explicitly: AC-FR-1-d (Cancel handling — covered by §Sub-Agent Patterns step 6 but no AC reference), AC-FR-1-e (Change-doctype handling — referenced in §Sub-Agent Patterns step 6 but no AC), AC-FR-2-a / AC-FR-2-b (update-mode flow — partially covered via AC-NFR-7-a), AC-FR-2-c (mutually exclusive args — referenced in capture-issue skill body but no AC line), AC-FR-4-a / AC-FR-4-b (folder-creation, sibling allowed — covered structurally in §Per-Issue Folder Model rules 1-4 but no AC line), AC-FR-5-b (no status mutation on amended file — covered in §Add-New-Sibling Evolution Pattern but no AC line), AC-FR-6-a / AC-FR-6-b (templates structural-only — covered in §Templates and KB Edits but no AC line), AC-NFR-3-a (no-change idempotency — covered in D-08 but the AC is restated as 'NFR-3 AC-NFR-3-a' inline rather than under §Acceptance Criteria Contribution), AC-NFR-6-a (never delete — covered in §Sub-Agent Patterns hard constraints but no AC line), AC-FR-8-a/b/c/d (migration ACs — partially covered in §D-13 but not enumerated in §Acceptance Criteria Contribution).",
+      "evidence": "PRD §FR-1 through §FR-15 collectively define ~50 PRD AC clauses; cc-design's §Acceptance Criteria Contribution maps 17 of them.",
+      "suggestion": "Either (a) expand §Acceptance Criteria Contribution to cover every PRD AC that this CC layer is responsible for testing (including the FR-8 migration ACs that this design owns), OR (b) add a one-line note at the start of §Acceptance Criteria Contribution: 'This section lists the load-bearing ACs whose testability depends on a specific design element; other CC-routed ACs are testable from the surface form of the artifacts (per-issue folder model, frontmatter shape, etc.) without specific design-element coupling.' Option (b) is lower-cost. Plan-author / test-acceptance-author will enumerate the full AC list."
+    },
+    {
+      "id": "I-DR-007",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "Multiple — D-04 examples paths, D-13 migration map, examples in §References",
+      "description": "Per the AC-FR-1-c and AC-FR-1-e references, the design correctly distinguishes pre-migration vs post-migration paths. However, D-04's example pairing table (lines 666-672) shows POST-migration paths, while D-13's migration map (lines 774-780) shows the pre→post mapping. A reader scanning quickly could miss that the D-04 example paths only become valid AFTER the D-13 migration completes. D-04 does note this in the 'Authoring constraint per D-13' subtle (line 673), but a cross-link from D-04 → D-13 (and vice-versa) would prevent confusion when these sections are read independently.",
+      "evidence": "cc-design.md lines 666-672 (D-04 table uses post-migration paths); cc-design.md lines 774-780 (D-13 migration map).",
+      "suggestion": "Add a one-line cross-reference at the head of D-04: 'POST-migration paths used below — see §D-13 for the migration map and §D-13 for the authoring-sequence constraint that examples.md is written in the same atomic commit as the migration.' Cost: 1 line."
+    },
+    {
+      "id": "I-DR-008",
+      "severity": "recommended",
+      "category": "consistency",
+      "location": "§Acceptance Criteria Contribution / AC-NFR-9-a (line 1077)",
+      "description": "AC-NFR-9-a is paraphrased: 'While the user is in any Claude Code session, the system shall accept /capture-issue <hint> without context-switch.' The PRD verbatim phrasing (prd-v2.md line 454) is: 'without requiring the user to context-switch, run an external tool, or open a different window.' The design's paraphrase drops two of the three concrete failure modes (external tool, different window). For a Gate-0-traceable AC, verbatim or near-verbatim transcription is preferred.",
+      "evidence": "prd-v2.md line 454: full AC-NFR-9-a text. cc-design.md line 1077: paraphrased.",
+      "suggestion": "Restore the full AC text: 'While the user is in any Claude Code session, the system shall accept /capture-issue <hint> without requiring the user to context-switch, run an external tool, or open a different window. [Skill activation pattern.]' Cost: half a line."
+    },
+    {
+      "id": "I-DR-009",
+      "severity": "recommended",
+      "category": "completeness",
+      "location": "Fact Disposition Table (absent — per-layer Design subsection)",
+      "description": "Per Gate 1's fact-disposition-completeness check (when codebase_analysis is provided): every entry in focusAreas requires a corresponding row in a Fact Disposition Table. The codebase-analysis.json has 16 findings (F-001..F-016) — equivalent to focusAreas. The cc-design references these findings extensively throughout (F-001..F-007 in §Project Precedents Established; F-010/F-013/F-014/F-015 in §D-14; F-016 in §Open Items U-1) but does not consolidate the dispositions into a single table. NOTE: per the v4.3.0 blueprint template, the Fact Disposition Table is a CROSS-CUTTING section authored by design-composer at Stage 7, not per-layer. So this is not a per-layer Gate 0 failure. It IS material that design-composer needs as input.",
+      "evidence": "codebase-analysis.json findings array (F-001..F-016, 16 entries); cc-design.md references findings throughout but does not table them.",
+      "suggestion": "Add a brief 'CC-layer Fact Dispositions' subsection (16 rows max) just before §References. Each row: fact_id | one-line disposition (preserve/transform/remove/out-of-scope) | rationale (one phrase). This isn't a Gate 0 requirement at the per-layer level, but it would directly feed design-composer's Stage 7 Fact Disposition Table without re-derivation. Cost: ~20 lines."
+    },
+    {
+      "id": "I-DR-010",
+      "severity": "recommended",
+      "category": "clarity",
+      "location": "§Hook Patterns / hook script lines 392-437",
+      "description": "Per KB-general-coding-principles Dimension 6 (No hidden control flow): the hook script uses `set -u` (no -e per inline rationale 'we want to control all exit paths explicitly'). This is sound for a fail-open hook. Per Dimension 3 (Error contract visible): the script's error paths are visible (jq parse failure detected at line 408-412, malformed stdin detected at line 409). Per Dimension 7 (Idempotency stated): the hook is idempotent (no side effects beyond stderr + stdout) but this isn't explicit in the script's prose. Per Dimension 8 (Concurrency posture stated): multiple Task tools can spawn in parallel; each hook invocation is independent (no shared state). The design body does not explicitly call out either dimension.",
+      "evidence": "cc-design.md lines 392-437 (hook script).",
+      "suggestion": "Add a one-line comment in the hook script: '# Idempotent: no side effects beyond stderr/stdout; no shared state; concurrent Task spawns each get an independent invocation.' Cost: 1 line."
+    }
+  ],
+  "recommendations": [
+    "Address the three conditions before promoting status: draft → status: accepted on the per-layer Design subsection.",
+    "Reconcile D-05 ownership in both cc-design.md AND cc-dependencies.json (CONSUMES-SYNTH-01 ids list) so reviewers and design-backend can locate the canonical per-state companion-field table without confusion.",
+    "Consider adding a labelled 'Verification Strategy' subsection (I-DR-003) — this work product becomes design-composer's direct input for the cross-cutting Blueprint Verification Strategy, reducing Stage 7 composition cost.",
+    "Consider authoring the CC-layer Fact Disposition rows (I-DR-009) for the same reason — direct input to design-composer's cross-cutting Fact Disposition Table.",
+    "All five Q-CC-N (Q-CC-1..5) are well-formed for composer arbitration. Q-CC-1 (audit-trail ADR consolidation) is the highest-value question — design-composer's resolution of this drives the 7-ADR slate cardinality from synthesis U-10.",
+    "Strong rationale verification: F-003 BLOCKER mitigation (D-01) is correctly architected — runtime Read/Glob substitutes for the broken skills: preload, with cc-critique (CP-001) as the in-project structural precedent. The audit trail (SETTINGS-NOTES + ADR + non-pollution-contract.md cross-references) is well-designed.",
+    "The three-layer enforcement architecture (§Three-Layer Enforcement Architecture, lines 1025-1041) is the strongest section of the design — each layer's independence is shown with a bypass-cost analysis. This is publication-quality and should be lifted verbatim into the Stage 7 ADR for three-layer enforcement (U-10 item 4)."
+  ],
+  "checklist": [
+    {"item": "Frontmatter complete (id, doc_type, version, status, feature_slug, derived_from, generated, generated_by, companion_artifacts)", "status": "pass"},
+    {"item": "Layer Responsibility Scope clear (in-scope artifacts enumerated; out-of-scope routing explicit to design-backend)", "status": "pass"},
+    {"item": "All 11 mechanism-design decisions routed to CC are addressed (D-01, D-02, D-03, D-04, D-07, D-08, D-09, D-11, D-12, D-13, D-14)", "status": "pass"},
+    {"item": "D-05 (shared with backend) status clear in this design's body", "status": "fail", "note": "Inconsistency between Contents declaration and body usage — see I-DR-001"},
+    {"item": "All PRD FRs in CC scope (FR-1, FR-2, FR-3, FR-4, FR-5, FR-6, FR-8, FR-9, FR-10, FR-11, FR-12, FR-13, FR-14, FR-15) are addressed by at least one design element", "status": "pass"},
+    {"item": "F-003 BLOCKER risk (skills disable-model-invocation silent-drop) is mitigated", "status": "pass", "note": "D-01 runtime Read/Glob pattern with cc-critique (CP-001) as structural precedent"},
+    {"item": "All five 'project firsts' documented in both §Project Precedents and §SETTINGS-NOTES append", "status": "fail", "note": "SETTINGS-NOTES draft lists 4; should list 5 — see I-DR-002"},
+    {"item": "Code inspection evidence — files and functions cited", "status": "pass", "note": "Extensive file:line citations throughout (subagent-spec.md:110, validate_pipeline_frontmatter.py:365-371, cc-critique.md, etc.)"},
+    {"item": "Applicable standards classified (explicit/implicit)", "status": "pass", "note": "KB-cc-design Principles 1, 3, 4, 5, 6, 8, 9 cited; cc-dependencies.json principles_summary enumerates each principle's role"},
+    {"item": "Field propagation map — none required (fields don't cross component boundaries beyond the spec-to-validator declared in §Dependencies on Other Layers)", "status": "na"},
+    {"item": "Dependency realizability — all cited dependencies (cc-critique, validate_pipeline_frontmatter.py, intake-intent-clarifier.md, KB-cc-platform extensions.md, jq, bash, shellcheck) verified to exist in codebase or be devcontainer-standard", "status": "pass"},
+    {"item": "Verification Strategy section — present in some form", "status": "fail", "note": "Material exists (D-07, D-11, D-13) but is scattered; recommend consolidation — see I-DR-003"},
+    {"item": "Output comparison defined when design replaces/modifies behavior (NFR-1 latency baseline, NFR-8 backward-compat baseline)", "status": "pass", "note": "D-11 specifies 1000-iteration p95 measurement; NFR-8 regression baseline is correctly routed to design-backend"},
+    {"item": "Code sample standards compliance (KB-general-coding-principles, 10 dimensions)", "status": "pass_with_note", "note": "Hook script: ~85/100 (Dim 10 borderline at ~45 lines). Agent-body workflow: ~70/100 (Dim 10 below threshold — see I-DR-004). No fabricated APIs, no real credentials, no hidden control flow, no production-URL writes."},
+    {"item": "Acceptance Criteria coverage — design elements mapped to PRD ACs", "status": "pass_with_note", "note": "17 of ~30 CC-routed ACs explicitly mapped; some omitted — see I-DR-006"},
+    {"item": "Open Items routed onward to next-stage owners (plan-author, test-acceptance-author, phase-quality-reviewer, design-composer, design-backend)", "status": "pass", "note": "11 OIs all have explicit owner assignments in cc-dependencies.json open_items_routed_onward"},
+    {"item": "Pipeline-isolation invariant (FR-13) preserved post-design", "status": "pass", "note": "PROVIDES-CC-12 (intake-intent-clarifier edit) does not reference KB-issue-capture or issue-capture-author by name — verified via cc-dependencies.json blast_radius_self.pipeline_isolation_preserved"},
+    {"item": "Q-CC-N items surfaced for composer arbitration", "status": "pass", "note": "5 Q-CC items (Q-CC-1..5), each with rationale, options, and recommended resolution"}
+  ],
+  "gate1_summary": {
+    "consistency_check": "PASS_WITH_FINDINGS — three consistency gaps: D-05 ownership (I-DR-001), SETTINGS-NOTES precedent count (I-DR-002), AC-NFR-9-a paraphrase (I-DR-008).",
+    "completeness_check": "PASS_WITH_FINDINGS — Verification Strategy section missing as a consolidated heading (I-DR-003); Fact Disposition rows not consolidated (I-DR-009); some PRD ACs not enumerated under §Acceptance Criteria Contribution (I-DR-006).",
+    "rule_compliance_check": "PASS — all KB-cc-design principles invoked and traceable; no auto-fail dimensions of KB-general-coding-principles triggered (no real credentials, no fabricated APIs, no production-URL writes); ADR-0032 universal-required feature_slug honored; ADR-0017 invocation-point alignment verified.",
+    "feasibility_check": "PASS — all primitives are realizable in the existing Claude Code platform; cc-critique (CP-001) is the structural precedent for the new sub-agent; validate_pipeline_frontmatter.py extension (FR-7) is correctly routed to design-backend; jq + bash + shellcheck are devcontainer-standard; ${CLAUDE_PROJECT_DIR} is the canonical path prefix per KB-cc-platform/references/extensions.md.",
+    "clarity_check": "PASS_WITH_FINDINGS — agent-body workflow block over the 40-line guideline (I-DR-004); D-04↔D-13 cross-reference would prevent confusion (I-DR-007); hook script could state idempotency/concurrency posture explicitly (I-DR-010)."
+  }
+}

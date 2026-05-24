@@ -1,0 +1,164 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-issue-capture-mechanism-r1-round1",
+  "audited_artifact": "blueprint-v2.md",
+  "audited_at": "2026-05-23T00:00:00Z",
+  "code_graph_used": "direct-read-grep-glob (no GitNexus and no codebase-memory-mcp available in environment; consistent with codebase-analysis.json extraction_method)",
+  "checks_performed": [
+    "brief_honor_L3 (decision contradiction; open-item handling; re-surfaced verified issues)",
+    "synthesis_claim_verification (14 decision frames D-01..D-14; ADR slate placement claim; F-003 BLOCKER mitigation rigor)",
+    "codebase_fact_grounding (validator lines 157-167; 314-323; 365-371; doc_type_category lines 147-154; pipeline-isolation zero-baseline)",
+    "blast_radius_audit (validator extension 3-hop transitive; hook PreToolUse on Task tool; intake-intent-clarifier Phase 0 user-token chain)",
+    "cross_section_consistency (ADR-0044 evidence/updates exclusion vs Backend Design pseudocode; Blueprint Interface Change Matrix vs Backend Design §Service Module Layout; ADR-0047 internal four-vs-five)",
+    "inherited_adr_coverage (ADR-0005, ADR-0008, ADR-0011, ADR-0017, ADR-0020, ADR-0023, ADR-0032, ADR-0036)",
+    "new_adr_coverage (ADR-0044..ADR-0050 cover the 7 load-bearing decisions per synthesis ADR slate)",
+    "pipeline_isolation_invariant (AC-FR-13-a/b zero-baseline at HEAD cf48e5e; verified by direct grep)"
+  ],
+  "scope_acknowledged": {
+    "structural_review_excluded": "Gate 0/1 by shared-document-reviewer at Stage 7 verdict: approved (blueprint-v2-review-issues.json); this audit does NOT replicate Gate 0/1 work",
+    "adr_authorship_excluded": "FR-5 reserves ADR authorship to design-composer; audit findings recommend revisions; the auditor does NOT author ADRs",
+    "blueprint_revision_excluded": "Read-only audit; finalize-reconciler dispatches any revisions"
+  },
+  "issues": [
+    {
+      "id": "I-AA-001",
+      "severity": "MAJOR",
+      "category": "decision_contradiction_with_synthesis_and_inherited_adr",
+      "summary": "Blueprint places the 7 new ADRs (ADR-0044..ADR-0050) at working/feature/issue-capture-mechanism-r1/adrs/, contradicting both ADR-0036 (single-location ADR placement) AND the synthesis ADR Slate Placement Constraint",
+      "description": "ADR-0036 (status: accepted) Decision: 'Architectural Decision Records (ADRs) live in exactly one canonical location: the project-wide registry at adrs/ADR-NNNN-<title>.md at the repository root. No feature-scoped duplicate is required, expected, or recommended... Do NOT create working/feature/<slug>/adrs/ directories or duplicate ADR files.' Synthesis §ADR Slate Placement Constraint reinforces this verbatim: 'All 7 ADRs land in /workspaces/feature-pipeline/adrs/ per ADR-0036.' Yet the Blueprint authored all 7 ADRs at working/feature/issue-capture-mechanism-r1/adrs/. Verified by direct ls: /workspaces/feature-pipeline/adrs/ADR-0044* through ADR-0050* return 'No such file or directory'; /workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/adrs/ contains all seven. The Blueprint's §References > ADR placement note acknowledges this and defers to 'the prompt's directive and the still-current operational convention pending ADR-0036 amendment propagation' — but no superseding ADR exists per ADR-0005, and Blueprint §Background and Context Prerequisite ADRs claims ADR-0036 'applies to the 7 new ADRs authored this run'. The ADR-0036 Kill Criteria (3+ feature runs surfacing operational need for feature-scoped copies) is NOT the basis cited; the cited basis is an external 'prompt directive'.",
+      "evidence": [
+        {"artifact": "adrs/ADR-0036-single-location-adr-placement.md", "section": "Decision", "excerpt": "ADRs live only at adrs/ADR-NNNN-<title>.md. No feature-scoped duplicate. Do NOT create working/feature/<slug>/adrs/ directories or duplicate ADR files."},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/synthesis.md", "section": "ADR Slate / Placement constraint", "excerpt": "All 7 ADRs land in /workspaces/feature-pipeline/adrs/ per ADR-0036."},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "section": "References > ADR placement note (lines 1298-1302)", "excerpt": "the 7 new ADRs (ADR-0044..ADR-0050) are written to working/feature/issue-capture-mechanism-r1/adrs/. The deliverable-packager at Stage 13 handles final placement per current operational behavior."},
+        {"artifact": "filesystem state", "section": "ls /workspaces/feature-pipeline/adrs/ADR-004{4,5,6,7,8,9}* /workspaces/feature-pipeline/adrs/ADR-0050*", "excerpt": "No such file or directory (all 7 ADRs absent from canonical /adrs/)"}
+      ],
+      "recommended_resolution": "Three viable paths: (a) MOVE the 7 ADR files from working/feature/<slug>/adrs/ to /adrs/ per ADR-0036's Decision (this would also align with the synthesis claim and remove the cross-document inconsistency); (b) author a superseding ADR per ADR-0005 that amends ADR-0036 to permit feature-scoped ADR authoring during pipeline runs (with deliverable-packager later canonicalizing to /adrs/) — this would require Stage-7 design-composer to author the superseding ADR per FR-5; (c) escalate to the user with an explicit user-disposition recorded in the Blueprint frontmatter (e.g., user_token_for_adr_placement_deviation) and a corresponding revision to the synthesis claim. Path (a) is the cleanest brief-honor resolution. Path (b) requires honest documentation of the architectural drift as a new ADR. The current 'captured drift' framing in Blueprint §References is insufficient because it neither resolves the contradiction nor authors a superseding decision record."
+    },
+    {
+      "id": "I-AA-002",
+      "severity": "MAJOR",
+      "category": "cross_section_inconsistency_new_adr_vs_blueprint_backend_design",
+      "summary": "ADR-0044 commits 'evidence/ and updates/ subdirectories explicitly excluded from FR-7's validator extension' but the Blueprint's Backend Design does not specify the exclusion mechanism; current validator emits minor finding on agent-roster-impact-matrix.md (verified empirically) which will persist after FR-9 migration into Issues/.../evidence/ unless the validator extension adds a path-prefix skip",
+      "description": "ADR-0044 Decision item 4 (line 61): 'A topic folder MAY contain these two subdirectories for non-doctype artifacts. Files inside evidence/ and updates/ are NOT validated as doctype files and MAY carry any frontmatter shape. They are explicitly excluded from FR-7's validator extension.' ADR-0044 Implementation Guidance (line 149): 'Files under Issues/<topic-slug>/evidence/ and Issues/<topic-slug>/updates/ are skipped (no doctype validation applied).' However, the Blueprint's Backend Design §Service/Module Layout (lines 850-857), §Corrected Pseudocode Reference (lines 887-921), §Data Contract (lines 687-713), and §Field Propagation Map do NOT describe any path-prefix skip for Issues/<topic>/evidence/ or Issues/<topic>/updates/. The validator extension's dispatch is by doc_type_category returning 'issue' when doc_type ∈ ISSUE_DOC_TYPES. The migrated agent-roster-impact-matrix.md (FR-9 target) carries doc_type: agent-roster-impact-matrix (not in any known category), so it currently produces a minor 'doc_type ... not in known category' finding (verified empirically via python3 validate_pipeline_frontmatter.py on the current path). Post-FR-9 migration into Issues/per-agent-design-evaluation-gap/evidence/, the same minor finding will persist unless the validator extension explicitly path-prefix-skips evidence/ and updates/ subdirectories. The Blueprint provides no such mechanism. This is a cross-section inconsistency: the new ADR makes a commitment the new Backend Design does not honor.",
+      "evidence": [
+        {"artifact": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md", "section": "Decision §4 (line 61) and Implementation Guidance (line 149)", "excerpt": "explicitly excluded from FR-7's validator extension ... Files under Issues/<topic-slug>/evidence/ and Issues/<topic-slug>/updates/ are skipped (no doctype validation applied)."},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "section": "Backend Design > Service/Module Layout (lines 850-857) + Corrected Pseudocode Reference (lines 887-921)", "excerpt": "no mention of path-prefix skip for Issues/<topic>/evidence/ or Issues/<topic>/updates/"},
+        {"artifact": "validator empirical output", "section": "python3 .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md", "excerpt": "{\"severity\": \"minor\", \"message\": \"doc_type 'agent-roster-impact-matrix' not in known category; cannot validate state vocabulary\"}"},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "section": "Implementation Plan > Migration Strategy (row 5: agent-roster-impact-matrix.md → Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md; 'no doc_type change' + 'no back-fill')", "excerpt": "the file retains doc_type: agent-roster-impact-matrix; nothing in the Backend Design exempts it from validator scrutiny"}
+      ],
+      "recommended_resolution": "Amend the Blueprint's Backend Design to specify the exclusion mechanism. Two viable approaches: (a) extend the outer dispatch at validate_pipeline_frontmatter.py lines 365-371 with a path-prefix check that skips files under /evidence/ or /updates/ inside Issues/, returning an empty finding list before reaching validate_pipeline_artifact (e.g., 'if \"/Issues/\" in str_path and (\"/evidence/\" in str_path or \"/updates/\" in str_path): return []'); (b) extend validate_pipeline_artifact's unknown-category branch (lines 304-312) to skip files whose path matches Issues/<topic>/(evidence|updates)/ rather than emit a minor finding. Either approach honors ADR-0044's commitment. Without this fix, the Blueprint's claim that ADR-0044 is fully implemented by FR-7 is false, and AC-FR-9-b (agent-roster-impact-matrix migration produces no validator regression) is at risk of failing post-migration. Note: this does NOT affect NFR-8 zero-blocker backward compatibility (the finding is minor), but it does contradict ADR-0044's explicit commitment and may surface as a Plan-stage defect."
+    },
+    {
+      "id": "I-AA-003",
+      "severity": "MINOR",
+      "category": "internal_blueprint_inconsistency",
+      "summary": "Blueprint Interface Change Matrix presents two alternative validator dispatch designs as 'or', but the Backend Design §Service/Module Layout has explicitly chosen one. The 'or' wording is stale.",
+      "description": "Blueprint §Interface Change Matrix line 469: 'validate_pipeline_artifact(fm, path) — existing dispatcher | Adds fourth elif branch keyed on doc_type ∈ ISSUE_DOC_TYPES (or extends doc_type_category to return \"issue\" per Q-BE-5 / I-DR-BE-005 resolution) | No | Additive only — existing branches unchanged.' Backend Design §Service/Module Layout line 856 explicitly resolves: 'Mechanism for dispatch (per I-DR-BE-005 precision): extend doc_type_category (at lines 147-154) to return \"issue\" when doc_type ∈ ISSUE_DOC_TYPES, then add an elif category == \"issue\" branch inside validate_pipeline_artifact.' The Interface Change Matrix preserves the v1 wording with both options; the resolution should be reflected as the single chosen design. Minor wording inconsistency that does not affect implementation but slightly degrades the Blueprint's status as the canonical source.",
+      "evidence": [
+        {"artifact": "blueprint-v2.md", "section": "Interface Change Matrix (line 469)", "excerpt": "Adds fourth elif branch keyed on doc_type ∈ ISSUE_DOC_TYPES (or extends doc_type_category to return 'issue' per Q-BE-5 / I-DR-BE-005 resolution)"},
+        {"artifact": "blueprint-v2.md", "section": "Backend Design > Service/Module Layout (line 856)", "excerpt": "Mechanism for dispatch (per I-DR-BE-005 precision): extend doc_type_category ... then add an elif category == 'issue' branch"}
+      ],
+      "recommended_resolution": "Replace the 'or' phrasing in Interface Change Matrix line 469 with the single chosen mechanism: 'extends doc_type_category (lines 147-154) to return \"issue\" when doc_type ∈ ISSUE_DOC_TYPES; adds an elif category == \"issue\" branch inside validate_pipeline_artifact'. Removes the false-options ambiguity."
+    },
+    {
+      "id": "I-AA-004",
+      "severity": "MINOR",
+      "category": "internal_adr_inconsistency",
+      "summary": "ADR-0047 frontmatter applies_to enumerates 'four project firsts' but Decision §5 enumerates five firsts — internal inconsistency mirroring the I-DR-BP-001 fix in the Blueprint",
+      "description": "ADR-0047 frontmatter line 14 (applies_to): 'the four project firsts this run introduces (disable-model-invocation skill, .claude/hooks/ directory, settings.json hooks block, runtime Read/Glob KB-load pattern for sub-agents)'. ADR-0047 Decision §5 (line 73): 'The five firsts captured: first disable-model-invocation: true skills; first .claude/hooks/ directory; first hooks block in settings.json; first runtime Read/Glob KB-load sub-agent; first 5-state lifecycle vocabulary (per ADR-0050).' This is the same four-vs-five inconsistency that the Blueprint Stage-7 review caught as I-DR-BP-001. The Blueprint fixed its own complexity_rationale to say 'Five project firsts' but ADR-0047 (which records the architectural rationale for the firsts) still carries the four-firsts language in its applies_to frontmatter. Cross-section inconsistency between Blueprint (corrected to five) and the ADR that documents the audit trail (still four in applies_to, five in Decision §5).",
+      "evidence": [
+        {"artifact": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md", "section": "Frontmatter applies_to (line 14)", "excerpt": "the four project firsts this run introduces"},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md", "section": "Decision §5 (line 73)", "excerpt": "The five firsts captured: ... first 5-state lifecycle vocabulary (per ADR-0050)"},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "section": "Design Summary (Meta) complexity_rationale (line 138)", "excerpt": "Five project firsts (first disable-model-invocation skills; first .claude/hooks/ directory; first hooks block in settings.json; first runtime KB-load sub-agent; first 5-state lifecycle vocabulary ...)"}
+      ],
+      "recommended_resolution": "Amend ADR-0047's applies_to frontmatter line 14 to enumerate five firsts (add 'first 5-state lifecycle vocabulary distinct from ADR-0008's 4-state intra-pipeline ledger and ADR-0032's 3-tier per-doc-type vocabulary'). This brings the ADR's applies_to into alignment with its Decision §5 and with the Blueprint's complexity_rationale. Note: per FR-5, only design-composer authors ADRs, so finalize-reconciler should dispatch this revision to design-composer."
+    },
+    {
+      "id": "I-AA-005",
+      "severity": "MINOR",
+      "category": "citation_inaccuracy",
+      "summary": "Blueprint Acceptance Criteria one-line note cites 'AC-FR-11-a/b/c' but PRD-v2 only defines AC-FR-11-a and AC-FR-11-b (no AC-FR-11-c exists)",
+      "description": "Blueprint line 294 (the I-DR-BP-006 resolution note): 'In addition to the FR-1..FR-5, FR-7, FR-13 ACs enumerated below, the design-coupled AC families also include ... FR-11 (intake-intent-clarifier Phase 0 detection branch per D-14 — AC-FR-11-a/b/c)...' Direct grep of prd-v2.md confirms: AC-FR-11-c does NOT exist. PRD lines 346-347 define only AC-FR-11-a and AC-FR-11-b. Minor citation error introduced by the I-DR-BP-006 resolution note; does not affect implementation but degrades the Blueprint's traceability accuracy.",
+      "evidence": [
+        {"artifact": "blueprint-v2.md", "section": "Acceptance Criteria (line 294, I-DR-BP-006 resolution note)", "excerpt": "FR-11 (intake-intent-clarifier Phase 0 detection branch per D-14 — AC-FR-11-a/b/c)"},
+        {"artifact": "prd-v2.md", "section": "FR-11 (lines 344-347)", "excerpt": "Defines AC-FR-11-a (proposal treated as authoritative prior context) and AC-FR-11-b (elicit only missing fields). No AC-FR-11-c."},
+        {"artifact": "prd-v2.md grep", "section": "grep -c 'AC-FR-11-c' prd-v2.md", "excerpt": "0 matches"}
+      ],
+      "recommended_resolution": "Amend Blueprint line 294 to read 'AC-FR-11-a/b' (drop the spurious '/c'). One-character fix; aligns the citation with the PRD's actual AC enumeration."
+    },
+    {
+      "id": "I-AA-006",
+      "severity": "INFO",
+      "category": "carry_forward_pre_existing",
+      "summary": "Blueprint frontmatter omits doc_type field — pre-existing condition flagged by Stage-7 reviewer; ADR-0032 + shared-conventions require universal doc_type",
+      "description": "Per ADR-0032 Change 4 and shared-conventions.md line 232: 'doc_type: <enum> — universal required'. Blueprint v2 frontmatter (lines 1-70) does not declare a doc_type field. The Stage-7 reviewer (blueprint-v2-review-issues.json line 43) flagged this as 'carry-forward; not a regression' because the canonical blueprint-template.md itself omits doc_type. This is a pre-existing template-vs-convention drift that exists independently of this run; recording at INFO level for completeness only.",
+      "evidence": [
+        {"artifact": "blueprint-v2.md", "section": "Frontmatter (lines 1-70)", "excerpt": "No doc_type: field declared"},
+        {"artifact": "blueprint-v2-review-issues.json", "section": "recommendations [1]", "excerpt": "the Blueprint frontmatter does not declare doc_type: explicitly. Per shared-conventions §v2 Amendments, doc_type is universal-required. This was also absent in v1; v1 passed reviewer as PASS_WITH_RECOMMENDATIONS so this is a pre-existing condition"},
+        {"artifact": "adrs/ADR-0032-conventions-canonicalization.md", "section": "Change 4", "excerpt": "doc_type field as universal required (20+5 enum)"},
+        {"artifact": ".claude/skills/KB-documentation-criteria/references/templates/blueprint-template.md", "section": "frontmatter example", "excerpt": "no doc_type: line in the template's frontmatter example"}
+      ],
+      "recommended_resolution": "Out of scope for this audit cycle; recorded for traceability. A future pipeline run (likely the auditing-family-graduation or a templates-consolidation feature) should reconcile the blueprint-template.md with ADR-0032's universal-required doc_type rule."
+    },
+    {
+      "id": "I-AA-007",
+      "severity": "INFO",
+      "category": "audit_observation",
+      "summary": "F-003 BLOCKER mitigation is architecturally rigorous; load-bearing checks pass",
+      "description": "Per the audit prompt's check 3, F-003 BLOCKER mitigation verification: (a) issue-capture-author frontmatter does NOT list KB-issue-capture in skills: — verified at cc-design.md §Sub-Agent Patterns (skills: ABSENT explicitly) and Blueprint §Component 3 line 613 ('skills: ABSENT (F-003 silent-drop constraint)'). (b) Runtime Read/Glob pattern documented with specific paths — verified at cc-design.md lines 238-242: 'Read .claude/skills/KB-issue-capture/SKILL.md ... Read .claude/skills/KB-issue-capture/references/non-pollution-contract.md ... approval-prompt-rubric.md ... triage-criteria.md ... examples.md'. Five explicit Read calls naming five distinct paths. (c) Agent body workflow honors the mitigation — at task start (step 1-5) before any other procedure; the Hard Constraints section (cc-design line 372-378) plus the Blueprint §Sub-Agent Patterns 'NEVER call Write before exactly one AskUserQuestion' constraint cite the structural sequence. (d) cc-critique (CP-001) is correctly cited as the structural precedent — verified in Blueprint §Project Precedents Established item 4 (line 200) and ADR-0047 Decision §4 (line 72). All four checks pass; no audit finding. Recording at INFO level for traceability.",
+      "evidence": [
+        {"artifact": "working/feature/issue-capture-mechanism-r1/cc-design.md", "section": "Sub-Agent Patterns (lines 213-234)", "excerpt": "skills: ABSENT. Per F-003, listing KB-issue-capture or capture-issue in skills: causes silent-drop by the platform AND a BLOCKER finding from auditing-cc-configs/scripts/cross_file_checks.py X3 (line 410)."},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/cc-design.md", "section": "At task start (lines 236-244)", "excerpt": "1. Read .claude/skills/KB-issue-capture/SKILL.md (router). 2. Read non-pollution-contract.md. 3. Read approval-prompt-rubric.md. 4. Read triage-criteria.md. 5. Read examples.md."},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/cc-design.md", "section": "Hard constraints (lines 372-378)", "excerpt": "NEVER call Write before exactly one AskUserQuestion has completed with Approve / Approve-with-edits"},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "section": "Component 3 frontmatter shape (line 613)", "excerpt": "skills: ABSENT (F-003 silent-drop constraint)"},
+        {"artifact": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "section": "Project Precedents Established item 4 (line 200)", "excerpt": "First sub-agent that loads its KB at runtime via Read/Glob rather than via skills: frontmatter preload (per F-003 silent-drop constraint). The closest existing structural template is cc-critique (CP-001)"}
+      ],
+      "recommended_resolution": "No action required. F-003 mitigation is structurally airtight; the Blueprint and the underlying cc-design both honor the constraint at the frontmatter, body procedure, and audit-trail levels."
+    },
+    {
+      "id": "I-AA-008",
+      "severity": "INFO",
+      "category": "audit_observation",
+      "summary": "Pipeline-isolation invariant (FR-13 / AC-FR-13-a/b) verified at zero-baseline at audit time (HEAD cf48e5e)",
+      "description": "Direct grep audit (re-run at audit time): grep -r 'KB-issue-capture' /workspaces/feature-pipeline/.claude/agents/ → 0 matches; grep -r 'issue-capture-author' /workspaces/feature-pipeline/.claude/agents/ → 0 matches. Confirms the zero-baseline recorded in codebase-analysis.json (F-010, F-015) is intact at audit time. Design preserves the invariant structurally: the new issue-capture-author agent file does not yet exist (out-of-tree per FR-1 invariant) and no pipeline-agent file references it. AC-FR-13-a/b grep commands encoded verbatim by Blueprint §Acceptance Criteria FR-13 entries.",
+      "evidence": [
+        {"artifact": "audit-time grep", "section": "grep -r 'KB-issue-capture|issue-capture-author' .claude/agents/", "excerpt": "0 matches (zero-baseline preserved)"},
+        {"artifact": "codebase-analysis.json", "section": "F-010, F-015, pipeline_isolation_check (line 706-722)", "excerpt": "PASS — Zero-baseline confirmed at 2026-05-23T18:55Z against HEAD cf48e5e"},
+        {"artifact": "blueprint-v2.md", "section": "Functional ACs > FR-13 (lines 344-345)", "excerpt": "AC-FR-13-a — grep -r 'KB-issue-capture' .claude/agents/{intake,discovery,design,plan,test,review,finalize,execute,synth}-*.md returns empty. AC-FR-13-b — grep -r 'subagent_type:\\s*issue-capture-author' returns empty."}
+      ],
+      "recommended_resolution": "No action required. test-acceptance-author (Stage 8) should encode the verbatim grep commands as direct acceptance assertions per the Blueprint."
+    },
+    {
+      "id": "I-AA-009",
+      "severity": "INFO",
+      "category": "audit_observation",
+      "summary": "All 14 synthesis decision frames (D-01..D-14) are addressed in the Blueprint with defensible resolutions",
+      "description": "Brief-honor verification at synthesis decision-frame granularity: (D-01 runtime Read/Glob) — Blueprint §Mechanism Designs D-01 confirms; verified. (D-02 PreToolUse bash+jq) — Blueprint §Component 4 + §Mechanism Designs D-02; verified. (D-03 AskUserQuestion 4 archetypes) — Blueprint §Mechanism Designs D-03 specifies 4 archetypes; verified. (D-04 1:1 doctype-to-precedent) — Blueprint §Mechanism Designs D-04 specifies pairings; verified. (D-05 per-state companion fields) — Blueprint §Backend Design Per-State Companion Field Authoritative Table + ADR-0050 §Decision §4; verified. (D-06 proposes_future_feature advisory) — ADR-0050 §Decision §6; verified. (D-07 three-layer hook test) — Blueprint §Quality Assurance Mechanisms shellcheck+golden-file+integration smoke; verified. (D-08 frontmatter-state-diff idempotency) — Blueprint §Data Flow update-mode + §Mechanism Designs D-08; verified. (D-09 stderr+JSONL log) — Blueprint §Mechanism Designs D-09 + Phase 5 .gitignore step; verified. (D-10 fourth issue category branch) — Blueprint §Backend Design §Service/Module Layout; verified. (D-11 100ms p95 1000-iteration measurement) — Blueprint §Verification Strategy + AC-NFR-1-a; verified. (D-12 three-surface audit trail) — Blueprint §Project Precedents Established + ADR-0047; verified. (D-13 atomic git mv + back-fill) — Blueprint §Implementation Plan > Migration Strategy + §Quality Assurance Mechanisms; verified. (D-14 Phase 0 detection branch in intake-intent-clarifier) — Blueprint §Component intake-intent-clarifier edit + ADR-0048 §Decision; verified. All 14 frames addressed; no synthesis claim left dangling.",
+      "evidence": [
+        {"artifact": "blueprint-v2.md", "section": "Mechanism Designs (D-01..D-14) (lines 827-844)", "excerpt": "11 decisions routed to CC layer + 3 to Backend layer; all dispositions present and traceable"},
+        {"artifact": "synthesis.md", "section": "Decision Framing (D-01..D-14)", "excerpt": "14 frames with recommended option, rationale, PRD cross-references, and routing"}
+      ],
+      "recommended_resolution": "No action required."
+    },
+    {
+      "id": "I-AA-010",
+      "severity": "INFO",
+      "category": "audit_observation",
+      "summary": "All Q-CC-1..5 / Q-BE-1..5 layer-design open items have explicit dispositions in the Blueprint",
+      "description": "Brief-honor open-item handling: per Blueprint §Resolved Q-CC-N / Q-BE-N items table (lines 1252-1264), all 10 layer-design open items have explicit resolutions (Q-CC-1: consolidate audit under ADR-0047; Q-CC-2: defer permissions.deny; Q-CC-3: defer plugin packaging; Q-CC-4: yes .gitignore; Q-CC-5: keep permissionMode: default; Q-BE-1: adopt issue-* enum; Q-BE-2: adopt per-state companion field names verbatim; Q-BE-3: distinct superseded_by_issue_id field; Q-BE-4: single PR with baseline pre-merge; Q-BE-5: capture findings JSON only for L2). U-1, U-2, U-5, U-7, U-11, OI-1, OI-2 also all routed (lines 1267-1273). No open item silently dropped.",
+      "evidence": [
+        {"artifact": "blueprint-v2.md", "section": "Resolved Q-CC-N / Q-BE-N items table (lines 1250-1264)", "excerpt": "Q-CC-1..5 + Q-BE-1..5 each with explicit Resolution and Rationale"},
+        {"artifact": "blueprint-v2.md", "section": "Unresolved Items Deferred to Plan / Test / Execution (lines 1265-1273)", "excerpt": "U-1, U-2, U-5, U-7, U-11, OI-1, OI-2 each routed to Plan/Test/Execute owner"}
+      ],
+      "recommended_resolution": "No action required."
+    }
+  ],
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 2,
+    "MINOR": 3,
+    "INFO": 5
+  },
+  "verdict": "conditional_pass",
+  "verdict_rationale": "No BLOCKER issues. Two MAJOR issues: (I-AA-001) Inherited-ADR contradiction with ADR-0036 — the 7 new ADRs are placed at working/feature/<slug>/adrs/ rather than the canonical /adrs/, contradicting both ADR-0036 (accepted) AND the synthesis claim that '/All 7 ADRs land in /workspaces/feature-pipeline/adrs/ per ADR-0036'. The Blueprint acknowledges this drift but does not author a superseding ADR per ADR-0005. (I-AA-002) Cross-section inconsistency between ADR-0044 (commits to evidence/updates exclusion from validator) and Blueprint Backend Design (no exclusion mechanism specified; agent-roster-impact-matrix.md will produce a minor finding post-migration). Three MINOR issues are stale-wording or citation-accuracy nits localizable to specific lines (Interface Change Matrix 'or' phrasing, ADR-0047 applies_to four-vs-five inconsistency, AC-FR-11-c citation). Five INFO observations document audit-positive findings (F-003 mitigation rigorous; pipeline-isolation invariant verified at zero-baseline; all 14 decision frames addressed; all Q-CC/Q-BE items dispositioned; Blueprint doc_type omission is a pre-existing template drift). Per the severity rules, MAJOR-without-BLOCKER → conditional_pass — finalize-reconciler may dispatch revision (recommended for I-AA-001 and I-AA-002, which are auditor-driven reconciliation candidates not requiring user gate) or surface to user with rationale to defer the I-AA-001 ADR placement question if the orchestrator's prior 'prompt directive' is the binding source."
+}

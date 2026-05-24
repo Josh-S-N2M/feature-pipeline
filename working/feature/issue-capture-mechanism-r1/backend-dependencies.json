@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0.0",
+  "id": "DEPS-BE-issue-capture-mechanism-r1",
+  "feature_slug": "issue-capture-mechanism-r1",
+  "layer": "backend",
+  "generated": "2026-05-23T20:30:00Z",
+  "generated_by": "design-backend",
+  "companion_artifact": "working/feature/issue-capture-mechanism-r1/backend-design.md",
+  "provides": [
+    {
+      "id": "BE-PROV-1",
+      "name": "Validator extension — fourth `issue` doc-type category",
+      "description": "Adds ISSUE_DOC_TYPES, ISSUE_STATES, ISSUE_PER_STATE_REQUIRED_FIELDS module-level constants and a validate_issue_artifact function to .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py. Adds a new elif branch inside validate_pipeline_artifact dispatching on doc_type in ISSUE_DOC_TYPES. Outer dispatch at lines 365-371 unchanged.",
+      "artifact_path": ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py",
+      "satisfies_prd": ["FR-7", "AC-FR-7-a", "AC-FR-7-b", "AC-FR-7-c", "AC-FR-7-d", "NFR-8", "AC-NFR-8-a", "AC-NFR-8-b"],
+      "satisfies_synthesis_decisions": ["D-05", "D-06", "D-10"],
+      "consumed_by_layers": ["claude-code"],
+      "consumed_by_artifacts": [
+        ".claude/agents/shared-document-reviewer.md (line 460)",
+        ".claude/agents/execute-task-quality-handler.md (line 62)",
+        ".claude/skills/auditing-shared/scripts/run_phase_checks.py (line 40)",
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py (line 29)"
+      ]
+    },
+    {
+      "id": "BE-PROV-2",
+      "name": "Regression-test fixture set for the new branch",
+      "description": "L3 + L4 synthetic and post-migration fixtures under .claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/ — at minimum 18 (doc_type × state) positive cases, 6 missing-companion-field negative cases, 3 invalid-status negative cases, and 4 post-FR-8-migration fixtures.",
+      "artifact_path": ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/",
+      "satisfies_prd": ["AC-FR-7-c", "AC-FR-7-d", "AC-NFR-8-b"],
+      "satisfies_synthesis_decisions": ["D-10"],
+      "consumed_by_layers": ["claude-code"],
+      "consumed_by_artifacts": [
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py (extended)"
+      ]
+    },
+    {
+      "id": "BE-PROV-3",
+      "name": "Regression-corpus baseline-capture procedure",
+      "description": "Documented pre/post baseline-capture procedure (§7 of backend-design.md): capture findings JSON pre-extension against L1+L2 corpus; implement extension; capture post-extension findings JSON; diff must be empty. Baseline captured PRE-implementation per synthesis D-10.",
+      "artifact_path": "working/feature/issue-capture-mechanism-r1/backend-design.md#7",
+      "satisfies_prd": ["NFR-8", "AC-NFR-8-a"],
+      "satisfies_synthesis_decisions": ["D-10"],
+      "consumed_by_layers": ["claude-code", "test", "plan"],
+      "consumed_by_artifacts": [
+        "plan.md (Plan-author records the baseline-capture step)",
+        "acceptance-tests.md (test-acceptance-author encodes the diff-must-be-empty assertion)"
+      ]
+    }
+  ],
+  "depends_on": [
+    {
+      "id": "BE-DEP-1",
+      "from_layer": "claude-code",
+      "owner_agent": "design-cc",
+      "what": "Final lock on three new doc_type enum strings",
+      "values": ["issue-register", "issue-analysis", "issue-proposal"],
+      "why_blocks_backend": "These strings populate ISSUE_DOC_TYPES. Renaming after Backend implementation would require a coordinated change across the validator, templates, agent body, and the FR-8 migration back-fill.",
+      "satisfies_decision": "D-10",
+      "blocks_implementation": true
+    },
+    {
+      "id": "BE-DEP-2",
+      "from_layer": "claude-code",
+      "owner_agent": "design-cc",
+      "what": "Final 5-state status vocabulary",
+      "values": ["draft", "open", "adopted", "complete", "superseded", "wontfix-with-rationale"],
+      "why_blocks_backend": "These strings populate ISSUE_STATES. The vocabulary is named in the PRD and synthesis and confirmed at Intent Clarification, but `design-cc` formally owns the lifecycle design (synthesis D-05 shared routing).",
+      "satisfies_decision": "D-05",
+      "blocks_implementation": true
+    },
+    {
+      "id": "BE-DEP-3",
+      "from_layer": "claude-code",
+      "owner_agent": "design-cc",
+      "what": "Per-state required-companion-field names",
+      "values": {
+        "draft": [],
+        "open": ["since"],
+        "adopted": ["adopted_by_feature_slug", "adopted_at"],
+        "complete": ["resolved_by", "resolved_at", "resolution_summary"],
+        "superseded": ["superseded_by_issue_id", "superseded_at"],
+        "wontfix-with-rationale": ["wontfix_rationale", "decided_at"]
+      },
+      "why_blocks_backend": "These strings populate ISSUE_PER_STATE_REQUIRED_FIELDS. The validator enforces presence; the field names must match the templates (FR-6) authored by design-cc.",
+      "satisfies_decision": "D-05",
+      "blocks_implementation": true,
+      "note": "Values shown are the synthesis-D-05-recommended slate; final lock owned by design-cc."
+    },
+    {
+      "id": "BE-DEP-4",
+      "from_layer": "claude-code",
+      "owner_agent": "design-cc",
+      "what": "Optional cross-link field names and their ID-syntax pattern",
+      "values": ["escalates_from", "escalated_to", "rolled_into_register"],
+      "why_blocks_backend": "These drive the syntactic-correctness check inside validate_issue_artifact. A canonical regex for ID syntax is also needed.",
+      "satisfies_decision": "D-05",
+      "blocks_implementation": false,
+      "note": "Validator can ship without this check and add it in a follow-up; not on the critical path for AC-FR-7-a/b/c/d."
+    },
+    {
+      "id": "BE-DEP-5",
+      "from_layer": "claude-code",
+      "owner_agent": "design-cc",
+      "what": "Confirmation that `proposes_future_feature` field-name string remains as-is",
+      "values": ["proposes_future_feature"],
+      "why_blocks_backend": "Drives the D-06 advisory check on issue-proposal. Two existing precedents (F-006) use this literal field name.",
+      "satisfies_decision": "D-06",
+      "blocks_implementation": true,
+      "note": "If design-cc renames the field in the new templates, the validator's advisory check must match the new name."
+    },
+    {
+      "id": "BE-DEP-6",
+      "from_layer": "claude-code",
+      "owner_agent": "design-cc",
+      "what": "Template structure for the 3 doc_types (FR-6)",
+      "values": [
+        "KB-documentation-criteria/references/templates/issue-register-template.md",
+        "KB-documentation-criteria/references/templates/issue-analysis-template.md",
+        "KB-documentation-criteria/references/templates/issue-proposal-template.md"
+      ],
+      "why_blocks_backend": "Informational dependency. The validator only inspects frontmatter, not body shape. The dependency exists because the templates' frontmatter sections must declare the fields this validator enforces.",
+      "satisfies_decision": "D-04",
+      "blocks_implementation": false
+    },
+    {
+      "id": "BE-DEP-7",
+      "from_layer": "claude-code",
+      "owner_agent": "design-cc",
+      "what": "FR-8 migration back-fill values (doc_type rename + status:open + since:<date> + version:0.1.0) on the 4 pre-migration files",
+      "values": [
+        "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+        "Issues/per-agent-design-evaluation-gap/analysis.md",
+        "Issues/adr-placement-rootcause/analysis.md",
+        "Issues/auditing-family-graduation-review/proposal.md"
+      ],
+      "why_blocks_backend": "The L4 regression-corpus layer (§7 of backend-design.md) requires the 4 migrated files in their post-back-fill state. AC-FR-8-c (validator-clean on the 4 migrated files) and AC-FR-7-a both depend on the back-fill matching the validator's expectations.",
+      "satisfies_decision": "D-13",
+      "blocks_implementation": false,
+      "note": "Plan-author sequences the FR-7 implementation and FR-8 migration; the validator can be extended first, then the migration runs against the extended validator."
+    }
+  ],
+  "cross_layer": [
+    {
+      "id": "BE-CL-1",
+      "kind": "shared_decision",
+      "decision": "D-05 (per-state required-companion-field rules)",
+      "co_owners": ["design-backend", "design-cc"],
+      "resolution_path": "design-cc finalizes the field-name strings (BE-DEP-3); design-backend codifies them into ISSUE_PER_STATE_REQUIRED_FIELDS in the validator. Composer arbitrates if naming conflicts arise."
+    },
+    {
+      "id": "BE-CL-2",
+      "kind": "naming_lock",
+      "decision": "D-10 (validator extension shape — doc_type enum values)",
+      "co_owners": ["design-backend", "design-cc"],
+      "resolution_path": "design-cc owns the canonical enum strings (BE-DEP-1); design-backend uses them verbatim. Q-BE-1 surfaces the recommendation for composer arbitration."
+    }
+  ],
+  "provides_to_plan": [
+    {
+      "id": "BE-PROV-PLAN-1",
+      "name": "Plan-step: capture regression-corpus baseline BEFORE implementing extension",
+      "rationale": "Per synthesis D-10, NFR-8 verification requires the pre-extension findings JSON as the diff baseline. Plan must sequence: (1) extend smoke_test_auditing_shared.py with the regression runner; (2) run validator pre-extension; persist baseline; (3) implement extension; (4) run validator post-extension; (5) diff; (6) assert empty diff.",
+      "consumed_by": "plan-author"
+    },
+    {
+      "id": "BE-PROV-PLAN-2",
+      "name": "Plan-step: extend smoke_test_auditing_shared.py with regression_test_issue_extension()",
+      "rationale": "Per CP-006, smoke_test_auditing_shared.py is the canonical test surface for the validator. Plan-author owns the harness-wiring choice (extend in place vs sibling file).",
+      "consumed_by": "plan-author"
+    }
+  ],
+  "provides_to_tests": [
+    {
+      "id": "BE-PROV-TEST-1",
+      "name": "Regression-corpus assertion: pre/post diff must be empty",
+      "rationale": "NFR-8 acceptance: post-extension validator findings byte-identical to pre-extension findings on the L1+L2 corpus.",
+      "consumed_by": "test-acceptance-author",
+      "ears_form": "When the post-extension validator is run against the regression corpus, the system shall produce findings byte-identical to the pre-extension baseline."
+    },
+    {
+      "id": "BE-PROV-TEST-2",
+      "name": "Per-state positive and negative fixtures",
+      "rationale": "L3 fixtures: 18 positive (doc_type × state) cases + 6 missing-field negatives + 3 invalid-status negatives — these are the acceptance fixtures for AC-BE-1..AC-BE-5.",
+      "consumed_by": "test-acceptance-author"
+    }
+  ],
+  "open_questions_for_composer": [
+    "Q-BE-1 — Final lock on three new doc_type enum strings (issue-register / issue-analysis / issue-proposal). Recommended: PRD-named slate.",
+    "Q-BE-2 — Final field-name slate for per-state required companions. Recommended: synthesis D-05 slate verbatim.",
+    "Q-BE-3 — Should superseded_by_issue_id share namespace with ADR-0005's superseded_by? Recommended: distinct field name.",
+    "Q-BE-4 — Single PR vs split PRs for the extension? Recommended: single PR with synthesis-D-10 baseline-capture procedure.",
+    "Q-BE-5 — Regression corpus L2 storage: checked-in fixtures, path references, or findings-only snapshot? Recommended: findings-only snapshot."
+  ],
+  "no_dependencies_on_layers": ["frontend", "api", "query", "database", "cicd", "iac", "codespaces"],
+  "constraints_honored": [
+    {
+      "constraint": "NFR-8 — zero false positives, zero false negatives on existing pipeline doc_types after extension",
+      "how": "Option A (§3 of backend-design.md) adds only an elif branch dispatching on doc_type in ISSUE_DOC_TYPES; no existing branch modified. Empirical verification via the regression-corpus diff (§7)."
+    },
+    {
+      "constraint": "FR-13 — pipeline-isolation invariant (no pipeline sub-agent loads KB-issue-capture or invokes issue-capture-author)",
+      "how": "Backend design touches only validate_pipeline_frontmatter.py — a tooling script, not a sub-agent. No reference to KB-issue-capture or issue-capture-author is introduced into any .claude/agents/{intake,discovery,design,plan,test,review,finalize,execute,synth}-*.md file."
+    },
+    {
+      "constraint": "FR-5 — only design-composer authors ADRs",
+      "how": "No ADR authored by this design. Architectural decisions surfaced as Q-BE-1..Q-BE-5 in §16 of backend-design.md."
+    },
+    {
+      "constraint": "CP-002 — auditing-shared CLI conventions (stdlib-only, argparse, JSON-stdout, observer-only default, stderr discipline)",
+      "how": "Extension reuses existing make_finding (VE-002); no new CLI surface; no new dependencies; severity vocabulary preserved verbatim."
+    },
+    {
+      "constraint": "VE-004 — current outer dispatch (lines 365-371) preserved unchanged",
+      "how": "New branch lives inside validate_pipeline_artifact, not at the outer dispatch."
+    }
+  ]
+}
