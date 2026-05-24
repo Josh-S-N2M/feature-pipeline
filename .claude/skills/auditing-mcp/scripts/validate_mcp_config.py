@@ -42,9 +42,18 @@ DOWNLOAD_EXEC_COMMANDS = {"curl", "wget", "fetch", "bash", "sh", "zsh"}
 
 def check_server(name: str, server: dict, location: str) -> list[dict]:
     findings = []
-    # Recognize both `type` (older convention) and `transport` (newer per Claude Code MCP spec).
-    # An entry with `transport: "http"` (or "sse") MUST NOT require `command`.
-    server_type = server.get("type") or server.get("transport") or "stdio"
+    # Claude Code's actual `.mcp.json` schema uses `type: "http" | "sse"` (or absent → stdio).
+    # `transport` is NOT a recognized field — entries using `transport: "http"` will be
+    # silently rejected by Claude Code's MCP loader as missing `command`.
+    if "transport" in server and "type" not in server:
+        findings.append({
+            "dimension": 1, "severity": "BLOCKER",
+            "what": f"Server '{name}': uses `transport` field — Claude Code's `.mcp.json` schema uses `type`, not `transport`. The entry will be rejected by Claude Code's MCP loader.",
+            "fix": "Rename `transport` to `type` (e.g., `\"type\": \"http\"`). Verify with `claude mcp add --transport http <name> <url> --scope project` in a scratch dir and inspecting the resulting .mcp.json.",
+            "location": location, "where": location,
+        })
+        return findings
+    server_type = server.get("type", "stdio")
 
     # MC-8: missing command for stdio
     if server_type == "stdio" and "command" not in server:

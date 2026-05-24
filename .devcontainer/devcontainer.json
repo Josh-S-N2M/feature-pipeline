@@ -68,7 +68,12 @@
     "CONTEXT7_API_KEY": "${localEnv:CONTEXT7_API_KEY}",
     "EXA_API_KEY": "${localEnv:EXA_API_KEY}",
     "TFE_TOKEN": "${localEnv:TFE_TOKEN}",
-    "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1"
+    "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1",
+    "SERENA_REF": "v1.2.0",
+    "MCP_OPENAPI_SCHEMA_VERSION": "0.0.1",
+    "ACTIONLINT_MCP_SHA": "7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef",
+    "GITNEXUS_TAG": "1.6.5",
+    "TERRAFORM_MCP_VERSION": "0.5.2"
   },
 
   "hostRequirements": {
