@@ -101,8 +101,8 @@ Checkpoint at `working/feature/<slug>/checkpoint.json` is updated after every st
   "run_id": "<run-id>",
   "feature_slug": "<slug>",
   "started_at": "<ISO 8601>",
-  "current_stage": "intent_clarification | prd_authoring | discovery_planning | discovery_research | synthesis | per_layer_design | design_composition | architecture_audit | plan_authoring | test_authoring | cross_artifact_audit | task_decomposition | reconciliation | complete",
-  "stage_status": "pending | in_progress | awaiting_gate | passed | reconciling",
+  "current_stage": "intent_clarification | prd_authoring | discovery_planning | discovery_research | synthesis | per_layer_design | design_composition | architecture_audit | plan_authoring | test_authoring | cross_artifact_audit | task_decomposition | reconciliation | execution | complete",
+  "stage_status": "pending | in_progress | awaiting_gate | passed | reconciling | executing",
   "gate_history": [
     {"gate": "intent_confirmation", "decision": "approved", "timestamp": "<ISO>", "user_notes": "..."},
     {"gate": "prd_approval", "decision": "approved_with_revision", "timestamp": "<ISO>"}
@@ -123,11 +123,56 @@ Checkpoint at `working/feature/<slug>/checkpoint.json` is updated after every st
   "params": {
     "max_external_research_topics": 6,
     "reconciliation_cap": 4
+  },
+  "execution_pipeline_state_transitions": [
+    {
+      "transition": "<transition-name | transition-name-prime>",
+      "from": "<state-name>",
+      "to": "<state-name>",
+      "timestamp": "<ISO 8601>",
+      "trigger": "<human-readable description of what caused this transition>",
+      "void": "<true — optional; present only when this entry is voided by a subsequent correction>",
+      "void_reason": "<human-readable explanation — optional; present only when void is true>"
+    }
+  ],
+  "execution_mode": "specialist-dispatch | parent-driven-workaround",
+  "execution_pipeline_cycle_counters": {
+    "per_task": {"T1.1": 0, "T1.2": 1},
+    "per_phase": {"1": 0, "2": 0}
   }
 }
 ```
 
 Atomic write: write to `.tmp`, rename. Update after every meaningful state change.
+
+### execution_pipeline_state_transitions — per-entry semantics
+
+Each entry in the `execution_pipeline_state_transitions` array records one substantive state-machine transition emitted by the execution pipeline. The canonical per-entry shape is defined in `.claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md`; the fields below are a narrative supplement, not a duplicate schema.
+
+**Field semantics:**
+
+- `transition` — the T-N label (T1 through T14) per the 14-substantive-state machine documented in `execute-orchestrator.md`. Boundary transitions T0 and T13 are also logged using the same protocol per I-AA-609. See the template file for the full label table.
+- `from` / `to` — the substantive-state names on either side of the transition (e.g., `"pending"`, `"per_task_active"`, `"quality_active"`, `"phase_complete"`).
+- `timestamp` — ISO 8601 UTC at the moment the transition was recorded.
+- `trigger` — human-readable description of the cause (e.g., `"task spec received from tasks.json"`, `"code-producer returned COMPLETED"`, `"quality-handler verdict: NEEDS_REVISION"`).
+- `invoking_agent` — logical owner of the transition. Always `"execute-orchestrator"` in v1 per ADR-0044. This is the *logical* owner, not necessarily the literal emitting agent: under the ADR-0044 flatten pattern the parent orchestrator is the literal emitter; `execute-orchestrator.md` (the advisor file) remains the canonical state-machine reference.
+- `void` (optional boolean) — set to `true` when this entry was emitted but subsequently voided by a `-prime` re-emission (e.g., a quality-handler verdict was initially logged then reclassified by the reconciler). The prior emission is retained in the log with `void: true` to preserve the audit trail.
+- `void_reason` (optional string) — paired with `void: true`; documents why the entry was voided (e.g., `"reconciler reclassified NEEDS_REVISION as COMPLETED after reviewing full context"`).
+
+**The `-prime` transition-name suffix convention:**
+
+When a transition must be re-emitted — typically because the reconciler reclassified a prior verdict — the re-emission uses the same T-N label suffixed with `-prime` (e.g., `"T2-prime"`). Successive re-emissions use `-double-prime`, `-triple-prime`, etc. The voided chain is auditable: prior entries carry `void: true` + `void_reason`; the replacement entry carries the `-prime` (or `-double-prime`) suffix. This preserves the audit-trail invariant per analysis §3.1: every transition is logged, including voided ones; no entry is ever deleted or overwritten.
+
+### execution_mode — field semantics
+
+- `"specialist-dispatch"` — ADR-0044 end-state pattern. The parent orchestrator dispatches the four execution specialists (`execute-orchestrator`, `execute-code-producer`, `execute-quality-handler`, `execute-finalize-reconciler`); each specialist runs in its own sub-agent context with isolated context window.
+- `"parent-driven-workaround"` — pre-ADR-0044 pattern. The parent orchestrator executes specialist responsibilities inline rather than dispatching. This loses the four specialist-isolation properties documented in analysis §3.2. Used in `devcontainer-mcp-provisioning-r1`'s partial execution; preserved as a fallback execution-mode for historical artifacts and edge-case resumption scenarios. This mode MUST NOT be the default for new execution runs.
+
+### execution_pipeline_cycle_counters — increment rule
+
+- `per_task[<task_id>]` increments at T4 (per-task `quality_active` → `per_task_active` via NEEDS_REVISION path) per ADR-0017's 4-cycle cap. Each task's counter records how many NEEDS_REVISION cycles have been consumed for that task.
+- `per_phase[<phase_n>]` increments at T10 (per-phase `quality_active` → `reconciliation_active`) per ADR-0033's symmetric D-12 application. Each phase's counter records how many phase-level reconciliation cycles have been consumed.
+- Both counters cap at 4. If either counter would be incremented beyond 4, `execute-finalize-reconciler` triggers user escalation per AC-FR-10-c rather than initiating another cycle. The hard-cap enforcement is not overridable.
 
 ## Step-by-step Orchestration
 
@@ -327,6 +372,159 @@ When invoked with `--resume`:
    - `passed` → advance to the next stage per the orchestration order.
    - `reconciling` → continue the reconciliation cycle.
 3. Reconciliation cycle counters are preserved across resumption.
+
+## Execution Phase Dispatch
+
+**Activation gate.** Execution dispatch begins after Gate 6 (Final Approval) is ratified AND `tasks.json` is present and validated. The parent orchestrator does NOT automatically proceed into execution dispatch. The operator may pause, hand off to a subsequent session, or schedule execution for a fresh session — this is especially important when new sub-agents are registered mid-session (see F-7 finding, project-memory note `project_f7_mid_session_agent_registry`).
+
+**What this section does.** This section is the operational dispatcher the parent recipe-feature-pipeline orchestrator follows when entering the execution side of the pipeline. It operationalizes ADR-0044 (option-(a) flatten decision). The canonical 14-substantive-state machine (plus 2 boundary states INIT/TERMINATED) is documented in `.claude/agents/execute-orchestrator.md` — do NOT look for the full state list here; this section cites transitions by T-N label only.
+
+### The 4 Specialists Dispatched by the Parent Orchestrator
+
+Per ADR-0044, the parent orchestrator dispatches four execution-phase specialists. Each dispatch is its own sub-agent context with its own isolated context window (see Specialist Isolation Invariant below).
+
+| Specialist | File | When dispatched |
+|---|---|---|
+| `execute-task-code-producer` | `.claude/agents/execute-task-code-producer.md` | Once per task; T1 dispatch (pending → per_task_active) |
+| `execute-task-quality-handler` | `.claude/agents/execute-task-quality-handler.md` | Once per task after code-producer returns COMPLETED; T2 dispatch |
+| `execute-phase-quality-reviewer` | `.claude/agents/execute-phase-quality-reviewer.md` | Once per phase after all tasks in that phase reach APPROVED; T7 dispatch |
+| `execute-finalize-reconciler` | `.claude/agents/execute-finalize-reconciler.md` | When phase-quality-reviewer returns NEEDS_RECONCILIATION; T9 dispatch |
+
+### State-Transition Dispatch Contract
+
+The following summarizes the parent orchestrator's dispatch obligations at each relevant transition. See `.claude/agents/execute-orchestrator.md` for the full 14-state machine with all transitions.
+
+**T1 (pending → per_task_active):** Parent dispatches `execute-task-code-producer` with the full task spec from `tasks.json` (including `per_task_skills`, `target_files`, `satisfies_ac`, `revision_context`). Parent records `checkpoint.execution_mode = "specialist-dispatch"` (see `execution_mode` field semantics in the Checkpoint schema above). Parent emits a T1 state-transition entry to `state-transitions.log` (see State-transitions.log Emission below).
+
+**T2 (per_task_active → quality_active):** When code-producer returns `COMPLETED`, parent dispatches `execute-task-quality-handler` with the task verdict context (task spec + code-producer's result JSON). Parent emits a T2 entry.
+
+**T3 (quality_active → per_task_approved):** When quality-handler returns `APPROVED`, parent marks the task APPROVED in its internal state, advances to the next task (T6 back to T1), and emits a T3 entry.
+
+**T4 (quality_active → per_task_active — NEEDS_REVISION path):** When quality-handler returns `NEEDS_REVISION`, parent:
+1. Increments `checkpoint.execution_pipeline_cycle_counters.per_task[<task_id>]` (the T1.2 schema field).
+2. Checks the counter against the ADR-0017 4-cycle cap.
+3. If counter ≤ 4: constructs `revision_context` from quality-handler findings and re-dispatches `execute-task-code-producer` (T4 back to T1).
+4. If counter would exceed 4: escalates to user per AC-FR-10-c (do NOT initiate another cycle). Emits T13 boundary transition with `trigger: "cycle-cap-exhaustion"`.
+
+Parent emits a T4 entry at the transition.
+
+**T6 (per_task_approved → pending, iterating to next task):** After T3, if tasks remain in the current phase, parent advances to the next eligible task and dispatches code-producer again (T1). Parent emits a T6 entry.
+
+**T7 (per_task_approved → phase_quality_active — last task in phase):** After the last task in a phase is APPROVED, parent dispatches `execute-phase-quality-reviewer`. Parent emits a T7 entry.
+
+**T8 (phase_quality_active → phase_complete — PASS path):** When phase-quality-reviewer returns `PASS`, parent advances to the next phase (T11 back to T1) or, if this is the last phase, emits T12 (pipeline_complete) and writes the pipeline-run-summary. Parent emits a T8 entry.
+
+**T9 / T10 (phase quality NEEDS_RECONCILIATION path):** When phase-quality-reviewer returns `NEEDS_RECONCILIATION`, parent dispatches `execute-finalize-reconciler` (T9). After finalize-reconciler returns dispatch directives (see T2.2 for `dispatch_directives[]` Contract 6 indirection), parent:
+1. Parses the directives and dispatches the corresponding specialist re-invocations.
+2. Re-dispatches `execute-phase-quality-reviewer` (T10).
+3. Increments `checkpoint.execution_pipeline_cycle_counters.per_phase[<phase_n>]` per ADR-0033 D-12 symmetric application.
+4. Checks the phase counter against the 4-cycle cap; escalates per AC-FR-10-c if exhausted.
+
+Parent emits T9 and T10 entries at each respective transition.
+
+**T14 (terminal state):** When `pipeline_complete` is reached (T12) or escalation triggers TERMINATED (T13), the execution phase is over. Parent updates `checkpoint.current_stage` accordingly.
+
+### Specialist Isolation Invariant
+
+Each dispatch is its own sub-agent context with its own isolated context window. This isolation is load-bearing for four properties (per analysis §3.1):
+
+1. **Per-dispatch state-transition logging** — each dispatch emits its T-N entry to `state-transitions.log` (see below); the parent orchestrator is the literal emitter under the flatten pattern.
+2. **Per-task and per-phase cycle-counter enforcement** — counters are stored in `checkpoint.execution_pipeline_cycle_counters` (the T1.2 schema field) and are compared against the ADR-0017 + ADR-0033 caps before each re-dispatch.
+3. **Dispatch-matrix routing** — `execute-finalize-reconciler` returns dispatch directives; the parent routes these to the correct upstream specialists without conflating the finalize-reconciler's context with the specialists' contexts.
+4. **ADR-0033 D-12 symmetric application** — per-phase reconciliation cycle counting is enforced at the per-phase boundary, symmetrically with the per-task boundary enforcement.
+
+Sub-agents MUST NOT declare `Agent` in their `tools:` array (ADR-0045). Sub-agents do not invoke other sub-agents; the parent orchestrator is the sole dispatcher.
+
+### execution_mode and State-Transition Arrays
+
+The parent orchestrator records its dispatch mode in `checkpoint.execution_mode`. The canonical value for new execution runs is `"specialist-dispatch"` (the ADR-0044 end-state). The `"parent-driven-workaround"` value is preserved for historical artifacts and edge-case resumption scenarios but MUST NOT be the default for new runs. See `execution_mode — field semantics` in the Checkpoint schema sub-section above.
+
+Each state-transition entry is appended to `checkpoint.execution_pipeline_state_transitions` and simultaneously emitted to `state-transitions.log`. The `execution_pipeline_state_transitions` array in `checkpoint.json` serves as the in-memory audit trail; the log file is the on-disk record. Both are updated at every T-N transition.
+
+### State-transitions.log Emission
+
+The parent orchestrator emits one entry to `working/feature/<slug>/state-transitions.log` per transition, via:
+
+```bash
+echo '<contract-5-payload>' | python3 .claude/skills/auditing-shared/scripts/log_state_transition.py \
+  --feature-slug <slug>
+```
+
+The `invoking_agent` field in every emitted entry is always `"execute-orchestrator"` in v1 per ADR-0044. See the sub-section below for the full invariant.
+
+### invoking_agent — Logical-Owner Invariant
+
+> The state-transitions-log `invoking_agent` field is interpreted as the **logical owner** of the state transition (always `"execute-orchestrator"` in v1), not the literal emitting agent. This is a v1 invariant clarification, not a schema evolution.
+>
+> — ADR-0044 §Implementation Guidance
+
+**Literal emitter vs. logical owner.** Under the ADR-0044 flatten pattern the parent `recipe-feature-pipeline` orchestrator is the agent that physically writes entries to `state-transitions.log` (because only the parent has the `Agent` tool and dispatches specialists; ADR-0045 prohibits sub-agents from declaring `Agent`). Despite being the literal emitter, the parent populates `invoking_agent` with `"execute-orchestrator"`, not `"recipe-feature-pipeline"`. The advisor file `.claude/agents/execute-orchestrator.md` is the canonical state-machine reference; all entries are attributed to it as the logical owner of the state machine regardless of which agent physically emitted them.
+
+**Why the invariant matters.**
+
+- Audit-trail consumers (per Blueprint Stakeholders) read `state-transitions.log` expecting `invoking_agent: "execute-orchestrator"` across all entries. Treating this field as the literal emitter rather than the logical owner would break downstream consumers without a schema evolution.
+- The in-flight artifact `working/feature/devcontainer-mcp-provisioning-r1/state-transitions.log` already uses `"execute-orchestrator"` as the value across all entries (per Plan T4.1 + NFR-6-a). Preserving the invariant means that artifact remains valid under the flatten pattern without migration.
+- The invariant decouples *who emits* (mutable across patterns) from *who owns* (stable across patterns), honoring the logical vs. literal layering separation that ADR-0044 establishes.
+
+**Cross-references.**
+
+- ADR-0044 §Implementation Guidance — canonical authorization for this invariant
+- `.claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md` — per-entry template whose v1 `invoking_agent` semantics this invariant clarifies
+- AC-FR-6-a — per-task state-transition entries verifiable per specialist boundary
+- AC-NFR-2-b — `invoking_agent` identity preserved in log
+
+**Future evolution (informational, out of scope for v1).** If a future pattern introduces multiple state-machine owners, a v2 schema would add a separate `literal_emitter` field; `invoking_agent` semantics would shift accordingly. The v1 invariant keeps this simple: one logical owner, always `"execute-orchestrator"`.
+
+Hook failure is observer-only — it does NOT block the substantive transition. A failure surfaces as a Level-1 finding per AC-FR-5-e.
+
+### Contract 6 — Reconciliation Dispatch Indirection (dispatch_directives[])
+
+**Indirection rationale.** ADR-0045 prohibits sub-agents from declaring the `Agent` tool in their `tools:` array, which means `execute-finalize-reconciler` cannot directly dispatch other specialists. This is the T-001 anchor: sub-agents cannot dispatch sub-agents. To preserve the D-14 8-row dispatch matrix and the dispatch-matrix routing through `execute-finalize-reconciler` (Specialist Isolation Invariant, property 3), the reconciler instead emits a structured `dispatch_directives[]` array in its output (`quality-reconciliation-log.json`). The parent orchestrator reads this array and performs the actual dispatches. This indirection is Contract 6 (new under ADR-0044); Contracts 1–5 are the pre-existing Blueprint contracts. Cross-reference: Contract 5 covers per-dispatch state-transition logging (see State-transitions.log Emission above) — Contract 6 does not re-document it.
+
+**`dispatch_directives[]` shape:**
+
+```json
+"dispatch_directives": [
+  {
+    "directive_id": "DD-1",
+    "specialist": "execute-task-code-producer | execute-task-quality-handler | execute-phase-quality-reviewer | execute-finalize-reconciler",
+    "task_id": "<task-id>",
+    "phase": "<phase-n>",
+    "rationale": "<one-line cause: e.g., 'task T1.2 returned NEEDS_REVISION; cycle counter at 1/4'>",
+    "args": { "<specialist-specific args>" },
+    "expected_return": "APPROVED | NEEDS_REVISION | BLOCKER | <other-per-specialist>",
+    "priority": "P1 | P2 | P3",
+    "depends_on_directives": ["DD-N", "..."]
+  }
+]
+```
+
+All fields are required. `depends_on_directives` may be an empty array `[]` when the directive has no predecessors.
+
+**Parent orchestrator directive-execution loop.** After `execute-finalize-reconciler` returns, the parent:
+
+1. Reads `dispatch_directives[]` from `quality-reconciliation-log.json`.
+2. Validates the array (see malformed-directive handling below) before executing any directives.
+3. Topologically sorts directives respecting `depends_on_directives` edges; dispatches in that order, waiting for each prerequisite directive to resolve before dispatching dependents.
+4. Within the same topological tier, dispatches by ascending `priority` (P1 before P2 before P3).
+5. Invokes each specialist via the Agent tool, passing the directive's `args`.
+6. Updates `state-transitions.log` and `checkpoint.execution_pipeline_state_transitions` per Contract 5 for each specialist dispatch initiated from a directive.
+7. After all directives are executed, re-dispatches `execute-phase-quality-reviewer` (T10 transition).
+
+**Malformed-directive surface-to-user behavior (AC-CC-4 — no silent fallback).** If `dispatch_directives[]` is malformed, the parent MUST surface a BLOCKER to the user immediately. Silent dropping or guessing are prohibited. Specific cases:
+
+| Condition | Action |
+|---|---|
+| Missing required field in any directive | BLOCKER surfaced to user; no directives executed |
+| Circular `depends_on_directives` reference | BLOCKER surfaced to user; no directives executed |
+| `specialist` value not one of the four known specialists | BLOCKER surfaced to user; no directives executed |
+| `dispatch_directives[]` is empty AND reconciler reported `NEEDS_RECONCILIATION` | BLOCKER surfaced to user (reconciler must emit at least one directive or return a different verdict) |
+
+**Cross-references:**
+- Contract 5 (State-transitions.log Emission, this section) — per-dispatch state-transition logging contract
+- `quality-reconciliation-log.json` — the file `execute-finalize-reconciler` writes; contains `dispatch_directives[]`
+- ADR-0045 — the project-wide prohibition on sub-agent-to-sub-agent dispatch that necessitates this indirection
+- AC-CC-4 — no silent fallback; mandates the BLOCKER behavior above
 
 ## Error Handling Per Stage
 
