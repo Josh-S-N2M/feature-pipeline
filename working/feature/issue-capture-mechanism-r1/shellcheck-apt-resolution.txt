@@ -1,0 +1,42 @@
+# T8.2 — shellcheck apt-resolution evidence
+# Captured:        2026-05-24T12:57:57Z
+# HEAD:            6ee390bf0e2927f160cf5747a8e145b283ec6223
+# Verification method (per PV-8.C2 fallback): apt-cache show against the live devcontainer.
+# Rationale: docker is NOT available in this devcontainer (Docker-in-Docker not configured),
+# so a base-image spawn is not feasible. The live devcontainer IS bookworm (matching the
+# Dockerfile FROM line: mcr.microsoft.com/devcontainers/python:1-3.11-bookworm), so the live
+# apt-cache lookup uses the SAME apt sources the Dockerfile build will use. This satisfies
+# PV-8.C2 via the apt-cache path.
+
+## Live devcontainer environment
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+
+## apt-cache show shellcheck (full output)
+
+Package: shellcheck
+Version: 0.9.0-1
+Installed-Size: 18987
+Maintainer: Debian Haskell Group <pkg-haskell-maintainers@lists.alioth.debian.org>
+Architecture: amd64
+Depends: libc6 (>= 2.34), libffi8 (>= 3.4), libgmp10 (>= 2:6.2.1+dfsg1)
+Description: lint tool for shell scripts
+Description-md5: 7c996daa2907e3b071f909a6e67eef77
+Multi-Arch: foreign
+Homepage: https://www.shellcheck.net/
+Tag: devel::lang:posix-shell, devel::testing-qa, implemented-in::haskell,
+ interface::commandline, role::program, scope::application,
+ use::checking
+Section: devel
+Priority: optional
+Filename: pool/main/s/shellcheck/shellcheck_0.9.0-1_amd64.deb
+Size: 2621160
+MD5sum: 3162fa69fb009cd0130427d634c61e3c
+SHA256: 8c40f8a4ecccf3d746b933853972f1cd1be6df84fc5977d0137269d4debefa4f
+
+
+## Verdict
+
+PASS — shellcheck resolves on the bookworm apt sources. Version that will be installed by
+the modified .devcontainer/Dockerfile: 0.9.0-1

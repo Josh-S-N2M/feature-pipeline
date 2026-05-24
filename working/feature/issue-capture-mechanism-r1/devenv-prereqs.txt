@@ -1,0 +1,58 @@
+# Dev-environment prerequisites for Phase 5 (D-07 layer A + D-02)
+# Captured:        2026-05-24T12:14:01Z (T0.5 original)
+# Last updated:    2026-05-24T12:40:00Z (Phase 0 remediation; Phase 8 staged)
+# HEAD at capture: 6ee390bf0e2927f160cf5747a8e145b283ec6223
+
+## Current state (this session)
+
+shellcheck:
+  path:            /home/vscode/.local/bin/shellcheck   (hot-installed for this session)
+  version:         0.10.0                                (upstream static binary)
+  install_method:  curl https://github.com/koalaman/shellcheck/releases/download/v0.10.0/...
+  persisted?:      NO — see Phase 8 below
+
+jq:
+  path:            /usr/bin/jq                           (apt-installed in Dockerfile)
+  version:         jq-1.6
+  install_method:  apt-get install (in .devcontainer/Dockerfile)
+  persisted?:      YES
+
+## After Phase 8 ships (target state)
+
+shellcheck:
+  path:            /usr/bin/shellcheck                   (apt-installed via .devcontainer/Dockerfile)
+  version:         0.9.0-1                                (apt-shipped on debian/bookworm; resolved by T8.2)
+  install_method:  apt-get install (added to existing Dockerfile RUN block in T8.1)
+  persisted?:      YES
+  rebuild_required: YES — see "How to pick up the persisted install" below
+  evidence:        working/feature/issue-capture-mechanism-r1/shellcheck-apt-resolution.txt (T8.2)
+
+## How shellcheck got into this session (pre-Phase-8)
+
+Phase 0 task T0.5 surfaced shellcheck as MISSING from the devcontainer (`which shellcheck` returned no path). Per T0.5 spec, this was correctly classified as an Open Item rather than a Phase 0 blocker.
+
+Per user direction during Phase 0 execution (2026-05-24):
+  1. shellcheck v0.10.0 was downloaded from upstream GitHub releases and placed at ~/.local/bin/shellcheck (writable user path; no sudo required). This unblocks Phase 5 T5.2 (shellcheck on hook script) for the current execution session.
+  2. Phase 8 (Devcontainer hardening: shellcheck persistence) was added to plan-v2.md v1.2.0 to persist the install via .devcontainer/Dockerfile so future Codespaces / devcontainer rebuilds pre-install shellcheck automatically.
+
+## How to pick up the persisted install (after Phase 8 ships)
+
+For developers / CI pulling this branch (or main, post-merge):
+
+  1. Pull / checkout the branch with Phase 8 changes applied (.devcontainer/Dockerfile has a new `shellcheck \` line in the apt-get install block).
+  2. Rebuild the devcontainer to pick up the Dockerfile change:
+       - In VS Code:           Command Palette -> "Dev Containers: Rebuild Container" (or "Rebuild Without Cache" for a fully clean build)
+       - In GitHub Codespaces: `gh codespace rebuild --full` (or use the Codespaces menu in the browser)
+  3. Verify:
+       which shellcheck                       # expect: /usr/bin/shellcheck
+       shellcheck --version                   # expect: any apt-shipped version on bookworm
+
+After rebuild, the ~/.local/bin/shellcheck hot-install (if still present) is shadowed by /usr/bin/shellcheck via PATH ordering. Both can coexist harmlessly; the system-installed copy takes precedence.
+
+## Reference
+
+  - Phase 0 T0.5 spec:              working/feature/issue-capture-mechanism-r1/plan-v2.md  (search: Phase 0)
+  - Phase 8 spec:                   working/feature/issue-capture-mechanism-r1/plan-v2.md  (search: Phase 8 — v1.2.0 amendment)
+  - PV-0.C6 (devenv-prereqs check): working/feature/issue-capture-mechanism-r1/phase-validators.md  (search: PV-0.C6)
+  - PV-8 (persistence verifier):    working/feature/issue-capture-mechanism-r1/phase-validators.md  (search: PV-8)
+  - Codespaces design discipline:   .claude/skills/KB-codespaces-design/  +  .claude/skills/KB-codespaces-platform/

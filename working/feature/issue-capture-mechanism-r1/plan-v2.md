@@ -1,22 +1,29 @@
 ---
 id: PLAN-issue-capture-mechanism-r1
-version: 1.1.0
+version: 1.2.0
 status: draft
 feature_slug: issue-capture-mechanism-r1
 derived_from: working/feature/issue-capture-mechanism-r1/blueprint-v3.md
-predecessor: working/feature/issue-capture-mechanism-r1/plan-v1.md
-phases: 8
-total_tasks: 50
-generated: 2026-05-24T00:30:00Z
-generated_by: plan-author
+predecessor: working/feature/issue-capture-mechanism-r1/plan-v2.md
+phases: 9
+total_tasks: 55
+generated: 2026-05-24T12:40:00Z
+generated_by: plan-author (in-session amendment; user-authorized 2026-05-24)
 change_summary: |
+  **v1.2.0 (in-session amendment, user-authorized 2026-05-24 during Phase 0 execution):**
+  Phase 0 task T0.5 surfaced `shellcheck` as MISSING from the devcontainer (PV-0.C6 passed because devenv-prereqs.txt was authored, but the underlying tool was not installed). Per T0.5 spec ("not a phase blocker — bash hook can be written without these tools, but D-07 layer A + D-02 require both"), this was correctly classified as an Open Item rather than a Phase 0 blocker. User directed a two-part remediation:
+    1. Hot-install shellcheck for this session (`shellcheck v0.10.0` to `~/.local/bin/`) so Phase 5 T5.2 is unblocked in this run.
+    2. Add a new feature-delivery phase to persist the installation in `.devcontainer/Dockerfile` so future Codespaces / devcontainer rebuilds pick it up automatically — leveraging the project's KB-codespaces-design / KB-codespaces-platform skills for placement discipline.
+  Design decision (per KB-codespaces-design "Dockerfile for what Features don't cover; custom apt packages"): shellcheck is a small apt package consistent with the existing Dockerfile install line (ripgrep / jq / bat / tree / less); same placement preserves the image-build-cached + prebuild-captured + zero-per-start-cost properties. NOT chosen: `ghcr.io/devcontainers-contrib/features/shellcheck:1` Feature (overkill for one small apt-installable tool; inconsistent with existing pattern); NOT chosen: postCreate apt-get install (anti-pattern per KB-codespaces-design — runs every codespace creation, not captured by prebuild, requires sudo).
+  Added: **Phase 8 — Devcontainer hardening: shellcheck persistence**, 3 tasks (T8.1 / T8.2 / T8.3). Phase 8 has NO DAG dependency on Phase 5 because the hot-install satisfies the in-session prereq; Phase 8 ships the persistence alongside the feature in the same PR. Phase count 8 → 9. Task count 52 → 55 (also corrects v1.1.0 frontmatter `total_tasks: 50` which was stale per I-PKG-001 — actual body enumerated 52 task headings; new total 52 + 3 = 55).
+
+  **v1.1.0 (prior — superseded as the canonical version, but the change set still applies):**
   Absorbs 4 important-severity findings from plan-v1 review (verdict PASS_WITH_RECOMMENDATIONS):
   - I-DR-PL-001: Phase 4 Exit Criteria now lifts F-003 skills:-absence to a direct blocker via verbatim grep assertion; Phase 4 Phase Validator anchors the grep command.
   - I-DR-PL-002: Phase 3 Phase Validator now uses `git diff --name-only <phase-3-start-commit>..<phase-3-end-commit>` to enforce AC-FR-8-d negative scope. Commit-range anchor tasks T3.0 (start) and T3.8 (end) added.
   - I-DR-PL-003: T4.4 (22 ACs — too coarse) decomposed into T4.4a (frontmatter, ~7 ACs), T4.4b (create-mode workflow, ~10 ACs), T4.4c (update-mode workflow, ~5 ACs); each with its own L1/L2/L3 + AC mapping.
   - I-DR-PL-004: New T7.10 authors `packager-input-notes.md` recording the I-AA-001 user-accepted deviation for finalize-deliverable-packager Stage 13 consumption.
   Recommended-severity I-DR-PL-005/006/007 declined per scope hygiene (one-liner rationale in Update History).
-  Task count: 47 → 50 (T4.4 → T4.4a/b/c = +2; T7.10 added = +1). Phase count unchanged (8).
 ---
 
 # Plan: Issue-Capture Mechanism (Outside-the-Pipeline)
@@ -35,6 +42,7 @@ Section completion checklist — each box must be checked (including `N/A — ou
 - [x] Phase 5 — CC layer: hook script + settings.json patch
 - [x] Phase 6 — Cross-cutting handoff edits
 - [x] Phase 7 — Rollout / verification + acceptance
+- [x] Phase 8 — Devcontainer hardening (shellcheck persistence)
 - [x] Cross-Phase Dependencies
 - [x] L1/L2/L3 Verification Discipline
 - [x] Acceptance Test Cross-Reference
@@ -852,6 +860,74 @@ Execute end-to-end verification: pipeline-isolation grep (AC-FR-13), validator r
 - **Blocking severity threshold (per ADR-0023 FULL):** ANY new line in T7.5 validator regression diff is `blocker`; ANY non-empty result from T7.4 pipeline-isolation grep is `blocker`; ANY `git log --follow` returning truncated history on a migrated path is `blocker`; ANY BLOCKER from cc-critique or any of the 5 audits is `blocker`; absence of `packager-input-notes.md` post-T7.10 is `important` (warns; packager handoff is still possible via Open Items fallback but loses visibility per I-DR-PL-004 rationale).
 
 Phase Validator: this is effectively the Plan-wide acceptance gate. Re-runs T7.4 (isolation grep), T7.5 (regression diff), T7.6 (history), T7.7 (cc-critique), T7.8 (auditing-*). All must pass with their threshold conditions met. Asserts `packager-input-notes.md` exists and contains the 5 enumerated sections (T7.10 verification).
+
+---
+
+## Phase 8 — Devcontainer hardening (shellcheck persistence)
+
+### Goal
+
+Persist the `shellcheck` installation into `.devcontainer/Dockerfile` so future Codespaces rebuilds and local devcontainer (re)builds pre-install the tool, eliminating the manual `apt-get install` / non-sudo workaround surfaced during Phase 0 task T0.5. Phase 5 task T5.2 (`shellcheck` on the hook script) becomes a clean dependency-already-satisfied call after the devcontainer rebuilds.
+
+**Design provenance:** Per `KB-codespaces-design` `references/patterns-and-anti-patterns.md`, the canonical placement for a small apt-installable tool that doesn't have a domain-specific Dev Container Feature pairing is to extend the existing Dockerfile `RUN apt-get install` block. The project's `.devcontainer/Dockerfile` already follows this pattern for ripgrep / jq / bat / tree / less; shellcheck slots in alongside them with zero structural change. Per `KB-codespaces-platform` lifecycle table, image-build-time installation is **prebuild-captured** (whereas `postCreateCommand` apt-get install would NOT be captured and would also require `sudo` — blocked by this project's deny baseline in `.claude/settings.json`).
+
+**Rejected alternatives** (documented for future reviewers):
+- `ghcr.io/devcontainers-contrib/features/shellcheck:1` Feature — adds a Dev Container Feature layer for a single small apt package; inconsistent with the established Dockerfile pattern in the same file; no version-pinning benefit over the apt-shipped bookworm build at the project's quality bar.
+- `postCreateCommand`-based install — anti-pattern per KB-codespaces-design ("Tools installed in `postStartCommand` / `postCreateCommand` for things that should be in the Dockerfile"); needs `sudo`; not captured by prebuild; runs on every cold codespace creation.
+
+**No DAG dependency from Phase 5.** Phase 5 T5.2 (`shellcheck` on hook script) was unblocked in the current execution session by a hot-install of `shellcheck v0.10.0` to `~/.local/bin/`. Phase 8 ships the persistent change so the feature ships in a self-contained state — the next developer to spin up a Codespace from this branch / merged main gets shellcheck pre-installed without action.
+
+**Phase 8 is order-independent** with Phases 1–7 (no edges in / out). It can execute at any point after Phase 0 — including in parallel with feature delivery — and is included in this feature's deliverable archive.
+
+### Tasks
+
+#### T8.1: Add `shellcheck` to `.devcontainer/Dockerfile` apt-get install block
+
+- **Layer:** Codespaces / Dev Environment
+- **Description:** Edit `.devcontainer/Dockerfile`. Add `shellcheck \` as one new continuation line inside the existing `RUN apt-get update && apt-get install -y --no-install-recommends \ ...` block, placed alphabetically (after `less`, before the `&& ln -sf` continuation). One-line additive change; preserves the `--no-install-recommends` discipline and the `rm -rf /var/lib/apt/lists/*` cleanup tail. Do NOT introduce a separate `RUN apt-get install` invocation — that would defeat layer caching and is inconsistent with the existing pattern.
+- **Dependencies:** none (Phase 8 is order-independent)
+- **Estimate:** XS (≤15 min)
+- **Satisfies AC:** N/A — infrastructure hardening (not bound to a PRD/Blueprint AC; the binding is to the T0.5 Open Item surfaced during Phase 0 execution and to Phase 5 T5.2's runtime prerequisite)
+- **L1 verification:** `grep -nE "^[[:space:]]+shellcheck[[:space:]]*\\\\$" .devcontainer/Dockerfile` returns exactly 1 match; the line sits inside the existing `RUN apt-get install` block (visually verified by surrounding context in the diff).
+- **L2 verification:** `docker build --no-cache .devcontainer/ -t feature-pipeline-devcontainer-build-check:t8.1` succeeds (no apt resolution failure for the `shellcheck` package on the `mcr.microsoft.com/devcontainers/python:1-3.11-bookworm` base — verified at image-build time). May be deferred if Docker is not available in the current environment; in that case L2 is asserted via apt-cache check from inside the running container: `apt-cache show shellcheck | grep -q "^Package: shellcheck"`.
+- **L3 verification:** After a clean devcontainer rebuild (`gh codespace rebuild --full` or local devcontainer rebuild), `which shellcheck` returns a system path (e.g. `/usr/bin/shellcheck`) AND `shellcheck --version` returns a version line with `version: ` prefix. The `~/.local/bin/shellcheck` fallback installed in-session at Phase 0 is shadowed by the apt-installed version (or co-exists harmlessly) — both must report valid versions; the PATH lookup order determines which is used.
+
+#### T8.2: Verify Dockerfile change passes structural + build-sanity check
+
+- **Layer:** Codespaces / Dev Environment
+- **Description:** Run two sanity checks against the T8.1 change before considering Phase 8 complete:
+  1. **devcontainer.json + Dockerfile syntactic validity** — use `devcontainer-cli` if present (`devcontainer build --workspace-folder . --image-name dc-validate:t8.2`), else fall back to `python3 -c "import json; json.load(open('.devcontainer/devcontainer.json'))"` (devcontainer.json unaffected by T8.1, but check confirms no accidental edit) and `docker build --check .devcontainer/` (or BUildKit equivalent).
+  2. **apt-cache resolution** — confirm `shellcheck` resolves on the base image's apt source by spawning a short-lived container from the same base: `docker run --rm mcr.microsoft.com/devcontainers/python:1-3.11-bookworm bash -c "apt-get update -qq && apt-cache show shellcheck | head -5"`. Persist captured version-string output to `working/feature/issue-capture-mechanism-r1/shellcheck-apt-resolution.txt`.
+- **Dependencies:** T8.1
+- **Estimate:** S (15–30 min)
+- **Satisfies AC:** N/A — infrastructure hardening verification
+- **L1 verification:** `shellcheck-apt-resolution.txt` exists; contains a `Version:` line.
+- **L2 verification:** Recorded apt version string is non-empty (any version is acceptable; the project does not pin shellcheck to a specific point release at the bookworm-apt-shipped level).
+- **L3 verification:** Either (a) a successful `docker build` against the modified Dockerfile completed in T8.1 L2, or (b) the apt-cache check in this task confirms the package resolves on the base image. At least one of these two paths MUST pass before Phase 8 closes.
+
+#### T8.3: Update `devenv-prereqs.txt` + author rebuild-guidance note
+
+- **Layer:** Codespaces / Dev Environment + Documentation
+- **Description:** Two-part documentation update:
+  1. **Update `working/feature/issue-capture-mechanism-r1/devenv-prereqs.txt`** to remove the `shellcheck MISSING` warning block and replace it with: (a) the hot-install record (path `~/.local/bin/shellcheck`, version `0.10.0`, captured during Phase 0 remediation); (b) the persistence record (path `/usr/bin/shellcheck` post-rebuild, apt-shipped version recorded by T8.2); (c) an unambiguous instruction for developers / CI: "after pulling this branch, run `Rebuild Container` in VS Code OR `gh codespace rebuild --full` to pick up the persisted shellcheck install".
+  2. **Append a 3-line comment block to `.devcontainer/postCreate.sh`** (or insert at the top of the existing comment header, BEFORE the `set -euo pipefail` line, NOT inside any active code path) noting that `shellcheck` is installed at image-build time via `.devcontainer/Dockerfile` (Phase 8 of issue-capture-mechanism-r1). This is a documentation-only edit; it does NOT change any executable behavior and does NOT trigger any of the Phase 0 invariants.
+- **Dependencies:** T8.1, T8.2
+- **Estimate:** XS (≤15 min)
+- **Satisfies AC:** N/A — handoff documentation
+- **L1 verification:** `devenv-prereqs.txt` no longer contains the literal string `shellcheck MISSING`; contains both `~/.local/bin/shellcheck` and `/usr/bin/shellcheck` references; contains the rebuild instruction.
+- **L2 verification:** `postCreate.sh` comment header references "Phase 8" and "issue-capture-mechanism-r1"; `bash -n .devcontainer/postCreate.sh` parses cleanly (no syntax errors introduced).
+- **L3 verification:** A reader of `devenv-prereqs.txt` (no other context) can correctly answer (a) what state shellcheck was in pre-Phase-8, (b) how it was hot-installed for the current run, (c) what action is required to pick up the persistent install.
+
+### Phase 8 Exit Criteria
+
+- T8.1 L1+L3 verifications pass (one new `shellcheck \` line in Dockerfile; post-rebuild `which shellcheck` returns a system path).
+- T8.2 L1+L3 verifications pass (apt resolution confirmed OR Docker build succeeded).
+- T8.3 L1+L2+L3 verifications pass (documentation update lands; postCreate.sh comment header references Phase 8; reader can self-onboard).
+- `bash -n .devcontainer/postCreate.sh` exits 0 (no syntax regression from T8.3 comment append).
+- No edit to `.devcontainer/devcontainer.json` (Phase 8 is Dockerfile-only + script-comment-only).
+- **Blocking severity threshold (per ADR-0023 FULL):** T8.1 L1 fail is `blocker` (Dockerfile change must be present and well-formed). T8.2 L3 fail is `important` (if neither apt-cache nor docker-build path can verify, escalate to user with a manual-rebuild-confirmation request rather than auto-block). T8.3 verifications are `recommended` (documentation gap is recoverable post-merge).
+
+Phase Validator (PV-8, authored in phase-validators.md): asserts the Dockerfile line is present, the apt-resolution evidence file exists OR docker-build succeeded, and the devenv-prereqs.txt + postCreate.sh comment changes landed.
 
 ---
 

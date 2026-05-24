@@ -14,6 +14,13 @@
 #   - gitnexus            (npm install -g gitnexus@${GITNEXUS_TAG} with GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1)
 #
 # context7 and exa are HTTP-transport hosted servers — no install step (but auth-probed at end).
+#
+# Tool prerequisites (image-build-time, NOT installed by this script):
+#   - jq, ripgrep, bat, tree, less    installed via .devcontainer/Dockerfile RUN apt-get
+#   - shellcheck                       installed via .devcontainer/Dockerfile RUN apt-get
+#                                      (added in Phase 8 of feature issue-capture-mechanism-r1
+#                                      — persists the install so future codespace rebuilds
+#                                      pre-install shellcheck for hook-script linting.)
 
 set -euo pipefail
 

@@ -20,8 +20,9 @@
     ],
     "codebase_analysis": "working/feature/issue-capture-mechanism-r1/codebase-analysis.json"
   },
-  "total_tasks": 52,
-  "phases": ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7"],
+  "total_tasks": 55,
+  "_total_tasks_history": "Corrected 50→52 at execution kickoff per I-PKG-001 (plan-v2 added T4.4a/b/c [+2] and T7.10 [+1] but frontmatter counter not updated). Extended 52→55 by plan-v2 v1.2.0 amendment adding Phase 8 (3 tasks: T8.1/T8.2/T8.3) for shellcheck devcontainer persistence. 55 = verified `grep -c '\"id\": \"task-'`.",
+  "phases": ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
   "tasks": [
     {
       "id": "task-001",
@@ -910,6 +911,58 @@
       "risk_level": "medium",
       "consumed_by": "finalize-deliverable-packager",
       "notes": "Stage 13 (finalize-deliverable-packager) consumes this file directly. Cites task-021's migrated path Issues/adr-placement-rootcause/analysis.md as authoritative evidence. Absence is MAJOR (warns; packager handoff still possible via Open Items fallback) but presence is preferred per I-DR-PL-004."
+    },
+    {
+      "id": "task-053",
+      "plan_anchor": "T8.1",
+      "phase": "P8",
+      "title": "Add shellcheck to .devcontainer/Dockerfile apt-get install block",
+      "description": "Add one continuation line `shellcheck \\` to the existing `RUN apt-get update && apt-get install -y --no-install-recommends ...` block in .devcontainer/Dockerfile, placed alphabetically (after `less`, before the `&& ln -sf` continuation). One-line additive change; preserves --no-install-recommends discipline and rm -rf /var/lib/apt/lists/* cleanup tail. Per KB-codespaces-design (Dockerfile for custom apt packages), this is the canonical placement that preserves image-build caching + prebuild capture.",
+      "target_files": [
+        ".devcontainer/Dockerfile"
+      ],
+      "dependencies": [],
+      "parallelizable_with": ["task-054"],
+      "acceptance_criteria": [],
+      "validators": ["PV-8.C1"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "Phase 8 has no DAG dependency on Phase 5 because Phase 5 T5.2 (shellcheck on hook) was unblocked in this session via hot-install of shellcheck v0.10.0 to ~/.local/bin/. T8.1 ships the persistence for future codespace rebuilds."
+    },
+    {
+      "id": "task-054",
+      "plan_anchor": "T8.2",
+      "phase": "P8",
+      "title": "Verify Dockerfile change passes apt-resolution + structural sanity check",
+      "description": "Run two sanity checks against the T8.1 change: (1) devcontainer.json + Dockerfile syntactic validity via `devcontainer build` if available, else fallback python-json parse + docker --check. (2) Apt-cache resolution check: spawn a short-lived container from the same base image and confirm `apt-cache show shellcheck` resolves; persist the captured Version: line to working/feature/issue-capture-mechanism-r1/shellcheck-apt-resolution.txt.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/shellcheck-apt-resolution.txt"
+      ],
+      "dependencies": ["task-053"],
+      "parallelizable_with": [],
+      "acceptance_criteria": [],
+      "validators": ["PV-8.C2"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "If Docker is not available in the current environment, the apt-cache check inside a base-image container is the canonical fallback. At least one path (build or apt-cache) MUST verify."
+    },
+    {
+      "id": "task-055",
+      "plan_anchor": "T8.3",
+      "phase": "P8",
+      "title": "Update devenv-prereqs.txt + append rebuild-guidance note to postCreate.sh comment",
+      "description": "Two-part documentation update: (1) Replace the `shellcheck MISSING` warning block in working/feature/issue-capture-mechanism-r1/devenv-prereqs.txt with: hot-install record (~/.local/bin/shellcheck v0.10.0); persistence record (/usr/bin/shellcheck via Dockerfile post-rebuild); rebuild instruction (`Rebuild Container` in VS Code or `gh codespace rebuild --full`). (2) Append a 3-line comment block to .devcontainer/postCreate.sh header (BEFORE `set -euo pipefail`, NOT inside any code path) noting that shellcheck is now image-build-time installed per Phase 8 of issue-capture-mechanism-r1. Documentation-only edit; does NOT change executable behavior.",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/devenv-prereqs.txt",
+        ".devcontainer/postCreate.sh"
+      ],
+      "dependencies": ["task-053", "task-054"],
+      "parallelizable_with": [],
+      "acceptance_criteria": [],
+      "validators": ["PV-8.C3"],
+      "estimated_complexity": "small",
+      "risk_level": "low",
+      "notes": "postCreate.sh comment edit MUST NOT trigger any Phase 0 invariant (PV-0.C5 = no validator code edit). PV-0.C5 scopes to validate_pipeline_frontmatter.py only, so postCreate.sh comment edits are out of its scope. `bash -n .devcontainer/postCreate.sh` must still parse cleanly post-edit."
     }
   ],
   "parallelizable_groups": [
@@ -1041,7 +1094,8 @@
     "P4": {"tasks": 7, "complexity_buckets": {"small": 2, "medium": 3, "large": 2}},
     "P5": {"tasks": 7, "complexity_buckets": {"small": 5, "medium": 2, "large": 0}},
     "P6": {"tasks": 3, "complexity_buckets": {"small": 2, "medium": 1, "large": 0}},
-    "P7": {"tasks": 10, "complexity_buckets": {"small": 9, "medium": 1, "large": 0}}
+    "P7": {"tasks": 10, "complexity_buckets": {"small": 9, "medium": 1, "large": 0}},
+    "P8": {"tasks": 3, "complexity_buckets": {"small": 3, "medium": 0, "large": 0}}
   },
   "ac_coverage_summary": {
     "total_acs": 67,

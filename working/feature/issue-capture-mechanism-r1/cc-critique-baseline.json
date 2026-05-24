@@ -1,0 +1,487 @@
+{
+  "schema_version": "1.0.0",
+  "purpose": "Pre-change cc-critique baseline for issue-capture-mechanism-r1 Phase 7 comparison (T7.7). NFR-related: new components must not introduce BLOCKER/MAJOR findings vs this baseline.",
+  "generated_at": "2026-05-24T12:16:08Z",
+  "head_sha": "6ee390bf0e2927f160cf5747a8e145b283ec6223",
+  "audit_target": ".claude/",
+  "verdict": "NEEDS-REVISION",
+  "findings_count_by_severity": {
+    "BLOCKER": 27,
+    "MAJOR": 30,
+    "MINOR": 10,
+    "INFO": 0
+  },
+  "findings_total": 67,
+  "findings_summary": [
+    {
+      "id": "38d93c2f23",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:70",
+      "headline": "SKILL.md links to 'auditing-shared/scripts/log_state_transition.py' (line 70) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "535566b46f",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-documentation-criteria",
+      "headline": "references/shared-conventions.md links to 'working/feature/planning-agent-doctype-backfill-r1/intent-clarification.md' (line 307) but the file does not exist."
+    },
+    {
+      "id": "c45697de89",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-documentation-criteria",
+      "headline": "references/templates/state-transitions-log-entry-template.md links to 'recipe-feature-pipeline/SKILL.md' (line 71) but the file does not exist."
+    },
+    {
+      "id": "1bee9cfa85",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-documentation-criteria",
+      "headline": "references/templates/state-transitions-log-entry-template.md links to 'recipe-feature-pipeline/SKILL.md' (line 90) but the file does not exist."
+    },
+    {
+      "id": "1fe2c26c08",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-documentation-criteria",
+      "headline": "references/templates/state-transitions-log-entry-template.md links to 'recipe-feature-pipeline/SKILL.md' (line 100) but the file does not exist."
+    },
+    {
+      "id": "d641e51fe7",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-mcp-design",
+      "headline": "references/principles.md links to '.devcontainer/lib/log-mcp-event.sh' (line 51) but the file does not exist."
+    },
+    {
+      "id": "abeb0c5cf9",
+      "severity": "MINOR",
+      "category": "auditing-skills",
+      "location": "KB-mcp-design",
+      "headline": "references/patterns-and-anti-patterns.md is 179 lines but has no recognized table-of-contents heading near the top."
+    },
+    {
+      "id": "3ed9de6b4b",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:68",
+      "headline": "SKILL.md links to '.devcontainer/install/terraform-mcp.sh' (line 68) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "2016a52167",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:79",
+      "headline": "SKILL.md links to '.devcontainer/postCreate.sh' (line 79) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "33e102d981",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:80",
+      "headline": "SKILL.md links to '.devcontainer/postStart.sh' (line 80) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "3f565e4be3",
+      "severity": "MINOR",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/operator-runbook.md is 101 lines but has no recognized table-of-contents heading near the top."
+    },
+    {
+      "id": "f061513f0b",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/mcp-events-jsonl.md links to '.devcontainer/lib/log-mcp-event.sh' (line 110) but the file does not exist."
+    },
+    {
+      "id": "c4f05c5d52",
+      "severity": "MINOR",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/mcp-events-jsonl.md is 111 lines but has no recognized table-of-contents heading near the top."
+    },
+    {
+      "id": "be59003fce",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/lifecycle-hooks.md links to '.devcontainer/devcontainer.json' (line 13) but the file does not exist."
+    },
+    {
+      "id": "5e842b6ff2",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/lifecycle-hooks.md links to '.devcontainer/install/terraform-mcp.sh' (line 29) but the file does not exist."
+    },
+    {
+      "id": "a776a8ae28",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/lifecycle-hooks.md links to '.devcontainer/lib/log-mcp-event.sh' (line 45) but the file does not exist."
+    },
+    {
+      "id": "aa4859da56",
+      "severity": "MINOR",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/troubleshooting.md is 124 lines but has no recognized table-of-contents heading near the top."
+    },
+    {
+      "id": "513b39ec8f",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/seven-named-servers.md links to '.devcontainer/install/terraform-mcp.sh' (line 74) but the file does not exist."
+    },
+    {
+      "id": "ecc3a06486",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/credential-handling.md links to '.devcontainer/lib/log-mcp-event.sh' (line 89) but the file does not exist."
+    },
+    {
+      "id": "522bf9772e",
+      "severity": "MINOR",
+      "category": "auditing-skills",
+      "location": "KB-mcp-platform",
+      "headline": "references/credential-handling.md is 103 lines but has no recognized table-of-contents heading near the top."
+    },
+    {
+      "id": "95146f2036",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:78",
+      "headline": "SKILL.md links to '.claude/skills/auditing-github-actions/scripts/audit_workflow.py' (line 78) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "6a4f0fa888",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "scripts/audit_op9_url_credential_rejection.py:48",
+      "headline": "Instruction to append a credential to a URL or query parameter."
+    },
+    {
+      "id": "1dc093195d",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:150",
+      "headline": "SKILL.md links to '.claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md' (line 150) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "d7ed0768cd",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:380",
+      "headline": "SKILL.md links to '.claude/agents/execute-orchestrator.md' (line 380) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "1fb6811129",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:388",
+      "headline": "SKILL.md links to '.claude/agents/execute-task-code-producer.md' (line 388) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "00d0a6b1a1",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:389",
+      "headline": "SKILL.md links to '.claude/agents/execute-task-quality-handler.md' (line 389) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "82d7b92bb0",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:390",
+      "headline": "SKILL.md links to '.claude/agents/execute-phase-quality-reviewer.md' (line 390) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "744dc8cd4a",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:391",
+      "headline": "SKILL.md links to '.claude/agents/execute-finalize-reconciler.md' (line 391) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "11117068b0",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:395",
+      "headline": "SKILL.md links to '.claude/agents/execute-orchestrator.md' (line 395) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "91f45d91f5",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:449",
+      "headline": "SKILL.md links to '.claude/skills/auditing-shared/scripts/log_state_transition.py' (line 449) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "ddb44ace9f",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:461",
+      "headline": "SKILL.md links to '.claude/agents/execute-orchestrator.md' (line 461) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "ec0e5b127f",
+      "severity": "BLOCKER",
+      "category": "auditing-skills",
+      "location": "SKILL.md:472",
+      "headline": "SKILL.md links to '.claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md' (line 472) but the file does not exist (Reference Illusion)."
+    },
+    {
+      "id": "cfca739f64",
+      "severity": "MAJOR",
+      "category": "auditing-subagents",
+      "location": "/workspaces/feature-pipeline/.claude/agents/execute-orchestrator.md",
+      "headline": "Description has no triggering language ('use when', 'when reviewing', etc.). Claude has no signal for delegation. (SA-2)"
+    },
+    {
+      "id": "ae08936790",
+      "severity": "MAJOR",
+      "category": "auditing-settings",
+      "location": "/workspaces/feature-pipeline/.claude/settings.json",
+      "headline": "Bare tool name 'Bash' in 'allow' is equivalent to 'Bash(*)'. (ST-9)"
+    },
+    {
+      "id": "b12f7e0252",
+      "severity": "MAJOR",
+      "category": "auditing-settings",
+      "location": "/workspaces/feature-pipeline/.claude/settings.json",
+      "headline": "Bare tool name 'Read' in 'allow' is equivalent to 'Read(*)'. (ST-9)"
+    },
+    {
+      "id": "ce1463f2e9",
+      "severity": "MAJOR",
+      "category": "auditing-settings",
+      "location": "/workspaces/feature-pipeline/.claude/settings.json",
+      "headline": "Bare tool name 'WebFetch' in 'allow' is equivalent to 'WebFetch(*)'. (ST-9)"
+    },
+    {
+      "id": "4cb1f4d3d6",
+      "severity": "MINOR",
+      "category": "auditing-settings",
+      "location": "/workspaces/feature-pipeline/.claude/settings.local.json",
+      "headline": "Permission rule references unknown tool 'Skill' (in 'allow')."
+    },
+    {
+      "id": "4cb1f4d3d6",
+      "severity": "MINOR",
+      "category": "auditing-settings",
+      "location": "/workspaces/feature-pipeline/.claude/settings.local.json",
+      "headline": "Permission rule references unknown tool 'Skill' (in 'allow')."
+    },
+    {
+      "id": "3b4a45ef1a",
+      "severity": "MINOR",
+      "category": "auditing-mcp",
+      "location": "/workspaces/feature-pipeline/.mcp.json",
+      "headline": "Server 'gitnexus': package `gitnexus@${GITNEXUS_TAG}` is not in the known-publishers list. Review provenance. (MC-3)"
+    },
+    {
+      "id": "242421e408",
+      "severity": "MINOR",
+      "category": "auditing-mcp",
+      "location": "/workspaces/feature-pipeline/.mcp.json",
+      "headline": "Server 'mcp-openapi-schema': package `mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}` is not in the known-publishers list. Review provenance. (MC-3)"
+    },
+    {
+      "id": "39cae967b1",
+      "severity": "MINOR",
+      "category": "auditing-mcp",
+      "location": "/workspaces/feature-pipeline/.mcp.json",
+      "headline": "Server 'serena': package `git+https://github.com/oraios/serena@${SERENA_REF}` is not in the known-publishers list. Review provenance. (MC-3)"
+    },
+    {
+      "id": "8710f4f231",
+      "severity": "MAJOR",
+      "category": "auditing-mcp",
+      "location": ".mcp.json",
+      "headline": "(no description)"
+    },
+    {
+      "id": "8710f4f231",
+      "severity": "MAJOR",
+      "category": "auditing-mcp",
+      "location": ".mcp.json",
+      "headline": "(no description)"
+    },
+    {
+      "id": "fa91debec9",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-api.md",
+      "headline": "Subagent design-api.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "cad7c9c89c",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-backend.md",
+      "headline": "Subagent design-backend.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "c4a3f59a3e",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-cicd.md",
+      "headline": "Subagent design-cicd.md preloads skill 'auditing-github-actions' whose audit verdict is FAIL (2 findings)."
+    },
+    {
+      "id": "233f58f24b",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-cicd.md",
+      "headline": "Subagent design-cicd.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "1e7511ef01",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-claude-code.md",
+      "headline": "Subagent design-claude-code.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "6f92e0bda2",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-codespaces.md",
+      "headline": "Subagent design-codespaces.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "ea2b0f2a30",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-composer.md",
+      "headline": "Subagent design-composer.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "a04a4b74dd",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-database.md",
+      "headline": "Subagent design-database.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "7e8d084fce",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-frontend.md",
+      "headline": "Subagent design-frontend.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "9174caf8c3",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-iac.md",
+      "headline": "Subagent design-iac.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "f2a75850bf",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/design-query.md",
+      "headline": "Subagent design-query.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "a1eae6f1bf",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/discovery-external-researcher.md",
+      "headline": "Subagent discovery-external-researcher.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "74bd95b51d",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/discovery-plan-author.md",
+      "headline": "Subagent discovery-plan-author.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "d9eaefb2fb",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/execute-orchestrator.md",
+      "headline": "Subagent execute-orchestrator.md preloads skill 'recipe-feature-pipeline' whose audit verdict is FAIL (21 findings)."
+    },
+    {
+      "id": "f8403d7532",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/finalize-deliverable-packager.md",
+      "headline": "Subagent finalize-deliverable-packager.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "f23c733742",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/finalize-reconciler.md",
+      "headline": "Subagent finalize-reconciler.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "3344ba81d0",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/finalize-task-decomposer.md",
+      "headline": "Subagent finalize-task-decomposer.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "914b37c89e",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/intake-intent-clarifier.md",
+      "headline": "Subagent intake-intent-clarifier.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "e7e41c5a29",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/intake-prd-author.md",
+      "headline": "Subagent intake-prd-author.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "fea6543b9a",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/plan-author.md",
+      "headline": "Subagent plan-author.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "0607851403",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/review-architecture-auditor.md",
+      "headline": "Subagent review-architecture-auditor.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "87e31e81eb",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/review-cross-artifact-auditor.md",
+      "headline": "Subagent review-cross-artifact-auditor.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "242f0dce44",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/test-acceptance-author.md",
+      "headline": "Subagent test-acceptance-author.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    },
+    {
+      "id": "4d05dce0ad",
+      "severity": "MAJOR",
+      "category": "cross-file:X9",
+      "location": "/workspaces/feature-pipeline/.claude/agents/test-phase-validator-author.md",
+      "headline": "Subagent test-phase-validator-author.md preloads skill 'KB-documentation-criteria' whose audit verdict is FAIL (16 findings)."
+    }
+  ],
+  "notes": "No new feature components yet; this captures the steady-state Claude Code config health of the .claude/ tree at HEAD 6ee390bf0e29. Walker raw verdict was 'FAIL' (score=0.0); mapped to NEEDS-REVISION per target schema vocabulary (PASS | PASS-WITH-MINOR-FIXES | NEEDS-REVISION). Severity buckets normalize the walker's BLOCKER/MAJOR/MINOR/NIT/INFO into the schema's BLOCKER/MAJOR/MINOR/INFO (NIT->INFO). For Phase 7 (T7.7) the gate is *delta on new components*, not absolute steady-state health: the post-change audit must not add BLOCKER/MAJOR findings attributable to the new components introduced by issue-capture-mechanism-r1, and any new findings on those components must be MINOR-or-better. Full walker artifacts: /workspaces/feature-pipeline/project-audit-report.md and /workspaces/feature-pipeline/project-audit-report.json."
+}

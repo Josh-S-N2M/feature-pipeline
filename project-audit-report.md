@@ -17,10 +17,10 @@
 
 ## Summary
 
-Total findings: 83
+Total findings: 67
 - **BLOCKER**: 27
-- **MAJOR**: 48
-- **MINOR**: 8
+- **MAJOR**: 30
+- **MINOR**: 10
 
 ## Skills
 
@@ -41,7 +41,7 @@ Total findings: 83
 
 - **[BLOCKER]** references/principles.md links to '.devcontainer/lib/log-mcp-event.sh' (line 51) but the file does not exist.
   - *Fix:* Either create the file or fix/remove the link.
-- **[MINOR]** references/patterns-and-anti-patterns.md is 177 lines but has no recognized table-of-contents heading near the top.
+- **[MINOR]** references/patterns-and-anti-patterns.md is 179 lines but has no recognized table-of-contents heading near the top.
   - *Fix:* Add a heading like `## Contents`, `## Table of contents`, `## In this file`, `## On this page`, or `## Sections` listing the file's sections. The property is navigable-index-near-the-top, not a specific heading string.
 
 ### KB-mcp-platform
@@ -117,55 +117,19 @@ Total findings: 83
 
 ### settings.json
 
-- **[MAJOR]** Permission rule 'Bash(python3 -c "import json; d = json.load\(open\('/workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/plan-v2-review-issues.json'\)\); print\('JSON valid'\); print\('Verdict:', d['verdict']['verdict_label']\); print\('Gate 0:', d['gate0']['status']\); print\('Issues count:', len\(d['issues']\)\); print\('Prior context items received:', d['prior_context_check']['items_received']\); print\('Prior context resolved:', d['prior_context_check']['resolved']\); print\('Prior context declined_with_rationale:', d['prior_context_check']['declined_with_rationale']\); print\('Prior context unresolved:', d['prior_context_check']['unresolved']\)")' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(awk '/^## Test inventory/,/^## Per-test details/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(awk '/^## Verification-layer summary/,/^## /' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(awk '/^## Acceptance Test Cross-Reference/,/^## Estimation Methodology/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/plan-v1.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(awk '/^## Acceptance Criteria/,/^## Existing Codebase Analysis/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/blueprint-v1.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(awk '/^## AC coverage matrix/,/^## Verification-layer summary/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(sed -n '999,1004p' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(echo "Total tests inventory rows: $\(awk '/^## Test inventory/,/^## Per-test details/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(sed -n '1,15p' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/plan-v1.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(awk '/^## Update History/,/^$/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/plan-v1.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(python3 -c ' *)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(sed -n '96,135p' /workspaces/feature-pipeline/.claude/skills/recipe-feature-pipeline/SKILL.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(echo "=== ADR-0034 count \(must be 0\) ===" && grep -c "ADR-0034" .claude/agents/execute-finalize-reconciler.md && echo "=== ADR-0033 count \(must be >= 3\) ===" && grep -c "ADR-0033" .claude/agents/execute-finalize-reconciler.md && echo "=== Agent in frontmatter check ===" && sed -n '/^---$/,/^---$/p' .claude/agents/execute-finalize-reconciler.md | head -20 | grep -q "Agent" && echo "FAIL: Agent still in frontmatter" || echo "PASS: Agent not in frontmatter" && echo "=== dispatch_directives present \(must exist\) ===" && grep -c "dispatch_directives" .claude/agents/execute-finalize-reconciler.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(python3 -c "import json; data=json.load\(open\('/workspaces/feature-pipeline/working/feature/execution-pipeline-design-r1/tasks.json'\)\); tasks=[t for t in data.get\('tasks', data\) if isinstance\(data, list\) or True]; print\(type\(data\)\)")' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(python3 -c "import json; t=json.load\(open\('working/feature/synthetic-test-feature-T6/tasks.json'\)\); print\('tasks:', len\(t['tasks']\)\)")' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
+- **[MAJOR]** Bare tool name 'Bash' in 'allow' is equivalent to 'Bash(*)'. (ST-9)
+  - *Fix:* Add scoping: 'Bash(<pattern>)'.
+- **[MAJOR]** Bare tool name 'Read' in 'allow' is equivalent to 'Read(*)'. (ST-9)
+  - *Fix:* Add scoping: 'Read(<pattern>)'.
+- **[MAJOR]** Bare tool name 'WebFetch' in 'allow' is equivalent to 'WebFetch(*)'. (ST-9)
+  - *Fix:* Add scoping: 'WebFetch(<pattern>)'.
 
 ### settings.local.json
 
-- **[MAJOR]** Permission rule 'Bash(grep -rnE "[Ss]tage [0-9]+|[Pp]hase [0-9]+|[Ss]tep [0-9]+ of|[0-9]{1,2}-stage|[0-9]{1,2}-phase" /workspaces/feature-pipeline/.claude/agents/)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(grep -rnE "[Ss]tage [0-9]+|[Pp]hase [0-9]+|[0-9]{1,2}-stage|[0-9]{1,2}-phase" /workspaces/feature-pipeline/.claude/skills/)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(python3 -c "import json; d = json.load\(open\('/workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/intent-clarification-review-issues.json'\)\); print\('valid JSON; verdict:', d['verdict']['decision'], '; gate0:', d['gate0']['status'], '; issues:', len\(d['issues']\)\)")' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(python3 -c "import json; d = json.load\(open\('/workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/prd-v2-review-issues.json'\)\); print\('JSON valid. Top-level keys:', list\(d.keys\(\)\)\); print\('Verdict:', d['verdict']['decision']\); print\('Prior context resolved:', d['prior_context_check']['resolved'], '/', d['prior_context_check']['items_received']\); print\('New issues count:', len\(d['issues']\)\)")' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(grep -n "skills:\\s*ABSENT\\|skills:.*OMITS\\|skills: ABSENT\\|no skills\\|NO.*skills\\|skills: \\|skills:$\\|runtime Read" /workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/blueprint-v1.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(grep -A 5 "## Decision$" /workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md /workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/adrs/ADR-0045-three-doctypes-preserved.md /workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-add-new-sibling-file-evolution.md /workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md /workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/adrs/ADR-0048-prior-context-handoff.md /workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/adrs/ADR-0049-structural-vs-discipline-kb-split.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(grep -A 15 "## Decision$" /workspaces/feature-pipeline/adrs/ADR-0017-document-reviewer-integration.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
-- **[MAJOR]** Permission rule 'Bash(grep -A 15 "## Decision$" /workspaces/feature-pipeline/adrs-migrated/ADR-0009-rationale-brief-discipline.md)' has quote characters inside parens. The quotes are part of the literal pattern; the rule won't match real tool calls.
-  - *Fix:* Remove the inner quotes.
+- **[MINOR]** Permission rule references unknown tool 'Skill' (in 'allow').
+  - *Fix:* Check spelling. Known: Bash, Edit, Glob, Grep, NotebookEdit, Read, Task, WebFetch, WebSearch, Write
+- **[MINOR]** Permission rule references unknown tool 'Skill' (in 'allow').
+  - *Fix:* Check spelling. Known: Bash, Edit, Glob, Grep, NotebookEdit, Read, Task, WebFetch, WebSearch, Write
 
 ## MCP servers
 
@@ -177,6 +141,8 @@ Total findings: 83
   - *Fix:* Verify publisher. For third-party servers, read source before installing.
 - **[MINOR]** Server 'serena': package `git+https://github.com/oraios/serena@${SERENA_REF}` is not in the known-publishers list. Review provenance. (MC-3)
   - *Fix:* Verify publisher. For third-party servers, read source before installing.
+- **[MAJOR]** 
+- **[MAJOR]** 
 
 ## Cross-file checks
 

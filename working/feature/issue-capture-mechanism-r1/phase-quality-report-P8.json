@@ -1,0 +1,60 @@
+{
+  "phase_id": "P8",
+  "verdict_overall": "PASS",
+  "verdict_per_dimension": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "rollup_rule_applied": "blocking finding in any dimension \u2192 overall BLOCKER; revisable \u2192 NEEDS_RECONCILIATION; all clean \u2192 PASS. Result: PASS.",
+  "findings": [],
+  "validators_passed": [
+    "PV-8.C1",
+    "PV-8.C2",
+    "PV-8.C3",
+    "PV-8.C4",
+    "PV-8.C5"
+  ],
+  "validators_failed": [],
+  "audit_counter_delta": {
+    "baseline_type": "prior_phase",
+    "primary_baseline": "prior_phase",
+    "feature_start": {
+      "per_domain": {
+        "tests": "0\u21920",
+        "audits": "0\u21920",
+        "validator": "0\u21920",
+        "discipline": "0\u21920",
+        "scope_deviations": "0\u21921"
+      },
+      "aggregate": "0\u21921"
+    },
+    "prior_phase": {
+      "per_domain": {
+        "tests": "0\u21920",
+        "audits": "0\u21920",
+        "validator": "0\u21920",
+        "discipline": "0\u21920",
+        "scope_deviations": "0\u21921"
+      },
+      "aggregate": "0\u21921"
+    },
+    "gating": "informational",
+    "gating_rule": null,
+    "audit_severity_breakdown": null
+  },
+  "scope_deviations": [
+    {
+      "task_id": "task-054",
+      "deviation": "T8.2 used apt-cache fallback instead of preferred docker build verification (docker not available in this devcontainer).",
+      "proposed_resolution": "defer",
+      "evidence": "T8.2 spec explicitly authorizes fallback: 'May be deferred if Docker is not available in the current environment; in that case L2 is asserted via apt-cache check'."
+    }
+  ],
+  "rationale": "All PV-8.C1..C5 BLOCKER + MAJOR + RECOMMENDED validators PASS; 0 fails. Phase 8 scope-deviation (docker\u2192apt-cache fallback) is authorized by the T8.2 spec.",
+  "execution_mode_note": "Phase 0 + Phase 8 both executed in single-agent-fallback mode (parent inline; only T0.3 used canonical specialist-dispatch). Phase-quality check was run inline via Bash heredoc rather than dispatched execute-phase-quality-reviewer. Audit-trail backfilled 2026-05-24T13:00:00Z. Phase 1+ should resume specialist-dispatch.",
+  "backfilled": true,
+  "backfill_timestamp": "2026-05-24T13:00:00Z"
+}

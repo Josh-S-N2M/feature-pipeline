@@ -1,0 +1,21 @@
+# Pipeline-isolation invariant zero-baseline (AC-FR-13-a/b)
+# Captured: 2026-05-24T12:13:50Z
+# HEAD: 6ee390bf0e2927f160cf5747a8e145b283ec6223
+# F-010 / F-015 zero-baseline anchor for Phase 7 AC-FR-13 verification.
+
+## AC-FR-13-a — grep 'KB-issue-capture' across pipeline agents
+## Verbatim command:
+##   grep -l 'KB-issue-capture' .claude/agents/{intake,discovery,design,plan,test,review,finalize,execute,synth}-*.md
+
+
+## AC-FR-13-a exit code: 1  (expected: 1 = no matches)
+
+## AC-FR-13-b — grep 'subagent_type:\s*issue-capture-author' across same files
+## Verbatim command:
+##   grep -E 'subagent_type:[[:space:]]*issue-capture-author' .claude/agents/{intake,discovery,design,plan,test,review,finalize,execute,synth}-*.md
+
+
+## AC-FR-13-b exit code: 1  (expected: 1 = no matches)
+
+## Combined verdict:
+## PASS — zero-baseline preserved (both invariants empty).

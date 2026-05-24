@@ -496,6 +496,49 @@ Phase 7 is the catch-all for ALL remaining ACs not already directly enforced ear
 
 ---
 
+## PV-8 — Devcontainer hardening (shellcheck persistence)
+
+- **Validator ID:** `PV-8`
+- **Phase reference:** Plan Phase 8 — Devcontainer hardening (plan-v2.md v1.2.0 §Phase 8)
+- **Validator goal:** Prove that `shellcheck` is now persisted via `.devcontainer/Dockerfile` (image-build-time install, prebuild-captured), that the Dockerfile change is structurally sound and apt-resolvable on the base image, and that the devenv-prereqs.txt + postCreate.sh documentation correctly handoff the rebuild requirement to future operators.
+- **Load-bearing assertions (BLOCKER):** PV-8.C1
+- **Dependencies:** PV-0 PASS (Phase 8 is order-independent with Phases 1–7; the Dockerfile edit does NOT depend on any feature delivery phase and the in-session hot-install at `~/.local/bin/shellcheck` already satisfies the Phase 5 T5.2 runtime prereq)
+
+### Pass criteria
+
+| ID | Description | Assertion | Source | Automation hook | Severity |
+|---|---|---|---|---|---|
+| PV-8.C1 | `shellcheck` continuation line present in Dockerfile apt-get install block | `grep -nE "^[[:space:]]+shellcheck[[:space:]]*\\\\$" .devcontainer/Dockerfile` returns exactly 1 match AND the matched line sits inside the existing `RUN apt-get update && apt-get install -y --no-install-recommends ...` block (verified by surrounding context: preceded by another tool name + `\\` continuation, followed by either another tool name or the `&& ln -sf` / `&& rm -rf` cleanup tail) | T8.1 in plan-v2.md | `[ $(grep -cE "^[[:space:]]+shellcheck[[:space:]]*\\\\$" .devcontainer/Dockerfile) -eq 1 ]` AND a one-shot manual review of the surrounding 5 lines | BLOCKER |
+| PV-8.C2 | Apt-resolution evidence OR docker-build success captured | Either `working/feature/issue-capture-mechanism-r1/shellcheck-apt-resolution.txt` exists and contains a `Version:` line, OR T8.1 L2 docker-build succeeded (captured in task notes or build log) | T8.2 in plan-v2.md | `test -f working/feature/issue-capture-mechanism-r1/shellcheck-apt-resolution.txt && grep -q "^Version:" working/feature/issue-capture-mechanism-r1/shellcheck-apt-resolution.txt` (apt-cache path); OR check task-054 result.notes for `docker_build_status=succeeded` | MAJOR (if neither path verifies, escalate to user with manual-rebuild-confirmation rather than auto-block) |
+| PV-8.C3 | `devenv-prereqs.txt` updated; postCreate.sh comment header references Phase 8 | (a) `working/feature/issue-capture-mechanism-r1/devenv-prereqs.txt` does NOT contain literal "shellcheck MISSING"; contains both `~/.local/bin/shellcheck` and `/usr/bin/shellcheck` references; contains a rebuild instruction. (b) `.devcontainer/postCreate.sh` head-of-file comment references "Phase 8" and "issue-capture-mechanism-r1". (c) `bash -n .devcontainer/postCreate.sh` exits 0. | T8.3 in plan-v2.md | `! grep -q "shellcheck MISSING" working/feature/issue-capture-mechanism-r1/devenv-prereqs.txt && grep -q "/usr/bin/shellcheck" working/feature/issue-capture-mechanism-r1/devenv-prereqs.txt && grep -q "Phase 8" .devcontainer/postCreate.sh && bash -n .devcontainer/postCreate.sh` | RECOMMENDED (documentation gap is recoverable post-merge; do not block on this alone) |
+| PV-8.C4 | No edit to `.devcontainer/devcontainer.json` (Phase 8 scope = Dockerfile + postCreate.sh comment only) | `git diff --name-only <phase-8-start>..HEAD -- .devcontainer/devcontainer.json \| wc -l` returns `0` | Phase 8 Exit Criteria: "No edit to .devcontainer/devcontainer.json (Phase 8 is Dockerfile-only + script-comment-only)." | `[ $(git diff --name-only -- .devcontainer/devcontainer.json \| wc -l) -eq 0 ]` | MAJOR |
+| PV-8.C5 | `validate_pipeline_frontmatter.py` not edited by Phase 8 (PV-0.C5 invariant preserved) | `git diff --name-only -- .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py \| wc -l` returns `0` (Phase 8 does NOT touch the validator) | CPI-2-adjacent invariant preserved | `[ $(git diff --name-only -- .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py \| wc -l) -eq 0 ]` | BLOCKER (cross-phase invariant; Phase 8 must not destabilize the validator) |
+
+### Acceptance tests scheduled for this phase
+
+None. Phase 8 is infrastructure hardening with no PRD/Blueprint AC binding; the binding is to the Open Item surfaced at T0.5 and to Phase 5 T5.2's runtime prerequisite (which is already satisfied in-session by the hot-install).
+
+### Operational checks (phase-specific)
+
+- `.devcontainer/Dockerfile` diff is one new line; passes `git diff --stat` size sanity (< 5 lines added).
+- `.devcontainer/postCreate.sh` comment-only edit; `git diff` body shows zero changes inside any function definition.
+- `devenv-prereqs.txt` records the dual-state (hot-installed v0.10.0 at `~/.local/bin/` + persisted apt-shipped at `/usr/bin/`) so post-rebuild operators understand which one is on PATH.
+
+### Failure response
+
+- **PV-8.C1 fail (Dockerfile line missing or malformed):** Re-author T8.1; verify continuation-line position (must be inside the existing `RUN apt-get install` block, not a separate `RUN` invocation which would defeat layer caching). Re-run validator.
+- **PV-8.C2 fail (neither apt-cache nor docker-build verifies):** Escalate to user. Possible causes: Docker unavailable in the execution environment AND the spawned base-image container couldn't resolve `apt-get update` (network egress restriction). In that case, the user authorizes proceeding via a manual rebuild-and-verify on the actual Codespace. Do NOT auto-block on PV-8.C2 alone.
+- **PV-8.C4 fail (devcontainer.json was edited):** Out of scope for Phase 8. Inspect the diff; if the edit is intentional and pulls in some other Codespaces decision, surface as a NEW deviation requiring user authorization. If accidental, `git checkout HEAD -- .devcontainer/devcontainer.json` and re-run.
+- **PV-8.C5 fail (validator edited):** Hard rollback (`git checkout HEAD -- .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py`). Phase 8 must not destabilize the validator; if it did, the Phase 0 NFR-8 baseline is invalidated.
+
+### Validator metadata
+
+- **Run trigger:** Post-T8.3
+- **Expected duration:** ~2 minutes (one Dockerfile grep + one apt-cache probe + two doc-presence greps)
+- **Prerequisites:** PV-0 PASS. Note: PV-8 does NOT require PV-1..PV-7 to pass first; Phase 8 is order-independent. In practice, Phase 8 is executed alongside Phase 5 or batched with the rollout PR, but the validator imposes no upstream-phase ordering constraint beyond PV-0.
+
+---
+
 ## Cross-phase invariants
 
 These assertions MUST hold at every validator boundary, not just within a single phase. They are re-asserted by PV-N for `N ≥ 1` as part of the phase exit, and re-confirmed end-to-end at PV-7.
@@ -540,6 +583,7 @@ Per Plan v2 cross-phase dependencies:
 - **PV-4** (F-003 skills:-absence) — failure here means the agent is functionally broken (silent-drop); the F-003 BLOCKER mitigation is the single highest-priority validator assertion across the whole feature.
 - **PV-3** (AC-FR-8-d migration scope) — failure here means the migration touched unintended paths; resolves only by hard rollback.
 - **PV-7** (Plan-wide acceptance gate) — failure of any C1..C8 BLOCKER assertion halts merge.
+- **PV-8** (Devcontainer hardening) — order-independent (depends only on PV-0). Not on the feature-delivery critical path; sequencing is convenience-only.
 
 ### Parallelizable validator checks (within-phase)
 
@@ -577,6 +621,7 @@ A human operator (or downstream phase-quality-reviewer agent) executes the valid
 6. **End of Phase 5:** Run `PV-5`. **PV-5.C4 latency outcome may force escalate-to-design (re-author hook in faster language); this is a non-pass that requires a design decision, not a code fix.**
 7. **End of Phase 6:** Run `PV-6`. Diff-only; fast.
 8. **End of Phase 7:** Run `PV-7`. This is the Plan-wide merge gate.
+9. **End of Phase 8 (order-independent — may run any time after PV-0):** Run `PV-8`. Lightweight check; ~2 minutes. Failure of PV-8.C1 (BLOCKER) prevents the Phase 8 deliverable from shipping but does NOT halt Phases 1–7. Failure of PV-8.C5 (BLOCKER) means Phase 8 destabilized the validator — this is the only Phase 8 failure that affects the rest of the run.
 
 **On any BLOCKER failure:** the orchestrator surfaces the failing assertion(s) to the user, cites the Plan's per-phase rollback path (the "Failure response" sections above), and does not advance to the next phase until the validator re-runs PASS.
 
@@ -602,6 +647,7 @@ Every PV-N maps to the corresponding Plan phase's Exit Criteria + the per-phase 
 | PV-5 | Phase 5 | "ANY shellcheck warning is `blocker`; any golden-file fixture failure is `blocker`; latency benchmark p95 > 200ms escalates to design iteration" | "re-runs shellcheck; re-runs the 5-fixture golden-file suite; asserts `.claude/settings.json`'s diff is purely additive; asserts `.claude/SETTINGS-NOTES.md` contains the FR-15 note; asserts the latency-results JSON shows p95 ≤ ratified threshold" |
 | PV-6 | Phase 6 | "ANY non-additive change in T6.1/T6.2/T6.3 diffs is `blocker`. Any new pipeline stage or gate bypass in T6.3 is `blocker`" | "diffs each of the 3 edited files against the pre-Phase-6 state; asserts all changes are additive; asserts no new stage / gate / bypass language in `recipe-feature-pipeline/SKILL.md`" |
 | PV-7 | Phase 7 | "ANY new line in T7.5 validator regression diff is `blocker`; ANY non-empty result from T7.4 pipeline-isolation grep is `blocker`; ANY BLOCKER from cc-critique or any of the 5 audits is `blocker`" | "this is effectively the Plan-wide acceptance gate. Re-runs T7.4 ... T7.8" |
+| PV-8 | Phase 8 | "T8.1 L1 fail is `blocker` (Dockerfile change must be present and well-formed); T8.2 L3 fail is `important`; T8.3 verifications are `recommended`" | "asserts the Dockerfile line is present, the apt-resolution evidence file exists OR docker-build succeeded, and the devenv-prereqs.txt + postCreate.sh comment changes landed" |
 
 ### PRD v2 AC cross-reference
 
