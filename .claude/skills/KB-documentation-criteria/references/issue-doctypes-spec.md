@@ -1,11 +1,18 @@
 ---
 id: SPEC-issue-doctypes
-version: 1.0.0
-status: Proposed
-doc_type: reference-spec
+version: 1.0.1
+status: complete
+doc_type: spec
 feature_slug: issue-capture-mechanism-r1
 generated: 2026-05-24
 generated_by: execute-task-code-producer
+# Note: this file lives under .claude/skills/KB-documentation-criteria/references/
+# which is OUTSIDE the validator's normal scan scope (validator runs against
+# working/feature/**/*.md and post-Phase-3 Issues/**/*.md). doc_type: spec is
+# not a recognized validator category; if the validator ever scans this file
+# it would emit a `minor` "doc_type not in known category" finding. This is
+# acceptable per the file's role as documentation-infrastructure metadata, not
+# a pipeline artifact.
 ---
 
 # Issue Doctypes Structural Spec
@@ -200,32 +207,45 @@ is a forward-pointer signal only.
 
 ## §7 ID Derivation Rule (per ADR-0050)
 
-Frontmatter `id` is derived from the file's path per ADR-0044:
+Frontmatter `id` is derived from the file's path per ADR-0050 Decision §7:
 
 ```text
-id: <UPPERCASE-DOCTYPE>-<kebab-topic-slug>
+id: <UPPERCASE-BASE-DOCTYPE>-<kebab-topic-slug>
 ```
 
-Where `<UPPERCASE-DOCTYPE>` is the `doc_type` value with `issue-` prefix uppercased and
-hyphen-separated:
+Where `<UPPERCASE-BASE-DOCTYPE>` is the `doc_type` value with the `issue-` prefix **stripped**
+and the remainder uppercased:
 
-| `doc_type` | Uppercase prefix |
-| --- | --- |
-| `issue-register` | `ISSUE-REGISTER` |
-| `issue-analysis` | `ISSUE-ANALYSIS` |
-| `issue-proposal` | `ISSUE-PROPOSAL` |
+| `doc_type` | Base doctype (after stripping `issue-`) | Uppercase prefix used in `id` |
+| --- | --- | --- |
+| `issue-register` | `register` | `REGISTER` |
+| `issue-analysis` | `analysis` | `ANALYSIS` |
+| `issue-proposal` | `proposal` | `PROPOSAL` |
 
-Examples:
+Examples (all five empirical precedents follow this short-form convention; paths shown
+are POST-FR-8-migration where applicable — Phase 3 of this feature performs the migration):
 
 - `Issues/adr-placement-rootcause/analysis.md` with `doc_type: issue-analysis`
-  → `id: ISSUE-ANALYSIS-adr-placement-rootcause`
-- `Issues/devcontainer-mcp-provisioning-deferrals/register.md` with `doc_type: issue-register`
-  → `id: ISSUE-REGISTER-devcontainer-mcp-provisioning-deferrals`
-- `Issues/auditing-family-graduation/proposal.md` with `doc_type: issue-proposal`
-  → `id: ISSUE-PROPOSAL-auditing-family-graduation`
+  → `id: ANALYSIS-adr-placement-rootcause`
+- `Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md` with `doc_type: issue-register`
+  → `id: REGISTER-devcontainer-mcp-provisioning-r1-deferrals`
+- `Issues/auditing-family-graduation-review/proposal.md` with `doc_type: issue-proposal`
+  → `id: PROPOSAL-auditing-family-graduation-review`
 
-The validator verifies this match at validation time; a mismatch emits a `blocker`
-finding.
+The validator (Phase 2 T2.1) verifies this match at validation time; a mismatch emits a
+`blocker` finding. The short-form convention is **load-bearing** for the FR-8 migration:
+the four pre-migration files in `Issues/` already use the short form (`REGISTER-*`,
+`ANALYSIS-*`, `PROPOSAL-*`); the validator MUST accept them as-is post-migration.
+
+**Rationale for the strip-prefix interpretation** (resolves the ambiguity in
+ADR-0050 §Decision §7's `<UPPERCASE-DOCTYPE>` phrasing):
+
+- All 5 empirical precedents use the short form.
+- The 3 sibling templates (`issue-register-template.md`, `issue-analysis-template.md`,
+  `issue-proposal-template.md`) all use the short form.
+- The doctype namespace (3 values) is small and the base names are unambiguous; the
+  `issue-` prefix is redundant in the ID context where the doctype is already implied
+  by the file's location under `Issues/<topic-slug>/<basename>.md`.
 
 ## §8 Distinct From
 
