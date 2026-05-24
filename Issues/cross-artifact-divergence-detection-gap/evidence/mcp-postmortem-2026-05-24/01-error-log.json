@@ -1,0 +1,305 @@
+{
+  "$schema_intent": "AI-targeted structured defect log for the devcontainer-mcp-provisioning-r1 feature. Each entry is self-contained so an AI agent loading a single record has every fact it needs to reproduce, diagnose, and fix the defect without re-reading the whole codebase. Human-readable narrative lives in the sibling .md files; this file is the canonical machine-actionable surface.",
+  "scan_metadata": {
+    "scanned_at": "2026-05-24T06:00:00Z",
+    "scanned_by": "claude-opus-4-7 (forensic-postmortem-pass)",
+    "feature_under_review": "devcontainer-mcp-provisioning-r1",
+    "evidence_sources": [
+      "/workspaces/feature-pipeline/.mcp.json",
+      "/workspaces/feature-pipeline/.devcontainer/",
+      "/workspaces/feature-pipeline/.claude/runtime/mcp-events.jsonl",
+      "/workspaces/feature-pipeline/.claude/agents/",
+      "/workspaces/feature-pipeline/.claude/skills/auditing-mcp/scripts/",
+      "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/",
+      "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0040 through ADR-0043"
+    ],
+    "live_reproduction_environment": {
+      "container": "mcr.microsoft.com/devcontainers/python:1-3.11-bookworm",
+      "uvx_present": false,
+      "node_version": "v20.20.2 (via devcontainer feature node:1)",
+      "go_version": "go1.22 (via devcontainer feature go:1)",
+      "all_5_oss_local_install_commands_attempted": "T1.1 install pass at 2026-05-24T02:29-02:33Z; results captured in .claude/runtime/mcp-events.jsonl"
+    },
+    "audit_run_against_current_state_exit_code": 0,
+    "audit_run_finding_counts": {"BLOCKER": 0, "MAJOR": 2, "MINOR": 3},
+    "live_mcp_server_connection_count": "2 of 7 actually reachable (terraform-mcp + actionlint-mcp); 5 misconfigured at config or transport layer"
+  },
+  "defects": [
+    {
+      "id": "DEF-01",
+      "title": "Probe script reads `.transport` field but `.mcp.json` schema uses `.type`",
+      "severity": "BLOCKER",
+      "class": "config-schema-mismatch",
+      "category": "code-vs-spec-divergence",
+      "affects_servers": ["context7", "exa"],
+      "evidence": {
+        "wrong_code_location": "/workspaces/feature-pipeline/.devcontainer/lib/mcp-ping.sh:43",
+        "wrong_code_snippet": "TRANSPORT=\"$(echo \"${SERVER_CONFIG}\" | jq -r 'if .transport == \"http\" then \"http\" else \"stdio\" end')\"",
+        "correct_schema_field": ".type",
+        "spec_citation": "Claude Code docs (code.claude.com/docs/en/mcp-servers.md): .mcp.json HTTP server entries declare `\"type\": \"http\"` (alias `streamable-http`). There is no `transport` field in .mcp.json — `transport` is a CLI-only `claude mcp add --transport http` flag.",
+        "observable_in_jsonl": [
+          ".claude/runtime/mcp-events.jsonl line 6: {\"server\":\"context7\",\"result\":\"fail\",\"failure_layer\":\"config\",\"latency_ms\":28,\"message_redacted\":\"stdio entry has no command field\"}",
+          ".claude/runtime/mcp-events.jsonl line 7: same shape for exa"
+        ],
+        "reproduction_command": "jq -r '.mcpServers.context7 | if .transport == \"http\" then \"http\" else \"stdio\" end' /workspaces/feature-pipeline/.mcp.json # → prints 'stdio' (WRONG); replace .transport with .type → prints 'http' (CORRECT)"
+      },
+      "root_cause": "The mcp-ping.sh author confused two different Claude Code surfaces: the .mcp.json schema (which uses `type`) and the `claude mcp add` CLI flag (which uses `--transport`). The two are not synonyms. The probe is the ONLY consumer of .mcp.json in the lifecycle scripts, so the mismatch had no compile-time signal.",
+      "impact": "All HTTP MCP servers (context7, exa) are misrouted to `probe_stdio()`, which then reads .command, finds none, and emits 'stdio entry has no command field'. The probe latency of 28-30ms (vs the 10s stdio-timeout used for genuinely-unreachable servers) is the smoking gun. Claude Code itself reads .type correctly and these servers connect fine when actually used.",
+      "fix": {
+        "edit": {"file": ".devcontainer/lib/mcp-ping.sh", "line": 43, "from": ".transport", "to": ".type"},
+        "verification_command": "echo '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{}}' | timeout 5 curl -sS -H \"x-api-key: $EXA_API_KEY\" -H 'Content-Type: application/json' -X POST -d @- https://mcp.exa.ai/mcp"
+      }
+    },
+    {
+      "id": "DEF-02",
+      "title": "Probe script omits MCP `initialize` handshake before calling `tools/list`",
+      "severity": "BLOCKER",
+      "class": "protocol-noncompliance",
+      "category": "code-vs-spec-divergence",
+      "affects_servers": ["actionlint-mcp (rejected outright)", "gitnexus (timeout)", "mcp-openapi-schema (timeout — also affected by DEF-03)", "serena (timeout — also blocked by DEF-04)"],
+      "evidence": {
+        "wrong_code_location": "/workspaces/feature-pipeline/.devcontainer/lib/mcp-ping.sh:58-63",
+        "wrong_code_snippet": "local req='{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{}}'\nresponse=\"$(echo \"${req}\" | timeout 10 env ${env_block} ${cmd} ${args} 2>/dev/null | head -1)\"",
+        "spec_citation": "MCP specification 2025-11-25 §lifecycle: 'The client SHOULD NOT send requests other than pings before the server has responded to the initialize request.' Servers MAY reject such calls. Canonical three-message sequence: (1) client → initialize request, (2) server → initialize response, (3) client → notifications/initialized.",
+        "observable_in_jsonl": [
+          ".claude/runtime/mcp-events.jsonl line 8: {\"server\":\"actionlint-mcp\",\"status\":\"degraded\",\"error\":\"method \\\"tools/list\\\" is invalid during session initialization\"} — server enforced the spec",
+          ".claude/runtime/mcp-events.jsonl lines 11-13: gitnexus / mcp-openapi-schema / serena all timed out at 10s waiting for an initialize that never came"
+        ],
+        "live_reproduction_strict_server": "echo '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{}}' | actionlint-mcp # → returns JSON-RPC error: method invalid during session initialization",
+        "live_reproduction_correct_handshake": "printf '%s\\n%s\\n%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"probe\",\"version\":\"0.0.1\"}}}' '{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}' '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{}}' | actionlint-mcp # → returns serverInfo + full tool catalog in <1s"
+      },
+      "root_cause": "The probe author assumed MCP servers would accept tools/list before the session was established. The MCP spec rejects this. Implementations split into two failure modes: strict servers (actionlint-mcp) reject with a JSON-RPC error; lenient servers (gitnexus) wait for the missing initialize and time out at the 10s wrapper limit.",
+      "impact": "All 4 stdio servers register as 'degraded' or 'unreachable' in mcp-events.jsonl even when they are perfectly functional. Operators see false alarms and may chase phantom install issues (as happened in this case).",
+      "fix": {
+        "edit_strategy": "Rewrite probe_stdio() to send the three-message sequence and parse the SECOND response (the tools/list response, since the FIRST is the initialize response). OR adopt the cheaper alternative: send only `initialize` and treat parseable `result.serverInfo` as success — this avoids the `head -1` race against the unrelated stderr/notification timing.",
+        "file": ".devcontainer/lib/mcp-ping.sh",
+        "lines": "58-80",
+        "secondary_fix_note": "Replace `head -1` with reading until JSON-RPC id=1 appears, since some servers (gitnexus) emit pino log lines to stdout before the response."
+      }
+    },
+    {
+      "id": "DEF-03",
+      "title": "`.mcp.json` invokes mcp-openapi-schema with no schema-path argument and no openapi.yaml exists in repo",
+      "severity": "BLOCKER",
+      "class": "missing-required-runtime-input",
+      "category": "config-vs-server-contract",
+      "affects_servers": ["mcp-openapi-schema"],
+      "evidence": {
+        "wrong_config_location": "/workspaces/feature-pipeline/.mcp.json:28-31",
+        "wrong_config_snippet": "\"mcp-openapi-schema\": { \"command\": \"npx\", \"args\": [\"-y\", \"mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}\"] }",
+        "server_help_output": "Usage: node index.mjs [path/to/openapi.yaml]\\nArguments:\\n  path/to/openapi.yaml  Path to the OpenAPI schema file (JSON or YAML) (optional)\\n                       If not provided, defaults to openapi.yaml",
+        "server_source_behavior": "Reads process.argv[2]; if absent, resolves './openapi.yaml' against process.cwd(); if file missing, logs ENOENT and exits non-zero before any MCP handshake response.",
+        "live_reproduction": "mcp-openapi-schema # → 'Error loading schema: Error opening file \"/workspaces/feature-pipeline/openapi.yaml\" ENOENT: no such file or directory'",
+        "filesystem_check": "ls /workspaces/feature-pipeline/openapi.yaml # → no such file",
+        "adr_prescription_violated": "ADR-0041 §Decision Details install-mechanism taxonomy explicitly defines this invocation form: `npx -y \"mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}\" <spec-path>` (with `<spec-path>` token). The implementation dropped the `<spec-path>` token without recording why."
+      },
+      "root_cause": "Two compounding failures: (a) the .mcp.json author did not pass an argv path or place an openapi.yaml at repo root; (b) the ADR-0041 taxonomy that prescribed `<spec-path>` was not enforced by any audit check. The package is also abandoned upstream (single 2025-03-13 release per npm; single 'Initial commit' on hannesj/mcp-openapi-schema; 6 open issues, no subsequent commits) and was already flagged in versions.env as `STALE_PACKAGE per H-3`.",
+      "impact": "The server self-terminates within milliseconds of being launched, so Claude Code's MCP loader will register it as failed-to-start. The 'install_complete' record at JSONL line 2 was correct (the npm package installed); only the runtime invocation is broken. Even after fixing DEF-02 (probe handshake), this server would still fail because it dies before responding.",
+      "fix": {
+        "option_a_minimal": "Decide which OpenAPI spec is the target, place it at a known path, and update args: `\"args\": [\"-y\", \"mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}\", \"${workspaceFolder}/openapi.yaml\"]` (or absolute path).",
+        "option_b_remove": "If no target OpenAPI spec exists in the repo (current state), remove the server entry from .mcp.json AND remove `mcp__mcp-openapi-schema__*` from the design-api agent allowlist. design-api currently relies on this MCP for no purpose; the spec it would consume does not exist.",
+        "option_c_replace": "Swap to `mcp-openapi-schema-explorer` (kadykov, actively maintained, last pushed 2026-05-18, supports HTTP(S) URLs as well as local paths). Same surface area; different package id. Requires updating .mcp.json server name AND the per-agent allowlist token.",
+        "recommended": "option_b_remove until an OpenAPI spec is actually checked in; option_c_replace if the design-api consumer is load-bearing."
+      }
+    },
+    {
+      "id": "DEF-04",
+      "title": "`.mcp.json` invokes serena via `uvx` but uv/uvx is not installed in the devcontainer image",
+      "severity": "BLOCKER",
+      "class": "missing-prerequisite-binary",
+      "category": "install-vs-runtime-mismatch",
+      "affects_servers": ["serena"],
+      "evidence": {
+        "wrong_config_location": "/workspaces/feature-pipeline/.mcp.json:32-35",
+        "wrong_config_snippet": "\"serena\": { \"command\": \"uvx\", \"args\": [\"--from\", \"git+https://github.com/oraios/serena@${SERENA_REF}\", \"serena\"] }",
+        "binary_check": "command -v uvx # → (no output); find / -name uvx -type f 2>/dev/null # → no results",
+        "dockerfile_evidence": "/workspaces/feature-pipeline/.devcontainer/Dockerfile installs only ripgrep/jq/bat/tree/less via apt; no uv install.",
+        "devcontainer_features_evidence": ".devcontainer/devcontainer.json declares features: common-utils, github-cli, node:1@20, go:1@1.22, anthropics/claude-code:1. NO uv feature, no python-tools-with-uv feature.",
+        "install_log_evidence": ".claude/runtime/mcp-events.jsonl line 1: {\"event\":\"install_complete\",\"server\":\"serena\",\"status\":\"failed\",\"note\":\"uvx serena --version failed\"} — postCreate.sh:61 attempted `uvx --from ... serena --version` and got 'No such file or directory' on uvx itself.",
+        "live_reproduction": "uvx --from git+https://github.com/oraios/serena@v1.2.0 serena --version # → 'timeout: failed to run command \\u2018uvx\\u2019: No such file or directory'"
+      },
+      "root_cause": "ADR-0041's install-taxonomy table treats `uvx` as if it is automatically available, but uv/uvx is not installed by any Dockerfile RUN or devcontainer feature in this project. The base image (mcr.microsoft.com/devcontainers/python:1-3.11-bookworm) ships pip but not uv. The Node and Go features were added; uv was overlooked.",
+      "secondary_concern": "Per upstream Serena README (github.com/oraios/serena): the project explicitly warns 'Do not install Serena via an MCP or plugin marketplace! They contain outdated and suboptimal installation commands.' The canonical install is `uv tool install -p 3.13 serena-agent@latest --prerelease=allow` (PyPI package `serena-agent`), not `uvx --from git+...@<ref>`. The ADR-0041 git-ref invocation is non-canonical AND the implementation is missing the upstream-prescribed `start-mcp-server` argv (see DEF-05).",
+      "impact": "Serena never starts. The install fails at postCreate (so no sentinel exists), then every subsequent postStart probe times out. Five separate places reference SERENA_REF: devcontainer.json containerEnv, versions.env, .mcp.json args, postCreate.sh install_serena(), and .install-sentinel-serena-${SERENA_REF} naming. All carry a v1.2.0 pin against an install path that cannot execute.",
+      "fix": {
+        "step_1_install_uv": "Add to .devcontainer/Dockerfile (preferred — image-time, cached): `RUN curl -LsSf https://astral.sh/uv/install.sh | sh && ln -sf /home/vscode/.local/bin/uv /usr/local/bin/uv && ln -sf /home/vscode/.local/bin/uvx /usr/local/bin/uvx` (adjust the path to wherever the installer drops the binaries for the user). Alternative: use a third-party devcontainer feature such as `ghcr.io/va-h/devcontainers-features/uv:1` in devcontainer.json features.",
+        "step_2_decide_invocation": "Either keep the git-ref form and add `serena start-mcp-server` to args (matches DEF-05 fix), OR switch to the upstream-canonical `uv tool install -p 3.13 serena-agent` flow in postCreate.sh and call `serena start-mcp-server` directly from .mcp.json (no uvx).",
+        "step_3_reconsider_pin": "ADR-0040 pinned pre-v1.3.0 (last known: v1.2.0). Current upstream is v1.5.1 (2026-05-18). The base_modes→added_modes review that justified the pin must either complete or be re-deferred explicitly; the pin should not silently drift further out of date."
+      }
+    },
+    {
+      "id": "DEF-05",
+      "title": "`.mcp.json` serena invocation omits the `start-mcp-server` argv prescribed by ADR-0041",
+      "severity": "MAJOR",
+      "class": "implementation-vs-adr-divergence",
+      "category": "config-vs-spec-divergence",
+      "affects_servers": ["serena"],
+      "evidence": {
+        "adr_prescription_location": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0041-install-mechanism-hybrid.md §Decision Details install-mechanism taxonomy row 1",
+        "adr_prescription_text": "Serena | uvx --from (Python; uv-managed; ephemeral) | uvx --from \"git+https://github.com/oraios/serena@${SERENA_REF}\" serena start-mcp-server",
+        "implementation_actual": ".mcp.json line 34: args = [\"--from\", \"git+https://github.com/oraios/serena@${SERENA_REF}\", \"serena\"] — `start-mcp-server` subcommand is MISSING.",
+        "postcreate_smoke_form": "postCreate.sh:61 runs `uvx --from ... serena --version` for smoke-testing — that's a different invocation than the runtime-launch form. The smoke form does not exercise the missing argv."
+      },
+      "root_cause": "Two-form discipline gap: the install-smoke-test command and the runtime-launch command differ, and the ADR-prescribed runtime form was not copied verbatim into .mcp.json. The discrepancy survived the audit because no auditor compares .mcp.json args against the ADR-0041 taxonomy table.",
+      "impact": "Compounds DEF-04: even if uvx were installed, calling `serena` (without `start-mcp-server`) would invoke serena's CLI help/dispatcher, not launch the MCP stdio loop. The server would never become reachable.",
+      "fix": {
+        "edit": {"file": ".mcp.json", "path": ".mcpServers.serena.args", "from": ["--from", "git+https://github.com/oraios/serena@${SERENA_REF}", "serena"], "to": ["--from", "git+https://github.com/oraios/serena@${SERENA_REF}", "serena", "start-mcp-server"]},
+        "audit_addition_needed": "Add an OP rule comparing .mcp.json invocation strings against the ADR-0041 install-taxonomy table for each named server. This is a config-vs-design-contract check; currently no auditor performs it."
+      }
+    },
+    {
+      "id": "DEF-06",
+      "title": "Sentinel file location and naming diverge from ADR-0041 §Decision §2",
+      "severity": "MAJOR",
+      "class": "implementation-vs-adr-divergence",
+      "category": "convention-violation",
+      "affects_servers": ["all 5 OSS-local installs (serena, mcp-openapi-schema, actionlint-mcp, terraform-mcp, gitnexus)"],
+      "evidence": {
+        "adr_prescription_location": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0041-install-mechanism-hybrid.md §Decision §2",
+        "adr_prescription_text": "Sentinel naming = <server>@<version>.installed [...] Sentinels live under .claude/runtime/install-sentinels/.",
+        "adr_self_assertion": "The unversioned form in the postCreate.sh outline is the bug; the version-pinned form is the canonical convention.",
+        "implementation_actual_location": "postCreate.sh line 38: `SENTINEL_DIR=\"${REPO_ROOT}/.claude/runtime\"` (flat, no install-sentinels/ subdir)",
+        "implementation_actual_naming": "postCreate.sh line 52/78/102/135: `.install-sentinel-<server>-<version>` (dot-prefixed, dashes not @-separators, no `.installed` suffix)",
+        "filesystem_evidence": "ls /workspaces/feature-pipeline/.claude/runtime/install-sentinels/ # → No such file or directory. Actual files at .claude/runtime/.install-sentinel-actionlint-mcp-7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef etc."
+      },
+      "root_cause": "The same author that wrote postCreate.sh did not consult ADR-0041 §Decision §2 (or consulted a draft that predated the I-DR-CS-001 resolution). The ADR explicitly resolved this exact inconsistency in favor of the version-pinned form under install-sentinels/, then the implementation ignored the resolution.",
+      "impact": "Pure behavior is unaffected (any naming works as long as it's internally consistent), but the violation breaks any tooling that consumes the ADR-prescribed sentinel layout, and it signals weak ADR-to-code discipline that lowers confidence in every other ADR claim.",
+      "fix": {
+        "edits": [
+          {"file": ".devcontainer/postCreate.sh", "line": 38, "from": "SENTINEL_DIR=\"${REPO_ROOT}/.claude/runtime\"", "to": "SENTINEL_DIR=\"${REPO_ROOT}/.claude/runtime/install-sentinels\""},
+          {"file": ".devcontainer/postCreate.sh", "lines": "52,78,102,135", "rename": ".install-sentinel-<server>-<version> → <server>@<version>.installed"}
+        ],
+        "migration": "Existing sentinel files will not match the new pattern — postCreate will treat installs as missing and re-run (idempotent; safe). Consider a one-line migration in postCreate.sh that mv's any legacy `.install-sentinel-*` files to the new path before the existence checks."
+      }
+    },
+    {
+      "id": "DEF-07",
+      "title": "discovery-external-researcher agent allowlists exa tool names that the live exa MCP no longer exposes",
+      "severity": "MAJOR",
+      "class": "allowlist-vs-server-drift",
+      "category": "config-vs-server-contract",
+      "affects_servers": ["exa"],
+      "evidence": {
+        "agent_file": "/workspaces/feature-pipeline/.claude/agents/discovery-external-researcher.md",
+        "allowlist_actual": "tools: [..., mcp__exa__web_search_exa, mcp__exa__company_research_exa, mcp__exa__crawling_exa]",
+        "live_tool_surface_observed_2026_05_24": "Deferred-tool listing in active session declares exa exposes: mcp__exa__web_fetch_exa, mcp__exa__web_search_exa. The two tools the allowlist names (company_research_exa, crawling_exa) are absent.",
+        "side_effect": "When the agent calls mcp__exa__crawling_exa, Claude Code returns 'tool not exposed by server' rather than executing the call. The web_search_exa entry still works."
+      },
+      "root_cause": "Exa's hosted MCP product evolved (likely renamed tools) and the agent allowlist was never refreshed. There is no automated check that the named `mcp__<server>__<tool>` entries in agent allowlists actually exist on the live server.",
+      "impact": "Two of three exa tool entries in the allowlist are silently dead. Agents that need crawling or company-research capability via exa will fail at tool-call time, not at config-load time. This is a soft-fail mode that masks misconfiguration.",
+      "fix": {
+        "step_1_refresh": "Run a live tools/list against https://mcp.exa.ai/mcp using the canonical 3-message handshake; record the returned tool names; update discovery-external-researcher.md allowlist to exactly that set.",
+        "step_2_audit_rule": "Add an auditing-mcp OP rule that (when --with-runtime is genuinely runtime) probes each HTTP server's tools/list and diff's against the per-agent `mcp__<server>__<tool>` allowlists. This is the only way to catch upstream tool-surface drift."
+      }
+    },
+    {
+      "id": "DEF-08",
+      "title": "`audit_mcp.py --with-runtime` is misnamed — it performs no live MCP-server probe of the registered servers",
+      "severity": "MAJOR",
+      "class": "naming-vs-behavior-divergence",
+      "category": "gate-non-protection",
+      "affects_servers": ["all 7"],
+      "evidence": {
+        "script_location": "/workspaces/feature-pipeline/.claude/skills/auditing-mcp/scripts/audit_mcp.py",
+        "runtime_flag_handling": "audit_mcp.py lines 36, 56-58: parses --with-runtime, passes it through ONLY to check_toxic_combinations.py. validate_mcp_config.py, scan_mcp_secrets.py, and OP-1..OP-10 do not receive the flag.",
+        "toxic_combinations_runtime_behavior": "check_toxic_combinations.py --with-runtime spawns each server and queries tools/list to categorize them — but does so for toxic-combination detection (filesystem+web, etc.), NOT for verifying that THIS project's 7 registered servers are reachable, return their expected tool surface, or match per-agent allowlists.",
+        "gate_6_dependency": "PV-5.C-HARDGATE per phase-validators.md: 'python audit_mcp.py --with-runtime --severity-threshold BLOCKER exits 0; the produced report shows 0 BLOCKER findings across OP-1..OP-10'. The gate trusts a static analysis disguised as a runtime check.",
+        "consequence_observed": "audit_mcp.py against current state returns exit 0 with 0 BLOCKER, even though 5 of 7 servers are demonstrably broken (DEF-01..DEF-04). The hard gate let the broken artifacts through."
+      },
+      "root_cause": "The name `--with-runtime` was attached to a flag that only enables toxic-combination probing, not end-to-end MCP-server reachability verification. PV-5 was authored as if `--with-runtime` would perform the latter; the implementation only does the former.",
+      "impact": "The PV-5 hard gate — described in ADR-0043 as 'MCPs can cause a lot of problems if they are not stable and the system fails silently' — does not actually verify that any of the 7 servers can be started, do a handshake, and expose the tools the per-agent allowlists name. The gate is a paper tiger against exactly the failure class it was created to prevent.",
+      "fix": {
+        "design_change": "Rename `--with-runtime` to `--with-toxic-runtime` and add a new `--with-mcp-reachability` flag (or a unified `--live`) that: (1) launches each .mcp.json server using the exact command+args+env that Claude Code would; (2) performs the 3-message MCP handshake; (3) records the tools/list response; (4) diffs the tool set against per-agent allowlists; (5) emits BLOCKER findings on handshake failure or tool-not-found.",
+        "audit_addition_needed": "Plug the new live-reachability script into audit_mcp.py. The PV-5 contract must require BOTH static OP-1..OP-10 AND the live reachability check. No exit 0 unless all 7 servers respond."
+      }
+    },
+    {
+      "id": "DEF-09",
+      "title": "Feature shipped `delivery_status: ready-for-execution-validation` without ever performing PV-5 live verification",
+      "severity": "BLOCKER",
+      "class": "gate-bypass",
+      "category": "pipeline-process-violation",
+      "affects_servers": "n/a (process defect)",
+      "evidence": {
+        "deliverable_status": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/deliverable-archive.md frontmatter: `delivery_status: ready-for-execution-validation`",
+        "verify_at_execution_t5_2": "verify-at-execution.md §T5.2: 'Status: rebuild-dependent; CANNOT be executed from the parent orchestrator session without disrupting the user's active Codespace. Documented as user-driven exercise per Phase 5 T5.2 contract.'",
+        "execution_state_log_evidence": "state-transitions.log records execution pipeline T0 at 2026-05-23T03:20:00Z, T5 (escalated_stub) at 2026-05-23T18:20:00Z after only 4/10 Phase-0 tasks (T0.1, T0.3 PASS; T0.2, T0.4 SURFACED FINDINGS; T0.5..T0.10 NOT EXECUTED). Phases 1-5 of the execution pipeline never ran.",
+        "git_log_evidence": "Commits 6f46d14 and 094d47e ('feat: devcontainer-mcp-provisioning-r1 Phase 5 — rollout + hard-gate exercise', etc.) record that the code was eventually committed — but the execution pipeline that should have driven those commits never ran past Phase 0.",
+        "phase_validator_evidence": "phase-validators.md PV-5.C1..C21 (BLOCKER each) include 'Fresh Codespace cold-cache rebuild' (C1), 'claude mcp list returns 7 connected entries' (C4), 'AC-X-1 failure-mode rehearsal: missing env-var produces distinguishable failure' (C8). NONE of these were executed against a fresh Codespace.",
+        "audit_run_only_static": "T5.4 audit ran audit_mcp.py against repo files only — a STATIC check. The PV-5 hard gate was satisfied by the static check returning exit 0; the live C1..C21 checks were deferred to 'user-driven' status with no enforcement."
+      },
+      "root_cause": "Two compounding gaps: (a) the phase validator framework treats live-environment checks as 'specified but executable later by humans'; the orchestrator has no machinery to drive a fresh Codespace rebuild and observe the results; (b) the deliverable packager accepted `delivery_status: ready-for-execution-validation` as a valid shippable state. The pipeline shipped a feature whose acceptance tests were specified-but-not-run.",
+      "impact": "Every defect DEF-01..DEF-07 is a direct consequence of this gap. If PV-5.C4 had been mechanically enforced ('claude mcp list returns 7 connected entries'), the pipeline would have halted on this very feature. Instead the static audit ran, returned green, and the broken artifacts shipped.",
+      "fix": {
+        "principle": "PV-5 hard-gate criteria that require a live environment must EITHER (a) be executable by the orchestrator (e.g., the orchestrator can rebuild and verify, treating the long wall-clock cost as a gate cost), OR (b) be downgraded to non-BLOCKER and ineligible to gate-pass the feature. The current 'specified-but-deferred-to-user' middle ground is the worst of both: it labels itself BLOCKER while having no enforcement.",
+        "concrete_change_1": "Add a `tests/postship-smoke.sh` script that runs in a CI container (or a recyclable Codespace) and exercises the live PV-5.C1..C21 sequence. The feature pipeline blocks on this script's exit code at Gate 6.",
+        "concrete_change_2": "Forbid the deliverable packager from emitting `approved` (or any green status) for FULL-scope features when verify-at-execution.md contains any §T5.x section in 'user-driven; not executed' state."
+      }
+    },
+    {
+      "id": "DEF-10",
+      "title": "Architecture audit verdict was `approved_with_conditions` despite known design-vs-implementation drift",
+      "severity": "MAJOR",
+      "class": "audit-permissiveness",
+      "category": "gate-non-protection",
+      "evidence": {
+        "audit_verdict_location": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/architecture-audit-issues.json .verdict.decision = 'approved_with_conditions'",
+        "audit_scope_evidence": "The audit surfaced I-AA-001 (filename drift design-cc vs design-claude-code) and I-AA-002 (consumer-set math narrative). It did NOT compare ADR-0041 install-taxonomy strings against .mcp.json invocations, did NOT verify uvx availability, did NOT verify sentinel location matches ADR-0041 §Decision §2.",
+        "audit_dimensions_evidence": "The architecture-audit dimensions covered claim-verification, brief-honor, blast-radius — none of which exercise 'does the prescribed install path actually exist at runtime?' or 'does .mcp.json match the ADR taxonomy?'"
+      },
+      "root_cause": "The architecture audit dimensions focus on internal-consistency of design artifacts and against synthesis claims. They do not include a 'design-vs-codebase-reality' axis. ADR-0041 was internally consistent; the codebase implementation drifted from ADR-0041; the audit had no rule that fired on the gap.",
+      "impact": "The Gate-4 approval relied on this audit. The drift discovered here (DEF-05, DEF-06, plus the underlying DEF-04 prerequisite gap) was already latent at the audit moment and was not flagged.",
+      "fix": {
+        "audit_dimension_addition": "Add a 'design-realization-check' axis to review-architecture-auditor: for every ADR that names a concrete file/command/path/argv, verify the named artifact exists in the codebase and matches the ADR specification verbatim. Treat divergence as a MAJOR finding minimum."
+      }
+    },
+    {
+      "id": "DEF-11",
+      "title": "Cross-artifact audit cycle 4 verdict `needs_reconciliation` with `count: 0` — pipeline ignored a non-pass verdict",
+      "severity": "MAJOR",
+      "class": "audit-verdict-disregarded",
+      "category": "pipeline-process-violation",
+      "evidence": {
+        "audit_file": "/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/cross-artifact-audit-issues-cycle-4.json",
+        "audit_verdict": ".verdict = 'needs_reconciliation'; .findings.length = 0",
+        "deliverable_archive_status": "Listed cycle 4 as 'converged' in the artifact index notes; delivery_status: ready-for-execution-validation"
+      },
+      "root_cause": "Either the auditor emitted an inconsistent verdict (needs_reconciliation with no findings is structurally invalid — there's nothing to reconcile) OR the downstream consumer of the verdict treated 'no findings' as 'converged' regardless of the .verdict string. Either way, the pipeline accepted a non-PASS as PASS.",
+      "impact": "The 4-cycle reconciliation cap was 'used up' on this cycle without delivering a definitive verdict, and the orchestrator moved forward as if the verdict were green. Any future audit run that produces this structure will quietly pass.",
+      "fix": {
+        "rule": "Reconciler logic must treat any .verdict != 'pass' as a hard halt regardless of findings count. If 'needs_reconciliation' is emitted with 0 findings, the auditor itself is broken — surface this as an orchestrator-level error, not a pass.",
+        "audit_writer_invariant": "test-acceptance-author + review-cross-artifact-auditor should never emit verdict==needs_reconciliation with findings==0. Add this as a frontmatter-validation rule in the reviewer."
+      }
+    },
+    {
+      "id": "DEF-12",
+      "title": "Execution pipeline ran in 'single-agent-fallback' mode — quality handlers and phase reviewers never invoked",
+      "severity": "MAJOR",
+      "class": "execution-mode-degradation",
+      "category": "pipeline-process-violation",
+      "evidence": {
+        "state_transitions_log": "state-transitions.log T0-prime entry: 'corrective_action: re-enter pending; dispatch Phase-0 parallel leaves T0.1..T0.10' and context.single-agent-fallback note from checkpoint.json: 'single-agent-fallback mode elected (brief option c)'.",
+        "checkpoint_log": "checkpoint.json T0-prime: trigger='re-invocation after false-blocker void; single-agent-fallback mode elected (brief option c)'",
+        "missing_quality_dispatch": "No Task() calls to execute-task-quality-handler or execute-phase-quality-reviewer recorded in state-transitions.log. The Per-Task Quality Verdict step (T2) and Phase Quality Review (T7) never executed; the orchestrator did the code-producer work itself and self-graded.",
+        "per_task_results": "Only two per-task-execution-result.json records exist: T2.3 (SKILL.md edit) and T4.1 (template edit). 37 of 39 tasks have no execution result artifact at all."
+      },
+      "root_cause": "The execute-orchestrator initially reported a missing-dispatch-tool blocker, was voided by a user corrective brief, and resumed in 'single-agent-fallback' mode — but this mode bypasses the verdict-issuer separation that the pipeline's defense-in-depth depends on. The single agent now both produces code and grades it; there is no independent quality verdict.",
+      "impact": "Every defect in DEF-01..DEF-07 was either authored or accepted by the same agent. The execute-task-quality-handler's detect_stubs.py + 4-phase verification, and execute-phase-quality-reviewer's dimensional verdict, never ran on this feature's execution artifacts.",
+      "fix": {
+        "principle": "Single-agent-fallback must NOT be a valid mode for FULL-scope features when the deliverable acceptance depends on multi-agent quality enforcement. The fallback was authored as an emergency continuation path; using it on the canonical happy path defeats the pipeline's purpose.",
+        "concrete_change": "When the orchestrator detects it cannot dispatch the verdict-issuer subagents, the recipe must HALT and require user re-invocation with the correct tool grants — not fall back to single-agent mode."
+      }
+    }
+  ],
+  "summary_for_ai_consumers": {
+    "total_defects": 12,
+    "blocker": 4,
+    "major": 8,
+    "minor": 0,
+    "actual_servers_reachable_after_pipeline": "2 of 7",
+    "audit_gate_returned_pass_against_broken_state": true,
+    "pipeline_phase_at_which_actual_code_was_authored": "single-agent-fallback after Phase-0 escalation — not via the execute-task-code-producer / execute-task-quality-handler / execute-phase-quality-reviewer dispatch chain",
+    "primary_failure_mode": "The pipeline's hard gate (PV-5.C-HARDGATE per ADR-0043) trusted a static analysis disguised as a runtime check. None of the 7 servers were ever launched-and-verified by the gate.",
+    "secondary_failure_mode": "Even within static analysis, the auditors had no rule that compared .mcp.json invocation strings against ADR-0041's install-taxonomy table. ADR-vs-implementation drift was therefore invisible to the audits."
+  }
+}
