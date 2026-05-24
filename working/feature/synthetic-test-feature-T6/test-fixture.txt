@@ -1,0 +1,5 @@
+# Synthetic test feature T6 - regression test for execute-orchestrator-dispatch-mechanism-repair-r1
+# Initial state. Tasks TS.1 and TS.2 modify this file to exercise the dispatch loop.
+
+counter: 0
+markers:

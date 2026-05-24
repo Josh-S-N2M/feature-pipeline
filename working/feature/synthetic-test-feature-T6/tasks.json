@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "synthetic-test-feature-T6",
+  "scope_class": "PATCH",
+  "layer_scope": ["cc"],
+  "generated": "2026-05-24",
+  "generated_by": "execute-task-code-producer (T6.1)",
+  "total_tasks": 2,
+  "total_phases": 1,
+  "purpose": "regression-test for execute-orchestrator-dispatch-mechanism-repair-r1; exercises ADR-0044 flatten dispatch loop end-to-end",
+  "f7_session_constraint": "this tasks.json must be invoked in a fresh session AFTER session-restart per T6.2",
+  "tasks": [
+    {
+      "id": "TS.1",
+      "phase": 1,
+      "summary": "Append a single timestamped marker line to a sacrificial test fixture (regression artifact)",
+      "target_files": ["working/feature/synthetic-test-feature-T6/test-fixture.txt"],
+      "predecessors": [],
+      "size": "XS",
+      "parallelizable_with": ["TS.2"],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-6-a"],
+      "gated_by_validator": "PV-S1",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    },
+    {
+      "id": "TS.2",
+      "phase": 1,
+      "summary": "Increment a counter in the same test fixture (or a sibling fixture); verify state-transitions.log got an entry for TS.1 between TS.1 dispatch and TS.2 dispatch",
+      "target_files": ["working/feature/synthetic-test-feature-T6/test-fixture.txt"],
+      "predecessors": ["TS.1"],
+      "size": "XS",
+      "parallelizable_with": [],
+      "operator_facing": false,
+      "satisfies_acs": ["AC-FR-6-a", "AC-NFR-3-a"],
+      "gated_by_validator": "PV-S1",
+      "agent_dispatch_hint": "execute-task-code-producer"
+    }
+  ]
+}
