@@ -1,0 +1,11 @@
+{
+  "task_id": "T4.1",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md"
+  ],
+  "files_created": [],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Added 'v1 invariant: invoking_agent is the logical owner, not the literal emitter' sub-section under Required Fields. The callout includes the full invariant prose, cross-references ADR-0044 §Implementation Guidance, recipe-feature-pipeline/SKILL.md §Execution Phase Dispatch → invoking_agent Logical-Owner Invariant, AC-FR-6-a, AC-NFR-6-a, and NFR-6-a. Placement is additive — existing field definitions and schema unchanged. Verification command PASS (grep for 'v1 invariant', 'logical owner', 'ADR-0044' all found). Room preserved for T4.2 void/void_reason/-prime additions in Optional Fields."
+}

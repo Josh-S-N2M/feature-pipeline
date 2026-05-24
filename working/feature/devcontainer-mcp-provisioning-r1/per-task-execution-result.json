@@ -1,0 +1,11 @@
+{
+  "task_id": "T2.3",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/skills/recipe-feature-pipeline/SKILL.md"
+  ],
+  "files_created": [],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Replaced the T2.3 stub sentence at SKILL.md line 453 with a 25-line H3 sub-section '### invoking_agent — Logical-Owner Invariant'. The verbatim invariant from ADR-0044 §Implementation Guidance is blockquoted with attribution. The section covers: literal emitter vs. logical owner distinction, three bullet-point rationale items, cross-references to ADR-0044 §Implementation Guidance / state-transitions-log-entry-template.md / AC-FR-6-a / AC-NFR-2-b, and an informational future-evolution note scoped to v2+. T2.2's Contract 6 section is untouched. The 'Hook failure is observer-only' sentence remains in place immediately after the new sub-section. All content assertions pass; section length is 25 lines (within 20-35 target)."
+}
