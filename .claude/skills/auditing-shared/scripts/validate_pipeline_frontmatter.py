@@ -67,6 +67,42 @@ GATED_STATES = {"draft", "accepted", "superseded", "rejected"}
 ANALYSIS_STATES = {"draft", "complete", "superseded"}
 ADR_STATES = {"proposed", "accepted", "superseded", "rejected"}
 
+# ---- Issue artifact constants (Phase 2 T2.1; ADR-0045 + ADR-0050) ----
+
+# Per ADR-0045 + ADR-0050 §Decision §3: the three first-class issue doctypes.
+ISSUE_DOC_TYPES = {"issue-register", "issue-analysis", "issue-proposal"}
+
+# Per ADR-0050 §Decision §1: 5-state lifecycle vocabulary (6 dict keys including
+# the universal `draft` initial state per ADR-0032 per blueprint-v3 I-DR-BP-010).
+ISSUE_STATES = {
+    "draft", "open", "adopted", "complete",
+    "superseded", "wontfix-with-rationale",
+}
+
+# Per ADR-0050 §Decision §4 + blueprint-v3 D-05 Backend Per-State Companion Field
+# Authoritative Table. SOURCE-OF-TRUTH: issue-doctypes-spec.md §4.
+# Each entry maps a status value → tuple of additionally-required companion fields
+# (in addition to the 7 universal-required fields).
+ISSUE_PER_STATE_REQUIRED_FIELDS = {
+    "draft": (),
+    "open": ("since",),
+    "adopted": ("since", "adopted_by_feature_slug", "adopted_at"),
+    "complete": ("since", "resolved_by", "resolved_at", "resolution_summary"),
+    "superseded": ("since", "superseded_by_issue_id", "superseded_at"),
+    "wontfix-with-rationale": ("since", "wontfix_rationale", "decided_at"),
+}
+
+# Per ADR-0044 §Decision §4 + I-AA-002 v3 outer-dispatch path-prefix skip.
+# Files matching these path-prefixes are excluded from validation (return [])
+# at the top of validate_pipeline_artifact. This handles evidence/ and updates/
+# subdirectories under Issues/<topic>/ which carry no doctype constraint.
+# IMPORTANT: T2.1 only DEFINES this constant; T2.2 wires it into the
+# validate_pipeline_artifact early-return.
+ISSUE_NON_VALIDATED_PATH_PREFIXES = (
+    "Issues/*/evidence/",
+    "Issues/*/updates/",
+)
+
 # Per I-AA-601: canonical effort enum.
 EFFORT_ENUM = {"low", "medium", "high", "xhigh", "max"}
 
@@ -149,6 +185,8 @@ def doc_type_category(doc_type: str) -> str:
         return "gated"
     if doc_type == "adr":
         return "adr"
+    if doc_type in ISSUE_DOC_TYPES:           # v2 addition per ADR-0050 §Decision §1
+        return "issue"
     if doc_type in ANALYSIS_DOC_TYPES or any(doc_type.endswith(suf) for suf in ANALYSIS_DOC_TYPE_SUFFIXES):
         return "analysis"
     return "unknown"
@@ -252,8 +290,113 @@ def validate_agent_frontmatter(fm: dict, path: Path) -> list[dict]:
     return findings
 
 
+# Per issue-doctypes-spec.md §7 (post-7b56248 fix): id derivation uses the
+# SHORT form — uppercase BASE doctype (issue- prefix stripped) + hyphen +
+# kebab-case topic slug. The regex matches the same form.
+_ISSUE_ID_PATTERN = re.compile(r"^(REGISTER|ANALYSIS|PROPOSAL)-[a-z][a-z0-9-]*$")
+
+
+def is_valid_issue_id_syntax(value: str) -> bool:
+    """True if `value` matches the SHORT-form Issues/ ID convention per
+    issue-doctypes-spec.md §7: `<UPPERCASE-BASE-DOCTYPE>-<kebab-topic-slug>`
+    where BASE is one of REGISTER / ANALYSIS / PROPOSAL."""
+    return isinstance(value, str) and bool(_ISSUE_ID_PATTERN.match(value))
+
+
+def validate_issue_artifact(fm: dict, path: Path) -> list[dict]:
+    """Validate an Issues/<topic>/<doctype>.md file per ADR-0045 + ADR-0050 +
+    issue-doctypes-spec.md. Called from validate_pipeline_artifact when
+    doc_type_category returns "issue"."""
+    findings: list[dict] = []
+    doc_type = fm.get("doc_type")
+    status = fm.get("status")
+
+    # Check 1 — status must be in the 5-state vocabulary (per ADR-0050 §3, spec §3.3).
+    # Short-circuit if invalid; per-state rules below require a known state.
+    if status not in ISSUE_STATES:
+        findings.append(make_finding(
+            severity="blocker",
+            file_path=path,
+            message=f"status '{status}' not in issue vocabulary {sorted(ISSUE_STATES)}",
+        ))
+        return findings  # short-circuit
+
+    # Check 2 — per-state required companion fields (spec §4.2, ADR-0050 §4).
+    # Uses the actual codebase idiom `field in fm` (cf. lines 314-323 in the
+    # ADR-0005 superseded_by check).
+    for field in ISSUE_PER_STATE_REQUIRED_FIELDS.get(status, ()):
+        if field not in fm:
+            findings.append(make_finding(
+                severity="blocker",
+                file_path=path,
+                message=f"status:{status} requires companion field '{field}'",
+            ))
+
+    # Check 3 — proposes_future_feature advisory (spec §6, ADR-0050 §6).
+    # When doc_type is issue-proposal and field is absent, emit info-severity.
+    if doc_type == "issue-proposal" and "proposes_future_feature" not in fm:
+        findings.append(make_finding(
+            severity="info",
+            file_path=path,
+            message="issue-proposal recommends a 'proposes_future_feature' slug",
+        ))
+
+    # Check 4 — optional cross-link fields syntactic validation (spec §5, ADR-0046).
+    # Validate when present; never required. Regex matches the
+    # <UPPERCASE-BASE-DOCTYPE>-<kebab-topic-slug> form per spec §7 (SHORT form,
+    # post-7b56248 fix).
+    for field in ("escalates_from", "escalated_to", "rolled_into_register"):
+        value = fm.get(field)
+        if value is not None:
+            # Support list values per ADR-0050 §5: "Optional fields support list
+            # values where multiple evolution events touch the same file."
+            values = value if isinstance(value, list) else [value]
+            for v in values:
+                if not is_valid_issue_id_syntax(v):
+                    findings.append(make_finding(
+                        severity="minor",
+                        file_path=path,
+                        message=f"field '{field}' value '{v}' does not match expected ID syntax "
+                                f"<UPPERCASE-BASE-DOCTYPE>-<kebab-topic-slug> (spec §7)",
+                    ))
+
+    # Check 5 (per spec §7) — id MUST match path-derived expected id:
+    # Expected = <UPPERCASE-BASE-DOCTYPE>-<kebab-topic-slug-from-path>
+    # where topic-slug is the parent directory name of the file under Issues/.
+    fm_id = fm.get("id")
+    if fm_id and doc_type:
+        base = doc_type.removeprefix("issue-").upper()  # issue-analysis → ANALYSIS
+        # Topic slug is the parent directory name. Robustly handle both relative
+        # and absolute paths (mirror the T2.2 path-prefix handling pattern).
+        parts = path.parts
+        if "Issues" in parts:
+            idx = parts.index("Issues")
+            if idx + 1 < len(parts):
+                topic_slug = parts[idx + 1]
+                expected_id = f"{base}-{topic_slug}"
+                if fm_id != expected_id:
+                    findings.append(make_finding(
+                        severity="blocker",
+                        file_path=path,
+                        message=f"id '{fm_id}' does not match path-derived expected id '{expected_id}' "
+                                f"(spec §7: <UPPERCASE-BASE-DOCTYPE>-<kebab-topic-slug>)",
+                    ))
+
+    return findings
+
+
 def validate_pipeline_artifact(fm: dict, path: Path) -> list[dict]:
     findings: list[dict] = []
+
+    # v3 addition (per I-AA-002 honoring ADR-0044 §Decision §4 + spec §2.3):
+    # path-prefix early-return for non-validated Issues/ subdirectories.
+    # Returns BEFORE any other validation logic — evidence/ and updates/
+    # files carry no doctype constraint.
+    path_str = str(path)
+    if ("/Issues/" in path_str or path_str.startswith("Issues/")) and (
+        "/evidence/" in path_str or "/updates/" in path_str
+    ):
+        return []  # ADR-0044 §Decision §4: evidence/ and updates/ excluded
 
     # Universal required fields per ADR-0032 Change 1 + Change 4.
     for required in ("feature_slug", "doc_type"):
@@ -301,6 +444,8 @@ def validate_pipeline_artifact(fm: dict, path: Path) -> list[dict]:
                     depth="0",
                 )
             )
+    elif category == "issue":             # v2 per ADR-0050; body in T2.3
+        findings.extend(validate_issue_artifact(fm, path))
     elif doc_type:
         findings.append(
             make_finding(
@@ -345,6 +490,19 @@ def validate_skill_frontmatter(fm: dict, path: Path) -> list[dict]:
 
 
 def validate_file(path: Path) -> list[dict]:
+    # Per ADR-0044 §Decision §4 + spec §2.3 + ISSUE_NON_VALIDATED_PATH_PREFIXES:
+    # Issues/<topic>/evidence/ and Issues/<topic>/updates/ files are non-validated.
+    # The early-return MUST sit here (not in validate_pipeline_artifact) so that
+    # files in these subdirs that legitimately have no YAML frontmatter (plain
+    # markdown evidence files) do not trip the "no YAML frontmatter found" guard.
+    # Discovered as a placement defect during T2.3 quality review; relocated from
+    # validate_pipeline_artifact (where T2.2 originally placed it) to here.
+    path_str = str(path)
+    if ("/Issues/" in path_str or path_str.startswith("Issues/")) and (
+        "/evidence/" in path_str or "/updates/" in path_str
+    ):
+        return []
+
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:

@@ -1,0 +1,50 @@
+{
+  "task_id": "task-012",
+  "plan_anchor": "T2.2",
+  "phase_id": "P2",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py"
+  ],
+  "files_created": [],
+  "findings_4phase": {
+    "lint": {
+      "tool": "py_compile (or n/a for non-code)",
+      "result": "PASS",
+      "notes": "static check passed"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-2 checks PV-2.C3,PV-2.C5",
+      "result": "PASS",
+      "notes": "Quality-handler verified PV-2 checks + functional unit tests + NFR-8 spot-check"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-2.C3",
+    "PV-2.C5"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 0,
+  "notes": "Producer added path-prefix early-return at top of validate_pipeline_artifact + `elif category == 'issue':` branch in dispatch chain + forward-declaration stub for validate_issue_artifact. Smart relative-path extension: guard handles both '/Issues/' (absolute) and 'Issues/' (relative startswith) since validator is called with relative paths. Parent applied in-flight remediation post-T2.3 review to relocate the early-return from validate_pipeline_artifact to validate_file (architecturally correct placement). Quality-handler: APPROVED.",
+  "in_flight_remediation": {
+    "applied_at": "2026-05-24T15:30:00Z",
+    "triggered_by": "T2.3 quality-handler review surfaced placement defect",
+    "what": "Path-prefix early-return relocated from validate_pipeline_artifact to validate_file",
+    "rationale": "Original T2.2 placement inside validate_pipeline_artifact only fired AFTER frontmatter parsing. Files in evidence/ subdirectories without YAML frontmatter still tripped validate_file's 'no YAML frontmatter found' guard before reaching the early-return. Relocation to validate_file (BEFORE the file-read + frontmatter-parse) ensures evidence/ files are skipped regardless of frontmatter presence.",
+    "in_scope_to_deliverable": true,
+    "scope_deviation_under_adr_0033": false,
+    "discovered_by": "T2.3 quality-handler functional test (evidence-path fixture)",
+    "precedent": "Same in-flight-remediation pattern as Phase 1 T1.4 \u00a78.2 fix"
+  }
+}

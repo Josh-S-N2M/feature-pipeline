@@ -1,0 +1,41 @@
+{
+  "task_id": "task-011",
+  "plan_anchor": "T2.1",
+  "phase_id": "P2",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py"
+  ],
+  "files_created": [],
+  "findings_4phase": {
+    "lint": {
+      "tool": "py_compile (or n/a for non-code)",
+      "result": "PASS",
+      "notes": "static check passed"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-2 checks PV-2.C1,PV-2.C2,PV-2.C3",
+      "result": "PASS",
+      "notes": "Quality-handler verified PV-2 checks + functional unit tests + NFR-8 spot-check"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-2.C1",
+    "PV-2.C2",
+    "PV-2.C3"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 0,
+  "notes": "Producer added 4 module-level constants (ISSUE_DOC_TYPES, ISSUE_STATES, ISSUE_PER_STATE_REQUIRED_FIELDS, ISSUE_NON_VALIDATED_PATH_PREFIXES) after ADR_STATES; extended doc_type_category with `issue` branch placed between adr and analysis (precedence-safe). Spec-byte-match verified row-by-row for the per-state companion field table. NFR-8 spot-check on 3 baseline files unchanged. Quality-handler: APPROVED."
+}

@@ -1,0 +1,51 @@
+{
+  "task_id": "task-016",
+  "plan_anchor": "T2.6",
+  "phase_id": "P2",
+  "status": "COMPLETED",
+  "files_modified": [],
+  "files_created": [
+    "working/feature/issue-capture-mechanism-r1/validator-postextension-l1-l2-diff.json"
+  ],
+  "findings_4phase": {
+    "lint": {
+      "tool": "py_compile (or n/a for non-code)",
+      "result": "PASS",
+      "notes": "static check passed"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-2 checks PV-2.C7,AT-024,AT-055,AT-063",
+      "result": "PASS",
+      "notes": "Quality-handler verified PV-2 checks + functional unit tests + NFR-8 spot-check"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-2.C7",
+    "AT-024",
+    "AT-055",
+    "AT-063"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 1,
+  "notes": "LOAD-BEARING TASK of the entire feature. Cycle 0 produced FAIL_REGRESSION (8 new findings) but producer correctly identified the cause as corpus growth, not validator regression. Cycle 1 adopted git-based corpus filtering (`git ls-tree -r 814924a`) to compare same-files-same-behavior. Result: verdict=PASS; baseline_corpus_size=133; post_extension findings_total=95 (matches baseline); diff=0/0/0. Quality-handler ran INDEPENDENT re-derivation (live validator + git-reconstructed corpus + finding-key diff) and confirmed 0/0/0 \u2014 this is high-confidence verification because the entire Phase 2 work is gated by this assertion. NFR-8 backward-compatibility invariant HOLDS. The 8 corpus-growth files are tracked in the diff JSON's supplementary section for audit transparency, correctly excluded from regression scope.",
+  "revision_history": [
+    {
+      "cycle": 1,
+      "trigger": "Producer cycle 0 returned FAIL_REGRESSION (8 new findings)",
+      "fault": "Naive diff counted 8 corpus-growth files (Phase 1 commit added templates + per-task-execution-result.md files BETWEEN T0.1 baseline capture and T2.6 execution) as spurious 'new findings'",
+      "fix": "Adopted git-based corpus reconstruction methodology: `git ls-tree -r 814924a` reconstructs the exact baseline file-set; diff scope restricted to that intersection. Principled same-files-same-validator-behavior NFR-8 invariant",
+      "outcome": "APPROVED on cycle 1; verdict PASS; 0/0/0 diff; independent re-derivation by quality-handler confirmed"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "task_id": "task-014",
+  "plan_anchor": "T2.4",
+  "phase_id": "P2",
+  "status": "COMPLETED",
+  "files_modified": [],
+  "files_created": [
+    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/positive-register-draft.md",
+    "... (29 total fixture files; see directory listing for full set)"
+  ],
+  "findings_4phase": {
+    "lint": {
+      "tool": "py_compile (or n/a for non-code)",
+      "result": "PASS",
+      "notes": "static check passed"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-2 checks PV-2.C6",
+      "result": "PASS",
+      "notes": "Quality-handler verified PV-2 checks + functional unit tests + NFR-8 spot-check"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-2.C6"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 1,
+  "notes": "Producer authored 29 files: 18 positive (3 doc_types \u00d7 6 states; proposes_future_feature included on positive-proposal-*) + 6 missing-companion-field negative + 3 invalid-status negative (rejected/accepted/resolved \u2014 each from a DIFFERENT category's vocab) + 1 advisory + 1 AC-BE-10 evidence-path fixture (under nested evidence-path-fixtures/Issues/per-agent-design-evaluation-gap/evidence/). Revision cycle 1 applied to 5 negative fixture id fields; all 6 negative now produce exactly 1 blocker each. Quality-handler APPROVED on cycle 1; cycle counter task-014=1 (well within ADR-0017 4-cap).",
+  "revision_history": [
+    {
+      "cycle": 1,
+      "trigger": "Quality-handler NEEDS_REVISION on cycle 0",
+      "fault": "5 of 6 negative missing-companion-field fixtures used hyphen-form ids that didn't match underscore-containing synthetic test paths; spurious Check 5 (id-vs-path) blocker",
+      "fix": "Corrected 5 fixture id fields to use underscore-containing form matching synthetic path. Added proposes_future_feature to 2 proposal-negative fixtures to suppress confounding advisory info",
+      "outcome": "APPROVED on cycle 1"
+    }
+  ]
+}

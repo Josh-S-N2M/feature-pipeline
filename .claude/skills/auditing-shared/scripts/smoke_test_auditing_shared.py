@@ -24,6 +24,15 @@ import sys
 import tempfile
 from pathlib import Path
 
+# Validator imports — used by the issue-doc-type fixture scenarios (H–K).
+sys.path.insert(0, str(Path(__file__).parent))
+from validate_pipeline_frontmatter import (  # noqa: E402
+    parse_frontmatter,
+    validate_issue_artifact,
+    validate_file,
+    validate_pipeline_artifact,
+)
+
 
 SCRIPTS = {
     "validator": ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py",
@@ -227,6 +236,250 @@ def scenario_log_state_transition() -> None:
 
 
 # -----------------------------------------------------------------------------
+# Scenario H — 18 positive issue-doc-type fixtures each return zero findings.
+# -----------------------------------------------------------------------------
+
+FIXTURE_DIR = Path(__file__).parent / "test_fixtures" / "issue_doc_types"
+
+POSITIVE_FIXTURES: dict[str, str] = {
+    "positive-register-draft.md": "Issues/test-register-draft/register.md",
+    "positive-register-open.md": "Issues/test-register-open/register.md",
+    "positive-register-adopted.md": "Issues/test-register-adopted/register.md",
+    "positive-register-complete.md": "Issues/test-register-complete/register.md",
+    "positive-register-superseded.md": "Issues/test-register-superseded/register.md",
+    "positive-register-wontfix.md": "Issues/test-register-wontfix/register.md",
+    "positive-analysis-draft.md": "Issues/test-analysis-draft/analysis.md",
+    "positive-analysis-open.md": "Issues/test-analysis-open/analysis.md",
+    "positive-analysis-adopted.md": "Issues/test-analysis-adopted/analysis.md",
+    "positive-analysis-complete.md": "Issues/test-analysis-complete/analysis.md",
+    "positive-analysis-superseded.md": "Issues/test-analysis-superseded/analysis.md",
+    "positive-analysis-wontfix.md": "Issues/test-analysis-wontfix/analysis.md",
+    "positive-proposal-draft.md": "Issues/test-proposal-draft/proposal.md",
+    "positive-proposal-open.md": "Issues/test-proposal-open/proposal.md",
+    "positive-proposal-adopted.md": "Issues/test-proposal-adopted/proposal.md",
+    "positive-proposal-complete.md": "Issues/test-proposal-complete/proposal.md",
+    "positive-proposal-superseded.md": "Issues/test-proposal-superseded/proposal.md",
+    "positive-proposal-wontfix.md": "Issues/test-proposal-wontfix/proposal.md",
+}
+
+
+def scenario_positive_fixtures() -> None:
+    """18 positive fixtures must each produce zero findings from validate_issue_artifact."""
+    for fixture_name, synthetic_path in POSITIVE_FIXTURES.items():
+        fixture_file = FIXTURE_DIR / fixture_name
+        text = fixture_file.read_text(encoding="utf-8")
+        parsed = parse_frontmatter(text)
+        if parsed is None:
+            raise SmokeFailure(
+                f"positive fixture {fixture_name}: no YAML frontmatter found"
+            )
+        fm, _ = parsed
+        findings = validate_issue_artifact(fm, Path(synthetic_path))
+        assert_eq(
+            f"positive fixture {fixture_name}: zero findings",
+            findings,
+            [],
+        )
+        print(f"  PASS  positive fixture {fixture_name} → []", file=sys.stderr)
+
+
+# -----------------------------------------------------------------------------
+# Scenario I — 10 negative/advisory fixtures fire expected findings.
+# -----------------------------------------------------------------------------
+
+# Maps fixture filename → (synthetic_path, expected_field_in_message)
+NEGATIVE_BLOCKER_FIELD_FIXTURES: dict[str, tuple[str, str]] = {
+    "negative-missing-since-open.md": (
+        "Issues/test-register-missing-since/register.md",
+        "since",
+    ),
+    "negative-missing-adopted_at-adopted.md": (
+        "Issues/test-analysis-missing-adopted_at/analysis.md",
+        "adopted_at",
+    ),
+    "negative-missing-resolution_summary-complete.md": (
+        "Issues/test-proposal-missing-resolution_summary/proposal.md",
+        "resolution_summary",
+    ),
+    "negative-missing-superseded_by_issue_id-superseded.md": (
+        "Issues/test-register-missing-superseded_by_issue_id/register.md",
+        "superseded_by_issue_id",
+    ),
+    "negative-missing-wontfix_rationale-wontfix.md": (
+        "Issues/test-analysis-missing-wontfix_rationale/analysis.md",
+        "wontfix_rationale",
+    ),
+    "negative-missing-decided_at-wontfix.md": (
+        "Issues/test-proposal-missing-decided_at/proposal.md",
+        "decided_at",
+    ),
+}
+
+INVALID_STATUS_FIXTURES: dict[str, str] = {
+    "negative-invalid-status-register.md": "Issues/test-register-invalid-status/register.md",
+    "negative-invalid-status-analysis.md": "Issues/test-analysis-invalid-status/analysis.md",
+    "negative-invalid-status-proposal.md": "Issues/test-proposal-invalid-status/proposal.md",
+}
+
+ADVISORY_FIXTURES: dict[str, str] = {
+    # Synthetic path topic slug matches the id in the fixture (PROPOSAL-test-proposal-no-pff)
+    # so Check 5 (id vs path-derived id) does not fire a spurious blocker alongside the
+    # advisory info finding we are testing.
+    "advisory-proposal-no-proposes_future_feature.md": (
+        "Issues/test-proposal-no-pff/proposal.md"
+    ),
+}
+
+
+def scenario_negative_fixtures() -> None:
+    """10 negative/advisory fixtures fire exactly the expected findings."""
+    # Group 1: missing per-state required field → 1 blocker containing the field name.
+    for fixture_name, (synthetic_path, expected_field) in NEGATIVE_BLOCKER_FIELD_FIXTURES.items():
+        fixture_file = FIXTURE_DIR / fixture_name
+        text = fixture_file.read_text(encoding="utf-8")
+        parsed = parse_frontmatter(text)
+        if parsed is None:
+            raise SmokeFailure(
+                f"negative fixture {fixture_name}: no YAML frontmatter found"
+            )
+        fm, _ = parsed
+        findings = validate_issue_artifact(fm, Path(synthetic_path))
+        assert_eq(
+            f"negative fixture {fixture_name}: exactly 1 finding",
+            len(findings),
+            1,
+        )
+        assert_eq(
+            f"negative fixture {fixture_name}: severity=blocker",
+            findings[0]["severity"],
+            "blocker",
+        )
+        assert_in(
+            f"negative fixture {fixture_name}: message contains field name",
+            expected_field,
+            findings[0]["message"],
+        )
+        print(
+            f"  PASS  negative fixture {fixture_name} → 1 blocker [{expected_field}]",
+            file=sys.stderr,
+        )
+
+    # Group 2: invalid status → 1 blocker containing "vocabulary".
+    for fixture_name, synthetic_path in INVALID_STATUS_FIXTURES.items():
+        fixture_file = FIXTURE_DIR / fixture_name
+        text = fixture_file.read_text(encoding="utf-8")
+        parsed = parse_frontmatter(text)
+        if parsed is None:
+            raise SmokeFailure(
+                f"invalid-status fixture {fixture_name}: no YAML frontmatter found"
+            )
+        fm, _ = parsed
+        findings = validate_issue_artifact(fm, Path(synthetic_path))
+        assert_eq(
+            f"invalid-status fixture {fixture_name}: exactly 1 finding",
+            len(findings),
+            1,
+        )
+        assert_eq(
+            f"invalid-status fixture {fixture_name}: severity=blocker",
+            findings[0]["severity"],
+            "blocker",
+        )
+        assert_in(
+            f"invalid-status fixture {fixture_name}: message contains 'vocabulary'",
+            "vocabulary",
+            findings[0]["message"],
+        )
+        print(
+            f"  PASS  invalid-status fixture {fixture_name} → 1 blocker [vocabulary]",
+            file=sys.stderr,
+        )
+
+    # Group 3: advisory (info) — missing proposes_future_feature.
+    for fixture_name, synthetic_path in ADVISORY_FIXTURES.items():
+        fixture_file = FIXTURE_DIR / fixture_name
+        text = fixture_file.read_text(encoding="utf-8")
+        parsed = parse_frontmatter(text)
+        if parsed is None:
+            raise SmokeFailure(
+                f"advisory fixture {fixture_name}: no YAML frontmatter found"
+            )
+        fm, _ = parsed
+        findings = validate_issue_artifact(fm, Path(synthetic_path))
+        assert_eq(
+            f"advisory fixture {fixture_name}: exactly 1 finding",
+            len(findings),
+            1,
+        )
+        assert_eq(
+            f"advisory fixture {fixture_name}: severity=info",
+            findings[0]["severity"],
+            "info",
+        )
+        assert_in(
+            f"advisory fixture {fixture_name}: message contains 'proposes_future_feature'",
+            "proposes_future_feature",
+            findings[0]["message"],
+        )
+        print(
+            f"  PASS  advisory fixture {fixture_name} → 1 info [proposes_future_feature]",
+            file=sys.stderr,
+        )
+
+
+# -----------------------------------------------------------------------------
+# Scenario J — AC-BE-10: evidence/ path early-return fires → returns [].
+# -----------------------------------------------------------------------------
+
+def scenario_ac_be_10_evidence_path() -> None:
+    """AC-BE-10: validate_file on a path under Issues/<topic>/evidence/ MUST
+    return [] regardless of frontmatter (path-prefix early-return per ADR-0044
+    §4 + spec §2.3)."""
+    fixture_path = (
+        FIXTURE_DIR
+        / "evidence-path-fixtures"
+        / "Issues"
+        / "per-agent-design-evaluation-gap"
+        / "evidence"
+        / "agent-roster-impact-matrix.md"
+    )
+    result = validate_file(fixture_path)
+    assert_eq("ac-be-10: evidence/ path early-return", result, [])
+    print("  PASS  ac-be-10: evidence/ path early-return → []", file=sys.stderr)
+
+
+# -----------------------------------------------------------------------------
+# Scenario K — positive control: non-Issues unknown doc_type produces minor finding.
+# -----------------------------------------------------------------------------
+
+def scenario_positive_control_non_issues_unknown_doctype() -> None:
+    """Positive control per Blueprint §Verification Strategy: the path-prefix
+    skip MUST NOT over-silence. A non-Issues file with an unknown doc_type still
+    produces a minor 'not in known category' finding."""
+    fm = {
+        "doc_type": "not-a-known-type",
+        "feature_slug": "test",
+        "status": "whatever",
+    }
+    # Use a synthetic path under working/feature/ (NOT Issues/) so the
+    # path-prefix early-return does not fire.
+    findings = validate_pipeline_artifact(
+        fm, Path("working/feature/test-not-issues/some-file.md")
+    )
+    minor_findings = [
+        f for f in findings
+        if f["severity"] == "minor" and "not in known category" in f["message"]
+    ]
+    if len(minor_findings) != 1:
+        raise SmokeFailure(
+            f"positive control: expected 1 minor finding for unknown doc_type; got {findings}"
+        )
+    print(
+        "  PASS  positive control: unknown doc_type → minor finding", file=sys.stderr
+    )
+
+
+# -----------------------------------------------------------------------------
 # Scenario G — coordinator returns 5-dimensional verdict; stub field correct.
 # -----------------------------------------------------------------------------
 def scenario_coordinator_dimensional_verdict() -> None:
@@ -264,6 +517,10 @@ SCENARIOS = [
     ("detect_stubs (impl blocker + test major + false-positive suppression)", scenario_detect_stubs),
     ("log_state_transition append", scenario_log_state_transition),
     ("coordinator 5-dimensional verdict + stub field", scenario_coordinator_dimensional_verdict),
+    ("H: 18 positive issue-doc-type fixtures → zero findings", scenario_positive_fixtures),
+    ("I: 10 negative/advisory fixtures → expected findings", scenario_negative_fixtures),
+    ("J: AC-BE-10 evidence/ path early-return → []", scenario_ac_be_10_evidence_path),
+    ("K: positive control — non-Issues unknown doc_type → minor finding", scenario_positive_control_non_issues_unknown_doctype),
 ]
 
 

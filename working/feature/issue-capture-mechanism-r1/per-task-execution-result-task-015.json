@@ -1,0 +1,46 @@
+{
+  "task_id": "task-015",
+  "plan_anchor": "T2.5",
+  "phase_id": "P2",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py"
+  ],
+  "files_created": [],
+  "findings_4phase": {
+    "lint": {
+      "tool": "py_compile (or n/a for non-code)",
+      "result": "PASS",
+      "notes": "static check passed"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-2 checks PV-2.C6,PV-2.C8,AT-058,AT-059,AT-060,AT-061,AT-062,AT-067",
+      "result": "PASS",
+      "notes": "Quality-handler verified PV-2 checks + functional unit tests + NFR-8 spot-check"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-2.C6",
+    "PV-2.C8",
+    "AT-058",
+    "AT-059",
+    "AT-060",
+    "AT-061",
+    "AT-062",
+    "AT-067"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 0,
+  "notes": "Producer added 4 scenarios (H/I/J/K): Scenario H runs all 18 positive fixtures and asserts 0 findings each; Scenario I covers 10 negative+advisory fixtures with expected findings; Scenario J validates the AC-BE-10 evidence-path fixture returns []; Scenario K is the positive control \u2014 a non-Issues file with unknown doc_type produces a 'minor' finding (proves path-prefix skip doesn't over-silence). All 11 scenarios pass with exit 0. Producer made a smart alignment fix: the advisory fixture's id was authored as PROPOSAL-test-proposal-no-pff (shorter slug); producer aligned synthetic path to match. Quality-handler: APPROVED."
+}
