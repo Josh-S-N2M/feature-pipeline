@@ -1,0 +1,1 @@
+- [F-003 disable-model-invocation skills test pattern](feedback_disable_model_invocation_skills_pattern.md) — verbatim `grep -E '^skills:'` against the agent file returning zero matches is the canonical structural assertion when a feature pairs `disable-model-invocation: true` skills with a runtime-loading sub-agent.

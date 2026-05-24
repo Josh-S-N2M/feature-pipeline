@@ -1,0 +1,2 @@
+- [Constraint-tension preservation](feedback_constraint_tension_preservation.md) — when the IC defers a load-bearing tension to downstream Design, mirror both constraints into the PRD Constraints + Policy Decisions + an AC auditing the rationale; do not pre-decide.
+- [Kill-criterion as FR, not Rollout-Plan narrative](feedback_kill_criterion_as_fr.md) — IC-ratified kill-criteria that change scope-class mid-run get a dedicated FR with EARS ACs; Rollout Plan points to the FR rather than re-narrating.
