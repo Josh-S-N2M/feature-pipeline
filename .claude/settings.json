@@ -7,7 +7,35 @@
       "Bash(python3 .claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py:*)",
       "Bash(python3 .claude/skills/auditing-shared/scripts/check_pipeline_discipline.py:*)",
       "Bash(python3 .claude/skills/auditing-codespaces/scripts/audit_codespaces.py:*)",
-      "Bash(python3 .claude/skills/auditing-github-actions/scripts/audit_workflow.py:*)"
+      "Bash(python3 .claude/skills/auditing-github-actions/scripts/audit_workflow.py:*)",
+      "Bash(python3 -c \"import json; d = json.load\\(open\\('/workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/plan-v2-review-issues.json'\\)\\); print\\('JSON valid'\\); print\\('Verdict:', d['verdict']['verdict_label']\\); print\\('Gate 0:', d['gate0']['status']\\); print\\('Issues count:', len\\(d['issues']\\)\\); print\\('Prior context items received:', d['prior_context_check']['items_received']\\); print\\('Prior context resolved:', d['prior_context_check']['resolved']\\); print\\('Prior context declined_with_rationale:', d['prior_context_check']['declined_with_rationale']\\); print\\('Prior context unresolved:', d['prior_context_check']['unresolved']\\)\")",
+      "Bash(rm -v /workspaces/feature-pipeline/.claude/agents/probe-dispatch-test-r1.md /workspaces/feature-pipeline/.claude/agents/probe-dispatch-test-r2.md)",
+      "Bash(awk '/^## Test inventory/,/^## Per-test details/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)",
+      "Bash(awk '/^## Verification-layer summary/,/^## /' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)",
+      "Bash(awk '/^## Acceptance Test Cross-Reference/,/^## Estimation Methodology/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/plan-v1.md)",
+      "Bash(awk '/^## Acceptance Criteria/,/^## Existing Codebase Analysis/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/blueprint-v1.md)",
+      "Bash(awk '/^## AC coverage matrix/,/^## Verification-layer summary/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)",
+      "Bash(sed -n '999,1004p' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)",
+      "Bash(echo \"Total tests inventory rows: $\\(awk '/^## Test inventory/,/^## Per-test details/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/acceptance-tests.md)",
+      "Bash(sed -n '1,15p' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/plan-v1.md)",
+      "Bash(awk '/^## Update History/,/^$/' /workspaces/feature-pipeline/working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/plan-v1.md)",
+      "WebFetch(domain:www.morphllm.com)",
+      "WebFetch(domain:claudefa.st)",
+      "WebFetch(domain:hub.stabilarity.com)",
+      "WebFetch(domain:www.newsletter.swirlai.com)",
+      "WebFetch(domain:blog.logrocket.com)",
+      "Bash(python3 -c ' *)",
+      "Bash(sed -n '96,135p' /workspaces/feature-pipeline/.claude/skills/recipe-feature-pipeline/SKILL.md)",
+      "Edit(/.claude/skills/recipe-feature-pipeline/**)",
+      "Bash(echo \"=== ADR-0034 count \\(must be 0\\) ===\" && grep -c \"ADR-0034\" .claude/agents/execute-finalize-reconciler.md && echo \"=== ADR-0033 count \\(must be >= 3\\) ===\" && grep -c \"ADR-0033\" .claude/agents/execute-finalize-reconciler.md && echo \"=== Agent in frontmatter check ===\" && sed -n '/^---$/,/^---$/p' .claude/agents/execute-finalize-reconciler.md | head -20 | grep -q \"Agent\" && echo \"FAIL: Agent still in frontmatter\" || echo \"PASS: Agent not in frontmatter\" && echo \"=== dispatch_directives present \\(must exist\\) ===\" && grep -c \"dispatch_directives\" .claude/agents/execute-finalize-reconciler.md)",
+      "Edit(/.claude/skills/KB-documentation-criteria/**)",
+      "Bash(python3 -c \"import json; data=json.load\\(open\\('/workspaces/feature-pipeline/working/feature/execution-pipeline-design-r1/tasks.json'\\)\\); tasks=[t for t in data.get\\('tasks', data\\) if isinstance\\(data, list\\) or True]; print\\(type\\(data\\)\\)\")",
+      "Edit(/.claude/skills/auditing-subagents/**)",
+      "Bash(python3 -c \"import json; t=json.load\\(open\\('working/feature/synthetic-test-feature-T6/tasks.json'\\)\\); print\\('tasks:', len\\(t['tasks']\\)\\)\")",
+      "Bash(python3 .claude/skills/auditing-cc-configs/scripts/audit_project.py /workspaces/feature-pipeline --json)"
+    ],
+    "additionalDirectories": [
+      "/workspaces/feature-pipeline/.claude/agents"
     ]
   }
 }
