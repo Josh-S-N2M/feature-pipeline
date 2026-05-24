@@ -235,3 +235,41 @@ This is the exact failure mode this analysis predicted in §1.
 
 **The 26 ADRs at canonical `adrs/` (0011–0036) plus the 12 feature-scoped ADRs (in 5 features' working dirs) form the steady-state inventory this follow-up feature must reconcile.**
 
+---
+
+## 10. Update from `execute-orchestrator-dispatch-mechanism-repair-r1` run (2026-05-24)
+
+The pipeline run for `execute-orchestrator-dispatch-mechanism-repair-r1` exercised the inverse placement disposition: the user ratified ADR-0036-canonical (root `adrs/` only, no feature-scoped copy) at the feature's Gate-7 ADR-placement question, and design-composer wrote ADR-0044 and ADR-0045 to `/workspaces/feature-pipeline/adrs/` directly.
+
+**What this run revealed that this analysis (authored 2026-05-23) did not fully capture:**
+
+1. **The deliverable-archive-spec is in fact fully amended per ADR-0036.** `KB-documentation-criteria/references/deliverable-archive-spec.md` §"ADR placement convention" (lines 136–150) + §"Patterns and anti-patterns" Pattern (line 162) are unambiguous: "ADRs live in exactly one canonical location" + "Do NOT create feature-scoped duplicate copies." Pre-ADR-0036 archives with feature-scoped `adrs/` directories are explicitly grandfathered ("validator ignores those directories; presence or absence is not a finding"). The analysis's §2.3 framing that "Both compliance paths fail" was therefore overstated — the canonical-only path is fully spec-conformant.
+
+2. **The packager AGENT showed runtime discretion to defer to the spec.** When `finalize-deliverable-packager` ran for this feature, it read the current spec, recognized the amendment, and PASSED the canonical-only placement (verdict: PASS; 25/25 artifacts present; 0 BLOCKER). The packager's status report explicitly noted: "the current spec ... is fully amended per ADR-0036 ... No dual-location requirement remains."
+
+3. **The agent FILE TEXTS still carry the unamended check.** `.claude/agents/finalize-deliverable-packager.md` lines 56–63 + `.claude/agents/shared-document-reviewer.md` line 349 still contain the retired dual-location BLOCKER check (as this analysis correctly observed). The reviewer file even contradicts itself (line 349 vs. line 472 — both retired-check AND amended-check coexist). So the partial-amendment framing remains technically correct for the file texts, but the practical effect (Gate-6 BLOCKER firing on every run) is mitigated by the packager agent's runtime discretion to defer to the spec — which is fragile (it depends on the packager actually reading the spec each run).
+
+4. **The orchestrator + design-composer default behavior is still un-amended.** When `output_adrs_dir` is not explicitly overridden by the parent orchestrator, the convention default still computes to `working/feature/<slug>/adrs/` (feature-scoped). This run worked only because the parent orchestrator explicitly passed `output_adrs_dir=/workspaces/feature-pipeline/adrs/` after the user's Gate-7 ratification. Without the explicit override, the next feature run would write to feature-scoped again — and then trigger the original devcontainer-mcp-provisioning-r1 BLOCKER (canonical-required-but-absent).
+
+### Re-scope of the proposed follow-on feature
+
+Based on the above, the follow-on feature **`adr-placement-mechanism-repair-r1`** is SMALLER than this analysis (and the devcontainer-mcp-provisioning-r1 Gate-6 disposition) originally framed:
+
+| Original §6 framing | Revised scope (post-2026-05-24) |
+|---|---|
+| 4 operator files need amendment | 2 operator file TEXTS need amendment: `finalize-deliverable-packager.md:56–63` + `shared-document-reviewer.md:349` (delete the retired dual-location BLOCKER text). Spec already amended. |
+| Need to author a promotion mechanism | NOT needed. Canonical-only is the chosen end-state per ADR-0036; no promotion mechanism exists or should exist. |
+| Need to migrate existing feature-scoped ADRs to canonical | OPTIONAL hygiene; not blocking. The spec grandfathers pre-amendment archives. |
+| Need orchestrator + design-composer default change | Yes — change the default for `output_adrs_dir` from feature-scoped to canonical-root. Surgical (1-2 lines in `recipe-feature-pipeline/SKILL.md` + matching default in `design-composer.md`). |
+
+**Revised scope_class for the follow-on:** MINOR (was previously framed as FULL). Estimated 4–6 hours of work, not the 2–3 days originally implied by the FULL framing.
+
+### Updated outstanding gap
+
+The single sentence summary of the remaining gap as of 2026-05-24:
+
+> The deliverable-archive spec is amended per ADR-0036; the packager agent has runtime discretion to defer to the spec; but the packager + reviewer agent FILE TEXTS still contain retired dual-location check prose that should be deleted, and orchestrator + design-composer defaults for `output_adrs_dir` should change from feature-scoped to canonical-root so future runs don't depend on explicit operator override.
+
+This is materially smaller than the original §6 framing. The `execute-orchestrator-dispatch-mechanism-repair-r1` run is the empirical demonstration: a feature can ship cleanly through Gate 6 with canonical-only ADRs today, provided the operator explicitly opts into ADR-0036 disposition at Gate 7.
+
+
