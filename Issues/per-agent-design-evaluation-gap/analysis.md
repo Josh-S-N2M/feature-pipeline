@@ -1,7 +1,9 @@
 ---
 id: ANALYSIS-per-agent-design-evaluation-gap
-doc_type: analysis
-status: draft
+doc_type: issue-analysis
+status: open
+since: 2026-05-23
+version: 0.1.0
 generated: 2026-05-23
 generated_by: claude (orchestrator) — manual analysis from feature artifacts
 feature_slug: devcontainer-mcp-provisioning-r1

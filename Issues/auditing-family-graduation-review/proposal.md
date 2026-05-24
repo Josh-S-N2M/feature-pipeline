@@ -1,7 +1,9 @@
 ---
 id: PROPOSAL-auditing-family-graduation-review
-doc_type: proposal
-status: draft
+doc_type: issue-proposal
+status: open
+since: 2026-05-23
+version: 0.1.0
 generated: 2026-05-23
 generated_by: claude (orchestrator) — captured from Gate-4 decision in devcontainer-mcp-provisioning-r1
 feature_slug: devcontainer-mcp-provisioning-r1

@@ -1,7 +1,9 @@
 ---
 id: REGISTER-devcontainer-mcp-provisioning-r1-deferrals
-doc_type: deferral-register
-status: draft
+doc_type: issue-register
+version: 0.1.0
+status: open
+since: 2026-05-23
 generated: 2026-05-23
 generated_by: claude (orchestrator) — pre-Gate-4 deferral sweep
 feature_slug: devcontainer-mcp-provisioning-r1
