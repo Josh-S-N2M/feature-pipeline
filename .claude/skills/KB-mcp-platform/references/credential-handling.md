@@ -12,7 +12,7 @@ Credentials enter `.mcp.json` ONLY via env-block indirection. The shape:
 {
   "mcpServers": {
     "context7": {
-      "transport": "http",
+      "type": "http",
       "url": "https://mcp.context7.com/mcp",
       "headers": { "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}" }
     }
@@ -21,6 +21,8 @@ Credentials enter `.mcp.json` ONLY via env-block indirection. The shape:
 ```
 
 The env-var name (`CONTEXT7_API_KEY`) appears literally in `.mcp.json`. The actual value is sourced from `containerEnv` (devcontainer.json) which in turn sources from Codespaces secrets via `${localEnv:CONTEXT7_API_KEY}`.
+
+**Schema note (cycle-3 D-3.2-completion + Phase 5 post-rebuild correction):** Claude Code's `.mcp.json` schema uses the field name **`type`** for HTTP/SSE servers (not `transport`). The CLI flag is `--transport http` — that's the flag name. The serialized file format uses `type`. Earlier drafts of this template used `transport` and were silently rejected by Claude Code's MCP loader. Verify with `claude mcp add --transport http <name> <url> --scope project` in a scratch directory and inspecting the resulting `.mcp.json` — the serialized form is `"type": "http"`.
 
 ## Anti-patterns the auditor flags
 
@@ -32,7 +34,7 @@ The env-var name (`CONTEXT7_API_KEY`) appears literally in `.mcp.json`. The actu
 {
   "mcpServers": {
     "context7": {
-      "transport": "http",
+      "type": "http",
       "url": "https://mcp.context7.com/mcp?apiKey=sk-...REPLACED...",
       "headers": {}
     }

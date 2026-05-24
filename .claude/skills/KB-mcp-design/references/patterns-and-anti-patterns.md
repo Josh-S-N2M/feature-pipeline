@@ -12,7 +12,7 @@ Pattern catalog (✓) + anti-pattern catalog (✗) for MCP layer design. Authore
 {
   "mcpServers": {
     "context7": {
-      "transport": "http",
+      "type": "http",
       "url": "https://mcp.context7.com/mcp",
       "headers": { "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}" }
     }
@@ -21,6 +21,8 @@ Pattern catalog (✓) + anti-pattern catalog (✗) for MCP layer design. Authore
 ```
 
 The env-var name appears literally; the actual value comes from `containerEnv` (devcontainer.json) → `${localEnv:CONTEXT7_API_KEY}` → Codespaces secret. Per ADR-0039.
+
+**Schema note (post-Phase-5 correction):** Claude Code's `.mcp.json` schema uses **`type`** (not `transport`) for HTTP/SSE servers. `--transport` is the CLI flag name; the serialized file format uses `type`. Earlier drafts of this reference used `transport` and were silently rejected by Claude Code's MCP loader. Verify with `claude mcp add --transport http <name> <url> --scope project` in a scratch directory and inspecting the resulting `.mcp.json` — the serialized form is `"type": "http"`.
 
 ### Narrowed per-tool allowlist
 
@@ -80,7 +82,7 @@ Plus `mcp-events.jsonl` records emit `primary_degraded: true` + `fallback_invoke
 {
   "mcpServers": {
     "context7": {
-      "transport": "http",
+      "type": "http",
       "url": "https://mcp.context7.com/mcp?apiKey=sk-...REPLACED...",
       "headers": {}
     }
