@@ -35,3 +35,10 @@ Thumbs.db
 # Per Q-CC-4 + AC-NFR-7-a: runtime audit trail, regenerated each session,
 # not committable signal.
 .claude/logs/*.jsonl
+
+# Serena MCP server's per-developer state. Honors .serena/.gitignore (which
+# lists /cache and /project.local.yml as ignored). .serena/project.yml IS
+# committed — it's the versioned project config. .serena/memories/ is also
+# committed when populated (project-scoped Serena memories).
+.serena/cache/
+.serena/project.local.yml
