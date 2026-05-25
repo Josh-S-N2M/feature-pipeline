@@ -1,9 +1,9 @@
 ---
 id: ADR-0014
-version: 1.0.0
+version: 2.0.0
 status: Accepted
-generated: 2026-05-12
-generated_by: synth-designer (new ADR for blueprint v4)
+generated: 2026-05-19
+generated_by: finalize-reconciler (v4.3.0 naming-convention retroactive update per ADR-0019)
 supersedes: []
 adrs_inherited:
   - ADR-0005 (append-only supersession)
@@ -12,6 +12,8 @@ applies_to:
   - feature-pipeline (blueprint v4, forthcoming)
   - retroactive: ADRs 0001 through 0010 in this pipeline's design conversation
 template_format: per ADR.txt v1.0 (this ADR is itself authored in the template)
+superseded_by_consolidation: 2026-05-25
+superseded_canonical_archived_to: adrs/superseded/ADR-0014-pre-consolidation-canonical.md
 ---
 
 # ADR-0014: Adoption of the uploaded ADR template + retroactive migration of ADRs 0001-0010
@@ -35,15 +37,15 @@ Per Q-v4-5 Option A (user-confirmed): retroactively migrate all existing ADRs to
 
 ## Decision
 
-Adopt the uploaded ADR template as the canonical structure for all ADRs produced by the pipeline going forward. Retroactively migrate the 11 existing ADR files (0001 through 0010, plus ADR-0007 v1 which is superseded but preserved per ADR-0005) to the new template structure. The template lives in `documentation-criteria` per ADR-0011.
+Adopt the uploaded ADR template as the canonical structure for all ADRs produced by the pipeline going forward. Retroactively migrate the 11 existing ADR files (0001 through 0010, plus ADR-0007 v1 which is superseded but preserved per ADR-0005) to the new template structure. The template lives in `KB-documentation-criteria` per ADR-0011.
 
 ## Decision Details
 
 | Item | Content |
 |---|---|
 | Decision | All ADRs use the uploaded template structure. Existing ADRs 0001-0010 (11 files) are retroactively migrated. New ADRs 0011-0018 are authored in the template from the start. |
-| Why now | Adopting the template before blueprint v4 ensures every ADR v4 inherits is in the canonical structure. Migrating existing ADRs in the same batch avoids hybrid format states that complicate document-reviewer's ADR review (doc_type: ADR). |
-| Why this | The template's `Decision Details` fields (especially `Kill criteria`) and separate `Architecture Impact` section provide structured surfaces that document-reviewer can validate; existing ADR format requires per-ADR judgment of where content sits. The structured form is materially better for AI-driven review (claim C-R3-0023: template conformance enabled by application-layer enforcement). |
+| Why now | Adopting the template before blueprint v4 ensures every ADR v4 inherits is in the canonical structure. Migrating existing ADRs in the same batch avoids hybrid format states that complicate shared-document-reviewer's ADR review (doc_type: ADR). |
+| Why this | The template's `Decision Details` fields (especially `Kill criteria`) and separate `Architecture Impact` section provide structured surfaces that shared-document-reviewer can validate; existing ADR format requires per-ADR judgment of where content sits. The structured form is materially better for AI-driven review (claim C-R3-0023: template conformance enabled by application-layer enforcement). |
 | Known unknowns | Whether all 11 existing ADRs have content that meaningfully maps to `Kill criteria` (some decisions may not have a clear reversal signal — e.g., ADR-0005's append-only invariant is foundational and reversal would require redesigning the pipeline). For such ADRs, `Kill criteria` will be authored as "Not applicable — foundational invariant; reversal requires whole-pipeline redesign." |
 | Kill criteria | If retroactive migration produces ADRs where 50%+ of the template fields are placeholder content ("Not applicable" or "TBD"), the template is over-engineered for our decision shape and a slimmer template should supersede this one. |
 
@@ -57,7 +59,7 @@ Structural ADRs pay specific dividends in this pipeline:
 
 (3) The `Why now` field prevents premature decisions. Decisions made because "it seemed good at the time" but with no timing rationale tend to be the first to bit-rot.
 
-(4) Architecture Impact as a separate section makes blast-radius explicit and reviewable, complementing the synth-architecture-auditor's analysis.
+(4) Architecture Impact as a separate section makes blast-radius explicit and reviewable, complementing the review-architecture-auditor's analysis.
 
 The migration cost is one-time. The structural benefit is permanent.
 
@@ -65,7 +67,7 @@ The migration cost is one-time. The structural benefit is permanent.
 
 **Option 1: New ADRs only (forward-only adoption).** ADRs 0011-0018 use the new template; 0001-0010 grandfathered with their current structure.
 - Pros: no migration work; existing artifacts unchanged.
-- Cons: hybrid format in the same pipeline's ADR set; document-reviewer must support multiple structures; ADR cross-references are weakened when target ADR has different fields than source.
+- Cons: hybrid format in the same pipeline's ADR set; shared-document-reviewer must support multiple structures; ADR cross-references are weakened when target ADR has different fields than source.
 
 **Option 2: Full migration including content rewrite.** Rewrite all 11 existing ADRs from scratch using the new template, with original content reorganized + new fields populated.
 - Pros: complete consistency; every ADR has all template fields.
@@ -82,7 +84,7 @@ The migration cost is one-time. The structural benefit is permanent.
 - All ADRs in the pipeline are structurally consistent.
 - Document-reviewer's `doc_type: ADR` Gate 0 check has a fixed required-element target.
 - Kill criteria field forces explicit articulation of reversal signals — improves long-term decision quality.
-- Architecture Impact section makes blast-radius reviewable per ADR independently of synth-architecture-auditor analysis.
+- Architecture Impact section makes blast-radius reviewable per ADR independently of review-architecture-auditor analysis.
 - New contributors learn one ADR format, not two.
 
 ### Negative Consequences
@@ -98,15 +100,15 @@ The migration cost is one-time. The structural benefit is permanent.
 ## Architecture Impact
 
 **Components that change:**
-- `documentation-criteria`: extended with ADR template (per ADR-0011).
+- `KB-documentation-criteria`: extended with ADR template (per ADR-0011).
 - All existing ADR files (0001-0010, plus ADR-0007 v1): retroactive migration produces new versions in the canonical template structure.
 - ADRs added in v4 (0011-0018, this ADR being one of them): authored directly in the canonical template.
-- synth-reconcile: when producing new ADRs during resolution loops, must use the canonical template.
-- synth-designer-composer (per ADR-0016): when introducing new ADRs at Stage 5b, must use the canonical template.
-- document-reviewer: `doc_type: ADR` Gate 0 verifies presence of template's required sections (Status, Context, Decision, Decision Details with 4 rows, Rationale, Options Considered, Consequences with 3 sub-sections, Architecture Impact, Implementation Guidance, Related Information).
+- finalize-reconciler: when producing new ADRs during resolution loops, must use the canonical template.
+- design-composer (per ADR-0016): when introducing new ADRs at Stage 5b, must use the canonical template.
+- shared-document-reviewer: `doc_type: ADR` Gate 0 verifies presence of template's required sections (Status, Context, Decision, Decision Details with 4 rows, Rationale, Options Considered, Consequences with 3 sub-sections, Architecture Impact, Implementation Guidance, Related Information).
 
 **New dependencies introduced:**
-- None new; ADR structure depends on `documentation-criteria` skill which is already a pipeline dependency.
+- None new; ADR structure depends on `KB-documentation-criteria` skill which is already a pipeline dependency.
 
 **Architectural constraints added:**
 - All ADRs MUST follow the canonical template structure.
@@ -135,7 +137,11 @@ For new ADRs (0011-0018, this one included):
 ## Related Information
 
 - User-provided template: ADR.txt (uploaded; canonical from this ADR forward).
-- ADR-0011: template lives in `documentation-criteria`.
+- ADR-0011: template lives in `KB-documentation-criteria`.
 - ADR-0005: append-only supersession applies to ADR migration — original ADR versions preserved.
-- ADR-0017 (forthcoming): document-reviewer's `doc_type: ADR` Gate 0 check operates against this template's required-element list.
-- Claim C-R3-0023: template conformance requires application-layer enforcement; the document-reviewer provides this.
+- ADR-0017 (forthcoming): shared-document-reviewer's `doc_type: ADR` Gate 0 check operates against this template's required-element list.
+- Claim C-R3-0023: template conformance requires application-layer enforcement; the shared-document-reviewer provides this.
+
+## v4.3.0 retroactive naming-convention update
+
+Per ADR-0019, all sub-agent, knowledge skill, and orchestrator skill references in this ADR have been updated to the v4.3.0 naming convention (phase-prefixed sub-agents, KB-prefixed knowledge skills, recipe-prefixed orchestrator, shared-prefixed cross-phase sub-agents). The pre-update version is preserved at `ADR-0014-adr-template-adoption-and-migration-pre-naming-convention.md`. The decision recorded in this ADR is unchanged; only entity names are updated for cross-document consistency.

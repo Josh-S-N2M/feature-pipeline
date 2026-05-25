@@ -169,3 +169,6 @@ The composer-only ADR authorship (Q-v4-8) is the right discipline: ADRs are cros
 - Claims C-R3-0007 through C-R3-0013: fan-out-fan-in patterns, consistency gap, dependency resolution patterns.
 - Claim C-R3-0030: production tradeoffs (Barnacle chose sequential over parallel for cost predictability) — informs our kill criteria.
 - User-confirmed: Q-v4-3 inverted (fan-out then fan-in), Q-v4-8 (composer-only ADR authorship), Q-v4-9 (9 per-layer designers), Q-v4-10 (assumption-based cross-layer resolution).
+
+---
+**Provenance footer (added by T2d.2):** Archived from canonical `adrs/ADR-0016-per-layer-fanout-composer-fanin.md` during adr-placement-mechanism-repair-r1 Phase 2d (sub-procedure ii — archive-wins consolidation per ADR-0055 v1.0.1). The archive version from `adrs-migrated/ADR-0016-per-layer-fanout-composer-fanin.md` is the new canonical. See git log for full provenance.

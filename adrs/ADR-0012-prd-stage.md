@@ -1,9 +1,9 @@
 ---
 id: ADR-0012
-version: 1.0.0
+version: 2.0.0
 status: Accepted
-generated: 2026-05-12
-generated_by: synth-designer (new ADR for blueprint v4)
+generated: 2026-05-19
+generated_by: finalize-reconciler (v4.3.0 naming-convention retroactive update per ADR-0019)
 supersedes: []
 adrs_inherited:
   - ADR-0001 (orchestrator placement)
@@ -12,9 +12,11 @@ adrs_inherited:
 applies_to:
   - feature-pipeline (blueprint v4, forthcoming)
 template_format: per ADR.txt v1.0
+superseded_by_consolidation: 2026-05-25
+superseded_canonical_archived_to: adrs/superseded/ADR-0012-pre-consolidation-canonical.md
 ---
 
-# ADR-0012: PRD generation as Stage 1.5 with single sub-agent (synth-prd-author)
+# ADR-0012: PRD generation as Stage 1.5 with single sub-agent (intake-prd-author)
 
 ## Status
 
@@ -30,17 +32,17 @@ Research planning benefits materially from having a structured PRD as input rath
 
 ## Decision
 
-Insert a new pipeline stage between Intent Clarification (Stage 1) and Research Planning (Stage 2): Stage 1.5 — PRD Generation. A single sub-agent (`synth-prd-author`) consumes the Intent Clarification document and produces a PRD following the canonical PRD template (sourced from `documentation-criteria` per ADR-0011). A new human gate, PRD Approval, fires after document-reviewer review of the PRD.
+Insert a new pipeline stage between Intent Clarification (Stage 1) and Research Planning (Stage 2): Stage 1.5 — PRD Generation. A single sub-agent (`intake-prd-author`) consumes the Intent Clarification document and produces a PRD following the canonical PRD template (sourced from `KB-documentation-criteria` per ADR-0011). A new human gate, PRD Approval, fires after shared-document-reviewer review of the PRD.
 
 ## Decision Details
 
 | Item | Content |
 |---|---|
-| Decision | Single sub-agent `synth-prd-author` produces the PRD as a coherent document; not fan-out across stakeholder perspectives. |
+| Decision | Single sub-agent `intake-prd-author` produces the PRD as a coherent document; not fan-out across stakeholder perspectives. |
 | Why now | Adding PRD as a separate stage before research planning is the right time to commit to a single-author topology, before downstream stages depend on a different shape. |
 | Why this | PRDs require unified voice across stakeholder sections — stakeholder enumeration and cross-cutting policy decisions are coherent only when authored together. Fan-out across stakeholder perspectives would force a composer to reconcile voice, terminology, and emphasis without obvious gain (claim C-R3-0015: AI quality on user stories is HIGH; the issue is over-generation not under-coverage). |
-| Known unknowns | Whether PRDs for very large multi-stakeholder features (5+ distinct stakeholder groups) will hit synth-prd-author's context limits; whether the single-author topology will need re-evaluation if practical experience shows specific stakeholder sections being consistently underdeveloped. |
-| Kill criteria | If 3+ consecutive feature runs produce PRDs where document-reviewer issues `important` or `critical` issues for missing stakeholder coverage despite the stakeholder being identified, supersede with a stakeholder-fan-out design. |
+| Known unknowns | Whether PRDs for very large multi-stakeholder features (5+ distinct stakeholder groups) will hit intake-prd-author's context limits; whether the single-author topology will need re-evaluation if practical experience shows specific stakeholder sections being consistently underdeveloped. |
+| Kill criteria | If 3+ consecutive feature runs produce PRDs where shared-document-reviewer issues `important` or `critical` issues for missing stakeholder coverage despite the stakeholder being identified, supersede with a stakeholder-fan-out design. |
 
 ## Rationale
 
@@ -60,12 +62,12 @@ The single-author approach trades depth-per-stakeholder for unified voice and re
 - Pros: each stakeholder section gets focused attention; per-stakeholder context isolation.
 - Cons: PRDs have substantial cross-cutting content (Layer Scope, Product Policy Decisions, Success Criteria, Rollout Plan) that doesn't map to stakeholders; voice inconsistency requires composer reconciliation; over-generation per claim C-R3-0017 multiplies.
 
-**Option 2: Two-pass single-author.** synth-prd-author writes a draft, then a second invocation refines based on document-reviewer feedback.
+**Option 2: Two-pass single-author.** intake-prd-author writes a draft, then a second invocation refines based on shared-document-reviewer feedback.
 - Pros: bounded refinement loop with explicit improvement target.
-- Cons: this is already captured by the document-reviewer iteration discipline (ADR-0017 forthcoming) — adding explicit two-pass scheduling duplicates that mechanism.
+- Cons: this is already captured by the shared-document-reviewer iteration discipline (ADR-0017 forthcoming) — adding explicit two-pass scheduling duplicates that mechanism.
 
-**Option 3 (Selected): Single sub-agent (synth-prd-author) producing the full PRD in one invocation.**
-- Pros: unified voice; minimal coordination overhead; matches AI-quality profile per claim C-R3-0015; document-reviewer catches under-coverage post-hoc; aligns with production-validated pattern from Microsoft Conductor (single author, parallel reviewers).
+**Option 3 (Selected): Single sub-agent (intake-prd-author) producing the full PRD in one invocation.**
+- Pros: unified voice; minimal coordination overhead; matches AI-quality profile per claim C-R3-0015; shared-document-reviewer catches under-coverage post-hoc; aligns with production-validated pattern from Microsoft Conductor (single author, parallel reviewers).
 - Cons: very large multi-stakeholder features may stress context budget; less depth per stakeholder section than fan-out would produce.
 
 ## Consequences
@@ -75,14 +77,14 @@ The single-author approach trades depth-per-stakeholder for unified voice and re
 - Single authorial voice across the PRD.
 - Reduced coordination overhead vs fan-out (no composer step needed at Stage 1.5).
 - Pipeline shape stays linear at the PRD stage; only Stage 5 (Design) uses fan-out per Q-v4-3 inverted.
-- prd-authoring-knowledge can teach the full PRD template structure to one agent rather than coordinating multiple per-stakeholder skills.
-- AI-PRD failure modes (claim C-R3-0014) are addressed in one place via prd-authoring-knowledge content guidance.
+- KB-documentation-criteria can teach the full PRD template structure to one agent rather than coordinating multiple per-stakeholder skills.
+- AI-PRD failure modes (claim C-R3-0014) are addressed in one place via KB-documentation-criteria content guidance.
 
 ### Negative Consequences
 
-- For features with 5+ stakeholder groups, synth-prd-author may produce under-detailed per-stakeholder sections. document-reviewer's "stakeholder coverage gaps" check (extension of its existing completeness analysis) is the mitigation; not preventive.
-- Single agent owning all PRD content means a single failure point — if synth-prd-author hallucinates, the entire PRD is suspect rather than just one section.
-- maxTurns budget for synth-prd-author needs to be generous (recommendation: 50, matching synth-designer) to allow multi-section authoring without truncation.
+- For features with 5+ stakeholder groups, intake-prd-author may produce under-detailed per-stakeholder sections. shared-document-reviewer's "stakeholder coverage gaps" check (extension of its existing completeness analysis) is the mitigation; not preventive.
+- Single agent owning all PRD content means a single failure point — if intake-prd-author hallucinates, the entire PRD is suspect rather than just one section.
+- maxTurns budget for intake-prd-author needs to be generous (recommendation: 50, matching synth-designer) to allow multi-section authoring without truncation.
 
 ### Neutral Consequences
 
@@ -92,36 +94,40 @@ The single-author approach trades depth-per-stakeholder for unified voice and re
 
 **Components that change:**
 - Pipeline topology gains Stage 1.5 between Stage 1 and Stage 2.
-- Sub-agent inventory adds `synth-prd-author`.
-- Knowledge skill inventory adds `prd-authoring-knowledge`.
-- Human-gate inventory adds **PRD Approval Gate** (after document-reviewer review of the PRD).
+- Sub-agent inventory adds `intake-prd-author`.
+- Knowledge skill inventory adds `KB-documentation-criteria`.
+- Human-gate inventory adds **PRD Approval Gate** (after shared-document-reviewer review of the PRD).
 - Research planner (Stage 2) input changes: now consumes the approved PRD rather than the Intent Clarification document.
 
 **New dependencies introduced:**
-- `synth-prd-author` depends on `documentation-criteria` (for PRD template) and `prd-authoring-knowledge` (for process guidance).
+- `intake-prd-author` depends on `KB-documentation-criteria` (for PRD template) and `KB-documentation-criteria` (for process guidance).
 - Stage 2 (Research Planning) depends on Stage 1.5's approved PRD output.
 
 **Architectural constraints added:**
 - Stage 2 (Research Planning) MUST NOT begin until PRD Approval Gate clears.
-- synth-prd-author MUST produce the PRD as a single markdown document per the canonical template.
-- document-reviewer MUST run on the PRD before the PRD Approval Gate fires (per ADR-0017).
+- intake-prd-author MUST produce the PRD as a single markdown document per the canonical template.
+- shared-document-reviewer MUST run on the PRD before the PRD Approval Gate fires (per ADR-0017).
 
 **Architectural constraints removed:**
 - None. Prior gate structure preserved.
 
 ## Implementation Guidance
 
-- synth-prd-author's tools should be Read (clarified intent doc + manifest), Write (PRD output), AskUserQuestion (for clarification of business-level ambiguities that surface during PRD authoring).
+- intake-prd-author's tools should be Read (clarified intent doc + manifest), Write (PRD output), AskUserQuestion (for clarification of business-level ambiguities that surface during PRD authoring).
 - Memory: `project`.
 - maxTurns: 50.
-- synth-prd-author should NOT have Agent tool (recursion-safe; cannot spawn sub-agents).
-- prd-authoring-knowledge should include explicit guidance on AI-PRD failure modes (claim C-R3-0014): never fabricate customer reactions; specify exact dimensions only with rationale; do not include implementation suggestions; do not over-generate user stories (target 3-4 per stakeholder for MVP).
+- intake-prd-author should NOT have Agent tool (recursion-safe; cannot spawn sub-agents).
+- KB-documentation-criteria should include explicit guidance on AI-PRD failure modes (claim C-R3-0014): never fabricate customer reactions; specify exact dimensions only with rationale; do not include implementation suggestions; do not over-generate user stories (target 3-4 per stakeholder for MVP).
 - The PRD Approval Gate uses AskUserQuestion with options: `approve / refine / cancel` with text-input for refinement direction.
 
 ## Related Information
 
-- ADR-0011 (canonical document skill): PRD template lives in `documentation-criteria`.
-- ADR-0017 (forthcoming): document-reviewer integration — reviews PRD at Stage 1.5 completion.
+- ADR-0011 (canonical document skill): PRD template lives in `KB-documentation-criteria`.
+- ADR-0017 (forthcoming): shared-document-reviewer integration — reviews PRD at Stage 1.5 completion.
 - ADR-0009 (rationale brief): orchestrator generates brief at Stage 1 → Stage 1.5 handoff and at Stage 1.5 → Stage 2 handoff.
 - Claims C-R3-0014, C-R3-0015, C-R3-0016, C-R3-0017: AI PRD failure modes and quality profile.
 - User-provided template: PDR.txt (uploaded; adopted as canonical PRD template via ADR-0011).
+
+## v4.3.0 retroactive naming-convention update
+
+Per ADR-0019, all sub-agent, knowledge skill, and orchestrator skill references in this ADR have been updated to the v4.3.0 naming convention (phase-prefixed sub-agents, KB-prefixed knowledge skills, recipe-prefixed orchestrator, shared-prefixed cross-phase sub-agents). The pre-update version is preserved at `ADR-0012-prd-stage-pre-naming-convention.md`. The decision recorded in this ADR is unchanged; only entity names are updated for cross-document consistency.

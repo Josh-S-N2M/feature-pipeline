@@ -142,3 +142,6 @@ The template's risk is over-engineering for narrow features. Mitigated by the `N
 - ADR-0017: document-reviewer uses template structure for `doc_type: DesignDoc` Gate 0 checks.
 - ADR-0018: synth-codebase-researcher output schema — populates the Fact Disposition Table.
 - Claim C-R3-0023: template conformance for markdown documents requires application-layer enforcement (i.e., document-reviewer Gate 0).
+
+---
+**Provenance footer (added by T2d.2):** Archived from canonical `adrs/ADR-0013-blueprint-template-adoption.md` during adr-placement-mechanism-repair-r1 Phase 2d (sub-procedure ii — archive-wins consolidation per ADR-0055 v1.0.1). The archive version from `adrs-migrated/ADR-0013-blueprint-template-adoption.md` is the new canonical. See git log for full provenance.

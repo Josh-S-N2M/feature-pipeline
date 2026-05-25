@@ -139,3 +139,6 @@ For new ADRs (0011-0018, this one included):
 - ADR-0005: append-only supersession applies to ADR migration — original ADR versions preserved.
 - ADR-0017 (forthcoming): document-reviewer's `doc_type: ADR` Gate 0 check operates against this template's required-element list.
 - Claim C-R3-0023: template conformance requires application-layer enforcement; the document-reviewer provides this.
+
+---
+**Provenance footer (added by T2d.2):** Archived from canonical `adrs/ADR-0014-adr-template-adoption-and-migration.md` during adr-placement-mechanism-repair-r1 Phase 2d (sub-procedure ii — archive-wins consolidation per ADR-0055 v1.0.1). The archive version from `adrs-migrated/ADR-0014-adr-template-adoption-and-migration.md` is the new canonical. See git log for full provenance.

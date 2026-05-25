@@ -1,9 +1,9 @@
 ---
 id: ADR-0016
-version: 1.0.0
+version: 2.0.0
 status: Accepted
-generated: 2026-05-12
-generated_by: synth-designer (new ADR for blueprint v4)
+generated: 2026-05-19
+generated_by: finalize-reconciler (v4.3.0 naming-convention retroactive update per ADR-0019)
 supersedes: []
 adrs_inherited:
   - ADR-0001 (orchestrator placement)
@@ -13,6 +13,8 @@ adrs_inherited:
 applies_to:
   - feature-pipeline (blueprint v4, forthcoming)
 template_format: per ADR.txt v1.0
+superseded_by_consolidation: 2026-05-25
+superseded_canonical_archived_to: adrs/superseded/ADR-0016-pre-consolidation-canonical.md
 ---
 
 # ADR-0016: Per-layer fan-out + composer fan-in for Stage 5 (Design)
@@ -44,7 +46,7 @@ Stage 5 (Design) is split into Stage 5a (fan-out) and Stage 5b (fan-in):
 - Does NOT author ADRs; ADRs are composer-only (Q-v4-8)
 - Does NOT author cross-cutting sections (Overview, Design Summary, Background, Change Impact Map, etc.)
 
-**Stage 5b — Fan-in:** `synth-designer-composer` runs after Stage 5a completes. The composer:
+**Stage 5b — Fan-in:** `design-composer` runs after Stage 5a completes. The composer:
 - Receives all per-layer designer outputs as input
 - Authors the cross-cutting Blueprint sections (Overview, Design Summary YAML, Background, Architecture Overview, Data Flow top-level, Change Impact Map, Interface Change Matrix, Fact Disposition Table, top-level Components, Verification Strategy)
 - Resolves cross-layer dependencies surfaced by per-layer designers using evidence-based arbitration (claim C-R3-0013)
@@ -53,15 +55,15 @@ Stage 5 (Design) is split into Stage 5a (fan-out) and Stage 5b (fan-in):
 - Produces the final, integrated `05-blueprint-v1.md` artifact conforming to the Blueprint template
 
 The 9 potential per-layer designers (matching the Blueprint template's Layer Scope checklist):
-- `synth-designer-claude-code-fs`
-- `synth-designer-frontend`
-- `synth-designer-backend`
-- `synth-designer-api`
-- `synth-designer-query`
-- `synth-designer-database`
-- `synth-designer-cicd`
-- `synth-designer-iac`
-- `synth-designer-codespaces`
+- `design-claude-code`
+- `design-frontend`
+- `design-backend`
+- `design-api`
+- `design-query`
+- `design-database`
+- `design-cicd`
+- `design-iac`
+- `design-codespaces`
 
 ## Decision Details
 
@@ -130,15 +132,15 @@ The composer-only ADR authorship (Q-v4-8) is the right discipline: ADRs are cros
 
 **Components that change:**
 - Stage 5 topology: split into 5a (fan-out) and 5b (fan-in).
-- Sub-agent inventory: `synth-designer` (v3) removed; 9 new per-layer designers + `synth-designer-composer` added.
-- `design-knowledge` (v3): replaced with `design-composition-knowledge` (composer-only) and 9 per-layer `<layer>-design-knowledge` skills (or alternatively, the existing domain knowledge skills serve dual purpose with extended content covering blueprint-section authoring).
+- Sub-agent inventory: `synth-designer` (v3) removed; 9 new per-layer designers + `design-composer` added.
+- `design-knowledge` (v3): replaced with `KB-documentation-criteria` (composer-only) and 9 per-layer `<layer>-design-knowledge` skills (or alternatively, the existing domain knowledge skills serve dual purpose with extended content covering blueprint-section authoring).
 - Stage 5b output: still a single `05-blueprint-v1.md`; internal complexity (multiple authors) is invisible to downstream stages.
 - Stage 0 (Preflight): produces `00-feature-scope.json` with per-layer-designer activation flags (already in v3 plan; now load-bearing).
-- document-reviewer: receives a single blueprint document for review; no awareness of per-layer authoring required.
+- shared-document-reviewer: receives a single blueprint document for review; no awareness of per-layer authoring required.
 
 **New dependencies introduced:**
-- Each per-layer designer depends on its corresponding domain knowledge skill (from blueprint v3's stub-skill inventory) AND on `documentation-criteria` (for Blueprint template per ADR-0011).
-- `synth-designer-composer` depends on `design-composition-knowledge` (new), `documentation-criteria`, and the output artifacts of all activated per-layer designers.
+- Each per-layer designer depends on its corresponding domain knowledge skill (from blueprint v3's stub-skill inventory) AND on `KB-documentation-criteria` (for Blueprint template per ADR-0011).
+- `design-composer` depends on `KB-documentation-criteria` (new), `KB-documentation-criteria`, and the output artifacts of all activated per-layer designers.
 
 **Architectural constraints added:**
 - Per-layer designers MUST NOT write outside their assigned per-layer Design section.
@@ -153,11 +155,11 @@ The composer-only ADR authorship (Q-v4-8) is the right discipline: ADRs are cros
 ## Implementation Guidance
 
 - Each per-layer designer's tools: Read (rationale brief + PRD + relevant codebase analysis); Write (its per-layer Design section file). NO Agent tool (recursion-safe).
-- Per-layer designer skill loadout: `documentation-criteria`, `claude-code-filesystem-knowledge`, `general-coding-principles-knowledge`, and the layer-specific domain knowledge skill. 3-5 skills total per designer (per blueprint v3 §3.3 rule of thumb).
+- Per-layer designer skill loadout: `KB-documentation-criteria`, `KB-claude-code-platform`, `KB-general-coding-principles`, and the layer-specific domain knowledge skill. 3-5 skills total per designer (per blueprint v3 §3.3 rule of thumb).
 - Per-layer designer maxTurns: 40.
-- synth-designer-composer's tools: Read (all per-layer outputs + rationale brief + PRD); Write (full integrated blueprint). NO Agent tool.
-- synth-designer-composer skill loadout: `documentation-criteria`, `claude-code-filesystem-knowledge`, `design-composition-knowledge`, `general-coding-principles-knowledge`. Composer may also load relevant domain knowledge skills based on which cross-layer reconciliations are likely.
-- synth-designer-composer maxTurns: 60 (composer authors more content than any single per-layer designer).
+- design-composer's tools: Read (all per-layer outputs + rationale brief + PRD); Write (full integrated blueprint). NO Agent tool.
+- design-composer skill loadout: `KB-documentation-criteria`, `KB-claude-code-platform`, `KB-documentation-criteria`, `KB-general-coding-principles`. Composer may also load relevant domain knowledge skills based on which cross-layer reconciliations are likely.
+- design-composer maxTurns: 60 (composer authors more content than any single per-layer designer).
 - The `dependencies_on_other_layers` field shape: list of `{depends_on_layer: <layer>, assumption: <statement>, fallback_if_wrong: <action>}` entries.
 - Per the Blueprint template, mark per-layer sections corresponding to unchecked Layer Scope checkboxes as `N/A — out of scope`. Composer authors these section markers — per-layer designers for unchecked layers do not run.
 
@@ -165,7 +167,11 @@ The composer-only ADR authorship (Q-v4-8) is the right discipline: ADRs are cros
 
 - ADR-0013: Blueprint template adoption — per-layer Design sections map to per-layer designers.
 - ADR-0009: rationale brief — orchestrator generates once per stage handoff; provides entity canonicalization (claim C-R3-0013 pattern a) at fan-out.
-- ADR-0017 (forthcoming): document-reviewer integration — reviews the integrated blueprint, not per-layer outputs individually.
+- ADR-0017 (forthcoming): shared-document-reviewer integration — reviews the integrated blueprint, not per-layer outputs individually.
 - Claims C-R3-0007 through C-R3-0013: fan-out-fan-in patterns, consistency gap, dependency resolution patterns.
 - Claim C-R3-0030: production tradeoffs (Barnacle chose sequential over parallel for cost predictability) — informs our kill criteria.
 - User-confirmed: Q-v4-3 inverted (fan-out then fan-in), Q-v4-8 (composer-only ADR authorship), Q-v4-9 (9 per-layer designers), Q-v4-10 (assumption-based cross-layer resolution).
+
+## v4.3.0 retroactive naming-convention update
+
+Per ADR-0019, all sub-agent, knowledge skill, and orchestrator skill references in this ADR have been updated to the v4.3.0 naming convention (phase-prefixed sub-agents, KB-prefixed knowledge skills, recipe-prefixed orchestrator, shared-prefixed cross-phase sub-agents). The pre-update version is preserved at `ADR-0016-per-layer-fanout-composer-fanin-pre-naming-convention.md`. The decision recorded in this ADR is unchanged; only entity names are updated for cross-document consistency.

@@ -176,3 +176,6 @@ When document-reviewer surfaces issues:
 - ADR-0003: synth-cross-artifact-auditor still uses CMC + diff-mode + convergence discipline (renamed, not redefined).
 - ADR-0008: issues-ledger receives document-reviewer issues.
 - Claims C-R3-0024 (Microsoft Conductor) and C-R3-0026 (STOA Council): production references for multi-stage review composition.
+
+---
+**Provenance footer (added by T2d.2):** Archived from canonical `adrs/ADR-0017-document-reviewer-integration.md` during adr-placement-mechanism-repair-r1 Phase 2d (sub-procedure ii — archive-wins consolidation per ADR-0055 v1.0.1). The archive version from `adrs-migrated/ADR-0017-document-reviewer-integration.md` is the new canonical. See git log for full provenance.

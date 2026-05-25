@@ -1,9 +1,9 @@
 ---
 id: ADR-0015
-version: 2.0.0
+version: 1.0.0
 status: Accepted
-generated: 2026-05-19
-generated_by: finalize-reconciler (v4.3.0 naming-convention retroactive update per ADR-0019)
+generated: 2026-05-12
+generated_by: synth-designer (new ADR for blueprint v4)
 supersedes: []
 adrs_inherited:
   - ADR-0004 (test split — acceptance reads blueprint only)
@@ -37,7 +37,7 @@ All acceptance criteria produced by the pipeline (in PRD functional requirements
 | Item | Content |
 |---|---|
 | Decision | All acceptance criteria across PRD, Blueprint, and acceptance test artifacts use EARS format with the five canonical templates. No BDD (Given/When/Then), no freeform "the system should..." prose. |
-| Why now | Blueprint v4 introduces the canonical Blueprint template (ADR-0013) which specifies EARS format in the Acceptance Criteria section. Committing to EARS pipeline-wide ensures PRD acceptance criteria, Blueprint ACs, and test-acceptance-author outputs share one syntax. |
+| Why now | Blueprint v4 introduces the canonical Blueprint template (ADR-0013) which specifies EARS format in the Acceptance Criteria section. Committing to EARS pipeline-wide ensures PRD acceptance criteria, Blueprint ACs, and synth-acceptance-tester outputs share one syntax. |
 | Why this | EARS is industry-proven (15+ years, major adopters per claim C-R3-0002); Kiro's adoption (claim C-R3-0003) validates the format specifically for AI-driven workflows; structured keywords reduce ambiguity AI agents would otherwise resolve by assumption (claim C-R3-0006); maps cleanly to test types (When → event-driven test, If-then → branch coverage test, While → state condition test). |
 | Known unknowns | EARS is best for event-driven systems (claim C-R3-0005); for ubiquitous behaviors and purely mathematical/functional requirements, EARS may feel forced. The "Ubiquitous" template (no keyword) handles this, but the question of when to use Ubiquitous vs an explicit keyword is a judgment call. |
 | Kill criteria | If 30%+ of ACs across 3 consecutive feature runs use the Ubiquitous template (no keyword), the pipeline is producing ACs that don't benefit from EARS structure, and a hybrid format permitting BDD for non-event-driven behaviors should supersede this ADR. |
@@ -50,7 +50,7 @@ Three findings converge on strict EARS adoption:
 
 (2) **Mature industry adoption.** Claim C-R3-0002: 15+ years of production use across safety-critical industries (aerospace, automotive). The format works at scale; not a research artifact.
 
-(3) **Maps to test design.** The Blueprint template explicitly states the test-type mapping: When → event-driven test, While → state condition test, If-then → branch coverage test, Ubiquitous → basic functionality test. This gives test-acceptance-author a structured production path: each EARS AC becomes a specific test type.
+(3) **Maps to test design.** The Blueprint template explicitly states the test-type mapping: When → event-driven test, While → state condition test, If-then → branch coverage test, Ubiquitous → basic functionality test. This gives synth-acceptance-tester a structured production path: each EARS AC becomes a specific test type.
 
 The trade-off against BDD: BDD scenarios (Given/When/Then) are widely known and have richer expressive power for multi-step user flows. EARS focuses on system behavior — what the system shall do in response to triggers/states/conditions — which is a tighter scope. For our pipeline (architecting features, not exhaustively scripting user flows), EARS's tighter scope is the right level. BDD's strengths show in human-readable user stories — which is where they live, in PRD User Stories section, not Acceptance Criteria.
 
@@ -62,25 +62,25 @@ The trade-off against BDD: BDD scenarios (Given/When/Then) are widely known and 
 
 **Option 2: Hybrid — BDD for user-facing flows, EARS for system behavior, prose for everything else.**
 - Pros: format matches use case.
-- Cons: classification overhead per AC; format inconsistency makes structural validation harder; shared-document-reviewer Gate 0 check for AC format becomes "is it any of three formats" rather than "is it EARS."
+- Cons: classification overhead per AC; format inconsistency makes structural validation harder; document-reviewer Gate 0 check for AC format becomes "is it any of three formats" rather than "is it EARS."
 
 **Option 3 (Selected): Strict EARS across all AC artifacts.**
-- Pros: industry-proven for safety-critical and AI-driven workflows; structural enforcement via shared-document-reviewer Gate 0; tight mapping to test design; reduces AI assumption-making per claim C-R3-0006; matches user-provided Blueprint template structure.
+- Pros: industry-proven for safety-critical and AI-driven workflows; structural enforcement via document-reviewer Gate 0; tight mapping to test design; reduces AI assumption-making per claim C-R3-0006; matches user-provided Blueprint template structure.
 - Cons: ubiquitous (non-event) behaviors feel structurally forced; learning curve for contributors unfamiliar with EARS.
 
 ## Consequences
 
 ### Positive Consequences
 
-- AC format is structurally enforceable via shared-document-reviewer Gate 0 (validates `When`/`While`/`If-then` keyword usage or explicit Ubiquitous form).
-- test-acceptance-author has a defined production rule: each EARS AC maps to a specific test type per the Blueprint template's table.
+- AC format is structurally enforceable via document-reviewer Gate 0 (validates `When`/`While`/`If-then` keyword usage or explicit Ubiquitous form).
+- synth-acceptance-tester has a defined production rule: each EARS AC maps to a specific test type per the Blueprint template's table.
 - Cross-document consistency: PRD functional requirements ACs, blueprint Acceptance Criteria section, and acceptance test artifacts all use the same syntax.
 - Reduces AI assumption-making: per claim C-R3-0006, EARS's structured triggers force the author to make preconditions/triggers explicit.
 - Maps to the pipeline's failure-mode defense for wrong-assumption (MAST FM-2.2): when a critique finds the agent made an assumption the spec didn't license, the AC syntax shows whether the assumption is licensed by the AC's keyword structure.
 
 ### Negative Consequences
 
-- Contributors unfamiliar with EARS face a learning curve. Mitigated by `KB-documentation-criteria` and `KB-documentation-criteria` containing EARS examples and the canonical template references.
+- Contributors unfamiliar with EARS face a learning curve. Mitigated by `acceptance-testing-knowledge` and `prd-authoring-knowledge` containing EARS examples and the canonical template references.
 - Some behaviors (mathematical/functional requirements without triggers) are naturally Ubiquitous and may not benefit from EARS structure — they just become AC-prefixed statements. Acceptable but watches for the kill criterion (30%+ Ubiquitous as a signal).
 - ACs become longer than BDD equivalents in some cases due to explicit keyword usage. Acceptable trade-off for ambiguity reduction.
 
@@ -91,11 +91,11 @@ The trade-off against BDD: BDD scenarios (Given/When/Then) are widely known and 
 ## Architecture Impact
 
 **Components that change:**
-- `KB-documentation-criteria`: teaches EARS format for functional requirement acceptance criteria.
+- `prd-authoring-knowledge`: teaches EARS format for functional requirement acceptance criteria.
 - `design-knowledge` (per ADR-0013, taught via the Blueprint template): teaches EARS for blueprint Acceptance Criteria section.
-- `KB-documentation-criteria`: teaches mapping from EARS keyword to test type (`When` → event-driven test, etc.).
-- intake-prd-author, synth-designer (and per ADR-0016 per-layer designers + composer), test-acceptance-author: all instructed to produce EARS-format ACs.
-- shared-document-reviewer: `doc_type: PRD` and `doc_type: DesignDoc` Gate 1 quality checks validate EARS keyword usage in AC sections.
+- `acceptance-testing-knowledge`: teaches mapping from EARS keyword to test type (`When` → event-driven test, etc.).
+- synth-prd-author, synth-designer (and per ADR-0016 per-layer designers + composer), synth-acceptance-tester: all instructed to produce EARS-format ACs.
+- document-reviewer: `doc_type: PRD` and `doc_type: DesignDoc` Gate 1 quality checks validate EARS keyword usage in AC sections.
 
 **New dependencies introduced:**
 - None.
@@ -115,16 +115,15 @@ The trade-off against BDD: BDD scenarios (Given/When/Then) are widely known and 
 - When a behavior involves both state and trigger, combine: `While <state>, when <event>, the system shall <response>`.
 - Each AC should be testable in isolation. If an AC requires multi-step setup beyond what `While` or `Where` express, split it into multiple ACs or push the setup into separate state-establishment ACs.
 - Group ACs by layer when blueprint spans multiple layers (Blueprint template convention).
-- Reference: see `KB-documentation-criteria` → Templates → Blueprint → "Acceptance Criteria (AC) - EARS Format" section.
+- Reference: see `documentation-criteria` → Templates → Blueprint → "Acceptance Criteria (AC) - EARS Format" section.
 
 ## Related Information
 
 - User-provided template: BluePrint.txt (uploaded; specifies EARS in §"Acceptance Criteria (AC) - EARS Format").
 - ADR-0013: Blueprint template adoption — locks in EARS structure for blueprint ACs.
-- ADR-0017 (forthcoming): shared-document-reviewer Gate 1 quality checks include EARS keyword validation.
+- ADR-0017 (forthcoming): document-reviewer Gate 1 quality checks include EARS keyword validation.
 - Claims C-R3-0001 through C-R3-0006: EARS origin, adoption, AI workflow precedent.
 - Reference: Mavin, A. et al. "Easy Approach to Requirements Syntax (EARS)." IEEE International Requirements Engineering Conference, 2009.
 
-## v4.3.0 retroactive naming-convention update
-
-Per ADR-0019, all sub-agent, knowledge skill, and orchestrator skill references in this ADR have been updated to the v4.3.0 naming convention (phase-prefixed sub-agents, KB-prefixed knowledge skills, recipe-prefixed orchestrator, shared-prefixed cross-phase sub-agents). The pre-update version is preserved at `ADR-0015-ears-acceptance-criteria-pre-naming-convention.md`. The decision recorded in this ADR is unchanged; only entity names are updated for cross-document consistency.
+---
+**Provenance footer (added by T2d.2):** Archived from canonical `adrs/ADR-0015-ears-acceptance-criteria.md` during adr-placement-mechanism-repair-r1 Phase 2d (sub-procedure ii — archive-wins consolidation per ADR-0055 v1.0.1). The archive version from `adrs-migrated/ADR-0015-ears-acceptance-criteria.md` is the new canonical. See git log for full provenance.

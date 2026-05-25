@@ -111,3 +111,6 @@ The risk of skill bloat is real but mitigated. Templates organized as referenced
 - ADR-0013 (forthcoming): Blueprint template adoption — uses the Blueprint template from `documentation-criteria`.
 - ADR-0017 (forthcoming): document-reviewer integration — `document-reviewer` references `documentation-criteria` for all template structures.
 - Claim C-R3-0028: codebase analysis schemas vary; no industry-standard schema. Documentation schemas are similar — defining our own and committing to one canonical home is the right call.
+
+---
+**Provenance footer (added by T2d.2):** Archived from canonical `adrs/ADR-0011-documentation-criteria-canonical-skill.md` during adr-placement-mechanism-repair-r1 Phase 2d (sub-procedure ii — archive-wins consolidation per ADR-0055 v1.0.1). The archive version from `adrs-migrated/ADR-0011-documentation-criteria-canonical-skill.md` is the new canonical. See git log for full provenance.
