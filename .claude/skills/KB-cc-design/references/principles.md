@@ -13,6 +13,7 @@ The foundational principles a Claude Code Designer applies when authoring the `#
 - Principle 7: Plugins for distribution, not for organization
 - Principle 8: Migrate to skills; keep commands only for tiny one-shots
 - Principle 9: Sub-agent reasoning configuration is intentional, not default
+- Principle 10: Uniform rules over named exceptions — no carve-outs in canonical-placement rules
 
 ## Principle 1: Pick the lowest-cost primitive that does the job
 
@@ -193,3 +194,31 @@ The Designer's discipline:
 - Anti-pattern to avoid: using the `skills:` array to express reasoning-depth intent (e.g., a fictional `deep-reasoning` skill). This is a category error; Claude Code's skill loader silently skips missing references, and the sub-agent runs at default reasoning while the design document claims otherwise. Map "I want this sub-agent to reason deeply" to `model:` and/or `effort:`, not to `skills:`.
 
 A worked example from this project: the feature-pipeline uses `model: opus` uniformly across all 30 sub-agents, with the reasoning gradient shaped by `effort:` instead of by model class. Five sub-agents — `design-composer`, `review-architecture-auditor`, `review-cross-artifact-auditor`, `synth-synthesizer`, and `finalize-task-decomposer` — use `effort: xhigh` (extended reasoning) because each is a terminal compositional or gatekeeping agent whose output either composes upstream work into a load-bearing artifact (Blueprint, synthesis report, tasks.json) or gates downstream stages against unrecoverable defects (cross-artifact audit, architecture audit). The other twenty-five sub-agents use `effort: high` (deep reasoning) — each does judgment-heavy work within a bounded single-stage scope. The pipeline's per-agent reasoning configuration is intentional throughout: every choice records "the highest quality output within the context the agent is required to fulfill" as the calibration target, with `effort:` as the documented intermediate lever above default and below `xhigh`.
+
+## Principle 10: Uniform rules over named exceptions — no carve-outs in canonical-placement rules
+
+When a canonical-placement rule exists for an artifact class (the project's precedent: ADR-0036 mandates `adrs/` for ADRs), every file in that class lives at the canonical location. No naming-convention, extension-based, or allowlist-based exception is permitted to evade the rule. Audit trails for migrations live in `git log` and in the per-feature `migration-log.md`, never as scattered breadcrumb files at the legacy location.
+
+The triggering anti-pattern: the `adr-placement-mechanism-repair-r1` Plan + Blueprint specified `.tombstone` redirect files at the old ADR locations so the validator's `rglob('ADR-*.md')` would skip them. The extension was chosen *specifically to evade the uniform rule*. That is the carve-out shape this principle refuses. ADR-0056 retroactively retired the tombstone files and codifies the discipline going forward.
+
+The Designer's discipline:
+
+- When proposing a placement convention in the Blueprint, check whether any sub-decision introduces a carve-out shape:
+  - An extension-based exception to a canonical-placement rule (smell — e.g., `*.tombstone`, `*.legacy`, `*.archived` at the legacy location).
+  - An allowlist entry that exists to evade a uniform rule rather than integrate two systems (smell — see below for the legitimate-allowlist test).
+  - A scattered breadcrumb pattern in the legacy location (smell — replace with `git log` + a canonical migration log).
+  - A "treat X as not-really-a-Y" naming convention (smell — e.g., a file named after the artifact class but excluded from validation by extension).
+- If any of these is proposed, restructure to eliminate the carve-out. Default question at design review: "can we remove this entirely?"
+
+Legitimate distinctions that are NOT carve-outs (the discriminating test):
+
+- **A recognized structural category with its own uniform internal rule.** Example: `adrs/superseded/` (codified by ADR-0005) has its own well-defined semantics — archived bodies of replaced ADRs, validated against the same field schema. It is a category, not an exception.
+- **A cross-tool integration where two systems own distinct namespaces by design.** Example: the synthesize skill writes its outputs to `output/synthesis-*/adrs/`, and `--allowlist 'output/synthesis-*/adrs/'` integrates with that distinct namespace. The allowlist exists to bridge two systems whose namespaces are independent by design, not to evade a uniform rule that should have applied uniformly.
+
+The test for "is this a legitimate distinction or a carve-out?": does it have a uniform internal rule, or is it a one-off escape valve? Legitimate distinctions have schemas, validators, and upgrade paths. Carve-outs exist to be ignored.
+
+The cost framing (preserved from the user's durable feedback that triggered ADR-0056): each carve-out looks small at authoring time. The aggregate compounds — five carve-outs later, the validator's scan pattern is a maze of special cases, future readers must learn each exception before they can reason about the system, and the documentation must caveat the uniform rule everywhere it's stated. The Designer pays the long-tail tax of every exception they admit.
+
+**Reviewer enforcement.** `shared-document-reviewer` at Gate 0/1 reviews of Plan / Blueprint documents flags any proposed carve-out shape and cites ADR-0056. Future updates to the auditor / reviewer machinery make this enforcement load-bearing rather than aspirational.
+
+**Cross-references.** ADR-0056 (the canonical statement); ADR-0036 (the precedent canonical-placement rule); ADR-0005 (the `adrs/superseded/` category that demonstrates the "structural category with uniform rule" pattern); ADR-0054 (canonical-helper three-surface enforcement — the integration shape that ADR-0056 is consistent with).

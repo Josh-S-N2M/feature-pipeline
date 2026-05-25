@@ -365,3 +365,21 @@ Deferrals carried forward: T5.4b (design-composition.md:295), T5.4c (deliverable
 |---------|----------------|-------------------|--------|
 | TR.1 | working/feature/devcontainer-mcp-provisioning-r1/ | PKG-BLOCKER-001 deferral closure note written | COMPLETED |
 | TR.2 | working/feature/frontend-design-knowledge-r1/ + working/feature/issue-capture-mechanism-r1/ | informed-stakeholder notifications written | COMPLETED |
+
+## Phase R postscript — Tombstone retirement per ADR-0056 (2026-05-25)
+
+The five `.tombstone` redirect files written by T2c.1 at `working/feature/issue-capture-mechanism-r1/adrs/ADR-{0046,0047,0048,0049,0050}.tombstone` have been retired post-execution under ADR-0056 ("No carve-outs in canonical-placement rules — uniform rules over named exceptions").
+
+**Trigger.** User durable feedback during post-execution review of this feature surfaced the carve-out shape of the tombstone pattern: the `.tombstone` extension was chosen specifically so the validator's `rglob('ADR-*.md')` would not match those files. That extension-based evasion of a uniform rule is the anti-pattern ADR-0056 codifies as project-level design discipline.
+
+**Action.**
+- 5 files deleted via `git rm`.
+- `working/feature/issue-capture-mechanism-r1/adrs/` directory removed (it was empty after the delete; git auto-removes empty parent directories).
+- ADR-0056 authored at `adrs/ADR-0056-no-carve-outs-in-canonical-placement.md`.
+- Principle 10 added to `.claude/skills/KB-cc-design/references/principles.md` as the forward-signal that any future Plan / Blueprint that proposes a similar carve-out shape will be flagged at review.
+
+**Provenance preserved.** The five ADR-relocation moves remain auditable through (a) `git log --follow adrs/ADR-004{6..9}-*.md` + `git log --follow adrs/ADR-0050-*.md`, which detect the rename from `working/feature/issue-capture-mechanism-r1/adrs/` to canonical `adrs/`, and (b) the Phase-2c table earlier in this migration log, which records every disposition with timestamps and source/target paths.
+
+**Validator status post-retirement.** `validate_adr_placement.py . --allowlist '.claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/'` returns PASS with zero findings (~30ms). No validator logic changed; the uniform rule was already correct.
+
+**This postscript does not amend the Phase-2c historical record.** The Phase-2c table earlier in this log faithfully records that tombstones *were* written by T2c.1 at execution time. This postscript records that they were subsequently retired by post-execution amendment under ADR-0056. Both records stand per ADR-0005 supersession discipline.

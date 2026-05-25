@@ -1,4 +1,0 @@
-ADR-0047 moved to canonical adrs/ADR-0047-three-layer-enforcement.md (2026-05-25 per adr-placement-mechanism-repair-r1 T2c.1).
-Original location: working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md (git mv preserves history).
-See git log adrs/ADR-0047-three-layer-enforcement.md for full provenance.
-Per ADR-0036, canonical-root is the single valid location for ADRs.
