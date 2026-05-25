@@ -1,7 +1,7 @@
 ---
 id: PRD-issue-capture-mechanism-r1
 doc_type: prd
-version: 1.1.0
+version: 1.2.0
 status: draft
 feature_slug: issue-capture-mechanism-r1
 scope_class: FULL
@@ -17,6 +17,15 @@ change_summary: >-
   I-DR-004 (AC-NFR-7-a inline test-acceptance-author note pointing to U-9),
   I-DR-005 (US-3 cross-section preamble), I-DR-006 (FR-3 user-confirmed-primitives footnote).
   No substantive changes to FR/NFR/AC/Layer-Scope/Won't-Have/Undetermined-Items content.
+  v1.2.0 (2026-05-25, mid-execution scope revision at user direction): RETIRED FR-15
+  (the SETTINGS-NOTES.md append) and AC-FR-15-a. The audit-trail content FR-15 specified
+  was redundant with ADR-0047's inline precedent enumeration; the duplicated surface
+  added maintenance burden without architectural value. Downstream: Blueprint v3
+  inlined the precedent enumeration; AT-042 + PV-5.C6 + PV-7.C7 removed; tasks.json T5.7
+  superseded; non-pollution-contract.md cross-reference removed; SETTINGS-NOTES.md deleted.
+  The three-layer enforcement architecture (FR-3) is unchanged. Layer Scope rationale
+  updated to drop the SETTINGS-NOTES.md mention. See ADR-0047 v1.1.0 and reconciliation-log-r1.md
+  for the coordinated revision record.
 companion_artifacts:
   - Issues/issue-capture-mechanism/proposal.md
   - /home/vscode/.claude/plans/i-am-noticing-as-reflective-wilkes.md
@@ -92,7 +101,7 @@ Product-surface concerns (end-user experience, release cadence, residency, etc.)
 
 | # | Layer | Disposition | Rationale |
 |---|---|---|---|
-| 1 | Claude Code / Project Filesystem | **IN scope (primary)** | New agent under `.claude/agents/`, two new skills + one KB edit under `.claude/skills/`, new `.claude/hooks/` directory and script, additive `.claude/settings.json` patch, three new templates and one new spec under `KB-documentation-criteria`, append to `.claude/SETTINGS-NOTES.md`. Bulk of the work. |
+| 1 | Claude Code / Project Filesystem | **IN scope (primary)** | New agent under `.claude/agents/`, two new skills + one KB edit under `.claude/skills/`, new `.claude/hooks/` directory and script, additive `.claude/settings.json` patch, three new templates and one new spec under `KB-documentation-criteria`. Bulk of the work. *(v2.1, 2026-05-25: SETTINGS-NOTES.md append removed — see PRD §Document History and ADR-0047 v1.1.0.)* |
 | 2 | Frontend | **OUT of scope** | No UI surface beyond the slash command, which is itself a CC-layer artifact. |
 | 3 | Backend | **IN scope (secondary)** | Extension to `.claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py`. Python tooling/infra logic, not a service — lives in the Backend layer per the 9-layer taxonomy. |
 | 4 | API | **OUT of scope** | No HTTP / GraphQL / RPC contract change. |
@@ -361,9 +370,11 @@ Tag each requirement with the stakeholder it serves and the layer where its acce
   The system shall additively update `.claude/skills/KB-documentation-criteria/SKILL.md` to list the three new templates and the new spec, and shall add one bullet under "Where this KB is NOT used" stating that the triggering discipline for issue capture lives in `KB-issue-capture`. No removals; no restructure.
   - AC-FR-14-a: When a reader consults `KB-documentation-criteria/SKILL.md`, the system shall present rows for `issue-register-template.md`, `issue-analysis-template.md`, `issue-proposal-template.md`, and `issue-doctypes-spec.md` in the appropriate index sections.
 
-- [ ] **FR-15: Append-only documentation note in `.claude/SETTINGS-NOTES.md`** — Stakeholder: pipeline orchestrator, future maintainers — Layer: Claude Code
-  The system shall append a note to `.claude/SETTINGS-NOTES.md` documenting the new hook policy and the user authorization for the additive `settings.json` change.
-  - AC-FR-15-a: When a reader consults `.claude/SETTINGS-NOTES.md`, the system shall present the appended note describing the hook policy and user authorization timestamp.
+- [x] ~~**FR-15: Append-only documentation note in `.claude/SETTINGS-NOTES.md`** — Stakeholder: pipeline orchestrator, future maintainers — Layer: Claude Code~~
+  ~~The system shall append a note to `.claude/SETTINGS-NOTES.md` documenting the new hook policy and the user authorization for the additive `settings.json` change.~~
+  ~~- AC-FR-15-a: When a reader consults `.claude/SETTINGS-NOTES.md`, the system shall present the appended note describing the hook policy and user authorization timestamp.~~
+
+  **RETIRED v2.1 (2026-05-25)** at user direction during execution Phase 6/7 boundary. The audit-trail content that FR-15 specified now lives inline in **ADR-0047 v1.1.0** §Decision §5 (the five-precedent enumeration was the load-bearing content; SETTINGS-NOTES.md was a duplicated surface). Downstream amendments: Blueprint v3 references resurfaced inline; acceptance-tests AT-042 removed; phase-validators PV-5.C6 + PV-7.C7 removed; tasks.json T5.7 superseded; SETTINGS-NOTES.md deleted from `.claude/`. See `reconciliation-log-r1.md` for the full revision record. Three-layer enforcement architecture (FR-3) is unchanged.
 
 ### Should Have (P2)
 
@@ -510,7 +521,7 @@ The PRD names what's true about the environment; the design doc names what to bu
   - `.claude/skills/KB-documentation-criteria/` — receives 3 new templates + 1 new spec + 1 SKILL.md additive update.
   - `.claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py` — receives an extension (FR-7); the script already exists.
   - `.claude/settings.json` — receives one additive permission entry + one PreToolUse hook block (FR-3); existing 7 allow entries untouched.
-  - `.claude/SETTINGS-NOTES.md` — receives an append (FR-15); the file already exists.
+  - ~~`.claude/SETTINGS-NOTES.md` — receives an append (FR-15); the file already exists.~~ *(Retired v2.1, 2026-05-25: FR-15 removed; SETTINGS-NOTES.md deleted from `.claude/`. See ADR-0047 v1.1.0.)*
   - `recipe-feature-pipeline/SKILL.md` — receives a one-bullet additive edit (FR-12).
   - `KB-review-disciplines/references/issue-lifecycle.md` — referenced as the parallel-but-distinct 4-state ledger vocabulary; not modified.
 - **External services we depend on:** None.

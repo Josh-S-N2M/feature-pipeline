@@ -1,6 +1,6 @@
 ---
 id: BP-issue-capture-mechanism-r1
-version: 1.2.0
+version: 1.3.0
 status: draft
 feature_slug: issue-capture-mechanism-r1
 derived_from: working/feature/issue-capture-mechanism-r1/prd-v2.md
@@ -68,6 +68,27 @@ change_summary: >-
   ADR-0047 receives a single-line frontmatter applies_to amendment per
   I-AA-004; no new ADR introduced in this cycle (per FR-5 and the dispatch's
   no-new-ADR posture).
+
+  v1.3.0 (2026-05-25, mid-execution scope revision at user direction):
+  Retired the SETTINGS-NOTES.md audit-trail surface (FR-15) and all
+  Blueprint references to it across §Project Precedents Established,
+  §Agreement Checklist, §Functional Requirements summary, §Project
+  Touchpoints, §Project Touchpoints (numbered list), §Cross-cutting
+  Concerns inventory, §Design Decisions D-12, §Implementation Phases
+  Phase 5 phase rollup, §First-of-kind audit trail summary, and §Risk
+  Register. Audit-trail surface count reduced from three to two
+  (ADR-0047 + non-pollution-contract.md). The Blueprint's
+  §Background and Context > Project Precedents Established subsection
+  remains the canonical Blueprint-side carrier of the 5-precedent
+  enumeration; ADR-0047 §Decision §5 v1.1.0 carries the inline
+  enumeration on the architectural side. Three-layer enforcement
+  architecture (FR-3, the load-bearing safety property) is unchanged.
+  Coordinated amendments to PRD v2 (v1.2.0), ADR-0047 (v1.1.0),
+  acceptance-tests (AT-042 removed), phase-validators (PV-5.C6 +
+  PV-7.C7 removed), tasks.json (T5.7 task-037 superseded),
+  non-pollution-contract.md (cross-reference removed), and
+  reconciliation-log-r1.md (entry appended) were made in the same
+  revision. See reconciliation-log-r1.md for the full record.
 companion_artifacts:
   - working/feature/issue-capture-mechanism-r1/cc-design.md
   - working/feature/issue-capture-mechanism-r1/cc-dependencies.json
@@ -199,9 +220,9 @@ No external resources. All artifacts are local files in the project repository.
 
 ### Project Precedents Established
 
-*This subsection resolves I-DR-BP-002. It lifts the canonical 5-precedent enumeration from `cc-design.md` lines 55-65 with light editorial polish for Blueprint context; `cc-design.md` remains the canonical layer-level source. The Agreement Checklist row below ("SETTINGS-NOTES audit-trail append") cross-references this subsection in place of v1's dangling "(see I-DR-002 resolution below)" forward reference.*
+*This subsection resolves I-DR-BP-002. It lifts the canonical 5-precedent enumeration from `cc-design.md` lines 55-65 with light editorial polish for Blueprint context; `cc-design.md` remains the canonical layer-level source. (v3.1, 2026-05-25: previously the Agreement Checklist row "SETTINGS-NOTES audit-trail append" cross-referenced this subsection; that row is now retired — see Agreement Checklist below. ADR-0047 §Decision §5 now carries the canonical inline 5-precedent enumeration on the architectural side; THIS subsection carries it on the Blueprint side.)*
 
-Per codebase findings F-001, F-002, F-003, F-007, and the synthesis Theme 1 ("First-of-kind constraints"), this feature establishes **five project firsts** that have no in-project worked example to template against. The audit trail for these is captured in §Three-Layer Enforcement Architecture (cross-cutting concerns) and in the `.claude/SETTINGS-NOTES.md` append (FR-15) per D-12:
+Per codebase findings F-001, F-002, F-003, F-007, and the synthesis Theme 1 ("First-of-kind constraints"), this feature establishes **five project firsts** that have no in-project worked example to template against. The audit trail for these is captured in §Three-Layer Enforcement Architecture (cross-cutting concerns) and in **ADR-0047 §Decision §5** per D-12 *(v3.1: previously also referenced `.claude/SETTINGS-NOTES.md` (FR-15); that surface was retired on 2026-05-25)*:
 
 1. **First SKILL.md files declaring `disable-model-invocation: true`** — both new skills (`KB-issue-capture` and `capture-issue`) carry the flag. Per F-001, no existing project SKILL.md has used it.
 2. **First `.claude/hooks/` directory** — does not exist pre-merge (confirmed by codebase-analysis `ls`).
@@ -219,7 +240,7 @@ These precedents are intentionally bundled in one feature run because they are i
 - [x] **Validator extension** — fourth `issue` category branch in validate_pipeline_frontmatter.py; module-level constants (ISSUE_DOC_TYPES, ISSUE_STATES, ISSUE_PER_STATE_REQUIRED_FIELDS, **ISSUE_NON_VALIDATED_PATH_PREFIXES** [v3 addition per I-AA-002]); new validate_issue_artifact function.
 - [x] **Existing artifact edits** — intake-intent-clarifier.md (Phase 0 addition); intent-clarification-template.md (Source-section guidance); recipe-feature-pipeline/SKILL.md (one bullet); KB-documentation-criteria/SKILL.md (additive index rows + 1 bullet).
 - [x] **Migrations** — 4 flat `Issues/*.md` files + 1 `agent-roster-impact-matrix.md` via atomic `git mv` + frontmatter back-fill commits.
-- [x] **SETTINGS-NOTES audit-trail append** — documents hook policy + user authorization + the FIVE project precedents established this run (enumerated inline at §Background and Context > Project Precedents Established above).
+- [x] ~~**SETTINGS-NOTES audit-trail append** — documents hook policy + user authorization + the FIVE project precedents established this run (enumerated inline at §Background and Context > Project Precedents Established above).~~ *(RETIRED v3.1, 2026-05-25: SETTINGS-NOTES.md deleted; precedent enumeration now lives inline at §Background and Context > Project Precedents Established above AND in ADR-0047 §Decision §5. See ADR-0047 v1.1.0 Document History.)*
 
 #### Non-Scope (Explicitly not changing)
 
@@ -283,7 +304,7 @@ The practice is already empirically established by four ad-hoc files under `Issu
 - FR-6, FR-7, FR-14: structural templates + validator extension + KB index update.
 - FR-8, FR-9: one-time migration of 4+1 files.
 - FR-10..FR-13: source-citation discipline, proposal-as-prior-context detection, handoff template+recipe edits, pipeline-isolation invariant.
-- FR-15: SETTINGS-NOTES append.
+- ~~FR-15: SETTINGS-NOTES append.~~ *(RETIRED v3.1, 2026-05-25; see PRD v2 §FR-15 strikethrough and ADR-0047 v1.1.0.)*
 
 #### Non-Functional Requirements
 
@@ -373,7 +394,7 @@ The PRD §FRs and §NFRs collectively define ~50 EARS-format ACs. The cc-design 
 | Claude Code | Existing | `.claude/skills/KB-documentation-criteria/references/templates/intent-clarification-template.md` | FR-12a edit target (~5 lines) |
 | Claude Code | Existing | `.claude/skills/recipe-feature-pipeline/SKILL.md` | FR-12b one-bullet edit target |
 | Claude Code | Existing | `.claude/settings.json` | FR-3 additive `hooks.PreToolUse` block |
-| Claude Code | Existing | `.claude/SETTINGS-NOTES.md` | FR-15 append target |
+| Claude Code | ~~Existing~~ Deleted (v3.1) | ~~`.claude/SETTINGS-NOTES.md`~~ | ~~FR-15 append target~~ *(RETIRED v3.1, 2026-05-25; file deleted, FR-15 dropped from PRD v2 — see ADR-0047 v1.1.0)* |
 | Claude Code | New | `.claude/agents/issue-capture-author.md` | New sub-agent (cc-design §Sub-Agent Patterns) |
 | Claude Code | New | `.claude/skills/KB-issue-capture/SKILL.md` + 4 refs | New discipline KB |
 | Claude Code | New | `.claude/skills/capture-issue/SKILL.md` | New entry-point skill |
@@ -412,7 +433,7 @@ One row per codebase-analysis finding F-001..F-016 (16 entries). The table is th
 
 | Fact ID | Focus Area | Disposition | Rationale | Evidence |
 |---|---|---|---|---|
-| F-001 | NO existing SKILL.md declares `disable-model-invocation: true` | transform | Two new skills (KB-issue-capture, capture-issue) introduce the project's first uses of this flag. Captured as a project precedent in SETTINGS-NOTES + ADR-0047. | Grep result: zero matches for the literal in existing SKILL.md frontmatter. |
+| F-001 | NO existing SKILL.md declares `disable-model-invocation: true` | transform | Two new skills (KB-issue-capture, capture-issue) introduce the project's first uses of this flag. Captured as a project precedent in ADR-0047 §Decision §5. *(v3.1: previously also "SETTINGS-NOTES"; that surface was retired 2026-05-25.)* | Grep result: zero matches for the literal in existing SKILL.md frontmatter. |
 | F-002 | NO hook directory; NO hooks block in settings.json | transform | New `.claude/hooks/` directory + new `hooks.PreToolUse` block in settings.json + new hook script. Captured as project precedents 2 and 3. | `ls .claude/hooks` → not found; grep `"hooks"` in settings.json → no match. |
 | F-003 | Silent-drop BLOCKER: `disable-model-invocation: true` skills cannot be in sub-agent `skills:` preload | preserve | Design honors the constraint structurally: `issue-capture-author` frontmatter has NO `skills:` field. Runtime Read/Glob pattern per D-01; closest precedent cc-critique (CP-001). Captured as project precedent 4 (first runtime-Read-KB sub-agent). | subagent-spec.md:110; cross_file_checks.py:410 X3. |
 | F-004 | ADR-0008 lives in adrs-migrated/, not adrs/ | out-of-scope | Per PRD §Risks #2: this run does NOT migrate ADR-0008. The 7 new ADRs (ADR-0044..ADR-0050) land in `working/feature/issue-capture-mechanism-r1/adrs/` per current operational convention (user-accepted Option A in I-AA-001 escalation). ADR-0050 cites ADR-0008 by its current location. | `Issues/adr-placement-rootcause/analysis.md` (captured drift). |
@@ -458,7 +479,7 @@ Direct Impact:
       - .claude/skills/KB-documentation-criteria/references/templates/intent-clarification-template.md (Source guidance)
       - .claude/skills/recipe-feature-pipeline/SKILL.md (one bullet)
       - .claude/settings.json (hooks.PreToolUse block)
-      - .claude/SETTINGS-NOTES.md (audit-trail append)
+      # .claude/SETTINGS-NOTES.md (audit-trail append) — RETIRED v3.1 (2026-05-25); file deleted; precedent enumeration now lives in ADR-0047 §Decision §5
       - .gitignore (append .claude/logs/*.jsonl per Q-CC-4)
     migrated:
       - 4 × Issues/<flat>.md → Issues/<topic>/<doctype>.md
@@ -798,7 +819,7 @@ The cc-design provides a comprehensive 16-row inventory table of every CC artifa
 3. **issue-capture-author** (NEW sub-agent) — see Component 3 above for the frontmatter and rationale.
 4. **intercept-issue-capture-agent.sh** (NEW hook script) — see Component 4 above.
 5. **.claude/settings.json** (additive `hooks.PreToolUse[matcher=Task]` block; no new permissions.allow entry needed).
-6. **.claude/SETTINGS-NOTES.md** (audit-trail append; see §Three-Layer Enforcement Architecture below for content).
+6. ~~**.claude/SETTINGS-NOTES.md** (audit-trail append; see §Three-Layer Enforcement Architecture below for content).~~ *(RETIRED v3.1, 2026-05-25; file deleted, FR-15 removed from PRD v2; precedent enumeration now lives inline in ADR-0047 §Decision §5.)*
 7-10. **Three templates + one spec** under KB-documentation-criteria (see §Templates and KB Edits below).
 11. **KB-documentation-criteria/SKILL.md** (FR-14 additive index update).
 12. **intake-intent-clarifier.md** (FR-11 Phase 0 ~15-line addition per ADR-0048).
@@ -876,7 +897,7 @@ The cc-design integrates 11 routed decisions (D-01, D-02, D-03, D-04, D-05 [shar
 - **D-09 (observability destination):** stderr + `.claude/logs/capture-issue.jsonl`. `.gitignore` discipline: `.claude/logs/*.jsonl` is gitignored (Q-CC-4 RESOLVED — see arbitration below; Phase 5 of the Implementation Plan executes the `.gitignore` append per I-DR-BP-008 resolution).
 - **D-10 (validator extension architecture):** Fourth `issue` category branch inside `validate_pipeline_artifact`. See backend-design §3. NFR-8 regression-corpus baseline-capture is PRE-implementation prerequisite.
 - **D-11 (hook latency threshold):** ~100ms p95 target; 1000-iteration measurement at plan stage; ratify or replace per the algorithm in backend-design §11.
-- **D-12 (first-of-kind audit-trail placement):** Three-surface audit trail (SETTINGS-NOTES + ADR-0047 + non-pollution-contract.md). Q-CC-1 RESOLVED (see arbitration below): consolidate the first-of-kind audit under ADR-0047, keeping the slate at 7 ADRs.
+- **D-12 (first-of-kind audit-trail placement):** Two-surface audit trail (ADR-0047 + non-pollution-contract.md). *(v3.1, 2026-05-25: reduced from three surfaces by retiring SETTINGS-NOTES.md; the five-precedent enumeration now lives inline in ADR-0047 §Decision §5 plus this Blueprint's §Project Precedents Established. See ADR-0047 v1.1.0 Document History.)* Q-CC-1 RESOLVED (see arbitration below): consolidate the first-of-kind audit under ADR-0047, keeping the slate at 7 ADRs.
 - **D-13 (atomic git mv + frontmatter back-fill commit):** One atomic commit per file. Plan-stage dry-run procedure verifies similarity-index detection. Fallback to two-commit sequence if detection fails.
 - **D-14 (Phase 0 detect proposal seed in intake-intent-clarifier):** Procedure-section edit (~15 lines); checklist lives in `intent-clarification-template.md` (not in agent body — prevents drift).
 
@@ -1062,7 +1083,7 @@ All seven layers are **N/A — out of scope per PRD §Layer Scope rows 2, 4, 5, 
 
 6. **Phase 5 — Cross-cutting edits + handoff (CC layer)**
    - Layer: Claude Code
-   - Technical Reason: intake-intent-clarifier Phase 0 (FR-11), intent-clarification-template.md guidance (FR-12a), recipe-feature-pipeline/SKILL.md one-bullet (FR-12b), KB-documentation-criteria/SKILL.md index (FR-14), SETTINGS-NOTES.md append (FR-15), **`.gitignore` append for `.claude/logs/*.jsonl` (Q-CC-4 resolution; per I-DR-BP-008)**. All additive, low-risk; sequenced after the load-bearing primitives are in place.
+   - Technical Reason: intake-intent-clarifier Phase 0 (FR-11), intent-clarification-template.md guidance (FR-12a), recipe-feature-pipeline/SKILL.md one-bullet (FR-12b), KB-documentation-criteria/SKILL.md index (FR-14), ~~SETTINGS-NOTES.md append (FR-15)~~ *(FR-15 RETIRED v3.1, 2026-05-25)*, **`.gitignore` append for `.claude/logs/*.jsonl` (Q-CC-4 resolution; per I-DR-BP-008)**. All additive, low-risk; sequenced after the load-bearing primitives are in place.
 
 7. **Phase 6 — Verification + Acceptance**
    - Layer: All
@@ -1111,7 +1132,7 @@ Plan-stage dry-run: `git mv <src> <dst>` + edit + `git diff -M` + `git log --fol
 - **Hook fail-open posture (NFR-2)**: Hook script errors do not block the Task spawn; stderr line ensures the failure is visible.
 - **No silent overwrite (NFR-5)**: Collision re-prompt with three explicit options.
 - **No `Issues/*.md` deletion (NFR-6)**: Even on supersession, the superseded file remains; only `status:` + `superseded_by_issue_id:` are amended.
-- **First-of-kind audit trail**: SETTINGS-NOTES.md append documents the hook policy and user authorization (FR-15) + the five project firsts (enumerated inline at §Background and Context > Project Precedents Established). ADR-0047 documents the architectural rationale.
+- **First-of-kind audit trail**: ADR-0047 §Decision §5 carries the canonical inline enumeration of the five project firsts and the architectural rationale. *(v3.1, 2026-05-25: previously this list also named SETTINGS-NOTES.md as the FR-15 surface for hook policy + user authorization documentation; that surface was retired. The Blueprint's §Background and Context > Project Precedents Established also carries the enumeration inline.)*
 
 ### Backend
 
@@ -1308,7 +1329,7 @@ This parallels the Backend early-verification target in spirit: the smallest com
 | Filename collision and silent overwrite (NFR-5 violation) | CC | High | Low | 3-option re-prompt is a hard requirement; AC-NFR-5-a covers |
 | Future intake-intent-clarifier runs fail to detect proposal seed | CC | Low | Low | FR-11 ACs cover the detection branch; review-cross-artifact-auditor verifies |
 | Hook p95 exceeds 200ms (over the user-perceptible threshold) | CC | Medium | Low | Plan-stage 1000-iteration measurement per D-11; escalation path to bash-alternative language if needed |
-| First-of-kind audit trail drift across three surfaces | CC | Low | Low | First-of-kind is a static fact after this run lands; SETTINGS-NOTES + ADR-0047 + non-pollution-contract.md cross-references are bidirectional; the 5-precedent enumeration is now in this Blueprint (§Background and Context > Project Precedents Established) as a single inline source. |
+| First-of-kind audit trail drift across two surfaces | CC | Low | Low | First-of-kind is a static fact after this run lands; ADR-0047 + non-pollution-contract.md cross-references are bidirectional; the 5-precedent enumeration is in this Blueprint (§Background and Context > Project Precedents Established) and in ADR-0047 §Decision §5 as parallel inline sources. *(v3.1, 2026-05-25: reduced from three surfaces by retiring SETTINGS-NOTES.md; drift surface area reduced.)* |
 | Cross-cutting auditing-* findings on first hook, first disable-model-invocation skills, first runtime-Read sub-agent | CC | Medium | High | Pre-stage all four auditing-* skill checks (auditing-hooks, auditing-skills, auditing-subagents, auditing-settings) at Plan stage per Blueprint §Open Items U-5 |
 | **Outer-dispatch path-prefix skip silences a finding that should fire (v3 risk per I-AA-002)** | Backend | Low | Low | Path-prefix patterns are literal (`Issues/*/evidence/` and `Issues/*/updates/`); cannot match any non-Issues path; AC-BE-10 fixture verifies positive case; positive control (non-Issues file with doc_type-not-in-known-category) verifies non-interference |
 | **ADR-placement drift across 7 new ADRs (v3 user-accepted deviation per I-AA-001)** | Cross-cutting | Low (informational) | Accepted | User explicitly accepted Option A in the Gate 4 escalation: the 7 ADRs remain at `working/feature/<slug>/adrs/` for this run; PRD §Won't-Have already excludes resolving the drift; the captured drift tracker `Issues/adr-placement-rootcause/analysis.md` is the project-wide root-cause record; deliverable packager (Stage 13) follows current operational behavior; future migration is the separate drift-remediation feature's responsibility. No file moves and no superseding ADR in this run. |

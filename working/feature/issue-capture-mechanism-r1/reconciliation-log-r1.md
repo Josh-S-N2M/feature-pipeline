@@ -76,3 +76,48 @@ None preemptively deferred at the reconciler stage. The author may defer any of 
 - Upstream artifact: `working/feature/issue-capture-mechanism-r1/blueprint-v1.md`
 - Reviewer verdict source: `working/feature/issue-capture-mechanism-r1/blueprint-v1-review-issues.json`
 - Companion layer docs (unchanged this cycle): `cc-design.md`, `backend-design.md`, `cc-dependencies.json`, `backend-dependencies.json`
+
+---
+
+# Post-Execution Scope Revision — 2026-05-25
+
+**Date**: 2026-05-25
+**Trigger**: User direction during cold-read of the artifact set after Phase 6 commit. User asked why `.claude/SETTINGS-NOTES.md` existed; cold-read review surfaced that the file was load-bearing in PRD §FR-15, Blueprint §D-12 + §Project Precedents Established + §Agreement Checklist + multiple inline references, ADR-0047 §5 (three audit-trail surfaces), acceptance-tests AT-042, phase-validators PV-5.C6 + PV-7.C7, and tasks.json T5.7 (task-039). User chose the "full coordinated retirement" path (over the "surgical" or "defer-to-follow-on-feature" alternatives) to keep cross-document consistency.
+
+**Type**: Mid-execution scope revision (NOT a reconciliation cycle; this is a post-execution scope reduction triggered by user judgment about feature value, not by a reviewer verdict).
+
+**Rationale captured at decision time**:
+
+- SETTINGS-NOTES.md was a duplicated audit-trail surface. The five-precedent enumeration it carried is also present in ADR-0047 §Decision §5 and Blueprint §Background and Context > Project Precedents Established.
+- The platform fact that justified a separate file (settings.json loader strips `_notes` keys) is a KB-cc-platform concern, not an architectural one. The audit-trail surface count reduces from three to two with no material loss of discoverability.
+- The three-layer enforcement architecture (the load-bearing safety property of the feature) is unchanged. Layers 1+2+3 (skill `disable-model-invocation: true`; agent-body AskUserQuestion-before-Write; PreToolUse hook on Task) all remain in force.
+
+**Coordinated amendments applied (2026-05-25)**:
+
+| Artifact | Version transition | Change |
+|---|---|---|
+| `adrs/ADR-0047-three-layer-enforcement.md` | 1.0.0 → 1.1.0 | Decision §5 reframed three-surface → two-surface; precedent enumeration inlined here; Implementation Guidance updated; Architecture Impact bullet removed; Negative Consequences updated; Document History entry added. |
+| `prd-v2.md` | 1.1.0 → 1.2.0 | FR-15 + AC-FR-15-a struck through with retirement note; Layer Scope row updated; Touched Files entry updated; change_summary appended. |
+| `blueprint-v3.md` | 1.2.0 → 1.3.0 | ~10 inline references updated to retirement annotations: §Project Precedents Established preamble; §Agreement Checklist; §Functional Requirements summary; §Project Touchpoints table row; §Codebase findings F-001 row; §Cross-cutting Concerns inventory item; §Project Touchpoints numbered list item 6; §Design Decisions D-12; §Implementation Phases Phase 5 phase rollup; §First-of-kind audit trail summary; §Risk Register entry. change_summary appended. |
+| `acceptance-tests.md` | 1.0.0 → 1.1.0 | AT-042 marked RETIRED in test catalog + traceability table; Counts by Layer of Verification table updated (Claude Code hook script tests: 9 → 8; Total: 70 → 69). |
+| `phase-validators.md` | 1.0.0 → 1.1.0 | PV-5 validator goal updated; PV-5.C6 row marked RETIRED; PV-7.C7 inline AC-FR-15-a reference marked retired; PV-5 dimensional gate language updated; traceability matrix AC-FR-15-a row marked RETIRED. |
+| `tasks.json` | n/a (status field added) | task-039 (plan_anchor T5.7) marked `status: SUPERSEDED` with superseded_at + superseded_reason fields; acceptance_criteria + validators arrays emptied; title/description prefixed `[SUPERSEDED 2026-05-25]`. |
+| `.claude/skills/KB-issue-capture/references/non-pollution-contract.md` | (no change) | Verified: the "three" references are to the three enforcement LAYERS (unchanged), not the audit-trail SURFACES. No edit required. |
+| `.claude/SETTINGS-NOTES.md` | (deleted) | File removed from `.claude/`. |
+
+**Cycle-cap posture**: This revision is NOT a reconciliation cycle and does NOT consume the 4-cycle reconciliation cap. It is a post-execution scope reduction outside the reconciliation envelope.
+
+**Downstream impact on remaining execution**:
+
+- Phase 7 (Verification + Acceptance) will NOT execute the retired validators (PV-5.C6, PV-7.C7's AC-FR-15-a coverage, AT-042). All other Phase 7 work is unchanged.
+- task-039 will NOT need re-execution. The historical execution artifacts (`per-task-execution-result-task-039.{json,md}`) are kept under `working/feature/issue-capture-mechanism-r1/` for audit but do not represent active deliverable scope.
+- No effect on three-layer enforcement validation (PV-5.C1..C5, C7, C8 + PV-7 cc-critique sweep cover the safety property).
+
+**User authorization**: User explicitly chose "Full coordinated retirement now" via AskUserQuestion on 2026-05-25 in lieu of the surgical or defer-to-follow-on-feature alternatives.
+
+**Audit trail**:
+
+- Cold-read trigger: user question "i do not understand why we have started this settings notes.md"
+- Decision option chosen: "Full coordinated retirement now"
+- ADR amendment driver: ADR-0047 v1.1.0 Document History entry (2026-05-25)
+- Companion change: SETTINGS-NOTES.md deleted from `.claude/`

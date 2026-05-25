@@ -679,18 +679,21 @@
       "id": "task-039",
       "plan_anchor": "T5.7",
       "phase": "P5",
-      "title": "Append note to .claude/SETTINGS-NOTES.md (FR-15)",
-      "description": "Append note documenting (a) hook policy (PreToolUse on Task; discriminator on subagent_type; fail-open per NFR-2); (b) user authorization timestamp `approved-2026-05-23T16:51:00Z` (sourced from Intent Clarification approval token); (c) the 5 project firsts (disable-model-invocation skills; .claude/hooks/ directory; hooks block in settings.json; runtime KB-load sub-agent; 5-state lifecycle vocabulary). Append-only.",
+      "status": "SUPERSEDED",
+      "superseded_at": "2026-05-25",
+      "superseded_reason": "FR-15 retired from PRD v2 (now v1.2.0) in coordinated mid-execution scope revision; .claude/SETTINGS-NOTES.md deleted. The audit-trail content this task carried (hook policy + user authorization + 5 project firsts) now lives inline in ADR-0047 v1.1.0 Decision §5. AC-FR-15-a removed; PV-5.C6 + AT-042 retired. See reconciliation-log-r1.md entry for 2026-05-25 and ADR-0047 Document History. The task-039 execution-result artifacts (per-task-execution-result-task-039.json + .md) are kept for historical record but the work they describe is no longer required.",
+      "title": "[SUPERSEDED 2026-05-25] Append note to .claude/SETTINGS-NOTES.md (FR-15)",
+      "description": "[SUPERSEDED 2026-05-25] Append note documenting (a) hook policy (PreToolUse on Task; discriminator on subagent_type; fail-open per NFR-2); (b) user authorization timestamp `approved-2026-05-23T16:51:00Z` (sourced from Intent Clarification approval token); (c) the 5 project firsts (disable-model-invocation skills; .claude/hooks/ directory; hooks block in settings.json; runtime KB-load sub-agent; 5-state lifecycle vocabulary). Append-only.",
       "target_files": [
         ".claude/SETTINGS-NOTES.md"
       ],
       "dependencies": ["task-038"],
       "parallelizable_with": [],
-      "acceptance_criteria": ["AC-FR-15-a"],
-      "validators": ["PV-5.C6", "AT-042"],
+      "acceptance_criteria": [],
+      "validators": [],
       "estimated_complexity": "small",
       "risk_level": "low",
-      "notes": "Append-only; do NOT modify prior content. I-DR-BP-002 resolution requires inline enumeration of 5 project firsts."
+      "notes": "SUPERSEDED 2026-05-25: see superseded_reason field. Original notes (preserved for historical context): Append-only; do NOT modify prior content. I-DR-BP-002 resolution requires inline enumeration of 5 project firsts."
     },
     {
       "id": "task-040",

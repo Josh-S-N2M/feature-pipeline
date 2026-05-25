@@ -297,5 +297,110 @@ LIVE RESULT RECORDING:
     - Overall: PASS or FAIL for PV-7.C3
 
 ===========================================================================
+LIVE-TEST-RESULT
+===========================================================================
+
+Session date/time: 2026-05-25
+Session HEAD:      7a91df9 (post-merge; settings.json hooks block loaded)
+Driver:            issue-capture-author Task spawn (direct, with explicit
+                   pre-approval framing on STEPs 2 + 4 because the
+                   `capture-issue` skill carries `disable-model-invocation: true`
+                   and `SendMessage`-based agent continuation is unavailable
+                   in this environment — see SLASH-COMMAND CAVEAT below).
+Target file:       Issues/auditing-family-graduation-review/proposal.md
+
+---
+
+STEP 1 — AT-006 / AC-FR-2-a (OLD->NEW preview observed; no Write)
+  Verdict: PASS
+  Evidence:
+    - Agent executed Update-Mode Workflow steps 1–5 (Validate path → Read →
+      Idempotency check → Compute OLD→NEW preview → Render Archetype-2 prompt).
+    - Preview rendered the complete OLD→NEW diff:
+        OLD: status=open, since=2026-05-23
+        NEW: status=complete (changed), since=2026-05-23 (unchanged),
+             resolved_by/resolved_at/resolution_summary (new — required by spec §4.2).
+    - Three Archetype-2 options enumerated (Approve / Edit-transition / Cancel).
+    - "body content will not be changed" disclaimer present.
+    - mtime unchanged (2026-05-24 19:04:50.805287322 — matches pre-test value).
+    - status field still `open`.
+
+STEP 2 — AT-007 / AC-FR-2-b (write transition + new status reported)
+  Verdict: PASS
+  Evidence:
+    - File updated in place with frontmatter-only mutation; body preserved verbatim.
+    - Frontmatter delta:
+        status: open → complete
+        + resolved_by: T7.3 smoke test (issue-capture-author live verification, fresh session)
+        + resolved_at: 2026-05-25
+        + resolution_summary: Synthetic transition for T7.3 smoke test; reverted in STEP 4.
+    - Report message: "Updated <path>: status open → complete" (matches Update-Mode
+      Workflow Step 6 item 2 format).
+    - Stderr line emitted per AC-NFR-7-a:
+        [issue-capture-author] updated Issues/auditing-family-graduation-review/proposal.md: status open → complete
+    - JSONL appended to .claude/logs/capture-issue.jsonl:
+        {"action":"update","old_status":"open","new_status":"complete",
+         "fields_added":["resolved_by","resolved_at","resolution_summary"],
+         "approval_path":"approve", ...}
+    - mtime advanced to 2026-05-25 02:55:54.941187666 (new Write applied).
+
+STEP 3 — AT-048 / AC-NFR-3-a (idempotency on empty diff)
+  Verdict: PASS
+  Evidence:
+    - Re-invoked with the same target state (status=complete + same companion field values).
+    - Agent executed steps 1–3, detected empty diff at Step 3, exited cleanly.
+    - Steps 4, 5, 6 NOT reached (agent explicitly reported "NOT REACHED" for each).
+    - No AskUserQuestion invoked.
+    - No Write invoked.
+    - mtime unchanged (still 2026-05-25 02:55:54.941187666 — matches post-STEP-2).
+    - JSONL line count unchanged at 3 (no append).
+    - Report: "(no change — status already complete)".
+
+STEP 4 — RESTORE to pre-test state
+  Verdict: PASS
+  Evidence:
+    - Transition status: complete → open with the three complete-state companion
+      fields removed (resolved_by, resolved_at, resolution_summary).
+    - `since: 2026-05-23` retained as the open-state companion field.
+    - All other frontmatter unchanged; body preserved verbatim.
+    - `git diff Issues/auditing-family-graduation-review/proposal.md` is EMPTY
+      (file matches its committed pre-test state byte-for-byte).
+    - JSONL fourth entry appended:
+        {"action":"update","old_status":"complete","new_status":"open",
+         "fields_removed":["resolved_by","resolved_at","resolution_summary"],
+         "approval_path":"approve (T7.3 STEP 4 restore)", ...}
+
+---
+
+OVERALL VERDICT: PASS for PV-7.C3
+
+All four ACs under test exercised live; static verification corroborated by
+runtime behavior; target file restored to pre-test state with zero residue.
+
+PV-7.C3 gate condition: "OLD→NEW preview observed; transition applied;
+re-invocation produces 'no change'" — all three elements observed live.
+
+---
+
+SLASH-COMMAND CAVEAT (consistent with create-mode smoke test)
+
+The `capture-issue` skill declares `disable-model-invocation: true` (per F-001),
+so /capture-issue is strictly user-typed at an interactive prompt. The smoke
+test was driven by directly Task-spawning the `issue-capture-author` sub-agent,
+which is the exact invocation the slash-command's body emits in step 3 of
+its workflow (`Task(subagent_type="issue-capture-author",
+prompt="update-mode: <path>")`). The hook + sub-agent surface — the substantive
+update-mode logic — is fully exercised. The slash-command argument parser
+itself (positional vs. `--update <path>` form) remains covered only by static
+review of `.claude/skills/capture-issue/SKILL.md`.
+
+Additionally, `SendMessage`-based agent continuation is not available in this
+environment, so the AskUserQuestion approval gate in STEPs 2 and 4 was honored
+by explicit pre-approval framing in the Task prompt (the smoke-test runner
+acted as the user-approver one turn earlier). STEP 1 explicitly verified
+the AskUserQuestion preview structure and the no-Write contract; STEP 3
+explicitly verified the no-prompt + no-Write idempotency path.
+
+===========================================================================
 END OF SMOKE-TEST-UPDATE-MODE.TXT
 ===========================================================================

@@ -211,3 +211,97 @@ PV-7.C2:
 
 Hook golden suite re-run timestamp: 2026-05-25T00:00:00Z (approx session time)
 Hook golden suite result file: working/feature/issue-capture-mechanism-r1/hook-golden-results.json
+
+
+===========================================================================
+SECTION C — LIVE-TEST-RESULT (fresh session, 2026-05-25)
+===========================================================================
+
+Session HEAD: 7a91df9 (post-merge; settings.json hooks block loaded)
+Driver:       Direct Task spawn of sub-agents (issue-capture-author for B.1;
+              general-purpose for B.2). See SLASH-COMMAND CAVEAT in the
+              create-mode + update-mode smoke-test files for the parallel
+              explanation of why direct Task spawn substitutes for the
+              user-typed /capture-issue invocation.
+
+---
+
+C.1  B.1 — Cancel branch live verification (AT-004 / AC-FR-1-d / PV-7.C2-a)
+---------------------------------------------------------------------------
+Procedure:
+  1. Session marker set: /tmp/smoke-cancel-marker-kYhB (mtime 2026-05-25 03:01:27).
+  2. Pre-invocation `find Issues/ -newer marker -type f` → empty.
+  3. Sub-agent invoked: subagent_type=issue-capture-author,
+     prompt="create-mode: smoke-test-cancel-do-not-save",
+     with explicit "user pre-selected Cancel" framing on Step 5.
+  4. Agent executed Steps 1–4 of Create-Mode Workflow (KB load → collision
+     check → triage → derive path → draft in memory).
+  5. At Step 5, agent rendered the WHY/WHAT/WHERE preview content (so the
+     runner can verify triage + draft were exercised correctly), then took
+     the Cancel branch.
+
+Observed behavior:
+  - Cancellation confirmation message emitted: "No file written. Cancelled."
+  - Hard Constraint #3 honored: no Write call issued at any point.
+  - No mkdir call issued.
+  - JSONL emission spec inspected: Step 6 observability fires only on
+    Approve/Approve-with-edits — Cancel produces no JSONL entry. Agent
+    correctly did NOT append a JSONL entry (no `action:cancel` is defined
+    in the workflow spec, so writing one would be undocumented behavior).
+
+Post-invocation filesystem assertion:
+  - `find Issues/ -newer /tmp/smoke-cancel-marker-kYhB -type f` → EMPTY.
+  - Directory `Issues/smoke-test-cancel-do-not-save/` does NOT exist
+    (ls returns "No such file or directory").
+  - JSONL line count: 4 (unchanged from before B.1; no append on Cancel).
+
+B.1 verdict: PASS
+  - AT-004 ("post-cancel filesystem shows no new file under Issues/") — PASS.
+  - AC-FR-1-d ("Cancel results in zero Write calls") — PASS.
+  - PV-7.C2-a — PASS.
+
+---
+
+C.2  B.2 — Non-issue fast-path live confirmation (AC-FR-3-c / PV-7.C2-b)
+---------------------------------------------------------------------------
+Procedure:
+  1. First attempt: Task spawn with subagent_type=Explore. This invocation
+     reached the agent's tool-loading phase, where it errored out with an
+     unrelated MCP-tool-schema 400 error ("input_schema does not support
+     oneOf, allOf, or anyOf at the top level"). The fact that the spawn
+     reached tool-loading at all means the PreToolUse hook had already
+     emitted `allow` — the failure was downstream of the hook contract.
+  2. Retry: Task spawn with subagent_type=general-purpose. This invocation
+     completed normally with no ask prompt surfaced. The sub-agent reported
+     verbatim: "general-purpose subagent spawned without a user-facing ask
+     prompt — hook fast-path allow PATH verified end-to-end."
+
+Observed behavior:
+  - No user-facing ask prompt surfaced for either subagent_type.
+  - Both spawns advanced past the PreToolUse hook gate without interruption.
+
+B.2 verdict: PASS
+  - AC-FR-3-c ("Hook fast-path allow on non-issue-capture") — PASS
+    (corroborates the golden-file suite's fixture_2 + fixture_3 PASS).
+  - PV-7.C2-b — PASS.
+
+---
+
+UPDATED OVERALL SUMMARY (live results merged)
+
+AC-FR-1-d (Cancel: no file written)
+  Overall: PASS (static documentation PASS + live filesystem assertion PASS)
+
+AC-FR-3-c (Hook fast-path allow on non-issue-capture)
+  Overall: PASS (golden-file PASS + live end-to-end PASS)
+
+AT-004 (cancel_writes_no_file)
+  Overall: PASS
+
+AT-012 (hook_emits_permission_decision_allow_on_other_subagent_types_silently)
+  Overall: PASS (golden-file; live B.2 corroborates)
+
+PV-7.C2
+  (a) Cancel branch: PASS (B.1)
+  (b) Non-issue fast-path: PASS (golden-file + B.2)
+  Overall: PASS

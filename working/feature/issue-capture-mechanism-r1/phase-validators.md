@@ -1,7 +1,7 @@
 ---
 id: PVALS-issue-capture-mechanism-r1
 doc_type: phase-validators
-version: 1.0.0
+version: 1.1.0
 status: draft
 feature_slug: issue-capture-mechanism-r1
 derived_from: working/feature/issue-capture-mechanism-r1/plan-v2.md
@@ -337,7 +337,7 @@ None. Phase 0 is setup-only; all baselines feed into PV-2 and PV-7.
 
 - **Validator ID:** `PV-5`
 - **Phase reference:** Plan Phase 5 — CC layer: hook script + settings.json patch (plan-v2.md §Phase 5)
-- **Validator goal:** Prove that Layer 3 of the three-layer enforcement is in place: the PreToolUse hook script passes shellcheck, the 5-fixture golden-file harness passes, `.claude/settings.json` is patched additively (existing entries unchanged), `.claude/SETTINGS-NOTES.md` carries the FR-15 note, and the latency benchmark (D-11) ratified or replaced AC-NFR-1-a's ~100ms target.
+- **Validator goal:** Prove that Layer 3 of the three-layer enforcement is in place: the PreToolUse hook script passes shellcheck, the 5-fixture golden-file harness passes, `.claude/settings.json` is patched additively (existing entries unchanged), and the latency benchmark (D-11) ratified or replaced AC-NFR-1-a's ~100ms target. *(v1.1, 2026-05-25: previously also required `.claude/SETTINGS-NOTES.md` to carry the FR-15 note; that requirement was retired with the rest of FR-15 — see PV-5.C6 RETIRED below and ADR-0047 v1.1.0.)*
 - **Load-bearing assertions (BLOCKER):** PV-5.C1, PV-5.C2, PV-5.C3, PV-5.C5
 - **Dependencies:** PV-0 PASS (T0.5 devenv check)
 
@@ -350,7 +350,7 @@ None. Phase 0 is setup-only; all baselines feed into PV-2 and PV-7.
 | PV-5.C3 | All 5 golden-file fixtures PASS | `python3 .claude/hooks/test_intercept_issue_capture_agent.py` exits 0; output reports 5/5 fixtures pass: (a) issue-capture-author spawn → ask; (b) non-issue spawn → allow; (c) malformed JSON → allow + stderr; (d) missing tool_input → allow + stderr; (e) empty stdin → allow + stderr | T5.3 + T5.4 in plan-v2.md | `python3 .claude/hooks/test_intercept_issue_capture_agent.py` | BLOCKER |
 | PV-5.C4 | 1000-iteration p95 latency benchmark recorded; D-11 outcome documented | `working/feature/issue-capture-mechanism-r1/hook-latency-results.json` exists; contains p50, p95, p99 in ms; D-11 algorithm outcome (ratify / replace / escalate) recorded; AC-NFR-1-c marked CLOSED with the finalized threshold value | T5.5 in plan-v2.md; D-11; resolves U-11 | `python3 scripts/check_hook_latency_results.py` (asserts schema + D-11 outcome) | BLOCKER (escalate-to-design is also a non-pass outcome for this validator) |
 | PV-5.C5 | `.claude/settings.json` patched additively; `permissions.allow` unchanged | JSON parses; new `hooks.PreToolUse` block present; `permissions.allow` array byte-identical to pre-Phase-5 (only the `hooks` block is new) | T5.6 in plan-v2.md | `python3 scripts/check_settings_json_additive.py` (parses JSON; compares against snapshot) | BLOCKER |
-| PV-5.C6 | `.claude/SETTINGS-NOTES.md` contains the FR-15 append | Diff vs pre-Phase-5 shows only append; append text mentions (a) hook policy (PreToolUse on Task), (b) user authorization timestamp `approved-2026-05-23T16:51:00Z`, (c) the 5 project firsts | T5.7 in plan-v2.md; AC-FR-15-a | `git diff --stat HEAD~<phase-5-start>..HEAD -- .claude/SETTINGS-NOTES.md` shows only insertions; grep for the 3 expected items | MAJOR |
+| ~~PV-5.C6~~ | ~~`.claude/SETTINGS-NOTES.md` contains the FR-15 append~~ | **RETIRED v1.1, 2026-05-25** — FR-15 was removed from PRD v2 and the file deleted; the precedent enumeration this validator checked now lives inline in ADR-0047 §Decision §5. No replacement validator needed (ADR-0047 itself does not require runtime validation; doc-review covers it). See ADR-0047 v1.1.0 Document History. | ~~T5.7 in plan-v2.md; AC-FR-15-a~~ | N/A | N/A |
 | PV-5.C7 | `auditing-hooks` + `auditing-settings` pre-merge checks PASS | Each produces verdict PASS or PASS-WITH-MINOR-FIXES; zero BLOCKER findings | Plan Phase 5 Exit Criteria | Dispatch each audit; parse output | BLOCKER |
 | PV-5.C8 | p95 latency ≤ ratified threshold | After D-11 outcome, p95 from `hook-latency-results.json` ≤ threshold (100ms by default; replacement value if D-11 said "replace") | T5.5; AC-NFR-1-a | `python3 -c "import json; r=json.load(open('<path>')); assert r['p95_ms'] <= r['threshold_ms']"` | BLOCKER |
 
@@ -362,7 +362,7 @@ None. Phase 0 is setup-only; all baselines feed into PV-2 and PV-7.
 - AC-NFR-1-c (Design ratifies or replaces target; deferral closed) — directly enforced by PV-5.C4.
 - AC-NFR-2-a (fail-open on error) — directly enforced by PV-5.C3 fixtures (c)–(e).
 - AC-NFR-2-b (visible stderr line) — enforced by PV-5.C3 fixtures (c)–(e).
-- AC-FR-15-a (SETTINGS-NOTES.md append) — directly enforced by PV-5.C6.
+- ~~AC-FR-15-a (SETTINGS-NOTES.md append) — directly enforced by PV-5.C6.~~ *(RETIRED v1.1, 2026-05-25; AC-FR-15-a removed from PRD v2; PV-5.C6 retired; see ADR-0047 v1.1.0.)*
 
 ### Operational checks (phase-specific)
 
@@ -462,7 +462,7 @@ Phase 7 is the catch-all for ALL remaining ACs not already directly enforced ear
 - AC-FR-8-b/c, AC-FR-9-b (history + clean validation end-to-end) — PV-7.C5 + PV-7.C6
 - AC-FR-13-a/b (pipeline isolation invariant) — PV-7.C4
 - AC-FR-14-a (KB index discoverable end-to-end) — verified by PV-7.C7's cc-critique sweep
-- AC-FR-15-a (SETTINGS-NOTES.md append discoverable end-to-end) — verified by PV-7.C7
+- ~~AC-FR-15-a (SETTINGS-NOTES.md append discoverable end-to-end) — verified by PV-7.C7~~ *(RETIRED v1.1, 2026-05-25; AC-FR-15-a removed from PRD v2; SETTINGS-NOTES.md deleted; see ADR-0047 v1.1.0.)*
 - AC-NFR-1-a (latency target met) — verified by PV-5.C8; re-confirmed here via PV-7.C8 auditing-hooks
 - AC-NFR-2-a/b (fail-open) — verified by PV-5.C3; re-confirmed here via PV-7.C2 fast-path
 - AC-NFR-3-a (idempotency) — PV-7.C3
@@ -644,7 +644,7 @@ Every PV-N maps to the corresponding Plan phase's Exit Criteria + the per-phase 
 | PV-2 | Phase 2 | "ANY new line in the regression diff is a `blocker`" | "re-runs T2.6 regression diff; asserts empty. Re-runs T2.5 smoke test; asserts all fixtures pass. Asserts the constants list contains all 4 expected items." |
 | PV-3 | Phase 3 | "any path in `phase-3-scope-diff.txt` outside the 5 expected file pairs → `blocker`" | "(I-DR-PL-002 concrete enforcement) Runs `git diff --name-only` ... asserts the output set is EXACTLY the 5 expected file pairs" |
 | PV-4 | Phase 4 | "BLOCKER if `grep -E '^skills:' .claude/agents/issue-capture-author.md` returns any line — F-003 silent-drop avoidance non-negotiable" | "Direct F-003 grep enforcement: runs `grep -E '^skills:' .claude/agents/issue-capture-author.md` and asserts the output is empty" |
-| PV-5 | Phase 5 | "ANY shellcheck warning is `blocker`; any golden-file fixture failure is `blocker`; latency benchmark p95 > 200ms escalates to design iteration" | "re-runs shellcheck; re-runs the 5-fixture golden-file suite; asserts `.claude/settings.json`'s diff is purely additive; asserts `.claude/SETTINGS-NOTES.md` contains the FR-15 note; asserts the latency-results JSON shows p95 ≤ ratified threshold" |
+| PV-5 | Phase 5 | "ANY shellcheck warning is `blocker`; any golden-file fixture failure is `blocker`; latency benchmark p95 > 200ms escalates to design iteration" | "re-runs shellcheck; re-runs the 5-fixture golden-file suite; asserts `.claude/settings.json`'s diff is purely additive; ~~asserts `.claude/SETTINGS-NOTES.md` contains the FR-15 note;~~ *(SETTINGS-NOTES assertion RETIRED v1.1, 2026-05-25 — see PV-5.C6 above)* asserts the latency-results JSON shows p95 ≤ ratified threshold" |
 | PV-6 | Phase 6 | "ANY non-additive change in T6.1/T6.2/T6.3 diffs is `blocker`. Any new pipeline stage or gate bypass in T6.3 is `blocker`" | "diffs each of the 3 edited files against the pre-Phase-6 state; asserts all changes are additive; asserts no new stage / gate / bypass language in `recipe-feature-pipeline/SKILL.md`" |
 | PV-7 | Phase 7 | "ANY new line in T7.5 validator regression diff is `blocker`; ANY non-empty result from T7.4 pipeline-isolation grep is `blocker`; ANY BLOCKER from cc-critique or any of the 5 audits is `blocker`" | "this is effectively the Plan-wide acceptance gate. Re-runs T7.4 ... T7.8" |
 | PV-8 | Phase 8 | "T8.1 L1 fail is `blocker` (Dockerfile change must be present and well-formed); T8.2 L3 fail is `important`; T8.3 verifications are `recommended`" | "asserts the Dockerfile line is present, the apt-resolution evidence file exists OR docker-build succeeded, and the devenv-prereqs.txt + postCreate.sh comment changes landed" |
@@ -668,7 +668,7 @@ Each PRD Acceptance Criterion is enforced by one or more validator assertions:
 | AC-FR-10-a, AC-FR-11-a/b, AC-FR-12-a/b | PV-6.C2..C4 | — |
 | AC-FR-13-a/b/c | PV-7.C4 (cross-phase invariant CPI-1) | — |
 | AC-FR-14-a | PV-1.C5 | PV-7.C7 (cc-critique) |
-| AC-FR-15-a | PV-5.C6 | PV-7.C7 |
+| ~~AC-FR-15-a~~ | ~~PV-5.C6~~ | ~~PV-7.C7~~ — **RETIRED v1.1, 2026-05-25** (AC-FR-15-a removed from PRD v2; see ADR-0047 v1.1.0) |
 | AC-BE-1..AC-BE-10 | PV-2.C1..C8 | PV-7.C5 |
 | AC-NFR-1-a/b/c | PV-5.C4, C8 | PV-7.C8 |
 | AC-NFR-2-a/b | PV-5.C3 | PV-7.C2 |

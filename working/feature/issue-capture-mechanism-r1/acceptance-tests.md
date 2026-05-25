@@ -1,7 +1,7 @@
 ---
 id: ACTESTS-issue-capture-mechanism-r1
 doc_type: acceptance-tests
-version: 1.0.0
+version: 1.1.0
 status: draft
 feature_slug: issue-capture-mechanism-r1
 derived_from:
@@ -70,11 +70,11 @@ change_summary: |
 | Layer | Tests | Notes |
 |---|---|---|
 | Backend (Python; validator) | 31 | Includes 18 positive + 6 missing-field + 3 invalid-status + AC-BE-10 + positive control + 6 regression-related tests |
-| Claude Code (hook script) | 9 | 5 golden-file + shellcheck + latency + 2 settings.json/SETTINGS-NOTES checks |
+| Claude Code (hook script) | 8 | 5 golden-file + shellcheck + latency + 1 settings.json check *(v1.1, 2026-05-25: was 9; AT-042 SETTINGS-NOTES check retired per FR-15 removal; see ADR-0047 v1.1.0)* |
 | Claude Code (agent body, skills, KB structure) | 18 | Frontmatter parse, F-003 grep, KB-issue-capture refs, capture-issue skill, KB-documentation-criteria index, intake-intent-clarifier Phase 0 |
 | Filesystem / Git (migrations, history, pipeline-isolation) | 8 | `git log --follow` × 5 paths + AC-FR-8-d scope diff + AC-FR-13-a/b grep |
 | Integration / E2E (manual session) | 8 | Scenarios A..K below |
-| **Total** | **70** | — |
+| **Total** | **69** | — *(v1.1, 2026-05-25: reduced from 70 by retiring AT-042; see ADR-0047 v1.1.0)* |
 
 ### Counts by AC Coverage Confidence
 
@@ -131,7 +131,7 @@ Every PRD/Blueprint AC maps to ≥1 test ID. Every test maps to ≥1 AC (no orph
 | AC-FR-13-b | AT-039, SCEN-F | `grep_subagent_type_issue_capture_author_returns_empty_across_pipeline_agent_files` |
 | AC-FR-13-c | AT-040 | `no_automated_cross_reference_between_issues_directory_and_issues_ledger_json` |
 | AC-FR-14-a | AT-041 | `kb_documentation_criteria_skill_md_lists_3_templates_plus_spec_additively` |
-| AC-FR-15-a | AT-042 | `settings_notes_md_carries_appended_note_with_hook_policy_and_user_authorization` |
+| ~~AC-FR-15-a~~ | ~~AT-042~~ | ~~`settings_notes_md_carries_appended_note_with_hook_policy_and_user_authorization`~~ — **RETIRED v1.1, 2026-05-25** (FR-15 removed from PRD v2; SETTINGS-NOTES.md deleted; see ADR-0047 v1.1.0) |
 
 ### Non-Functional Requirement ACs
 
@@ -673,16 +673,9 @@ Each test below is structured as:
   2. Diff against pre-T1.5 version; confirm only additive rows + 1 bullet.
 - **Expected outcome**: 4 paths present in index; "Where this KB is NOT used" bullet present pointing at KB-issue-capture; no removals.
 
-### AT-042 — `settings_notes_md_carries_appended_note_with_hook_policy_and_user_authorization`
+### ~~AT-042~~ — **RETIRED v1.1, 2026-05-25** (was: `settings_notes_md_carries_appended_note_with_hook_policy_and_user_authorization`)
 
-- **Maps to AC**: AC-FR-15-a
-- **Type**: Manual review + grep
-- **Layer**: Claude Code
-- **Preconditions**: Phase 5 T5.7 complete.
-- **Steps**:
-  1. Read `.claude/SETTINGS-NOTES.md` appended note.
-  2. Grep for keywords: "hook policy", "PreToolUse", "approved-2026-05-23", "project precedents".
-- **Expected outcome**: All keywords present in the appended note; prior content unmodified.
+- **Status**: RETIRED in coordinated mid-execution scope revision (2026-05-25). FR-15 was removed from PRD v2 (now v1.2.0); `.claude/SETTINGS-NOTES.md` was deleted; the audit-trail content previously specified by this AT now lives inline in **ADR-0047 §Decision §5** (v1.1.0). See `reconciliation-log-r1.md` for the full record. PV-5.C6 and PV-7.C7 were retired in the same revision.
 
 ### AT-043 — `hook_p95_latency_under_ratified_threshold_on_standard_devcontainer`
 
