@@ -41,5 +41,5 @@ These two forms are **mutually exclusive** per AC-FR-2-c. Mixing them (e.g., `/c
 
 - Sub-agent: `.claude/agents/issue-capture-author.md` (T4.4a/b/c)
 - Discipline KB: `.claude/skills/KB-issue-capture/SKILL.md` (T4.1)
-- ADR-0044 per-issue folder model: `working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md`
-- ADR-0047 (4-option AskUserQuestion archetype for create-mode): `.../adrs/ADR-0047-three-layer-enforcement.md` (referenced for the 4-option pattern)
+- ADR-0051 per-issue folder model: `adrs/ADR-0051-per-issue-folder-model.md`
+- ADR-0047 (4-option AskUserQuestion archetype for create-mode): `adrs/ADR-0047-three-layer-enforcement.md` (referenced for the 4-option pattern)

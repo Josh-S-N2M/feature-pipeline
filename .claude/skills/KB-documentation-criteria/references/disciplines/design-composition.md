@@ -33,7 +33,7 @@ The discipline used by `design-composer` during Design Composition. Integrates p
 
 ## Outputs
 
-A single Blueprint file at `working/feature/<slug>/blueprint-v<N>.md`, conforming to `../templates/blueprint-template.md`. Plus zero or more ADR files at `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md`.
+A single Blueprint file at `working/feature/<slug>/blueprint-v<N>.md`, conforming to `../templates/blueprint-template.md`. Plus zero or more ADR files at `adrs/ADR-NNNN-<slug>.md` (canonical project-wide registry per ADR-0036).
 
 The Blueprint is reviewed by `shared-document-reviewer` immediately (per ADR-0017 invocation point 3). Each ADR is reviewed individually (per invocation point 5). Then the Blueprint enters Architecture Audit.
 
@@ -292,6 +292,6 @@ A complete Blueprint has:
 11. Verification Strategy (Correctness Proof Method, Early Verification Point, Output Comparison or N/A, Operational Verification or N/A)
 12. Future Extensibility, Alternative Solutions, Risks and Mitigation, References, Update History
 
-Plus, separately, zero or more ADR files at `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md`.
+Plus, separately, zero or more ADR files at `adrs/ADR-NNNN-<slug>.md` (canonical project-wide registry per ADR-0036).
 
 Output goes to `working/feature/<slug>/blueprint-v<N>.md`. `shared-document-reviewer` invoked immediately for Gate 0/1 (with `codebase_analysis` populated from `codebase-analysis.json`). Each ADR is reviewed individually. After all approvals, the Blueprint enters Architecture Audit.

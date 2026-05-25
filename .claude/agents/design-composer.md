@@ -45,10 +45,20 @@ Read in this order:
 - `rationale_brief_path` — rationale brief (applicable KBs + inherited ADRs).
 - `existing_adrs_dir` — directory of inherited ADRs (you may reference; you do NOT modify).
 - `output_blueprint_path` — `blueprint-v<N>.md` target. The orchestrator manages version numbering.
-- `output_adrs_dir` — directory where any new ADRs you author land.
+- `output_adrs_dir` — directory where any new ADRs you author land. Per ADR-0036, the canonical default is `adrs/` (the project-wide registry at repository root). When the orchestrator does not supply an explicit override, this parameter resolves to `adrs/`. A test-only override mechanism exists for test fixtures that need to write ADRs to a sandboxed path — see the "Test-only override for `output_adrs_dir`" subsection below. Production callers MUST NOT override this value; canonical-root is invariant for real runs (AC-FR-5-b / ADR-0036).
 - `prior_blueprint_path` — optional; the previous Blueprint version if this is a re-author after Gate failure.
 - `review_feedback` — optional; shared-document-reviewer's feedback from the previous version.
 - `slug` — feature slug.
+
+## Test-only override for `output_adrs_dir`
+
+**Rationale.** Test fixtures need to write fake ADRs to a sandboxed path without polluting the canonical `adrs/` registry. Because the validator scripts (Phase 4) need to be exercised in negative-path scenarios (e.g., confirming the packager raises a BLOCKER when ADRs are absent from canonical root), those fixtures must be able to redirect `output_adrs_dir` to a temporary directory.
+
+**Mechanism.** When the orchestrator passes `output_adrs_dir` explicitly in the invocation prompt, this value overrides the canonical-root default. The design-composer honors the passed value exactly (pass-through fidelity per AC-FR-3-b). No code change is required in design-composer itself — the parameter is already a caller-supplied input; canonical-root is simply the well-known default that production orchestrators supply when no override is given.
+
+**Discipline.** This override surface is **test-only**. Production callers (the orchestrator running a real feature-pipeline pass) MUST supply canonical-root `adrs/` as `output_adrs_dir` and MUST NOT deviate from the canonical default. Canonical-root is invariant for real runs. Any caller passing a non-canonical path in a production context violates ADR-0036 and the FR-5-b discipline.
+
+**Pointer.** See ADR-0036 (single-location ADR placement convention) and AC-FR-5-b for the normative discipline. The PRD Q1 binding resolution retains `output_adrs_dir` as a parameter specifically to preserve this testability surface without opening a production-override path.
 
 ## Procedure
 
@@ -126,7 +136,7 @@ For each contradiction or Q-`<LAYER>`-N item where `warrants_adr: true`:
    - Architecture Impact — which layers are affected; what changes.
    - Implementation Guidance — principle-only (no procedures; procedures live in Plan).
    - Status — Accepted (default), Superseded-by (if applicable).
-3. Write to `output_adrs_dir/ADR-<NNNN>.md`. Use the next available ADR number (read existing ADRs to find the highest, increment).
+3. Write to `output_adrs_dir/ADR-<NNNN>.md`. Per ADR-0036, `output_adrs_dir` defaults to the canonical-root `adrs/` (project-wide registry). Use the next available ADR number (read existing ADRs to find the highest, increment). If the orchestrator has passed an explicit `output_adrs_dir` override (test-only — see the "Test-only override for `output_adrs_dir`" subsection), honor that value instead.
 4. Reference the ADR in the relevant section of the Blueprint.
 
 Per FR-5, you are the only sub-agent authoring ADRs. Per ADR-0005, ADRs are append-only — if you supersede an inherited ADR, the new one references the prior version; the prior version is preserved.
@@ -184,7 +194,7 @@ Walk Gate 1 (semantic):
 ## Output
 
 - `output_blueprint_path` — `blueprint-v<N>.md`.
-- `output_adrs_dir/ADR-<NNNN>.md` — one file per new ADR (zero or more).
+- `output_adrs_dir/ADR-<NNNN>.md` — one file per new ADR (zero or more). Per ADR-0036, `output_adrs_dir` defaults to canonical-root `adrs/`; the orchestrator may supply a test-only override (see the "Test-only override for `output_adrs_dir`" subsection).
 
 After your write, the orchestrator invokes `shared-document-reviewer` with `doc_type: DesignDoc` and the `codebase_analysis` parameter. If Gate 0 fails, you are re-invoked. If Gate 1 fails, `finalize-reconciler` (later batch) may produce reconciliation guidance and re-invoke you for a new Blueprint version.
 

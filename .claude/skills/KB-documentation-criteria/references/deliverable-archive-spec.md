@@ -147,7 +147,7 @@ ADRs are categorically cross-feature artifacts; their semantics warrant a single
 - Cross-feature traversal is the normal access pattern; feature archives are not expected to be self-contained for cross-feature artifacts.
 - The bulk-copy step previously documented as a Pattern was easily skipped (this surfaced as a Gate-6 BLOCKER during the `execution-pipeline-design-r1` feature run).
 
-**Backward-compat.** Pre-ADR-0036 archives that contain `working/feature/<slug>/adrs/` directories are not retroactively cleaned. The validator ignores those directories (presence or absence is not a finding). New feature runs do not create them.
+**Canonical placement (ADR-0036).** ADRs are written once at `adrs/ADR-NNNN-<title>.md`. No feature-scoped copy is created or expected. The `validate_adr_placement.py` helper enforces this: any ADR file outside `adrs/` (or the structural exception `adrs/superseded/`) is flagged as BLOCKER. Pre-ADR-0036 archives have been consolidated in the `adr-placement-mechanism-repair-r1` feature; no working-tree residuals remain.
 
 ## Handoff document convention
 

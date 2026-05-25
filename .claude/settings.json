@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash",
+      "Bash(python3 .claude/skills/auditing-shared/scripts/validate_adr_placement.py*)",
       "Read",
       "Edit",
       "Write",

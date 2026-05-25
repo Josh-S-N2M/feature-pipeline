@@ -346,7 +346,6 @@ Invoked by `finalize-deliverable-packager` during Stage 13 (Deliverable Packagin
    - If required AND missing → BLOCKER ("required artifact missing: <path>").
    - If conditional AND missing → check intent-clarification's `discovery_shortcut` section for justification. If unjustified → MAJOR ("conditional artifact missing without justification: <path>").
 5. For each archive entry not in the spec's expected set → MINOR ("unexpected artifact: <path>; forward-compat extension or orphan?").
-6. ADR cross-location check: for each ADR ID in Blueprint's `adrs_authored:` frontmatter, verify presence at both `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md` AND `adrs/ADR-NNNN-<title>.md` (matched by ID). Missing at either → BLOCKER.
 
 ### Output
 

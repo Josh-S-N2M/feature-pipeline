@@ -12,6 +12,8 @@ Invokes in parallel:
 - auditing-codespaces/scripts/audit_codespaces.py
 - validate_pipeline_frontmatter.py
 - check_pipeline_discipline.py
+- validate_adr_placement.py (surface b per ADR-0054; --allowlist for
+  output/synthesis-*/adrs/ per ADR-0054 commitment 2)
 
 Aggregates per-check JSON outputs into a single 5-dimensional verdict per
 Blueprint Contract 2 (tests, audits, validator, discipline,
@@ -39,9 +41,14 @@ from typing import Iterable
 SCRIPTS_DIR = Path(".claude/skills/auditing-shared/scripts")
 VALIDATOR = SCRIPTS_DIR / "validate_pipeline_frontmatter.py"
 DISCIPLINE_CHECK = SCRIPTS_DIR / "check_pipeline_discipline.py"
+ADR_PLACEMENT_VALIDATOR = SCRIPTS_DIR / "validate_adr_placement.py"
 GHA_AUDIT = Path(".claude/skills/auditing-github-actions/scripts/audit_workflow.py")
 CODESPACES_AUDIT = Path(".claude/skills/auditing-codespaces/scripts/audit_codespaces.py")
 CC_AUDIT = Path(".claude/skills/auditing-cc-configs/scripts/audit_project.py")
+
+# Per ADR-0054 commitment 2: synthesize-skill output dirs are the only
+# allowlisted surface for ADR placement validation.
+ADR_PLACEMENT_ALLOWLIST = "output/synthesis-*/adrs/"
 
 
 def run_script(args: list[str], stdin_paths: Iterable[Path] | None = None) -> dict:
@@ -136,6 +143,20 @@ def main() -> int:
     if VALIDATOR.exists() and artifact_paths:
         tasks.append(("validator", ["python3", str(VALIDATOR)] + [str(p) for p in artifact_paths], None))
 
+    # ADR placement validator (surface b per ADR-0054).  Runs unconditionally
+    # against cwd; --allowlist exempts synthesize-skill output dirs per
+    # ADR-0054 commitment 2.  Non-zero exit folds as BLOCKER per AC-FR-10-c.
+    if ADR_PLACEMENT_VALIDATOR.exists():
+        tasks.append((
+            "validator:adr_placement",
+            [
+                "python3", str(ADR_PLACEMENT_VALIDATOR),
+                ".",
+                "--allowlist", ADR_PLACEMENT_ALLOWLIST,
+            ],
+            None,
+        ))
+
     # Discipline-check dimension.
     if DISCIPLINE_CHECK.exists() and artifact_paths:
         tasks.append(("discipline", ["python3", str(DISCIPLINE_CHECK)] + [str(p) for p in artifact_paths], None))
@@ -167,7 +188,7 @@ def main() -> int:
         "scope_deviations": empty_dimension(),
     }
 
-    # Validator dimension.
+    # Validator dimension — frontmatter validator.
     val = dimension_results.get("validator")
     if val:
         if "_error" in val:
@@ -184,7 +205,34 @@ def main() -> int:
             )
         else:
             per_dimension["validator"]["findings"].extend(val.get("findings", []))
-        per_dimension["validator"]["verdict"] = dimension_rollup(per_dimension["validator"]["findings"])
+
+    # Validator dimension — ADR placement validator (surface b per ADR-0054).
+    # Findings are folded into the same "validator" dimension per Q-CC-7 Option A.
+    # validate_adr_placement.py emits severity as uppercase ("BLOCKER"); normalise
+    # to lowercase so dimension_rollup's comparison is consistent.
+    adr_val = dimension_results.get("validator:adr_placement")
+    if adr_val:
+        if "_error" in adr_val:
+            per_dimension["validator"]["findings"].append(
+                {
+                    "domain": "validator",
+                    "severity": "blocker",
+                    "source_activity": "adr-placement-validator",
+                    "file_path": "<coordinator>",
+                    "message": adr_val["_error"],
+                    "dispatch_hint": "n/a",
+                    "depth_level": "0",
+                }
+            )
+        else:
+            for finding in adr_val.get("findings", []):
+                normalised = dict(finding)
+                if "severity" in normalised:
+                    normalised["severity"] = normalised["severity"].lower()
+                normalised.setdefault("source_activity", "adr-placement-validator")
+                per_dimension["validator"]["findings"].append(normalised)
+
+    per_dimension["validator"]["verdict"] = dimension_rollup(per_dimension["validator"]["findings"])
 
     # Discipline dimension.
     disc = dimension_results.get("discipline")

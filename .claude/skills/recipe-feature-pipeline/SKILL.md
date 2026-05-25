@@ -270,12 +270,27 @@ Per FR-3 + ADR-0016, per-layer Design is fan-out: K parallel invocations, one pe
 ### Step 8 — Stage 7: Design Composition
 
 1. Invoke `design-composer`:
-   - `prd_path`, `per_layer_designs_dir`, `per_layer_dependencies_dir`, `codebase_analysis_path`, `research_notes_dir`, `synthesis_path`, `rationale_brief_path`, `existing_adrs_dir`, `output_blueprint_path`, `output_adrs_dir`, `slug`.
+   - `prd_path`, `per_layer_designs_dir`, `per_layer_dependencies_dir`, `codebase_analysis_path`, `research_notes_dir`, `synthesis_path`, `rationale_brief_path`, `existing_adrs_dir`, `output_blueprint_path`, `output_adrs_dir` (default: `"adrs/"` per ADR-0036), `slug`.
+   - Pass-through fidelity: when the caller passes `output_adrs_dir` explicitly, the orchestrator forwards it unmodified; when absent, the orchestrator passes `"adrs/"` as the value.
    - On re-compose after reconciliation: `prior_blueprint_path` + `review_feedback`.
    - Note: design-composer uses `model: opus` (declared in its frontmatter); the orchestrator does NOT need to override.
-2. After the Blueprint is written: invoke `shared-document-reviewer` with `doc_type: DesignDoc` (Blueprint variant).
-3. If Gate 0 fails: re-invoke `design-composer`. If Gate 1 fails: dispatch to `finalize-reconciler`.
-4. After reviewer pass: **Gate 4 (Blueprint Approval)** — present to user; require approval. Update checkpoint.
+2.5. **ADR-placement validator (surface a per ADR-0054).** After design-composer returns the Blueprint + any authored ADRs, run the canonical ADR-placement validator before invoking `shared-document-reviewer`.
+
+   Invocation: `python3 .claude/skills/auditing-shared/scripts/validate_adr_placement.py` (positional `scan_path` defaults to cwd; no `--allowlist` at this surface).
+
+   Behavior:
+   - Exit 0 / verdict PASS → advance to `shared-document-reviewer`.
+   - Exit 2 / verdict BLOCK → halt; surface the JSON verdict via `AskUserQuestion`; require user resolution before advancing. Resolution options: dispatch `finalize-reconciler` to fix placement (preferred); user authorization to proceed with documented exception (rare); abort run.
+
+   Timeout: 120 s per ADR-0035 (well above the NFR-2 5000 ms budget; the validator's repo-wide scan completes in <50 ms in practice).
+
+   Rationale: This is the EARLIEST opportunity to detect ADR placement drift after authoring. Catching at the orchestrator stage gate avoids propagating bad-placement state into the `shared-document-reviewer`, Architecture Audit, Plan Authoring, and downstream stages.
+
+   Per ADR-0054 commitment 1 (no allowlist at this surface): the orchestrator-stage validator invocation MUST NOT pass `--allowlist`. The orchestrator gate is canonical-only.
+
+3. After the Blueprint is written: invoke `shared-document-reviewer` with `doc_type: DesignDoc` (Blueprint variant).
+4. If Gate 0 fails: re-invoke `design-composer`. If Gate 1 fails: dispatch to `finalize-reconciler`.
+5. After reviewer pass: **Gate 4 (Blueprint Approval)** — present to user; require approval. Update checkpoint.
 
 ### Step 9 — Stage 8: Architecture Audit
 

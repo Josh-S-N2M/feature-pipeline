@@ -3,7 +3,7 @@ name: finalize-deliverable-packager
 description: At the Deliverable Packaging stage (added in v4.5.0; runs after finalize-task-decomposer in the orchestrator's sequence). Use when a feature run reaches the Deliverable Packaging stage and the deliverable archive needs verification. Verifies that working/feature/<slug>/ contains the expected artifact set per the feature's declared scope class (FULL / MINOR / PATCH per ADR-0023). Invokes shared-document-reviewer with doc_type DeliverableArchive for validation against the spec at KB-documentation-criteria/references/deliverable-archive-spec.md. Optionally produces a versioned handoff document draft and continuation prompt draft when version_tag is provided. Emits packager-report.json listing present + missing artifacts and the validator's verdict. Surfaces BLOCKER findings to the Final Approval Gate.
 model: opus
 effort: medium
-tools: Read, Glob, Grep, Write, TaskCreate, TaskUpdate
+tools: Read, Glob, Grep, Write, TaskCreate, TaskUpdate, Bash
 skills: [KB-documentation-criteria, KB-review-disciplines]
 memory: project
 ---
@@ -53,14 +53,10 @@ For each entry in the spec's expected set for the declared scope class:
 
 For each entry in `artifacts_present` not covered by the spec → emit MINOR finding (unexpected artifact; possible forward-compat extension; possible orphan).
 
-### 3. ADR cross-location check
+<!-- ADR placement check: replaced by validator subprocess invocation per FR-10-d / ADR-0036; see T5.3 wiring (validate_adr_placement.py). -->
+### 3. ADR placement check
 
-For each ADR ID listed in Blueprint's `adrs_authored`:
-
-- Verify `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md` exists → BLOCKER if missing.
-- Verify `adrs/ADR-NNNN-<title>.md` exists in project registry → BLOCKER if missing.
-
-(Note: the title in the project registry may differ from the slug — match by ID, not filename suffix.)
+For each ADR ID listed in Blueprint's `adrs_authored`, verify the canonical-root entry `adrs/ADR-NNNN-<title>.md` exists in the project registry → BLOCKER if missing. (Match by ID, not filename suffix.) Per ADR-0036, canonical-root is the single valid location; the prior convention requiring a mirror copy under `working/feature/<slug>/adrs/` has been retired. T5.3 wires the canonical helper `validate_adr_placement.py` to perform this check via subprocess invocation per ADR-0054 surface (c).
 
 ### 4. Invoke shared-document-reviewer
 

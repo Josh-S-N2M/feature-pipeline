@@ -41,7 +41,14 @@ SCRIPTS = {
     "discipline": ".claude/skills/auditing-shared/scripts/check_pipeline_discipline.py",
     "coordinator": ".claude/skills/auditing-shared/scripts/run_phase_checks.py",
     "codespaces_stub": ".claude/skills/auditing-codespaces/scripts/audit_codespaces.py",
+    "adr_placement": ".claude/skills/auditing-shared/scripts/validate_adr_placement.py",
 }
+
+# Repo root — used by ADR placement tests to anchor paths.
+REPO_ROOT = str(Path(__file__).resolve().parents[4])
+
+# Allowlist for the known corpus fixture directory (exempts it from non-canonical checks).
+CORPUS_ALLOWLIST = ".claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/"
 
 
 class SmokeFailure(Exception):
@@ -480,6 +487,110 @@ def scenario_positive_control_non_issues_unknown_doctype() -> None:
 
 
 # -----------------------------------------------------------------------------
+# Scenario L — validate_adr_placement positive: clean repo → exit 0 / PASS / [].
+# -----------------------------------------------------------------------------
+def scenario_adr_placement_positive() -> None:
+    """Positive test (AT-046): validate_adr_placement against the full repo with
+    the corpus allowlist returns exit 0, verdict PASS, and an empty findings
+    array.  This exercises the post-Phase-3 clean-repo state."""
+    proc = run(
+        [
+            "python3",
+            SCRIPTS["adr_placement"],
+            REPO_ROOT,
+            "--allowlist",
+            CORPUS_ALLOWLIST,
+        ],
+        cwd=REPO_ROOT,
+    )
+    if proc.returncode != 0:
+        raise SmokeFailure(
+            f"adr_placement positive: expected exit 0, got {proc.returncode}; "
+            f"stderr={proc.stderr!r}; stdout={proc.stdout!r}"
+        )
+    data = json.loads(proc.stdout)
+    assert_eq("adr_placement positive: verdict", data.get("verdict"), "PASS")
+    assert_eq("adr_placement positive: findings empty", data.get("findings"), [])
+
+
+# -----------------------------------------------------------------------------
+# Scenario M — validate_adr_placement negative: feature-scoped ADR triggers BLOCK.
+# -----------------------------------------------------------------------------
+def scenario_adr_placement_negative() -> None:
+    """Negative test (AT-052): placing an ADR under working/feature/test-fixture/adrs/
+    (a non-canonical location) must produce exit 2, verdict BLOCK, and a finding
+    whose adr_file references the transient fixture path.  Fixture is cleaned up
+    after assertion."""
+    fixture_dir = Path(REPO_ROOT) / "working" / "feature" / "test-fixture" / "adrs"
+    fixture_file = fixture_dir / "ADR-9999-fixture-canonical-only-test.md"
+
+    # Create transient fixture.
+    fixture_dir.mkdir(parents=True, exist_ok=True)
+    fixture_file.write_text(
+        "---\n"
+        "id: ADR-9999\n"
+        "title: Fixture ADR — canonical-only test\n"
+        "status: proposed\n"
+        "---\n\n"
+        "Transient fixture for smoke_test_auditing_shared.py negative test case.\n"
+        "This file must not persist after the test run.\n"
+    )
+
+    try:
+        proc = run(
+            [
+                "python3",
+                SCRIPTS["adr_placement"],
+                REPO_ROOT,
+                "--allowlist",
+                CORPUS_ALLOWLIST,
+            ],
+            cwd=REPO_ROOT,
+        )
+        if proc.returncode != 2:
+            raise SmokeFailure(
+                f"adr_placement negative: expected exit 2, got {proc.returncode}; "
+                f"stdout={proc.stdout!r}"
+            )
+        data = json.loads(proc.stdout)
+        assert_eq("adr_placement negative: verdict", data.get("verdict"), "BLOCK")
+        findings = data.get("findings", [])
+        if not findings:
+            raise SmokeFailure(
+                "adr_placement negative: expected at least one finding, got empty findings"
+            )
+        # At least one finding must reference the fixture path.
+        fixture_rel = "working/feature/test-fixture/adrs/ADR-9999-fixture-canonical-only-test.md"
+        matching = [f for f in findings if fixture_rel in f.get("adr_file", "")]
+        if not matching:
+            raise SmokeFailure(
+                f"adr_placement negative: no finding references {fixture_rel!r}; "
+                f"findings={findings}"
+            )
+    finally:
+        # Always cleanup — even on assertion failure.
+        if fixture_file.exists():
+            fixture_file.unlink()
+        if fixture_dir.exists():
+            try:
+                fixture_dir.rmdir()  # removes only if empty
+            except OSError:
+                pass
+        # Remove parent working/feature/test-fixture if empty.
+        test_fixture_dir = Path(REPO_ROOT) / "working" / "feature" / "test-fixture"
+        if test_fixture_dir.exists():
+            try:
+                test_fixture_dir.rmdir()
+            except OSError:
+                pass
+        # Verify cleanup.
+        if fixture_file.exists():
+            raise SmokeFailure(
+                f"adr_placement negative: cleanup failed — fixture still exists at {fixture_file}"
+            )
+
+
+# -----------------------------------------------------------------------------
 # Scenario G — coordinator returns 5-dimensional verdict; stub field correct.
 # -----------------------------------------------------------------------------
 def scenario_coordinator_dimensional_verdict() -> None:
@@ -521,6 +632,8 @@ SCENARIOS = [
     ("I: 10 negative/advisory fixtures → expected findings", scenario_negative_fixtures),
     ("J: AC-BE-10 evidence/ path early-return → []", scenario_ac_be_10_evidence_path),
     ("K: positive control — non-Issues unknown doc_type → minor finding", scenario_positive_control_non_issues_unknown_doctype),
+    ("L: validate_adr_placement positive — clean repo → exit 0 / PASS / []", scenario_adr_placement_positive),
+    ("M: validate_adr_placement negative — feature-scoped ADR → exit 2 / BLOCK / finding", scenario_adr_placement_negative),
 ]
 
 
