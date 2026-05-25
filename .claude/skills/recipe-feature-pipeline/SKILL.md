@@ -610,3 +610,5 @@ Status check (no advance):
 /feature-pipeline --status <slug>
 ```
 (Reads checkpoint.json and reports current_stage + stage_status; does not invoke any sub-agent.)
+
+- **Proposal-seeded invocation** (per FR-12b + ADR-0048): pass an outside-pipeline `Issues/<topic>/proposal.md` as the raw request via `--raw-request <path>`. The orchestrator forwards the path to `intake-intent-clarifier`, which detects `doc_type: issue-proposal` in Phase 0 and treats the proposal body as authoritative prior context (elicits only Stage-1 fields the proposal lacks). This is NOT a new pipeline stage, gate, or bypass — it is a documentation pattern for an existing orchestrator argument.

@@ -29,6 +29,21 @@ This is the **first** stage in the pipeline. The PRD authoring stage that follow
 
 ## Procedure
 
+### Phase 0 — Proposal-as-prior-context detection (per ADR-0048 + D-14)
+
+Before the standard intent-clarification flow, the agent detects whether the feature run was seeded by an outside-pipeline issue-proposal:
+
+1. Check whether the orchestrator passed `--raw-request <path>` (the proposal seed).
+2. If yes → `Read(<path>)` and parse the frontmatter.
+3. If frontmatter contains `doc_type: issue-proposal` (the post-rename canonical value per Q-BE-1), treat the proposal body as **authoritative prior context** per ADR-0048:
+   - The proposal's TL;DR, Proposed Feature, Motivation, Open Questions, and Scope Considerations sections substitute for what the clarifier would otherwise elicit from the user
+   - The agent SKIPS questions on the fields the proposal already covers (AC-FR-11-b)
+   - The agent ELICITS ONLY the Stage-1 fields the proposal LACKS (e.g., target audience, success criteria, deliverable archive scope class — fields outside the proposal's authoring discipline)
+4. The resulting `intent-clarification.md` cites the proposal path verbatim in its `Source` section (per T6.2's template guidance).
+5. If `--raw-request` is unset OR the file's `doc_type` is not `issue-proposal`, proceed with the standard Phase 1+ flow unchanged.
+
+The proposal-seed checklist (which fields the clarifier expects the proposal to cover vs which it must elicit) lives in `intent-clarification-template.md` per T6.2 (single source of truth; prevents drift between agent and template).
+
 ### Phase 1: Read and understand the raw request
 
 1. Read the raw request in full.

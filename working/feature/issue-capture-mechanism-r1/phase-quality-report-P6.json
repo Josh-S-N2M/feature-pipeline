@@ -1,0 +1,61 @@
+{
+  "phase_id": "P6",
+  "verdict_overall": "PASS",
+  "verdict_per_dimension": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "rollup_rule_applied": "All 5 dimensions PASS; all 4 PV-6 criteria PASS (incl. BLOCKER PV-6.C4); 6 CPIs PASS \u2192 overall PASS.",
+  "validators_passed": [
+    "PV-6.C1",
+    "PV-6.C2",
+    "PV-6.C3",
+    "PV-6.C4"
+  ],
+  "validators_failed": [],
+  "validators_na": [],
+  "findings": [],
+  "cross_phase_invariants_checked": {
+    "CPI-1": "PASS (pipeline-isolation greps empty; T6.1 mentions doc_type/proposal but not KB-issue-capture or issue-capture-author)",
+    "CPI-2": "PASS (validator unchanged in P6)",
+    "CPI-3": "PASS (issue-capture-author unchanged in P6)",
+    "CPI-4": "PASS (NFR-8 baseline preserved)",
+    "CPI-5": "PASS (no Issues/*.md deletions)",
+    "CPI-6": "PASS (settings.json unchanged in P6)"
+  },
+  "audit_counter_delta": {
+    "baseline_type": "prior_phase",
+    "baseline_phase": "P5",
+    "aggregate_delta": "0 \u2192 0",
+    "gating": "informational"
+  },
+  "scope_deviations": [],
+  "in_phase_process_events": [],
+  "load_bearing_assertion_result": {
+    "assertion": "PV-6.C4 \u2014 AC-FR-12-b strict: no new pipeline stage/gate/bypass in recipe-feature-pipeline/SKILL.md",
+    "verdict": "PASS",
+    "evidence": "Diff inspection confirms 2-line additive bullet in Invocation Examples section; explicit disclaimer in bullet text; no entry added to 13-stage list or 6-gate sequence."
+  },
+  "per_task_summary": {
+    "task-040": {
+      "validator_id": "T6.1",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-041": {
+      "validator_id": "T6.2",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-042": {
+      "validator_id": "T6.3",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    }
+  },
+  "rationale": "Phase 6 delivered 3 strictly-additive handoff edits \u2014 Phase 0 proposal-detection in intake-intent-clarifier (per ADR-0048), Source-section convention in template (FR-12a), and proposal-seed bullet in recipe-feature-pipeline (FR-12b, BLOCKER-risk verified). All 3 tasks APPROVED on cycle 0; 0 revisions; smallest and lowest-risk phase of the feature.",
+  "execution_mode_note": "Phase 6 executed in canonical specialist-dispatch per ADR-0044. 7 specialist dispatches: 3 parallel producers + 3 parallel handlers + 1 phase-quality-reviewer."
+}

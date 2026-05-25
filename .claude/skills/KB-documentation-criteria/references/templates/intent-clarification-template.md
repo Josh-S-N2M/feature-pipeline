@@ -37,6 +37,8 @@ This document gates progression to PRD Authoring. The user must explicitly confi
 
 [One sentence: the user's original request, quoted or near-verbatim. Do NOT rephrase to sound more technical or more polished — the user's framing matters.]
 
+**Proposal-seed Source section convention** (per FR-12a + ADR-0048): when the feature run is seeded by an outside-pipeline `Issues/<topic>/proposal.md` (via orchestrator `--raw-request <path>`), this Source section MUST cite that proposal path verbatim. The `intake-intent-clarifier` agent's Phase 0 detection treats the proposal body as authoritative prior context — the Source section makes that lineage traceable. Proposal-seed checklist (fields the clarifier expects the proposal to cover): TL;DR, Proposed Feature, Motivation, Open Questions, Scope Considerations. Fields the clarifier still elicits (proposal does NOT cover): target audience, success criteria, deliverable archive scope class.
+
 ## Initial Interpretation
 
 [2–4 sentences: how `intake-intent-clarifier` first understood the request. This is the BEFORE picture — the interpretation BEFORE clarifying questions were asked. The point is to make visible the assumptions the AI was about to bake in.]
