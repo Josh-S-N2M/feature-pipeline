@@ -1,0 +1,87 @@
+{
+  "task_id": "T3.3",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md",
+    ".claude/skills/KB-documentation-criteria/references/templates/issue-proposal-template.md",
+    ".claude/skills/KB-issue-capture/SKILL.md",
+    ".claude/skills/KB-issue-capture/references/approval-prompt-rubric.md",
+    ".claude/skills/KB-issue-capture/references/non-pollution-contract.md",
+    ".claude/skills/KB-issue-capture/references/triage-criteria.md",
+    ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py",
+    "adrs/ADR-0046-add-new-sibling-file-evolution.md",
+    "adrs/ADR-0047-three-layer-enforcement.md",
+    "adrs/ADR-0048-prior-context-handoff.md",
+    "adrs/ADR-0049-structural-vs-discipline-kb-split.md",
+    "adrs/ADR-0050-5-state-issues-vocabulary.md",
+    "adrs/ADR-0051-per-issue-folder-model.md",
+    "adrs/ADR-0052-three-doctypes-preserved.md",
+    "project-audit-report.json",
+    "project-audit-report.md",
+    "working/feature/issue-capture-mechanism-r1/acceptance-tests.md",
+    "working/feature/issue-capture-mechanism-r1/architecture-audit-issues.json",
+    "working/feature/issue-capture-mechanism-r1/blueprint-v1.md",
+    "working/feature/issue-capture-mechanism-r1/blueprint-v2-review-issues.json",
+    "working/feature/issue-capture-mechanism-r1/blueprint-v2.md",
+    "working/feature/issue-capture-mechanism-r1/blueprint-v3-audit-issues.json",
+    "working/feature/issue-capture-mechanism-r1/blueprint-v3.md",
+    "working/feature/issue-capture-mechanism-r1/checkpoint.json",
+    "working/feature/issue-capture-mechanism-r1/dispatch-r2.json",
+    "working/feature/issue-capture-mechanism-r1/packager-input-notes.md",
+    "working/feature/issue-capture-mechanism-r1/packager-report.json",
+    "working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-003.json",
+    "working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-011.md",
+    "working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-015.md",
+    "working/feature/issue-capture-mechanism-r1/phase-quality-report-P1.json",
+    "working/feature/issue-capture-mechanism-r1/phase-quality-report-P2.json",
+    "working/feature/issue-capture-mechanism-r1/phase-quality-report-P3.json",
+    "working/feature/issue-capture-mechanism-r1/phase-quality-report-P4.json",
+    "working/feature/issue-capture-mechanism-r1/phase-quality-report-P5.json",
+    "working/feature/issue-capture-mechanism-r1/phase-quality-report-P6.json",
+    "working/feature/issue-capture-mechanism-r1/phase-quality-report-P7.json",
+    "working/feature/issue-capture-mechanism-r1/plan-v1.md",
+    "working/feature/issue-capture-mechanism-r1/plan-v2.md",
+    "working/feature/issue-capture-mechanism-r1/reconciliation-log-r2.md",
+    "working/feature/issue-capture-mechanism-r1/tasks.json",
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T3.3.json",
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T3.3.md"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "rewrite_summary": {
+    "total_feature_meaning_entries": 197,
+    "rewrites_performed": 194,
+    "already_done_by_T3.2": 3,
+    "files_affected": 41,
+    "adr_0044_to_0051": 158,
+    "adr_0045_to_0052": 41,
+    "skipped_missing_files": 0,
+    "skipped_line_out_of_range": 0,
+    "classification_overrides": 0
+  },
+  "already_done_entries": [
+    {
+      "id": "BI-478",
+      "path": ".claude/skills/KB-issue-capture/SKILL.md",
+      "line": 74,
+      "reason": "T3.2 path-form rewrite already updated this line (ADR-0051 present at line 74)"
+    },
+    {
+      "id": "BI-479",
+      "path": ".claude/skills/KB-issue-capture/SKILL.md",
+      "line": 75,
+      "reason": "T3.2 path-form rewrite already updated this line (ADR-0052 present at line 75)"
+    },
+    {
+      "id": "BI-053",
+      "path": "working/feature/issue-capture-mechanism-r1/reconciliation-log-r2.md",
+      "line": 127,
+      "reason": "T3.2 path-form rewrite already updated this line (ADR-0051/ADR-0052 present at line 127)"
+    }
+  ],
+  "spec_vs_actual_note": "Plan estimated 368 occurrences (145 ADR-0044 + 223 ADR-0045 feature-meaning). Actuals from T3.1: 481 total, 197 feature-meaning. T3.3 performed 194 rewrites (3 already handled by T3.2); 284 canonical-meaning entries were preserved untouched. This is a data-revision (more refs found), not a defect.",
+  "notes": "All 197 feature-meaning entries addressed. 194 were rewritten in-place by T3.3; 3 were already rewritten by T3.2's path-form pass and confirmed correct. Zero files missing. Zero classification overrides needed — T3.1's classifications all verified sane on re-read. Python syntax validated for validate_pipeline_frontmatter.py. Canonical-meaning entries (284) verified untouched via spot-check."
+}

@@ -3,8 +3,58 @@
   "feature_slug": "adr-placement-mechanism-repair-r1",
   "started_at": "2026-05-24T18:32:01Z",
   "completed_at": "2026-05-24T21:30:00Z",
-  "current_stage": "complete",
-  "stage_status": "passed",
+  "current_stage": "execution_complete",
+  "stage_status": "passed_with_documented_deferrals",
+  "execution_mode": "specialist-dispatch (with parent-driven-fallback for auto-mode classifier-blocked edits)",
+  "execution_started_at": "2026-05-25T12:00:00Z",
+  "execution_completed_at": "2026-05-25T18:00:30Z",
+  "execution_summary": {
+    "total_tasks": 40,
+    "completed_tasks": 40,
+    "tasks_fully_completed": 36,
+    "tasks_partial_with_deferrals": 4,
+    "deferrals": [
+      "T5.3 Edit C: settings.json narrow Bash allow-rule for validate_adr_placement.py (auto-mode classifier blocked; 'Bash' already broadly allowed so the narrow rule is defense-in-depth/documentation only per ADR-0054 commitment 3)",
+      "T5.4b: design-composition.md:295 path-form refresh (classifier blocked; cosmetic)",
+      "T5.4c: deliverable-archive-spec.md:150 backward-compat clause removal (classifier blocked; cosmetic)",
+      "T5.5: capture-issue/SKILL.md:44 path-form refresh (classifier blocked; cosmetic)"
+    ],
+    "phase_outcomes": {
+      "P-0": "PASS",
+      "P-1": "PASS",
+      "P-2": "PASS (F-P2-VAL-1 tombstone-citation remediated inline)",
+      "P-3": "PASS (with documented exclusion-surface residuals)",
+      "P-4": "PASS",
+      "P-5": "PASS (with 3 cosmetic skill-text deferrals)",
+      "P-6": "PASS (T6.8 PARTIAL on deferrals; all functional checks PASS)",
+      "P-R": "PASS"
+    },
+    "key_empirical_results": {
+      "validator_scan": "PASS, 0 findings, 30ms (NFR-2 budget 5000ms)",
+      "three_surface_negative_path_harness": "PASS at all 3 surfaces",
+      "validate_adr_placement_py_LOC": 106,
+      "validate_adr_placement_py_imports": "Python stdlib only (argparse, json, sys, time, pathlib)",
+      "bare_id_sweep": "197 feature-meaning rewrites + 284 canonical-meaning preserved (0 ambiguous)",
+      "path_form_sweep": "33 substitutions + 8 documented exclusions",
+      "adr_consolidation": "adrs-migrated/ removed; 12 byte-identical dedupes; 7 archive-wins; 5 issue-capture relocations; 2 renumbers (ADR-0044→0051, ADR-0045→0052)",
+      "adrs_count_canonical": 55,
+      "adrs_count_superseded": 7
+    }
+  },
+  "execution_pipeline_state_transitions": [
+    {
+      "transition": "T0",
+      "from": "INIT",
+      "to": "pending",
+      "timestamp": "2026-05-25T12:00:00Z",
+      "trigger": "execution pipeline activated; tasks.json ratified at Gate 6; entering specialist-dispatch mode",
+      "invoking_agent": "execute-orchestrator"
+    }
+  ],
+  "execution_pipeline_cycle_counters": {
+    "per_task": {},
+    "per_phase": {}
+  },
   "gate_history": [
     {"gate": "intent_confirmation", "decision": "approved", "timestamp": "2026-05-24T18:55:00Z", "artifact_version": "intent-clarification v2.0.1", "user_notes": "v1.1.0 binding override expanded scope MINOR→FULL. v2.0.0 re-authored; re-run gate approved with OI-2 override (consolidate adrs-migrated/)."},
     {"gate": "prd_approval", "decision": "approved", "timestamp": "2026-05-24T19:10:00Z", "artifact_version": "prd v1.0.2", "user_notes": "MINORs folded in (v1.0.0→v1.0.2)."},

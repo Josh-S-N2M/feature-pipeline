@@ -1,0 +1,25 @@
+{
+  "task_id": "T2b.2",
+  "status": "COMPLETED",
+  "files_modified": [
+    "adrs/ADR-0051-per-issue-folder-model.md",
+    "adrs/ADR-0052-three-doctypes-preserved.md",
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [],
+  "files_moved": [
+    {
+      "from": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md",
+      "to": "adrs/ADR-0051-per-issue-folder-model.md",
+      "operation": "git mv"
+    },
+    {
+      "from": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0045-three-doctypes-preserved.md",
+      "to": "adrs/ADR-0052-three-doctypes-preserved.md",
+      "operation": "git mv"
+    }
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "2 git mv ops completed. Frontmatter updated: id: ADR-0044→ADR-0051 and id: ADR-0045→ADR-0052; original_id, renumbered_per, renumbered_at fields added to both. Canonical adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md and adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md verified untouched (both retain id: ADR-0044 and id: ADR-0045 respectively, status: Accepted). Source dir working/feature/issue-capture-mechanism-r1/adrs/ retains only tombstone files. Migration-log Phase 2b table updated with 2 new rows."
+}

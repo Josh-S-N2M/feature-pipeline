@@ -1,0 +1,11 @@
+{
+  "task_id": "T4.1",
+  "status": "COMPLETED",
+  "files_modified": [],
+  "files_created": [
+    ".claude/skills/auditing-shared/scripts/validate_adr_placement.py"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Script authored per Blueprint Component 1 contract. 106 LOC. All 4 phases passed: py_compile OK, ast.parse OK, live scan elapsed_ms=29 (NFR-2 <5000ms satisfied). The validator correctly emits BLOCK for ADR-*.md files found outside canonical adrs/ or adrs/superseded/ locations. The 5 findings on the full-repo scan are for corpus fixture files at .claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/ — these are known corpus fixtures that an operator can exempt via --allowlist. No unexpected errors. Exit code 0=PASS, 2=BLOCK behavior confirmed."
+}

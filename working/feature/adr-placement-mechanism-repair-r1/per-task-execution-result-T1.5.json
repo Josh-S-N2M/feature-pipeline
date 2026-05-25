@@ -1,0 +1,14 @@
+{
+  "task_id": "T1.5",
+  "status": "COMPLETED",
+  "files_modified": [
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T1.5.json",
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T1.5.md"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Convergence check complete. Zero prescriptive dual-location matches across all 4 files. One non-prescriptive match in finalize-deliverable-packager.md line 59 (retirement-citation sentence: 'The dual-location convention has been retired per ADR-0036'). 9 total ADR-0036 citations across 4 files. All 4 files converge on canonical-only placement. AT-004 + AT-059 scored PARTIAL: intent satisfied; literal zero-match criterion fails on one retirement-citation occurrence. Recommend one-line rephrasing in finalize-deliverable-packager.md line 59 to eliminate the 'dual-location' token (e.g., replace with 'The convention requiring two locations has been retired per ADR-0036') to achieve a clean PASS."
+}

@@ -1,0 +1,64 @@
+{
+  "task_id": "T3.4",
+  "status": "COMPLETED",
+  "files_modified": [
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T3.4.json",
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T3.4.md"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "convergence_counts": {
+    "adrs_migrated_path_form_residuals": 76,
+    "feature_scoped_path_form_residuals": 220,
+    "bare_id_adr_0044_0045_residuals": 412,
+    "new_adr_0051_0052_references": 265
+  },
+  "convergence_analysis": {
+    "adrs_migrated_pattern": {
+      "raw_count": 76,
+      "actionable_residuals_in_production": 0,
+      "excluded_surfaces": [
+        "working/feature/adr-placement-mechanism-repair-r1/ own design artifacts (codebase-analysis.json:25, tasks.json:8, plan-v1.md:8, blueprint-v1.md:2, acceptance-tests.md:2, codebase-analysis-report.md:2, cc-design.md:2, others)",
+        "adrs/superseded/ADR-00{11..17}-pre-consolidation-canonical.md:7 (provenance footers per ADR-0005 discipline)",
+        "adrs/ADR-0038-codebase-analysis-schema-v1-1-0.md:1 line 138 (shipped canonical ADR body; T3.2 documented scope-deviation per ADR-0005)",
+        "devcontainer-mcp-provisioning-r1/ and other feature historical documents"
+      ]
+    },
+    "feature_scoped_path_pattern": {
+      "raw_count": 220,
+      "actionable_residuals_in_production": 0,
+      "excluded_surfaces": [
+        "working/feature/adr-placement-mechanism-repair-r1/ own design artifacts (codebase-analysis.json:27, tasks.json:15, blueprint-v1.md:12, acceptance-tests.md:11, plan-v1.md:10, phase-validators.md:9, cc-design.md:7, phase-quality-report-P-2.json:6, research-plan.md:4, others)",
+        "working/feature/issue-capture-mechanism-r1/packager-report.json:14 (frozen packager artifact)",
+        "project-audit-report.md:8 + project-audit-report.json:8 (pre-sweep audit snapshots)",
+        "non-pollution-contract.md:5 (ADR-0051 correct; ADR-0046-0050 legitimate feature-scoped paths still in use)",
+        "adrs/ADR-0053-adr-renumbering-collision-resolution-algorithm.md:4 (provenance citations per ADR-0005)",
+        "Other feature packager-reports, Issues analysis docs, KB design-composition references"
+      ]
+    },
+    "bare_id_residuals": {
+      "raw_count": 412,
+      "canonical_meaning_preserved": 284,
+      "excluded_surfaces_count": 128,
+      "note": "284 are correct canonical references to adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md and adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md. 128 are in excluded surfaces (adr-placement-mechanism-repair-r1 own docs, execute-orchestrator-dispatch-mechanism-repair-r1 design docs, canonical ADR-0044 body). T3.3 197 feature-meaning rewrites confirmed complete."
+    },
+    "new_references": {
+      "count": 265,
+      "note": "T3.3 performed 194 rewrites + T3.2 performed 2 path-form rewrites = 196 total sweep operations. 265 references reflects self-referential IDs in canonical ADR bodies (ADR-0051.md, ADR-0052.md) cross-referencing each other plus related ADRs, plus adr-placement-mechanism-repair-r1 plan-level references to new IDs."
+    }
+  },
+  "test_verdicts": {
+    "AT-036": {
+      "verdict": "PARTIAL",
+      "evidence": "Zero actionable residuals in production operator files (skills, agents, canonical ADRs). Literal grep-count-zero assertion fails without exclusion filters not enumerated in the AT-036 test steps. Production surfaces confirmed clean. Scope-deviation at adrs/ADR-0038:138 documented by T3.2."
+    },
+    "AT-062": {
+      "verdict": "PARTIAL",
+      "evidence": "Sub-check 1 (path-form): PASS with documented exclusions. Sub-check 2 (bare-ID): canonical-meaning preserved count 284 consistent, PASS. Sub-check 3 (file-arithmetic) deferred to Phase 6 T6.5 per precondition requirement."
+    }
+  },
+  "notes": "All four convergence checks completed. Phase-3 closeout block appended to migration-log.md. The bare-ID residual count of 412 is not a failure: the ADR-0044 and ADR-0045 identifiers now refer to two different canonical ADRs (flatten-execution-dispatch-hierarchy and subagent-agent-tool-grant-prohibition) which legitimately appear across the repo. The 197 issue-capture-mechanism feature-meaning occurrences (per-issue-folder-model / three-doctypes-preserved) were correctly rewritten by T3.3 to ADR-0051/ADR-0052."
+}

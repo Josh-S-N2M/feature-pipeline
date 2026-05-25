@@ -1,0 +1,99 @@
+{
+  "task_id": "T2d.2",
+  "status": "COMPLETED",
+  "files_created": [
+    "adrs/superseded/ADR-0011-pre-consolidation-canonical.md",
+    "adrs/superseded/ADR-0012-pre-consolidation-canonical.md",
+    "adrs/superseded/ADR-0013-pre-consolidation-canonical.md",
+    "adrs/superseded/ADR-0014-pre-consolidation-canonical.md",
+    "adrs/superseded/ADR-0015-pre-consolidation-canonical.md",
+    "adrs/superseded/ADR-0016-pre-consolidation-canonical.md",
+    "adrs/superseded/ADR-0017-pre-consolidation-canonical.md"
+  ],
+  "files_modified": [
+    "adrs/ADR-0011-documentation-criteria-canonical-skill.md",
+    "adrs/ADR-0012-prd-stage.md",
+    "adrs/ADR-0013-blueprint-template-adoption.md",
+    "adrs/ADR-0014-adr-template-adoption-and-migration.md",
+    "adrs/ADR-0015-ears-acceptance-criteria.md",
+    "adrs/ADR-0016-per-layer-fanout-composer-fanin.md",
+    "adrs/ADR-0017-document-reviewer-integration.md",
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_git_rmd": [
+    "adrs/ADR-0011-documentation-criteria-canonical-skill.md (old v1.0.0 canonical, replaced by git mv)",
+    "adrs/ADR-0012-prd-stage.md (old v1.0.0 canonical, replaced by git mv)",
+    "adrs/ADR-0013-blueprint-template-adoption.md (old v1.0.0 canonical, replaced by git mv)",
+    "adrs/ADR-0014-adr-template-adoption-and-migration.md (old v1.0.0 canonical, replaced by git mv)",
+    "adrs/ADR-0015-ears-acceptance-criteria.md (old v1.0.0 canonical, replaced by git mv)",
+    "adrs/ADR-0016-per-layer-fanout-composer-fanin.md (old v1.0.0 canonical, replaced by git mv)",
+    "adrs/ADR-0017-document-reviewer-integration.md (old v1.0.0 canonical, replaced by git mv)",
+    "adrs-migrated/ADR-0011-documentation-criteria-canonical-skill-pre-naming-convention.md",
+    "adrs-migrated/ADR-0012-prd-stage-pre-naming-convention.md",
+    "adrs-migrated/ADR-0013-blueprint-template-adoption-pre-naming-convention.md",
+    "adrs-migrated/ADR-0014-adr-template-adoption-and-migration-pre-naming-convention.md",
+    "adrs-migrated/ADR-0015-ears-acceptance-criteria-pre-naming-convention.md",
+    "adrs-migrated/ADR-0016-per-layer-fanout-composer-fanin-pre-naming-convention.md",
+    "adrs-migrated/ADR-0017-document-reviewer-integration-pre-naming-convention.md"
+  ],
+  "scope_deviations": [
+    {
+      "deviation": "Task spec described source files as ADR-NNNN-<slug>-final.md but actual adrs-migrated/ filenames have no -final suffix — they are ADR-NNNN-<slug>.md",
+      "proposed_resolution": "named-exempt",
+      "evidence": "ls adrs-migrated/ shows ADR-0011-documentation-criteria-canonical-skill.md (no -final); same pattern for all 7 IDs. Proceeded using actual filenames; semantics are identical."
+    }
+  ],
+  "phase_4_gate_passed": true,
+  "per_id_disposition": {
+    "ADR-0011": {
+      "old_canonical": "adrs/ADR-0011-documentation-criteria-canonical-skill.md (v1.0.0)",
+      "new_canonical": "adrs/ADR-0011-documentation-criteria-canonical-skill.md (v2.0.0, from adrs-migrated/)",
+      "superseded_archive": "adrs/superseded/ADR-0011-pre-consolidation-canonical.md",
+      "variants_removed": ["adrs-migrated/ADR-0011-documentation-criteria-canonical-skill-pre-naming-convention.md"],
+      "result": "COMPLETED"
+    },
+    "ADR-0012": {
+      "old_canonical": "adrs/ADR-0012-prd-stage.md (v1.0.0)",
+      "new_canonical": "adrs/ADR-0012-prd-stage.md (v2.0.0, from adrs-migrated/)",
+      "superseded_archive": "adrs/superseded/ADR-0012-pre-consolidation-canonical.md",
+      "variants_removed": ["adrs-migrated/ADR-0012-prd-stage-pre-naming-convention.md"],
+      "result": "COMPLETED"
+    },
+    "ADR-0013": {
+      "old_canonical": "adrs/ADR-0013-blueprint-template-adoption.md (v1.0.0)",
+      "new_canonical": "adrs/ADR-0013-blueprint-template-adoption.md (v2.0.0, from adrs-migrated/)",
+      "superseded_archive": "adrs/superseded/ADR-0013-pre-consolidation-canonical.md",
+      "variants_removed": ["adrs-migrated/ADR-0013-blueprint-template-adoption-pre-naming-convention.md"],
+      "result": "COMPLETED"
+    },
+    "ADR-0014": {
+      "old_canonical": "adrs/ADR-0014-adr-template-adoption-and-migration.md (v1.0.0)",
+      "new_canonical": "adrs/ADR-0014-adr-template-adoption-and-migration.md (v2.0.0, from adrs-migrated/)",
+      "superseded_archive": "adrs/superseded/ADR-0014-pre-consolidation-canonical.md",
+      "variants_removed": ["adrs-migrated/ADR-0014-adr-template-adoption-and-migration-pre-naming-convention.md"],
+      "result": "COMPLETED"
+    },
+    "ADR-0015": {
+      "old_canonical": "adrs/ADR-0015-ears-acceptance-criteria.md (v1.0.0)",
+      "new_canonical": "adrs/ADR-0015-ears-acceptance-criteria.md (v2.0.0, from adrs-migrated/)",
+      "superseded_archive": "adrs/superseded/ADR-0015-pre-consolidation-canonical.md",
+      "variants_removed": ["adrs-migrated/ADR-0015-ears-acceptance-criteria-pre-naming-convention.md"],
+      "result": "COMPLETED"
+    },
+    "ADR-0016": {
+      "old_canonical": "adrs/ADR-0016-per-layer-fanout-composer-fanin.md (v1.0.0)",
+      "new_canonical": "adrs/ADR-0016-per-layer-fanout-composer-fanin.md (v2.0.0, from adrs-migrated/)",
+      "superseded_archive": "adrs/superseded/ADR-0016-pre-consolidation-canonical.md",
+      "variants_removed": ["adrs-migrated/ADR-0016-per-layer-fanout-composer-fanin-pre-naming-convention.md"],
+      "result": "COMPLETED"
+    },
+    "ADR-0017": {
+      "old_canonical": "adrs/ADR-0017-document-reviewer-integration.md (v1.0.0)",
+      "new_canonical": "adrs/ADR-0017-document-reviewer-integration.md (v2.0.0, from adrs-migrated/)",
+      "superseded_archive": "adrs/superseded/ADR-0017-pre-consolidation-canonical.md",
+      "variants_removed": ["adrs-migrated/ADR-0017-document-reviewer-integration-pre-naming-convention.md"],
+      "result": "COMPLETED"
+    }
+  },
+  "notes": "All 7 IDs processed per archive-wins routine. adrs/superseded/ directory created. Each old canonical (v1.0.0) archived with provenance footer. Each adrs-migrated/ v2.0.0 file promoted to adrs/ via git mv. Each new canonical has superseded_by_consolidation and superseded_canonical_archived_to frontmatter fields added. All pre-naming-convention variants removed via git rm. Migration log Phase 2d table populated with 7 rows. Scope deviation: task spec referenced -final.md suffix in adrs-migrated/ but actual filenames have no such suffix — proceeding with actual filenames is semantically correct and named-exempt."
+}

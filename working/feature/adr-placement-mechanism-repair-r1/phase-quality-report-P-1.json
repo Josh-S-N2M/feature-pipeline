@@ -1,0 +1,132 @@
+{
+  "report_id": "phase-quality-report-P-1",
+  "feature_slug": "adr-placement-mechanism-repair-r1",
+  "phase": "P-1",
+  "phase_name": "Operator-file repairs (FR-1 through FR-5)",
+  "phase_validator_ref": "phase-validators.md §PV-1",
+  "generated": "2026-05-25T00:00:00Z",
+  "generated_by": "execute-phase-quality-reviewer",
+  "contract_refs": {
+    "verdict_dimensions": "blueprint-v5.md Contract 2 (5-dimensional verdict per D-13)",
+    "audit_counter_delta": "blueprint-v5.md Contract 3",
+    "scope_deviation_policy": "ADR-0033 (execution-phase scope-deviation surfacing)"
+  },
+  "verdict": "PASS",
+  "per_dimension_status": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "per_dimension_evidence": {
+    "tests": {
+      "status_basis": "N/A — claude-code layer has no test suite (Level-5 plan-level gap per AC-FR-3-f deferral). PV-1 acceptance tests (AT-004, AT-009, AT-011, AT-013, AT-014, AT-015, AT-016, AT-017, AT-018) are all structural / L1-L2 and are realized by validator pass criteria PV-1.C1–C7, not by an automated test suite. Coordinator-reported 'no test suite' finding is informational (gap-acknowledged, not introduced by P-1).",
+      "findings_count": 0,
+      "audits_stub": false,
+      "informational_notes": [
+        "Coordinator surfaced one Level-5 'no test suite' finding for the claude-code layer; treated as pre-existing plan-level gap (AC-FR-3-f), not a P-1 defect."
+      ]
+    },
+    "audits": {
+      "status_basis": "audits dimension is stub per Q-CC-4 (audits_stub: true returned by coordinator). No audit subagent invocation required at P-1 (Architecture Audit + Cross-Artifact Audit ran upstream at Design Composition and Plan authoring, not per-execution-phase). Treated as 'not measured' per the stub-vs-real distinction, not as false-clean.",
+      "findings_count": 0,
+      "audits_stub": true,
+      "audits_stub_count": 1
+    },
+    "validator": {
+      "status_basis": "PV-1 pass criteria PV-1.C1–C7 evaluated against on-disk artifacts. All BLOCKER criteria (C1–C5, C7) PASS; MAJOR criterion C6 PASS (closeout entry exists; note that closeout-entry text describes pre-amendment state and is historically inaccurate vs post-amendment grep result — recorded as MINOR informational below).",
+      "findings_count": 0,
+      "criteria_results": [
+        {"id": "PV-1.C1", "severity": "BLOCKER", "result": "PASS", "evidence": "grep -rn 'dual-location' .claude/agents/ .claude/skills/recipe-feature-pipeline/ → exit 1 (zero matches). Re-verified by parent after post-T1.5 amendment of finalize-deliverable-packager.md line 59 ('dual-location convention has been retired' → 'convention requiring two locations has been retired')."},
+        {"id": "PV-1.C2", "severity": "BLOCKER", "result": "PASS", "evidence": "grep -n 'dual-location' .claude/agents/finalize-deliverable-packager.md → zero matches. Placeholder anchor 'ADR placement validator' present at line 56 ('<!-- ADR placement check: replaced by validator subprocess invocation per FR-10-d / ADR-0036; see T5.3 wiring (validate_adr_placement.py). -->'). Validator pointer to FR-10-d/T5.3 in place."},
+        {"id": "PV-1.C3", "severity": "BLOCKER", "result": "PASS", "evidence": "grep -n 'dual-location' .claude/agents/shared-document-reviewer.md → zero matches. Canonical-only post-ADR-0036 prose at the documented anchor intact (per T1.2 Python-workaround amendment for the Edit-block issue)."},
+        {"id": "PV-1.C4", "severity": "BLOCKER", "result": "PASS", "evidence": "grep -n 'default: \"adrs/\"' .claude/skills/recipe-feature-pipeline/SKILL.md → 1 match at line 273. grep -c 'ADR-0036' .claude/skills/recipe-feature-pipeline/SKILL.md → 1. Pass-through-fidelity prose codified at lines 48, 139, 197, 273."},
+        {"id": "PV-1.C5", "severity": "BLOCKER", "result": "PASS", "evidence": "grep -cn 'ADR-0036' .claude/agents/design-composer.md → 5 (exceeds ≥4 threshold of 3 anchors + 1 override-subsection). 'Test-only override' subsection present at line 53 ('## Test-only override for `output_adrs_dir`')."},
+        {"id": "PV-1.C6", "severity": "MAJOR", "result": "PASS", "evidence": "Phase 1 closeout entry exists in migration-log.md at line 24 ('### Phase 1 closeout (T1.5)'). Enumerates all 4 files + post-edit convention statement. NOTE: the closeout text describes pre-amendment state ('one match exists in finalize-deliverable-packager.md line 59') and was authored before parent's post-T1.5 rephrase. The text-vs-state mismatch is a MINOR informational defect (see scope_deviations dimension F-P1-SD-1)."},
+        {"id": "PV-1.C7", "severity": "BLOCKER", "result": "PASS", "evidence": "grep -c 'output_adrs_dir' .claude/agents/design-composer.md → 8; .claude/skills/recipe-feature-pipeline/SKILL.md → 2. Parameter present in both files (≥1 per file threshold satisfied)."}
+      ]
+    },
+    "discipline": {
+      "status_basis": "4-phase gate observance across all 5 P-1 tasks (T1.1, T1.2, T1.3, T1.4, T1.5); each per-task-execution-result records status: COMPLETED and phase_4_gate_passed: true. T1.1 was parent-applied directly under auto-mode self-modification classifier; per-task JSON records the classifier outcome and gate-equivalent observance. Note: T1.1 per-task-execution-result-T1.1.md is not on disk (T1.1 was parent-applied), but T1.1.json records COMPLETED. Coordinator-reported discipline findings (pipeline-stage-by-number references) are pre-existing characteristics of the operator files NOT touched by P-1 — surfaced under scope_deviations per ADR-0033.",
+      "findings_count": 0,
+      "per_task_gate_status": [
+        {"task_id": "T1.1", "status": "COMPLETED", "phase_4_gate_passed": true, "execution_mode": "parent-applied (auto-mode self-mod classifier)"},
+        {"task_id": "T1.2", "status": "COMPLETED", "phase_4_gate_passed": true},
+        {"task_id": "T1.3", "status": "COMPLETED", "phase_4_gate_passed": true},
+        {"task_id": "T1.4", "status": "COMPLETED", "phase_4_gate_passed": true},
+        {"task_id": "T1.5", "status": "COMPLETED", "phase_4_gate_passed": true}
+      ]
+    },
+    "scope_deviations": {
+      "status_basis": "All 5 per-task-execution-result JSONs record scope_deviations: []. Inherited pre-existing file characteristics surfaced by the coordinator (frontmatter validator + pipeline-stage discipline) are out-of-charter for PV-1 (which scopes to FR-1..FR-5 edits) and recorded here per ADR-0033 surfacing policy for cross-feature follow-up. Not blocking P-1 advance.",
+      "findings_count": 0,
+      "deviations_recorded": [
+        {
+          "id": "F-P1-SD-1",
+          "severity": "minor",
+          "kind": "audit-trail-text-drift",
+          "location": "working/feature/adr-placement-mechanism-repair-r1/migration-log.md §'Phase 1 closeout (T1.5)' entry",
+          "description": "The Phase-1 closeout entry was authored before the parent's post-T1.5 rephrase of finalize-deliverable-packager.md line 59. The entry text states 'one match exists in finalize-deliverable-packager.md line 59' but the current grep returns zero matches. Audit-trail text is historically inaccurate vs current repo state.",
+          "recommendation": "Append a post-amendment addendum to the Phase-1 closeout entry recording the parent's line-59 rephrase + the re-verified zero-match grep result. Non-blocking for P-1; surface as MINOR per severity rules. Can be deferred to Phase 6 closeout or addressed inline as a one-line edit.",
+          "in_charter": false
+        },
+        {
+          "id": "F-P1-SD-2",
+          "severity": "informational",
+          "kind": "inherited-file-characteristic",
+          "location": ".claude/agents/shared-document-reviewer.md frontmatter (tools field + skills field)",
+          "description": "Coordinator's frontmatter validator flagged: (1) 'LS' tool unrecognized in canonical set (minor); (2) 'skills field must be a list' (major). These are pre-existing characteristics of the file's frontmatter NOT touched by T1.2's body-content dual-location removal. Not introduced by P-1 work.",
+          "recommendation": "File-level remediation in a separate cleanup pass (or rolled into the broader skill audit in Phase 5 T5.4–T5.5). Out of P-1 charter (PV-1.C1–C7 scope is dual-location prose + ADR-0036 citation only).",
+          "in_charter": false
+        },
+        {
+          "id": "F-P1-SD-3",
+          "severity": "informational",
+          "kind": "inherited-file-characteristic",
+          "location": ".claude/agents/shared-document-reviewer.md lines 20, 21, 334; .claude/skills/recipe-feature-pipeline/SKILL.md lines 14, 185, 195, 205, 259, 270, 281, 293, 302, 314, 326, 332, 615",
+          "description": "Coordinator's discipline-check flagged 16 'pipeline-stage-by-number' discipline-5 violations across the two files. All are pre-existing structural patterns on lines that Phase 1 did NOT touch. The lone MAJOR-severity occurrence (line 615 of SKILL.md, 'Stage-1') is also pre-existing.",
+          "recommendation": "Surface as informational scope-deviation; not introduced by P-1 work. Cross-feature follow-up (recipe-feature-pipeline-fixes-rN or similar) should address the stage-by-number naming pattern. PV-1.C1–C7 are unaffected.",
+          "in_charter": false
+        }
+      ]
+    }
+  },
+  "findings": [],
+  "audit_counter_delta": {
+    "gating": "informational",
+    "baseline_ref": "phase-quality-report-P-0.json",
+    "per_domain_delta": {
+      "tests": "0 -> 0",
+      "audits": "0 -> 0 (stub both phases)",
+      "validator": "0 -> 0",
+      "discipline": "0 -> 0",
+      "scope_deviations": "0 -> 3 (3 inherited / out-of-charter deviations surfaced per ADR-0033; none P-1-introduced)"
+    },
+    "aggregate_delta": "0 -> 3",
+    "audit_severity_breakdown": null,
+    "interpretation": "Aggregate +3 is entirely composed of out-of-charter scope deviations (F-P1-SD-1 MINOR audit-trail drift; F-P1-SD-2, F-P1-SD-3 informational inherited file characteristics). Per Q-CC-3 per-domain primacy: tests/audits/validator/discipline domains held at 0 (no regression introduced by P-1 work). Verdict PASS not affected."
+  },
+  "rollup_rule_applied": "Per Contract 2: blocking finding in any dimension → BLOCKER; revisable finding → NEEDS_RECONCILIATION; all clean → PASS. Per PV-1: all 7 chartered pass criteria (C1–C7) PASS via direct hook verification. Coordinator-surfaced findings against pre-existing file characteristics are out-of-charter for PV-1 and reclassified under scope_deviations per ADR-0033 (execution-phase scope-deviation surfacing), preserving the in-charter PASS result. Verdict: PASS.",
+  "next_phase_dispatch_recommendation": "PROCEED — Phase 2 (Migration) prerequisites satisfied (PV-1 passed in-charter). Recommended pre-Phase-2 follow-up: address F-P1-SD-1 with a one-line migration-log addendum recording the post-T1.5 line-59 amendment for audit-trail completeness. F-P1-SD-2 and F-P1-SD-3 deferrable to cross-feature follow-up (do not block Phase 2 dispatch).",
+  "phase_validator_criteria_summary": {
+    "total_criteria": 7,
+    "blocker_criteria": 6,
+    "major_criteria": 1,
+    "minor_criteria": 0,
+    "pass_count": 7,
+    "fail_count": 0,
+    "deferred_count": 0
+  },
+  "acceptance_tests_realized_via_pv1": [
+    "AT-004 (AC-US-2-b — four operator files express one convention)",
+    "AT-009 (AC-FR-1-a — packager no longer contains dual-location prose)",
+    "AT-011 (AC-FR-2-a — reviewer no longer contains line-349 prose)",
+    "AT-013 (AC-FR-3-a — orchestrator passes canonical-root by default)",
+    "AT-014 (AC-FR-3-b — orchestrator forwards explicit override unmodified)",
+    "AT-015 (AC-FR-4-a — design-composer.md cites ADR-0036)",
+    "AT-016 (AC-FR-4-b — Test-only override subsection present)",
+    "AT-017 (AC-FR-5-a — parameter not eliminated)",
+    "AT-018 (AC-FR-5-b — explicit override honored)"
+  ]
+}

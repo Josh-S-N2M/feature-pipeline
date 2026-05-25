@@ -1,0 +1,56 @@
+{
+  "task_id": "T2d.1",
+  "status": "COMPLETED",
+  "files_modified": [
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [
+    "adrs/ADR-0001-orchestrator-placement.md",
+    "adrs/ADR-0002-critique-1-discipline.md",
+    "adrs/ADR-0003-critique-2-discipline.md",
+    "adrs/ADR-0004-test-split.md",
+    "adrs/ADR-0005-append-only-supersession.md",
+    "adrs/ADR-0006-synthesis-inlined.md",
+    "adrs/ADR-0008-issue-ledger-scope.md",
+    "adrs/ADR-0009-rationale-brief-discipline.md",
+    "adrs/ADR-0010-knowledge-skill-frontmatter-correction.md"
+  ],
+  "files_deleted": [
+    "adrs-migrated/ADR-0001-orchestrator-placement.md",
+    "adrs-migrated/ADR-0001-orchestrator-placement-pre-naming-convention.md",
+    "adrs-migrated/ADR-0001-orchestrator-placement-pre-template-migration.md",
+    "adrs-migrated/ADR-0002-critique-1-discipline.md",
+    "adrs-migrated/ADR-0002-critique-1-discipline-pre-naming-convention.md",
+    "adrs-migrated/ADR-0002-critique-1-discipline-pre-template-migration.md",
+    "adrs-migrated/ADR-0003-critique-2-discipline.md",
+    "adrs-migrated/ADR-0003-critique-2-discipline-pre-naming-convention.md",
+    "adrs-migrated/ADR-0003-critique-2-discipline-pre-template-migration.md",
+    "adrs-migrated/ADR-0004-test-split.md",
+    "adrs-migrated/ADR-0004-test-split-pre-naming-convention.md",
+    "adrs-migrated/ADR-0004-test-split-pre-template-migration.md",
+    "adrs-migrated/ADR-0005-append-only-supersession.md",
+    "adrs-migrated/ADR-0005-append-only-supersession-pre-naming-convention.md",
+    "adrs-migrated/ADR-0005-append-only-supersession-pre-template-migration.md",
+    "adrs-migrated/ADR-0006-synthesis-inlined.md",
+    "adrs-migrated/ADR-0006-synthesis-inlined-pre-naming-convention.md",
+    "adrs-migrated/ADR-0006-synthesis-inlined-pre-template-migration.md",
+    "adrs-migrated/ADR-0008-issue-ledger-scope.md",
+    "adrs-migrated/ADR-0008-issue-ledger-scope-pre-naming-convention.md",
+    "adrs-migrated/ADR-0008-issue-ledger-scope-pre-template-migration.md",
+    "adrs-migrated/ADR-0009-rationale-brief-discipline.md",
+    "adrs-migrated/ADR-0009-rationale-brief-discipline-pre-naming-convention.md",
+    "adrs-migrated/ADR-0009-rationale-brief-discipline-pre-template-migration.md",
+    "adrs-migrated/ADR-0010-knowledge-skill-frontmatter-correction.md",
+    "adrs-migrated/ADR-0010-knowledge-skill-frontmatter-correction-pre-naming-convention.md",
+    "adrs-migrated/ADR-0010-knowledge-skill-frontmatter-correction-pre-template-migration.md"
+  ],
+  "scope_deviations": [
+    {
+      "deviation": "Source files in adrs-migrated/ do not carry the -final suffix described in the task spec. The 'keeper' file for each ID is the plain-slug file (e.g., ADR-0001-orchestrator-placement.md, not ADR-0001-orchestrator-placement-final.md). Additionally, the target slugs enumerated in target_files differ from the source slugs (e.g., task spec lists adrs/ADR-0001-canonical-process-naming.md but source slug is orchestrator-placement). Per the sanity-check instruction, source filename slug was used for the canonical target.",
+      "proposed_resolution": "defer",
+      "evidence": "ls adrs-migrated/ADR-0001-* returned three files: ADR-0001-orchestrator-placement.md (keeper), ADR-0001-orchestrator-placement-pre-naming-convention.md, ADR-0001-orchestrator-placement-pre-template-migration.md. No -final suffix present on any file. Same pattern confirmed for all 9 IDs. Target files placed at adrs/ADR-NNNN-<source-slug>.md per sanity-check instruction."
+    }
+  ],
+  "phase_4_gate_passed": true,
+  "notes": "Executed 9 git mv operations (R status in git staging) and 18 git rm operations (D status). All 9 canonical targets verified present at adrs/. Zero 0001-0006/0008-0010 files remain in adrs-migrated/. adrs-migrated/ now contains only ADR-0007 variants (handled by T2d.4) and ADR-0011 through ADR-0018 variants (handled by T2d.2 and T2d.3). 9 migration-log rows appended to Phase 2d table under sub-procedure (i). Git staging shows exactly 9 renames and 18 deletes for the target IDs."
+}

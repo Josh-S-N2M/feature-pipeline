@@ -1,0 +1,11 @@
+{
+  "task_id": "T5.2",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/skills/auditing-shared/scripts/run_phase_checks.py"
+  ],
+  "files_created": [],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Added validate_adr_placement.py to parallel-dispatch set with --allowlist 'output/synthesis-*/adrs/' per ADR-0054 commitment 2. Findings fold into validator dimension per Q-CC-7 Option A with severity normalised from uppercase (BLOCKER) to lowercase (blocker) for consistency with dimension_rollup comparisons. Non-zero exit (code 2) from the validator is handled by run_script which accepts exit codes 0 and 2 as valid; the resulting BLOCKER findings drive the overall verdict to BLOCKER, blocking phase progression. LOC delta: +37 lines (2 new module-level constants, 13 dispatch block lines, 22 rollup fold lines; 0 deletions)."
+}

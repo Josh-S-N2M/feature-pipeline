@@ -1,0 +1,163 @@
+{
+  "doc_type": "phase-quality-report",
+  "feature_slug": "adr-placement-mechanism-repair-r1",
+  "phase": "P-2",
+  "phase_scope": ["P-2a", "P-2b", "P-2c", "P-2d"],
+  "consolidation_note": "Phases P-2a, P-2b, P-2c, P-2d aggregated into a single Phase-2 verdict per orchestrator request for execution efficiency. All four sub-phases evaluated together against PV-2a/2b/2c/2d criteria from phase-validators.md.",
+  "verdict": "NEEDS_RECONCILIATION",
+  "per_dimension_status": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "NEEDS_RECONCILIATION",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "audits_stub": true,
+  "findings": [
+    {
+      "id": "F-P2-VAL-1",
+      "domain": "validator",
+      "severity": "MAJOR",
+      "phase_validator_ref": "PV-2c.C3",
+      "title": "Tombstones lack ADR-0036 citation required by Blueprint FR-8c template",
+      "evidence": "All 5 tombstone files at working/feature/issue-capture-mechanism-r1/adrs/ADR-{0046,0047,0048,0049,0050}.tombstone contain the move announcement, original location, and git-log provenance pointer, but NONE of the 5 files contain the literal string 'ADR-0036' that the Blueprint §Migration map FR-8c template requires. PV-2c.C3 is classified MAJOR (revisable), not BLOCKER.",
+      "remediation": "Append a 4th line to each of the 5 tombstone files: 'Canonical placement per ADR-0036 (single-location ADR placement).' This satisfies PV-2c.C3 without restructuring the tombstones or the migration. Re-run PV-2c.C3 grep loop for confirmation.",
+      "blocking": false
+    },
+    {
+      "id": "F-P2-SD-1",
+      "domain": "scope_deviations",
+      "severity": "MINOR",
+      "source_task": "T2b.1",
+      "title": "ADR-0024 filename slug differs from task-spec slug",
+      "evidence": "Task spec referenced 'ADR-0024-frontend-design-knowledge.md' but actual filename on disk (both feature-scoped and canonical) is 'ADR-0024-frontend-design-knowledge-corpus-structure.md'. Producer adapted using actual filename; outcome equivalent.",
+      "scope_deviation_resolution": "named-exemption: actual-filename-used",
+      "blocking": false
+    },
+    {
+      "id": "F-P2-SD-2",
+      "domain": "scope_deviations",
+      "severity": "MINOR",
+      "source_task": "T2c.1",
+      "title": "Task-spec slugs for ADRs 0046-0050 stale vs disk reality",
+      "evidence": "Task spec declared slugs 'issue-capture-orchestration', 'issue-doctype-taxonomy', 'issue-frontmatter-discipline', 'issue-doctype-structural-spec', 'issue-capture-validator-discipline'; actual filenames use slugs 'add-new-sibling-file-evolution', 'three-layer-enforcement', 'prior-context-handoff', 'structural-vs-discipline-kb-split', '5-state-issues-vocabulary'. Producer used actual filenames; all 5 files now correctly placed at adrs/ canonical with matching tombstones.",
+      "scope_deviation_resolution": "named-exemption: actual-filename-used",
+      "blocking": false
+    },
+    {
+      "id": "F-P2-SD-3",
+      "domain": "scope_deviations",
+      "severity": "MINOR",
+      "source_task": "T2d.1",
+      "title": "Task-spec slugs for ADR-0001..0010 differ from disk reality (-final suffix expected)",
+      "evidence": "Task spec described 'keeper' files as ADR-NNNN-<slug>-final.md but actual adrs-migrated/ filenames had no '-final' suffix (e.g., actual: ADR-0001-orchestrator-placement.md, not ADR-0001-canonical-process-naming-final.md). Producer used actual filenames.",
+      "scope_deviation_resolution": "named-exemption: actual-filename-used",
+      "blocking": false
+    },
+    {
+      "id": "F-P2-SD-4",
+      "domain": "scope_deviations",
+      "severity": "MINOR",
+      "source_task": "T2d.2",
+      "title": "Task-spec '-final' suffix on archive-wins sources absent on disk",
+      "evidence": "Task spec described source files as ADR-NNNN-<slug>-final.md but actual filenames in adrs-migrated/ had no -final suffix. Producer adapted; 7 archive writes + 7 canonical updates landed correctly per ADR-0055 v1.0.1 archive-wins policy.",
+      "scope_deviation_resolution": "named-exemption: actual-filename-used",
+      "blocking": false
+    },
+    {
+      "id": "F-P2-SD-5",
+      "domain": "scope_deviations",
+      "severity": "MINOR",
+      "source_task": "T2d.3",
+      "title": "ADR-0018 task-spec '-final' suffix absent on disk",
+      "evidence": "Task spec named 'adrs-migrated/ADR-0018-codebase-analysis-schema-final.md' but actual file is 'adrs-migrated/ADR-0018-codebase-analysis-schema.md' (no -final suffix). Canonical at adrs/ADR-0018-codebase-analysis-schema.md confirmed; both archive variants git-rm'd.",
+      "scope_deviation_resolution": "named-exemption: actual-filename-used",
+      "blocking": false
+    }
+  ],
+  "validator_checks_summary": {
+    "PV-2a": {
+      "verdict": "PASS",
+      "C1_feature_scoped_duplicates_deleted": "PASS (12/12 IDs 0026, 0028-0031, 0037-0043 absent from working/feature/*/adrs/)",
+      "C2_canonical_retained": "PASS (12/12 canonical IDs present at adrs/)",
+      "C3_migration_log_entries": "PASS (12 byte-equality + deletion rows present in Phase 2a section)"
+    },
+    "PV-2b": {
+      "verdict": "PASS",
+      "C1_ADR-0024_feature_deleted": "PASS",
+      "C2_ADR-0024_canonical_Accepted": "PASS (status: Accepted confirmed via grep)",
+      "C3_disposition_recorded": "PASS (Outcome A — zero non-frontmatter divergence — recorded in migration log)",
+      "C4_ADR-0044_to_0051_renumber": "PASS (adrs/ADR-0051-per-issue-folder-model.md exists; working source absent)",
+      "C5_ADR-0045_to_0052_renumber": "PASS (adrs/ADR-0052-three-doctypes-preserved.md exists; working source absent)",
+      "C6_original_id_provenance": "PASS (original_id: ADR-0044 in 0051; original_id: ADR-0045 in 0052)",
+      "C7_id_frontmatter_matches": "PASS (id: ADR-0051 and id: ADR-0052 confirmed)",
+      "C8_git_history_preserved": "PASS (git status shows RM rename; --follow chain inferred from rename status)"
+    },
+    "PV-2c": {
+      "verdict": "NEEDS_RECONCILIATION",
+      "C1_5_canonical_present": "PASS (ADR-0046..0050 all at adrs/)",
+      "C2_5_tombstones_present": "PASS (all 5 .tombstone files in working/feature/issue-capture-mechanism-r1/adrs/)",
+      "C3_tombstone_template_match": "MAJOR-FAIL — Tombstones contain canonical move, original location, and git-log provenance pointer, but lack the literal ADR-0036 citation that Blueprint §Migration map FR-8c template specifies. See F-P2-VAL-1.",
+      "C4_no_md_residual": "PASS (no .md files remain for 0046-0050 in feature dir)",
+      "C5_git_history_preserved": "PASS (git status shows R renames for all 5)",
+      "C6_migration_log_entries": "PASS (5 rows in Phase 2c section)"
+    },
+    "PV-2d": {
+      "verdict": "PASS",
+      "C1_T2d_1_no_collision": "PASS (9 IDs 0001-0006, 0008-0010 each at exactly 1 canonical file)",
+      "C2_T2d_2_archive_wins": "PASS (7 archives at adrs/superseded/ADR-NNNN-pre-consolidation-canonical.md; 7 canonical updated; all 7 carry superseded_by_consolidation + superseded_canonical_archived_to frontmatter)",
+      "C3_T2d_3_ADR-0018": "PASS (canonical-only; both archive variants git-rm'd)",
+      "C4_T2d_4_adrs_migrated_removed": "PASS (adrs-migrated/ directory absent from filesystem)",
+      "C4_T2d_4_ADR-0007_canonical_only": "PASS (single canonical file; AA-003 v1-superseded inclusion handled)"
+    }
+  },
+  "critical_structural_checks": {
+    "adrs_migrated_removed": "PASS",
+    "adrs_superseded_has_7_pre_consolidation_files": "PASS",
+    "ADR-0051_and_0052_with_original_id_frontmatter": "PASS",
+    "ADRs_0046_to_0050_at_canonical": "PASS",
+    "issue-capture_adrs_dir_has_5_tombstones_and_zero_md": "PASS",
+    "T2a_source_dirs_empty_of_md": "PASS (all 4 sub-feature adrs/ dirs report 0 md files)",
+    "migration_log_rows_for_every_task": "PASS (Phase 2a: 12 dedupe rows; Phase 2b: 3 rows; Phase 2c: 5 rows; Phase 2d: 18 rows across 4 sub-procedures)"
+  },
+  "audit_counter_delta": {
+    "gating": "informational",
+    "baseline_ref": "phase-quality-report-P-1.json",
+    "per_domain_delta": {
+      "tests": "0 -> 0",
+      "audits": "0 -> 0 (stub)",
+      "validator": "0 -> 1 (F-P2-VAL-1 MAJOR tombstone template gap, revisable)",
+      "discipline": "0 -> 0",
+      "scope_deviations": "3 -> 8 (P-1 carried 3 inherited; P-2 added 5 task-spec-staleness deviations, all named-exemption / actual-filename-used; no execution failures)"
+    },
+    "aggregate_delta": "0 -> 6",
+    "audit_severity_breakdown": null,
+    "interpretation": "Per-domain primacy (Q-CC-3): tests/audits/discipline held at 0 (no regression). Validator gained 1 MAJOR revisable finding (tombstone template incomplete). scope_deviations grew by 5, all classified named-exemption / actual-filename-used (task-spec staleness adapted by producers using actual disk filenames — no execution failure, no architectural deviation). Aggregate 0→6 dominated by scope_deviations + 1 validator MAJOR. Verdict NEEDS_RECONCILIATION is driven exclusively by F-P2-VAL-1, which is a 5-file append-only edit."
+  },
+  "rollup_rationale": "Per Contract 2 rollup rule: revisable finding in validator dimension (F-P2-VAL-1 MAJOR, blocking=false) -> validator dimension NEEDS_RECONCILIATION -> phase verdict NEEDS_RECONCILIATION. All other 4 dimensions are PASS. Scope_deviations dimension is PASS because all 5 deviations were correctly surfaced, resolved via named-exemption, and represent task-spec staleness (not execution failure) per ADR-0033.",
+  "reconciliation_required": [
+    {
+      "finding_id": "F-P2-VAL-1",
+      "scope": "Append ADR-0036 citation line to 5 tombstones",
+      "files": [
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0046.tombstone",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047.tombstone",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0048.tombstone",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0049.tombstone",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0050.tombstone"
+      ],
+      "estimated_effort": "5 single-line appends; <2 minutes"
+    }
+  ],
+  "phase_completion_summary": {
+    "tasks_completed": ["T2a.1", "T2b.1", "T2b.2", "T2c.1", "T2d.1", "T2d.2", "T2d.3", "T2d.4"],
+    "git_operations": {
+      "git_rm": "approximately 44 deletions (12 dedupes + 1 ADR-0024 + 18 pre-naming/pre-template variants + 7 canonical-pre-archive + 2 ADR-0018 archive + 4 ADR-0007 variants)",
+      "git_mv": "approximately 21 renames (2 renumber + 5 issue-capture relocations + 9 no-collision + 7 archive moves)",
+      "tombstone_writes": "5 (ADR-0046..0050)",
+      "archive_writes": "7 (ADR-0011..0017-pre-consolidation-canonical.md)",
+      "frontmatter_edits": "16 (2 renumber + 7 archived + 7 canonical with superseded_by_consolidation)"
+    },
+    "final_state": "55 canonical ADRs at adrs/ (0001-0055); 7 pre-consolidation archives at adrs/superseded/; adrs-migrated/ removed; 5 tombstones at working/feature/issue-capture-mechanism-r1/adrs/"
+  }
+}

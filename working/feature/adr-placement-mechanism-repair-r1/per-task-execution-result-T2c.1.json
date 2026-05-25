@@ -1,0 +1,28 @@
+{
+  "task_id": "T2c.1",
+  "status": "COMPLETED",
+  "files_modified": [
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [
+    "adrs/ADR-0046-add-new-sibling-file-evolution.md",
+    "adrs/ADR-0047-three-layer-enforcement.md",
+    "adrs/ADR-0048-prior-context-handoff.md",
+    "adrs/ADR-0049-structural-vs-discipline-kb-split.md",
+    "adrs/ADR-0050-5-state-issues-vocabulary.md",
+    "working/feature/issue-capture-mechanism-r1/adrs/ADR-0046.tombstone",
+    "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047.tombstone",
+    "working/feature/issue-capture-mechanism-r1/adrs/ADR-0048.tombstone",
+    "working/feature/issue-capture-mechanism-r1/adrs/ADR-0049.tombstone",
+    "working/feature/issue-capture-mechanism-r1/adrs/ADR-0050.tombstone"
+  ],
+  "scope_deviations": [
+    {
+      "deviation": "Task spec target_files and slug table declared slugs 'issue-capture-orchestration', 'issue-doctype-taxonomy', 'issue-frontmatter-discipline', 'issue-doctype-structural-spec', 'issue-capture-skill-architecture' for ADR-0046–0050. Actual files on disk carry slugs 'add-new-sibling-file-evolution', 'three-layer-enforcement', 'prior-context-handoff', 'structural-vs-discipline-kb-split', '5-state-issues-vocabulary'.",
+      "proposed_resolution": "named-exempt — the task's intent (git mv ADR-0046–0050 from issue-capture-mechanism-r1 working dir to canonical adrs/) is unambiguous; the actual filenames are the correct subject. The slug mismatch is a stale-spec artefact from when the ADRs were originally authored under different tentative titles. The migration was executed against the actual files; no content change was made.",
+      "evidence": "ls /workspaces/feature-pipeline/working/feature/issue-capture-mechanism-r1/adrs/ showed the real filenames; no file matching the spec's slugs existed anywhere in the repository."
+    }
+  ],
+  "phase_4_gate_passed": true,
+  "notes": "5 git mv operations executed (R-status confirmed in git status --short). 5 tombstone files written with 3-line template per spec. 5 Phase-2c migration-log rows appended. Slug mismatch between task spec and actual files surfaced as named-exempt scope deviation — task intent was unambiguous and actual files were used. Tombstone .tombstone extension used as specified so rglob('ADR-*.md') will not match them."
+}

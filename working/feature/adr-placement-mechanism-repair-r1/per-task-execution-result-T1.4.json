@@ -1,0 +1,12 @@
+{
+  "task_id": "T1.4",
+  "status": "COMPLETED",
+  "files_modified": [".claude/agents/design-composer.md"],
+  "files_created": [
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T1.4.json",
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T1.4.md"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Edited .claude/agents/design-composer.md at lines 48, 129, 187 (verified against actual file; grep confirmed those were the three output_adrs_dir anchor locations). Each mention now cites ADR-0036, states canonical-root adrs/ as the default, and references the test-only override mechanism. Added new '## Test-only override for output_adrs_dir' subsection after the Inputs section, covering rationale, mechanism, discipline, and pointer to FR-5-b / ADR-0036. Final gate: 6 ADR-0036 refs (>=4 required by AT-015), test-only override subsection present (AT-016), parameter retained with 14 occurrences (AT-017), override-honor prose present (AT-018). All four acceptance criteria AC-FR-4-a, AC-FR-4-b, AC-FR-5-a, AC-FR-5-b satisfied."
+}

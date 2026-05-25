@@ -1,0 +1,14 @@
+{
+  "task_id": "T1.3",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/skills/recipe-feature-pipeline/SKILL.md"
+  ],
+  "files_created": [
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T1.3.json",
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T1.3.md"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Annotated output_adrs_dir parameter on line 273 of .claude/skills/recipe-feature-pipeline/SKILL.md with 'default: \"adrs/\" per ADR-0036'. Added pass-through fidelity sentence on line 274: when the caller passes output_adrs_dir explicitly the orchestrator forwards it unmodified; when absent the orchestrator passes \"adrs/\". File is 615 lines, valid UTF-8. No markdown linter available in environment; structural integrity verified via Python readlines check. Surrounding prose (lines 270-281) confirmed intact. Satisfies AC-FR-3-a, AC-FR-3-b, AC-US-4-a (partial)."
+}

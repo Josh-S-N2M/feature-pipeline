@@ -1,0 +1,22 @@
+{
+  "task_id": "T2b.1",
+  "status": "COMPLETED",
+  "files_modified": [
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [],
+  "files_deleted": [
+    "working/feature/frontend-design-knowledge-r1/adrs/ADR-0024-frontend-design-knowledge-corpus-structure.md"
+  ],
+  "scope_deviations": [
+    {
+      "deviation": "Task spec references ADR-0024-frontend-design-knowledge.md but actual filename is ADR-0024-frontend-design-knowledge-corpus-structure.md in both feature-scoped and canonical locations",
+      "proposed_resolution": "named-exempt — operated on actual filename; no scope expansion required",
+      "evidence": "ls working/feature/frontend-design-knowledge-r1/adrs/ and ls adrs/ both show ADR-0024-frontend-design-knowledge-corpus-structure.md; ADR-0024-frontend-design-knowledge.md does not exist at either path"
+    }
+  ],
+  "phase_4_gate_passed": true,
+  "outcome": "A",
+  "outcome_rationale": "Diff of both ADR-0024 files excluding frontmatter status: line shows zero non-frontmatter divergence. Feature-scoped copy had status: Proposed; canonical copy had status: Accepted. All 200+ lines of body content are byte-identical. Outcome A path executed: git rm feature-scoped copy, migration-log Phase-2b table updated.",
+  "notes": "Filename discrepancy noted: task spec declared target_files with ADR-0024-frontend-design-knowledge.md but the actual artifact is ADR-0024-frontend-design-knowledge-corpus-structure.md. The adrs/superseded/ADR-0024-feature-scoped-body.md target_file was not created because Outcome A (zero non-frontmatter divergence) does not require an archive write — that path is only Outcome B. The git rm succeeded on the correct actual filename."
+}

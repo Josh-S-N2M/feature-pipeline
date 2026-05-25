@@ -1,0 +1,15 @@
+{
+  "task_id": "T5.1",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/skills/recipe-feature-pipeline/SKILL.md",
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T5.1.json",
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T5.1.md"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Inserted sub-step 2.5 'ADR-placement validator (surface a per ADR-0054)' in Step 8 of SKILL.md between design-composer return (line 276) and shared-document-reviewer invocation (formerly line 277, now line 291). Renumbered former steps 2/3/4 to 3/4/5 to maintain sequential flow. Inserted block spans lines 277-290. Validator invocation prose, exit-code behavior, 120s timeout (ADR-0035), rationale, and no-allowlist constraint (ADR-0054 commitment 1) all included. Structural checks verified: single step-3, steps 4 and 5 present, no broken cross-references."
+}

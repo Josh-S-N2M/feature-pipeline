@@ -1,0 +1,141 @@
+{
+  "task_id": "P6-consolidated",
+  "description": "Consolidated Phase-6 empirical verification batch: T6.1, T6.2, T6.3, T6.6, T6.7, T6.8, T6.9, T6.10 + Phase-6 closeout block",
+  "status": "COMPLETED",
+  "files_modified": [
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-P6-consolidated.json",
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-P6-consolidated.md"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "subtask_verdicts": {
+    "T6.1": {
+      "ac": ["AC-OP-2", "AC-FR-2-b"],
+      "verdict": "PASS",
+      "method": "grep blueprint-v1.md + read 4 operator files",
+      "finding": "Zero prescriptive feature-scoped ADR path tokens in all 4 operator files; all cite canonical-root adrs/ per ADR-0036"
+    },
+    "T6.2": {
+      "ac": ["AC-OP-1"],
+      "verdict": "PASS",
+      "method": "simulation — read recipe-feature-pipeline/SKILL.md Step 8",
+      "finding": "output_adrs_dir default = adrs/ at line 273 (T1.3); validator wiring prose at Step 2.5 cites ADR-0054 surface (a) (T5.1); no production-path override present"
+    },
+    "T6.3": {
+      "ac": ["NFR-2"],
+      "verdict": "PASS",
+      "method": "5 live validator invocations",
+      "elapsed_ms_per_run": [27, 82, 26, 32, 31],
+      "average_ms": 39.6,
+      "nfr2_budget_ms": 5000
+    },
+    "T6.4": {
+      "ac": ["AC-FR-10-a"],
+      "verdict": "PASS",
+      "method": "inline confirmation (parent-orchestrator)",
+      "finding": "verdict PASS, 0 findings, elapsed_ms 30"
+    },
+    "T6.5": {
+      "ac": ["AC-FR-8c-1"],
+      "verdict": "PASS",
+      "method": "inline confirmation (parent-orchestrator)",
+      "finding": "all 5 target feature-scoped adrs/ directories confirmed absent"
+    },
+    "T6.6": {
+      "ac": ["AC-OP-5"],
+      "verdict": "PASS",
+      "method": "grep re-confirmation + file-count arithmetic",
+      "finding": {
+        "pattern1_adrs_migrated_count": 24,
+        "pattern1_actionable_residuals": 0,
+        "pattern1_exclusion_categories": ["adrs/superseded provenance footers (7)", "shipped canonical ADR body ADR-0038 (T3.2 scope-deviation, 3)", "ADR-0036 self-referential (1)", "historical feature codebase-analysis/plan/design artifacts (13)"],
+        "pattern2_feature_adrs_count": 83,
+        "pattern2_actionable_residuals": 0,
+        "adrs_count": 55,
+        "superseded_count": 7,
+        "adrs_migrated_absent": true,
+        "tombstones_count": 5,
+        "feature_adrs_md_excl_this_feature": 0
+      }
+    },
+    "T6.7": {
+      "ac": ["AC-OP-4", "AC-FR-10-e"],
+      "verdict": "PASS",
+      "method": "live fixture + validator invocations",
+      "surfaces": {
+        "a_validator_standalone": {
+          "verdict": "PASS",
+          "exit_code": 2,
+          "top_level_verdict": "BLOCK",
+          "fixture_finding_present": true,
+          "fixture_severity": "BLOCKER"
+        },
+        "b_run_phase_checks": {
+          "verdict": "PASS",
+          "top_level_verdict": "BLOCKER",
+          "validator_dimension": "BLOCKER",
+          "fixture_finding_present": true,
+          "source_activity": "adr-placement-validator"
+        },
+        "c_packager_prose": {
+          "verdict": "PASS",
+          "method": "prose verification",
+          "finding": "Section 3 (line 59) cites validate_adr_placement.py subprocess invocation per ADR-0054 surface (c)"
+        }
+      },
+      "fixture_path": "working/feature/test-fixture/adrs/ADR-9999-fixture-T6.7.md",
+      "fixture_cleaned": true
+    },
+    "T6.8": {
+      "ac": ["AC-CC-7", "NFR-4"],
+      "verdict": "PARTIAL",
+      "method": "migration-log Phase-5 review + spot-check",
+      "finding": {
+        "phase5_entries_present": true,
+        "phase5_closeout_present": true,
+        "t54a_landed": true,
+        "t54a_target": ".claude/skills/KB-documentation-criteria/references/disciplines/design-composition.md:36",
+        "t54b_landed": false,
+        "t54b_target": ".claude/skills/KB-documentation-criteria/references/disciplines/design-composition.md:295",
+        "t54b_status": "classifier-deferred — user-applied manual edit required",
+        "t54c_landed": false,
+        "t54c_status": "classifier-deferred — user-applied manual edit required",
+        "t55_status": "already-canonical disposition (T3.2/T3.3 sweep); capture-issue/SKILL.md:44 classifier-deferred"
+      }
+    },
+    "T6.9": {
+      "ac": ["NFR-1", "AC-NFR-1-a"],
+      "verdict": "PASS",
+      "method": "read Phase-2 per-task execution results",
+      "finding": {
+        "T2a1": "12 git rm operations — documented batch exception (12-ADR-as-one-task per plan); reversible",
+        "T2b1": "1 git rm — atomic, reversible",
+        "T2b2": "2 git mv renames (ADR-0044→0051, ADR-0045→0052) — atomic, reversible",
+        "T2c1": "5 git mv + 5 tombstone writes — atomic batch; R-status confirmed",
+        "T2d1_to_T2d4": "each sub-procedure atomic batch; all individually reversible"
+      }
+    },
+    "T6.10": {
+      "ac": ["NFR-7", "NFR-8"],
+      "verdict": "PASS",
+      "method": "grep + python ast import inspection",
+      "finding": {
+        "no_verify_grep_count": 24,
+        "no_verify_actual_invocations": 0,
+        "no_verify_all_in_requirement_text": true,
+        "validator_imports": ["argparse", "json", "sys", "time", "pathlib"],
+        "all_stdlib": true
+      }
+    }
+  },
+  "overall_phase6_verdict": "PASS with documented deferrals",
+  "deferrals": [
+    "T5.4b: design-composition.md:295 — classifier-blocked; user-applied manual edit required",
+    "T5.4c: deliverable-archive-spec.md:150 — classifier-blocked; user-applied manual edit required",
+    "T5.5: capture-issue/SKILL.md:44 — classifier-blocked; user-applied manual edit required"
+  ],
+  "notes": "T6.4 and T6.5 already confirmed inline by parent-orchestrator before this dispatch. T6.7 surface (a) also detected synthesize corpus ADRs as blockers (expected at no-allowlist surface). Fixture cleaned via shutil.rmtree. T6.10 --no-verify grep returned 24 matches — all in requirement-description and risk-register prose within adr-placement-mechanism-repair-r1 design artifacts; zero in execution artifacts or scripts."
+}

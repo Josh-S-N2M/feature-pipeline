@@ -1,0 +1,20 @@
+{
+  "task_id": "T2d.4",
+  "status": "COMPLETED",
+  "files_modified": [
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [],
+  "files_deleted": [
+    "adrs-migrated/ADR-0007-code-graph-mcp-selection-pre-naming-convention.md",
+    "adrs-migrated/ADR-0007-code-graph-mcp-selection-v1-pre-template-migration.md",
+    "adrs-migrated/ADR-0007-code-graph-mcp-selection-v1-superseded.md",
+    "adrs-migrated/ADR-0007-code-graph-mcp-selection-v2-pre-template-migration.md"
+  ],
+  "directories_removed": [
+    "adrs-migrated/"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Canonical adrs/ADR-0007-code-graph-mcp-selection.md verified present and untouched. All 4 archive variants in adrs-migrated/ removed via git rm. Directory adrs-migrated/ auto-removed by git when last tracked file was deleted (git ls-files adrs-migrated/ returns 0 entries). AA-003 critical inclusion (v1-superseded variant) confirmed deleted. Two migration-log rows appended to Phase-2d table. IDE lint warnings on migration-log.md are pre-existing MD036/MD060 warnings present throughout the file (same pattern as all prior rows); they do not represent new regressions introduced by this task."
+}

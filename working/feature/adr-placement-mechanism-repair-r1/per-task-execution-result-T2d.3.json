@@ -1,0 +1,21 @@
+{
+  "task_id": "T2d.3",
+  "status": "COMPLETED",
+  "files_modified": [
+    "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+  ],
+  "files_created": [],
+  "files_removed": [
+    "adrs-migrated/ADR-0018-codebase-analysis-schema.md",
+    "adrs-migrated/ADR-0018-codebase-analysis-schema-pre-naming-convention.md"
+  ],
+  "scope_deviations": [
+    {
+      "deviation": "Target file list named 'adrs-migrated/ADR-0018-codebase-analysis-schema-final.md' but the actual file in the repo is 'adrs-migrated/ADR-0018-codebase-analysis-schema.md' (no '-final' suffix). This is a naming discrepancy in the task spec, not a missing file.",
+      "proposed_resolution": "named-exempt",
+      "evidence": "ls adrs-migrated/ADR-0018* returned: ADR-0018-codebase-analysis-schema.md and ADR-0018-codebase-analysis-schema-pre-naming-convention.md. The '-final' variant does not exist. The '-final'-less file (v2.0.0, finalize-reconciler origin, status Accepted, no ADR-0038 supersession marker) is the archive copy that loses to the canonical. git rm executed on both actual variants."
+    }
+  ],
+  "phase_4_gate_passed": true,
+  "notes": "2 git rm ops completed: adrs-migrated/ADR-0018-codebase-analysis-schema.md and adrs-migrated/ADR-0018-codebase-analysis-schema-pre-naming-convention.md. Canonical adrs/ADR-0018-codebase-analysis-schema.md retained intact (carries ADR-0038 supersession marker per IN-004). Migration-log Phase-2d table row appended for sub-procedure (iii). All 4 quality-gate phases passed."
+}

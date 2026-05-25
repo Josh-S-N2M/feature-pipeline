@@ -1,0 +1,14 @@
+{
+  "task_id": "T1.2",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/agents/shared-document-reviewer.md"
+  ],
+  "files_created": [
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T1.2.json",
+    "working/feature/adr-placement-mechanism-repair-r1/per-task-execution-result-T1.2.md"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "Deleted line 349 (the dual-location ADR cross-location check: 'verify presence at both working/feature/<slug>/adrs/ADR-NNNN-<slug>.md AND adrs/ADR-NNNN-<title>.md'). The list step formerly numbered 6 was cleanly removed; the blank line and '### Output' heading follow step 5 without disruption. The canonical-only statement at lines 469-471 (per ADR-0036, 'single canonical location: adrs/ADR-NNNN-<slug>.md at project root') is intact and unmodified. All assertions in the 4-phase gate passed: dual-location text absent, ADR-0036 reference present, canonical-only prose present. Migration-log row appended to Phase 1 table."
+}
