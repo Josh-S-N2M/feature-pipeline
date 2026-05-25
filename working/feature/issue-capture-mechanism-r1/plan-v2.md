@@ -57,7 +57,7 @@ This Plan is the executable decomposition of `blueprint-v3.md` (audit-passed at 
 
 Per ADR-0017, every Plan phase has measurable pass criteria for the upcoming `test-phase-validator-author` to consume. Per ADR-0023 scope class FULL, every phase has explicit blocking-severity thresholds in its exit criteria. Per NFR-8, the load-bearing verification mechanism is the **Phase 0 baseline + Phase 2 regression diff** — the pre-extension findings JSON snapshot is captured BEFORE any validator change, and the post-extension diff against that baseline MUST be empty.
 
-The Plan does NOT re-author ADRs (per FR-5). The 7 ADRs (ADR-0044..ADR-0050) authored by `design-composer` are referenced as-is. Implementation specifics not pinned by the Blueprint are surfaced as Open Items.
+The Plan does NOT re-author ADRs (per FR-5). The 7 ADRs (ADR-0051..ADR-0050) authored by `design-composer` are referenced as-is. Implementation specifics not pinned by the Blueprint are surfaced as Open Items.
 
 ## Source
 
@@ -191,7 +191,7 @@ Author the three new doctype templates and one structural spec under `KB-documen
 #### T1.4: Author `issue-doctypes-spec.md` (structural spec)
 
 - **Layer:** Claude Code
-- **Description:** Create `.claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md` — the canonical structural spec codifying (a) the three doc_types from ADR-0045; (b) the 5-state vocabulary from ADR-0050; (c) the per-state required-companion-field table verbatim from Blueprint §Backend Per-State Companion Field Authoritative Table (D-05); (d) the bidirectional cross-link fields per ADR-0046; (e) the `superseded_by_issue_id` field per Q-BE-3. This spec is the single source-of-truth that the validator extension (Phase 2) and the agent body (Phase 4) both consume; it does NOT contain triggering discipline.
+- **Description:** Create `.claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md` — the canonical structural spec codifying (a) the three doc_types from ADR-0052; (b) the 5-state vocabulary from ADR-0050; (c) the per-state required-companion-field table verbatim from Blueprint §Backend Per-State Companion Field Authoritative Table (D-05); (d) the bidirectional cross-link fields per ADR-0046; (e) the `superseded_by_issue_id` field per Q-BE-3. This spec is the single source-of-truth that the validator extension (Phase 2) and the agent body (Phase 4) both consume; it does NOT contain triggering discipline.
 - **Dependencies:** none
 - **Estimate:** L (2–3 h)
 - **Satisfies AC:** AC-FR-6-a, AC-FR-6-b (no triggering discipline), AC-FR-14-a (referenced from SKILL.md index)
@@ -225,7 +225,7 @@ Phase Validator: asserts all 4 files exist; asserts SKILL.md diff is additive-on
 
 ### Goal
 
-Extend `validate_pipeline_frontmatter.py` with (a) the four module-level constants, (b) the outer-dispatch path-prefix early-return for `Issues/<topic>/(evidence|updates)/**` (per I-AA-002 / ADR-0044 §Decision §4), (c) the extension of `doc_type_category` to return `"issue"`, (d) the `elif category == "issue"` branch dispatching to a new `validate_issue_artifact` function, and (e) the new function itself. Verify NFR-8 via empty regression diff against the Phase 0 baseline. Extend `smoke_test_auditing_shared.py` with L3 + L4 fixtures.
+Extend `validate_pipeline_frontmatter.py` with (a) the four module-level constants, (b) the outer-dispatch path-prefix early-return for `Issues/<topic>/(evidence|updates)/**` (per I-AA-002 / ADR-0051 §Decision §4), (c) the extension of `doc_type_category` to return `"issue"`, (d) the `elif category == "issue"` branch dispatching to a new `validate_issue_artifact` function, and (e) the new function itself. Verify NFR-8 via empty regression diff against the Phase 0 baseline. Extend `smoke_test_auditing_shared.py` with L3 + L4 fixtures.
 
 ### Tasks
 
@@ -243,7 +243,7 @@ Extend `validate_pipeline_frontmatter.py` with (a) the four module-level constan
 #### T2.2: Add outer-dispatch path-prefix early-return + `elif category == "issue"` branch
 
 - **Layer:** Backend
-- **Description:** Inside `validate_pipeline_artifact`, add (a) the 3-5 line path-prefix early-return guard BEFORE the existing `doc_type_category` dispatch at lines 365-371: if path matches any prefix in `ISSUE_NON_VALIDATED_PATH_PREFIXES`, return `[]` immediately (per I-AA-002 / ADR-0044 §4); (b) the new `elif category == "issue": return validate_issue_artifact(fm, path)` branch in the dispatch. The new function is a stub that returns `[]` for now (T2.3 fills it). Existing GATED/ANALYSIS/ADR branches unchanged (AC-BE-8). The unknown-category else branch unchanged.
+- **Description:** Inside `validate_pipeline_artifact`, add (a) the 3-5 line path-prefix early-return guard BEFORE the existing `doc_type_category` dispatch at lines 365-371: if path matches any prefix in `ISSUE_NON_VALIDATED_PATH_PREFIXES`, return `[]` immediately (per I-AA-002 / ADR-0051 §4); (b) the new `elif category == "issue": return validate_issue_artifact(fm, path)` branch in the dispatch. The new function is a stub that returns `[]` for now (T2.3 fills it). Existing GATED/ANALYSIS/ADR branches unchanged (AC-BE-8). The unknown-category else branch unchanged.
 - **Dependencies:** T2.1
 - **Estimate:** S (30–45 min)
 - **Satisfies AC:** AC-BE-7 (existing categories route through pre-existing validators unchanged), AC-BE-8 (outer dispatch logic unchanged except for the new early-return; existing per-category dispatch preserved), AC-BE-10 partial (path-prefix skip behavior; full verification requires T2.5 fixture)
@@ -313,7 +313,7 @@ Phase Validator: re-runs T2.6 regression diff; asserts empty. Re-runs T2.5 smoke
 
 ### Goal
 
-Execute the one-time migration per FR-8 + FR-9 + ADR-0044's D-13. Five atomic commits (one per file), each consisting of `git mv` + frontmatter back-fill (back-fill skipped for the agent-roster-matrix per AC-BE-10 path-prefix skip). Verify `git log --follow` returns full history per AC-FR-8-b / AC-FR-9-b. Per I-DR-PL-002 absorbed in v1.1.0, Phase 3 also captures explicit commit-range anchors (T3.0 + T3.8) so the Phase 3 Phase Validator can run `git diff --name-only <phase-3-start-commit>..<phase-3-end-commit>` and enforce AC-FR-8-d (no other files migrated) as a hard, machine-checkable scope assertion.
+Execute the one-time migration per FR-8 + FR-9 + ADR-0051's D-13. Five atomic commits (one per file), each consisting of `git mv` + frontmatter back-fill (back-fill skipped for the agent-roster-matrix per AC-BE-10 path-prefix skip). Verify `git log --follow` returns full history per AC-FR-8-b / AC-FR-9-b. Per I-DR-PL-002 absorbed in v1.1.0, Phase 3 also captures explicit commit-range anchors (T3.0 + T3.8) so the Phase 3 Phase Validator can run `git diff --name-only <phase-3-start-commit>..<phase-3-end-commit>` and enforce AC-FR-8-d (no other files migrated) as a hard, machine-checkable scope assertion.
 
 ### Tasks
 
@@ -342,7 +342,7 @@ Execute the one-time migration per FR-8 + FR-9 + ADR-0044's D-13. Five atomic co
 #### T3.2: Migrate `register-devcontainer-mcp-provisioning-r1-deferrals.md` (atomic commit)
 
 - **Layer:** Claude Code
-- **Description:** Execute the migration per ADR-0044 D-13 (or two-commit fallback if T3.1 detected): `git mv Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md` → back-fill frontmatter (`doc_type: issue-register` per Q-BE-1; `version: 0.1.0`; `status: open`; `since: 2026-05-23`) → `git commit` as one atomic commit. Commit message references FR-8 + ADR-0044.
+- **Description:** Execute the migration per ADR-0051 D-13 (or two-commit fallback if T3.1 detected): `git mv Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md` → back-fill frontmatter (`doc_type: issue-register` per Q-BE-1; `version: 0.1.0`; `status: open`; `since: 2026-05-23`) → `git commit` as one atomic commit. Commit message references FR-8 + ADR-0051.
 - **Dependencies:** T3.1
 - **Estimate:** S (30–45 min)
 - **Satisfies AC:** AC-FR-8-a (target path correct), AC-FR-8-b (`git log --follow` returns history), AC-FR-8-c (validator zero findings post back-fill), AC-FR-8-d (no other files migrated)
@@ -386,7 +386,7 @@ Execute the one-time migration per FR-8 + FR-9 + ADR-0044's D-13. Five atomic co
 #### T3.6: Migrate `agent-roster-impact-matrix.md` to evidence subdirectory (atomic commit)
 
 - **Layer:** Claude Code
-- **Description:** Per FR-9: `git mv working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md` → no back-fill (validator skips this path per AC-BE-10 / I-AA-002 outer-dispatch path-prefix skip) → atomic commit. Commit message references FR-9 + ADR-0044 §Decision §4.
+- **Description:** Per FR-9: `git mv working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md` → no back-fill (validator skips this path per AC-BE-10 / I-AA-002 outer-dispatch path-prefix skip) → atomic commit. Commit message references FR-9 + ADR-0051 §Decision §4.
 - **Dependencies:** T3.1, T3.3 (the per-agent-design-evaluation-gap topic folder must exist before evidence/ subdirectory can be populated — created by T3.3's `git mv`)
 - **Estimate:** S (30–45 min)
 - **Satisfies AC:** AC-FR-9-a (target path correct; no copy at prior path), AC-FR-9-b (`git log --follow` returns history)
@@ -835,7 +835,7 @@ Execute end-to-end verification: pipeline-isolation grep (AC-FR-13), validator r
 
 - **Layer:** Claude Code
 - **Description:** Author `working/feature/issue-capture-mechanism-r1/packager-input-notes.md` recording the I-AA-001 user-accepted deviation for finalize-deliverable-packager (Stage 13) consumption. Resolves I-DR-PL-004 (absorbed v1.1.0) by elevating the deferral from Open Items (where it risked being lost in handoff) to a binding deliverable read by the packager. Content (~30–50 lines):
-    1. **Deviation summary**: The 7 new ADRs (ADR-0044..ADR-0050) for this run remain at `working/feature/issue-capture-mechanism-r1/adrs/` rather than the canonical `/adrs/` root-level location (per ADR-0036).
+    1. **Deviation summary**: The 7 new ADRs (ADR-0051..ADR-0050) for this run remain at `working/feature/issue-capture-mechanism-r1/adrs/` rather than the canonical `/adrs/` root-level location (per ADR-0036).
     2. **Authoritative evidence**: cite `Issues/adr-placement-rootcause/analysis.md` (post-Phase-3 migrated path) as the root-cause analysis for why the project's ADR-placement convention has drifted from ADR-0036's canonical location.
     3. **User acceptance**: cite the Architecture Audit cycle 1 verdict where the user accepted I-AA-001 (Option A — keep ADRs under `working/feature/<slug>/adrs/` for this run; defer the location-normalization remediation to a future drift-remediation feature).
     4. **Packager direction**: finalize-deliverable-packager (Stage 13) follows the **current operational convention** (`working/feature/<slug>/adrs/`) for this run's 7 new ADRs. Do NOT relocate them to `/adrs/`. Do NOT flag the placement as a packaging error. Do NOT block on ADR-0036's canonical-location assertion.

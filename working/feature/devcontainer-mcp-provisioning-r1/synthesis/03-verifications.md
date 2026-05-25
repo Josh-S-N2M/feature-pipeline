@@ -304,7 +304,7 @@ V=18 P=2 U=0 C=0 S=0
 - **Verdict: verified / high.** (Load-bearing for trifecta-completion narrative.)
 
 ### C-0442 — ADR-0007 v2.2.0 lives in adrs-migrated/, not adrs/.
-- Q1: Does adrs-migrated/ADR-0007-code-graph-mcp-selection.md exist? → Yes (one of five ADR-0007 variants in adrs-migrated/).
+- Q1: Does adrs/ADR-0007-code-graph-mcp-selection.md exist? → Yes (one of five ADR-0007 variants in adrs-migrated/).
 - Q2: Frontmatter version? → `version: 2.2.0`, `status: Accepted`.
 - Q3: Absent from adrs/? → Yes — `ADR-0007*` glob against adrs/ returned zero files.
 - **Verdict: verified / high.**

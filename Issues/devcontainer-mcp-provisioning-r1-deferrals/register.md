@@ -15,7 +15,11 @@ companion_artifacts:
   - working/feature/devcontainer-mcp-provisioning-r1/cc-design.md
   - working/feature/devcontainer-mcp-provisioning-r1/codespaces-design.md
   - working/feature/devcontainer-mcp-provisioning-r1/research-plan-v3.md
-  - working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0037..ADR-0041
+  - adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md
+  - adrs/ADR-0038-codebase-analysis-schema-v1-1-0.md
+  - adrs/ADR-0039-credential-redaction-posture.md
+  - adrs/ADR-0040-serena-narrowed-always-on.md
+  - adrs/ADR-0041-install-mechanism-hybrid.md
   - Issues/analysis-per-agent-design-evaluation-gap.md
 ---
 

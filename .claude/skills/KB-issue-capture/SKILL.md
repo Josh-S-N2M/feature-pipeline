@@ -7,7 +7,7 @@ allowed-tools: Read, Glob, Grep
 
 # KB-issue-capture — Triggering Discipline for Outside-Pipeline Issue Capture
 
-This skill is loaded **at runtime** by the `issue-capture-author` sub-agent (NOT auto-invoked by main Claude). Per F-001 + ADR-0044, capture-the-issue is a SLASH-COMMAND-INVOKED workflow only — main Claude must never auto-detect "I'm noticing X" and write under `Issues/`.
+This skill is loaded **at runtime** by the `issue-capture-author` sub-agent (NOT auto-invoked by main Claude). Per F-001 + ADR-0051, capture-the-issue is a SLASH-COMMAND-INVOKED workflow only — main Claude must never auto-detect "I'm noticing X" and write under `Issues/`.
 
 ## Contents
 
@@ -53,7 +53,7 @@ These 4 files are authored by T4.2 (plan anchor). This router cites them by path
 
 ## When loaded
 
-This KB is loaded **explicitly** at runtime by the `issue-capture-author` sub-agent via the Read tool (per ADR-0044 + F-003 invariant — the agent does NOT use `skills:` frontmatter preload, which Claude Code silently drops for sub-agents with `disable-model-invocation: true` per F-003). The sub-agent reads:
+This KB is loaded **explicitly** at runtime by the `issue-capture-author` sub-agent via the Read tool (per ADR-0051 + F-003 invariant — the agent does NOT use `skills:` frontmatter preload, which Claude Code silently drops for sub-agents with `disable-model-invocation: true` per F-003). The sub-agent reads:
 
 1. This SKILL.md (first; learns the router structure)
 2. The 4 references (as needed, per workflow step)
@@ -69,12 +69,12 @@ The closest structural precedent in the codebase is `cc-critique` (CP-001): it a
 
 ## Cross-references
 
-All ADR paths are relative to `working/feature/issue-capture-mechanism-r1/adrs/`:
+All ADR paths are canonical per ADR-0036:
 
-- ADR-0044 (per-issue folder model): `ADR-0044-per-issue-folder-model.md`
-- ADR-0045 (three doctypes preserved): `ADR-0045-three-doctypes-preserved.md`
-- ADR-0046 (sibling-file evolution): `ADR-0046-add-new-sibling-file-evolution.md`
-- ADR-0047 (three-layer enforcement — KB-issue-capture is Layer 1): `ADR-0047-three-layer-enforcement.md`
-- ADR-0049 (structural-vs-discipline KB split): `ADR-0049-structural-vs-discipline-kb-split.md`
-- ADR-0050 (5-state issues vocabulary): `ADR-0050-5-state-issues-vocabulary.md`
+- ADR-0051 (per-issue folder model): `adrs/ADR-0051-per-issue-folder-model.md`
+- ADR-0052 (three doctypes preserved): `adrs/ADR-0052-three-doctypes-preserved.md`
+- ADR-0046 (sibling-file evolution): `adrs/ADR-0046-add-new-sibling-file-evolution.md`
+- ADR-0047 (three-layer enforcement — KB-issue-capture is Layer 1): `adrs/ADR-0047-three-layer-enforcement.md`
+- ADR-0049 (structural-vs-discipline KB split): `adrs/ADR-0049-structural-vs-discipline-kb-split.md`
+- ADR-0050 (5-state issues vocabulary): `adrs/ADR-0050-5-state-issues-vocabulary.md`
 - `KB-documentation-criteria/SKILL.md` — sibling KB owning structural codification (templates + spec)

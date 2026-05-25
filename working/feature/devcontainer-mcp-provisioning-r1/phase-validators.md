@@ -122,8 +122,8 @@ A shell script (proposed path: `.claude/scripts/phase-validators/pv-0-setup.sh`)
 | PV-1.C1 | 7 newly authored ADRs exist in canonical `adrs/` | `ls /workspaces/feature-pipeline/adrs/ADR-{0037,0038,0039,0040,0041,0042,0043}-*.md` lists 7 files | T1.1 | bash glob | BLOCKER |
 | PV-1.C2 | Each promoted ADR has `status: accepted` | For each of ADR-0037..0043: `yq '.status' <adr-path>` returns `Accepted` | T1.1 | yq loop | BLOCKER |
 | PV-1.C3 | ADR-0038 frontmatter declares `supersedes: ADR-0018` | `yq '.supersedes' adrs/ADR-0038-*.md` contains `ADR-0018` | T1.1 | yq | BLOCKER |
-| PV-1.C4 | ADR-0018 body carries supersession marker | `grep -E 'Superseded by ADR-0038' adrs/ADR-0018-*.md` OR `adrs-migrated/ADR-0018-*.md` matches | T1.2 | grep | BLOCKER |
-| PV-1.C5 | ADR-0007 in canonical `adrs/` (not `adrs-migrated/`) | `ls /workspaces/feature-pipeline/adrs/ADR-0007-*.md` returns a file; `! ls adrs-migrated/ADR-0007-*.md` (absent) | T1.2 | bash | BLOCKER |
+| PV-1.C4 | ADR-0018 body carries supersession marker | `grep -E 'Superseded by ADR-0038' adrs/ADR-0018-*.md` | T1.2 | grep | BLOCKER |
+| PV-1.C5 | ADR-0007 in canonical `adrs/` | `ls /workspaces/feature-pipeline/adrs/ADR-0007-*.md` returns a file | T1.2 | bash | BLOCKER |
 | PV-1.C6 | No stale cross-references to `adrs-migrated/ADR-0007` | `git grep -E 'adrs-migrated/ADR-0007'` returns no hits | T1.2 | git grep | MAJOR |
 | PV-1.C7 | `.devcontainer/versions.env` exists and parses | `test -f .devcontainer/versions.env && bash -n .devcontainer/versions.env` exits 0 | T1.3 | bash | BLOCKER |
 | PV-1.C8 | versions.env carries 5 expected keys | `grep -E '^(SERENA_REF\|MCP_OPENAPI_SCHEMA_VERSION\|ACTIONLINT_MCP_SHA\|TERRAFORM_MCP_VERSION\|GITNEXUS_TAG)=' .devcontainer/versions.env` matches 5 lines | T1.3 | grep | BLOCKER |

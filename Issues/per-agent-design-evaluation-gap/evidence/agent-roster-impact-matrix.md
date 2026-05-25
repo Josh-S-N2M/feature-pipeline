@@ -8,7 +8,7 @@ generated: 2026-05-23T00:00:00Z
 generated_by: design-cc
 derived_from:
   - working/feature/devcontainer-mcp-provisioning-r1/cc-design.md
-  - working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0040-serena-narrowed-always-on.md
+  - adrs/ADR-0040-serena-narrowed-always-on.md
   - working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis.json
   - working/feature/devcontainer-mcp-provisioning-r1/synthesis.md
   - working/feature/devcontainer-mcp-provisioning-r1/prd-v3.md

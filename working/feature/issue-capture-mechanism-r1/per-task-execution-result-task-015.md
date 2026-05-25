@@ -25,7 +25,7 @@ Three sub-groups:
 - 1 advisory fixture: asserts exactly 1 info finding whose message contains "proposes_future_feature".
 
 **Scenario J — AC-BE-10 evidence-path early-return**
-Calls `validate_file` on the real fixture at `test_fixtures/issue_doc_types/evidence-path-fixtures/Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md`. The path-prefix early-return (ADR-0044 §4) fires and returns `[]`.
+Calls `validate_file` on the real fixture at `test_fixtures/issue_doc_types/evidence-path-fixtures/Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md`. The path-prefix early-return (ADR-0051 §4) fires and returns `[]`.
 
 **Scenario K — positive control**
 Calls `validate_pipeline_artifact` directly with `doc_type: not-a-known-type` on a `working/feature/...` path (not under Issues/). Asserts exactly 1 minor finding with "not in known category" in the message, confirming the evidence-path skip does not over-silence.

@@ -9,8 +9,8 @@ derived_from:
   - working/feature/issue-capture-mechanism-r1/blueprint-v3.md
   - working/feature/issue-capture-mechanism-r1/plan-v2.md
 adrs_referenced:
-  - ADR-0044  # per-issue folder model
-  - ADR-0045  # three doctypes preserved
+  - ADR-0051  # per-issue folder model
+  - ADR-0052  # three doctypes preserved
   - ADR-0046  # add-new-sibling-file evolution
   - ADR-0047  # three-layer enforcement
   - ADR-0048  # prior-context handoff
@@ -46,7 +46,7 @@ change_summary: |
 - **PRD**: `working/feature/issue-capture-mechanism-r1/prd-v2.md` v1.1.0 — 15 FRs, 9 NFRs, 67 EARS-format ACs.
 - **Blueprint**: `working/feature/issue-capture-mechanism-r1/blueprint-v3.md` v1.2.0 — 10 AC-BE-N (validator); design-coupled AC enumeration.
 - **Plan**: `working/feature/issue-capture-mechanism-r1/plan-v2.md` v1.1.0 — 50 tasks across 8 phases; the AC Cross-Reference table is the authoritative AC→task mapping that this document inverts into AC→test specifications.
-- **ADRs**: ADR-0044..ADR-0050 at `working/feature/issue-capture-mechanism-r1/adrs/`.
+- **ADRs**: ADR-0051..ADR-0050 at `working/feature/issue-capture-mechanism-r1/adrs/`.
 - **Codebase analysis**: `working/feature/issue-capture-mechanism-r1/codebase-analysis.json` — referenced for existing test infrastructure (`smoke_test_auditing_shared.py`, no `.claude/hooks/` directory pre-merge, etc.).
 
 ## Test Suite Overview
@@ -385,7 +385,7 @@ Each test below is structured as:
 - **Steps**:
   1. Parse frontmatter of the newly-captured file.
   2. Read `id:` field.
-- **Expected outcome**: `id:` value matches the pattern `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` exactly (e.g., `ANALYSIS-my-topic-slug`); per ADR-0044 derivation rule.
+- **Expected outcome**: `id:` value matches the pattern `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` exactly (e.g., `ANALYSIS-my-topic-slug`); per ADR-0051 derivation rule.
 
 ### AT-017 — `collision_re_prompts_with_three_options_no_silent_overwrite`
 
@@ -956,7 +956,7 @@ Each test below is structured as:
   1. Unit: synthetic fm + path `Issues/foo/evidence/anything.md` → call `validate_pipeline_artifact`; assert returns `[]` regardless of fm contents.
   2. Repeat with `Issues/foo/updates/bar.md`.
   3. Real-file: run validator against `Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md`.
-- **Expected outcome**: All three return empty findings list; no finding emitted regardless of frontmatter shape (honors ADR-0044 §Decision §4).
+- **Expected outcome**: All three return empty findings list; no finding emitted regardless of frontmatter shape (honors ADR-0051 §Decision §4).
 
 ### AT-068 — `agent_frontmatter_skills_field_absent_F003_invariant`
 

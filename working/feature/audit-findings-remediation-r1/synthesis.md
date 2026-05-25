@@ -9,7 +9,7 @@ derived_from:
   - working/feature/audit-findings-remediation-r1/codebase-analysis-report.md (v1.0.0)
   - working/feature/audit-findings-remediation-r1/research-notes/T-001.md
   - working/feature/audit-findings-remediation-r1/prd-v1.md (v1.2.0, current)
-  - working/feature/audit-findings-remediation-r1/adrs/ADR-0029-no-silent-scope-changes-principle.md
+  - adrs/ADR-0029-no-silent-scope-changes-principle.md
 ---
 
 # Synthesis — audit-findings-remediation-r1

@@ -57,5 +57,5 @@
     }
   },
   "rationale": "Phase 6 delivered 3 strictly-additive handoff edits \u2014 Phase 0 proposal-detection in intake-intent-clarifier (per ADR-0048), Source-section convention in template (FR-12a), and proposal-seed bullet in recipe-feature-pipeline (FR-12b, BLOCKER-risk verified). All 3 tasks APPROVED on cycle 0; 0 revisions; smallest and lowest-risk phase of the feature.",
-  "execution_mode_note": "Phase 6 executed in canonical specialist-dispatch per ADR-0044. 7 specialist dispatches: 3 parallel producers + 3 parallel handlers + 1 phase-quality-reviewer."
+  "execution_mode_note": "Phase 6 executed in canonical specialist-dispatch per ADR-0051. 7 specialist dispatches: 3 parallel producers + 3 parallel handlers + 1 phase-quality-reviewer."
 }

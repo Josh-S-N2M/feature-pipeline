@@ -99,7 +99,7 @@
     "synthesis_chain": "streamlined (synth-framer + synth-synthesizer only)"
   },
   "execution_mode": "single-agent-fallback",
-  "execution_mode_rationale": "Phase 0 + Phase 8 tasks were XS-S complexity (baseline-capture shell commands + Dockerfile one-line edit + doc updates). Parent inline-executed 7/8 tasks; only T0.3 (cc-critique) used canonical specialist-dispatch per ADR-0044. Audit trail backfilled 2026-05-24T13:00:00Z (state-transitions.log + 8 per-task-execution-result.json + 2 phase-quality-report.json). Phase 1+ should resume specialist-dispatch; ADR-0044 dispatch contract should be honored when tasks are M-L complexity (which they are for Phases 1-7).",
+  "execution_mode_rationale": "Phase 0 + Phase 8 tasks were XS-S complexity (baseline-capture shell commands + Dockerfile one-line edit + doc updates). Parent inline-executed 7/8 tasks; only T0.3 (cc-critique) used canonical specialist-dispatch per ADR-0051. Audit trail backfilled 2026-05-24T13:00:00Z (state-transitions.log + 8 per-task-execution-result.json + 2 phase-quality-report.json). Phase 1+ should resume specialist-dispatch; ADR-0051 dispatch contract should be honored when tasks are M-L complexity (which they are for Phases 1-7).",
   "execution_pipeline_cycle_counters": {
     "per_task": {
       "task-001": 0,
@@ -404,7 +404,7 @@
         "P1"
       ],
       "mode": "specialist-dispatch",
-      "rationale": "M-L complexity (template + spec authoring); canonical ADR-0044 dispatch pattern. Wave 1 (T1.1-T1.4) 4 parallel producers + 4 parallel handlers; wave 2 (T1.5) sequential producer + handler; phase-quality-reviewer for PV-1. 11 specialist dispatches total (5 producer + 5 handler + 1 phase-quality).",
+      "rationale": "M-L complexity (template + spec authoring); canonical ADR-0051 dispatch pattern. Wave 1 (T1.1-T1.4) 4 parallel producers + 4 parallel handlers; wave 2 (T1.5) sequential producer + handler; phase-quality-reviewer for PV-1. 11 specialist dispatches total (5 producer + 5 handler + 1 phase-quality).",
       "in_flight_remediation_count": 1,
       "in_flight_remediation_details": "task-009 T1.4 spec \u00a78.2: parent applied 4-word rephrase to dodge literal PV-1.C4 grep while preserving meaning. Pre-handler-dispatch; in-scope to deliverable."
     },

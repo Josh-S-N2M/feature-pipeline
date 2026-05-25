@@ -62,7 +62,7 @@ I-AA-001 is a pure mechanical string replacement, verified zero residuals by gre
 ## Files modified this cycle
 
 - `/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/blueprint-v3.md` (3 sites; v3.0.1)
-- `/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0040-serena-narrowed-always-on.md` (1 site; ADR Document History bumped 1.0.0 → 1.0.1)
+- `/workspaces/feature-pipeline/adrs/ADR-0040-serena-narrowed-always-on.md` (1 site; ADR Document History bumped 1.0.0 → 1.0.1)
 - `/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/plan-v1.md` (1 site; v1.0.1)
 - `/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/tasks.json` (2 sites in T4.1)
 - `/workspaces/feature-pipeline/working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md` (1 site)

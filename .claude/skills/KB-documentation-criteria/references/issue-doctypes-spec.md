@@ -29,7 +29,7 @@ This is the single source-of-truth consumed by:
 ## Contents
 
 - [x] §1 Purpose
-- [x] §2 Three Doctypes (per ADR-0045)
+- [x] §2 Three Doctypes (per ADR-0052)
 - [x] §3 5-State Lifecycle Vocabulary (per ADR-0050)
 - [x] §4 Per-State Required Companion Fields (D-05 Authoritative Table)
 - [x] §5 Optional Cross-Link Fields (per ADR-0046 + ADR-0050)
@@ -50,11 +50,11 @@ files at runtime) consume this spec as their structural authority. The three sib
 templates under `KB-documentation-criteria/references/templates/` encode the body skeleton
 for each doctype and reference this spec for all frontmatter assertions.
 
-## §2 Three Doctypes (per ADR-0045)
+## §2 Three Doctypes (per ADR-0052)
 
 ### 2.1 First-Class Doctypes
 
-Three doctypes are defined and preserved as structurally distinct (ADR-0045 Decision §1).
+Three doctypes are defined and preserved as structurally distinct (ADR-0052 Decision §1).
 Each has its own canonical template and its own validator branch. No unified `issue`
 doctype exists; captured issues MUST be classified into one of the three.
 
@@ -276,7 +276,7 @@ The structural-vs-discipline split prevents duplication and drift.
 
 | ADR | Subject |
 | --- | --- |
-| ADR-0045 | Three doctypes preserved as distinct (register / analysis / proposal) |
+| ADR-0052 | Three doctypes preserved as distinct (register / analysis / proposal) |
 | ADR-0046 | Add-new-sibling-file evolution pattern; `escalates_from` / `escalated_to` fields |
 | ADR-0049 | Structural-vs-discipline KB split; templates are structural-only |
 | ADR-0050 | 5-state lifecycle vocabulary; per-state companion fields; `proposes_future_feature` advisory |

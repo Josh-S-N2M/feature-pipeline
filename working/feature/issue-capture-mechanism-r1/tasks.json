@@ -10,8 +10,8 @@
     "acceptance_tests": "working/feature/issue-capture-mechanism-r1/acceptance-tests.md",
     "phase_validators": "working/feature/issue-capture-mechanism-r1/phase-validators.md",
     "adrs": [
-      "ADR-0044",
-      "ADR-0045",
+      "ADR-0051",
+      "ADR-0052",
       "ADR-0046",
       "ADR-0047",
       "ADR-0048",
@@ -165,7 +165,7 @@
       "plan_anchor": "T1.4",
       "phase": "P1",
       "title": "Author issue-doctypes-spec.md (canonical structural spec)",
-      "description": "Create source-of-truth structural spec codifying ADR-0045 3 doc_types, ADR-0050 5-state vocab, ADR-0046 cross-link fields, per-state companion-field table verbatim from Blueprint Backend authoritative table. NO triggering discipline.",
+      "description": "Create source-of-truth structural spec codifying ADR-0052 3 doc_types, ADR-0050 5-state vocab, ADR-0046 cross-link fields, per-state companion-field table verbatim from Blueprint Backend authoritative table. NO triggering discipline.",
       "target_files": [
         ".claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md"
       ],
@@ -216,7 +216,7 @@
       "plan_anchor": "T2.2",
       "phase": "P2",
       "title": "Add outer-dispatch path-prefix early-return + 'issue' branch (stub)",
-      "description": "Inside validate_pipeline_artifact, add (a) path-prefix early-return guard for ISSUE_NON_VALIDATED_PATH_PREFIXES BEFORE doc_type_category dispatch (per I-AA-002/ADR-0044 §4); (b) `elif category == 'issue'` branch dispatching to stub validate_issue_artifact returning [].",
+      "description": "Inside validate_pipeline_artifact, add (a) path-prefix early-return guard for ISSUE_NON_VALIDATED_PATH_PREFIXES BEFORE doc_type_category dispatch (per I-AA-002/ADR-0051 §4); (b) `elif category == 'issue'` branch dispatching to stub validate_issue_artifact returning [].",
       "target_files": [
         ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py"
       ],
@@ -345,7 +345,7 @@
       "validators": ["PV-3.C2", "PV-3.C3", "PV-3.C4", "PV-3.C5", "AT-027", "AT-028", "AT-029"],
       "estimated_complexity": "small",
       "risk_level": "high",
-      "notes": "commit_strategy: atomic (per ADR-0044 D-13). Commit message references FR-8 + ADR-0044. Single commit = git mv + frontmatter back-fill."
+      "notes": "commit_strategy: atomic (per ADR-0051 D-13). Commit message references FR-8 + ADR-0051. Single commit = git mv + frontmatter back-fill."
     },
     {
       "id": "task-020",
@@ -413,7 +413,7 @@
       "validators": ["PV-3.C2", "PV-3.C3", "PV-3.C4", "PV-3.C6", "AT-031", "AT-032", "AT-067"],
       "estimated_complexity": "small",
       "risk_level": "high",
-      "notes": "commit_strategy: atomic. Depends on task-020 (per-agent-design-evaluation-gap topic folder created by task-020's git mv). NO frontmatter back-fill (path-prefix skip). Commit message references FR-9 + ADR-0044 §Decision §4."
+      "notes": "commit_strategy: atomic. Depends on task-020 (per-agent-design-evaluation-gap topic folder created by task-020's git mv). NO frontmatter back-fill (path-prefix skip). Commit message references FR-9 + ADR-0051 §Decision §4."
     },
     {
       "id": "task-024",

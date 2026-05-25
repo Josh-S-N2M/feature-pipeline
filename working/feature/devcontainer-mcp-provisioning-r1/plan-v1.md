@@ -292,7 +292,7 @@ Stage the architectural substrate (ADR promotion + relocation per ADR-0036/0038;
 #### T1.2: Mark ADR-0018 v1.0.0 superseded; relocate ADR-0007 to canonical `adrs/`
 
 - **Layer:** Claude Code
-- **Description:** Edit `adrs-migrated/ADR-0018-codebase-analysis-schema-version.md` (or wherever it lives) to add `Status: Superseded by ADR-0038` in the body (per ADR-0005 append-only — the file is preserved). Move (`git mv`) `adrs-migrated/ADR-0007-code-graph-mcp-selection.md` → `adrs/ADR-0007-code-graph-mcp-selection.md` per ADR-0036. Update any internal cross-references that point to the old path.
+- **Description:** Edit `adrs/ADR-0018-codebase-analysis-schema.md` (or wherever it lives) to add `Status: Superseded by ADR-0038` in the body (per ADR-0005 append-only — the file is preserved). Move (`git mv`) `adrs-migrated/ADR-0007-code-graph-mcp-selection.md` → `adrs/ADR-0007-code-graph-mcp-selection.md` per ADR-0036. Update any internal cross-references that point to the old path.
 - **Dependencies:** T1.1 (ADR-0038 must exist in canonical adrs/ before it can supersede ADR-0018).
 - **Estimate:** S
 - **Satisfies AC:** Contributes to AC-X-2 (canonical inventory disposition); housekeeping for Blueprint Implementation Plan steps 11 + 12.

@@ -93,10 +93,10 @@ Entries are organized by category. Each table row carries: item ID, the item, it
 - `rolled_into_register`: <id of a register in a different topic that absorbed related items, per ADR-0050; omit if not applicable>
 
 For the full bidirectional evolution discipline, see `ADR-0046` at
-`working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-add-new-sibling-file-evolution.md`.
+`adrs/ADR-0046-add-new-sibling-file-evolution.md`.
 
 For the per-state companion-field authoritative table and 5-state lifecycle vocabulary, see:
-- `ADR-0050` at `working/feature/issue-capture-mechanism-r1/adrs/ADR-0050-5-state-issues-vocabulary.md`
+- `ADR-0050` at `adrs/ADR-0050-5-state-issues-vocabulary.md`
 - `.claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md`
 
 ---

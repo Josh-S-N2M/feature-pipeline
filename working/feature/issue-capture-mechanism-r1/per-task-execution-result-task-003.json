@@ -34,7 +34,7 @@
   "open_items_surfaced": [],
   "specialist_dispatched": true,
   "execution_mode": "specialist-dispatch",
-  "notes": "Dispatched cc-critique sub-agent (canonical Agent call per ADR-0044) which ran the auditing-cc-configs skill across the .claude/ tree. Pre-change verdict: NEEDS-REVISION (walker raw FAIL, score 0.0). Findings: 27 BLOCKER, 30 MAJOR, 10 MINOR, 0 INFO (total 67). Steady-state baseline captured BEFORE any new components from this feature land \u2014 Phase 7 T7.7 will measure delta-on-new-components, NOT absolute count. PV-0.C3 (MAJOR): PASS. This is the ONLY task in Phase 0 that used the canonical specialist-dispatch pattern; all others were inline.",
+  "notes": "Dispatched cc-critique sub-agent (canonical Agent call per ADR-0051) which ran the auditing-cc-configs skill across the .claude/ tree. Pre-change verdict: NEEDS-REVISION (walker raw FAIL, score 0.0). Findings: 27 BLOCKER, 30 MAJOR, 10 MINOR, 0 INFO (total 67). Steady-state baseline captured BEFORE any new components from this feature land \u2014 Phase 7 T7.7 will measure delta-on-new-components, NOT absolute count. PV-0.C3 (MAJOR): PASS. This is the ONLY task in Phase 0 that used the canonical specialist-dispatch pattern; all others were inline.",
   "backfilled": true,
   "backfill_timestamp": "2026-05-24T13:00:00Z"
 }

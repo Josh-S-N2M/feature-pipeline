@@ -134,5 +134,5 @@
     }
   },
   "rationale": "Phase 3 successfully migrated 5 file pairs (4 Issues/<flat>.md \u2192 Issues/<topic>/<doctype>.md + 1 agent-roster-matrix into evidence/) with all PV-3 BLOCKER validators passing. PV-3.C7 load-bearing AC-FR-8-d assertion explicitly PASS (0 extras in commit-range scope). One revision cycle on T3.4 (D-13 two-commit fallback) preserved git rename detection on substantively-rewritten content. One process irregularity at 405bb23 (commit-scope leak swept sibling migrations into T3.4's first commit) is documented as a non-blocking discipline observation \u2014 per-commit atomicity holds, scope assertion holds via mixed rendering.",
-  "execution_mode_note": "Phase 3 executed in canonical specialist-dispatch mode per ADR-0044. 19 specialist dispatches: 9 producers (1 with revision cycle 1) + 9 handlers + 1 phase-quality-reviewer. Per-task cycle counter: task-021=1; all others=0."
+  "execution_mode_note": "Phase 3 executed in canonical specialist-dispatch mode per ADR-0051. 19 specialist dispatches: 9 producers (1 with revision cycle 1) + 9 handlers + 1 phase-quality-reviewer. Per-task cycle counter: task-021=1; all others=0."
 }

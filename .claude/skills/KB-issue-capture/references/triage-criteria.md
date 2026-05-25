@@ -151,7 +151,7 @@ correct a written file's doctype after the fact.
   `.claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md`
   `.claude/skills/KB-documentation-criteria/references/templates/issue-analysis-template.md`
   `.claude/skills/KB-documentation-criteria/references/templates/issue-proposal-template.md`
-- **ADR-0045**: Three doctypes preserved — the rationale for keeping register / analysis /
+- **ADR-0052**: Three doctypes preserved — the rationale for keeping register / analysis /
   proposal as three distinct doctypes rather than collapsing them.
 - **ADR-0049**: Structural-vs-discipline KB split — why this classification rubric lives
   in KB-issue-capture and not in the templates.

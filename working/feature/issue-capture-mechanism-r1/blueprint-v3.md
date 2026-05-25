@@ -16,8 +16,8 @@ adrs_referenced:
   - ADR-0032   # universal-required feature_slug + 3-tier per-doc-type vocabulary
   - ADR-0036   # single-location ADR placement
 adrs_authored:
-  - ADR-0044   # per-issue folder model
-  - ADR-0045   # three doctypes preserved
+  - ADR-0051   # per-issue folder model
+  - ADR-0052   # three doctypes preserved
   - ADR-0046   # add-new-sibling-file evolution
   - ADR-0047   # three-layer enforcement
   - ADR-0048   # prior-context handoff via existing --raw-request mechanism
@@ -30,7 +30,7 @@ change_summary: >-
   posture per dispatch-r2.json convergence_assessment). MUST APPLIED four
   mechanical corrections from architecture-audit-issues.json:
   (I-AA-002 MAJOR) Backend Design now specifies the evidence/updates validator-
-  exclusion mechanism. ADR-0044 §Decision §4 committed that files under
+  exclusion mechanism. ADR-0051 §Decision §4 committed that files under
   Issues/<topic>/evidence/ and Issues/<topic>/updates/ are explicitly excluded
   from FR-7's validator extension; the v2 Backend Design did not implement the
   commitment. v3 adds (a) a new module-level constants list
@@ -39,7 +39,7 @@ change_summary: >-
   validate_pipeline_artifact lines 365-371, (c) a 3-line pseudocode block at
   the head of the Corrected Pseudocode Reference, and (d) a new
   §Field Propagation Map row recording the skipped path family. Together these
-  close the cross-section inconsistency between ADR-0044 and the Blueprint's
+  close the cross-section inconsistency between ADR-0051 and the Blueprint's
   Backend Design without requiring any new ADR (per FR-5 and the dispatch
   no-new-ADR posture). (I-AA-003 MINOR) Interface Change Matrix line 469
   'or'-wording stale: replaced with the single chosen mechanism (extend
@@ -206,7 +206,7 @@ unknowns:
 ### Prerequisite ADRs
 
 - **ADR-0005 (supersession discipline)** — informs the collision re-prompt's `supersede` option (NFR-5 AC-NFR-5-a). The new `superseded_by_issue_id` field on `Issues/` files mirrors ADR-0005's pattern with a distinct field name to preserve category separation.
-- **ADR-0008 (intra-pipeline 4-state issue-ledger)** — the parallel-but-distinct anchor for the new 5-state vocabulary authored as ADR-0050. ADR-0008 lives in `adrs-migrated/` per the known drift captured in `Issues/adr-placement-rootcause/analysis.md`; this run does NOT migrate ADR-0008 (out of scope per PRD §Risks #2). New ADRs cite ADR-0008 by its current location.
+- **ADR-0008 (intra-pipeline 4-state issue-ledger)** — the parallel-but-distinct anchor for the new 5-state vocabulary authored as ADR-0050. ADR-0008 lives in `adrs/` per the known drift captured in `Issues/adr-placement-rootcause/analysis.md`; this run does NOT migrate ADR-0008 (out of scope per PRD §Risks #2). New ADRs cite ADR-0008 by its current location.
 - **ADR-0011 (KB-documentation-criteria scope)** — informs ADR-0049's structural-vs-discipline split (the new templates land in KB-documentation-criteria; the triggering discipline lives in KB-issue-capture).
 - **ADR-0017 (shared-document-reviewer 5 invocation points)** — this Blueprint and the 7 new ADRs are reviewed at the same invocation points as all other pipeline documents.
 - **ADR-0020 (KB consolidation discipline)** — informs ADR-0049 (one responsibility per KB).
@@ -282,7 +282,7 @@ These precedents are intentionally bundled in one feature run because they are i
 - [x] **shellcheck** — Enforces: hook-script syntax + portability — Config: pre-merge invocation — Covers: `.claude/hooks/intercept-issue-capture-agent.sh` — Status: `adopted` (D-07 layer A).
 - [x] **golden-file hook unit test** — Enforces: hook fail-open + discriminator branches — Config: `.claude/hooks/test_intercept_issue_capture_agent.py` — Covers: 5 canonical stdin fixtures — Status: `adopted` (D-07 layer B).
 - [x] **Integration smoke test** — Enforces: end-to-end `/capture-issue` invocation — Config: manual acceptance — Covers: AC-FR-3-b + AC-FR-3-d — Status: `adopted` (D-07 layer C).
-- [x] **validate_pipeline_frontmatter.py extended regression suite** — Enforces: NFR-8 backward compatibility + per-state companion-field rules + ADR-0044 evidence/updates path-prefix skip — Config: smoke_test_auditing_shared.py extension — Covers: L1 (existing fixtures) + L2 (real pipeline artifacts; 27 minimum) + L3 (synthetic issue-doc-type fixtures; 27 minimum) + L4 (post-migration files including agent-roster-impact-matrix.md under Issues/per-agent-design-evaluation-gap/evidence/) — Status: `adopted` (D-10 + backend-design §7 + v3 §Backend Design path-prefix skip per I-AA-002).
+- [x] **validate_pipeline_frontmatter.py extended regression suite** — Enforces: NFR-8 backward compatibility + per-state companion-field rules + ADR-0051 evidence/updates path-prefix skip — Config: smoke_test_auditing_shared.py extension — Covers: L1 (existing fixtures) + L2 (real pipeline artifacts; 27 minimum) + L3 (synthetic issue-doc-type fixtures; 27 minimum) + L4 (post-migration files including agent-roster-impact-matrix.md under Issues/per-agent-design-evaluation-gap/evidence/) — Status: `adopted` (D-10 + backend-design §7 + v3 §Backend Design path-prefix skip per I-AA-002).
 - [x] **1000-iteration p95 latency benchmark** — Enforces: NFR-1 hook fast-path — Config: plan-stage execution — Covers: AC-NFR-1-a — Status: `adopted` (D-11).
 - [x] **git mv + edit + git diff -M dry-run** — Enforces: AC-FR-8-b / AC-FR-9-b git history preservation — Config: plan-stage verification — Covers: FR-8 + FR-9 migrations — Status: `adopted` (D-13).
 - [x] **cc-critique + auditing-{hooks, skills, subagents, settings} pre-merge** — Enforces: KB-cc-design discipline compliance — Status: `adopted` (Blueprint §Risks).
@@ -349,7 +349,7 @@ The PRD §FRs and §NFRs collectively define ~50 EARS-format ACs. The cc-design 
 
 #### FR-4 (per-issue folder model) — Layer: Claude Code
 
-- **AC-FR-4-c** — `id` derives as `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` from path. [Per ADR-0044.]
+- **AC-FR-4-c** — `id` derives as `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` from path. [Per ADR-0051.]
 - **AC-FR-4-d** — On collision, present 3-option re-prompt (supersede / rename / cancel). [D-03 archetype 3; NFR-5.]
 
 #### FR-5 (add-new-sibling evolution) — Layer: Claude Code
@@ -367,9 +367,9 @@ The PRD §FRs and §NFRs collectively define ~50 EARS-format ACs. The cc-design 
 - **AC-BE-5** — When optional cross-link field present with malformed ID, emit one `minor` finding per field. [ADR-0046 syntactic validation.]
 - **AC-BE-6** — When post-extension validator runs against the regression corpus, produce byte-identical findings to the pre-extension baseline. [NFR-8.]
 - **AC-BE-7** — Files with `doc_type` in pre-existing enum route through pre-existing per-category validators unchanged. [Dispatch isolation.]
-- **AC-BE-8** — The outer dispatch (lines 365-371) is unchanged in its existing dispatch logic; v3 adds a single early-return path-prefix skip BEFORE the existing dispatch (per I-AA-002 / ADR-0044 §Decision §4); the existing GATED/ANALYSIS/ADR/ISSUE per-category dispatch is preserved unchanged. [VE-004 preservation + ADR-0044 honoring.]
+- **AC-BE-8** — The outer dispatch (lines 365-371) is unchanged in its existing dispatch logic; v3 adds a single early-return path-prefix skip BEFORE the existing dispatch (per I-AA-002 / ADR-0051 §Decision §4); the existing GATED/ANALYSIS/ADR/ISSUE per-category dispatch is preserved unchanged. [VE-004 preservation + ADR-0051 honoring.]
 - **AC-BE-9** — `validate_issue_artifact` uses `make_finding` (VE-002) verbatim; no parallel construction. [Backend §8.]
-- **AC-BE-10 (v3 new, per I-AA-002)** — When validator processes any file under `Issues/<topic-slug>/evidence/` or `Issues/<topic-slug>/updates/`, return empty list with zero findings regardless of frontmatter shape. [ADR-0044 §Decision §4 honoring; covers post-FR-9 migration of agent-roster-impact-matrix.md so it produces no validator regression.]
+- **AC-BE-10 (v3 new, per I-AA-002)** — When validator processes any file under `Issues/<topic-slug>/evidence/` or `Issues/<topic-slug>/updates/`, return empty list with zero findings regardless of frontmatter shape. [ADR-0051 §Decision §4 honoring; covers post-FR-9 migration of agent-roster-impact-matrix.md so it produces no validator regression.]
 
 #### FR-13 (pipeline-isolation invariant) — Layer: Claude Code
 
@@ -421,7 +421,7 @@ The PRD §FRs and §NFRs collectively define ~50 EARS-format ACs. The cc-design 
 | `validate_pipeline_frontmatter.py:38-68` (VE-003) | GATED_DOC_TYPES / ANALYSIS_DOC_TYPES / per-category state vocabularies — the pattern the new ISSUE category mirrors. |
 | `validate_pipeline_frontmatter.py:157-167` (VE-002) | `make_finding` function shape — reused verbatim by the new branch (per AC-BE-9; resolves I-DR-BE-002 citation correction). |
 | `validate_pipeline_frontmatter.py:314-323` | Existing ADR-0005 `superseded_by` enforcement — the pattern the new `superseded_by_issue_id` mirrors. Uses bare `in fm` idiom (NOT a `field_present` helper — resolves I-DR-BE-001). |
-| `validate_pipeline_frontmatter.py:365-371` (VE-004) | Outer dispatch — v3 adds a single early-return path-prefix skip BEFORE this block to honor ADR-0044 §Decision §4 (per I-AA-002); the existing per-category dispatch logic at this site is preserved unchanged per AC-BE-8. |
+| `validate_pipeline_frontmatter.py:365-371` (VE-004) | Outer dispatch — v3 adds a single early-return path-prefix skip BEFORE this block to honor ADR-0051 §Decision §4 (per I-AA-002); the existing per-category dispatch logic at this site is preserved unchanged per AC-BE-8. |
 | `.claude/skills/auditing-subagents/references/subagent-spec.md:110` (F-003) | Silent-drop BLOCKER constraint: skills with `disable-model-invocation: true` cannot be in sub-agent `skills:` preload arrays. Forces D-01 runtime Read/Glob pattern. |
 | `.claude/skills/auditing-cc-configs/scripts/cross_file_checks.py:410` | X3 cross-file check that enforces F-003 at audit time. |
 | `.claude/skills/KB-cc-platform/references/extensions.md` | PreToolUse hook contract — the design's primary platform reference (Assumption 2 verified at plan stage per Open Items U-1). |
@@ -436,7 +436,7 @@ One row per codebase-analysis finding F-001..F-016 (16 entries). The table is th
 | F-001 | NO existing SKILL.md declares `disable-model-invocation: true` | transform | Two new skills (KB-issue-capture, capture-issue) introduce the project's first uses of this flag. Captured as a project precedent in ADR-0047 §Decision §5. *(v3.1: previously also "SETTINGS-NOTES"; that surface was retired 2026-05-25.)* | Grep result: zero matches for the literal in existing SKILL.md frontmatter. |
 | F-002 | NO hook directory; NO hooks block in settings.json | transform | New `.claude/hooks/` directory + new `hooks.PreToolUse` block in settings.json + new hook script. Captured as project precedents 2 and 3. | `ls .claude/hooks` → not found; grep `"hooks"` in settings.json → no match. |
 | F-003 | Silent-drop BLOCKER: `disable-model-invocation: true` skills cannot be in sub-agent `skills:` preload | preserve | Design honors the constraint structurally: `issue-capture-author` frontmatter has NO `skills:` field. Runtime Read/Glob pattern per D-01; closest precedent cc-critique (CP-001). Captured as project precedent 4 (first runtime-Read-KB sub-agent). | subagent-spec.md:110; cross_file_checks.py:410 X3. |
-| F-004 | ADR-0008 lives in adrs-migrated/, not adrs/ | out-of-scope | Per PRD §Risks #2: this run does NOT migrate ADR-0008. The 7 new ADRs (ADR-0044..ADR-0050) land in `working/feature/issue-capture-mechanism-r1/adrs/` per current operational convention (user-accepted Option A in I-AA-001 escalation). ADR-0050 cites ADR-0008 by its current location. | `Issues/adr-placement-rootcause/analysis.md` (captured drift). |
+| F-004 | ADR-0008 lives in adrs-migrated/, not adrs/ | out-of-scope | Per PRD §Risks #2: this run does NOT migrate ADR-0008. The 7 new ADRs (ADR-0051..ADR-0050) land in `working/feature/issue-capture-mechanism-r1/adrs/` per current operational convention (user-accepted Option A in I-AA-001 escalation). ADR-0050 cites ADR-0008 by its current location. | `Issues/adr-placement-rootcause/analysis.md` (captured drift). |
 | F-005 | doc_type drift: pre-migration files use older names (deferral-register, analysis, proposal) | transform | FR-8 migration back-fills to canonical enum (issue-register, issue-analysis, issue-proposal) in same atomic commit per ADR-0048 D-13. NFR-8 regression corpus snapshots pre-migration findings as baseline. | Four pre-migration files frontmatter `doc_type:` values. |
 | F-006 | `proposes_future_feature` field has TWO existing precedents (divergent shapes) | preserve | D-06 advisory posture: emit `info` finding when absent on issue-proposal; accept any string when present. Honors both precedents. | `Issues/proposal-auditing-family-graduation-review.md:15`; `Issues/issue-capture-mechanism/proposal.md:11`. |
 | F-007 | auditing-hooks references/ has 4 files, NOT 6 — no examples/ subdirectory | preserve | Design composes the hook from KB-cc-platform/extensions.md + auditing-hooks references; no annotated-example precedent in-project. Acceptable per Blueprint §Open Items OI-2. | `ls .claude/skills/auditing-hooks/references/` returns 4 files. |
@@ -499,14 +499,14 @@ No Ripple Effect:
 | Existing | New | Conversion Required | Compatibility Method |
 |---|---|---|---|
 | `validate_pipeline_artifact(fm, path)` — existing dispatcher | Extends `doc_type_category` (lines 147-154) to return `"issue"` when `doc_type ∈ ISSUE_DOC_TYPES`; adds an `elif category == "issue"` branch inside `validate_pipeline_artifact`. (v3 per I-AA-003: single chosen mechanism — removes the v2 `or`-wording ambiguity that left two options open; the alternative fourth-elif-on-doc_type was the rejected option.) | No | Additive only — existing branches unchanged. |
-| `validate_pipeline_artifact(fm, path)` — outer dispatch entry at lines 365-371 | v3 adds a single early-return path-prefix skip immediately BEFORE the existing dispatch (per I-AA-002 / ADR-0044 §Decision §4): if path matches `Issues/<topic-slug>/evidence/**` or `Issues/<topic-slug>/updates/**`, return empty findings list. Existing dispatch logic at lines 365-371 unchanged thereafter (AC-BE-8). | No | Additive prefix — observable as a new early-return path; existing flows for non-Issues paths unaffected. |
+| `validate_pipeline_artifact(fm, path)` — outer dispatch entry at lines 365-371 | v3 adds a single early-return path-prefix skip immediately BEFORE the existing dispatch (per I-AA-002 / ADR-0051 §Decision §4): if path matches `Issues/<topic-slug>/evidence/**` or `Issues/<topic-slug>/updates/**`, return empty findings list. Existing dispatch logic at lines 365-371 unchanged thereafter (AC-BE-8). | No | Additive prefix — observable as a new early-return path; existing flows for non-Issues paths unaffected. |
 | `make_finding(severity, file_path, message, depth)` — existing helper | Unchanged | No | Reused verbatim by new branch (AC-BE-9). |
 | `.claude/settings.json` — existing permissions.allow array | Adds top-level `hooks` object with `PreToolUse` block matching `Task`. permissions.allow unchanged (7 entries; no hook-script entry needed because hooks run via platform mechanism, not via Bash) | No | Additive top-level key. |
 | `intake-intent-clarifier.md` — existing procedure section | Adds Phase 0 (~15 lines) before existing Phase 1 | No | Body-level addition; no signature change (F-013). |
 | `intent-clarification-template.md` — existing Source section | Appends ~5 lines of proposal-seed guidance | No | Additive. |
 | `recipe-feature-pipeline/SKILL.md` — existing --raw-request documentation | Appends one bullet on proposal-seed invocation pattern | No | Additive (FR-12b). |
 | `KB-documentation-criteria/SKILL.md` — existing Canonical templates table | Adds 3 rows for issue templates + 1 row for issue-doctypes-spec; adds 1 bullet to "Where this KB is NOT used" | No | Additive rows (FR-14). |
-| `Issues/<flat-file>.md` — pre-migration paths | `Issues/<topic-slug>/<doctype>.md` — per-issue folder layout (ADR-0044) | Yes (one-time) | `git mv` + atomic frontmatter back-fill per ADR-0044's D-13 procedure. |
+| `Issues/<flat-file>.md` — pre-migration paths | `Issues/<topic-slug>/<doctype>.md` — per-issue folder layout (ADR-0051) | Yes (one-time) | `git mv` + atomic frontmatter back-fill per ADR-0051's D-13 procedure. |
 
 ### Architecture Overview
 
@@ -545,7 +545,7 @@ USER  ──── /capture-issue ──►   capture-issue skill (Layer 1: disa
                               ▼                                     ▼
               ┌───────────────────────────┐       ┌──────────────────────────────┐
               │ Issues/<topic>/<file>.md  │       │ .claude/logs/capture-issue   │
-              │ (per ADR-0044 layout)     │       │   .jsonl (per D-09)          │
+              │ (per ADR-0051 layout)     │       │   .jsonl (per D-09)          │
               └─────────────┬─────────────┘       └──────────────────────────────┘
                             │
                             │ (any time later)
@@ -560,7 +560,7 @@ USER  ──── /capture-issue ──►   capture-issue skill (Layer 1: disa
               │   ELSE: per-category      │
               │   dispatch incl. fourth   │
               │   `issue` branch          │
-              │   (per ADR-0044 + 0050)   │
+              │   (per ADR-0051 + 0050)   │
               └───────────────────────────┘
 
 DISJOINT from the intra-pipeline issues-ledger.json (per ADR-0008):  [annotated per I-DR-BP-009]
@@ -622,7 +622,7 @@ For update-mode (`/capture-issue --update <path>`):
 |---|---|---|---|---|---|
 | Slash-command surface | `/capture-issue` | None (ad-hoc hand-authored `Issues/*.md`) | `capture-issue` skill with `disable-model-invocation: true` | Skill is user-invocable; spawns `issue-capture-author` | Manual acceptance test: `/capture-issue dummy` produces the expected flow |
 | Task spawn discriminator | PreToolUse hook | None | bash + jq script reading stdin JSON | Hook registered in settings.json `hooks.PreToolUse[matcher=Task]` | Golden-file unit tests (D-07 layer B); shellcheck (D-07 layer A); integration smoke (D-07 layer C) |
-| Validator outer dispatch | `validate_pipeline_artifact` entry (lines 365-371) | Direct per-category dispatch | v3 adds path-prefix early-return for `Issues/<topic>/(evidence|updates)/**` BEFORE the existing dispatch (per I-AA-002 / ADR-0044 §4) | Constants list `ISSUE_NON_VALIDATED_PATH_PREFIXES`; one-line glob check returning empty findings | Regression diff baseline (NFR-8); L4 post-migration fixture (agent-roster-impact-matrix.md under Issues/per-agent-design-evaluation-gap/evidence/) returns zero findings |
+| Validator outer dispatch | `validate_pipeline_artifact` entry (lines 365-371) | Direct per-category dispatch | v3 adds path-prefix early-return for `Issues/<topic>/(evidence|updates)/**` BEFORE the existing dispatch (per I-AA-002 / ADR-0051 §4) | Constants list `ISSUE_NON_VALIDATED_PATH_PREFIXES`; one-line glob check returning empty findings | Regression diff baseline (NFR-8); L4 post-migration fixture (agent-roster-impact-matrix.md under Issues/per-agent-design-evaluation-gap/evidence/) returns zero findings |
 | Validator dispatch (fourth category) | `validate_pipeline_artifact` per-category branch | 3 categories: GATED / ANALYSIS / ADR | 4 categories: GATED / ANALYSIS / ADR / ISSUE | Extend `doc_type_category` to return `"issue"`; add `elif category == "issue"` branch | Pre/post regression corpus diff (NFR-8 baseline-capture procedure) |
 | intake-intent-clarifier Phase 0 | Stage 1 of recipe-feature-pipeline | Direct Phase 1 elicitation | Phase 0 detects proposal seed; treats body as prior context | Body-level edit; existing `prior_context` parameter accommodates | Dogfood validation: this run's intent-clarification.md cites the proposal verbatim |
 
@@ -663,7 +663,7 @@ For update-mode (`/capture-issue --update <path>`):
 
 #### Component 5: Validator extension (Backend)
 
-- **Responsibility**: Validate `Issues/*.md` files' frontmatter against the 5-state vocabulary and per-state required companion fields; **also honor ADR-0044 §Decision §4 by skipping any file under `Issues/<topic-slug>/evidence/` or `Issues/<topic-slug>/updates/` at the outer-dispatch entry (per I-AA-002).**
+- **Responsibility**: Validate `Issues/*.md` files' frontmatter against the 5-state vocabulary and per-state required companion fields; **also honor ADR-0051 §Decision §4 by skipping any file under `Issues/<topic-slug>/evidence/` or `Issues/<topic-slug>/updates/` at the outer-dispatch entry (per I-AA-002).**
 - **Interface**: `validate_issue_artifact(fm, path) -> list[dict]` — invoked from `validate_pipeline_artifact` when `doc_type ∈ ISSUE_DOC_TYPES`. **Outer-dispatch early-return**: `validate_pipeline_artifact` checks `ISSUE_NON_VALIDATED_PATH_PREFIXES` first and returns `[]` for matching paths regardless of frontmatter.
 - **Dependencies**: `make_finding` (VE-002), existing parser, existing dispatch. No new dependencies.
 
@@ -682,7 +682,7 @@ For update-mode (`/capture-issue --update <path>`):
 | Lifecycle Fit | No | Outside-pipeline files persist across pipeline runs; intra-pipeline ledger entries are scoped to one run. |
 | Boundary/Interop Cost | Low | The new doctypes are a fourth category alongside existing three; validator dispatch is additive. |
 
-**Decision**: new — ADR-0044/45/46/47/50 codify the new structural surface. The new vocabulary and folder model do not conflict with existing structures.
+**Decision**: new — ADR-0051/45/46/47/50 codify the new structural surface. The new vocabulary and folder model do not conflict with existing structures.
 
 ### Contract Definitions
 
@@ -705,7 +705,7 @@ ISSUE_PER_STATE_REQUIRED_FIELDS = {
     "wontfix-with-rationale": ("since", "wontfix_rationale", "decided_at"),
 }
 
-# v3 addition per I-AA-002 / ADR-0044 §Decision §4
+# v3 addition per I-AA-002 / ADR-0051 §Decision §4
 ISSUE_NON_VALIDATED_PATH_PREFIXES = (
     "Issues/*/evidence/",
     "Issues/*/updates/",
@@ -724,7 +724,7 @@ ISSUE_NON_VALIDATED_PATH_PREFIXES = (
 }
 ```
 
-**ID derivation rule (ADR-0044):** `id = <UPPERCASE-DOCTYPE>-<kebab-topic-slug>`, derived from the file path.
+**ID derivation rule (ADR-0051):** `id = <UPPERCASE-DOCTYPE>-<kebab-topic-slug>`, derived from the file path.
 
 ### Data Contract
 
@@ -737,7 +737,7 @@ Input:
     - fm parsed by existing parse_frontmatter (validate_pipeline_frontmatter.py:86-144)
     - path is the file's filesystem path
     - dispatched only when doc_type ∈ ISSUE_DOC_TYPES (per-category dispatch)
-    - NOT dispatched when path matches ISSUE_NON_VALIDATED_PATH_PREFIXES (outer-dispatch early-return per ADR-0044 §4 + I-AA-002)
+    - NOT dispatched when path matches ISSUE_NON_VALIDATED_PATH_PREFIXES (outer-dispatch early-return per ADR-0051 §4 + I-AA-002)
   Validation:
     - status ∈ ISSUE_STATES (else blocker)
     - all fields in ISSUE_PER_STATE_REQUIRED_FIELDS[status] present in fm (else one blocker per missing)
@@ -756,7 +756,7 @@ Outer-dispatch Pre-Validation (v3 per I-AA-002):
   Type: pathlib.Path → list[dict] (called BEFORE validate_pipeline_artifact's per-category dispatch)
   Behavior: if any prefix in ISSUE_NON_VALIDATED_PATH_PREFIXES matches the path,
             return [] immediately. The doc_type_category dispatch is not consulted.
-  Rationale: ADR-0044 §Decision §4 commits that evidence/ and updates/ subdirectories
+  Rationale: ADR-0051 §Decision §4 commits that evidence/ and updates/ subdirectories
              are NOT validated; this avoids a minor `doc_type not in known category`
              finding on agent-roster-impact-matrix.md after FR-9 migration.
   Idempotency: trivially idempotent (pure function over path).
@@ -774,12 +774,12 @@ Invariants:
 | Field | Boundary | Status | Detail |
 |---|---|---|---|
 | `feature_slug` | Issues/ frontmatter ↔ validator | preserved | Universal-required per ADR-0032; default `pipeline-wide` for pipeline-wide-scope; real slug for feature-specific captures. |
-| `id` | path ↔ frontmatter | derived | id = `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` from path (ADR-0044); validator verifies match. |
+| `id` | path ↔ frontmatter | derived | id = `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` from path (ADR-0051); validator verifies match. |
 | `proposes_future_feature` | issue-proposal frontmatter ↔ validator advisory | preserved | Advisory per D-06: info finding if absent; any string accepted when present. |
 | `escalates_from` / `escalated_to` | older/newer file frontmatter ↔ validator | preserved | Bidirectional cross-links per ADR-0046; syntactic-shape validated when present. |
 | `superseded_by_issue_id` | superseded file frontmatter ↔ validator | preserved | Distinct field name from ADR-0005's `superseded_by` (Q-BE-3 resolution); enforces ID syntax. |
 | `subagent_type` | Task tool_input ↔ PreToolUse hook | inspected | Hook's jq discriminator path: `.tool_input.subagent_type`. Plan-stage verifies schema field name per Open Items U-1; if differently named, only the jq path changes (architecture unaffected per I-DR-005 resolution). |
-| **(path family) `Issues/<topic-slug>/evidence/**` and `Issues/<topic-slug>/updates/**`** | filesystem path ↔ validator outer dispatch | **skipped (v3 per I-AA-002)** | Emit no findings regardless of frontmatter shape. Honors ADR-0044 §Decision §4. Constants list `ISSUE_NON_VALIDATED_PATH_PREFIXES` enumerated in `validate_pipeline_frontmatter.py`. Post-FR-9, `agent-roster-impact-matrix.md` (whose pre-migration path emits a minor `doc_type not in known category` finding) is silenced cleanly. |
+| **(path family) `Issues/<topic-slug>/evidence/**` and `Issues/<topic-slug>/updates/**`** | filesystem path ↔ validator outer dispatch | **skipped (v3 per I-AA-002)** | Emit no findings regardless of frontmatter shape. Honors ADR-0051 §Decision §4. Constants list `ISSUE_NON_VALIDATED_PATH_PREFIXES` enumerated in `validate_pipeline_frontmatter.py`. Post-FR-9, `agent-roster-impact-matrix.md` (whose pre-migration path emits a minor `doc_type not in known category` finding) is silenced cleanly. |
 
 ### State Transitions and Invariants
 
@@ -825,7 +825,7 @@ The cc-design provides a comprehensive 16-row inventory table of every CC artifa
 12. **intake-intent-clarifier.md** (FR-11 Phase 0 ~15-line addition per ADR-0048).
 13. **intent-clarification-template.md** (FR-12a Source-section guidance ~5 lines).
 14. **recipe-feature-pipeline/SKILL.md** (FR-12b one-bullet edit).
-15-16. **Migrations** (4 + 1 files via atomic `git mv` + frontmatter back-fill; ADR-0044 + ADR-0048 D-13).
+15-16. **Migrations** (4 + 1 files via atomic `git mv` + frontmatter back-fill; ADR-0051 + ADR-0048 D-13).
 
 #### Skill Patterns
 
@@ -912,7 +912,7 @@ The validator extension preserves the existing 421-line file's flat module-level
 - New module-level constants: `ISSUE_DOC_TYPES`, `ISSUE_STATES`, `ISSUE_PER_STATE_REQUIRED_FIELDS`, **`ISSUE_NON_VALIDATED_PATH_PREFIXES` (v3 per I-AA-002)**.
 - New function: `validate_issue_artifact(fm, path) -> list[dict]`.
 - Mechanism for dispatch (per I-DR-BE-005 precision): extend `doc_type_category` (at lines 147-154) to return `"issue"` when `doc_type ∈ ISSUE_DOC_TYPES`, then add an `elif category == "issue"` branch inside `validate_pipeline_artifact`. The outer dispatch at lines 365-371 is unchanged in its existing per-category logic (AC-BE-8).
-- **Outer-dispatch path-prefix skip (v3 per I-AA-002, honoring ADR-0044 §Decision §4):** Before the doc_type-category dispatch fires inside `validate_pipeline_artifact` (lines 365-371), the function early-returns an empty finding list for any path matching `Issues/*/evidence/` or `Issues/*/updates/`. The skip is implemented as a glob match against the new module-level constants list `ISSUE_NON_VALIDATED_PATH_PREFIXES = ("Issues/*/evidence/", "Issues/*/updates/")`. The skip is positioned BEFORE doc_type_category dispatch (per the dispatch's `feedback_brief` recommended option: "outer-dispatch early-return at lines 365-371, rather than unknown-category branch at lines 304-312, because the former is unambiguous and does not require doc_type_category to know about the path"). Honors ADR-0044's commitment that "Files under Issues/<topic-slug>/evidence/ and Issues/<topic-slug>/updates/ are skipped (no doctype validation applied)" and silences the minor `doc_type not in known category` finding that would otherwise persist on `agent-roster-impact-matrix.md` after FR-9 migration.
+- **Outer-dispatch path-prefix skip (v3 per I-AA-002, honoring ADR-0051 §Decision §4):** Before the doc_type-category dispatch fires inside `validate_pipeline_artifact` (lines 365-371), the function early-returns an empty finding list for any path matching `Issues/*/evidence/` or `Issues/*/updates/`. The skip is implemented as a glob match against the new module-level constants list `ISSUE_NON_VALIDATED_PATH_PREFIXES = ("Issues/*/evidence/", "Issues/*/updates/")`. The skip is positioned BEFORE doc_type_category dispatch (per the dispatch's `feedback_brief` recommended option: "outer-dispatch early-return at lines 365-371, rather than unknown-category branch at lines 304-312, because the former is unambiguous and does not require doc_type_category to know about the path"). Honors ADR-0051's commitment that "Files under Issues/<topic-slug>/evidence/ and Issues/<topic-slug>/updates/ are skipped (no doctype validation applied)" and silences the minor `doc_type not in known category` finding that would otherwise persist on `agent-roster-impact-matrix.md` after FR-9 migration.
 
 #### Domain Model
 
@@ -944,7 +944,7 @@ Field names per Q-BE-1/Q-BE-2/Q-BE-3 resolution (locked by ADR-0050).
 ```python
 # illustrative — production wording owned by plan-author + implementer
 
-# v3 module-level constant per I-AA-002 / ADR-0044 §Decision §4
+# v3 module-level constant per I-AA-002 / ADR-0051 §Decision §4
 ISSUE_NON_VALIDATED_PATH_PREFIXES = (
     "Issues/*/evidence/",
     "Issues/*/updates/",
@@ -954,13 +954,13 @@ ISSUE_NON_VALIDATED_PATH_PREFIXES = (
 # Inside validate_pipeline_artifact, BEFORE the existing doc_type_category dispatch
 # (currently at lines 365-371 in validate_pipeline_frontmatter.py):
 def validate_pipeline_artifact(fm: dict, path: Path) -> list[dict]:
-    # v3 addition (per I-AA-002 honoring ADR-0044 §4):
+    # v3 addition (per I-AA-002 honoring ADR-0051 §4):
     # path-prefix early-return for non-validated subdirectories
     path_str = str(path)
     if "/Issues/" in path_str and (
         "/evidence/" in path_str or "/updates/" in path_str
     ):
-        return []  # ADR-0044 §Decision §4: evidence/ and updates/ excluded
+        return []  # ADR-0051 §Decision §4: evidence/ and updates/ excluded
 
     # ... existing dispatch logic unchanged (lines 365-371) ...
     category = doc_type_category(fm.get("doc_type"))
@@ -1032,7 +1032,7 @@ All seven layers are **N/A — out of scope per PRD §Layer Scope rows 2, 4, 5, 
 | Migration history loss | git mv fails to track rename | D-13 dry-run detects | Fallback to two-commit sequence (git mv first, edit second) | Migration proceeds; AC-FR-8-b verifies via `git log --follow` |
 | Prompt-injection in agent context | `$ARGUMENTS` or read-file body contains "bypass approval" | Agent body's hard-constraint section "NEVER bypass…" | Layer 2 sequencing governs over in-context text | User still sees AskUserQuestion (NFR-4 AC-NFR-4-b) |
 | Pipeline-isolation invariant violation | A pipeline agent's body mentions KB-issue-capture | F-010/F-015 grep-based acceptance tests | Block merge until grep returns zero | review-cross-artifact-auditor catches; user remediates |
-| **Validator file under evidence/ or updates/ (v3 per I-AA-002)** | `agent-roster-impact-matrix.md` under `Issues/per-agent-design-evaluation-gap/evidence/` | Outer-dispatch path-prefix match | Early-return empty findings; no validation applied | No finding emitted regardless of frontmatter shape; honors ADR-0044 §Decision §4 |
+| **Validator file under evidence/ or updates/ (v3 per I-AA-002)** | `agent-roster-impact-matrix.md` under `Issues/per-agent-design-evaluation-gap/evidence/` | Outer-dispatch path-prefix match | Early-return empty findings; no validation applied | No finding emitted regardless of frontmatter shape; honors ADR-0051 §Decision §4 |
 
 ### Logging and Monitoring
 
@@ -1078,7 +1078,7 @@ All seven layers are **N/A — out of scope per PRD §Layer Scope rows 2, 4, 5, 
 
 5. **Phase 4 — Migrations (CC layer)**
    - Layer: Claude Code
-   - Technical Reason: FR-8 migration of 4 files + FR-9 migration of agent-roster-impact-matrix. Atomic `git mv` + frontmatter back-fill per ADR-0044's D-13. Each commit is independently reversible.
+   - Technical Reason: FR-8 migration of 4 files + FR-9 migration of agent-roster-impact-matrix. Atomic `git mv` + frontmatter back-fill per ADR-0051's D-13. Each commit is independently reversible.
    - Prerequisites: Phase 2 (validator must be able to validate the post-migration files cleanly, AND the outer-dispatch path-prefix skip must be in place so agent-roster-impact-matrix.md under `Issues/per-agent-design-evaluation-gap/evidence/` produces no validator finding).
 
 6. **Phase 5 — Cross-cutting edits + handoff (CC layer)**
@@ -1099,7 +1099,7 @@ All seven layers are **N/A — out of scope per PRD §Layer Scope rows 2, 4, 5, 
 
 ### Migration Strategy
 
-Per FR-8 + FR-9 + ADR-0044's D-13: atomic `git mv` + frontmatter back-fill in one commit per file. Five files in total:
+Per FR-8 + FR-9 + ADR-0051's D-13: atomic `git mv` + frontmatter back-fill in one commit per file. Five files in total:
 
 | Source | Destination | doc_type rename | Companion back-fill |
 |---|---|---|---|
@@ -1262,7 +1262,7 @@ This parallels the Backend early-verification target in spirit: the smallest com
 ## Future Extensibility
 
 - **Extension points:**
-  - Fourth doctype could be added via amendment to ADR-0044 + ADR-0045; templates would extend; validator constants would extend.
+  - Fourth doctype could be added via amendment to ADR-0051 + ADR-0052; templates would extend; validator constants would extend.
   - Sixth lifecycle state could be added via amendment to ADR-0050; per-state companion-field rules would extend.
   - Additional non-validated subdirectory families (beyond `evidence/` and `updates/`) could be added to `ISSUE_NON_VALIDATED_PATH_PREFIXES` if a future need arises (e.g., `Issues/<topic>/artifacts/`); the mechanism is a tuple — additive.
   - `permissions.deny` rule for non-issue-capture-author writes to `Issues/` (Q-CC-2 deferred): future hardening pass; Layers 1+2+3 are sufficient for r1.
@@ -1287,7 +1287,7 @@ This parallels the Backend early-verification target in spirit: the smallest com
 - **Overview:** One template, one validator branch.
 - **Advantages:** Simpler; less to maintain.
 - **Disadvantages:** Loses CP-004's three documented body shapes; doctype-specific rules become awkward conditional logic.
-- **Reason for Rejection:** ADR-0045 — the three body shapes are empirically distinct.
+- **Reason for Rejection:** ADR-0052 — the three body shapes are empirically distinct.
 
 ### Alternative 3: New pipeline stage between recipe and Stage 1 for proposal ingest
 
@@ -1349,8 +1349,8 @@ This parallels the Backend early-verification target in spirit: the smallest com
 
 ### New ADRs Authored (this run)
 
-1. **ADR-0044** — Per-issue folder model for `Issues/`.
-2. **ADR-0045** — Three doctypes preserved as distinct (register / analysis / proposal).
+1. **ADR-0051** — Per-issue folder model for `Issues/`.
+2. **ADR-0052** — Three doctypes preserved as distinct (register / analysis / proposal).
 3. **ADR-0046** — Add-new-sibling-file evolution pattern.
 4. **ADR-0047** — Three-layer enforcement for outside-pipeline issue capture. *(v3 cycle-2 amendment per I-AA-004: frontmatter `applies_to` corrected from "four project firsts" to "five project firsts"; the 5th item — "5-state lifecycle vocabulary distinct from ADR-0008's 4-state intra-pipeline ledger and ADR-0032's 3-tier per-doc-type vocabulary" — was already present in §Decision §5 but missing from the frontmatter applies_to. In-place frontmatter amendment per dispatch Option A; status remains Proposed pre-Gate-4 ratification, so no superseding ADR is required per ADR-0005.)*
 5. **ADR-0048** — Prior-context handoff via existing `--raw-request` mechanism.
@@ -1364,7 +1364,7 @@ This parallels the Backend early-verification target in spirit: the smallest com
 | **I-AA-001** | MAJOR | **Documented user-accepted deviation (Option A)** — 7 new ADRs remain at `working/feature/<slug>/adrs/` for this run | §References > ADR placement note (full user disposition); §Agreement Checklist > Non-Scope row; §Background > ADR-0036 reference; §Risks table row |
 | **I-AA-002** | MAJOR | **Resolved** — Backend Design now specifies path-prefix skip; new constants list `ISSUE_NON_VALIDATED_PATH_PREFIXES`; outer-dispatch early-return at validate_pipeline_artifact entry; new AC-BE-10; new Field Propagation Map row; new Error Handling row | §Backend Design > Service/Module Layout; §Corrected Pseudocode Reference (pre-dispatch block); §Contract Definitions (constants); §Field Propagation Map (new row); §Acceptance Criteria (AC-BE-10); §Implementation Plan (Phase 2); §Verification Strategy (NFR-8 + AC-BE-10 fixture); §Risks |
 | **I-AA-003** | MINOR | **Resolved** — Interface Change Matrix `or`-wording replaced with the single chosen mechanism (extend doc_type_category then elif category == "issue") | §Interface Change Matrix (first dispatcher row) |
-| **I-AA-004** | MINOR | **Resolved** — ADR-0047 frontmatter `applies_to` corrected from "four" to "five project firsts" (added the 5-state lifecycle vocabulary item); in-place edit since status remains Proposed pre-Gate-4 | `working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md` line 14; also noted in §Cross-References > New ADRs Authored row 4 |
+| **I-AA-004** | MINOR | **Resolved** — ADR-0047 frontmatter `applies_to` corrected from "four" to "five project firsts" (added the 5-state lifecycle vocabulary item); in-place edit since status remains Proposed pre-Gate-4 | `adrs/ADR-0047-three-layer-enforcement.md` line 14; also noted in §Cross-References > New ADRs Authored row 4 |
 | **I-AA-005** | MINOR | **Resolved** — Blueprint citation corrected from `AC-FR-11-a/b/c` to `AC-FR-11-a/b` (PRD-v2 defines only -a and -b) | §Acceptance Criteria > "Note (resolving I-DR-BP-006 recommended; corrected per I-AA-005)" paragraph |
 | **I-AA-006** | INFO | **Deferred (no action)** — Blueprint frontmatter doc_type omission is pre-existing template drift; the canonical blueprint-template.md itself omits doc_type; scoped to a future templates-consolidation feature per the auditor's own recommended_resolution | No action; documented in dispatch deferrals |
 | **I-AA-007** | INFO | **Audit-positive (no action)** — F-003 BLOCKER mitigation architecturally rigorous | No action; preserved structural mitigation in §Component 3 + §Project Precedents Established |
@@ -1412,7 +1412,7 @@ This parallels the Backend early-verification target in spirit: the smallest com
 - **Cycle-2 Dispatch:** `working/feature/issue-capture-mechanism-r1/dispatch-r2.json` (converging posture; cycle 2 of 4 cap; design-composer-only dispatch; no new ADRs).
 - **Source proposal (seed):** `Issues/issue-capture-mechanism/proposal.md` (`doc_type: issue-proposal`, `proposes_future_feature: issue-capture-mechanism-r1`).
 - **Companion plan:** `/home/vscode/.claude/plans/i-am-noticing-as-reflective-wilkes.md`.
-- **Pipeline issue-tracking precedent:** `adrs-migrated/ADR-0008-issue-ledger-scope.md` (NOT migrated this run; cited at its current location per F-004).
+- **Pipeline issue-tracking precedent:** `adrs/ADR-0008-issue-ledger-scope.md` (NOT migrated this run; cited at its current location per F-004).
 - **Intra-pipeline 4-state issue-lifecycle vocabulary:** `.claude/skills/KB-review-disciplines/references/issue-lifecycle.md` (VE-001 source).
 - **Empirical precedent files (pre-migration):**
   - `Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md` (CP-004 register shape)
@@ -1424,7 +1424,7 @@ This parallels the Backend early-verification target in spirit: the smallest com
 
 ### ADR placement note (v3 per I-AA-001 user-accepted deviation)
 
-**User disposition.** The user accepted Option A of the I-AA-001 escalation (Gate 4 user decision): the 7 new ADRs (ADR-0044..ADR-0050) remain at `working/feature/issue-capture-mechanism-r1/adrs/` for this run. The user-accepted deviation is documented here as out-of-scope for this run's resolution, with the rationale below.
+**User disposition.** The user accepted Option A of the I-AA-001 escalation (Gate 4 user decision): the 7 new ADRs (ADR-0051..ADR-0050) remain at `working/feature/issue-capture-mechanism-r1/adrs/` for this run. The user-accepted deviation is documented here as out-of-scope for this run's resolution, with the rationale below.
 
 **Rationale.**
 
@@ -1446,8 +1446,8 @@ This Blueprint does NOT modify any file in `/adrs/`, does NOT move the 7 new ADR
 
 | Date | Version | Changes | Author |
 |---|---|---|---|
-| 2026-05-23 | 1.0.0 | Initial integrated Blueprint. Absorbs cc-design + backend-design verbatim per ADR-0013 + ADR-0017. Resolves cc-design review's 3 important + 7 recommended findings, and backend-design review's 1 important + 5 recommended findings. Authors 7 ADRs (ADR-0044..ADR-0050) per FR-5. Arbitrates Q-CC-1..5 and Q-BE-1..5. | design-composer |
-| 2026-05-23 | 1.1.0 | Reconciliation cycle 1 (regular posture per dispatch-r1.json). MUST APPLIED: I-DR-BP-001 (Design Summary (Meta) "Four project firsts" → "Five project firsts" + 5th item: 5-state lifecycle vocabulary distinct from ADR-0008's 4-state and ADR-0032's 3-tier) and I-DR-BP-002 (new §Background and Context > Project Precedents Established subsection lifting cc-design.md lines 55-65; replaces dangling forward reference in Agreement Checklist). MAY APPLIED (all 8 recommended polish items): I-DR-BP-003 (cc-dependencies.json CONSUMES-SYNTH-01 + D-05); I-DR-BP-004 (backend-design.md §5 SUPERSEDED-NOTE pointing to the Blueprint's Corrected Pseudocode Reference); I-DR-BP-005 (ADR placement note explicit cross-link to `Issues/adr-placement-rootcause/analysis.md`); I-DR-BP-006 (Acceptance Criteria one-line note enumerating FR-8/9/11/12 design-coupled ACs); I-DR-BP-007 (Verification Strategy CC-layer early-verification target — shellcheck + single-fixture golden-file dry-run); I-DR-BP-008 (Phase 5 of Implementation Plan now includes the `.gitignore` append for `.claude/logs/*.jsonl` per Q-CC-4); I-DR-BP-009 (Architecture Overview ASCII diagram annotation marking the disjoint relationship between Issues/ and issues-ledger.json); I-DR-BP-010 (ADR-0050 clarification — "5-state" label refers to the 5 substantive lifecycle states; `draft` is the universal initial state per ADR-0032 and not counted). Predecessor: blueprint-v1.md. No new ADRs introduced (per FR-5 and the dispatch's no-new-ADR-expected posture); 7 ADRs (ADR-0044..0050) remain. Cycle 1 of 4 (cap per pipeline policy). | design-composer |
-| 2026-05-23 | 1.2.0 | Reconciliation cycle 2 (auditor-driven; converging posture per dispatch-r2.json; cycle 2 of 4 cap). MUST APPLIED four mechanical corrections from architecture-audit-issues.json: (I-AA-002 MAJOR) Backend Design + Corrected Pseudocode Reference + Interface Change Matrix + Field Propagation Map + Acceptance Criteria (AC-BE-10) + Implementation Plan (Phase 2/4/6) + Verification Strategy + Error Handling + Risks all now specify the outer-dispatch path-prefix skip honoring ADR-0044 §Decision §4 (evidence/updates excluded from FR-7's validator extension). Mechanism: new module-level constants list `ISSUE_NON_VALIDATED_PATH_PREFIXES`; 3-line early-return at the head of `validate_pipeline_artifact` BEFORE the existing doc_type_category dispatch at lines 365-371. (I-AA-003 MINOR) Interface Change Matrix line on validate_pipeline_artifact: 'or'-wording replaced with the single chosen mechanism (extend doc_type_category then elif category == "issue"). (I-AA-004 MINOR) ADR-0047 frontmatter `applies_to` corrected from "four project firsts" to "five project firsts" in-place (single-line edit; status remains Proposed pre-Gate-4 ratification, so no superseding ADR per ADR-0005). (I-AA-005 MINOR) Blueprint Acceptance Criteria citation corrected from "AC-FR-11-a/b/c" to "AC-FR-11-a/b" (PRD-v2 defines only -a and -b). DOCUMENT-ONLY (I-AA-001 user-accepted deviation): §References ADR placement note rewritten to record the Gate 4 user disposition (Option A); §Cross-References > Inherited ADRs row for ADR-0036 + §Background > Prerequisite ADRs row + §Agreement Checklist > Non-Scope row + §Risks table row all updated to cite the user disposition with cross-link to `Issues/adr-placement-rootcause/analysis.md` and explicit citation of PRD §Won't-Have exclusion. No file moves; no superseding ADR; deliverable packager (Stage 13) follows current operational behavior; future migration is the separate drift-remediation feature's responsibility. DEFERRED (I-AA-006 INFO): doc_type field omission is pre-existing template drift per the auditor's own recommended_resolution. AUDIT-POSITIVE (I-AA-007..010 INFO): no action. Predecessor: blueprint-v2.md. ADR-0047 receives an in-place frontmatter applies_to amendment (the only ADR file edit this cycle); the 7 ADRs (ADR-0044..0050) otherwise unchanged. No new ADRs introduced per FR-5 and per the dispatch no-new-ADR posture. Cycle 2 of 4. | design-composer |
+| 2026-05-23 | 1.0.0 | Initial integrated Blueprint. Absorbs cc-design + backend-design verbatim per ADR-0013 + ADR-0017. Resolves cc-design review's 3 important + 7 recommended findings, and backend-design review's 1 important + 5 recommended findings. Authors 7 ADRs (ADR-0051..ADR-0050) per FR-5. Arbitrates Q-CC-1..5 and Q-BE-1..5. | design-composer |
+| 2026-05-23 | 1.1.0 | Reconciliation cycle 1 (regular posture per dispatch-r1.json). MUST APPLIED: I-DR-BP-001 (Design Summary (Meta) "Four project firsts" → "Five project firsts" + 5th item: 5-state lifecycle vocabulary distinct from ADR-0008's 4-state and ADR-0032's 3-tier) and I-DR-BP-002 (new §Background and Context > Project Precedents Established subsection lifting cc-design.md lines 55-65; replaces dangling forward reference in Agreement Checklist). MAY APPLIED (all 8 recommended polish items): I-DR-BP-003 (cc-dependencies.json CONSUMES-SYNTH-01 + D-05); I-DR-BP-004 (backend-design.md §5 SUPERSEDED-NOTE pointing to the Blueprint's Corrected Pseudocode Reference); I-DR-BP-005 (ADR placement note explicit cross-link to `Issues/adr-placement-rootcause/analysis.md`); I-DR-BP-006 (Acceptance Criteria one-line note enumerating FR-8/9/11/12 design-coupled ACs); I-DR-BP-007 (Verification Strategy CC-layer early-verification target — shellcheck + single-fixture golden-file dry-run); I-DR-BP-008 (Phase 5 of Implementation Plan now includes the `.gitignore` append for `.claude/logs/*.jsonl` per Q-CC-4); I-DR-BP-009 (Architecture Overview ASCII diagram annotation marking the disjoint relationship between Issues/ and issues-ledger.json); I-DR-BP-010 (ADR-0050 clarification — "5-state" label refers to the 5 substantive lifecycle states; `draft` is the universal initial state per ADR-0032 and not counted). Predecessor: blueprint-v1.md. No new ADRs introduced (per FR-5 and the dispatch's no-new-ADR-expected posture); 7 ADRs (ADR-0051..0050) remain. Cycle 1 of 4 (cap per pipeline policy). | design-composer |
+| 2026-05-23 | 1.2.0 | Reconciliation cycle 2 (auditor-driven; converging posture per dispatch-r2.json; cycle 2 of 4 cap). MUST APPLIED four mechanical corrections from architecture-audit-issues.json: (I-AA-002 MAJOR) Backend Design + Corrected Pseudocode Reference + Interface Change Matrix + Field Propagation Map + Acceptance Criteria (AC-BE-10) + Implementation Plan (Phase 2/4/6) + Verification Strategy + Error Handling + Risks all now specify the outer-dispatch path-prefix skip honoring ADR-0051 §Decision §4 (evidence/updates excluded from FR-7's validator extension). Mechanism: new module-level constants list `ISSUE_NON_VALIDATED_PATH_PREFIXES`; 3-line early-return at the head of `validate_pipeline_artifact` BEFORE the existing doc_type_category dispatch at lines 365-371. (I-AA-003 MINOR) Interface Change Matrix line on validate_pipeline_artifact: 'or'-wording replaced with the single chosen mechanism (extend doc_type_category then elif category == "issue"). (I-AA-004 MINOR) ADR-0047 frontmatter `applies_to` corrected from "four project firsts" to "five project firsts" in-place (single-line edit; status remains Proposed pre-Gate-4 ratification, so no superseding ADR per ADR-0005). (I-AA-005 MINOR) Blueprint Acceptance Criteria citation corrected from "AC-FR-11-a/b/c" to "AC-FR-11-a/b" (PRD-v2 defines only -a and -b). DOCUMENT-ONLY (I-AA-001 user-accepted deviation): §References ADR placement note rewritten to record the Gate 4 user disposition (Option A); §Cross-References > Inherited ADRs row for ADR-0036 + §Background > Prerequisite ADRs row + §Agreement Checklist > Non-Scope row + §Risks table row all updated to cite the user disposition with cross-link to `Issues/adr-placement-rootcause/analysis.md` and explicit citation of PRD §Won't-Have exclusion. No file moves; no superseding ADR; deliverable packager (Stage 13) follows current operational behavior; future migration is the separate drift-remediation feature's responsibility. DEFERRED (I-AA-006 INFO): doc_type field omission is pre-existing template drift per the auditor's own recommended_resolution. AUDIT-POSITIVE (I-AA-007..010 INFO): no action. Predecessor: blueprint-v2.md. ADR-0047 receives an in-place frontmatter applies_to amendment (the only ADR file edit this cycle); the 7 ADRs (ADR-0051..0050) otherwise unchanged. No new ADRs introduced per FR-5 and per the dispatch no-new-ADR posture. Cycle 2 of 4. | design-composer |
 </content>
 </invoke>

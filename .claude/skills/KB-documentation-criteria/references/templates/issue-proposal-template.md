@@ -5,7 +5,7 @@ id: PROPOSAL-<kebab-topic-slug>
 # Example: PROPOSAL-auditing-family-graduation-review
 version: 0.1.0
 doc_type: issue-proposal
-# Canonical string per ADR-0045 / Q-BE-1. Do NOT use "proposal" (pre-rename value).
+# Canonical string per ADR-0052 / Q-BE-1. Do NOT use "proposal" (pre-rename value).
 status: draft
 # 5-state vocabulary (ADR-0050): draft | open | adopted | complete | superseded | wontfix-with-rationale
 # Per-state companion fields (full table in issue-doctypes-spec.md):
@@ -93,7 +93,7 @@ radius distinct enough to warrant a separate layer?"]
 - **Escalates from**: [Path to prior analysis or register, if applicable — per ADR-0046]
 - **Escalated to**: [Path to register or analysis this proposal triggered, if applicable]
 - **Companion artifacts**: [Paths to supporting files that ground this proposal]
-- **Related ADRs**: [e.g., ADR-0045 (three doctypes), ADR-0046 (sibling evolution), ADR-0050 (5-state lifecycle)]
+- **Related ADRs**: [e.g., ADR-0052 (three doctypes), ADR-0046 (sibling evolution), ADR-0050 (5-state lifecycle)]
 - **Structural spec**: `.claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md`
   (full per-state companion-field table and doctype vocabulary)
 

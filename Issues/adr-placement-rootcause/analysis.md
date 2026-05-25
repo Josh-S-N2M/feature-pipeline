@@ -255,7 +255,7 @@ Full per-state required companion field table: [.claude/skills/KB-documentation-
 - [.claude/agents/finalize-deliverable-packager.md:56-63](../../.claude/agents/finalize-deliverable-packager.md) — retired dual-location BLOCKER check still active
 - [.claude/agents/shared-document-reviewer.md](../../.claude/agents/shared-document-reviewer.md) line 349 vs lines 470–472 — internal contradiction
 - [working/feature/devcontainer-mcp-provisioning-r1/blueprint-v2.md:1226](../../working/feature/devcontainer-mcp-provisioning-r1/blueprint-v2.md) — Blueprint's misreading + `:379` ("ADR-0007 currently in adrs-migrated/")
-- `diff -q adrs/ADR-0024-*.md working/feature/frontend-design-knowledge-r1/adrs/ADR-0024-*.md` — drift already realized (files differ)
+- `diff -q adrs/ADR-0024-*.md adrs/ADR-0024-frontend-design-knowledge-corpus-structure.md` — drift already realized (files differ)
 
 **Promotion machinery search (returned empty):**
 

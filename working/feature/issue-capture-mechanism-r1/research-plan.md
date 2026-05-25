@@ -98,13 +98,13 @@ The `auditing-*` family is loaded by `cc-critique` and pre-merge auditors, not b
 
 ## ADR inventory and applicability analysis
 
-Every ADR present at the repo's authoritative `adrs/` path is classified. ADR-0008 lives at `adrs-migrated/ADR-0008-issue-ledger-scope.md` (a known placement-drift target per `Issues/adr-placement-rootcause/`-pending-migration analysis); for this run, ADR-0008 is treated as authoritative.
+Every ADR present at the repo's authoritative `adrs/` path is classified. ADR-0008 lives at `adrs/ADR-0008-issue-ledger-scope.md` (a known placement-drift target per `Issues/adr-placement-rootcause/`-pending-migration analysis); for this run, ADR-0008 is treated as authoritative.
 
 ### CONSTRAIN this run
 
 | ADR | Title (short) | Constraint imposed on this feature |
 |---|---|---|
-| ADR-0008 | `issues-ledger.json` scope | Defines the intra-pipeline 4-state issue ledger. This feature's 5-state `Issues/` vocabulary parallels but is explicitly distinct (PRD §Product Policy Decisions, FR-13). The two systems never share IDs. **Constraint**: any design that conflates the two is disallowed. **Verify**: locate the canonical schema (in `adrs-migrated/` per drift) and confirm the 4-state vocabulary text. |
+| ADR-0008 | `issues-ledger.json` scope | Defines the intra-pipeline 4-state issue ledger. This feature's 5-state `Issues/` vocabulary parallels but is explicitly distinct (PRD §Product Policy Decisions, FR-13). The two systems never share IDs. **Constraint**: any design that conflates the two is disallowed. **Verify**: locate the canonical schema (in `adrs/` per drift) and confirm the 4-state vocabulary text. |
 | ADR-0011 | KB-documentation-criteria canonical skill | Templates land under `KB-documentation-criteria/references/templates/`. The three new issue-doctype templates (FR-6) MUST follow the same structure and discipline. |
 | ADR-0017 | shared-document-reviewer integration (5 invocations) | The 5 fixed reviewer invocation points are unchanged. The new templates inherit Gate 0/1 review at the moment they are authored or when files using them are reviewed. **Constraint**: no new reviewer invocation points are created by this feature. |
 | ADR-0019 | Naming convention | The new agent, skills, KB, hook script, templates, and spec files MUST follow the project naming convention. **Constraint**: agent `issue-capture-author`, skill `capture-issue`, KB `KB-issue-capture`, hook script under `.claude/hooks/` follow kebab-case and project-specific prefixes. |
@@ -234,7 +234,7 @@ The researcher uses these as starting points for graph traversal. Touch points a
 
 **Group E — Out-of-scope but contextually adjacent (verify only, no edits):**
 
-- `adrs-migrated/ADR-0008-issue-ledger-scope.md` — ADR-0008 canonical text; confirm 4-state intra-pipeline vocabulary verbatim (IN-012 cross-reference, PRD §Product Policy Decisions row 2).
+- `adrs/ADR-0008-issue-ledger-scope.md` — ADR-0008 canonical text; confirm 4-state intra-pipeline vocabulary verbatim (IN-012 cross-reference, PRD §Product Policy Decisions row 2).
 - `Issues/adr-placement-rootcause/`-equivalent or `Issues/analysis-adr-placement-rootcause.md` — context only; this run does NOT author findings here.
 
 ### Blast-radius questions
@@ -360,7 +360,7 @@ Anti-scope-creep mechanism. Each row corresponds to an information need with `co
 ### Risks Discovery / Design must remain alert for
 
 1. **Drift in the Claude Code platform contract.** KB-cc-platform documents a snapshot of the hook / `AskUserQuestion` / `Task` contracts. If the underlying Claude Code release has shifted since the KB was last updated, design assumptions may be subtly wrong. The codebase-researcher should spot-check KB-cc-platform's claims against `.claude/SETTINGS-NOTES.md` and any visible version notes.
-2. **ADR-0008 placement drift.** ADR-0008 lives in `adrs-migrated/` per the known drift. If `design-composer`'s 7-ADR slate (PRD U-10) needs to cite ADR-0008's 4-state vocabulary, the canonical text should be loaded from the migrated path. **Do not attempt to migrate ADR-0008 as part of this run** — that is a separate (deferred) concern captured in `Issues/analysis-adr-placement-rootcause.md`.
+2. **ADR-0008 placement drift.** ADR-0008 lives in `adrs/` per the known drift. If `design-composer`'s 7-ADR slate (PRD U-10) needs to cite ADR-0008's 4-state vocabulary, the canonical text should be loaded from the migrated path. **Do not attempt to migrate ADR-0008 as part of this run** — that is a separate (deferred) concern captured in `Issues/analysis-adr-placement-rootcause.md`.
 3. **Validator-extension regression surface unknown until codebase research completes.** The full set of files validated by `validate_pipeline_frontmatter.py` is not yet inventoried. The "zero false positives, zero false negatives" NFR-8 requires that the regression baseline corpus be enumerable before the extension is implemented.
 4. **Pipeline-isolation grep may surface ambient mentions in comments or documentation.** AC-FR-13-a / AC-FR-13-b expect zero matches in pipeline agent files. The codebase-researcher should distinguish "true reference to invoke the mechanism" from "discussion in a comment or example." If any current match exists, it's a baseline finding that must be resolved before merge.
 5. **Hook fail-open semantics may differ between bash and other interpreters.** PRD U-1 leaves the hook implementation language open. The codebase-researcher should note any existing hook precedent in `.claude/hooks/` (if a `.claude/hooks/` directory already exists with any precedent).

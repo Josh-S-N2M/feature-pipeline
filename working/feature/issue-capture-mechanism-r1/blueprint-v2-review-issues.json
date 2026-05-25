@@ -35,7 +35,7 @@
   "verdict": {
     "decision": "approved",
     "conditions": [],
-    "summary": "v2 absorbs all 2 important + all 8 recommended findings from v1. Cross-document edits (cc-dependencies.json D-05 add per I-DR-BP-003; backend-design.md SUPERSEDED-NOTE per I-DR-BP-004) are confirmed present. F-003 BLOCKER mitigation language is preserved unchanged. ADR slate (ADR-0044..ADR-0050) unchanged; no new ADRs introduced this cycle (consistent with FR-5 and dispatch posture). No regressions detected; no new defects introduced."
+    "summary": "v2 absorbs all 2 important + all 8 recommended findings from v1. Cross-document edits (cc-dependencies.json D-05 add per I-DR-BP-003; backend-design.md SUPERSEDED-NOTE per I-DR-BP-004) are confirmed present. F-003 BLOCKER mitigation language is preserved unchanged. ADR slate (ADR-0051..ADR-0050) unchanged; no new ADRs introduced this cycle (consistent with FR-5 and dispatch posture). No regressions detected; no new defects introduced."
   },
   "issues": [],
   "recommendations": [
@@ -143,7 +143,7 @@
     },
     "adr_slate_unchanged": {
       "status": "preserved",
-      "evidence": "adrs/ directory contains exactly 7 files: ADR-0044..ADR-0050 (matches v1 adrs_authored frontmatter). v1 vs v2 ADR id mentions diff returns empty set differential. No new ADR file authored this cycle, consistent with FR-5 and dispatch's no-new-ADR-expected posture."
+      "evidence": "adrs/ directory contains exactly 7 files: ADR-0051..ADR-0050 (matches v1 adrs_authored frontmatter). v1 vs v2 ADR id mentions diff returns empty set differential. No new ADR file authored this cycle, consistent with FR-5 and dispatch's no-new-ADR-expected posture."
     },
     "no_new_internal_contradictions": {
       "status": "clean",

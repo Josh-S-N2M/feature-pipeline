@@ -15,7 +15,6 @@ feature-pipeline-round-3/
 │   └── scripts/                   # (project-level scripts, if any)
 │
 ├── adrs/                          # 12 production ADRs (ADR-0011 through ADR-0022)
-├── adrs-migrated/                 # Historical/superseded ADRs from prior pipeline rounds
 │
 ├── handoff/                       # Versioned blueprints + continuation prompts + prior-session state
 │   ├── blueprint-v4.3.1.md        # ← CURRENT blueprint (224 KB)

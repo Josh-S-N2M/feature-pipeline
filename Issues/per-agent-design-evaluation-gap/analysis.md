@@ -13,7 +13,7 @@ companion_artifacts:
   - working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md
   - working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis-report.md
   - working/feature/devcontainer-mcp-provisioning-r1/cc-design.md
-  - working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0040-serena-narrowed-always-on.md
+  - adrs/ADR-0040-serena-narrowed-always-on.md
   - working/feature/devcontainer-mcp-provisioning-r1/blueprint-v2.md
 ---
 
@@ -61,7 +61,7 @@ Both are **defensive** invocations of discipline — they argue *for inaction* o
 
 ### 1.4 The ADR carrying the closest related decision admitted the gap in writing
 
-`working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0040-serena-narrowed-always-on.md` line 74 (Known Unknowns row, verbatim):
+`adrs/ADR-0040-serena-narrowed-always-on.md` line 74 (Known Unknowns row, verbatim):
 
 > "(a) Whether `design-iac` and `design-api` also occasionally touch audit-script Python (no current evidence; if true, they would be added in a follow-up — easy additive change)."
 

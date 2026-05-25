@@ -42,7 +42,7 @@ All checks green. PASS.
 
 ## Notes
 
-The 4 new constants were inserted after `ADR_STATES` (around the old line 68) under a block comment `# ---- Issue artifact constants (Phase 2 T2.1; ADR-0045 + ADR-0050) ----`. `ISSUE_PER_STATE_REQUIRED_FIELDS` was verified byte-for-byte against spec §4 table (issue-doctypes-spec.md lines 160-167): all 6 state entries and their companion field tuples match exactly, including the `superseded_by_issue_id` distinct field name (separate from ADR's `superseded_by`).
+The 4 new constants were inserted after `ADR_STATES` (around the old line 68) under a block comment `# ---- Issue artifact constants (Phase 2 T2.1; ADR-0052 + ADR-0050) ----`. `ISSUE_PER_STATE_REQUIRED_FIELDS` was verified byte-for-byte against spec §4 table (issue-doctypes-spec.md lines 160-167): all 6 state entries and their companion field tuples match exactly, including the `superseded_by_issue_id` distinct field name (separate from ADR's `superseded_by`).
 
 The `doc_type_category` branch ordering is gated → adr → issue → analysis → unknown. Placing `issue` before the suffix-based `analysis` check ensures that if a future analysis suffix were ever `-issue`, the issue category takes precedence — safe by construction.
 

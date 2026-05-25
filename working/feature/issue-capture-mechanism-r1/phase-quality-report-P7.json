@@ -126,5 +126,5 @@
     }
   },
   "rationale": "All 10 PV-7 criteria PASS or PASS-WITH-MINOR-FIXES after 2 in-flight fixes + named-exempt + deferred-live. All 6 CPIs hold. Feature READY-FOR-MERGE-WITH-DEFERRED-LIVE-SMOKE.",
-  "execution_mode_note": "Phase 7 executed in canonical specialist-dispatch per ADR-0044. ~22 specialist dispatches (10 producers + 9 handlers + 1 cc-critique + 1 phase-quality-reviewer + 1 in-flight remediation orchestration)."
+  "execution_mode_note": "Phase 7 executed in canonical specialist-dispatch per ADR-0051. ~22 specialist dispatches (10 producers + 9 handlers + 1 cc-critique + 1 phase-quality-reviewer + 1 in-flight remediation orchestration)."
 }

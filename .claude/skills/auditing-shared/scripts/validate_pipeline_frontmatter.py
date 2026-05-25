@@ -67,9 +67,9 @@ GATED_STATES = {"draft", "accepted", "superseded", "rejected"}
 ANALYSIS_STATES = {"draft", "complete", "superseded"}
 ADR_STATES = {"proposed", "accepted", "superseded", "rejected"}
 
-# ---- Issue artifact constants (Phase 2 T2.1; ADR-0045 + ADR-0050) ----
+# ---- Issue artifact constants (Phase 2 T2.1; ADR-0052 + ADR-0050) ----
 
-# Per ADR-0045 + ADR-0050 §Decision §3: the three first-class issue doctypes.
+# Per ADR-0052 + ADR-0050 §Decision §3: the three first-class issue doctypes.
 ISSUE_DOC_TYPES = {"issue-register", "issue-analysis", "issue-proposal"}
 
 # Per ADR-0050 §Decision §1: 5-state lifecycle vocabulary (6 dict keys including
@@ -92,7 +92,7 @@ ISSUE_PER_STATE_REQUIRED_FIELDS = {
     "wontfix-with-rationale": ("since", "wontfix_rationale", "decided_at"),
 }
 
-# Per ADR-0044 §Decision §4 + I-AA-002 v3 outer-dispatch path-prefix skip.
+# Per ADR-0051 §Decision §4 + I-AA-002 v3 outer-dispatch path-prefix skip.
 # Files matching these path-prefixes are excluded from validation (return [])
 # at the top of validate_pipeline_artifact. This handles evidence/ and updates/
 # subdirectories under Issues/<topic>/ which carry no doctype constraint.
@@ -304,7 +304,7 @@ def is_valid_issue_id_syntax(value: str) -> bool:
 
 
 def validate_issue_artifact(fm: dict, path: Path) -> list[dict]:
-    """Validate an Issues/<topic>/<doctype>.md file per ADR-0045 + ADR-0050 +
+    """Validate an Issues/<topic>/<doctype>.md file per ADR-0052 + ADR-0050 +
     issue-doctypes-spec.md. Called from validate_pipeline_artifact when
     doc_type_category returns "issue"."""
     findings: list[dict] = []
@@ -388,7 +388,7 @@ def validate_issue_artifact(fm: dict, path: Path) -> list[dict]:
 def validate_pipeline_artifact(fm: dict, path: Path) -> list[dict]:
     findings: list[dict] = []
 
-    # v3 addition (per I-AA-002 honoring ADR-0044 §Decision §4 + spec §2.3):
+    # v3 addition (per I-AA-002 honoring ADR-0051 §Decision §4 + spec §2.3):
     # path-prefix early-return for non-validated Issues/ subdirectories.
     # Returns BEFORE any other validation logic — evidence/ and updates/
     # files carry no doctype constraint.
@@ -396,7 +396,7 @@ def validate_pipeline_artifact(fm: dict, path: Path) -> list[dict]:
     if ("/Issues/" in path_str or path_str.startswith("Issues/")) and (
         "/evidence/" in path_str or "/updates/" in path_str
     ):
-        return []  # ADR-0044 §Decision §4: evidence/ and updates/ excluded
+        return []  # ADR-0051 §Decision §4: evidence/ and updates/ excluded
 
     # Universal required fields per ADR-0032 Change 1 + Change 4.
     for required in ("feature_slug", "doc_type"):
@@ -490,7 +490,7 @@ def validate_skill_frontmatter(fm: dict, path: Path) -> list[dict]:
 
 
 def validate_file(path: Path) -> list[dict]:
-    # Per ADR-0044 §Decision §4 + spec §2.3 + ISSUE_NON_VALIDATED_PATH_PREFIXES:
+    # Per ADR-0051 §Decision §4 + spec §2.3 + ISSUE_NON_VALIDATED_PATH_PREFIXES:
     # Issues/<topic>/evidence/ and Issues/<topic>/updates/ files are non-validated.
     # The early-return MUST sit here (not in validate_pipeline_artifact) so that
     # files in these subdirs that legitimately have no YAML frontmatter (plain

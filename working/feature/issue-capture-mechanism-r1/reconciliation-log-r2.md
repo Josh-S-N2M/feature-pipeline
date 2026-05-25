@@ -23,7 +23,7 @@ All re-author dispatches target a single sub-agent (`design-composer`). One disp
 | Issue ID | Severity | Category | Disposition |
 |---|---|---|---|
 | I-AA-001 | MAJOR | ADR placement drift vs ADR-0036 (scope-of-this-run question) | USER ESCALATION |
-| I-AA-002 | MAJOR | Cross-section inconsistency: ADR-0044 vs Blueprint Backend Design (evidence/updates validator exclusion not implemented) | Re-author dispatch → `design-composer` |
+| I-AA-002 | MAJOR | Cross-section inconsistency: ADR-0051 vs Blueprint Backend Design (evidence/updates validator exclusion not implemented) | Re-author dispatch → `design-composer` |
 | I-AA-003 | MINOR | Internal Blueprint inconsistency: Interface Change Matrix "or"-wording stale | Re-author dispatch → `design-composer` |
 | I-AA-004 | MINOR | Internal ADR inconsistency: ADR-0047 frontmatter four-vs-five (incomplete propagation of cycle-1 fix into ADR-0047) | Re-author dispatch → `design-composer` (per FR-5, only design-composer authors ADRs) |
 | I-AA-005 | MINOR | Citation inaccuracy: Blueprint line 294 cites AC-FR-11-c which does not exist in PRD | Re-author dispatch → `design-composer` |
@@ -31,7 +31,7 @@ All re-author dispatches target a single sub-agent (`design-composer`). One disp
 
 ### Classification rationale
 
-**I-AA-001 (MAJOR) — USER ESCALATION.** The Blueprint places the 7 new ADRs (ADR-0044..0050) at `working/feature/<slug>/adrs/` per the still-current operational convention. ADR-0036 (accepted, repo-root `/adrs/`) mandates `/adrs/` placement. The same drift is documented as a pipeline-wide issue in `Issues/adr-placement-rootcause/analysis.md`, an outside-pipeline analysis explicitly scoped as a separate future feature; the PRD's Won't-Have section excludes resolving this drift in this run.
+**I-AA-001 (MAJOR) — USER ESCALATION.** The Blueprint places the 7 new ADRs (ADR-0051..0050) at `working/feature/<slug>/adrs/` per the still-current operational convention. ADR-0036 (accepted, repo-root `/adrs/`) mandates `/adrs/` placement. The same drift is documented as a pipeline-wide issue in `Issues/adr-placement-rootcause/analysis.md`, an outside-pipeline analysis explicitly scoped as a separate future feature; the PRD's Won't-Have section excludes resolving this drift in this run.
 
 This is not the reconciler's call to make. The auditor offered three resolution paths:
 - (a) Move the 7 ADRs to repo-root `/adrs/` — clean brief-honor resolution but extends scope into the drift-remediation feature that is tracked separately.
@@ -40,7 +40,7 @@ This is not the reconciler's call to make. The auditor offered three resolution 
 
 Surfacing to the user is mandatory because each option has different scope/cost trade-offs that the reconciler is not authorized to choose between. The user previously acknowledged this drift as a separate feature concern; whether this run accepts the drift with a frontmatter token, fixes it inline, or supersedes the inherited ADR is a user-judgment call.
 
-**I-AA-002 (MAJOR) — RE-AUTHOR BACKEND DESIGN (via design-composer).** ADR-0044 §Decision §4 + §Implementation Guidance commit that files under `Issues/<topic>/evidence/` and `Issues/<topic>/updates/` are explicitly excluded from FR-7's validator extension. The Blueprint's Backend Design §Service/Module Layout, §Corrected Pseudocode Reference, and §Data Contract describe the validator extension WITHOUT this path-prefix skip mechanism. Empirically verified: `validate_pipeline_frontmatter.py` currently emits a `minor` finding on `agent-roster-impact-matrix.md`, and the same finding will persist post-FR-9 migration into `Issues/per-agent-design-evaluation-gap/evidence/` unless the validator gains an explicit skip. This is a genuine cross-section inconsistency — the new ADR commits to behavior the new Backend Design does not specify how to deliver.
+**I-AA-002 (MAJOR) — RE-AUTHOR BACKEND DESIGN (via design-composer).** ADR-0051 §Decision §4 + §Implementation Guidance commit that files under `Issues/<topic>/evidence/` and `Issues/<topic>/updates/` are explicitly excluded from FR-7's validator extension. The Blueprint's Backend Design §Service/Module Layout, §Corrected Pseudocode Reference, and §Data Contract describe the validator extension WITHOUT this path-prefix skip mechanism. Empirically verified: `validate_pipeline_frontmatter.py` currently emits a `minor` finding on `agent-roster-impact-matrix.md`, and the same finding will persist post-FR-9 migration into `Issues/per-agent-design-evaluation-gap/evidence/` unless the validator gains an explicit skip. This is a genuine cross-section inconsistency — the new ADR commits to behavior the new Backend Design does not specify how to deliver.
 
 The fix is mechanical: add a path-prefix skip either (a) in the outer dispatch at `validate_pipeline_frontmatter.py` lines 365-371 (early-return empty findings if path matches `Issues/<topic>/(evidence|updates)/`), or (b) in the unknown-category branch at lines 304-312 (skip rather than emit minor finding). The Blueprint must specify which mechanism the implementation will use. ~3-5 lines of pseudocode in Backend Design §Corrected Pseudocode + a one-line addition to the Service/Module Layout's algorithm sketch.
 
@@ -69,7 +69,7 @@ Note on the convergence-classification: this is NOT a strict-persistence (the sa
 
 **Re-authoring brief (high-level — full text in dispatch JSON):**
 
-1. **MUST — I-AA-002 Backend Design evidence/updates exclusion mechanism.** Amend Blueprint §Backend Design §Service/Module Layout (around line 856) and §Corrected Pseudocode Reference (lines 887-921) to specify the path-prefix skip mechanism for `Issues/<topic>/(evidence|updates)/`. Recommended approach: extend the outer dispatch in `validate_pipeline_frontmatter.py` (around lines 365-371) with an early-return for paths matching the skip pattern, before reaching `validate_pipeline_artifact`. Also add a one-line entry to §Data Contract or Field Propagation Map noting the skipped path family. The Blueprint's claim that ADR-0044 is fully implemented by FR-7 must become true after this fix.
+1. **MUST — I-AA-002 Backend Design evidence/updates exclusion mechanism.** Amend Blueprint §Backend Design §Service/Module Layout (around line 856) and §Corrected Pseudocode Reference (lines 887-921) to specify the path-prefix skip mechanism for `Issues/<topic>/(evidence|updates)/`. Recommended approach: extend the outer dispatch in `validate_pipeline_frontmatter.py` (around lines 365-371) with an early-return for paths matching the skip pattern, before reaching `validate_pipeline_artifact`. Also add a one-line entry to §Data Contract or Field Propagation Map noting the skipped path family. The Blueprint's claim that ADR-0051 is fully implemented by FR-7 must become true after this fix.
 
 2. **MUST — I-AA-003 Interface Change Matrix "or"-wording.** Replace the stale "or"-phrasing at line 469 with the single chosen mechanism: "extends `doc_type_category` (lines 147-154) to return 'issue' when doc_type ∈ ISSUE_DOC_TYPES; adds an `elif category == 'issue'` branch inside `validate_pipeline_artifact`." Removes the false-options ambiguity.
 
@@ -87,7 +87,7 @@ Note on the convergence-classification: this is NOT a strict-persistence (the sa
 
 **I-AA-001 — ADR placement drift vs ADR-0036.**
 
-- **Issue summary**: 7 new ADRs (ADR-0044..0050) placed at `working/feature/<slug>/adrs/` contradicting ADR-0036 which mandates `/adrs/` at repo root. Same drift is acknowledged as a pipeline-wide issue tracked separately in `Issues/adr-placement-rootcause/analysis.md`. PRD's Won't-Have section excludes resolving this drift in this run.
+- **Issue summary**: 7 new ADRs (ADR-0051..0050) placed at `working/feature/<slug>/adrs/` contradicting ADR-0036 which mandates `/adrs/` at repo root. Same drift is acknowledged as a pipeline-wide issue tracked separately in `Issues/adr-placement-rootcause/analysis.md`. PRD's Won't-Have section excludes resolving this drift in this run.
 - **Severity**: MAJOR (per auditor classification).
 - **Why this needs user judgment**: choosing among the three resolution paths is a scope-trade-off question (resolve the drift here vs maintain the boundary of this feature's intent), not an artifact-quality question. The reconciler cannot decide whether resolving the drift inline expands scope beyond the user's Gate-2 intent approval.
 - **Recommended options to surface**:
@@ -124,6 +124,6 @@ Note on the convergence-classification: this is NOT a strict-persistence (the sa
 - Cycle 1 log: `working/feature/issue-capture-mechanism-r1/reconciliation-log-r1.md`
 - Cycle 1 dispatch JSON: `working/feature/issue-capture-mechanism-r1/dispatch-r1.json`
 - Cycle 2 dispatch JSON: `working/feature/issue-capture-mechanism-r1/dispatch-r2.json`
-- Upstream artifact this cycle: `working/feature/issue-capture-mechanism-r1/blueprint-v2.md` + `working/feature/issue-capture-mechanism-r1/adrs/ADR-0044..0050`
+- Upstream artifact this cycle: `working/feature/issue-capture-mechanism-r1/blueprint-v2.md` + `adrs/ADR-0046-add-new-sibling-file-evolution.md`, `adrs/ADR-0047-three-layer-enforcement.md`, `adrs/ADR-0048-prior-context-handoff.md`, `adrs/ADR-0049-structural-vs-discipline-kb-split.md`, `adrs/ADR-0050-5-state-issues-vocabulary.md`, `adrs/ADR-0051-per-issue-folder-model.md`, `adrs/ADR-0052-three-doctypes-preserved.md`
 - Auditor verdict source: `working/feature/issue-capture-mechanism-r1/architecture-audit-issues.json`
 - Outside-pipeline scope reference for I-AA-001: `Issues/adr-placement-rootcause/analysis.md`

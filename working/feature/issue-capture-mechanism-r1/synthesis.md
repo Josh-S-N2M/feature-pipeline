@@ -327,7 +327,7 @@ Seven ADR-worthy subjects (PRD U-10) routed to **design-composer at Stage 7** fo
 6. **Structural-vs-discipline KB split inside `KB-documentation-criteria`** — templates here; triggering discipline in `KB-issue-capture`. Ratifies PRD FR-6; FR-14; D-03's option-1 placement of approval-prompt-rubric.md inside KB-issue-capture.
 7. **5-state vocabulary distinct from intra-pipeline 4-state ledger** — `draft → open → adopted | complete | superseded | wontfix-with-rationale`; never share IDs with `issues-ledger.json`. Ratifies PRD FR-7; PRD §Product Policy row 2; D-05; VE-001 parallels-but-distinct relationship to ADR-0008.
 
-**Placement constraint:** All 7 ADRs land in `/workspaces/feature-pipeline/adrs/` per ADR-0036. They MAY cite ADR-0008 in its current `adrs-migrated/` location per F-004 (this run does NOT migrate ADR-0008; out of scope per PRD §Risks #2).
+**Placement constraint:** All 7 ADRs land in `/workspaces/feature-pipeline/adrs/` per ADR-0036. They MAY cite ADR-0008 in its current `adrs/` location per F-004 (this run does NOT migrate ADR-0008; out of scope per PRD §Risks #2).
 
 ## Per-layer Design Routing
 
@@ -410,7 +410,7 @@ The PRD's hard constraints (PRD §Technical Considerations / Constraints; FR-5; 
 
 **Cross-references — out-of-scope items (informational only, do NOT raise as findings):**
 
-- F-004: ADR-0008 lives at `adrs-migrated/ADR-0008-issue-ledger-scope.md`; explicitly out-of-scope for this run per PRD §Risks #2 and intent-clarification.md.
+- F-004: ADR-0008 lives at `adrs/ADR-0008-issue-ledger-scope.md`; explicitly out-of-scope for this run per PRD §Risks #2 and intent-clarification.md.
 - Issues/analysis-adr-placement-rootcause.md: separate analysis precedent; cited only as "second analysis in the precedent set" per D-04 Option 1.
 - `working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md`: migrated per FR-9; not a decision surface.
 

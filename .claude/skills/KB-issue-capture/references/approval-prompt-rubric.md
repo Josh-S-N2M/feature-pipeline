@@ -108,7 +108,7 @@ does NOT silently overwrite (NFR-5).
 **Discipline note**: The Supersede option follows ADR-0005's supersession discipline —
 the older file's content is preserved; only the status fields are amended. Supersession
 is NOT deletion. The `superseded_by_issue_id:` field uses the new file's derived ID
-(not its path), per the ID derivation rule in ADR-0044.
+(not its path), per the ID derivation rule in ADR-0051.
 
 ---
 

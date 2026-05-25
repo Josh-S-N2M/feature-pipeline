@@ -12,7 +12,7 @@ consumed_by: finalize-deliverable-packager (Stage 13)
 
 ## 1. Deviation summary
 
-The 7 new ADRs authored by this feature run (ADR-0044 through ADR-0050) remain at
+The 7 new ADRs authored by this feature run (ADR-0051 through ADR-0050) remain at
 `working/feature/issue-capture-mechanism-r1/adrs/` rather than the canonical `/adrs/`
 root-level location prescribed by ADR-0036. This is a deliberate, user-accepted deviation
 per the Architecture Audit cycle 1 escalation (I-AA-001).
@@ -41,7 +41,7 @@ to a future drift-remediation feature (slug TBD).
 **finalize-deliverable-packager (Stage 13) follows the CURRENT OPERATIONAL CONVENTION**
 (`working/feature/<slug>/adrs/`) for this run's 7 new ADRs:
 
-- DO follow current convention: the 7 ADRs (ADR-0044 through ADR-0050) ship at
+- DO follow current convention: the 7 ADRs (ADR-0051 through ADR-0050) ship at
   `working/feature/issue-capture-mechanism-r1/adrs/`
 - DO NOT relocate them to `/adrs/` — the user's Option A scope decision explicitly
   accepts the current location

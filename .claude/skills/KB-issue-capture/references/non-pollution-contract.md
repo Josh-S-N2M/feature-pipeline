@@ -100,7 +100,7 @@ is a structural invariant, not a style preference.
 
 ## Cross-References
 
-- **ADR-0044** (`working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md`)
+- **ADR-0051** (`working/feature/issue-capture-mechanism-r1/adrs/ADR-0051-per-issue-folder-model.md`)
   — the per-issue folder model that defines `Issues/<topic-slug>/<doctype>.md` paths.
 - **ADR-0046** (`working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-add-new-sibling-file-evolution.md`)
   — sibling-file evolution with bidirectional cross-links; the non-pollution contract

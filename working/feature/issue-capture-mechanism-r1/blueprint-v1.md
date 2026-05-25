@@ -16,8 +16,8 @@ adrs_referenced:
   - ADR-0032   # universal-required feature_slug + 3-tier per-doc-type vocabulary
   - ADR-0036   # single-location ADR placement
 adrs_authored:
-  - ADR-0044   # per-issue folder model
-  - ADR-0045   # three doctypes preserved
+  - ADR-0051   # per-issue folder model
+  - ADR-0052   # three doctypes preserved
   - ADR-0046   # add-new-sibling-file evolution
   - ADR-0047   # three-layer enforcement
   - ADR-0048   # prior-context handoff via existing --raw-request mechanism
@@ -137,7 +137,7 @@ unknowns:
 ### Prerequisite ADRs
 
 - **ADR-0005 (supersession discipline)** — informs the collision re-prompt's `supersede` option (NFR-5 AC-NFR-5-a). The new `superseded_by_issue_id` field on `Issues/` files mirrors ADR-0005's pattern with a distinct field name to preserve category separation.
-- **ADR-0008 (intra-pipeline 4-state issue-ledger)** — the parallel-but-distinct anchor for the new 5-state vocabulary authored as ADR-0050. ADR-0008 lives in `adrs-migrated/` per the known drift captured in `Issues/adr-placement-rootcause/analysis.md`; this run does NOT migrate ADR-0008 (out of scope per PRD §Risks #2). New ADRs cite ADR-0008 by its current location.
+- **ADR-0008 (intra-pipeline 4-state issue-ledger)** — the parallel-but-distinct anchor for the new 5-state vocabulary authored as ADR-0050. ADR-0008 lives in `adrs/` per the known drift captured in `Issues/adr-placement-rootcause/analysis.md`; this run does NOT migrate ADR-0008 (out of scope per PRD §Risks #2). New ADRs cite ADR-0008 by its current location.
 - **ADR-0011 (KB-documentation-criteria scope)** — informs ADR-0049's structural-vs-discipline split (the new templates land in KB-documentation-criteria; the triggering discipline lives in KB-issue-capture).
 - **ADR-0017 (shared-document-reviewer 5 invocation points)** — this Blueprint and the 7 new ADRs are reviewed at the same invocation points as all other pipeline documents.
 - **ADR-0020 (KB consolidation discipline)** — informs ADR-0049 (one responsibility per KB).
@@ -263,7 +263,7 @@ The PRD §FRs and §NFRs collectively define ~50 EARS-format ACs. The cc-design 
 
 #### FR-4 (per-issue folder model) — Layer: Claude Code
 
-- **AC-FR-4-c** — `id` derives as `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` from path. [Per ADR-0044.]
+- **AC-FR-4-c** — `id` derives as `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` from path. [Per ADR-0051.]
 - **AC-FR-4-d** — On collision, present 3-option re-prompt (supersede / rename / cancel). [D-03 archetype 3; NFR-5.]
 
 #### FR-5 (add-new-sibling evolution) — Layer: Claude Code
@@ -349,7 +349,7 @@ One row per codebase-analysis finding F-001..F-016 (16 entries). The table is th
 | F-001 | NO existing SKILL.md declares `disable-model-invocation: true` | transform | Two new skills (KB-issue-capture, capture-issue) introduce the project's first uses of this flag. Captured as a project precedent in SETTINGS-NOTES + ADR-0047. | Grep result: zero matches for the literal in existing SKILL.md frontmatter. |
 | F-002 | NO hook directory; NO hooks block in settings.json | transform | New `.claude/hooks/` directory + new `hooks.PreToolUse` block in settings.json + new hook script. Captured as project precedents 2 and 3. | `ls .claude/hooks` → not found; grep `"hooks"` in settings.json → no match. |
 | F-003 | Silent-drop BLOCKER: `disable-model-invocation: true` skills cannot be in sub-agent `skills:` preload | preserve | Design honors the constraint structurally: `issue-capture-author` frontmatter has NO `skills:` field. Runtime Read/Glob pattern per D-01; closest precedent cc-critique (CP-001). Captured as project precedent 4 (first runtime-Read-KB sub-agent). | subagent-spec.md:110; cross_file_checks.py:410 X3. |
-| F-004 | ADR-0008 lives in adrs-migrated/, not adrs/ | out-of-scope | Per PRD §Risks #2: this run does NOT migrate ADR-0008. The 7 new ADRs (ADR-0044..ADR-0050) land in `working/feature/issue-capture-mechanism-r1/adrs/` per current operational convention. ADR-0050 cites ADR-0008 by its current location. | `Issues/adr-placement-rootcause/analysis.md` (captured drift). |
+| F-004 | ADR-0008 lives in adrs-migrated/, not adrs/ | out-of-scope | Per PRD §Risks #2: this run does NOT migrate ADR-0008. The 7 new ADRs (ADR-0051..ADR-0050) land in `working/feature/issue-capture-mechanism-r1/adrs/` per current operational convention. ADR-0050 cites ADR-0008 by its current location. | `Issues/adr-placement-rootcause/analysis.md` (captured drift). |
 | F-005 | doc_type drift: pre-migration files use older names (deferral-register, analysis, proposal) | transform | FR-8 migration back-fills to canonical enum (issue-register, issue-analysis, issue-proposal) in same atomic commit per ADR-0048 D-13. NFR-8 regression corpus snapshots pre-migration findings as baseline. | Four pre-migration files frontmatter `doc_type:` values. |
 | F-006 | `proposes_future_feature` field has TWO existing precedents (divergent shapes) | preserve | D-06 advisory posture: emit `info` finding when absent on issue-proposal; accept any string when present. Honors both precedents. | `Issues/proposal-auditing-family-graduation-review.md:15`; `Issues/issue-capture-mechanism/proposal.md:11`. |
 | F-007 | auditing-hooks references/ has 4 files, NOT 6 — no examples/ subdirectory | preserve | Design composes the hook from KB-cc-platform/extensions.md + auditing-hooks references; no annotated-example precedent in-project. Acceptable per Blueprint §Open Items OI-2. | `ls .claude/skills/auditing-hooks/references/` returns 4 files. |
@@ -417,7 +417,7 @@ No Ripple Effect:
 | `intent-clarification-template.md` — existing Source section | Appends ~5 lines of proposal-seed guidance | No | Additive. |
 | `recipe-feature-pipeline/SKILL.md` — existing --raw-request documentation | Appends one bullet on proposal-seed invocation pattern | No | Additive (FR-12b). |
 | `KB-documentation-criteria/SKILL.md` — existing Canonical templates table | Adds 3 rows for issue templates + 1 row for issue-doctypes-spec; adds 1 bullet to "Where this KB is NOT used" | No | Additive rows (FR-14). |
-| `Issues/<flat-file>.md` — pre-migration paths | `Issues/<topic-slug>/<doctype>.md` — per-issue folder layout (ADR-0044) | Yes (one-time) | `git mv` + atomic frontmatter back-fill per ADR-0044's D-13 procedure. |
+| `Issues/<flat-file>.md` — pre-migration paths | `Issues/<topic-slug>/<doctype>.md` — per-issue folder layout (ADR-0051) | Yes (one-time) | `git mv` + atomic frontmatter back-fill per ADR-0051's D-13 procedure. |
 
 ### Architecture Overview
 
@@ -456,7 +456,7 @@ USER  ──── /capture-issue ──►   capture-issue skill (Layer 1: disa
                               ▼                                     ▼
               ┌───────────────────────────┐       ┌──────────────────────────────┐
               │ Issues/<topic>/<file>.md  │       │ .claude/logs/capture-issue   │
-              │ (per ADR-0044 layout)     │       │   .jsonl (per D-09)          │
+              │ (per ADR-0051 layout)     │       │   .jsonl (per D-09)          │
               └─────────────┬─────────────┘       └──────────────────────────────┘
                             │
                             │ (any time later)
@@ -586,7 +586,7 @@ For update-mode (`/capture-issue --update <path>`):
 | Lifecycle Fit | No | Outside-pipeline files persist across pipeline runs; intra-pipeline ledger entries are scoped to one run. |
 | Boundary/Interop Cost | Low | The new doctypes are a fourth category alongside existing three; validator dispatch is additive. |
 
-**Decision**: new — ADR-0044/45/46/47/50 codify the new structural surface. The new vocabulary and folder model do not conflict with existing structures.
+**Decision**: new — ADR-0051/45/46/47/50 codify the new structural surface. The new vocabulary and folder model do not conflict with existing structures.
 
 ### Contract Definitions
 
@@ -622,7 +622,7 @@ ISSUE_PER_STATE_REQUIRED_FIELDS = {
 }
 ```
 
-**ID derivation rule (ADR-0044):** `id = <UPPERCASE-DOCTYPE>-<kebab-topic-slug>`, derived from the file path.
+**ID derivation rule (ADR-0051):** `id = <UPPERCASE-DOCTYPE>-<kebab-topic-slug>`, derived from the file path.
 
 ### Data Contract
 
@@ -661,7 +661,7 @@ Invariants:
 | Field | Boundary | Status | Detail |
 |---|---|---|---|
 | `feature_slug` | Issues/ frontmatter ↔ validator | preserved | Universal-required per ADR-0032; default `pipeline-wide` for pipeline-wide-scope; real slug for feature-specific captures. |
-| `id` | path ↔ frontmatter | derived | id = `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` from path (ADR-0044); validator verifies match. |
+| `id` | path ↔ frontmatter | derived | id = `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` from path (ADR-0051); validator verifies match. |
 | `proposes_future_feature` | issue-proposal frontmatter ↔ validator advisory | preserved | Advisory per D-06: info finding if absent; any string accepted when present. |
 | `escalates_from` / `escalated_to` | older/newer file frontmatter ↔ validator | preserved | Bidirectional cross-links per ADR-0046; syntactic-shape validated when present. |
 | `superseded_by_issue_id` | superseded file frontmatter ↔ validator | preserved | Distinct field name from ADR-0005's `superseded_by` (Q-BE-3 resolution); enforces ID syntax. |
@@ -711,7 +711,7 @@ The cc-design provides a comprehensive 16-row inventory table of every CC artifa
 12. **intake-intent-clarifier.md** (FR-11 Phase 0 ~15-line addition per ADR-0048).
 13. **intent-clarification-template.md** (FR-12a Source-section guidance ~5 lines).
 14. **recipe-feature-pipeline/SKILL.md** (FR-12b one-bullet edit).
-15-16. **Migrations** (4 + 1 files via atomic `git mv` + frontmatter back-fill; ADR-0044 + ADR-0048 D-13).
+15-16. **Migrations** (4 + 1 files via atomic `git mv` + frontmatter back-fill; ADR-0051 + ADR-0048 D-13).
 
 #### Skill Patterns
 
@@ -924,7 +924,7 @@ All seven layers are **N/A — out of scope per PRD §Layer Scope rows 2, 4, 5, 
 
 5. **Phase 4 — Migrations (CC layer)**
    - Layer: Claude Code
-   - Technical Reason: FR-8 migration of 4 files + FR-9 migration of agent-roster-impact-matrix. Atomic `git mv` + frontmatter back-fill per ADR-0044's D-13. Each commit is independently reversible.
+   - Technical Reason: FR-8 migration of 4 files + FR-9 migration of agent-roster-impact-matrix. Atomic `git mv` + frontmatter back-fill per ADR-0051's D-13. Each commit is independently reversible.
    - Prerequisites: Phase 2 (validator must be able to validate the post-migration files cleanly).
 
 6. **Phase 5 — Cross-cutting edits + handoff (CC layer)**
@@ -945,7 +945,7 @@ All seven layers are **N/A — out of scope per PRD §Layer Scope rows 2, 4, 5, 
 
 ### Migration Strategy
 
-Per FR-8 + FR-9 + ADR-0044's D-13: atomic `git mv` + frontmatter back-fill in one commit per file. Five files in total:
+Per FR-8 + FR-9 + ADR-0051's D-13: atomic `git mv` + frontmatter back-fill in one commit per file. Five files in total:
 
 | Source | Destination | doc_type rename | Companion back-fill |
 |---|---|---|---|
@@ -1093,7 +1093,7 @@ This is the smallest target that proves the dispatch-isolation property holds; s
 ## Future Extensibility
 
 - **Extension points:**
-  - Fourth doctype could be added via amendment to ADR-0044 + ADR-0045; templates would extend; validator constants would extend.
+  - Fourth doctype could be added via amendment to ADR-0051 + ADR-0052; templates would extend; validator constants would extend.
   - Sixth lifecycle state could be added via amendment to ADR-0050; per-state companion-field rules would extend.
   - `permissions.deny` rule for non-issue-capture-author writes to `Issues/` (Q-CC-2 deferred): future hardening pass; Layers 1+2+3 are sufficient for r1.
   - Plugin packaging (Q-CC-3 deferred): if a sister project would benefit, future iteration.
@@ -1117,7 +1117,7 @@ This is the smallest target that proves the dispatch-isolation property holds; s
 - **Overview:** One template, one validator branch.
 - **Advantages:** Simpler; less to maintain.
 - **Disadvantages:** Loses CP-004's three documented body shapes; doctype-specific rules become awkward conditional logic.
-- **Reason for Rejection:** ADR-0045 — the three body shapes are empirically distinct.
+- **Reason for Rejection:** ADR-0052 — the three body shapes are empirically distinct.
 
 ### Alternative 3: New pipeline stage between recipe and Stage 1 for proposal ingest
 
@@ -1170,8 +1170,8 @@ This is the smallest target that proves the dispatch-isolation property holds; s
 
 ### New ADRs Authored (this run)
 
-1. **ADR-0044** — Per-issue folder model for `Issues/`.
-2. **ADR-0045** — Three doctypes preserved as distinct (register / analysis / proposal).
+1. **ADR-0051** — Per-issue folder model for `Issues/`.
+2. **ADR-0052** — Three doctypes preserved as distinct (register / analysis / proposal).
 3. **ADR-0046** — Add-new-sibling-file evolution pattern.
 4. **ADR-0047** — Three-layer enforcement for outside-pipeline issue capture.
 5. **ADR-0048** — Prior-context handoff via existing `--raw-request` mechanism.
@@ -1216,7 +1216,7 @@ This is the smallest target that proves the dispatch-isolation property holds; s
 - **Backend Design Review Issues:** `working/feature/issue-capture-mechanism-r1/backend-design-review-issues.json` (1 important [I-DR-BE-001], 5 recommended [I-DR-BE-002..006] — all resolved in this Blueprint).
 - **Source proposal (seed):** `Issues/issue-capture-mechanism/proposal.md` (`doc_type: issue-proposal`, `proposes_future_feature: issue-capture-mechanism-r1`).
 - **Companion plan:** `/home/vscode/.claude/plans/i-am-noticing-as-reflective-wilkes.md`.
-- **Pipeline issue-tracking precedent:** `adrs-migrated/ADR-0008-issue-ledger-scope.md` (NOT migrated this run; cited at its current location per F-004).
+- **Pipeline issue-tracking precedent:** `adrs/ADR-0008-issue-ledger-scope.md` (NOT migrated this run; cited at its current location per F-004).
 - **Intra-pipeline 4-state issue-lifecycle vocabulary:** `.claude/skills/KB-review-disciplines/references/issue-lifecycle.md` (VE-001 source).
 - **Empirical precedent files (pre-migration):**
   - `Issues/register-devcontainer-mcp-provisioning-r1-deferrals.md` (CP-004 register shape)
@@ -1228,10 +1228,10 @@ This is the smallest target that proves the dispatch-isolation property holds; s
 
 ### ADR placement note
 
-Per the prompt's directive and the still-current operational convention pending ADR-0036 amendment propagation (drift captured in `Issues/adr-placement-rootcause/analysis.md`), the 7 new ADRs (ADR-0044..ADR-0050) are written to `working/feature/issue-capture-mechanism-r1/adrs/`. The deliverable-packager at Stage 13 handles final placement per current operational behavior. This Blueprint does NOT attempt to resolve the ADR-placement drift — it is captured as a separate concern in `Issues/adr-placement-rootcause/analysis.md`.
+Per the prompt's directive and the still-current operational convention pending ADR-0036 amendment propagation (drift captured in `Issues/adr-placement-rootcause/analysis.md`), the 7 new ADRs (ADR-0051..ADR-0050) are written to `working/feature/issue-capture-mechanism-r1/adrs/`. The deliverable-packager at Stage 13 handles final placement per current operational behavior. This Blueprint does NOT attempt to resolve the ADR-placement drift — it is captured as a separate concern in `Issues/adr-placement-rootcause/analysis.md`.
 
 ## Update History
 
 | Date | Version | Changes | Author |
 |---|---|---|---|
-| 2026-05-23 | 1.0.0 | Initial integrated Blueprint. Absorbs cc-design + backend-design verbatim per ADR-0013 + ADR-0017. Resolves cc-design review's 3 important + 7 recommended findings, and backend-design review's 1 important + 5 recommended findings. Authors 7 ADRs (ADR-0044..ADR-0050) per FR-5. Arbitrates Q-CC-1..5 and Q-BE-1..5. | design-composer |
+| 2026-05-23 | 1.0.0 | Initial integrated Blueprint. Absorbs cc-design + backend-design verbatim per ADR-0013 + ADR-0017. Resolves cc-design review's 3 important + 7 recommended findings, and backend-design review's 1 important + 5 recommended findings. Authors 7 ADRs (ADR-0051..ADR-0050) per FR-5. Arbitrates Q-CC-1..5 and Q-BE-1..5. | design-composer |

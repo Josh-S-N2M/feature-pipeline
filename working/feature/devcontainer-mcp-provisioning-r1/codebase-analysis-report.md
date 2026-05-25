@@ -30,7 +30,7 @@ This is the discovery-codebase-research output for the seven-server MCP provisio
 | `.claude/skills/KB-codebase-research/SKILL.md` | 247 | Real, single-file | Cross-referenced from `KB-mcp-platform` (not duplicated); names GitNexus + codebase-memory-mcp |
 | `.claude/skills/auditing-mcp/` | SKILL + 4 refs + 4 scripts + 2 examples | Real | Augmented with per-server rules (incl. GitNexus) and operational-health rules per FR-11-c |
 | `adrs/ADR-0018-codebase-analysis-schema.md` | 215, v1.0.0 | Real but version-drifted (KB+agent say v1.1.0; ADR says v1.0.0) | Read for primary/fallback policy cross-reference |
-| `adrs-migrated/ADR-0007-code-graph-mcp-selection.md` | v2.2.0 | Real — canonical source-of-truth for primary/fallback decision | Read; not modified |
+| `adrs/ADR-0007-code-graph-mcp-selection.md` | v2.2.0 | Real — canonical source-of-truth for primary/fallback decision | Read; not modified |
 
 ### Sub-agent inventory
 
@@ -62,7 +62,7 @@ Inferred likely-consumer mapping (input for UI-1):
 
 ```
                                               ┌──────────────────────────────┐
-                                              │ adrs-migrated/ADR-0007 v2.2  │
+                                              │ adrs/ADR-0007 v2.2           │
                                               │ (CANONICAL: GitNexus primary │
                                               │  codebase-memory fallback)   │
                                               └────────────┬─────────────────┘
