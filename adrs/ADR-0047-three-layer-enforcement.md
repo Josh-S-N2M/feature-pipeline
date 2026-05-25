@@ -201,8 +201,8 @@ No procedural detail beyond the above — exact text of the agent body, hook scr
 ## Related Information
 
 - Related ADRs:
-  - ADR-0044 (per-issue folder model — the write target this architecture protects)
-  - ADR-0045 (three doctypes preserved — the AskUserQuestion options reflect this)
+  - ADR-0051 (per-issue folder model — the write target this architecture protects)
+  - ADR-0052 (three doctypes preserved — the AskUserQuestion options reflect this)
   - ADR-0046 (add-new-sibling evolution — uses the same AskUserQuestion transactional pattern)
   - ADR-0048 (prior-context handoff — independent of this architecture)
   - ADR-0049 (structural-vs-discipline KB split — KB-issue-capture is Layer 1's skill)

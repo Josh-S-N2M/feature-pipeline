@@ -86,7 +86,7 @@ The PRD §FR-7 codifies the validator extension. PRD §Product Policy Decisions 
    - `escalated_to: <id>` (per ADR-0046).
    - `rolled_into_register: <id>` (advisory; topic-crossing relationship).
 6. **`proposes_future_feature:` is advisory.** When `doc_type == issue-proposal` and `proposes_future_feature` is absent, the validator emits an `info`-severity finding. When present, accept any string value; no format enforcement. Two existing precedents diverge in field shape (one suggested-slug, one fixed-slug per F-006); strict enforcement would invalidate one without value. The advisory posture is upgradable to `blocker` in a later ADR if real-world use shows the field becomes load-bearing.
-7. **ID derivation rule.** Frontmatter `id` is derived from path per ADR-0044: `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>`. The validator verifies this match.
+7. **ID derivation rule.** Frontmatter `id` is derived from path per ADR-0051: `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>`. The validator verifies this match.
 
 ## Decision Details
 
@@ -204,8 +204,8 @@ No procedural detail beyond the above — the exact PR shape and test-fixture au
   - ADR-0008 (intra-pipeline 4-state ledger; parallel-but-distinct anchor; THIS ADR does NOT migrate ADR-0008's placement — per PRD §Risks #2)
   - ADR-0005 (supersession discipline; this ADR's `superseded_by_issue_id` mirrors the pattern with a distinct field name to preserve category separation)
   - ADR-0032 (per-doc-type 3-tier vocabulary policy; this ADR adds a fourth tier)
-  - ADR-0044 (per-issue folder model; `id` derivation rule)
-  - ADR-0045 (three doctypes preserved; the validator's `ISSUE_DOC_TYPES` set)
+  - ADR-0051 (per-issue folder model; `id` derivation rule)
+  - ADR-0052 (three doctypes preserved; the validator's `ISSUE_DOC_TYPES` set)
   - ADR-0046 (add-new-sibling evolution; the optional cross-link fields)
   - ADR-0047 (three-layer enforcement; the validator runs at Gate 0 below the three layers)
   - ADR-0048 (prior-context handoff; the `adopted` state captures the post-handoff transition)

@@ -1,5 +1,8 @@
 ---
-id: ADR-0044
+id: ADR-0051
+original_id: ADR-0044
+renumbered_per: ADR-0053
+renumbered_at: 2026-05-25
 version: 1.0.0
 status: Proposed
 generated: 2026-05-23
@@ -19,7 +22,7 @@ change_summary: >-
   permitted for non-doctype artifacts.
 ---
 
-# ADR-0044: Per-issue folder model for `Issues/`
+# ADR-0051: Per-issue folder model for `Issues/`
 
 ## Contents
 
@@ -155,7 +158,7 @@ No procedural detail beyond the above — step-by-step migration is a Plan-autho
 ## Related Information
 
 - Related ADRs:
-  - ADR-0045 (three doctypes preserved as distinct — the doctypes this model encodes)
+  - ADR-0052 (three doctypes preserved as distinct — the doctypes this model encodes)
   - ADR-0046 (add-new-sibling-file evolution pattern — operates on this model)
   - ADR-0047 (three-layer enforcement — the agent that writes into this model)
   - ADR-0048 (prior-context handoff — relies on `Issues/<topic>/proposal.md` paths)

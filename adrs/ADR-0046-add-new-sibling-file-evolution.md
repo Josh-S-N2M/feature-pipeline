@@ -52,7 +52,7 @@ The mutate-the-older approach is structurally simpler but has three failure mode
 
 - **Audit-trail erasure.** The original analysis content is lost (or buried in git history). A reader at time T+1 cannot see what the analysis said at time T without git archaeology.
 - **State conflation.** The original analysis may have been at `status: open` (active concern). The mutated proposal may belong at `status: draft`. One file cannot simultaneously hold both.
-- **Filename churn.** Per ADR-0044 (per-issue folder model with fixed canonical filenames), changing the doctype means renaming the file. This invalidates any in-flight reference and re-engages git's similarity-index heuristics.
+- **Filename churn.** Per ADR-0051 (per-issue folder model with fixed canonical filenames), changing the doctype means renaming the file. This invalidates any in-flight reference and re-engages git's similarity-index heuristics.
 
 The add-new-sibling approach preserves the audit trail by construction. The older file remains exactly as it was, with one additive amendment: a back-link field (`escalated_to: <newer-id>`) added to its frontmatter. The newer file declares the forward link (`escalates_from: <older-id>`). Both files persist; the relationship is browsable from either side.
 
@@ -60,7 +60,7 @@ The PRD §FR-5 codifies this pattern. PRD §Product Policy Decisions row "Issue 
 
 ## Decision
 
-1. **Add-new-sibling-file evolution.** When an issue evolves to a new doctype, the system writes a new file in the same topic folder (per ADR-0044) with `escalates_from: <id-of-older>` in its frontmatter. The older file's status field is NOT mutated. The older file is amended only to add `escalated_to: <id-of-newer>` to its frontmatter.
+1. **Add-new-sibling-file evolution.** When an issue evolves to a new doctype, the system writes a new file in the same topic folder (per ADR-0051) with `escalates_from: <id-of-older>` in its frontmatter. The older file's status field is NOT mutated. The older file is amended only to add `escalated_to: <id-of-newer>` to its frontmatter.
 2. **Bidirectional cross-links.** Both files carry the relationship: the newer declares `escalates_from`; the older declares `escalated_to`. A reader of either file can navigate to the other.
 3. **Single approved transaction.** Both writes (the new sibling file + the older file's frontmatter amendment) occur within one approved transaction. The `AskUserQuestion` (per ADR-0047) gates both writes simultaneously; on Approve both are written; on Cancel neither is written.
 4. **Write order.** On Approve, the amended (older) file is written first, then the new sibling file. This ordering preserves the back-link before the forward link points at it (defense against partial-write inconsistency).
@@ -136,7 +136,7 @@ Reuse the existing supersession discipline (per ADR-0005) for evolution.
 
 - Two writes per evolution event. Mitigated: the AskUserQuestion gates both; the user experiences one approval; the failure modes are bounded (write order + all-or-nothing semantics).
 - The validator extension (per ADR-0050) must syntactically validate `escalates_from` and `escalated_to` cross-link fields. Mitigated: the validation is regex-shape only (does the value look like a valid `<DOCTYPE>-<topic-slug>` id?) — referential integrity is not checked.
-- Folders accumulate files. Mitigated: the per-topic folder model (per ADR-0044) is designed for this; a folder with `register.md + analysis.md + proposal.md + evidence/agent-roster-impact-matrix.md` is a normal, well-organized accumulation.
+- Folders accumulate files. Mitigated: the per-topic folder model (per ADR-0051) is designed for this; a folder with `register.md + analysis.md + proposal.md + evidence/agent-roster-impact-matrix.md` is a normal, well-organized accumulation.
 
 ### Neutral Consequences
 
@@ -180,8 +180,8 @@ No procedural detail beyond the above — exact AskUserQuestion wording lives in
 ## Related Information
 
 - Related ADRs:
-  - ADR-0044 (per-issue folder model — the layout that makes sibling-files natural)
-  - ADR-0045 (three doctypes preserved — the doctype boundaries evolution crosses)
+  - ADR-0051 (per-issue folder model — the layout that makes sibling-files natural)
+  - ADR-0052 (three doctypes preserved — the doctype boundaries evolution crosses)
   - ADR-0047 (three-layer enforcement — the AskUserQuestion that gates both writes)
   - ADR-0050 (5-state lifecycle vocabulary — cross-link fields are optional-when-present)
   - ADR-0005 (supersession discipline — distinct from evolution; supersession DOES mutate older file's status)

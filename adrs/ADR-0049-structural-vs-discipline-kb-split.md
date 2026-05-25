@@ -62,7 +62,7 @@ PRD §FR-6 codifies the templates-in-KB-documentation-criteria placement. PRD §
 2. **Triggering discipline lives in `KB-issue-capture`.** The when-to-capture rules, doctype classification rubric, approval-prompt rubric, and worked examples live in `KB-issue-capture/references/` (4 files: `non-pollution-contract.md`, `approval-prompt-rubric.md`, `triage-criteria.md`, `examples.md`).
 3. **Templates are STRUCTURAL ONLY.** Per AC-FR-6-b, the templates do NOT include triggering discipline. A reader of `issue-analysis-template.md` sees: frontmatter shape, body skeleton, cross-link guidance — NOT "use this template when you've discovered a root cause." That rule lives in `KB-issue-capture/references/triage-criteria.md`.
 4. **KB-issue-capture cites templates by reference.** When the triage-criteria rubric or the approval-prompt rubric needs to refer to a template (e.g., "the analysis template has a numbered evidence section"), it cites the template by path; it does NOT inline the structural content.
-5. **Examples.md uses post-migration paths and post-rename doc_type values.** Per Blueprint §Mechanism Designs D-04, the three worked examples in `KB-issue-capture/references/examples.md` cite the four migrated files at their POST-migration paths with their POST-rename `doc_type` values. Examples.md MUST be authored AFTER the FR-8 migration (per ADR-0044) — or in the same atomic commit as the migration.
+5. **Examples.md uses post-migration paths and post-rename doc_type values.** Per Blueprint §Mechanism Designs D-04, the three worked examples in `KB-issue-capture/references/examples.md` cite the four migrated files at their POST-migration paths with their POST-rename `doc_type` values. Examples.md MUST be authored AFTER the FR-8 migration (per ADR-0051) — or in the same atomic commit as the migration.
 6. **The KB-documentation-criteria SKILL.md gains a "Where this KB is NOT used" bullet** pointing at KB-issue-capture for triggering discipline. Per FR-14, this is the single index entry that surfaces the split to future readers.
 
 ## Decision Details
@@ -72,7 +72,7 @@ PRD §FR-6 codifies the templates-in-KB-documentation-criteria placement. PRD §
 | Decision | Structural codification (templates + spec) in KB-documentation-criteria; triggering discipline (when/how to capture, classification, prompt rubric, examples) in KB-issue-capture; templates are structural-only; KB-issue-capture cites templates by reference. |
 | Why now | The two KBs land in this feature run; without an ADR, the split is implicit in the file placement and easily violated in future edits (e.g., a future contributor adding "when to use this template" guidance to the analysis-template.md). |
 | Why this | Templates are read by many consumers (validator, reviewer, composer, agent) — none should be forced into runtime Read/Glob because of KB-issue-capture's `disable-model-invocation: true` flag. Triggering discipline is consumed only by the issue-capture-author (which already runtime-loads its KB per ADR-0047 / F-003). The split matches consumer surface and loading semantics. |
-| Known unknowns | (a) If a fourth doctype emerges (per ADR-0044/ADR-0045 amendment), the structural template lives in KB-documentation-criteria; the triage criterion lives in KB-issue-capture; the split is preserved by construction. (b) Whether KB-issue-capture might absorb meta-discipline (e.g., a "when-to-evolve" rubric distinct from triage-criteria.md). Current posture: yes — any new discipline content lives in KB-issue-capture per this split. |
+| Known unknowns | (a) If a fourth doctype emerges (per ADR-0051/ADR-0052 amendment), the structural template lives in KB-documentation-criteria; the triage criterion lives in KB-issue-capture; the split is preserved by construction. (b) Whether KB-issue-capture might absorb meta-discipline (e.g., a "when-to-evolve" rubric distinct from triage-criteria.md). Current posture: yes — any new discipline content lives in KB-issue-capture per this split. |
 | Kill criteria | If contributors repeatedly add triggering content to the templates (or structural content to the KB-issue-capture discipline files) and the auditing-skills / cc-critique surface flags the drift more than three times in six months, revisit. The split would either need stronger structural enforcement (e.g., a validator rule that templates contain no when-to-use prose) or the two-KB model would be revised. |
 
 ## Rationale
@@ -183,8 +183,8 @@ No procedural detail beyond the above — exact template body content lives in B
 ## Related Information
 
 - Related ADRs:
-  - ADR-0044 (per-issue folder model — the filesystem layout the templates encode)
-  - ADR-0045 (three doctypes preserved — the three templates this split codifies)
+  - ADR-0051 (per-issue folder model — the filesystem layout the templates encode)
+  - ADR-0052 (three doctypes preserved — the three templates this split codifies)
   - ADR-0046 (add-new-sibling evolution — cross-link fields documented in templates and triage rubric)
   - ADR-0047 (three-layer enforcement — KB-issue-capture is Layer 1's skill with `disable-model-invocation: true`)
   - ADR-0050 (5-state lifecycle — frontmatter shape documented in the structural spec)

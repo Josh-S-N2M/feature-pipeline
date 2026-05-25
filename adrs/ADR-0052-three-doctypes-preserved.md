@@ -1,5 +1,8 @@
 ---
-id: ADR-0045
+id: ADR-0052
+original_id: ADR-0045
+renumbered_per: ADR-0053
+renumbered_at: 2026-05-25
 version: 1.0.0
 status: Proposed
 generated: 2026-05-23
@@ -18,7 +21,7 @@ change_summary: >-
   unification is rejected because the empirical body shapes diverge (CP-004).
 ---
 
-# ADR-0045: Three doctypes preserved as distinct (register / analysis / proposal)
+# ADR-0052: Three doctypes preserved as distinct (register / analysis / proposal)
 
 ## Contents
 
@@ -53,10 +56,10 @@ The PRD §Product Policy Decisions row "Doctype preservation" already records th
 
 ## Decision
 
-1. **Three distinct doctypes preserved.** `issue-register`, `issue-analysis`, and `issue-proposal` are three first-class doctypes, each with its own canonical filename (per ADR-0044), its own structural template under `KB-documentation-criteria/references/templates/`, and its own validator-enforced frontmatter shape.
+1. **Three distinct doctypes preserved.** `issue-register`, `issue-analysis`, and `issue-proposal` are three first-class doctypes, each with its own canonical filename (per ADR-0051), its own structural template under `KB-documentation-criteria/references/templates/`, and its own validator-enforced frontmatter shape.
 2. **No unified `issue` doctype.** The design explicitly rejects unification. A future captured issue MUST be classified into one of the three.
 3. **Triage rubric in `KB-issue-capture/references/triage-criteria.md`.** When the doctype is ambiguous, the rubric (authored at Plan stage) specifies how the issue-capture-author classifies. The four-option `AskUserQuestion` (per ADR-0047) gives the user a `Change-doctype` option for explicit re-classification.
-4. **`evidence/` and `updates/` subdirectories are NOT doctypes.** Files under those subdirectories carry no doctype constraint (per ADR-0044). They are not validated as doctype files and may carry any shape. They exist to support, not to replace, a doctype file in the same topic folder.
+4. **`evidence/` and `updates/` subdirectories are NOT doctypes.** Files under those subdirectories carry no doctype constraint (per ADR-0051). They are not validated as doctype files and may carry any shape. They exist to support, not to replace, a doctype file in the same topic folder.
 
 ## Decision Details
 
@@ -117,7 +120,7 @@ Unify register and analysis (both are "report what is true now") and keep propos
 
 - Triage discipline becomes a load-bearing concern. The `KB-issue-capture/references/triage-criteria.md` rubric (authored at Plan stage) must be unambiguous enough for the agent to classify reliably. Mitigation: the `Change-doctype` option in the AskUserQuestion gives the user explicit override.
 - Three templates to maintain (vs. one). Mitigation: each template is short (~30-60 lines per Blueprint §Templates) and codifies a body skeleton; maintenance load is low.
-- The fixed set of three is closed (per ADR-0044). A fourth doctype requires an amendment ADR. Mitigation: deliberate — the three doctypes are grounded in empirical precedent; surfacing a fourth is itself architectural news.
+- The fixed set of three is closed (per ADR-0051). A fourth doctype requires an amendment ADR. Mitigation: deliberate — the three doctypes are grounded in empirical precedent; surfacing a fourth is itself architectural news.
 
 ### Neutral Consequences
 
@@ -146,7 +149,7 @@ Unify register and analysis (both are "report what is true now") and keep propos
 ## Related Information
 
 - Related ADRs:
-  - ADR-0044 (per-issue folder model — the filesystem layout for the three doctypes)
+  - ADR-0051 (per-issue folder model — the filesystem layout for the three doctypes)
   - ADR-0046 (add-new-sibling-file evolution — operates across doctype boundaries)
   - ADR-0049 (structural-vs-discipline KB split — templates here, discipline in KB-issue-capture)
   - ADR-0050 (5-state lifecycle vocabulary — applies uniformly across doctypes)

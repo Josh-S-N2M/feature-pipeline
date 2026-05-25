@@ -194,8 +194,8 @@ No procedural detail beyond the above — exact wording of the Phase 0 branch is
 ## Related Information
 
 - Related ADRs:
-  - ADR-0044 (per-issue folder model — proposal paths are `Issues/<topic>/proposal.md`)
-  - ADR-0045 (three doctypes preserved — only `issue-proposal` triggers Phase 0)
+  - ADR-0051 (per-issue folder model — proposal paths are `Issues/<topic>/proposal.md`)
+  - ADR-0052 (three doctypes preserved — only `issue-proposal` triggers Phase 0)
   - ADR-0047 (three-layer enforcement — independent of this handoff)
   - ADR-0050 (5-state lifecycle — proposals have `proposes_future_feature:` advisory field; D-06 advisory posture)
 - Referenced specs / docs: PRD §FR-10 (source-citation discipline); PRD §FR-11 (proposal-as-prior-context detection); PRD §FR-12 (template + recipe edits); PRD §Constraints "Must preserve all 6 mandatory human gates; no bypass"; Blueprint §Mechanism Designs D-14; codebase-analysis F-013 (intake-intent-clarifier already supports prior_context); F-014 (template Source structurally ready); the dogfood example: this run's `intent-clarification.md` at `working/feature/issue-capture-mechanism-r1/intent-clarification.md`.
