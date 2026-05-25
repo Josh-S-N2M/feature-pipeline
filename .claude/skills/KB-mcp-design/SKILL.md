@@ -12,8 +12,9 @@ description: >-
   Pairs with KB-mcp-platform (the platform half) and the augmented
   `auditing-mcp` family (the audit half — graduated to its own family per
   ADR-0042). Loaded when a feature touches `.mcp.json` at repo root,
-  per-agent `mcp__<server>__*` tool allowlists, or any of the seven named
-  servers' configuration surface.
+  per-agent `mcp__<server>__*` tool allowlists, or any of the six named
+  servers' configuration surface (originally seven; `mcp-openapi-schema`
+  removed 2026-05-24 per postmortem — see KB-mcp-platform deprecation note).
 allowed-tools: Read, Grep, Glob, Edit, Write
 family: kb-mcp
 ---
@@ -33,7 +34,7 @@ Design knowledge for the MCP layer. The PLATFORM half (facts, install forms, sch
 
 Load when authoring or reviewing:
 
-- `.mcp.json` entries (the seven mcpServers block)
+- `.mcp.json` entries (the six mcpServers block)
 - Per-agent `mcp__<server>__*` `tools:` allowlists in `.claude/agents/*.md`
 - The augmented `auditing-mcp` skill's OP-1..OP-10 rules
 - ADRs that affect MCP layer posture (ADR-0007, ADR-0037, ADR-0039, ADR-0040, ADR-0041, ADR-0042, ADR-0043)

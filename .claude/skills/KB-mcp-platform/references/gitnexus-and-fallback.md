@@ -16,7 +16,7 @@ Two reasons:
 
 ## Why NOT provisioned in this feature
 
-Per Gate-4 OI-1 closure (user verbatim: *"Lets move forward with 7 MCP the codebase-memory-mcp was an earlier assessment that is now stall."*). The feature ships with exactly 7 named servers; codebase-memory-mcp is registered nowhere. The policy at ADR-0007 v2.2.0 stays in force at the project level; the `primary_degraded` schema-level provision is preserved (so a future feature that registers the fallback can wire it up cleanly), but no code is shipped for it in `.mcp.json`, `postCreate.sh`, or any consumer agent's `tools:` allowlist.
+Per Gate-4 OI-1 closure (user verbatim: *"Lets move forward with 7 MCP the codebase-memory-mcp was an earlier assessment that is now stall."*). The feature originally shipped seven named servers; the 2026-05-24 postmortem then removed `mcp-openapi-schema`, leaving six. Either way, codebase-memory-mcp is registered nowhere. The policy at ADR-0007 v2.2.0 stays in force at the project level; the `primary_degraded` schema-level provision is preserved (so a future feature that registers the fallback can wire it up cleanly), but no code is shipped for it in `.mcp.json`, `postCreate.sh`, or any consumer agent's `tools:` allowlist.
 
 ## `primary_degraded` schema-level provision (per ADR-0037)
 

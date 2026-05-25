@@ -53,7 +53,6 @@ Whole-server allowlist is appropriate when the server's tool set is tight and al
 ```env
 # .devcontainer/versions.env
 SERENA_REF=v1.2.0                                              # GitHub tag
-MCP_OPENAPI_SCHEMA_VERSION=0.0.1                                # npm package + version
 ACTIONLINT_MCP_SHA=7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef    # GitHub commit SHA
 TERRAFORM_MCP_VERSION=0.5.2                                    # HashiCorp release (+ SHA256 in install script)
 GITNEXUS_TAG=1.6.5                                              # npm package + version

@@ -8,7 +8,7 @@
         "1": 0.0,
         "2": 0.0,
         "3": 0.0,
-        "4": 5,
+        "4": 10,
         "5": 10,
         "6": 0.0,
         "7": 8,
@@ -17,9 +17,9 @@
         "10": 10
       },
       "deductions_by_severity": {
-        "BLOCKER": 86,
-        "MAJOR": 56,
-        "MINOR": 19,
+        "BLOCKER": 82,
+        "MAJOR": 55,
+        "MINOR": 16,
         "NIT": 0,
         "INFO": 0
       },
@@ -31,8 +31,8 @@
     },
     "report_path": "/workspaces/feature-pipeline/project-audit-report.md",
     "primitives_audited": {
-      "skills": 45,
-      "context_files": 0,
+      "skills": 46,
+      "context_files": 1,
       "subagents": 37,
       "subagent_memory_dirs": 23,
       "hooks_configs": 1,
@@ -42,12 +42,12 @@
       "mcp_configs": 1
     },
     "finding_counts": {
-      "skills": 93,
+      "skills": 86,
       "context_files": 0,
-      "subagents": 7,
+      "subagents": 4,
       "hooks": 1,
       "settings": 27,
-      "mcp": 4
+      "mcp": 6
     },
     "cross_file_findings": 29
   },
@@ -243,22 +243,6 @@
       },
       {
         "severity": "BLOCKER",
-        "what": "`description` contains XML-style tags, which are not allowed.",
-        "fix": "Remove any `<...>` tags from the description.",
-        "audited_by": "auditing-skills",
-        "primitive": "KB-issue-capture",
-        "dimension": 1
-      },
-      {
-        "severity": "BLOCKER",
-        "what": "`name` ('KB-issue-capture') contains characters other than lowercase letters, digits, and hyphens.",
-        "fix": "Use only lowercase letters, digits, and hyphens.",
-        "audited_by": "auditing-skills",
-        "primitive": "KB-issue-capture",
-        "dimension": 1
-      },
-      {
-        "severity": "BLOCKER",
         "what": "references/non-pollution-contract.md links to '.claude/agents/issue-capture-author.md' (line 36) but the file does not exist.",
         "fix": "Either create the file or fix/remove the link.",
         "marker_decision": "NO_MARKER",
@@ -303,7 +287,7 @@
       },
       {
         "severity": "BLOCKER",
-        "what": "references/non-pollution-contract.md links to 'working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md' (line 103) but the file does not exist.",
+        "what": "references/non-pollution-contract.md links to 'working/feature/issue-capture-mechanism-r1/adrs/ADR-0051-per-issue-folder-model.md' (line 103) but the file does not exist.",
         "fix": "Either create the file or fix/remove the link.",
         "marker_decision": "NO_MARKER",
         "final_severity": "BLOCKER",
@@ -677,22 +661,6 @@
       },
       {
         "severity": "BLOCKER",
-        "what": "`description` contains XML-style tags, which are not allowed.",
-        "fix": "Remove any `<...>` tags from the description.",
-        "audited_by": "auditing-skills",
-        "primitive": "KB-mcp-design",
-        "dimension": 1
-      },
-      {
-        "severity": "MINOR",
-        "what": "Unrecognized frontmatter field(s): ['family']. These are silently ignored.",
-        "fix": "Remove them, or check for typos (e.g. `descripton` instead of `description`).",
-        "audited_by": "auditing-skills",
-        "primitive": "KB-mcp-design",
-        "dimension": 1
-      },
-      {
-        "severity": "BLOCKER",
         "what": "references/principles.md links to '.devcontainer/lib/log-mcp-event.sh' (line 51) but the file does not exist.",
         "fix": "Either create the file or fix/remove the link.",
         "marker_decision": "NO_MARKER",
@@ -711,14 +679,6 @@
         "marker_note": "Location did not include file:line; marker triage skipped.",
         "audited_by": "auditing-skills",
         "primitive": "KB-mcp-design",
-        "dimension": 1
-      },
-      {
-        "severity": "MINOR",
-        "what": "Unrecognized frontmatter field(s): ['family']. These are silently ignored.",
-        "fix": "Remove them, or check for typos (e.g. `descripton` instead of `description`).",
-        "audited_by": "auditing-skills",
-        "primitive": "KB-mcp-platform",
         "dimension": 1
       },
       {
@@ -880,14 +840,6 @@
         "dimension": 1
       },
       {
-        "severity": "MINOR",
-        "what": "Unrecognized frontmatter field(s): ['family']. These are silently ignored.",
-        "fix": "Remove them, or check for typos (e.g. `descripton` instead of `description`).",
-        "audited_by": "auditing-skills",
-        "primitive": "auditing-mcp",
-        "dimension": 1
-      },
-      {
         "id": "DE-3",
         "severity_raw": "CRITICAL",
         "severity": "BLOCKER",
@@ -900,14 +852,6 @@
         "marker_note": "No pedagogical marker; severity unchanged for downstream triage.",
         "audited_by": "auditing-skills",
         "primitive": "auditing-mcp",
-        "dimension": 1
-      },
-      {
-        "severity": "BLOCKER",
-        "what": "Frontmatter failed to parse as YAML: mapping values are not allowed here\n  in \"<unicode string>\", line 2, column 242:\n     ... ent via Task. Mutually exclusive: create-mode positional hint XO ... \n                                         ^",
-        "fix": "Fix the YAML syntax. Common causes: unquoted colons in values, missing quotes around special chars.",
-        "audited_by": "auditing-skills",
-        "primitive": "capture-issue",
         "dimension": 1
       },
       {
@@ -937,7 +881,7 @@
       {
         "severity": "BLOCKER",
         "location": "SKILL.md:44",
-        "what": "SKILL.md links to 'working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md' (line 44) but the file does not exist (Reference Illusion).",
+        "what": "SKILL.md links to 'working/feature/issue-capture-mechanism-r1/adrs/ADR-0051-per-issue-folder-model.md' (line 44) but the file does not exist (Reference Illusion).",
         "fix": "Either create the file, inline the content into SKILL.md, or remove the broken link.",
         "marker_decision": "NO_MARKER",
         "final_severity": "BLOCKER",
@@ -1092,40 +1036,10 @@
         "primitive": "execute-orchestrator.md"
       },
       {
-        "dimension": 3,
-        "severity": "MAJOR",
-        "what": "Wildcard shell tool: `Bash`. Subagent has full shell access. (SA-3)",
-        "fix": "Scope to specific commands, e.g. `Bash(git diff *)`, `Bash(npm test *)`.",
-        "location": "/workspaces/feature-pipeline/.claude/agents/execute-task-code-producer.md",
-        "where": "/workspaces/feature-pipeline/.claude/agents/execute-task-code-producer.md",
-        "audited_by": "auditing-subagents",
-        "primitive": "execute-task-code-producer.md"
-      },
-      {
-        "dimension": 3,
-        "severity": "MAJOR",
-        "what": "Wildcard shell tool: `Bash`. Subagent has full shell access. (SA-3)",
-        "fix": "Scope to specific commands, e.g. `Bash(git diff *)`, `Bash(npm test *)`.",
-        "location": "/workspaces/feature-pipeline/.claude/agents/execute-task-quality-handler.md",
-        "where": "/workspaces/feature-pipeline/.claude/agents/execute-task-quality-handler.md",
-        "audited_by": "auditing-subagents",
-        "primitive": "execute-task-quality-handler.md"
-      },
-      {
         "dimension": 2,
         "severity": "MAJOR",
         "what": "Description has no triggering language ('use when', 'when reviewing', etc.). Claude has no signal for delegation. (SA-2)",
         "fix": "Add explicit trigger: 'Use when ...' or 'Use for ...'.",
-        "location": "/workspaces/feature-pipeline/.claude/agents/issue-capture-author.md",
-        "where": "/workspaces/feature-pipeline/.claude/agents/issue-capture-author.md",
-        "audited_by": "auditing-subagents",
-        "primitive": "issue-capture-author.md"
-      },
-      {
-        "dimension": 4,
-        "severity": "MAJOR",
-        "what": "Body references tools ['Bash', 'Edit'] not in declared `tools:` list.",
-        "fix": "Add the tools to `tools:` (with scoping) or remove the body references.",
         "location": "/workspaces/feature-pipeline/.claude/agents/issue-capture-author.md",
         "where": "/workspaces/feature-pipeline/.claude/agents/issue-capture-author.md",
         "audited_by": "auditing-subagents",
@@ -1475,6 +1389,30 @@
         "rule": "OP-7",
         "severity": "MAJOR",
         "line": 7,
+        "event": "readiness_probe",
+        "missing_fields": [
+          "status"
+        ],
+        "message": "record missing required fields for readiness_probe",
+        "audited_by": "auditing-mcp",
+        "primitive": ".mcp.json"
+      },
+      {
+        "rule": "OP-7",
+        "severity": "MAJOR",
+        "line": 33,
+        "event": "readiness_probe",
+        "missing_fields": [
+          "status"
+        ],
+        "message": "record missing required fields for readiness_probe",
+        "audited_by": "auditing-mcp",
+        "primitive": ".mcp.json"
+      },
+      {
+        "rule": "OP-7",
+        "severity": "MAJOR",
+        "line": 34,
         "event": "readiness_probe",
         "missing_fields": [
           "status"

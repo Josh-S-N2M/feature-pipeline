@@ -12,15 +12,15 @@ Day-to-day operator actions for the MCP layer. Authored per Plan T2.2.
 claude mcp list
 ```
 
-Should show the 7 named servers from `.mcp.json`. If a server is missing, check the entry exists and is syntactically valid (`jq '.mcpServers | keys' .mcp.json`).
+Should show the 6 named servers from `.mcp.json`. If a server is missing, check the entry exists and is syntactically valid (`jq '.mcpServers | keys' .mcp.json`).
 
 ### Check most recent readiness probes
 
 ```bash
-tail -n 7 .claude/runtime/mcp-events.jsonl | jq 'select(.event == "readiness_probe")'
+tail -n 6 .claude/runtime/mcp-events.jsonl | jq 'select(.event == "readiness_probe")'
 ```
 
-Returns the most recent 7 `readiness_probe` records (one per server from the most recent postStart). Look for `status: "ok"` on each.
+Returns the most recent 6 `readiness_probe` records (one per server from the most recent postStart). Look for `status: "ok"` on each.
 
 ### Inspect a failure
 

@@ -72,7 +72,7 @@ Reasons it's a BLOCKER:
 
 The augmented `auditing-mcp` rule **OP-10** flags any `args` element matching `--api-key`, `--apikey`, `--api_key`, `--token`, `--auth`, `--bearer`, or a positional argument that looks like a credential (long string with `sk-`, `eyJ`, `ghp_`, etc. prefixes).
 
-## The seven servers' auth shapes (after compliant patterns applied)
+## The six servers' auth shapes (after compliant patterns applied)
 
 | Server | Auth method | env-var name | Where it enters .mcp.json |
 |---|---|---|---|
@@ -80,7 +80,6 @@ The augmented `auditing-mcp` rule **OP-10** flags any `args` element matching `-
 | context7 | `CONTEXT7_API_KEY` header (canonical per Upstash README) | `CONTEXT7_API_KEY` | `headers: {"CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"}` |
 | exa | `x-api-key` header | `EXA_API_KEY` | `headers: {"x-api-key": "${EXA_API_KEY}"}` |
 | gitnexus | none | — | — |
-| mcp-openapi-schema | none | — | — |
 | serena | none | — | — |
 | terraform-mcp | optional `TFE_TOKEN` (local-only is no-auth) | `TFE_TOKEN` | `env: {"TFE_TOKEN": "${TFE_TOKEN}"}` (optional block) |
 

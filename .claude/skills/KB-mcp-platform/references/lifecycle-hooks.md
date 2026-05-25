@@ -22,21 +22,20 @@ How the MCP layer wires into the devcontainer lifecycle. Authored per Plan T2.2 
 
 ## `postCreate.sh` responsibilities (Plan T3.4)
 
-1. Source `.devcontainer/versions.env` — establishes the 5 OSS-local pins.
+1. Source `.devcontainer/versions.env` — establishes the 4 OSS-local pins (was 5; `MCP_OPENAPI_SCHEMA_VERSION` removed 2026-05-24 per postmortem).
 2. Install Serena via `uvx --from git+https://github.com/oraios/serena@${SERENA_REF} serena`.
-3. Install mcp-openapi-schema via `npm install -g mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}` (or run via `npx -y`).
-4. Install actionlint-mcp via `go install github.com/hongkongkiwi/actionlint-mcp@${ACTIONLINT_MCP_SHA}`.
-5. Install terraform-mcp via `.devcontainer/install/terraform-mcp.sh` (binary + sha256 + gpg).
-6. Install gitnexus via `npm install -g gitnexus@${GITNEXUS_TAG}` (with `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` exported).
-7. Emit one `install_complete` record per OSS-local server to `.claude/runtime/mcp-events.jsonl` (5 records total).
-8. Note: context7 and exa are HTTP-transport hosted servers; no install step.
+3. Install actionlint-mcp via `go install github.com/hongkongkiwi/actionlint-mcp@${ACTIONLINT_MCP_SHA}`.
+4. Install terraform-mcp via `.devcontainer/install/terraform-mcp.sh` (binary + sha256 + gpg).
+5. Install gitnexus via `npm install -g gitnexus@${GITNEXUS_TAG}` (with `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` exported).
+6. Emit one `install_complete` record per OSS-local server to `.claude/runtime/mcp-events.jsonl` (4 records total).
+7. Note: context7 and exa are HTTP-transport hosted servers; no install step.
 
 ## `postStart.sh` responsibilities (Plan T3.5)
 
-1. For each of the 7 registered servers in `.mcp.json`, probe readiness:
+1. For each of the 6 registered servers in `.mcp.json`, probe readiness:
    - If `claude mcp ping <server>` is available (per verify-at-execution §H-6), use it.
    - Else fall back to direct JSON-RPC `tools/list` per ADR-0041 (cycle-3 T0.6 verified `claude mcp ping` is NOT available in current Claude Code CLI — fallback applies).
-2. Emit one `readiness_probe` record per server to `.claude/runtime/mcp-events.jsonl` (7 records per postStart).
+2. Emit one `readiness_probe` record per server to `.claude/runtime/mcp-events.jsonl` (6 records per postStart).
 3. Each record has `status: ok | degraded | unreachable` + a `latency_ms` field + optional `error` field for non-ok.
 4. The script SHOULD NOT fail-closed on any single server's degradation — emit the record and continue (postStart must complete to make the Codespace usable).
 

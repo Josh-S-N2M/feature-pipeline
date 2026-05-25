@@ -2,7 +2,9 @@
   "//": [
     ".mcp.json TEMPLATE — KB-mcp-platform/assets/templates/mcp.json.tmpl",
     "Customized by Plan T2.4 + substituted at repo root .mcp.json.",
-    "Canonical inventory: 7 named MCP servers per Gate-4 OI-1 closure.",
+    "Canonical inventory: 6 named MCP servers (was 7; mcp-openapi-schema removed",
+    "2026-05-24 per postmortem — see KB-mcp-platform/SKILL.md and",
+    ".devcontainer/postCreate.sh line 16 for the deprecation note).",
     "Credential handling: env-block indirection only (ADR-0039); env-var names from",
     ".devcontainer/versions.env or devcontainer.json containerEnv.",
     "Replace <PIN_TBD> with actual pin values from versions.env per Plan T1.3."
@@ -32,10 +34,6 @@
       "env": {
         "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1"
       }
-    },
-    "mcp-openapi-schema": {
-      "command": "npx",
-      "args": ["-y", "mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}"]
     },
     "serena": {
       "command": "uvx",

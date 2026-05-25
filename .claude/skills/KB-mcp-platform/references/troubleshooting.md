@@ -1,10 +1,10 @@
 # Troubleshooting Catalog — MCP Failure Modes
 
-Per Plan T2.2. Failure → diagnosis → fix mapping for the seven named MCP servers.
+Per Plan T2.2. Failure → diagnosis → fix mapping for the six named MCP servers (was seven; `mcp-openapi-schema` removed 2026-05-24 per postmortem).
 
 > **Pedagogical note:** Contains anti-pattern examples (URL-query credential, argv-leaked API key) the auditor flags as DE-2 scanner anti-patterns — documenting what to refuse during debug, not what to execute. Also contains base64-shaped retry-token examples in API-error scenarios (e.g., `eyJhbG...` JWT-like strings) as illustrative payloads for `structured_failure` records, not live tokens.
 
-## `claude mcp list` shows fewer than 7 servers
+## `claude mcp list` shows fewer than 6 servers
 
 **Diagnosis**: `.mcp.json` syntax issue OR server entries removed.
 
@@ -12,7 +12,7 @@ Per Plan T2.2. Failure → diagnosis → fix mapping for the seven named MCP ser
 jq '.mcpServers | keys' .mcp.json
 ```
 
-Should return `["actionlint-mcp", "context7", "exa", "gitnexus", "mcp-openapi-schema", "serena", "terraform-mcp"]`. If the array is shorter, the missing servers' entries are absent or `jq` failed (invalid JSON).
+Should return `["actionlint-mcp", "context7", "exa", "gitnexus", "serena", "terraform-mcp"]`. If the array is shorter, the missing servers' entries are absent or `jq` failed (invalid JSON).
 
 **Fix**: restore from `KB-mcp-platform/assets/templates/mcp.json.tmpl` + re-apply your env-var substitutions.
 

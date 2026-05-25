@@ -33,7 +33,7 @@ Emitted once per OSS-local server install (5 records per postCreate run; context
 Fields:
 - `event`: literal `install_complete`
 - `timestamp`: ISO 8601 UTC
-- `server`: one of the 7 OSS-local server names (actionlint-mcp, gitnexus, mcp-openapi-schema, serena, terraform-mcp). The 2 HTTP servers (context7, exa) do not emit this event.
+- `server`: one of the 4 OSS-local server names (actionlint-mcp, gitnexus, serena, terraform-mcp). The 2 HTTP servers (context7, exa) do not emit this event.
 - `install_method`: `npm` | `uvx` | `go install` | `binary-download`
 - `version`: pin string from versions.env
 - `duration_ms`: elapsed time
@@ -41,7 +41,7 @@ Fields:
 
 ### `readiness_probe`
 
-Emitted once per registered server at every postStart run (7 records per cycle for the 7 named servers).
+Emitted once per registered server at every postStart run (6 records per cycle for the 6 named servers).
 
 ```jsonl
 {
@@ -57,7 +57,7 @@ Emitted once per registered server at every postStart run (7 records per cycle f
 Fields:
 - `event`: literal `readiness_probe`
 - `timestamp`: ISO 8601 UTC
-- `server`: one of the 7 registered server names
+- `server`: one of the 6 registered server names
 - `probe_method`: `claude-mcp-ping` (if CLI available) | `json-rpc-tools-list` (per ADR-0041 fallback when `claude mcp ping` is absent per cycle-3 T0.6 verify)
 - `latency_ms`: end-to-end latency
 - `status`: `ok` | `degraded` | `unreachable`
@@ -94,7 +94,7 @@ Fields:
 
 ## Bootstrap semantics
 
-Per ADR-0037 Implementation Guidance, the bootstrap produces **seven `readiness_probe` records** (one per named server; the 2026-05-23 cycle-3 OI-1 closure dropped the eighth previously-planned record for the codebase-memory-mcp fallback that's no longer registered). Per AC-X-2.
+Per ADR-0037 Implementation Guidance, the bootstrap produces **six `readiness_probe` records** (one per named server; the 2026-05-23 cycle-3 OI-1 closure dropped the eighth previously-planned record for the codebase-memory-mcp fallback that's no longer registered; the 2026-05-24 postmortem then dropped the seventh planned record by removing `mcp-openapi-schema`). Per AC-X-2.
 
 ## Consumer agents
 

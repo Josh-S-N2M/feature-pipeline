@@ -7,8 +7,8 @@
 
 ## Inventory
 
-- skills: 45
-- context files: 0
+- skills: 46
+- context files: 1
 - subagents: 37
 - subagent memory dirs: 23
 - hook scripts: 2
@@ -18,10 +18,10 @@
 
 ## Summary
 
-Total findings: 161
-- **BLOCKER**: 86
-- **MAJOR**: 56
-- **MINOR**: 19
+Total findings: 153
+- **BLOCKER**: 82
+- **MAJOR**: 55
+- **MINOR**: 16
 
 ## Skills
 
@@ -64,10 +64,6 @@ Total findings: 161
 
 ### KB-issue-capture
 
-- **[BLOCKER]** `description` contains XML-style tags, which are not allowed.
-  - *Fix:* Remove any `<...>` tags from the description.
-- **[BLOCKER]** `name` ('KB-issue-capture') contains characters other than lowercase letters, digits, and hyphens.
-  - *Fix:* Use only lowercase letters, digits, and hyphens.
 - **[BLOCKER]** references/non-pollution-contract.md links to '.claude/agents/issue-capture-author.md' (line 36) but the file does not exist.
   - *Fix:* Either create the file or fix/remove the link.
 - **[BLOCKER]** references/non-pollution-contract.md links to '.claude/settings.json' (line 53) but the file does not exist.
@@ -76,7 +72,7 @@ Total findings: 161
   - *Fix:* Either create the file or fix/remove the link.
 - **[BLOCKER]** references/non-pollution-contract.md links to 'Issues/adr-placement-rootcause/analysis.md' (line 83) but the file does not exist.
   - *Fix:* Either create the file or fix/remove the link.
-- **[BLOCKER]** references/non-pollution-contract.md links to 'working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md' (line 103) but the file does not exist.
+- **[BLOCKER]** references/non-pollution-contract.md links to 'working/feature/issue-capture-mechanism-r1/adrs/ADR-0051-per-issue-folder-model.md' (line 103) but the file does not exist.
   - *Fix:* Either create the file or fix/remove the link.
 - **[BLOCKER]** references/non-pollution-contract.md links to 'working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-add-new-sibling-file-evolution.md' (line 105) but the file does not exist.
   - *Fix:* Either create the file or fix/remove the link.
@@ -147,10 +143,6 @@ Total findings: 161
 
 ### KB-mcp-design
 
-- **[BLOCKER]** `description` contains XML-style tags, which are not allowed.
-  - *Fix:* Remove any `<...>` tags from the description.
-- **[MINOR]** Unrecognized frontmatter field(s): ['family']. These are silently ignored.
-  - *Fix:* Remove them, or check for typos (e.g. `descripton` instead of `description`).
 - **[BLOCKER]** references/principles.md links to '.devcontainer/lib/log-mcp-event.sh' (line 51) but the file does not exist.
   - *Fix:* Either create the file or fix/remove the link.
 - **[MINOR]** references/patterns-and-anti-patterns.md is 179 lines but has no recognized table-of-contents heading near the top.
@@ -158,8 +150,6 @@ Total findings: 161
 
 ### KB-mcp-platform
 
-- **[MINOR]** Unrecognized frontmatter field(s): ['family']. These are silently ignored.
-  - *Fix:* Remove them, or check for typos (e.g. `descripton` instead of `description`).
 - **[BLOCKER]** SKILL.md links to '.devcontainer/install/terraform-mcp.sh' (line 68) but the file does not exist (Reference Illusion).
   - *Fix:* Either create the file, inline the content into SKILL.md, or remove the broken link.
 - **[BLOCKER]** SKILL.md links to '.devcontainer/postCreate.sh' (line 79) but the file does not exist (Reference Illusion).
@@ -194,23 +184,16 @@ Total findings: 161
 
 ### auditing-mcp
 
-- **[MINOR]** Unrecognized frontmatter field(s): ['family']. These are silently ignored.
-  - *Fix:* Remove them, or check for typos (e.g. `descripton` instead of `description`).
 - **[BLOCKER]** Instruction to append a credential to a URL or query parameter.
   - *Fix:* Credentials must never be sent in URLs.
 
 ### capture-issue
 
-- **[BLOCKER]** Frontmatter failed to parse as YAML: mapping values are not allowed here
-  in "<unicode string>", line 2, column 242:
-     ... ent via Task. Mutually exclusive: create-mode positional hint XO ... 
-                                         ^
-  - *Fix:* Fix the YAML syntax. Common causes: unquoted colons in values, missing quotes around special chars.
 - **[BLOCKER]** SKILL.md links to '.claude/agents/issue-capture-author.md' (line 42) but the file does not exist (Reference Illusion).
   - *Fix:* Either create the file, inline the content into SKILL.md, or remove the broken link.
 - **[BLOCKER]** SKILL.md links to '.claude/skills/KB-issue-capture/SKILL.md' (line 43) but the file does not exist (Reference Illusion).
   - *Fix:* Either create the file, inline the content into SKILL.md, or remove the broken link.
-- **[BLOCKER]** SKILL.md links to 'working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md' (line 44) but the file does not exist (Reference Illusion).
+- **[BLOCKER]** SKILL.md links to 'working/feature/issue-capture-mechanism-r1/adrs/ADR-0051-per-issue-folder-model.md' (line 44) but the file does not exist (Reference Illusion).
   - *Fix:* Either create the file, inline the content into SKILL.md, or remove the broken link.
 - **[BLOCKER]** SKILL.md links to '.../adrs/ADR-0047-three-layer-enforcement.md' (line 45) but the file does not exist (Reference Illusion).
   - *Fix:* Either create the file, inline the content into SKILL.md, or remove the broken link.
@@ -245,22 +228,10 @@ Total findings: 161
 - **[MAJOR]** Description has no triggering language ('use when', 'when reviewing', etc.). Claude has no signal for delegation. (SA-2)
   - *Fix:* Add explicit trigger: 'Use when ...' or 'Use for ...'.
 
-### execute-task-code-producer.md
-
-- **[MAJOR]** Wildcard shell tool: `Bash`. Subagent has full shell access. (SA-3)
-  - *Fix:* Scope to specific commands, e.g. `Bash(git diff *)`, `Bash(npm test *)`.
-
-### execute-task-quality-handler.md
-
-- **[MAJOR]** Wildcard shell tool: `Bash`. Subagent has full shell access. (SA-3)
-  - *Fix:* Scope to specific commands, e.g. `Bash(git diff *)`, `Bash(npm test *)`.
-
 ### issue-capture-author.md
 
 - **[MAJOR]** Description has no triggering language ('use when', 'when reviewing', etc.). Claude has no signal for delegation. (SA-2)
   - *Fix:* Add explicit trigger: 'Use when ...' or 'Use for ...'.
-- **[MAJOR]** Body references tools ['Bash', 'Edit'] not in declared `tools:` list.
-  - *Fix:* Add the tools to `tools:` (with scoping) or remove the body references.
 - **[BLOCKER]** Body instructs subagent to bypass approval/safety prompts. (Prompt injection / SA-4 indicator)
   - *Fix:* Remove the instruction. The subagent must request approval when permissionMode requires it.
 - **[BLOCKER]** Body instructs subagent to bypass approval/safety prompts. (Prompt injection / SA-4 indicator)
@@ -341,6 +312,8 @@ Total findings: 161
 
 - **[MINOR]** Server 'gitnexus': package `gitnexus@${GITNEXUS_TAG}` is not in the known-publishers list. Review provenance. (MC-3)
   - *Fix:* Verify publisher. For third-party servers, read source before installing.
+- **[MAJOR]** 
+- **[MAJOR]** 
 - **[MAJOR]** 
 - **[MAJOR]** 
 - **[MAJOR]** 

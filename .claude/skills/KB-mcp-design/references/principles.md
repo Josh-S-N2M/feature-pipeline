@@ -35,7 +35,7 @@ The generic Bearer form may work practically for some servers, but the README-ca
 
 `.devcontainer/versions.env` carries explicit pins. Never `latest`. Per-server pin types:
 
-- npm package + version (e.g., `gitnexus@1.6.5`, `mcp-openapi-schema@0.0.1`)
+- npm package + version (e.g., `gitnexus@1.6.5`)
 - GitHub commit SHA (e.g., `actionlint-mcp@7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef`)
 - GitHub tag (e.g., `serena@v1.2.0`)
 - Release version + SHA-256 (e.g., `terraform-mcp-server@0.5.2` with verification)
@@ -44,7 +44,7 @@ Use `<PIN_TBD>` placeholder ONLY during pre-pin authoring (Plan §D-2). Phase 0 
 
 ## Principle 5 — Stdio-by-default for OSS-local; HTTP only when hosted
 
-For OSS-local servers (gitnexus, serena, actionlint-mcp, mcp-openapi-schema, terraform-mcp), prefer stdio transport. The benefits: no extra process to manage, no port to expose, less attack surface. HTTP is reserved for genuinely-hosted services (context7, exa — both Upstash-hosted endpoints).
+For OSS-local servers (gitnexus, serena, actionlint-mcp, terraform-mcp), prefer stdio transport. The benefits: no extra process to manage, no port to expose, less attack surface. HTTP is reserved for genuinely-hosted services (context7, exa — both Upstash-hosted endpoints).
 
 ## Principle 6 — Event surface is one file with redaction-at-source
 

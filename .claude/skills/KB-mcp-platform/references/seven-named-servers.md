@@ -1,6 +1,8 @@
-# Seven Named MCP Servers — Inventory + Per-Server Detail
+# Named MCP Servers — Inventory + Per-Server Detail
 
-Canonical inventory per Gate-4 OI-1 closure (devcontainer-mcp-provisioning-r1). No `codebase-memory-mcp` entry per OI-1; the fallback policy remains at the project level for any future feature that registers it.
+Canonical inventory: **six active servers** (originally seven per Gate-4 OI-1 closure of devcontainer-mcp-provisioning-r1; `mcp-openapi-schema` was removed 2026-05-24 — see the deprecation note below). No `codebase-memory-mcp` entry per OI-1; the fallback policy remains at the project level for any future feature that registers it.
+
+> **Filename note:** This file is named `seven-named-servers.md` for historical-link stability (the original inventory was seven; renaming would cascade through frozen phase-validator references in `working/feature/devcontainer-mcp-provisioning-r1/`). Content is now six servers.
 
 ## Inventory table
 
@@ -10,7 +12,6 @@ Canonical inventory per Gate-4 OI-1 closure (devcontainer-mcp-provisioning-r1). 
 | context7 | http | `https://mcp.context7.com/mcp` | `CONTEXT7_API_KEY` header | `resolve-library-id`, `query-docs` |
 | exa | http | `https://mcp.exa.ai/mcp` | `x-api-key` header | `web_search_exa`, `company_research_exa`, `crawling_exa` (+ others) |
 | gitnexus | stdio | `npx -y gitnexus@${GITNEXUS_TAG} mcp` (env `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1`) | none | code-graph (resolve, search, callers, etc.) |
-| mcp-openapi-schema | stdio | `npx -y mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}` | none | OpenAPI schema traversal |
 | serena | stdio | `uvx --from git+https://github.com/oraios/serena@${SERENA_REF} serena` | none | symbol-level Python audit (read/find/refs) |
 | terraform-mcp | stdio | binary on PATH (GPG-verified per ADR-0041) | optional `TFE_TOKEN` | Terraform-reasoning tools |
 
@@ -51,13 +52,12 @@ Canonical inventory per Gate-4 OI-1 closure (devcontainer-mcp-provisioning-r1). 
 - **Tools**: code-graph (resolve symbol, search, find callers, file structure, etc. — whole-server allowlist).
 - **Consumer**: `discovery-codebase-researcher` agent (primary) + `review-architecture-auditor` agent.
 
-### mcp-openapi-schema
+### mcp-openapi-schema (REMOVED 2026-05-24)
 
-- **Upstream**: `mcp-openapi-schema` on npm.
-- **Pin**: `MCP_OPENAPI_SCHEMA_VERSION=0.0.1` (single release on npm at 2025-03-13; `STALE_PACKAGE` annotation per Plan §H-3).
-- **Install**: `npx -y mcp-openapi-schema@0.0.1`.
-- **Tools**: OpenAPI schema traversal.
-- **Consumer**: `design-api` agent (whole-server allowlist).
+- **Status**: Removed per postmortem 2026-05-24 — no spec source available; upstream npm package abandoned (single release `0.0.1` at 2025-03-13); `design-api` agent had no working spec server anyway.
+- **Removal note**: `.devcontainer/postCreate.sh` line 16; full postmortem evidence under `Issues/cross-artifact-divergence-detection-gap/evidence/mcp-postmortem-2026-05-24/`.
+- **Restore path**: if a working spec server is ever found, re-register in `.mcp.json` via `assets/templates/mcp.json.tmpl` (the template no longer includes the entry — re-add it) and re-populate this section with the new server's upstream + pin + install + tools + consumer.
+- **Historical pin**: `MCP_OPENAPI_SCHEMA_VERSION=0.0.1` (recorded here for postmortem-trail completeness; the env var is no longer in `.devcontainer/versions.env`).
 
 ### serena
 
