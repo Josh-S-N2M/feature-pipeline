@@ -1,8 +1,11 @@
 ---
 id: PROPOSAL-issue-capture-mechanism
-version: 0.1.0
+version: 1.0.0
 doc_type: issue-proposal
-status: draft
+status: adopted
+since: 2026-05-23
+adopted_by_feature_slug: issue-capture-mechanism-r1
+adopted_at: 2026-05-25
 generated: 2026-05-23T00:00:00Z
 generated_by: claude (planning-mode session — pre-mechanism bootstrap)
 feature_slug: pipeline-wide
