@@ -1,0 +1,131 @@
+{
+  "phase_id": "P5",
+  "verdict_overall": "PASS",
+  "verdict_per_dimension": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "rollup_rule_applied": "All 5 dimensions PASS. PV-5.C7 N/A (deferred to Phase 7 T7.8 per Plan + Q-CC-4 stub-vs-real distinction).",
+  "validators_passed": [
+    "PV-5.C1",
+    "PV-5.C2",
+    "PV-5.C3",
+    "PV-5.C4",
+    "PV-5.C5",
+    "PV-5.C6",
+    "PV-5.C8"
+  ],
+  "validators_failed": [],
+  "validators_na": [
+    "PV-5.C7"
+  ],
+  "validators_na_rationale": {
+    "PV-5.C7": "auditing-skills + auditing-subagents + auditing-settings pre-merge audits deferred to Phase 7 T7.8 per Plan (Q-CC-4 stub-vs-real distinction honored \u2014 not silently false-clean)"
+  },
+  "findings": [],
+  "cross_phase_invariants_checked": {
+    "CPI-1": "PASS (pipeline-isolation grep empty; Phase 5 introduced no new pipeline-agent references to KB-issue-capture)",
+    "CPI-2": "PASS (no Phase 5 deliverable under Issues/; validator-clean baseline preserved)",
+    "CPI-3": "PASS (issue-capture-author.md skills: ABSENT \u2014 verified in Phase 4 PV-4.C1; Phase 5 did not touch the agent file)",
+    "CPI-4": "PASS (NFR-8 baseline preserved; Phase 5 did not touch validator)",
+    "CPI-5": "PASS (no Issues/*.md deletion in Phase 5)",
+    "CPI-6": "PASS (LOAD-BEARING \u2014 settings.json permissions.allow byte-stable vs HEAD; verified by PV-5.C5 + parent surgical isolation at T5.6)"
+  },
+  "audit_counter_delta": {
+    "baseline_type": "prior_phase",
+    "baseline_phase": "P4",
+    "per_domain_delta": {
+      "tests": "0 \u2192 0",
+      "audits": "0 \u2192 0 (audits_stub: true \u2014 PV-5.C7 deferred)",
+      "validator": "0 \u2192 0",
+      "discipline": "0 \u2192 0",
+      "scope_deviations": "0 \u2192 0"
+    },
+    "aggregate_delta": "0 \u2192 0",
+    "audit_severity_breakdown": null,
+    "gating": "informational"
+  },
+  "scope_deviations": [],
+  "in_phase_process_events": [
+    {
+      "event": "producer_revision_cycle",
+      "task_id": "task-036",
+      "phase_task_id": "T5.4",
+      "cycle": 1,
+      "what": "missing actual_decision field in hook-golden-results.json entries",
+      "outcome": "APPROVED on cycle 1"
+    },
+    {
+      "event": "parent_surgical_isolation",
+      "task_id": "task-038",
+      "phase_task_id": "T5.6",
+      "cycle": 1,
+      "what": "producer's cumulative diff vs HEAD captured prior-session dirty state (permissions.allow replacement + permissions.deny addition); parent reverted to HEAD + re-applied only the 13-line additive hooks block",
+      "outcome": "APPROVED on parent-applied revision 1; CPI-6 preserved; prior-session changes restored uncommitted to working tree for user triage"
+    },
+    {
+      "event": "parent_surgical_isolation",
+      "task_id": "task-039",
+      "phase_task_id": "T5.7",
+      "cycle": 1,
+      "what": "same pattern as T5.6: producer captured prior-session SETTINGS-NOTES restructuring; parent reverted to HEAD + re-applied only the 26-line additive FR-15 note append",
+      "outcome": "APPROVED on parent-applied revision 1; prior-session changes restored uncommitted"
+    }
+  ],
+  "load_bearing_assertion_result": {
+    "assertion": "PV-5.C4 (allow p95 \u2264 200ms) + PV-5.C5 (settings.json additive; permissions.allow byte-stable) + CPI-6 (settings.json permissions.allow unchanged from pre-Phase-5)",
+    "verdict": "PASS",
+    "evidence": {
+      "allow_p95_ms": 143.7,
+      "allow_p95_target_ms": 200,
+      "ask_p95_ms": 292.6,
+      "ask_p95_target_ms": 500,
+      "settings_diff_vs_head": "13 insertions / 0 deletions (truly additive after parent surgical isolation)",
+      "permissions_allow_byte_stable": true,
+      "permissions_deny_introduced": false,
+      "hook_fail_mode": "fail-OPEN (set -u no -e; all exits 0)"
+    }
+  },
+  "per_task_summary": {
+    "task-033": {
+      "validator_id": "T5.1",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-034": {
+      "validator_id": "T5.2",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-035": {
+      "validator_id": "T5.3",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-036": {
+      "validator_id": "T5.4",
+      "cycles": 1,
+      "verdict": "APPROVED"
+    },
+    "task-037": {
+      "validator_id": "T5.5",
+      "cycles": 0,
+      "verdict": "APPROVED"
+    },
+    "task-038": {
+      "validator_id": "T5.6",
+      "cycles": 1,
+      "verdict": "APPROVED"
+    },
+    "task-039": {
+      "validator_id": "T5.7",
+      "cycles": 1,
+      "verdict": "APPROVED"
+    }
+  },
+  "rationale": "Phase 5 delivers all CC-layer hook + settings infrastructure: 61-line shellcheck-clean fail-OPEN hook, 5-fixture golden-file test suite, 1000-iter latency benchmark within budget, settings.json hooks block additive, SETTINGS-NOTES.md FR-15 documentation appended. 7 validators PASS; 1 N/A (deferred). 3 in-phase process events: 1 producer-revision cycle (T5.4) and 2 parent surgical isolations (T5.6 + T5.7) to disentangle this-session contributions from pre-existing prior-session dirty state in settings.json + SETTINGS-NOTES.md. CPI-6 (permissions.allow byte-stable) preserved via the surgical isolation pattern. Prior-session changes restored uncommitted to working tree for user triage.",
+  "execution_mode_note": "Phase 5 executed in canonical specialist-dispatch mode per ADR-0044. 17 specialist dispatches: 7 producers (1 with producer-revision cycle 1 = T5.4) + 7 handlers (2 with parent surgical isolations = T5.6, T5.7) + 1 phase-quality-reviewer. Cycle counters: task-036=1, task-038=1, task-039=1; others=0. ADR-0017 4-cap not breached."
+}

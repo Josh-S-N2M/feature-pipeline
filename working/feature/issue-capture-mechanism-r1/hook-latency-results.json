@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-05-25T00:41:00Z",
+  "head_sha": "7dd2412bc05fd6b760337d9de747d7fedc52cee3",
+  "purpose": "PV-5.C4 + PV-5.C8 hook latency benchmark per D-11. Targets: allow p95 <= 200ms; ask p95 <= 500ms.",
+  "iterations_per_path": 1000,
+  "allow_path": {
+    "iterations": 1000,
+    "min_ms": 44.342,
+    "max_ms": 320.19,
+    "mean_ms": 96.474,
+    "p50_ms": 93.202,
+    "p95_ms": 143.691,
+    "p99_ms": 188.099
+  },
+  "ask_path": {
+    "iterations": 1000,
+    "min_ms": 168.512,
+    "max_ms": 526.608,
+    "mean_ms": 208.705,
+    "p50_ms": 192.871,
+    "p95_ms": 292.651,
+    "p99_ms": 387.695
+  },
+  "thresholds": {
+    "allow_p95_target_ms": 200,
+    "ask_p95_target_ms": 500
+  },
+  "verdict": {
+    "allow_path": "PASS",
+    "ask_path": "PASS",
+    "overall": "PASS"
+  }
+}

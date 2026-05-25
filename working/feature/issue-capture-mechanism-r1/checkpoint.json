@@ -3,7 +3,7 @@
   "feature_slug": "issue-capture-mechanism-r1",
   "started_at": "2026-05-23T16:48:32Z",
   "completed_at": null,
-  "current_stage": "execution_phase_4_complete",
+  "current_stage": "execution_phase_5_complete",
   "stage_status": "in_progress",
   "gate_history": [
     {
@@ -136,7 +136,14 @@
       "task-029": 0,
       "task-030": 0,
       "task-031": 0,
-      "task-032": 0
+      "task-032": 0,
+      "task-033": 0,
+      "task-034": 0,
+      "task-035": 0,
+      "task-036": 1,
+      "task-037": 0,
+      "task-038": 1,
+      "task-039": 1
     },
     "per_phase": {
       "P0": 0,
@@ -144,7 +151,8 @@
       "P1": 0,
       "P2": 0,
       "P3": 0,
-      "P4": 0
+      "P4": 0,
+      "P5": 0
     }
   },
   "execution_phase_progress": {
@@ -264,7 +272,33 @@
       "load_bearing_assertion_pv4_c1": "PASS"
     },
     "P5": {
-      "status": "pending"
+      "status": "complete",
+      "verdict": "PASS",
+      "tasks_completed": 7,
+      "tasks_total": 7,
+      "validators_passed": [
+        "PV-5.C1",
+        "PV-5.C2",
+        "PV-5.C3",
+        "PV-5.C4",
+        "PV-5.C5",
+        "PV-5.C6",
+        "PV-5.C8"
+      ],
+      "validators_na": [
+        "PV-5.C7"
+      ],
+      "execution_mode": "specialist-dispatch",
+      "revision_cycles_used": {
+        "task-036": 1,
+        "task-038": 1,
+        "task-039": 1
+      },
+      "load_bearing_assertions": {
+        "PV-5.C4": "PASS",
+        "PV-5.C5": "PASS",
+        "CPI-6": "PASS"
+      }
     },
     "P6": {
       "status": "pending"
@@ -347,6 +381,13 @@
       ],
       "mode": "specialist-dispatch",
       "rationale": "7 tasks; 17 specialist dispatches (7+7+1); 0 revision cycles; LOAD-BEARING PV-4.C1 F-003 mitigation PASS verified across 3 sub-task edits."
+    },
+    {
+      "phases": [
+        "P5"
+      ],
+      "mode": "specialist-dispatch",
+      "rationale": "7 tasks; 17 specialist dispatches; 1 producer-revision + 2 parent surgical isolations (T5.6/T5.7 to preserve CPI-6 vs pre-existing prior-session dirty state)."
     }
   ]
 }

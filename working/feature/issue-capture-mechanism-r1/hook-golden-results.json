@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-05-25T00:54:35.886558+00:00",
+  "fixtures_total": 5,
+  "fixtures_passed": 5,
+  "fixtures_failed": 0,
+  "fixtures": [
+    {
+      "name": "fixture_1_issue_capture_author_ask",
+      "verdict": "PASS",
+      "expected_decision": "ask",
+      "actual_decision": "ask",
+      "elapsed_ms": 251.4
+    },
+    {
+      "name": "fixture_2_cc_critique_allow",
+      "verdict": "PASS",
+      "expected_decision": "allow",
+      "actual_decision": "allow",
+      "elapsed_ms": 48.5
+    },
+    {
+      "name": "fixture_3_discovery_codebase_researcher_allow",
+      "verdict": "PASS",
+      "expected_decision": "allow",
+      "actual_decision": "allow",
+      "elapsed_ms": 57.0
+    },
+    {
+      "name": "fixture_4_empty_stdin_fail_open",
+      "verdict": "PASS",
+      "expected_decision": "allow",
+      "actual_decision": "allow",
+      "elapsed_ms": 7.9
+    },
+    {
+      "name": "fixture_5_malformed_json_fail_open",
+      "verdict": "PASS",
+      "expected_decision": "allow",
+      "actual_decision": "allow",
+      "elapsed_ms": 51.2
+    }
+  ],
+  "verdict": "PASS"
+}

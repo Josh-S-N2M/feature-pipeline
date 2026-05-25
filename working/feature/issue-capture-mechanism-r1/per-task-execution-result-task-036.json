@@ -1,0 +1,48 @@
+{
+  "task_id": "task-036",
+  "plan_anchor": "T5.4",
+  "phase_id": "P5",
+  "status": "COMPLETED",
+  "files_modified": [
+    ".claude/hooks/test_intercept_issue_capture_agent.py"
+  ],
+  "files_created": [
+    "working/feature/issue-capture-mechanism-r1/hook-golden-results.json"
+  ],
+  "findings_4phase": {
+    "lint": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-5 PV-5.C3",
+      "result": "PASS"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-5.C3"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 1,
+  "notes": "5 fixtures: 1 ask + 2 allow + 2 fail-open. After revision 1 each entry has actual_decision matching expected_decision.",
+  "revision_history": [
+    {
+      "cycle": 1,
+      "trigger": "Handler caught JSON entries missing actual_decision field",
+      "fault": "assert_decision didn't return the actual decision; main() only wrote expected_decision",
+      "fix": "refactored assert_decision to return actual decision; main() captures and writes both fields per entry",
+      "outcome": "APPROVED on cycle 1"
+    }
+  ]
+}
