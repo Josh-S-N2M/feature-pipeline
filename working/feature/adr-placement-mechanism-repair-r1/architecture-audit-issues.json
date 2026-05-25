@@ -1,0 +1,185 @@
+{
+  "metadata": {
+    "run_id": "adr-placement-mechanism-repair-r1-20260524-183201",
+    "slug": "adr-placement-mechanism-repair-r1",
+    "auditor": "review-architecture-auditor",
+    "generated": "2026-05-25T00:00:00Z",
+    "blueprint_version": "1.0.0",
+    "audit_round": 1,
+    "blast_radius_method": "manual (read of codebase-analysis.json blast_radius[] + Bash filesystem inspection; GitNexus not invoked because codebase-analysis already carries pre-computed hop-tier distribution per ADR-0007 v2.x's MCP-or-equivalent-evidence flexibility)",
+    "cove_sample_rate": 1.0,
+    "lenses_applied": ["cove", "blast_radius", "brief_honor", "adr_alignment", "adjacency", "new_adr_soundness"]
+  },
+  "verdict": "conditional_pass",
+  "issues": [
+    {
+      "id": "AA-001",
+      "severity": "MAJOR",
+      "category": "cove-failure",
+      "lens": "cove",
+      "claim_or_decision": "Blueprint §Output Comparison (line 1026) states post-feature canonical adrs/ contains 51 files = 36 pre-existing + 5 relocated + 2 renumbered + 8 archive consolidation + 3 new ADRs minus 1 collision-stale replaced = 51 net. Blueprint also restates this 51 figure at line 494 (Architecture Overview ASCII diagram) and line 788 (Conventions Touched table).",
+      "verification_method": "CoVe arithmetic re-derivation from ADR-0055's four sub-procedures + Discovery IN-003/IN-004. Per ADR-0055: archive-wins (8 cases, IDs 0011-0017) REPLACE bodies of canonical entries that already exist (no net add); no-collision (10 IDs: 0001-0010) ADD new canonical entries — but ADR-0007 is canonical-only (canonical pre-existing; no archive final), so only 9 IDs add new canonical files via no-collision sub-procedure; canonical-wins (1 case, ID 0018) leaves canonical untouched (no add).",
+      "finding": "Correct arithmetic: 36 pre-existing + 5 relocated (0046-0050) + 2 renumbered (0051-0052) + 3 new ADRs (0053-0055) + 9 no-collision-adds (0001-0006, 0008-0010) = 55 canonical files post-feature, NOT 51. The Blueprint conflates archive-wins replacements (which do not add files) with archive-adds (which do). Additionally, the 'minus 1 collision-stale ADR replaced by archive body' arithmetic step is meaningless: archive-wins replaces a body, not a file slot. The 51 figure appears in three places (lines 494, 788, 1026) and serves as the load-bearing comparison-input verification surface in §Verification Strategy.",
+      "recommended_action": "Recompute the post-feature canonical file count. The arithmetic that resolves to 55 (or recompute precisely after enumerating per-ID) should replace the 51 in all three occurrences. The Test Boundaries / Verification Strategy §Output Comparison must compare against the corrected count, or the post-Phase-2d verification will incorrectly report drift.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-002",
+      "severity": "MAJOR",
+      "category": "cove-failure",
+      "lens": "cove",
+      "claim_or_decision": "Blueprint §Migration map FR-8d sub-procedure (i) (line 650) declares '10 IDs: 0001–0010, excluding 0007' as the no-collision set.",
+      "verification_method": "Arithmetic check: 0001-0010 minus 0007 is 9 IDs, not 10. Cross-checked against ADR-0055 §Decision item 3 ('10 no-collision cases (ADRs 0001-0010)') and item 4 ('1 canonical-only case (ADR-0007)') — ADR-0055 itself contains the same off-by-one (10 + 1 = 11, but the range 0001-0010 is 10 IDs total inclusive, so 10 IDs split as 9 no-collision + 1 canonical-only is the correct decomposition).",
+      "finding": "Off-by-one in both Blueprint Phase 2d sub-procedure (i) AND in ADR-0055 §Decision item 3. The 'excluding 0007' language acknowledges the carve-out but the count '10' is wrong; should be 9. Compounds with AA-001 (the 51 vs 55 file count) — both stem from the same misreading of the no-collision set as 10 instead of 9.",
+      "recommended_action": "Correct '10 IDs: 0001-0010, excluding 0007' to '9 IDs: 0001-0006, 0008-0010' in Blueprint line 650, AND correct ADR-0055 §Decision item 3 to '9 no-collision cases (ADRs 0001-0006, 0008-0010)'. ADR-0055 is a v1.0.0 newly-accepted ADR; this is a same-version frontmatter-stable amendment.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-003",
+      "severity": "MAJOR",
+      "category": "completeness",
+      "lens": "brief_honor",
+      "claim_or_decision": "Blueprint §Migration map FR-8d sub-procedure (iv) (line 656) addresses ADR-0007 canonical-only case as 'git rm archive -pre-* variants (no final variant in archive)'.",
+      "verification_method": "Cross-check against codebase-analysis.json IN-003 (line 78) which enumerates the 4 archive-side files for ADR-0007: 'pre-naming + v1-pre-template + v1-superseded + v2-pre-template'. The v1-superseded variant is structurally distinct from the pre-* variants (it carries a supersession marker, not just a pre-naming-convention or pre-template tag).",
+      "finding": "Blueprint sub-procedure (iv) only enumerates 'pre-*' variants for deletion but Discovery's verified inventory includes 1 v1-superseded variant for ADR-0007 (codebase-analysis.json line 632: ADR-0007-code-graph-mcp-selection-v1-superseded.md). Neither ADR-0055 nor the Blueprint FR-8d disposition explicitly addresses the v1-superseded variant. The Blueprint's sub-procedure (iv) implicitly treats it as a pre-* variant; ADR-0055 §Implementation Guidance item 'Canonical-only procedure' says 'git rm the archive's -pre-* variants (no final variant in archive)'. The v1-superseded file does NOT match the -pre-* glob; under literal reading of the procedure, the Plan executor leaves it in place.",
+      "recommended_action": "Either: (a) amend ADR-0055 §Implementation Guidance / Canonical-only procedure to explicitly include v1-superseded in the deletion glob ('git rm archive -pre-* AND -v1-superseded variants'); OR (b) add a Blueprint §Migration map sub-bullet 'ADR-0007 v1-superseded variant: delete via git rm; Git history preserves' to make the disposition unambiguous. Failing to address this leaves a stray ADR-0007-*.md file in adrs-migrated/ that the FR-10 validator will flag (it's an ADR-*.md outside canonical, with no allowlist entry post-Phase-2d).",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-004",
+      "severity": "MINOR",
+      "category": "consistency",
+      "lens": "cove",
+      "claim_or_decision": "Blueprint §biggest_risks (line 113) lists 'Divergent-body reconciliation (FR-8b ADR-0024) picks the wrong canonical body' as a risk to be mitigated by Architecture Audit review + stakeholder notification.",
+      "verification_method": "Cross-check against Discovery IN-002 (line 54) and the Blueprint's own AC-FR-8b-1 (line 271): 'for ADR-0024, per Discovery IN-002, only the frontmatter status: differs (Accepted vs Proposed); no body archival is required (no body content is lost).' AND against Blueprint Risks table (line 1075): 'ADR-0024 is a status-lift dedupe (not a true divergent body); risk N/A.'",
+      "finding": "Internal contradiction within the Blueprint: §biggest_risks calls ADR-0024 a 'divergent-body reconciliation' risk requiring stakeholder notification, but every other Blueprint surface (AC-FR-8b-1, Migration map FR-8b table, Risks table line 1075) correctly classifies ADR-0024 as a status-lift dedupe (NOT divergent-body). The §biggest_risks entry is residual prose from the pre-Discovery PRD framing. Minor because the actionable risk table (line 1070+) is correct; the biggest_risks YAML field is meta-summary prose.",
+      "recommended_action": "Either delete the §biggest_risks entry (ADR-0024 risk is N/A per all other surfaces) OR rephrase as 'Divergent-body reconciliation hypothesis from PRD reframed: ADR-0024 is status-lift only (no body archival needed); ADR-0044/0045 are numbering collisions (renumber per ADR-0053) — risk reframing per Discovery IN-002.' Minor severity per severity-taxonomy rule (the issue is mitigated elsewhere in the document).",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-005",
+      "severity": "MINOR",
+      "category": "cove-failure",
+      "lens": "cove",
+      "claim_or_decision": "Blueprint repeatedly cites '14 feature-scoped path-form + 18 adrs-migrated/ path-form = 32 mechanical edits' (lines 156, 423, etc.).",
+      "verification_method": "Re-count from Discovery IN-008 (codebase-analysis.json lines 170-184). The enumerated feature-scoped path-form sites list 13 distinct file:line entries: Issues/adr-placement-rootcause/analysis.md:258; per-agent-design-evaluation-gap/analysis.md:16, :64; per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md:11; devcontainer-mcp-provisioning-r1-deferrals/register.md:18; adr-placement-rootcause/proposal.md:75; issue-capture-mechanism-r1/reconciliation-log-r2.md:127; issue-capture-mechanism-r1/blueprint-v3.md:1346; devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-2.md:65; audit-findings-remediation-r1/synthesis.md:12; issue-register-template.md:96, :99; capture-issue/SKILL.md:44 = 14 entries (some files have multiple references). ADR-0036:107 is explicitly excluded (rejected-option example). Count is 14, matches.",
+      "finding": "The 14 + 18 = 32 count is consistent. NOT an issue. (Recording the verification for traceability per CoVe procedure.)",
+      "recommended_action": "No action. This entry is informational evidence that AA-005 was checked and PASSED CoVe; do not include in remediation set.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-006",
+      "severity": "MAJOR",
+      "category": "new-adr-soundness",
+      "lens": "new_adr_soundness",
+      "claim_or_decision": "ADR-0053 §Implementation Guidance: 'Compute next_id = max({int(id) for id in canonical_adrs_ids}) + 1 after all consolidation phases have completed. Assign renumbered ADRs in deterministic order (smallest source ID first, then ASCII order on slug).'",
+      "verification_method": "Concurrency / partial-failure analysis: the Plan's Phase 2d (archive consolidation) introduces no new IDs (per ADR-0055 archive-wins replaces existing 0011-0017 bodies). Phase 2c (FR-8c relocation) claims IDs 0046-0050. Phase 2b-renumber (ADR-0053) computes max+1 = 0051, assigns ADR-0051 (formerly feature ADR-0044) and ADR-0052 (formerly feature ADR-0045). The 3 new ADRs authored this run (0053, 0054, 0055) are already at canonical at audit time, so max-ID at renumber time is actually 0055, not 0050.",
+      "finding": "ADR-0053's max+1 algorithm produces a DIFFERENT result depending on whether the 3-new-ADRs-this-run are counted. The ADR states the algorithm runs 'after all consolidation phases settle' — but the 3 new ADRs (0053-0055) were authored during Design Composition (THIS RUN), which is BEFORE the Plan author runs Phase 2b. By the time Phase 2b-renumber executes, max(canonical) = 0055, not 0050. The renumbered targets would resolve to ADR-0056 and ADR-0057, NOT ADR-0051 and ADR-0052 as the Blueprint asserts (AC-FR-8b-2, Migration map FR-8b, Interface Change Matrix line 444). This is a self-referential ordering bug: the ADR codifying the algorithm itself increments the max-ID counter, invalidating the algorithm's own pre-computed outputs.",
+      "recommended_action": "Resolve one of three ways: (a) amend ADR-0053 §Implementation Guidance to clarify 'consolidation phases' includes the run that authored this ADR — and update Blueprint to renumber to 0056/0057 instead of 0051/0052; (b) amend ADR-0053's algorithm to 'max-ID before this feature's new ADRs were authored + 1' — but this opens the question of which ADR-authoring run is the cutoff; (c) assign ADR-0051/0052 explicitly BEFORE Phase 2 begins (renumber is the first migration task; new ADRs in this run get 0053-0055 by happening later) — this matches the Blueprint's de-facto assumption and is what's already on disk (ADR-0053-0055 land at canonical). Option (c) is the cleanest reconciliation; the algorithm becomes 'pre-Phase-2b max-ID + 1' rather than 'post-consolidation max-ID + 1'. This may require Blueprint reconciliation OR an addendum to ADR-0053 noting the algorithm's effective definition.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-007",
+      "severity": "MINOR",
+      "category": "new-adr-soundness",
+      "lens": "new_adr_soundness",
+      "claim_or_decision": "ADR-0054 §Decision item 1: 'Same script, same args, same exit-codes, same JSON shape at all three surfaces. The only inter-surface difference is the failure-surfacing mechanism.'",
+      "verification_method": "Cross-check against Blueprint §Three-surface enforcement non-redundancy proof and §Allowlist enumeration. Blueprint line 681 states 'The packager and orchestrator surfaces do NOT pass an allowlist; only the run_phase_checks.py execution-pipeline surface passes the --allowlist output/synthesis-*/adrs/ flag.'",
+      "finding": "ADR-0054 commitment 1 ('same args') is technically violated by surface (b) passing --allowlist and surfaces (a) and (c) not passing it. The Blueprint acknowledges this divergence as design-intended (synthesize-skill artifacts only land during execution-pipeline runs). The 'same args' phrasing in ADR-0054 commitment 1 is therefore an overstatement; the actual commitment is 'same script, same exit-code semantics, same JSON shape, with allowlist content being context-specific'.",
+      "recommended_action": "Clarify ADR-0054 commitment 1: replace 'same args' with 'same default args; allowlist content is per-surface contextual (orchestrator + packager pass none; run_phase_checks.py passes --allowlist output/synthesis-*/adrs/ per the synthesize-skill carve-out documented in the consuming Blueprint)'. Minor severity because the Blueprint's §Allowlist enumeration already documents the correct semantics; the ADR's wording is misleading-by-omission only.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-008",
+      "severity": "MAJOR",
+      "category": "new-adr-soundness",
+      "lens": "new_adr_soundness",
+      "claim_or_decision": "ADR-0055 §Decision applies the archive-wins policy to '8 archive-wins cases (ADRs 0011-0017)' and treats ADR-0018 as the lone canonical-wins case. Codebase analysis IN-004 (line 100) describes ADR-0018 collision as 'canonical has supersession-by-ADR-0038 marker; archive does not'.",
+      "verification_method": "Cross-check: ADR-0055 enumerates the 8 archive-wins IDs as 0011-0017 (line 65). That range is 7 IDs (0011, 0012, 0013, 0014, 0015, 0016, 0017). NOT 8. Counting: 0017 - 0011 + 1 = 7. Discovery IN-004 (line 91-101) enumerates the collisions: 0011, 0012, 0013, 0014, 0015, 0016, 0017, 0018 = 8 total, of which ADR-0018 is canonical-wins.",
+      "finding": "Off-by-one in ADR-0055 and propagated through Blueprint. The 8 'archive-wins' cases per Discovery are actually 8 COLLISIONS, of which 7 are archive-wins (IDs 0011-0017) and 1 is canonical-wins (ID 0018). ADR-0055 says '8 archive-wins (ADRs 0011-0017)' — this is incorrect; should be '7 archive-wins (ADRs 0011-0017)'. The Blueprint AC-FR-8d-2 (line 276) similarly says '8 archive-wins collisions (ADRs 0011-0017)' — same error. This compounds with AA-001 (the 51 vs 55 file count) since the post-feature ADR count depends on getting the archive-wins/canonical-wins decomposition right.",
+      "recommended_action": "Correct ADR-0055 §Decision item 1 to '7 archive-wins cases (ADRs 0011-0017)' and Blueprint AC-FR-8d-2 to match. Also correct ADR-0053 §Context (line 50) which says 'IDs 0011-0018' and 'eight archive/canonical collisions' — that's correct (8 total collisions); but ADR-0053's phrasing should clarify '8 collisions, of which 7 are archive-wins and 1 is canonical-wins per ADR-0055'. The Migration map in the Blueprint correctly identifies these as 8 IDs (0011-0018) requiring different sub-procedures (line 652 + 654); the bug is in the count phrasing.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-009",
+      "severity": "MINOR",
+      "category": "adjacency",
+      "lens": "adjacency",
+      "claim_or_decision": "ADR-0029/0033 (no-silent-scope-changes) adjacency: Research Plan flagged that the v2.0.0 user-override scope expansion from 'four surgical edits + grandfather' to 'full migration + sweep + enforcement + audit' must be transparently surfaced per ADR-0029/0033 discipline.",
+      "verification_method": "Cross-check Blueprint §Problem to Solve (line 196): 'The v2.0.0 user directive at the Intent Confirmation Gate expanded the scope from \"four surgical edits + grandfather\" to a comprehensive repair: migrate every off-canonical ADR; sweep every cross-reference; wire enforcement at three independent surfaces; audit every skill that could re-introduce the feature-scoped behavior.' Also cross-check Intent Clarification v2.0.1 (line 305+) §What changed and §Why which surface the v1.1.0 → v2.0.0 transition explicitly.",
+      "finding": "Blueprint surfaces the scope expansion transparently (lines 196, 305+). The adjacency check passes; the v2.0.0 expansion is NOT silent. PASS for ADR-0029/0033 compliance.",
+      "recommended_action": "No action. Adjacency check passed; recorded for traceability.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-010",
+      "severity": "MINOR",
+      "category": "adjacency",
+      "lens": "adjacency",
+      "claim_or_decision": "ADR-0042 (auditing-shared canonical-helper-home graduation) extension adjacency: Research Plan flagged that FR-10's three-surface enforcement extends ADR-0042's consumer set from audit-family-only to a non-audit-family triad (orchestrator + execution-pipeline + packager).",
+      "verification_method": "Cross-check Blueprint §Prerequisite ADRs (line 132): 'ADR-0042 (auditing-mcp family graduation) — extended by ADR-0054 to non-audit-family consumers (the FR-10 validator is the first such consumer).' Also ADR-0054 §Context (line 50-58) which explicitly frames itself as the extension.",
+      "finding": "Blueprint cites the ADR-0042 extension explicitly via ADR-0054; the adjacency is structurally addressed. PASS for the adjacency check.",
+      "recommended_action": "No action. Adjacency check passed.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-011",
+      "severity": "MAJOR",
+      "category": "blast-radius",
+      "lens": "blast_radius",
+      "claim_or_decision": "Blueprint §Change Impact Map line 432 'No Ripple Effect: The 4000+ bare-ID prose references to ADRs (FR-9 is path-only; bare-ID exception applies only to renumbered ADR-0044/0045 → ADR-0051/0052 per ADR-0053).'",
+      "verification_method": "Cross-check against ADR-0053 §Implementation Guidance / Cross-reference sweep: 'Both the path-form references (e.g., working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-*) and the bare-ID references (e.g., prose \"see ADR-0044\") MUST be updated. The bare-ID update is a deliberate exception to FR-9's path-only rule because the ID itself has moved.' Per IN-008 (codebase-analysis.json line 166): 'ADR-0044: 223 mentions; ADR-0045: 145 mentions' across the repo.",
+      "finding": "The Blueprint's 'No Ripple Effect' assertion is incomplete. ADR-0044 has 223 mentions and ADR-0045 has 145 mentions across the repo (per IN-008). Most of these are bare-ID prose references (not path-form). After renumber to ADR-0051/ADR-0052, every bare-ID prose reference that means the FEATURE-SCOPED ADR (per-issue-folder-model / three-doctypes-preserved) must be rewritten to ADR-0051/ADR-0052; every bare-ID prose reference that means the CANONICAL ADR (flatten-execution-dispatch-hierarchy / subagent-agent-tool-grant-prohibition) must NOT be rewritten. Discerning which is which requires SEMANTIC analysis of each occurrence, not pattern-only grep. The Blueprint's Phase 3 sweep is declared path-only with a 'bare-ID exception' — but the exception requires per-occurrence semantic disambiguation, which is materially more expensive than a mechanical sweep. The Plan's Phase 3 task estimate must reflect this; otherwise the Plan underestimates effort by orders of magnitude.",
+      "recommended_action": "Augment Blueprint §FR-9 / Phase 3 task to explicitly note the per-occurrence semantic disambiguation cost for ADR-0044/0045 bare-ID references. Quantify: 223 + 145 = 368 candidate occurrences requiring semantic check. Provide either: (a) a heuristic for disambiguation (e.g., 'bare-ID references inside working/feature/issue-capture-mechanism-r1/* default to feature-meaning; bare-ID references outside that folder default to canonical-meaning'); (b) an explicit Plan task to enumerate and disambiguate per-occurrence; (c) a scope reduction (defer bare-ID rewrites to a follow-up feature, accept the renumber-without-bare-ID-sweep risk for one cycle). The current Blueprint silently leaves this decision to the Plan author, which violates the Blueprint's contract with the Plan stage.",
+      "blocking_advance_to_plan": true
+    },
+    {
+      "id": "AA-012",
+      "severity": "MINOR",
+      "category": "consistency",
+      "lens": "cove",
+      "claim_or_decision": "Blueprint Agreement Checklist (line 156) cites '47 archive consolidation actions' as part of the migration scope.",
+      "verification_method": "Per ADR-0055 §Architecture Impact (line 135-141): 'Components that change: 8 canonical ADRs (0011-0017) get archive-body replacement; 8 new files under adrs/superseded/; 1 canonical ADR (0018) untouched, archive counterpart deleted; 10 archive ADRs (0001-0010) git mv'd to canonical; 29 -pre-* variant files deleted; adrs-migrated/ directory removed.' Sum: 8 replace + 8 add + 0 (canonical-0018 untouched) + 1 (archive-0018 delete) + 10 mv + 29 -pre delete = 56 file-touching actions. ADR-0055 itself says '29 -pre-* variants' but Discovery IN-003 (line 79) gives 'pre-naming-convention=18 + pre-template-migration=11 + 1 v1-superseded = 30 -pre-and-superseded variants total'. Off-by-one in ADR-0055's pre-* count too.",
+      "finding": "Blueprint's '47 archive consolidation actions' phrasing is ambiguous about what an 'action' is. If actions are file-edits, ADR-0055 implies ~56 file-touching actions. If actions are source files in adrs-migrated/, that's 47 files (per IN-003). The number 47 corresponds to the latter. Consistent with IN-003 but confusing in the context of 'actions'. Compounds with AA-003 (v1-superseded handling).",
+      "recommended_action": "Replace 'actions' with 'source files in adrs-migrated/ touched by Phase 2d' to disambiguate. Cross-check ADR-0055's '29 -pre-* variants' count against IN-003's '18 + 11 + 1 = 30' — likely the 1 v1-superseded should be added to the deletion set, raising 29 → 30.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-013",
+      "severity": "MINOR",
+      "category": "completeness",
+      "lens": "brief_honor",
+      "claim_or_decision": "Blueprint §Risks (line 1083) lists 'Tombstone redirect note format diverges across the 5 FR-8c relocations' but does not list a risk for the bootstrap window where THIS feature's own ADRs (0053, 0054, 0055) were authored at canonical via the implicit-default behavior (the very behavior FR-3 is replacing).",
+      "verification_method": "Cross-check: ADRs 0053-0055 are already at canonical adrs/ per ls -la output. They were authored during Design Composition of THIS feature, BEFORE FR-3's canonical-default edit lands at recipe-feature-pipeline/SKILL.md:273. Per IN-005, the implicit default 'historically has resolved to working/feature/<slug>/adrs/'.",
+      "finding": "Self-referential coincidence: this feature's design-composer happened to write ADRs to canonical (which is what the feature is mandating going forward), rather than the historical implicit-default of working/feature/<slug>/adrs/. The Blueprint reviewer presumably verified the canonical landing (per the parent prompt's note: 'the Blueprint reviewer already confirmed by filesystem inspection that all 3 newly-authored ADRs landed at canonical adrs/'). But the Blueprint does not document HOW this happened — was an explicit output_adrs_dir override passed by the orchestrator for this run? Was the implicit default semantics different from IN-005's claim? Without this clarity, the Architecture Audit cannot rule out 'this run was a happy accident' as opposed to 'the mechanism is reliably canonical-defaulting'. The bootstrapping risk #9 (line 1082) acknowledges 'Phase 2 + 3 have non-canonical ADRs present' but conflates that with the THIS-RUN authoring of ADR-0053-0055.",
+      "recommended_action": "Add a brief Blueprint Bootstrapping Note documenting: (a) how this run's design-composer landed the 3 new ADRs at canonical (override mechanism, manual override, or coincidence); (b) confirmation that the FR-3 default codification at SKILL.md:273 will make this reliable for future runs. This is a forward-traceability concern; without it, a future incident-reviewer cannot diagnose whether the canonical landing in this run validates or undermines the FR-3 hypothesis.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-014",
+      "severity": "MAJOR",
+      "category": "completeness",
+      "lens": "brief_honor",
+      "claim_or_decision": "Blueprint §Unresolved items deferred to user (line 1115) says 'None. All 7 Q-CC-N items have evidence-based dispositions ratified in this Blueprint or codified into ADR-0053/0054/0055.' Blueprint also says all 5 PRD Open Items are resolved.",
+      "verification_method": "Cross-check OI-1 disposition (Blueprint line 1117): 'OI-1 (divergent-body archival format) — resolved at design level; ADR-0024 is a status-lift dedupe (no body archival needed); the OI's adrs/superseded/<id>-feature-scoped-body.md default is preserved as the convention if a future true divergent-body case arises.'",
+      "finding": "OI-1's resolution is structurally incomplete in one respect: the Blueprint never explicitly addresses what happens if Discovery's claim ('ADR-0024 is status-lift only') is wrong — i.e., if there IS a body diff that was missed. The Plan's Phase 2b-status-lift task should include a re-verification step ('diff -u canonical vs feature copy; if non-frontmatter lines differ, halt and surface to user for OI-1's archival default to apply'). The Blueprint's AC-FR-8b-1 (line 271) embeds this in prose but not as an explicit acceptance criterion. Minor-major boundary: this is a fail-safe gap; if the Discovery claim is wrong, the byte-equality re-check (FR-8a Assumption A2) does not apply to ADR-0024 because A2 only covers byte-identical cases, not status-lift cases.",
+      "recommended_action": "Add an AC-FR-8b-1.1 or amend AC-FR-8b-1: 'Where Phase 2b processes ADR-0024 (status-lift case), the Plan task shall include a re-verification step (diff against canonical excluding frontmatter status: field) prior to delete; if any non-frontmatter body line differs, halt and apply OI-1's adrs/superseded/<id>-feature-scoped-body.md archival default.' This closes the fail-safe gap and makes OI-1's documented fallback rule operational.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "AA-015",
+      "severity": "MINOR",
+      "category": "consistency",
+      "lens": "cove",
+      "claim_or_decision": "Blueprint §Allowlist enumeration (line 679) states: 'One contingent allowlist entry (per Q-CC-4 / per ADR-0054 structural commitment 2): output/synthesis-*/adrs/ (the synthesize skill's ADR-output target).'",
+      "verification_method": "Cross-check ADR-0054 commitment 2: 'Per-invocation CLI-flag allowlist (--allowlist <comma-separated-paths>). Empty default. No persistent config file. Mid-migration usage is scoped to a single human-invoked call; persistent state is forbidden.'",
+      "finding": "ADR-0054 commitment 2 says 'empty default' AND 'mid-migration usage is scoped to a single human-invoked call' — meaning the allowlist is intended to be ephemeral (one-time uses for mid-migration). But the Blueprint declares the output/synthesis-*/adrs/ entry as a PERSISTENT (always-on) entry at the run_phase_checks.py dispatch site. This is NOT mid-migration; it is a permanent carve-out. The semantics 'per-invocation CLI flag' vs. 'persistent CLI flag at every run_phase_checks.py invocation' is the same mechanism but a different intent. ADR-0054 commitment 2 should clarify that some allowlist entries are STEADY-STATE (synthesize carve-out) while others are MID-MIGRATION (ephemeral). The Blueprint's claim that the entry 'is expressed via the per-invocation CLI flag at the run_phase_checks.py dispatch site' is technically true but elides the distinction.",
+      "recommended_action": "Amend ADR-0054 commitment 2 to distinguish 'steady-state allowlist entries (e.g., synthesize carve-out — passed at every dispatch)' from 'mid-migration allowlist entries (e.g., during Phase 2 in-flight folders — passed once and removed when Phase ends)'. Both use the CLI flag mechanism (no persistent config file); the steady-state usage is at a hard-coded dispatch site, not a config file. Minor severity because the Blueprint's §Allowlist enumeration documents the actual behavior correctly; only the ADR's prose semantics needs refinement.",
+      "blocking_advance_to_plan": false
+    }
+  ],
+  "summary": "Architecture Audit on Blueprint v1.0.0 surfaces 15 issues: 5 MAJOR, 8 MINOR, 0 BLOCKER (one MINOR-with-MAJOR-effect, AA-011, marked blocking_advance_to_plan: true due to its Plan-stage cost implication). Verdict: conditional_pass — no architecturally fatal contradiction; substantive findings cluster in (a) arithmetic / off-by-one errors compounding across the file-count, archive-wins-count, and v1-superseded-handling chain (AA-001, AA-002, AA-003, AA-008, AA-012); (b) new-ADR soundness on the bootstrap-self-reference question for ADR-0053's max-ID algorithm (AA-006); (c) bare-ID semantic-disambiguation cost for the FR-9 sweep on ADR-0044/0045 renumbers (AA-011); (d) fail-safe gap for ADR-0024 status-lift re-verification (AA-014). The 3 new ADRs (0053, 0054, 0055) are structurally well-formed and address real decisions; ADR-0036 alignment confirmed; both Research-Plan-flagged adjacencies (ADR-0029/0033 transparency, ADR-0042 consumer extension) correctly surfaced. The Blueprint's 7 Q-CC-N items + 5 PRD Open Items dispositions are evidentially grounded (per AA-009, AA-010 PASSes); the gap is OI-1's fail-safe operationalization (AA-014).",
+  "cove_summary": "CoVe applied at full sample rate (1.0) to 9 substantive claim families: (1) ADR-0036 alignment — VERIFIED; (2) Discovery IN-002 reframing of ADR-0044/0045 as numbering collisions — VERIFIED (per ADR-0053 and codebase-analysis); (3) Discovery IN-004 8 archive-wins reframing — PARTIALLY VERIFIED, off-by-one in archive-wins count (AA-008); (4) Three-surface non-redundancy proof — VERIFIED with one ADR-prose-semantics nit (AA-007); (5) FR-9 path-only sweep math (32 mechanical edits) — VERIFIED for path-form (AA-005), MAJOR gap for bare-ID semantic-disambiguation (AA-011); (6) Post-feature canonical file count 51 — FAILED arithmetic re-derivation (AA-001, AA-002); (7) ADR-0007 v1-superseded handling — UNADDRESSED (AA-003); (8) ADR-0024 status-lift fail-safe — UNDER-SPECIFIED (AA-014); (9) IN-010 auditing-shared CLI convention conformance — VERIFIED (validator contract at Blueprint §Contract Definitions matches the ADR-0035 + IN-010 conventions).",
+  "blast_radius_summary": "Manual blast-radius re-check against codebase-analysis.json blast_radius[] entries: 8 touch-points enumerated, all covered by Blueprint's Change Impact Map or No Ripple Effect declarations. Critical gap: the bare-ID reference blast radius for ADR-0044 (223 mentions) and ADR-0045 (145 mentions) is acknowledged in Discovery but the Blueprint's 'No Ripple Effect' assertion (line 432) treats this as out-of-scope; ADR-0053 §Implementation Guidance explicitly says bare-ID references MUST be updated for renumbered IDs. The contradiction surfaces as AA-011 MAJOR (blocking_advance_to_plan: true). Other blast-radius items (operator-file family, validator addition, canonical adrs/ tree, feature-scoped sources, adrs-migrated/) are appropriately scoped in the Change Impact Map.",
+  "brief_honor_summary": "Brief-honor verification per ADR-0009: (a) Decision contradictions — NONE detected; no Blueprint decision contradicts an inherited ADR. (b) Open-item handling — 4 of 5 PRD Open Items are explicitly resolved with rationale (OI-1 via Discovery reframing + ADR-0055 default; OI-2 via gate-binding + ADR-0055; OI-3 via Synthesis D4 + ADR-0054; OI-4 via Synthesis D5; OI-5 via Q-CC-2 = Option C); OI-1's fail-safe gap captured as AA-014. All 7 Q-CC-N items have evidence-based dispositions. (c) Re-surfaced verified issues — NONE detected; no prior issue from a previous audit round re-appears (this is round 1 of 1). PASS for brief-honor overall, with the AA-014 fail-safe gap as a MINOR completeness flag."
+}

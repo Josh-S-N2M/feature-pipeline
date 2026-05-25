@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "run_id": "adr-placement-mechanism-repair-r1-20260525-audit-r2",
+    "slug": "adr-placement-mechanism-repair-r1",
+    "auditor": "review-architecture-auditor",
+    "generated": "2026-05-25T00:00:00Z",
+    "blueprint_version": "1.1.0",
+    "prior_blueprint_version": "1.0.0",
+    "audit_round": 2,
+    "audit_mode": "focused_delta_reaudit",
+    "blast_radius_method": "n/a (focused delta re-audit; no new touch points introduced; prior round's blast-radius assessment unchanged)",
+    "lenses_applied": ["prior_finding_verification", "regression_scan", "defect_prevention_check"],
+    "prior_audit_path": "working/feature/adr-placement-mechanism-repair-r1/architecture-audit-issues.json"
+  },
+  "verdict": "conditional_pass",
+  "recommendation": "dispatch-to-reconciler-cycle-2",
+  "summary_counts": {
+    "prior_findings_closed": 12,
+    "prior_findings_deferred_as_pass_records": 3,
+    "new_findings_regressions": 4,
+    "BLOCKER": 0,
+    "MAJOR": 1,
+    "MINOR": 3,
+    "INFO": 0
+  },
+  "prior_findings_verification": {
+    "AA-001": {"prior_severity": "MAJOR", "status": "CLOSED", "evidence": "51 → 55 corrected at Architecture Overview ASCII (blueprint-v1.md:506-512), Conventions Touched table (blueprint-v1.md:806), Output Comparison (blueprint-v1.md:1062). Arithmetic re-derives correctly: 36 pre-existing + 5 (0046-0050 relocated) + 2 (0051-0052 renumbered) + 3 (0053-0055 new) + 9 (no-collision adds 0001-0006, 0008-0010) = 55."},
+    "AA-002": {"prior_severity": "MAJOR", "status": "CLOSED", "evidence": "Migration map FR-8d sub-procedure (i) now reads '9 IDs: 0001-0006, 0008-0010' at blueprint-v1.md:668. ADR-0055 v1.0.1 §Decision item 3 corrected at adrs/ADR-0055:77."},
+    "AA-003": {"prior_severity": "MAJOR", "status": "CLOSED", "evidence": "New AC-FR-8d-2.1 added at blueprint-v1.md:282 explicitly mandating git rm of ADR-0007-v1-superseded variant. ADR-0055 v1.0.1 §Implementation Guidance / Canonical-only procedure extends the deletion glob (adrs/ADR-0055:169-171). Variant-deletion total raised 29 → 30 consistently in both ADR-0055 and Blueprint Migration map (blueprint-v1.md:676)."},
+    "AA-006": {"prior_severity": "MAJOR", "status": "CLOSED", "evidence": "ADR-0053 v1.0.1 §Decision Details (adrs/ADR-0053:70) and §Implementation Guidance (adrs/ADR-0053:131-139) clarify baseline as 'max(canonical IDs that pre-existed this feature's design-composer run) + 1'. Worked example demonstrates resolution to 0051/0052. AC-FR-8b-2 (blueprint-v1.md:277) reaffirms 0051/0052 targets and explicitly excludes ADR-0053/0054/0055 from renumber baseline. Self-referential ordering bug resolved via Option (a) from dispatch brief."},
+    "AA-008": {"prior_severity": "MAJOR", "status": "PARTIALLY_CLOSED", "evidence": "Primary corrections applied at AC-FR-8d-2 (blueprint-v1.md:281), Migration map FR-8d sub-procedure (ii) (blueprint-v1.md:670), Risks table (blueprint-v1.md:1112), biggest_risks (blueprint-v1.md:118), Architecture Overview ASCII note (blueprint-v1.md:509), Conventions Touched (blueprint-v1.md:806), and ADR-0055 v1.0.1 §Decision item 1 (adrs/ADR-0055:72-74). HOWEVER three stragglers remain — see I-AA-R2-001 below."},
+    "AA-011": {"prior_severity": "MAJOR (blocking_advance_to_plan)", "status": "CLOSED", "evidence": "AC-FR-9-b revised at blueprint-v1.md:288 with full 368-occurrence sweep per user binding decision. New AC-FR-9-b.1 (blueprint-v1.md:289-293) operationalizes the disambiguation procedure: (i) read ≥3 lines of surrounding prose, (ii) baseline heuristic as starting point (not exemption), (iii) AskUserQuestion escalation for ambiguous cases, (iv) per-occurrence disposition recorded in per-task execution result. 'No Ripple Effect' assertion removed and replaced with explicit cycle-1 revision note at Change Impact Map (blueprint-v1.md:444). New risk-table rows added at blueprint-v1.md:1121-1122 quantifying effort + misdisambiguation risk. ADR-0053 v1.0.1 §Implementation Guidance (adrs/ADR-0053:142) cross-references the user binding decision."},
+    "AA-014": {"prior_severity": "MAJOR", "status": "CLOSED", "evidence": "New AC-FR-8b-1.1 added at blueprint-v1.md:276 operationalizing OI-1 fail-safe: per-task `diff` against canonical excluding frontmatter `status:` field; if any non-frontmatter body line differs, halt and apply OI-1 archival default to `adrs/superseded/<id>-feature-scoped-body.md`. Risks-table row reframed (blueprint-v1.md:1111). OI-1 disposition prose at blueprint-v1.md:1158 updated to reference AC-FR-8b-1.1."},
+    "AA-004": {"prior_severity": "MINOR", "status": "CLOSED", "evidence": "biggest_risks ADR-0024 entry reframed at blueprint-v1.md:116 to reflect Discovery IN-002 (status-lift) with AC-FR-8b-1.1 fail-safe reference."},
+    "AA-005": {"prior_severity": "MINOR", "status": "DEFERRED_AS_PASS_RECORD", "evidence": "Auditor self-reported VERIFIED PASS in round 1; no remediation required; carried as PASS record."},
+    "AA-007": {"prior_severity": "MINOR", "status": "CLOSED", "evidence": "ADR-0054 v1.0.1 commitment 1 (adrs/ADR-0054:79) reworded: 'same default args' + 'allowlist content is per-surface contextual'; aligns with Blueprint Allowlist enumeration semantics. Revision history at adrs/ADR-0054:185 documents the change."},
+    "AA-009": {"prior_severity": "MINOR", "status": "DEFERRED_AS_PASS_RECORD", "evidence": "Auditor self-reported ADR-0029/0033 adjacency PASS in round 1; carried as PASS record."},
+    "AA-010": {"prior_severity": "MINOR", "status": "DEFERRED_AS_PASS_RECORD", "evidence": "Auditor self-reported ADR-0042 consumer-extension adjacency PASS in round 1; carried as PASS record."},
+    "AA-012": {"prior_severity": "MINOR", "status": "CLOSED", "evidence": "'47 archive consolidation actions' disambiguated to '47 source files in adrs-migrated/ touched by Phase 2d' at blueprint-v1.md:159; variant-deletion count corrected 29 → 30 at blueprint-v1.md:676 and ADR-0055 v1.0.1 §Decision item 5 (adrs/ADR-0055:79)."},
+    "AA-013": {"prior_severity": "MINOR", "status": "CLOSED", "evidence": "New Bootstrapping note sub-section added at blueprint-v1.md:891-907 documenting: (a) how this run's design-composer landed ADR-0053/0054/0055 at canonical (deliberate operator-time invocation, not historical implicit default per IN-005); (b) forward-traceability for FR-3 reliability; (c) incident-reviewer diagnostic triad. Closes forward-traceability gap."},
+    "AA-015": {"prior_severity": "MINOR", "status": "CLOSED", "evidence": "ADR-0054 v1.0.1 commitment 2 (adrs/ADR-0054:80-84) distinguishes steady-state allowlist usage (hard-coded dispatch site as persistent declaration surface) from mid-migration usage (ephemeral; phase-bounded). Both use CLI flag mechanism; no persistent config in either case. Revision history at adrs/ADR-0054:185 documents the change."}
+  },
+  "defect_prevention_check": {
+    "all_v101_amendments_at_canonical": true,
+    "evidence": "ls -la confirms ADR-0053 v1.0.1 (15302 bytes), ADR-0054 v1.0.1 (17402 bytes), ADR-0055 v1.0.1 (19375 bytes) all reside at /workspaces/feature-pipeline/adrs/. The feature-scoped working/feature/adr-placement-mechanism-repair-r1/adrs/ directory exists but is empty (only . and .. entries). Frontmatter-stable amendment per ADR-0005 honored (id, version 1.0.1, status Accepted; supersedes: []; revised_after: architecture-audit-r1).",
+    "self_referential_bootstrap_consistent_with_AA-006_resolution": true
+  },
+  "issues": [
+    {
+      "id": "I-AA-R2-001",
+      "severity": "MAJOR",
+      "category": "regression",
+      "lens": "regression_scan",
+      "lineage": "AA-008 incomplete remediation",
+      "claim_or_decision": "Three stragglers in the Blueprint still cite the pre-correction 8-archive-wins / 8-stale-canonical-bodies count rather than the cycle-1-corrected 7-archive-wins / 7-stale-canonical-bodies count.",
+      "verification_method": "Direct grep of blueprint-v1.md for '8 archive' and '8 stale' + visual inspection of Fact Disposition Table IN-004 row, Change Impact Map adrs/superseded/ line, and Alternative 2 disadvantage prose.",
+      "finding": "Three sites still carry the un-corrected count: (a) blueprint-v1.md:388 Fact Disposition Table IN-004 row: 'IN-004 | 8 archive/canonical collisions (IDs 0011–0017) where archive carries v2.0.0 (current); 1 collision (ID 0018) canonical-wins' — the prose 'IDs 0011-0017' attached to the 8 figure is internally contradictory (range 0011-0017 is 7 IDs); should read '8 archive/canonical collisions (IDs 0011-0018) decomposing into 7 archive-wins (0011-0017) and 1 canonical-wins (0018)'. (b) blueprint-v1.md:429 Change Impact Map: 'adrs/superseded/ (NEW directory; 8 stale canonical bodies per ADR-0055)' — should be '7 stale canonical bodies' to match ADR-0055 v1.0.1 §Architecture Impact item 1 which now correctly states '7 new files under adrs/superseded/'. (c) blueprint-v1.md:1096 Alternative 2 disadvantage prose: 'Leaves 8 archive-wins collisions silently stale in canonical' — should be 'Leaves 8 collisions (7 archive-wins + 1 canonical-wins) silently stale' or simply '7 archive-wins'. These stragglers partially undo the AA-008 remediation: the corrected count is now load-bearing in 7+ Blueprint surfaces but contradicted at these 3. A future reader cross-checking the IN-004 row against ADR-0055 v1.0.1 will see a contradiction.",
+      "recommended_action": "Update the three stragglers to use the corrected '7 archive-wins + 1 canonical-wins (8 total collisions)' phrasing. The Fact Disposition Table IN-004 row is the most load-bearing because that row is the binding between codebase-analysis fact and design — a reader cross-referencing it against ADR-0055 v1.0.1 will see direct contradiction.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "I-AA-R2-002",
+      "severity": "MINOR",
+      "category": "regression",
+      "lens": "regression_scan",
+      "lineage": "AA-001 incomplete remediation",
+      "claim_or_decision": "Blueprint Change Impact Map (line 428) describes the canonical adrs/ target as 'adrs/ (FR-8a/b/c/d destination; 3 new ADRs ADR-0053/54/55; ADR-0051/52 from renumber; ADR-0046–0050 from relocation; 17 from archive consolidation)'.",
+      "verification_method": "Cross-check '17 from archive consolidation' against the corrected arithmetic now codified in Architecture Overview ASCII (blueprint-v1.md:506-512) and Conventions Touched (blueprint-v1.md:806), which both state 9 no-collision adds (0001-0006, 0008-0010) and explicitly note 7 archive-wins (0011-0017) REPLACE existing canonical bodies (no net add) + 1 canonical-only (0007) leaves canonical untouched + 1 canonical-wins (0018) leaves canonical untouched.",
+      "finding": "'17 from archive consolidation' is internally inconsistent with the corrected post-cycle-1 arithmetic. The corrected Architecture Overview and Conventions Touched lines correctly say 9 no-collision adds. The '17' figure in line 428 appears to be the pre-cycle-1 conflation that AA-001 was supposed to fix (it sums 9 adds + 7 archive-wins replacements + 1 canonical-only, treating replacements as adds). This is a missed straggler from the AA-001 sweep through the Blueprint.",
+      "recommended_action": "Update line 428 to read 'adrs/ (FR-8a/b/c/d destination; 3 new ADRs ADR-0053/54/55; ADR-0051/52 from renumber; ADR-0046–0050 from relocation; 9 from archive consolidation no-collision adds; 7 archive-wins REPLACE existing canonical bodies and do not net-add files)'. Minor severity because the load-bearing 55-file total in Architecture Overview + Conventions Touched + Output Comparison is correct; only the Change Impact Map paraphrase is wrong.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "I-AA-R2-003",
+      "severity": "MINOR",
+      "category": "consistency",
+      "lens": "regression_scan",
+      "lineage": "new finding (cross-section consistency in cycle-1 changes)",
+      "claim_or_decision": "Agreement Checklist scope row (blueprint-v1.md:159) now reads: '47 source files in adrs-migrated/ touched by Phase 2d decomposing into 7 archive-wins + 1 canonical-wins + 9 no-collision + 1 canonical-only + 30 variant deletions = 48 file-touching operations per ADR-0055 v1.0.1'.",
+      "verification_method": "Arithmetic check: 7 + 1 + 9 + 1 + 30 = 48; matches the stated 48 file-touching ops. However the row presents 47 source files producing 48 operations, with 7 new superseded files implicitly added; the relationship between '47 source files' and '48 file-touching operations' and '7 new superseded-archive files written' is not made explicit.",
+      "finding": "The '47 → 48 file-touching ops' phrasing is mathematically correct but obscures the asymmetry (each archive-wins case = 2 ops: 1 read-canonical-and-write-to-superseded + 1 git-mv-archive-to-canonical; canonical-wins = 1 git-rm-archive-final + N pre-* deletes; no-collision = 1 git-mv + N pre-* deletes; canonical-only = N pre-* deletes including v1-superseded). A reader trying to budget the Plan stage's Phase-2d task count cannot derive task atomicity from the line. The bullet immediately following (line 160) jumps to cross-reference scope without resolving the asymmetry.",
+      "recommended_action": "Add a one-line clarification: 'The 47 source files in adrs-migrated/ map to 48 file-touching operations because the 7 archive-wins cases each generate one additional write to adrs/superseded/<id>-pre-consolidation-canonical.md beyond the source-file consumption; thus 47 archive-source reads/deletes/moves + 7 superseded-writes − 6 (deletes that consume the source without producing a separate op) = 48.' Alternatively, defer detailed per-op accounting to the Plan-stage decomposition and note the line is a high-level scope summary. Minor severity because the accuracy is not in dispute; only the cognitive accessibility is.",
+      "blocking_advance_to_plan": false
+    },
+    {
+      "id": "I-AA-R2-004",
+      "severity": "MINOR",
+      "category": "consistency",
+      "lens": "regression_scan",
+      "lineage": "AA-003 follow-on; new pre-* glob terminology mismatch",
+      "claim_or_decision": "AC-FR-8d-1 (blueprint-v1.md:280) still describes the variant deletions as 'every `-pre-naming-convention` and `-pre-template-migration` variant shall have been deleted' — does NOT mention the v1-superseded variant.",
+      "verification_method": "Cross-check AC-FR-8d-1 against AC-FR-8d-2.1 (which DOES enumerate the v1-superseded variant) and against ADR-0055 v1.0.1 §Decision item 5 ('All `-pre-naming-convention`, `-pre-template-migration`, and `-v1-superseded` variants are deleted via `git rm`').",
+      "finding": "AC-FR-8d-1's enumeration is narrower than ADR-0055 v1.0.1 §Decision item 5 and narrower than the actual cycle-1 corrected scope. A literal reading of AC-FR-8d-1 alone would leave the v1-superseded variant out of scope; only the supplementary AC-FR-8d-2.1 closes the gap. Acceptance-criteria readers (Plan author, test author) typically read AC-FR-8d-1 as the primary specification for FR-8d scope; the v1-superseded scope sits in a numbered child AC that's easy to miss. Suggest aligning AC-FR-8d-1 phrasing with ADR-0055 v1.0.1 item 5 so the primary AC contains the complete variant-deletion enumeration.",
+      "recommended_action": "Update AC-FR-8d-1 to read '...every `-pre-naming-convention`, `-pre-template-migration`, and `-v1-superseded` variant shall have been deleted'. Keep AC-FR-8d-2.1 as the procedural detail (canonical-only-procedure glob extension). Minor severity because AC-FR-8d-2.1 is sufficient to make the requirement binding; this is a clarity improvement, not a correctness gap.",
+      "blocking_advance_to_plan": false
+    }
+  ],
+  "regression_scan_summary": "Focused regression scan of v1.1.0 changes against v1.0.0 baseline + cycle-1 audit findings identifies 4 new findings, all related to incomplete propagation of cycle-1 corrections to ancillary Blueprint surfaces. (a) I-AA-R2-001 MAJOR: 3 stragglers of the AA-008 (8-archive-wins → 7) correction at lines 388, 429, 1096 — the load-bearing Fact Disposition Table row contradicts ADR-0055 v1.0.1. (b) I-AA-R2-002 MINOR: 1 straggler of the AA-001 (51 → 55) correction at Change Impact Map line 428 still cites '17 from archive consolidation' which conflates replacements with adds. (c) I-AA-R2-003 MINOR: 47 → 48 ops arithmetic in Agreement Checklist is correct but cognitively obscure. (d) I-AA-R2-004 MINOR: AC-FR-8d-1 variant-deletion enumeration narrower than ADR-0055 v1.0.1 item 5 and AC-FR-8d-2.1. No regression in the load-bearing 55-file-count, 9-no-collision-IDs, 0051/0052-renumber-targets, AC-FR-9-b.1 disambiguation procedure, AC-FR-8b-1.1 fail-safe, ADR-0055 canonical-only glob extension, ADR-0054 commitment-1/2 prose, or Bootstrapping note. The 4 findings are clustered tail-of-distribution cleanups, not architectural regressions.",
+  "convergence_assessment": {
+    "round": "2 of 4 (per ADR-0017 + ADR-0033 D-12 four-cycle cap)",
+    "trajectory": "converging",
+    "prior_round_issue_count": 15,
+    "this_round_issue_count": 4,
+    "delta": -11,
+    "notes": "Cycle 1 closed 12 of 15 prior findings (3 were auditor-self-recorded PASS records requiring no remediation). The 4 new findings are all tail-of-distribution stragglers of two of the cycle-1 corrections (AA-001 file-count sweep and AA-008 archive-wins count sweep). No architectural regression. Cycle 2 should close all 4 in one composer pass; cycle-3 risk is low absent further user-scope expansion. The 4-cycle cap is not at risk."
+  },
+  "verdict_rationale": "conditional_pass: 1 MAJOR finding (I-AA-R2-001) is a regression-class issue — the cycle-1 AA-008 remediation missed 3 sites including the load-bearing Fact Disposition Table row. The MAJOR severity is appropriate because the IN-004 row is the binding between codebase-analysis fact and Blueprint design; an unresolved contradiction at that surface undermines downstream traceability. The 3 MINOR findings are quality polish that the composer should absorb in the same dispatch. Recommendation: dispatch-to-reconciler-cycle-2 for a tightly-scoped fix-up pass (4 sites total + ADR-0054 already at v1.0.1 needs no further change; ADR-0055 v1.0.1 already correct; ADR-0053 v1.0.1 already correct). Plan stage should NOT advance until I-AA-R2-001 is closed; the 3 MINORs may be deferred to a 'fix in cycle 2' batch but are recommended to land in the same pass for cleanliness."
+}

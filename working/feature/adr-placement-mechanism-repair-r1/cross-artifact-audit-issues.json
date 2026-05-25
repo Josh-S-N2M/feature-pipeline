@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "cross-artifact-adr-placement-mechanism-repair-r1-r1",
+  "round_number": 1,
+  "terminal": false,
+  "audited_artifacts": [
+    "blueprint-v1.md (v1.2.0)",
+    "plan-v1.md (v1.0.1)",
+    "acceptance-tests.md (v1.0.0; 76 tests)",
+    "phase-validators.md (v1.0.0; 11 validators)"
+  ],
+  "audited_at": "2026-05-25T04:15:00Z",
+  "diff_mode": false,
+  "diff_mode_rationale": "Round 1; no prior Blueprint version available for diff. Subsequent rounds (if any) will operate in diff-mode against blueprint-v1.md v1.2.0.",
+  "checks_performed": [
+    "blueprint_plan_alignment",
+    "blueprint_tests_alignment",
+    "blueprint_validators_alignment",
+    "plan_tests_alignment",
+    "plan_validators_alignment",
+    "bare_id_368_consistency",
+    "adr_0053_0054_0055_dependency_honor",
+    "defect_prevention_feature_scoped_path_regression"
+  ],
+  "issues": [
+    {
+      "id": "I-CA-001",
+      "severity": "MINOR",
+      "category": "consistency",
+      "artifact_pair": "Acceptance Tests ↔ Plan/Phase Validators (frontmatter ↔ enumerated count)",
+      "summary": "acceptance-tests.md frontmatter declares total_tests: 73 but the document enumerates 76 test entries (AT-001 through AT-076) and the §Test count narrative + Update History say \"Total tests: 76\".",
+      "evidence": [
+        {"artifact": "acceptance-tests.md", "section": "frontmatter line 15: total_tests: 73"},
+        {"artifact": "acceptance-tests.md", "section": "§Test count by AC group: 'Total tests: 76 test entries (AT-001 through AT-076)' (line 162)"},
+        {"artifact": "acceptance-tests.md", "section": "Update History: '76 tests covering 60 unique ACs' (line 1512)"},
+        {"artifact": "phase-validators.md", "section": "frontmatter acceptance_tests_version: 1.0.0 (no count cross-check, but PV scheduling references AT-076 implying 76)"}
+      ],
+      "recommended_resolution": "Patch acceptance-tests.md frontmatter to total_tests: 76 (matches enumeration + narrative + Update History). Frontmatter-only patch; no body change."
+    },
+    {
+      "id": "I-CA-002",
+      "severity": "MINOR",
+      "category": "consistency",
+      "artifact_pair": "Plan ↔ Plan (frontmatter ↔ §Estimation Methodology enumeration)",
+      "summary": "plan-v1.md frontmatter declares total_tasks: 40 but enumerated Phase totals in §Estimation Methodology sum to 40 only if Phase 0 = 3 + Phase 1 = 5 + Phase 2 = 8 + Phase 3 = 4 + Phase 4 = 2 + Phase 5 = 6 + Phase 6 = 10 + Rollout = 2 = 40, while the §Acceptance Test Cross-Reference orphan-task check says '44 of 47 satisfy ≥1 PRD AC' (line 823), implying 47 total tasks. The two task counts (40 vs 47) are inconsistent within the same document; OPI-2 was closed as resolved at frontmatter = 40.",
+      "evidence": [
+        {"artifact": "plan-v1.md", "section": "frontmatter line 27: total_tasks: 40"},
+        {"artifact": "plan-v1.md", "section": "§Estimation Methodology: 'Total task count: 40 tasks' (line 838)"},
+        {"artifact": "plan-v1.md", "section": "§Acceptance Test Cross-Reference orphan-task check: '44 of 47 satisfy ≥1 PRD AC' (line 823)"},
+        {"artifact": "plan-v1.md", "section": "§Open Items: OPI-2 closed with 'frontmatter = 40; matches enumerated count'"}
+      ],
+      "recommended_resolution": "Edit plan-v1.md line 823 to read '37 of 40' (40 total minus 3 N/A-tagged setup/cleanup/communication: T0.1, T0.2, T0.3, T6.5, TR.1, TR.2 = 6 N/A entries, so 34 of 40, not 44 of 47). Re-derive the 'N of M' counts from the actual 40-task taxonomy. The '44 of 47' figure looks like a stale pre-reconciliation arithmetic that survived OPI-2 closure."
+    },
+    {
+      "id": "I-CA-003",
+      "severity": "MINOR",
+      "category": "consistency",
+      "artifact_pair": "Phase Validators ↔ Plan (dependency-arrow direction)",
+      "summary": "phase-validators.md §Validator dependency graph (line 78-87) shows 'PV-0 → PV-1' as a sequenced edge, but Plan §Cross-Phase Dependencies (line 656-717) shows Phase 0 fanning out to BOTH Phase 1 AND Phase 2 in parallel (no Phase 1 → Phase 2 sequencing constraint). The PV graph correctly shows PV-2a/b/c/d alongside PV-1 children of PV-0, but the ASCII art's positioning is ambiguous about whether PV-1 must precede PV-2.",
+      "evidence": [
+        {"artifact": "phase-validators.md", "section": "§Validator dependency graph lines 77-87"},
+        {"artifact": "plan-v1.md", "section": "§Cross-Phase Dependencies lines 656-717 (Phase 1 and Phase 2 are sibling fan-outs from Phase 0)"},
+        {"artifact": "plan-v1.md", "section": "Phase 2 §Phase 2 — Migration prerequisite: 'Phase 1 (optional ordering)' (Blueprint §Technical Dependencies item 3)"}
+      ],
+      "recommended_resolution": "Annotate phase-validators.md §Validator dependency graph with a one-line clarifying note: 'PV-1 and PV-2a/b/c/d are parallelizable siblings of PV-0; the ASCII art's PV-1→PV-2 visual proximity is layout, not sequencing.' Or redraw the ASCII with explicit parallel branches."
+    },
+    {
+      "id": "I-CA-004",
+      "severity": "MINOR",
+      "category": "completeness",
+      "artifact_pair": "Plan ↔ Phase Validators (PV-R coverage)",
+      "summary": "phase-validators.md PV-R §Acceptance tests scheduled for this phase states '(No new AT-NNN tests; Rollout closes communications per PRD §Communication plan.)'. Plan §Acceptance Test Cross-Reference confirms TR.1/TR.2 are tagged 'N/A — communication', so no AT-NNN coverage is needed for the Rollout-task pair. However, neither the Plan's Rollout Exit Criteria nor PV-R explicitly declares the absence as intentional in a way that prevents finalize-task-decomposer from over-scheduling Rollout tests.",
+      "evidence": [
+        {"artifact": "phase-validators.md", "section": "PV-R §Acceptance tests scheduled (line 542-543)"},
+        {"artifact": "plan-v1.md", "section": "§Acceptance Test Cross-Reference orphan-task check: TR.1, TR.2 are 'N/A — communication' (line 823)"}
+      ],
+      "recommended_resolution": "Optional polish; no remediation strictly required. If addressed: add one explicit cross-link in PV-R Operational checks: 'Rollout tasks intentionally produce no AT-NNN entries per Plan orphan-task tagging.'"
+    },
+    {
+      "id": "I-CA-005",
+      "severity": "MINOR",
+      "category": "consistency",
+      "artifact_pair": "Phase Validators ↔ Acceptance Tests (AT-NNN cross-reference — AT-074/075/076)",
+      "summary": "phase-validators.md PV-6 §Acceptance tests scheduled lists 'AT-063 (AC-NFR-1-a) through AT-076 (AC-NFR-8-a)' as a verification batch. The Plan AC mapping anchors AT-074→AC-NFR-7-a, AT-075→AC-NFR-7-b, AT-076→AC-NFR-8-a; PV-6.C11 (no --no-verify) maps to AT-074 and PV-6.C12 (stdlib-only) maps to AT-076. AT-075 (vacuous-satisfied If-then) has no explicit PV-6 criterion mapping; the 'verification batch' phrasing collapses 14 individual ACs into one bullet, which obscures whether each AT-NNN has a corresponding PV criterion.",
+      "evidence": [
+        {"artifact": "phase-validators.md", "section": "PV-6 §Acceptance tests scheduled line 507"},
+        {"artifact": "phase-validators.md", "section": "PV-6.C11/C12 (lines 487-488)"},
+        {"artifact": "acceptance-tests.md", "section": "AT-074, AT-075, AT-076 (lines 1365-1408)"}
+      ],
+      "recommended_resolution": "Optional clarity polish. If addressed: replace the 'verification batch' bullet with an explicit per-AC list, OR add a one-line note clarifying that AT-075 is a vacuous-satisfied conditional whose precondition is asserted FALSE at Discovery (per AC-NFR-7-b If-then form)."
+    }
+  ],
+  "convergence": {
+    "verdict": "first_round",
+    "prior_issue_count": null,
+    "current_issue_count": 5,
+    "persistent_issues": [],
+    "severity_weighted_delta": null
+  },
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 5,
+    "INFO": 0
+  },
+  "coverage_matrix_summary": {
+    "ac_count_total": 60,
+    "ac_count_with_at_least_one_test": 60,
+    "ac_count_orphan": 0,
+    "test_count_total": 76,
+    "test_count_orphan": 0,
+    "plan_task_count_total": 40,
+    "plan_task_count_with_phase_validator_binding": 40,
+    "plan_task_count_with_at_least_one_satisfies_ac_link": 34,
+    "plan_task_count_tagged_na_setup_cleanup_communication": 6,
+    "fr_count_total": 11,
+    "fr_count_covered_by_plan": 11,
+    "fr_count_covered_by_tests": 11,
+    "nfr_count_total": 8,
+    "nfr_count_covered_by_plan": 8,
+    "nfr_count_covered_by_tests": 8,
+    "cc_layer_specific_ac_count": 7,
+    "cc_layer_specific_ac_covered": 7,
+    "operational_ac_count": 5,
+    "operational_ac_covered": 5,
+    "phase_validator_count": 11,
+    "plan_internal_phase_count": 8,
+    "phase_validators_match_plan_phases": true,
+    "phase_validator_to_phase_mapping_note": "11 validators map to 8 internal phases because Phase 2 is decomposed into PV-2a/2b/2c/2d sub-validators (4) plus a single PV for Phase 2 collectively is implicit in the union; PV-R covers Rollout. 8 phases + 3 Phase-2 sub-decompositions = 11 validator entries."
+  },
+  "bare_id_368_consistency_check": {
+    "verdict": "consistent",
+    "rationale": "Plan T3.1 enumerates the 368-occurrence inventory (ADR-0044: 223 + ADR-0045: 145); T3.3 executes per-occurrence disambiguation per AC-FR-9-b.1 procedure (heuristic + escalation); PV-3.C1/C4/C5/C6/C8 assert the inventory completeness, no-TBD disposition, rationale recording, escalation audit, and zero-unexpected-occurrence invariant; AT-038/039/040/041/062 cover the structural + audit-trail dimensions. Blueprint §AC-FR-9-b.1 + §Change Impact Map cycle-1 note + Risks-table all internally cite the same 368/223/145 figures."
+  },
+  "adr_0053_0054_0055_dependency_honor_check": {
+    "verdict": "honored",
+    "rationale": "ADR-0053 (renumber baseline AFTER FR-8c): Plan T2b.2 dependencies = [T2c.1, T2d.4]; PV-2b.2 prerequisites = [PV-2c, PV-2d.4]; AT-027/028 preconditions cite T2b.2 sequencing. ADR-0054 (three-surface enforcement): Plan T5.1+T5.2+T5.3 wire three surfaces; PV-5.C1/C2/C3/C4 assert same-script-same-args invariant; AT-043/044/045/072 cover the three-surface structural+integration. ADR-0055 (archive-wins): Plan T2d.1-T2d.4 implement the four sub-procedures; PV-2d.C3-C7 assert the four sub-procedures; AT-031/032/033/034 cover the consolidation outcomes."
+  },
+  "defect_prevention_feature_scoped_path_regression_check": {
+    "verdict": "no_regression",
+    "rationale": "Every occurrence of `working/feature/<slug>/adrs/` in the 4 artifacts is one of: (a) a path being DELETED by a migration task, (b) a grep target for VERIFYING absence, (c) the negative-path test fixture (`working/feature/test-fixture/`), (d) prose-quoted text inside a skill-audit remediation entry (i.e., the text being REMOVED from a skill), or (e) the validator's example output `findings[].path`. No artifact uses a feature-scoped path as a normative ADR location."
+  },
+  "verdict": "pass",
+  "verdict_rationale": "Zero BLOCKER and zero MAJOR issues. Five MINOR issues surfaced (4 consistency polish, 1 completeness polish), none of which block the load-bearing claims of any artifact. AC coverage is 60/60 (100%); FR coverage 11/11; NFR coverage 8/8; CC-layer-AC coverage 7/7; Operational-AC coverage 5/5; Plan task count matches frontmatter (40); every Plan phase has exactly one Phase Validator (11 validators / 8 internal phases + 3 Phase-2 sub-decompositions). The 368-occurrence bare-ID handling is internally consistent across Plan T3.1/T3.3, AT-038/039/040, and PV-3. ADR-0053/0054/0055 dependency ordering is honored at all three layers (Plan task dependencies, Phase Validator prerequisites, Acceptance Test preconditions). Defect-prevention check passes — no artifact uses a feature-scoped ADR path as a normative reference.",
+  "recommendation": "advance-to-task-decomposition",
+  "recommendation_rationale": "Per severity taxonomy: only MINOR issues → verdict pass; pass routes onward, not to reconciliation. The 5 MINOR issues are frontmatter polish + arithmetic-stale-text polish + ASCII-art clarity polish; finalize-task-decomposer can address them as part of normal artifact-finalization without a reconciliation cycle."
+}

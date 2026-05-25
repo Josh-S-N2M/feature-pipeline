@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "adr-placement-mechanism-repair-r1",
+  "scope_class": "FULL",
+  "scope_class_source": "intent-clarification.md frontmatter (declared, not inferred)",
+  "generated_at": "2026-05-25T00:00:00Z",
+  "generated_by": "finalize-deliverable-packager",
+  "spec_reference": ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md",
+  "verdict": "PASS",
+  "verdict_rationale": "All FULL-scope required artifacts present at expected paths and versions. All 3 newly-authored ADRs (0053/0054/0055 at v1.0.1) present at canonical /adrs/ root per ADR-0036. No feature-scoped adrs/ directory present — the defect this feature exists to repair has NOT regressed within its own deliverable archive. Zero BLOCKER, zero MAJOR, zero MINOR findings.",
+  "orchestrator_preconditions": {
+    "cwd_is_repo_root": true,
+    "dot_claude_exists": true,
+    "intent_clarification_present_and_valid": true,
+    "scope_class_declared": true
+  },
+  "artifacts_present": [
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/intent-clarification.md", "version": "2.0.1", "expected": true, "stage": "Intent Clarification"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/prd-v1.md", "version": "1.0.2", "expected": true, "stage": "PRD Authoring"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/research-plan.md", "version": "1.0.0", "expected": true, "stage": "Discovery Planning"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/codebase-analysis.json", "expected": true, "stage": "Discovery Research"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/codebase-analysis-report.md", "expected": true, "stage": "Discovery Research"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/synthesis.md", "version": "1.0.0", "expected": true, "stage": "Synthesis"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/cc-design.md", "version": "1.0.0", "expected": true, "stage": "per-layer Design (claude-code)"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/cc-dependencies.json", "expected": true, "stage": "per-layer Design (claude-code)"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/blueprint-v1.md", "version": "1.2.0", "expected": true, "stage": "Design Composition (post 2 reconciliation cycles)"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/architecture-audit-issues.json", "expected": true, "stage": "Architecture Audit (round 1)"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/architecture-audit-issues-r2.json", "expected": true, "stage": "Architecture Audit (round 2 / focused delta re-audit)"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/reconciliation-log-r1.md", "expected": true, "stage": "Reconciliation (cycle 1)"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/dispatch-r1.json", "expected": true, "stage": "Reconciliation dispatch (cycle 1)"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/plan-v1.md", "version": "1.0.1", "expected": true, "stage": "Plan Authoring"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/acceptance-tests.md", "version": "1.0.0", "expected": true, "stage": "Acceptance Test Authoring"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/phase-validators.md", "version": "1.0.0", "expected": true, "stage": "Phase Validator Authoring"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/cross-artifact-audit-issues.json", "expected": true, "stage": "Cross-Artifact Audit (round 1)"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/tasks.json", "expected": true, "stage": "Task Decomposition"},
+    {"path": "working/feature/adr-placement-mechanism-repair-r1/checkpoint.json", "expected": true, "stage": "(continuously updated)"}
+  ],
+  "artifacts_present_count": 19,
+  "artifacts_expected_required_count": 15,
+  "artifacts_missing_required": [],
+  "artifacts_missing_conditional_unjustified": [],
+  "artifacts_missing_conditional_justified": [
+    {
+      "path": "working/feature/adr-placement-mechanism-repair-r1/research-notes/",
+      "spec_requirement": "research-notes/<topic>.md (at least one)",
+      "justification": "research-plan.md frontmatter declares external_research_topic_count: 0. Discovery research consisted entirely of codebase analysis (codebase-analysis.json + codebase-analysis-report.md). Per Gate 3 approval, 0 external research topics was explicitly accepted. No <topic>.md files are expected.",
+      "severity": "INFO"
+    }
+  ],
+  "artifacts_unexpected": [],
+  "artifacts_unexpected_notes": "reconciliation-log-r1.md, dispatch-r1.json, and architecture-audit-issues-r2.json are not listed in the spec's required-artifacts table but are standard FULL-scope reconciliation/re-audit outputs per ADR-0017. Treated as expected; no MINOR finding.",
+  "adr_cross_location_findings": [
+    {
+      "adr_id": "ADR-0053",
+      "blueprint_declared": true,
+      "canonical_registry_path": "adrs/ADR-0053-adr-renumbering-collision-resolution-algorithm.md",
+      "canonical_present": true,
+      "canonical_version": "1.0.1",
+      "feature_scoped_path_checked": "working/feature/adr-placement-mechanism-repair-r1/adrs/",
+      "feature_scoped_present": false,
+      "compliant_with_ADR_0036": true
+    },
+    {
+      "adr_id": "ADR-0054",
+      "blueprint_declared": true,
+      "canonical_registry_path": "adrs/ADR-0054-canonical-helper-three-surface-enforcement-pattern.md",
+      "canonical_present": true,
+      "canonical_version": "1.0.1",
+      "feature_scoped_path_checked": "working/feature/adr-placement-mechanism-repair-r1/adrs/",
+      "feature_scoped_present": false,
+      "compliant_with_ADR_0036": true
+    },
+    {
+      "adr_id": "ADR-0055",
+      "blueprint_declared": true,
+      "canonical_registry_path": "adrs/ADR-0055-archive-wins-consolidation-policy-for-version-divergent-collisions.md",
+      "canonical_present": true,
+      "canonical_version": "1.0.1",
+      "feature_scoped_path_checked": "working/feature/adr-placement-mechanism-repair-r1/adrs/",
+      "feature_scoped_present": false,
+      "compliant_with_ADR_0036": true
+    }
+  ],
+  "defect_prevention_confirmation": {
+    "feature_intent": "Repair the ADR placement mechanism so newly-authored ADRs land at canonical adrs/ only, per ADR-0036.",
+    "self_consistency_check": "PASS",
+    "empirical_evidence": "Glob of working/feature/adr-placement-mechanism-repair-r1/adrs/**/* returned ZERO matches. All 3 newly-authored ADRs (0053/0054/0055) reside exclusively at /workspaces/feature-pipeline/adrs/ canonical root. The very defect this feature was authored to repair has NOT regressed within its own deliverable archive — confirming the upstream pipeline correctly honored single-location ADR placement during this run.",
+    "blueprint_minor_3_absorption_honored": true,
+    "blueprint_minor_3_absorption_note": "Blueprint v1.2.0 directed absorption of feature-scoped adrs/ subdirectory; the directory is empirically absent."
+  },
+  "reviewer_findings": {
+    "reviewer_invoked": "shared-document-reviewer (doc_type: DeliverableArchive)",
+    "gate_0_structural": "PASS",
+    "gate_0_notes": "All required artifacts present at expected paths and named per convention. Versioning suffix convention (*-v<N>.md) honored. Frontmatter present and well-formed on all reviewed documents.",
+    "gate_1_quality": "PASS",
+    "gate_1_notes": "Versions internally consistent: prd v1.0.2 ↔ blueprint v1.2.0 ↔ plan v1.0.1, with cross-references in cross-artifact-audit-issues.json matching. ADR versions (all v1.0.1) reflect the reconciliation-cycle-1 amendment recorded in Blueprint frontmatter (lines 29-31). Audit-trail completeness: r1 audit → reconciliation-log-r1 + dispatch-r1 → r2 audit forms a coherent reviewer cycle per ADR-0017.",
+    "issues": []
+  },
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 0,
+    "INFO": 1
+  },
+  "info_findings": [
+    {
+      "id": "I-DP-001",
+      "severity": "INFO",
+      "category": "acknowledged_conditional_skip",
+      "description": "research-notes/ directory contains no files; this is the expected state per research-plan.md's declared external_research_topic_count: 0. No action required."
+    }
+  ],
+  "handoff_drafting_performed": false,
+  "handoff_drafting_skip_reason": "version_tag input not provided; handoff drafting is opt-in per finalize-deliverable-packager spec.",
+  "final_approval_gate_notes": "Archive is complete and self-consistent. The feature successfully repaired the defect it was authored to address (ADR-placement mechanism per ADR-0036), demonstrated empirically by zero ADRs landing in the feature-scoped adrs/ subdirectory. Recommend PASS to the Final Approval Gate."
+}

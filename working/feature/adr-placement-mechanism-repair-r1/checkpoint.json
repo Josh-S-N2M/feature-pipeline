@@ -1,0 +1,52 @@
+{
+  "run_id": "adr-placement-mechanism-repair-r1-20260524-183201",
+  "feature_slug": "adr-placement-mechanism-repair-r1",
+  "started_at": "2026-05-24T18:32:01Z",
+  "completed_at": "2026-05-24T21:30:00Z",
+  "current_stage": "complete",
+  "stage_status": "passed",
+  "gate_history": [
+    {"gate": "intent_confirmation", "decision": "approved", "timestamp": "2026-05-24T18:55:00Z", "artifact_version": "intent-clarification v2.0.1", "user_notes": "v1.1.0 binding override expanded scope MINOR→FULL. v2.0.0 re-authored; re-run gate approved with OI-2 override (consolidate adrs-migrated/)."},
+    {"gate": "prd_approval", "decision": "approved", "timestamp": "2026-05-24T19:10:00Z", "artifact_version": "prd v1.0.2", "user_notes": "MINORs folded in (v1.0.0→v1.0.2)."},
+    {"gate": "research_plan_approval", "decision": "approved", "timestamp": "2026-05-24T19:20:00Z", "artifact_version": "research-plan v1.0.0", "user_notes": "0 external research; 12 codebase INs."},
+    {"gate": "blueprint_approval", "decision": "approved", "timestamp": "2026-05-24T20:00:00Z", "artifact_version": "blueprint v1.0.0", "user_notes": "Defect-prevention check PASSED. 3 MINORs deferred to Plan."},
+    {"gate": "plan_approval", "decision": "approved", "timestamp": "2026-05-24T21:00:00Z", "artifact_version": "plan v1.0.1", "user_notes": "MAJOR fixed; 3 MINOR defer."},
+    {"gate": "final_approval", "decision": "approved_auto_mode", "timestamp": "2026-05-24T21:30:00Z", "artifact_version": "packager-report PASS", "user_notes": "Auto-mode reasonable call: packager returned PASS with zero findings; defect-prevention self-consistency check PASSED."}
+  ],
+  "artifact_versions": {
+    "intent_clarification": "2.0.1",
+    "prd": "1.0.2",
+    "research_plan": "1.0.0",
+    "codebase_analysis": "1.1.0",
+    "synthesis": "1.0.0",
+    "cc_design": "1.0.0",
+    "blueprint": "1.2.0",
+    "adr_0053": "1.0.1",
+    "adr_0054": "1.0.1",
+    "adr_0055": "1.0.1",
+    "plan": "1.0.1",
+    "acceptance_tests": "1.0.0",
+    "phase_validators": "1.0.0",
+    "tasks": "1.0.0"
+  },
+  "reconciliation_cycles": {
+    "blueprint": 2,
+    "cross_artifact": 0
+  },
+  "activated_layers": ["claude-code"],
+  "scope_class": "FULL",
+  "bare_id_full_sweep_user_binding": "AA-011 escalation 2026-05-24: user chose full sweep (all 368 occurrences). Plan T3.3 + AT-038/039/040/041/062 + PV-3 cover.",
+  "user_binding_open_item_overrides": {
+    "OI-2_adrs_migrated_disposition": "OVERRIDDEN: consolidate (interpretation a) — adds Phase 2d",
+    "Discovery_OQ-1_ADR_0044_0045_collision": "DEFERRED_TO_DESIGN_COMPOSITION — resolved by ADR-0053 (post-Phase-2d max+1)",
+    "Discovery_OQ-2_archive_vs_canonical": "BINDING: archive wins for 7 collisions (8th = canonical-wins per ADR-0055)",
+    "AA-011_bare_id_sweep_scope": "BINDING: full sweep (all 368 occurrences)"
+  },
+  "final_state": {
+    "defect_prevention_check": "PASSED — all 3 new ADRs at canonical adrs/, none at feature-scoped",
+    "packager_verdict": "PASS — 19 artifacts present, 0 BLOCKER/MAJOR/MINOR",
+    "tasks_json_count": 40,
+    "tasks_json_dag_edges": 103,
+    "critical_path_length": 12
+  }
+}

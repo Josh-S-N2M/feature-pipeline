@@ -1,0 +1,813 @@
+{
+  "schema_version": "1.1.0",
+  "metadata": {
+    "pipeline_run_id": "adr-placement-mechanism-repair-r1-20260524-183201",
+    "slug": "adr-placement-mechanism-repair-r1",
+    "generated_at": "2026-05-24T19:45:00Z",
+    "generated_by": "discovery-codebase-researcher",
+    "extraction_method": "grep+find+Read (GitNexus MCP available but not invoked; the .md-only corpus + repo-wide grep delivers higher precision than a Cypher graph query for this content-search-dominant analysis; KB-codebase-research SKILL.md endorses Read/Grep/Glob for ground-truth verification)",
+    "schema_version_basis": "v1.1.0 per ADR-0018 + ADR-0038 (blast-radius extension)"
+  },
+  "scope": {
+    "repo": "feature-pipeline",
+    "branch": "main",
+    "paths": [
+      ".claude/agents/finalize-deliverable-packager.md",
+      ".claude/agents/shared-document-reviewer.md",
+      ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      ".claude/agents/design-composer.md",
+      ".claude/skills/auditing-shared/",
+      "adrs/",
+      "adrs-migrated/",
+      "working/feature/**/adrs/",
+      ".claude/skills/KB-documentation-criteria/",
+      ".claude/skills/auditing-*/",
+      ".claude/skills/synthesize*/",
+      ".claude/skills/KB-review-disciplines/",
+      ".claude/skills/recipe-feature-pipeline/",
+      "Issues/**/*.md",
+      "README.md"
+    ]
+  },
+  "information_needs": [
+    {
+      "id": "IN-001",
+      "question": "Byte-by-byte content equivalence between each of the 12 nominally-byte-identical feature-scoped ADRs and their canonical counterparts?",
+      "findings": [
+        "All 12 nominally byte-identical ADR pairs are CONFIRMED IDENTICAL via `diff -q`.",
+        "ADR-0026 (audit-machinery-fixes-r1) — identical.",
+        "ADR-0028 (pipeline-skill-design-fixes-r1) — identical.",
+        "ADR-0029, ADR-0030, ADR-0031 (audit-findings-remediation-r1) — all 3 identical.",
+        "ADR-0037 through ADR-0043 (devcontainer-mcp-provisioning-r1) — all 7 identical.",
+        "Note: source feature folders are NOT just frontend-design-knowledge-r1 and issue-capture-mechanism-r1 per PRD framing; the duplicates span FOUR feature folders. PRD scope of 'feature-scoped sources' is materially under-specified."
+      ],
+      "sources": [
+        "diff -q /workspaces/feature-pipeline/adrs/ADR-NNNN-*.md /workspaces/feature-pipeline/working/feature/*/adrs/ADR-NNNN-*.md per ADR",
+        "ls /workspaces/feature-pipeline/working/feature/{audit-machinery-fixes-r1,pipeline-skill-design-fixes-r1,audit-findings-remediation-r1,devcontainer-mcp-provisioning-r1}/adrs/"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-002",
+      "question": "Body diffs for the 3 'divergent' ADRs (ADR-0024, ADR-0044, ADR-0045)?",
+      "findings": [
+        "ADR-0024 (frontend-design-knowledge-corpus-structure): differs by ONE line — frontmatter `status: Accepted` (canonical) vs `status: Proposed` (feature). Same body otherwise. This is not a 'divergent body' — it is a status-lift case (canonical is the accepted version). The rejected-body archival framing in FR-8b is overkill for this case.",
+        "ADR-0044 collision: canonical 'ADR-0044-flatten-execution-dispatch-hierarchy' is a COMPLETELY DIFFERENT decision from feature 'ADR-0044-per-issue-folder-model'. This is NOT a divergent body — it is a NUMBERING COLLISION where two ADRs share the same numeric ID by accident. FR-8b 'pick canonical body, archive rejected body' framing is structurally inapplicable.",
+        "ADR-0045 collision: same shape — canonical 'subagent-agent-tool-grant-prohibition' is a different decision from feature 'three-doctypes-preserved'. NUMBERING COLLISION, not divergent body.",
+        "CRITICAL IMPLICATION: the PRD's FR-8b framing treats ADR-0024/0044/0045 as one homogeneous 'divergent' bucket. Discovery finds 1 status-lift case (ADR-0024) + 2 numbering-collision cases (ADR-0044, ADR-0045). The feature-side ADR-0044 + ADR-0045 must be RE-NUMBERED to the next-available canonical IDs (currently 0046+ already claimed by issue-capture-mechanism-r1/adrs, so the new numbers must come after the FR-8c relocations land — likely ADR-0051 + ADR-0052).",
+        "Verified: highest ADR number currently in canonical `adrs/` is 0045; ADRs 0046-0050 will land at canonical via FR-8c."
+      ],
+      "sources": [
+        "diff -u adrs/ADR-0024-*.md working/feature/frontend-design-knowledge-r1/adrs/ADR-0024-*.md",
+        "head -20 adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md vs working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md",
+        "head -20 adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md vs working/feature/issue-capture-mechanism-r1/adrs/ADR-0045-three-doctypes-preserved.md"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-003",
+      "question": "Exact file inventory inside adrs-migrated/ (47 files), classified into final-variant / -pre-naming-convention / -pre-template-migration per FR-8d?",
+      "findings": [
+        "Verified count: 47 files in adrs-migrated/. Confirms PRD framing.",
+        "Per-ADR breakdown for IDs 0001-0018:",
+        "  ADR-0001..ADR-0006: 3 files each (final + pre-naming + pre-template) = 18 files.",
+        "  ADR-0007: 4 files (pre-naming + v1-pre-template + v1-superseded + v2-pre-template). NO final variant in adrs-migrated/. Canonical version exists at adrs/ADR-0007-code-graph-mcp-selection.md.",
+        "  ADR-0008..ADR-0010: 3 files each (final + pre-naming + pre-template) = 9 files.",
+        "  ADR-0011: 2 files (final + pre-naming). NO pre-template-migration variant.",
+        "  ADR-0012..ADR-0018: 2 files each (final + pre-naming) = 14 files. NO pre-template-migration variant for any.",
+        "PRD hypothesis 'ADRs 0001–0010 only' is WRONG. Archive contains 18 distinct ADR IDs (0001-0018). 47 = 18 final variants + 18 pre-naming-convention + 11 pre-template-migration. Of the 47: 17 final-variants (ADR-0007 has none), 18 pre-naming-convention, 11 pre-template-migration, 1 v1-superseded (ADR-0007 only).",
+        "Counts: final=17, pre-naming-convention=18, pre-template-migration=11, v1-superseded=1. Total: 47. Verified."
+      ],
+      "sources": [
+        "ls /workspaces/feature-pipeline/adrs-migrated/ | wc -l (47)",
+        "per-ADR ls loop covering 0001-0018"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-004",
+      "question": "Numbering collisions when consolidating adrs-migrated/ into canonical adrs/?",
+      "findings": [
+        "COLLISIONS EXIST. The PRD default hypothesis 'no collisions because canonical lacks 0001–0010' is correct ONLY for IDs 0001-0010 (none present in canonical). For IDs 0011-0018, BOTH canonical adrs/ AND adrs-migrated/ have a final-variant file with the same name.",
+        "Per-ID collision result (canonical-vs-archive final-variant, content diff):",
+        "  ADR-0011-documentation-criteria-canonical-skill.md: COLLISION + DIVERGENT (canonical v1.0.0 'documentation-criteria', archive v2.0.0 'KB-documentation-criteria' — naming-convention retroactive update).",
+        "  ADR-0012-prd-stage.md: COLLISION + DIVERGENT.",
+        "  ADR-0013-blueprint-template-adoption.md: COLLISION + DIVERGENT.",
+        "  ADR-0014-adr-template-adoption-and-migration.md: COLLISION + DIVERGENT.",
+        "  ADR-0015-ears-acceptance-criteria.md: COLLISION + DIVERGENT.",
+        "  ADR-0016-per-layer-fanout-composer-fanin.md: COLLISION + DIVERGENT.",
+        "  ADR-0017-document-reviewer-integration.md: COLLISION + DIVERGENT.",
+        "  ADR-0018-codebase-analysis-schema.md: COLLISION + DIVERGENT (canonical has supersession-by-ADR-0038 marker; archive does not).",
+        "All 8 collisions have content divergence at frontmatter line 3 (`version:`). The archive version is newer (v2.0.0 with retroactive naming-convention updates per ADR-0019) for ADRs 0011-0017. The canonical version of ADR-0018 carries the latest semantic update (supersession marker by ADR-0038).",
+        "ADR-0007 is also a content-divergence case (canonical exists; archive has no final variant but has multiple version snapshots).",
+        "RESOLUTION REQUIRED for FR-8d: the Blueprint must specify which version wins per collision (canonical or archive) and whether the -superseded suffix applies. The simple 'final variants move with -superseded suffix' policy in FR-8d does NOT cover the case where canonical is already the current truth and the archive has a stale 'final'."
+      ],
+      "sources": [
+        "for n in 0011..0018: diff canonical archive final-variant",
+        "Sample full diff for ADR-0011 confirms divergence in naming-convention names throughout body"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-005",
+      "question": "How does the orchestrator's output_adrs_dir parameter resolve today?",
+      "findings": [
+        "recipe-feature-pipeline/SKILL.md line 273 is a SINGLE line listing all design-composer parameters by name only. NO default value is specified for output_adrs_dir anywhere in that file. No surrounding section defines defaults.",
+        "design-composer.md line 48 defines output_adrs_dir as 'directory where any new ADRs you author land'. No default specified.",
+        "Line 129 in design-composer.md uses `output_adrs_dir/ADR-<NNNN>.md` as the write target (relative form).",
+        "Line 187 in design-composer.md confirms the output contract: `output_adrs_dir/ADR-<NNNN>.md` — one file per new ADR.",
+        "Default resolution today is IMPLICIT and at the caller's discretion: the orchestrator does not pass an explicit value, design-composer treats it as required, and any path the caller (or the live invocation) supplies wins. Historically the implicit default has resolved to `working/feature/<slug>/adrs/` based on observed behavior at devcontainer-mcp-provisioning-r1 and issue-capture-mechanism-r1.",
+        "FR-3 edit must therefore both (a) define the explicit canonical default and (b) document this in design-composer.md per FR-4."
+      ],
+      "sources": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md:273 (verified)",
+        ".claude/agents/design-composer.md:48, 129, 187 (verified)"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-006",
+      "question": "Actual current line ranges for retired BLOCKER prose and post-ADR-0036 statement in operator files?",
+      "findings": [
+        "finalize-deliverable-packager.md lines 56-63: CONFIRMED — '### 3. ADR cross-location check' section requires both feature-scoped AND canonical-root presence (the retired dual-location BLOCKER per FR-1).",
+        "  Lines 56-63 verbatim contain: '### 3. ADR cross-location check\\n\\nFor each ADR ID listed in Blueprint's `adrs_authored`:\\n\\n- Verify `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md` exists → BLOCKER if missing.\\n- Verify `adrs/ADR-NNNN-<title>.md` exists in project registry → BLOCKER if missing.\\n\\n(Note: the title in the project registry may differ from the slug — match by ID, not filename suffix.)'",
+        "  File total: 142 lines. PRD-cited line range is exact, no drift.",
+        "shared-document-reviewer.md line 349: CONFIRMED — contains the dual-location BLOCKER reference verbatim: '6. ADR cross-location check: for each ADR ID in Blueprint's `adrs_authored:` frontmatter, verify presence at both `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md` AND `adrs/ADR-NNNN-<title>.md` (matched by ID). Missing at either → BLOCKER.'",
+        "shared-document-reviewer.md lines 470-472: CONFIRMED — '### ADR placement (per ADR-0036)\\n\\nWhen reviewing ADRs, expect a single canonical location: `adrs/ADR-NNNN-<slug>.md` at project root. Do NOT flag absence of a `working/feature/<slug>/adrs/` mirror copy — that convention is retired.'",
+        "  File total: 473 lines. PRD-cited line ranges are exact, no drift."
+      ],
+      "sources": [
+        ".claude/agents/finalize-deliverable-packager.md:56-63 (Read verbatim, verified)",
+        ".claude/agents/shared-document-reviewer.md:349 (Read verbatim, verified)",
+        ".claude/agents/shared-document-reviewer.md:470-472 (Read verbatim, verified)"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-007",
+      "question": "Actual current line ranges for output_adrs_dir parameter mentions in design-composer.md?",
+      "findings": [
+        "Line 48: '- `output_adrs_dir` — directory where any new ADRs you author land.' (Inputs section.)",
+        "Line 129: 'Write to `output_adrs_dir/ADR-<NNNN>.md`. Use the next available ADR number (read existing ADRs to find the highest, increment).' (Phase 4 procedure.)",
+        "Line 187: '- `output_adrs_dir/ADR-<NNNN>.md` — one file per new ADR (zero or more).' (Output section.)",
+        "File total: 206 lines. PRD-cited line ranges are exact, no drift.",
+        "Verified via `grep -n` and direct `Read`. All three sites are short single-line references that the FR-4 edit can transform into canonical-default-stating prose with ADR-0036 citation."
+      ],
+      "sources": [
+        "grep -n 'output_adrs_dir' .claude/agents/design-composer.md",
+        ".claude/agents/design-composer.md (Read entire file)"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-008",
+      "question": "Complete inventory of in-repository cross-references to a relocated or deduplicated ADR?",
+      "findings": [
+        "Cross-reference COUNTS by target ADR (any form, includes prose + path):",
+        "  Relocation targets (FR-8c, 5 ADRs): ADR-0046: 74, ADR-0047: 72, ADR-0048: 45, ADR-0049: 51, ADR-0050: 144.",
+        "  Reconciliation/collision (FR-8b cases): ADR-0024: 44, ADR-0044: 223, ADR-0045: 145.",
+        "  Dedupe targets (FR-8a, 12 ADRs): counts range 25-375 per ID.",
+        "Most of these references are PROSE citations, not path-form references. The FR-9 sweep concerns only the PATH-form subset.",
+        "PATH-FORM references to feature-scoped working/feature/.../adrs/ paths (the FR-9 sweep set, excluding this feature's own working dir): 14 hits across:",
+        "  Issues/adr-placement-rootcause/analysis.md:258",
+        "  Issues/per-agent-design-evaluation-gap/analysis.md:16, 64",
+        "  Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md:11",
+        "  Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md:18",
+        "  Issues/adr-placement-rootcause/proposal.md:75",
+        "  working/feature/issue-capture-mechanism-r1/reconciliation-log-r2.md:127",
+        "  working/feature/issue-capture-mechanism-r1/blueprint-v3.md:1346",
+        "  working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-2.md:65",
+        "  working/feature/audit-findings-remediation-r1/synthesis.md:12",
+        "  .claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md:96, 99",
+        "  .claude/skills/capture-issue/SKILL.md:44",
+        "  adrs/ADR-0036-single-location-adr-placement.md:107 (illustrative symlink example; NOT a real cross-reference; per FR-9b path-only edits, NO change needed because it's a rejected-option example)",
+        "PATH-FORM references to adrs-migrated/ADR-NNNN (the FR-8d post-consolidation sweep set): 18 hits including phase-validators.md, codebase-analysis-report.md, plan-v1.md, blueprint-v*.md across devcontainer-mcp-provisioning-r1 and issue-capture-mechanism-r1.",
+        "Pattern-completeness check (OI-4): the IN-008 grep-pattern floor in the Research Plan is reasonable but Discovery identified 3 additional edge cases worth noting: (a) MERMAID diagrams in *.md may contain Person()/Node() definitions referencing ADR paths — verified absent for ADR paths; (b) frontmatter arrays `adrs_inherited:` `adrs_authored:` `supersedes:` `superseded_by:` use bare ADR-NNNN form — captured by the bare-ID grep; (c) prose forms like 'see ADR-NNNN' and 'per ADR-NNNN' do not contain a path and so are not in scope for FR-9 path-only sweep.",
+        "Frontmatter pattern hits: the `supersedes:` `superseded_by:` `subsumes:` `related:` `pairs_synthesis_decisions:` patterns are present across feature artifacts but ALL use bare ADR-NNNN form (no path); they are NOT in the FR-9 path-sweep scope. The grep-pattern floor adequately captures the in-scope subset."
+      ],
+      "sources": [
+        "grep -rEn 'ADR-XXXX' across all .md files, per ID",
+        "grep -rEn 'working/feature/[^/]+/adrs/ADR-' --include='*.md'",
+        "grep -rEn 'adrs-migrated/ADR-' --include='*.md'"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-009",
+      "question": "Three enforcement-surface integration points for the FR-10 validator?",
+      "findings": [
+        "Surface (a) — Orchestrator stage gate: recipe-feature-pipeline/SKILL.md Step 8 (Design Composition) is the natural insertion point. It runs design-composer (which writes ADRs), then shared-document-reviewer, then Gate 4. The validator call belongs BETWEEN design-composer return and shared-document-reviewer invocation — i.e., as a pre-reviewer mechanical check. Alternative surface: as part of Step 13 (Task Decomposition) or Step 14 (Deliverable Packaging). The Step-8 location is most defensible because it catches the violation at the moment of authoring, before any other artifact is touched.",
+        "Surface (b) — Execution-pipeline hook: per ADR-0044 flatten, the parent recipe-feature-pipeline orchestrator dispatches 4 execution specialists (execute-task-code-producer, execute-task-quality-handler, execute-phase-quality-reviewer, execute-finalize-reconciler). The natural integration is at execute-phase-quality-reviewer, which already invokes `run_phase_checks.py` (line 18, 54 in execute-phase-quality-reviewer.md). `run_phase_checks.py` (line 39-44) parallel-dispatches existing check scripts (audit_workflow.py, audit_codespaces.py, audit_project.py, validate_pipeline_frontmatter.py, check_pipeline_discipline.py). Adding the FR-10 validator as one more parallel entry conforms to the established pattern with zero new hook surface introduced.",
+        "  Alternative: execute-task-quality-handler.md line 62-63 invokes validate_pipeline_frontmatter.py directly. The FR-10 validator could be co-invoked here, but per-phase invocation in run_phase_checks.py is the more economical option (one repo-wide scan per phase rather than per-task).",
+        "Surface (c) — Packager check call-site: finalize-deliverable-packager.md '### 3. ADR cross-location check' at lines 56-63 (the retired BLOCKER prose) is the EXACT call-site for the replacement. FR-1 deletes that prose; FR-10 inserts a subprocess call to the validator at the same procedural location, emitting BLOCKER findings into the packager-report.json in the same shape as the existing dual-location BLOCKER did.",
+        "All three surfaces are non-redundant (per NFR-6): orchestrator surface (a) catches author-time violations PRE-review; execution-pipeline surface (b) catches runtime violations during phase execution (catches violations introduced by per-task-code-producer); packager surface (c) catches finalize-time violations as the last line of defense before Gate 6."
+      ],
+      "sources": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md Step 8 + Step 14",
+        ".claude/agents/execute-phase-quality-reviewer.md:18, 54",
+        ".claude/agents/execute-task-quality-handler.md:62-63",
+        ".claude/skills/auditing-shared/scripts/run_phase_checks.py:39-72 (dispatch pattern)",
+        ".claude/agents/finalize-deliverable-packager.md:56-63"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-010",
+      "question": "Existing validation-script invocation patterns used by auditing-shared/scripts/?",
+      "findings": [
+        "CLI shape: positional args, Python stdlib only. Examples: `python3 pedagogical_marker_check.py <skill-path> <findings.json>`, `python3 scan_memory_secrets.py <path>`.",
+        "Imports observed across the scripts directory (in order of prevalence): json, re, sys, pathlib.Path, typing, argparse, concurrent.futures, subprocess. Strictly stdlib — no third-party dependencies. Matches NFR-8 posture.",
+        "Exit-code convention: `sys.exit(0)` for clean, `sys.exit(2)` for blocker-present (the 'canonical blocker present' code recognized by run_phase_checks.py line 59). Non-canonical non-zero codes are treated as failures by the coordinator.",
+        "Output format: JSON to stdout, structured per the script's purpose. run_phase_checks.py parses each script's stdout as JSON; non-JSON stdout is surfaced as an _error finding.",
+        "Subprocess dispatch shape: run_phase_checks.py uses `subprocess.run(args, capture_output=True, text=True, timeout=120)`. Default 120s timeout per invocation.",
+        "Canonical-home pattern (per ADR-0031): scripts live at .claude/skills/auditing-shared/scripts/; family-coordinator skills (auditing-cc-configs, auditing-github-actions, auditing-codespaces, etc.) subprocess-dispatch into the canonical scripts rather than maintaining copies.",
+        "Test fixtures: auditing-shared/scripts/test_fixtures/ exists. Self-test convention: smoke_test_auditing_shared.py exists at the scripts/ root.",
+        "Recommendation: FR-10 validator name should be `validate_adr_placement.py` (mirrors `validate_pipeline_frontmatter.py` naming), live at .claude/skills/auditing-shared/scripts/, accept zero or one positional arg (repo root, defaulting to cwd), emit JSON findings to stdout, exit 0 on clean / 2 on violations, and be added to run_phase_checks.py's parallel dispatch set."
+      ],
+      "sources": [
+        ".claude/skills/auditing-shared/scripts/pedagogical_marker_check.py (lines 1-32)",
+        ".claude/skills/auditing-shared/scripts/scan_memory_secrets.py (lines 1-23)",
+        ".claude/skills/auditing-shared/scripts/run_phase_checks.py (lines 1-72)",
+        ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py (named in run_phase_checks)"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-011",
+      "question": "Complete list of skills that documents or enables ADR authoring/placement?",
+      "findings": [
+        "Skill inventory in scope: 45 total skills under .claude/skills/. Categories: 25 KB- skills (per-layer + cross-cutting), 10 auditing-* skills, 9 synthesize-class + non-prefixed skills (synthesize, claim-extraction-knowledge, entity-graph-knowledge, decision-framing-knowledge, report-composition-knowledge, substrate-translation-knowledge, verification-knowledge, capture-issue, ai-development-guide), 1 recipe- skill (recipe-feature-pipeline).",
+        "Skills CONFIRMED to contain prose enabling or documenting ADR placement:",
+        "  1. recipe-feature-pipeline/SKILL.md (orchestrator; line 273 names output_adrs_dir as a passthrough parameter without default) — FR-3 target.",
+        "  2. KB-documentation-criteria/references/disciplines/design-composition.md (lines 36, 295 — STILL says 'ADR files at working/feature/<slug>/adrs/ADR-NNNN-<slug>.md'. Direct contradiction of ADR-0036.) — FR-11 update required.",
+        "  3. KB-documentation-criteria/references/deliverable-archive-spec.md (multi-line — already amended per ADR-0036 with the post-amendment 'canonical-only' statement at line 140-184. Backward-compat clause at line 150 says 'pre-ADR-0036 archives... validator ignores those directories' which becomes inconsistent with the FR-10 validator's no-allowlist policy after FR-8d completes. Subtle re-amendment may be needed.) — FR-11 review-with-likely-update.",
+        "  4. KB-documentation-criteria/references/shared-conventions.md (line 302 — already aligned with ADR-0036; 'ADRs live in exactly one canonical location'.) — FR-11 no-change-with-rationale.",
+        "  5. KB-documentation-criteria/references/templates/issue-register-template.md (lines 96, 99 — uses working/feature/issue-capture-mechanism-r1/adrs/ paths as EXAMPLES. Will become stale after FR-8c relocates ADR-0046-0050.) — FR-11 update (path-only example refresh).",
+        "  6. KB-issue-capture/SKILL.md (line 72 — example references to working/feature/issue-capture-mechanism-r1/adrs/. Same staleness as 5.) — FR-11 update (path-only).",
+        "  7. capture-issue/SKILL.md (line 44 — same as 5/6.) — FR-11 update (path-only).",
+        "  8. synthesize/SKILL.md (lines 22, 240 — writes ADRs at output/synthesis-<topic>/adrs/. This is a DIFFERENT use case (synthesize is a separate skill from the feature pipeline) but it IS non-canonical ADR placement. Open question: is synthesize's output ADR mechanism in scope for the validator allowlist? Design Composition needs to decide.) — FR-11 review-with-explicit-disposition needed.",
+        "Skills CONFIRMED CLEAN (no FR-11 finding):",
+        "  - All 10 auditing-* skills (auditing-cc-configs, auditing-codespaces, auditing-context-files, auditing-github-actions, auditing-hooks, auditing-mcp, auditing-settings, auditing-shared, auditing-skills, auditing-subagents). None contain 'working/feature/.*/adrs', 'output_adrs_dir', 'feature-scoped', or 'dual-location' in their SKILL.md.",
+        "  - KB-review-disciplines (no matches).",
+        "  - KB-task-decomposition (no matches).",
+        "  - All other per-layer KB skills (KB-cc-design, KB-cc-platform, KB-frontend-design, KB-backend-design, etc.) — no ADR-placement guidance.",
+        "  - 6 synthesize-class knowledge skills (claim-extraction-knowledge, entity-graph-knowledge, decision-framing-knowledge, report-composition-knowledge, substrate-translation-knowledge, verification-knowledge) — references/ files exist but none contain 'working/feature/.*/adrs' or 'output_adrs_dir' prose.",
+        "PRD Assumption A5 says 5 skill families. Discovery surfaces 8 individual skill files with prose-or-template fragments — these cluster into 4 families (KB-documentation-criteria, KB-issue-capture/capture-issue, recipe-feature-pipeline, synthesize). The auditing-* family and KB-review-disciplines and synthesize-class knowledge skills are CLEAN. Assumption A5 is broadly correct but the audit-table population must list the specific files (not just families) — 8 files."
+      ],
+      "sources": [
+        "ls /workspaces/feature-pipeline/.claude/skills/",
+        "grep -rln 'output_adrs_dir|working/feature/.*/adrs|feature-scoped|dual-location|adrs/ADR-' (full skills tree)"
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "IN-012",
+      "question": "For each skill in the FR-11 audit scope, what concrete prose or template fragments could permit feature-scoped ADR placement?",
+      "findings": [
+        "Per-skill disposition (no-change-with-rationale vs update-with-fix):",
+        "  recipe-feature-pipeline/SKILL.md:273 — UPDATE-WITH-FIX. The parameter list passes output_adrs_dir to design-composer without specifying a default. Fix: add a default-value annotation (e.g., 'output_adrs_dir (default: \"adrs/\")') and a parenthetical citation of ADR-0036.",
+        "  KB-documentation-criteria/references/disciplines/design-composition.md:36 — UPDATE-WITH-FIX. Replace 'Plus zero or more ADR files at `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md`' with 'Plus zero or more ADR files at `adrs/ADR-NNNN-<slug>.md` per ADR-0036.'",
+        "  KB-documentation-criteria/references/disciplines/design-composition.md:295 — UPDATE-WITH-FIX. Same substitution as line 36 (occurs twice in the file).",
+        "  KB-documentation-criteria/references/deliverable-archive-spec.md:150 — REVIEW-WITH-LIKELY-UPDATE. The backward-compat clause 'Pre-ADR-0036 archives that contain working/feature/<slug>/adrs/ directories are not retroactively cleaned. The validator ignores those directories' is now INCONSISTENT with FR-10's no-allowlist policy + FR-8c's full relocation. After this feature ships, NO such directories exist anywhere; the clause becomes stale comfort prose. Fix: remove the clause, or amend to 'after the adr-placement-mechanism-repair-r1 feature ships (2026-XX-XX), all such directories have been migrated; the validator no longer needs an allowlist.'",
+        "  KB-documentation-criteria/references/deliverable-archive-spec.md:140, 144, 164, 181 — NO CHANGE. These are the post-ADR-0036 canonical-only statements; they are correct as-is.",
+        "  KB-documentation-criteria/references/shared-conventions.md:302 — NO CHANGE. Already aligned with ADR-0036.",
+        "  KB-documentation-criteria/references/templates/issue-register-template.md:96, 99 — UPDATE-WITH-FIX (path-only). Example paths point to working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-* and ADR-0050-*. After FR-8c relocates these, the example paths become broken-link examples. Fix: rewrite examples to canonical adrs/ADR-NNNN-* form (or use generic <slug>/<id> template placeholders).",
+        "  KB-issue-capture/SKILL.md:72 — UPDATE-WITH-FIX (path-only). 'All ADR paths are relative to `working/feature/issue-capture-mechanism-r1/adrs/`' is a worked-example header that the relocation breaks. Fix: rewrite as canonical-path-form examples.",
+        "  capture-issue/SKILL.md:44 — UPDATE-WITH-FIX (path-only). Same pattern as 6.",
+        "  synthesize/SKILL.md:22, 240 — REVIEW-WITH-EXPLICIT-DISPOSITION. synthesize's output ADRs land at `output/synthesis-<topic>/adrs/ADR-NNN-<slug>.md` — a fundamentally different output target than the feature pipeline. Design Composition must decide: (a) declare synthesize-ADRs out-of-scope for FR-10 validator (validator allowlists `output/synthesis-*/adrs/`); (b) re-target synthesize's ADR output to canonical adrs/ (large scope expansion); (c) deprecate synthesize's ADR-emission entirely. The default expectation is (a) with an explicit allowlist entry per FR-10 AC-FR-10-f.",
+        "Total FR-11 update count: 8 file-level updates required (6 with fixes determined; 2 with explicit-disposition needed at Design Composition). One file (shared-conventions.md) is confirmed no-change. Two file-level entries within deliverable-archive-spec.md (one update + one no-change) — the file is partially updated.",
+        "PRD AC-NFR-4-a says every audited skill carries a disposition. Discovery's audit-table draft satisfies AC-NFR-4-a with 8 update-with-fix dispositions (none left as TBD)."
+      ],
+      "sources": [
+        "Line-by-line Read of each cited file",
+        "Cross-check with PRD's FR-11 scope definition"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "components": [
+    {
+      "name": "finalize-deliverable-packager",
+      "path": ".claude/agents/finalize-deliverable-packager.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "Claude Code agent (model: opus, effort: medium)",
+      "entry_points": ["Invoked by recipe-feature-pipeline orchestrator at Step 14 (Deliverable Packaging)"],
+      "dependencies": ["shared-document-reviewer", "KB-documentation-criteria/references/deliverable-archive-spec.md", "KB-review-disciplines"],
+      "notes": "142 lines. FR-1 edit target: lines 56-63 contain the retired dual-location BLOCKER prose. FR-10 integration target: same lines (replace with validator subprocess call). Per the file's `tools:` frontmatter (Read, Glob, Grep, Write, TaskCreate, TaskUpdate), the packager cannot run a subprocess directly via Bash — Design Composition must decide whether to add Bash to the tools list or invoke the validator via an alternate channel (e.g., via the orchestrator hook surface)."
+    },
+    {
+      "name": "shared-document-reviewer",
+      "path": ".claude/agents/shared-document-reviewer.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "Claude Code agent (5 invocation points per ADR-0017)",
+      "entry_points": ["Per recipe-feature-pipeline shared-document-reviewer Invocation Points table: invoked after IntentClarification, PRD, per-layer Design, Design Composition, Plan Authoring"],
+      "dependencies": ["KB-documentation-criteria", "KB-review-disciplines", "auditing-shared/scripts/validate_pipeline_frontmatter.py (per line 460)"],
+      "notes": "473 lines. FR-2 edit target: line 349 contains the contradictory dual-location BLOCKER check. The post-ADR-0036 statement at lines 470-472 is the correct canonical-only convention to preserve. Internal inconsistency confirmed: same file says both 'BLOCKER if missing from either location' (line 349) AND 'do NOT flag absence of working/feature/<slug>/adrs/ mirror copy — that convention is retired' (lines 470-472)."
+    },
+    {
+      "name": "recipe-feature-pipeline",
+      "path": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "Claude Code skill (orchestrator; user-invocable)",
+      "entry_points": ["User invocation: recipe-feature-pipeline <feature-slug>"],
+      "dependencies": ["All 28 pipeline sub-agents", "checkpoint.json schema", "ADR-0027 cwd precondition"],
+      "notes": "612 lines. FR-3 edit target: line 273 (design-composer parameter list, including output_adrs_dir). FR-10 orchestrator-stage-gate integration target: Step 8 (Design Composition; lines 270-278). Subprocess invocation pattern observed at line 449 (log_state_transition.py via auditing-shared subprocess). The orchestrator does not directly run validator scripts in-line elsewhere; downstream hooks (execute-phase-quality-reviewer + finalize-deliverable-packager) do the script invocations."
+    },
+    {
+      "name": "design-composer",
+      "path": ".claude/agents/design-composer.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "Claude Code agent (model: opus, effort: xhigh; sole ADR-author per FR-5)",
+      "entry_points": ["Invoked by recipe-feature-pipeline orchestrator at Step 8 (Design Composition)"],
+      "dependencies": ["KB-documentation-criteria/references/templates/adr-template.md", "KB-documentation-criteria/references/disciplines/design-composition.md", "All per-layer KBs (model-invocable)"],
+      "notes": "206 lines. FR-4 edit target: lines 48, 129, 187 (output_adrs_dir mentions). Sole ADR-authoring sub-agent per FR-5 + hard exclusion #2 in recipe-feature-pipeline. The file currently does NOT cite ADR-0036; FR-4 adds that citation."
+    },
+    {
+      "name": "auditing-shared",
+      "path": ".claude/skills/auditing-shared/",
+      "layer": "cc",
+      "language": "python (stdlib only) + markdown",
+      "framework": "Canonical helper-home per ADR-0031, family-graduated per ADR-0042",
+      "entry_points": ["Subprocess-dispatched by family-coordinator skills (auditing-cc-configs, auditing-github-actions, auditing-codespaces) and by execute-phase-quality-reviewer via run_phase_checks.py"],
+      "dependencies": ["Python 3.x stdlib (json, re, sys, pathlib, argparse, concurrent.futures, subprocess, typing)"],
+      "notes": "Scripts inventory (7 + 1 test-runner): check_pipeline_discipline.py, detect_stubs.py, log_state_transition.py, pedagogical_marker_check.py, run_phase_checks.py (the parallel-dispatch coordinator), scan_memory_secrets.py, validate_pipeline_frontmatter.py, smoke_test_auditing_shared.py. CLI convention: positional args, JSON to stdout, exit 0/2/non-zero. FR-10 default home per OI-3."
+    },
+    {
+      "name": "execute-phase-quality-reviewer",
+      "path": ".claude/agents/execute-phase-quality-reviewer.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "Execution-pipeline specialist per ADR-0044 (one of 4 dispatched by parent orchestrator)",
+      "entry_points": ["Dispatched by recipe-feature-pipeline parent at T7 (per_task_approved → phase_quality_active)"],
+      "dependencies": ["auditing-shared/scripts/run_phase_checks.py", "KB-review-disciplines"],
+      "notes": "Natural FR-10 execution-pipeline hook surface (IN-009-b). Line 18 references run_phase_checks.py as 'primary input source'; line 54 invokes it. Adding the FR-10 validator to run_phase_checks.py's parallel dispatch set automatically wires it into execute-phase-quality-reviewer with zero new hook integration."
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "recipe-feature-pipeline",
+      "to": "design-composer",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md:272-275"],
+      "confidence": "high",
+      "edge_notes": "Step 8; parameter list at line 273 includes output_adrs_dir without a default value."
+    },
+    {
+      "from": "recipe-feature-pipeline",
+      "to": "finalize-deliverable-packager",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md:333-345"],
+      "confidence": "high",
+      "edge_notes": "Step 14 (added in v4.5.0)."
+    },
+    {
+      "from": "recipe-feature-pipeline",
+      "to": "shared-document-reviewer",
+      "kind": "call",
+      "count": 5,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md:83-89 (invocation table)"],
+      "confidence": "high",
+      "edge_notes": "Per ADR-0017, 5 invocation points: after IntentClarification, PRD, per-layer Design, Design Composition, Plan."
+    },
+    {
+      "from": "finalize-deliverable-packager",
+      "to": "shared-document-reviewer",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/agents/finalize-deliverable-packager.md:65-73"],
+      "confidence": "high",
+      "edge_notes": "Invoked with doc_type: DeliverableArchive for archive validation."
+    },
+    {
+      "from": "design-composer",
+      "to": "output_adrs_dir (filesystem write)",
+      "kind": "file_reference",
+      "count": 3,
+      "representative_files": [".claude/agents/design-composer.md:48, 129, 187"],
+      "confidence": "high",
+      "edge_notes": "FR-3/FR-4 modify how this resolves (canonical-root default vs caller-supplied)."
+    },
+    {
+      "from": "shared-document-reviewer",
+      "to": "auditing-shared/scripts/validate_pipeline_frontmatter.py",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/agents/shared-document-reviewer.md:460"],
+      "confidence": "high",
+      "edge_notes": "Mechanical Gate-0 pass per the validator integration section."
+    },
+    {
+      "from": "execute-phase-quality-reviewer",
+      "to": "auditing-shared/scripts/run_phase_checks.py",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/agents/execute-phase-quality-reviewer.md:18, 54"],
+      "confidence": "high",
+      "edge_notes": "Primary input source; FR-10 validator wiring point per IN-009-b."
+    },
+    {
+      "from": "execute-task-quality-handler",
+      "to": "auditing-shared/scripts/validate_pipeline_frontmatter.py",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/agents/execute-task-quality-handler.md:62-63"],
+      "confidence": "high",
+      "edge_notes": "Per-task frontmatter validation. Alternative FR-10 surface; less economical than per-phase."
+    },
+    {
+      "from": "run_phase_checks.py",
+      "to": "validate_pipeline_frontmatter.py",
+      "kind": "subprocess",
+      "count": 1,
+      "representative_files": [".claude/skills/auditing-shared/scripts/run_phase_checks.py:40-44"],
+      "confidence": "high",
+      "edge_notes": "Pattern: parallel dispatch via subprocess.run with 120s timeout. Adding FR-10 validator extends this set."
+    },
+    {
+      "from": "shared-document-reviewer (operator file)",
+      "to": "post-ADR-0036 canonical-only statement",
+      "kind": "internal_reference",
+      "count": 1,
+      "representative_files": [".claude/agents/shared-document-reviewer.md:470-472"],
+      "confidence": "high",
+      "edge_notes": "Internally CONTRADICTS line 349 (dual-location BLOCKER). FR-2 resolves by deleting line 349 content."
+    }
+  ],
+  "blast_radius": [
+    {
+      "touch_point": ".claude/agents/finalize-deliverable-packager.md:56-63 (FR-1 BLOCKER prose deletion + FR-10 validator integration)",
+      "direct_dependents": ["recipe-feature-pipeline orchestrator (Step 14)", "shared-document-reviewer (co-invoked)"],
+      "transitive_dependents_3_hop": ["finalize-reconciler", "Gate 6 (Final Approval) human surface", "packager-report.json consumers (downstream review)"],
+      "test_files": ["No dedicated automated test for this agent; smoke_test_auditing_shared.py covers auditing-shared scripts but not packager-specific behavior. Existing verification is empirical (per-feature-run packager-report.json inspection)."],
+      "hop_tier_distribution": {"1": 2, "2": 1, "3+": 2},
+      "risk_notes": "Low blast radius. The packager is end-of-pipeline (no downstream sub-agent reads its prose). Replacing the dual-location check with a validator subprocess call is a localized change. The dependent consumers care about packager-report.json shape; FR-10 ACs require BLOCKER findings in the same shape (per the existing convention)."
+    },
+    {
+      "touch_point": ".claude/agents/shared-document-reviewer.md:349 (FR-2 contradictory BLOCKER prose deletion)",
+      "direct_dependents": ["recipe-feature-pipeline (5 invocation points)", "finalize-deliverable-packager (DeliverableArchive dispatch)"],
+      "transitive_dependents_3_hop": ["All 28 sub-agents whose outputs pass through reviewer", "Gate 1 outcomes across all 5 reviewer invocations", "finalize-reconciler (consumes reviewer findings)"],
+      "test_files": ["No automated test; reviewer behavior is observed per-feature-run via reviewer-output JSON files."],
+      "hop_tier_distribution": {"1": 2, "2": 28, "3+": "many"},
+      "risk_notes": "Medium blast radius. The reviewer's DeliverableArchive procedure is invoked once per feature run by the packager; the FR-2 edit removes a check that has been emitting false BLOCKERs since ADR-0036. Removing the line is structurally safe (lines 470-472 are the contradicting canonical truth). No downstream sub-agent depends on the line-349 procedure being present."
+    },
+    {
+      "touch_point": ".claude/skills/recipe-feature-pipeline/SKILL.md:273 (FR-3 output_adrs_dir default)",
+      "direct_dependents": ["design-composer (sole reader of the parameter)"],
+      "transitive_dependents_3_hop": ["adrs/ filesystem (write target)", "All downstream consumers of authored ADRs (Plan, acceptance-tests, Architecture Audit)", "FR-10 validator at all 3 enforcement surfaces"],
+      "test_files": ["No integration test; behavior observed via per-feature-run blueprint-v<N>.md + adrs/ output inspection."],
+      "hop_tier_distribution": {"1": 1, "2": "all downstream consumers"},
+      "risk_notes": "High blast radius BUT low risk for this specific edit. Today the orchestrator passes no explicit default; design-composer interprets per-implementation. Adding an explicit canonical-root default does NOT break any current behavior (it codifies what already happens for properly-authored runs); it BLOCKS the failure mode that produced PKG-BLOCKER-001."
+    },
+    {
+      "touch_point": ".claude/agents/design-composer.md:48, 129, 187 (FR-4 parameter description)",
+      "direct_dependents": ["recipe-feature-pipeline orchestrator (passes the parameter)", "ADR-template authoring discipline (downstream of parameter resolution)"],
+      "transitive_dependents_3_hop": ["adrs/ filesystem", "All ADR consumers", "FR-10 validator surfaces"],
+      "test_files": ["None automated."],
+      "hop_tier_distribution": {"1": 2, "2": "all downstream consumers"},
+      "risk_notes": "Low blast radius. Prose-only edits; no behavioral change beyond the parameter description's new canonical-default statement. Reviewer (Gate 0 structural) checks against this file's structure but does not depend on the parameter description's specific wording."
+    },
+    {
+      "touch_point": "Operator-file family (all 4 files post-Phase-1 edits)",
+      "direct_dependents": ["recipe-feature-pipeline orchestrator", "shared-document-reviewer", "design-composer", "finalize-deliverable-packager (the 4 are mutually-referential)"],
+      "transitive_dependents_3_hop": ["All pipeline runs", "Gate 4 (Blueprint Approval) outcomes", "Gate 6 (Final Approval) outcomes"],
+      "test_files": ["No dedicated test suite; AC-OP-1 + AC-OP-2 (PRD) define the verification surface (fresh pipeline run produces internally-consistent operator-file behavior)."],
+      "hop_tier_distribution": {"1": 4, "2": "all pipeline runs"},
+      "risk_notes": "The 4 operator-file edits together produce the single internally-consistent convention per AC-US-2-b. Verification requires a fresh pipeline pass (Phase 6 task)."
+    },
+    {
+      "touch_point": "auditing-shared/ (FR-10 validator add)",
+      "direct_dependents": ["execute-phase-quality-reviewer (via run_phase_checks.py)", "execute-task-quality-handler (via validate_pipeline_frontmatter.py pattern)", "finalize-deliverable-packager (FR-10 packager surface)", "recipe-feature-pipeline (FR-10 orchestrator stage gate)"],
+      "transitive_dependents_3_hop": ["All future feature-pipeline runs", "All future execution-pipeline runs", "Negative-path test fixtures"],
+      "test_files": ["smoke_test_auditing_shared.py — will need extension for FR-10 validator coverage."],
+      "hop_tier_distribution": {"1": 4, "2": "all future runs"},
+      "risk_notes": "High blast radius — FR-10 adds enforcement at 3 surfaces, all reading the validator's output. Per NFR-2, validator latency must be < 5s (validated empirically). The Python stdlib-only constraint per NFR-8 is satisfiable (pathlib.Path.rglob + glob is sufficient)."
+    },
+    {
+      "touch_point": "Canonical adrs/ tree (FR-8 migrations + FR-9 sweep)",
+      "direct_dependents": ["design-composer (writes)", "shared-document-reviewer (reads ADR frontmatter for review)", "review-architecture-auditor (reads inherited_adrs_dir)", "finalize-deliverable-packager (reads for cross-location check; pre-FR-1)", "All shipped Blueprints/Plans/Issues/README that cite ADRs"],
+      "transitive_dependents_3_hop": "Repo-wide (every artifact citing an ADR; cf. IN-008 counts: ADR-0029 alone has 375 mentions, ADR-0030 has 254, etc.)",
+      "test_files": ["No automated test; AC-OP-5 + AC-OP-3 are the test surfaces (Phase 6 verification)."],
+      "hop_tier_distribution": {"1": "5 in-pipeline consumers", "2": "all artifacts citing ADRs"},
+      "risk_notes": "Very high blast radius for FR-9 sweep BUT path-only edits (per FR-9-b) preserve semantics. The 14 path-form references identified in IN-008 are the actionable subset (the 4000+ bare-ID mentions across the repo do NOT need to change). The FR-8d collisions (IN-004) are the highest-risk subset because semantic content differs between canonical and archive."
+    },
+    {
+      "touch_point": "Feature-scoped adrs/ source folders (FR-8a/b/c) — 4 distinct folders (audit-machinery-fixes-r1, audit-findings-remediation-r1, devcontainer-mcp-provisioning-r1, pipeline-skill-design-fixes-r1) for the 12 byte-identicals; plus frontend-design-knowledge-r1 (ADR-0024) and issue-capture-mechanism-r1 (ADR-0044/0045 collision + ADR-0046-0050 relocation)",
+      "direct_dependents": ["The respective feature's shipped Blueprint + Plan (which cite the ADRs at their feature-scoped paths)", "shared-document-reviewer DeliverableArchive procedure (line 349 — which is being deleted in FR-2)"],
+      "transitive_dependents_3_hop": ["Issues/ artifacts citing the ADRs by path", "Per-feature codebase-analysis-report.md and synthesis.md"],
+      "test_files": ["AC-OP-5 (Phase 6 verification re-run of inventory)."],
+      "hop_tier_distribution": {"1": "6 feature folders touched", "2": "14 path-form references (per IN-008)"},
+      "risk_notes": "Bounded blast radius. The 14 path-form references enumerated in IN-008 are the complete actionable set per NFR-3. Phase 3 sweep updates each one; Phase 6 verification re-runs the grep set to confirm zero remaining."
+    },
+    {
+      "touch_point": "adrs-migrated/ (FR-8d consolidation source)",
+      "direct_dependents": ["devcontainer-mcp-provisioning-r1 (its plan-v1.md:295 + phase-validators.md:125-127 + adrs/ADR-0038 line 138 all reference adrs-migrated/ADR-NNNN paths)", "issue-capture-mechanism-r1 (cites adrs-migrated/ADR-0008-issue-ledger-scope.md as the authoritative ADR-0008 source)"],
+      "transitive_dependents_3_hop": ["adrs/ADR-0038-codebase-analysis-schema-v1-1-0.md (canonical copy; line 138 references adrs-migrated/ADR-0007 paths)"],
+      "test_files": ["AC-OP-5."],
+      "hop_tier_distribution": {"1": "2 feature folders + 1 canonical ADR", "2": "8 collision ADRs (IDs 0011-0018)"},
+      "risk_notes": "Higher risk than FR-8a/b/c because of the 8 numbering collisions (IN-004). Each collision requires a semantic decision (which version is current truth, what suffix policy applies). adrs/ADR-0038 itself references adrs-migrated/ADR-0007 — this is a SHIPPED canonical ADR that the FR-9 path-only sweep must update, but FR-9b says shipped Blueprint prose is path-only — does this extend to shipped ADR prose? Open question for Design Composition."
+    }
+  ],
+  "conventions": {
+    "cc": {
+      "file_naming": {
+        "agents": ".claude/agents/<phase-prefix>-<role>.md (e.g., finalize-deliverable-packager, shared-document-reviewer, design-composer, recipe-feature-pipeline)",
+        "skills": ".claude/skills/<family-prefix>-<purpose>/SKILL.md (KB-* for knowledge bases, auditing-* for audit machinery, recipe-* for orchestrators)",
+        "scripts": ".claude/skills/auditing-shared/scripts/<verb>_<noun>.py (snake_case Python)",
+        "adrs": "adrs/ADR-NNNN-<slug>.md (canonical; per ADR-0036) — FR-8d consolidation must respect this form"
+      },
+      "module_layout": {
+        "agents_directory": "All agent files at .claude/agents/ flat (no subdirectories)",
+        "skills_directory": "One directory per skill at .claude/skills/<name>/; SKILL.md mandatory; references/ + scripts/ optional",
+        "auditing_shared_pattern": "auditing-shared/scripts/ is the canonical-helper-home per ADR-0031 + ADR-0035 + ADR-0042; family-coordinator skills (auditing-cc-configs, auditing-github-actions, etc.) subprocess-dispatch into it"
+      },
+      "error_handling": {
+        "agents": "BLOCKER / MAJOR / MINOR / NIT / INFO 5-tier severity per KB-review-disciplines",
+        "scripts": "exit 0 = clean, exit 2 = canonical-blocker-present (per run_phase_checks.py:59), other non-zero = error",
+        "json_output": "Scripts emit JSON to stdout; coordinators parse and rollup"
+      },
+      "logging": {
+        "state_transitions": "JSONL append-only at working/feature/<slug>/state-transitions.log per ADR-0044 invariant; emit via auditing-shared/scripts/log_state_transition.py",
+        "operator_findings": "JSON in artifact-specific output files (packager-report.json, architecture-audit-issues.json, etc.)"
+      },
+      "testing": {
+        "smoke_tests": ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py for the auditing-shared family",
+        "no_integration_test_for_operator_files": "Operator agent files have no automated test; verification is per-pipeline-run empirical inspection",
+        "verification_form": "Phase 6 verification of this feature should add an automated regression test for the FR-10 validator (smoke test + negative-path test fixture)"
+      },
+      "subprocess_dispatch_convention": {
+        "shape": "subprocess.run(args, capture_output=True, text=True, timeout=120)",
+        "default_timeout": "120 seconds per script invocation",
+        "stdin_pattern": "newline-separated file paths via stdin when scanning multiple targets (see run_phase_checks.py:47-58)"
+      },
+      "frontmatter_conventions": {
+        "agents": "name, description (~1500 chars), model (opus/sonnet), effort (low/medium/high/xhigh), tools (array), skills (array), memory (project|none)",
+        "skills": "name, description, user-invocable (true/false)"
+      },
+      "git_mv_usage_convention": {
+        "observed_patterns": "Prior plans (execution-pipeline-design-r1/plan-v2.md, devcontainer-mcp-provisioning-r1/plan-v1.md, issue-capture-mechanism-r1/plan-v1.md) all use `git mv` (not copy-and-delete) for file relocations, with `git log --follow` cited as the L2 verification surface",
+        "format": "Per-task description names src → dst; verification by `git log --follow <dst>` returning history from src",
+        "fr_8b_8c_alignment": "FR-8b archival and FR-8c relocation should adopt the same convention per NFR-5"
+      },
+      "redirect_note_precedent": {
+        "observed": "None. No prior Plan in the repo creates a redirect note for a relocated file. Symlink option mentioned in adrs/ADR-0036:107 was REJECTED. OI-5 default (one-line markdown stub) has no project precedent.",
+        "implication": "Design Composition cannot inherit a convention; OI-5 default is a fresh-design decision."
+      },
+      "markdown_link_form_catalog": {
+        "shipped_blueprint_forms": [
+          "Bare ADR-NNNN (most common; 4000+ across repo)",
+          "adrs/ADR-NNNN-<slug>.md (canonical-path form; most common path form)",
+          "working/feature/<slug>/adrs/ADR-NNNN-<slug>.md (feature-scoped path form; 14 occurrences in scope)",
+          "adrs-migrated/ADR-NNNN-<variant>.md (legacy path form; 18 occurrences)",
+          "[ADR-NNNN](path) (Markdown link form)",
+          "<../adrs/ADR-NNNN.md> (angle-bracket relative form; rare)",
+          "Frontmatter array forms: supersedes:, superseded_by:, adrs_inherited:, adrs_authored:, related:, subsumes: — ALL use bare ADR-NNNN form (no path)"
+        ],
+        "pattern_completeness_per_OI_4": "The IN-008 grep-pattern floor in the Research Plan is sufficient. Discovery found no additional reference forms that would slip past the pattern set."
+      }
+    }
+  },
+  "migration_map": {
+    "category_FR_8a_byte_identical_dedupe": [
+      {"id": "ADR-0026", "current_location": "adrs/ + working/feature/audit-machinery-fixes-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0028", "current_location": "adrs/ + working/feature/pipeline-skill-design-fixes-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0029", "current_location": "adrs/ + working/feature/audit-findings-remediation-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0030", "current_location": "adrs/ + working/feature/audit-findings-remediation-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0031", "current_location": "adrs/ + working/feature/audit-findings-remediation-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0037", "current_location": "adrs/ + working/feature/devcontainer-mcp-provisioning-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0038", "current_location": "adrs/ + working/feature/devcontainer-mcp-provisioning-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0039", "current_location": "adrs/ + working/feature/devcontainer-mcp-provisioning-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0040", "current_location": "adrs/ + working/feature/devcontainer-mcp-provisioning-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0041", "current_location": "adrs/ + working/feature/devcontainer-mcp-provisioning-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0042", "current_location": "adrs/ + working/feature/devcontainer-mcp-provisioning-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"},
+      {"id": "ADR-0043", "current_location": "adrs/ + working/feature/devcontainer-mcp-provisioning-r1/adrs/", "target_location": "adrs/ only", "classification": "duplicate-identical", "sub_action": "delete feature-scoped copy"}
+    ],
+    "category_FR_8b_divergent_reconciliation": [
+      {"id": "ADR-0024", "current_location": "adrs/ADR-0024-frontend-design-knowledge-corpus-structure.md + working/feature/frontend-design-knowledge-r1/adrs/ADR-0024-frontend-design-knowledge-corpus-structure.md", "target_location": "adrs/ only", "classification": "duplicate-divergent-MINOR", "sub_action": "STATUS-LIFT case — only frontmatter `status:` differs (Accepted vs Proposed). Body identical. Recommendation: keep canonical (Accepted) version; delete feature-scoped copy. NO supersession archival needed because no body content is lost.", "divergence_summary": "1-line frontmatter diff: status field"},
+      {"id": "ADR-0044 (canonical) + ADR-0044 (feature)", "current_location": "adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md AND working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md", "target_location": "adrs/ — canonical ADR-0044 stays; feature ADR re-numbered to next-available ID (likely ADR-0051 if FR-8c relocations land first)", "classification": "NUMBERING-COLLISION (NOT divergent body)", "sub_action": "RE-NUMBERING required. The two ADRs are different decisions sharing a numeric ID by accident. Canonical ADR-0044 stays; feature-scoped ADR-0044-per-issue-folder-model is renumbered (proposed ADR-0051) and relocated to canonical adrs/. Update all references (per IN-008 inventory) to the new ID. PRD FR-8b 'archive rejected body' framing is INAPPLICABLE here.", "divergence_summary": "Two distinct decisions accidentally sharing ID"},
+      {"id": "ADR-0045 (canonical) + ADR-0045 (feature)", "current_location": "adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md AND working/feature/issue-capture-mechanism-r1/adrs/ADR-0045-three-doctypes-preserved.md", "target_location": "adrs/ — canonical ADR-0045 stays; feature ADR re-numbered (proposed ADR-0052)", "classification": "NUMBERING-COLLISION (NOT divergent body)", "sub_action": "Same shape as ADR-0044 above. RE-NUMBERING required.", "divergence_summary": "Two distinct decisions accidentally sharing ID"}
+    ],
+    "category_FR_8c_relocation": [
+      {"id": "ADR-0046", "current_location": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-add-new-sibling-file-evolution.md", "target_location": "adrs/ADR-0046-add-new-sibling-file-evolution.md", "classification": "feature-scoped-only", "sub_action": "git mv (preserve history per NFR-5); redirect note in originating folder per OI-5 default"},
+      {"id": "ADR-0047", "current_location": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md", "target_location": "adrs/ADR-0047-three-layer-enforcement.md", "classification": "feature-scoped-only", "sub_action": "git mv; redirect note"},
+      {"id": "ADR-0048", "current_location": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0048-prior-context-handoff.md", "target_location": "adrs/ADR-0048-prior-context-handoff.md", "classification": "feature-scoped-only", "sub_action": "git mv; redirect note"},
+      {"id": "ADR-0049", "current_location": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0049-structural-vs-discipline-kb-split.md", "target_location": "adrs/ADR-0049-structural-vs-discipline-kb-split.md", "classification": "feature-scoped-only", "sub_action": "git mv; redirect note"},
+      {"id": "ADR-0050", "current_location": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0050-5-state-issues-vocabulary.md", "target_location": "adrs/ADR-0050-5-state-issues-vocabulary.md", "classification": "feature-scoped-only", "sub_action": "git mv; redirect note"}
+    ],
+    "category_FR_8d_legacy_archive_consolidate": {
+      "summary": "adrs-migrated/ contains 47 files spanning ADR IDs 0001-0018. Per FR-8d sub-action policy: final-variants move to canonical with appropriate suffix; -pre-naming-convention and -pre-template-migration variants are deleted (Git history preserves them). Numbering collisions for ADRs 0011-0018 require per-ID decision.",
+      "final_variants_no_canonical_collision": [
+        {"id": "ADR-0001", "archive_file": "ADR-0001-orchestrator-placement.md", "target_location": "adrs/ADR-0001-orchestrator-placement.md", "sub_action": "git mv (no canonical to collide with; suffix unnecessary)"},
+        {"id": "ADR-0002", "archive_file": "ADR-0002-critique-1-discipline.md", "target_location": "adrs/ADR-0002-critique-1-discipline.md", "sub_action": "git mv"},
+        {"id": "ADR-0003", "archive_file": "ADR-0003-critique-2-discipline.md", "target_location": "adrs/ADR-0003-critique-2-discipline.md", "sub_action": "git mv"},
+        {"id": "ADR-0004", "archive_file": "ADR-0004-test-split.md", "target_location": "adrs/ADR-0004-test-split.md", "sub_action": "git mv"},
+        {"id": "ADR-0005", "archive_file": "ADR-0005-append-only-supersession.md", "target_location": "adrs/ADR-0005-append-only-supersession.md", "sub_action": "git mv"},
+        {"id": "ADR-0006", "archive_file": "ADR-0006-synthesis-inlined.md", "target_location": "adrs/ADR-0006-synthesis-inlined.md", "sub_action": "git mv"},
+        {"id": "ADR-0008", "archive_file": "ADR-0008-issue-ledger-scope.md", "target_location": "adrs/ADR-0008-issue-ledger-scope.md", "sub_action": "git mv (note: cited by issue-capture-mechanism-r1 at its current adrs-migrated/ path — those references update in FR-9 sweep)"},
+        {"id": "ADR-0009", "archive_file": "ADR-0009-rationale-brief-discipline.md", "target_location": "adrs/ADR-0009-rationale-brief-discipline.md", "sub_action": "git mv"},
+        {"id": "ADR-0010", "archive_file": "ADR-0010-knowledge-skill-frontmatter-correction.md", "target_location": "adrs/ADR-0010-knowledge-skill-frontmatter-correction.md", "sub_action": "git mv"}
+      ],
+      "final_variants_with_canonical_collision_REQUIRING_DECISION": [
+        {"id": "ADR-0011", "canonical_version": "1.0.0 ('documentation-criteria' pre-naming-convention names)", "archive_version": "2.0.0 ('KB-documentation-criteria' post-naming-convention names per ADR-0019 retroactive update)", "recommended_resolution": "Archive version (v2.0.0) is the more current truth; canonical (v1.0.0) is stale. Option (a): replace canonical with archive (archive becomes canonical; old canonical preserved in Git history). Option (b): supersede-suffix archive's version, keep canonical at v1.0.0 stale (NOT recommended; user-confusing). Discovery recommends option (a)."},
+        {"id": "ADR-0012", "canonical_version": "1.0.0", "archive_version": "2.0.0 (v4.3.0 naming-convention retroactive update)", "recommended_resolution": "Same as ADR-0011: replace canonical with archive."},
+        {"id": "ADR-0013", "canonical_version": "1.0.0", "archive_version": "2.0.0", "recommended_resolution": "Same."},
+        {"id": "ADR-0014", "canonical_version": "1.0.0", "archive_version": "2.0.0", "recommended_resolution": "Same."},
+        {"id": "ADR-0015", "canonical_version": "1.0.0", "archive_version": "2.0.0", "recommended_resolution": "Same."},
+        {"id": "ADR-0016", "canonical_version": "1.0.0", "archive_version": "2.0.0", "recommended_resolution": "Same."},
+        {"id": "ADR-0017", "canonical_version": "1.0.0", "archive_version": "2.0.0", "recommended_resolution": "Same."},
+        {"id": "ADR-0018", "canonical_version": "1.0.0 + supersession-by-ADR-0038 frontmatter marker (most recent)", "archive_version": "2.0.0 (naming-convention update only; no supersession marker)", "recommended_resolution": "MORE COMPLEX. Canonical has the latest supersession marker (must be preserved). Recommendation: keep canonical (1.0.0 with supersession marker) as canonical; delete archive version (preserved in Git history); the archive version's naming-convention updates are stale because ADR-0018 is now superseded by ADR-0038."}
+      ],
+      "pre_naming_convention_variants_DELETE": [
+        "ADR-0001-orchestrator-placement-pre-naming-convention.md", "ADR-0002-critique-1-discipline-pre-naming-convention.md", "ADR-0003-critique-2-discipline-pre-naming-convention.md", "ADR-0004-test-split-pre-naming-convention.md", "ADR-0005-append-only-supersession-pre-naming-convention.md", "ADR-0006-synthesis-inlined-pre-naming-convention.md", "ADR-0007-code-graph-mcp-selection-pre-naming-convention.md", "ADR-0008-issue-ledger-scope-pre-naming-convention.md", "ADR-0009-rationale-brief-discipline-pre-naming-convention.md", "ADR-0010-knowledge-skill-frontmatter-correction-pre-naming-convention.md", "ADR-0011-documentation-criteria-canonical-skill-pre-naming-convention.md", "ADR-0012-prd-stage-pre-naming-convention.md", "ADR-0013-blueprint-template-adoption-pre-naming-convention.md", "ADR-0014-adr-template-adoption-and-migration-pre-naming-convention.md", "ADR-0015-ears-acceptance-criteria-pre-naming-convention.md", "ADR-0016-per-layer-fanout-composer-fanin-pre-naming-convention.md", "ADR-0017-document-reviewer-integration-pre-naming-convention.md", "ADR-0018-codebase-analysis-schema-pre-naming-convention.md"
+      ],
+      "pre_template_migration_variants_DELETE": [
+        "ADR-0001-orchestrator-placement-pre-template-migration.md", "ADR-0002-critique-1-discipline-pre-template-migration.md", "ADR-0003-critique-2-discipline-pre-template-migration.md", "ADR-0004-test-split-pre-template-migration.md", "ADR-0005-append-only-supersession-pre-template-migration.md", "ADR-0006-synthesis-inlined-pre-template-migration.md", "ADR-0007-code-graph-mcp-selection-v1-pre-template-migration.md", "ADR-0007-code-graph-mcp-selection-v2-pre-template-migration.md", "ADR-0008-issue-ledger-scope-pre-template-migration.md", "ADR-0009-rationale-brief-discipline-pre-template-migration.md", "ADR-0010-knowledge-skill-frontmatter-correction-pre-template-migration.md"
+      ],
+      "v1_superseded_variant_DELETE": [
+        "ADR-0007-code-graph-mcp-selection-v1-superseded.md"
+      ],
+      "ADR_0007_special_case": "ADR-0007 has NO final-variant in adrs-migrated/ (only pre-naming-convention + v1-pre-template + v1-superseded + v2-pre-template). The canonical version exists at adrs/ADR-0007-code-graph-mcp-selection.md. All 4 archive variants are DELETED per the pre-* / -superseded policy."
+    },
+    "post_consolidation_canonical_state": {
+      "adrs_count_after_FR_8": 52,
+      "adrs_count_calculation_note": "Currently 36. FR-8c adds 5 (ADR-0046-0050). FR-8b numbering-collision adds 2 (re-numbered ex-0044/0045 as 0051/0052). FR-8d adds 9 collision-free (ADR-0001-0006, 0008, 0009, 0010) + handles 8 collision (mostly replace canonical with archive v2.0.0 except ADR-0018). Net: 36 + 5 + 2 + 9 = 52. The 8 collisions don't add count (they overwrite existing canonical files).",
+      "adrs_migrated_count_after_FR_8d": 0,
+      "feature_scoped_adrs_after_FR_8": 0
+    }
+  },
+  "cross_reference_inventory": [
+    {"path": "Issues/adr-placement-rootcause/proposal.md", "line": 50, "link_form": "prose-mention", "target_adr_id": "various (adrs-migrated/ generic mention)", "action_required": "no-change (this is an Issue file describing the situation pre-this-feature; supersession discipline preserves)"},
+    {"path": "Issues/adr-placement-rootcause/proposal.md", "line": 75, "link_form": "markdown-link", "target_adr_id": "ADR-0024 (via working/feature/frontend-design-knowledge-r1/adrs/)", "action_required": "update-path (path-only sweep per FR-9; replace feature-scoped path with canonical adrs/ADR-0024-*.md)"},
+    {"path": "Issues/adr-placement-rootcause/proposal.md", "line": 76, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/ generic", "action_required": "no-change (Issue describes situation pre-this-feature)"},
+    {"path": "Issues/adr-placement-rootcause/proposal.md", "line": 92, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/ generic", "action_required": "no-change"},
+    {"path": "Issues/adr-placement-rootcause/analysis.md", "line": 42, "link_form": "markdown-link-table-row", "target_adr_id": "adrs-migrated/ generic", "action_required": "update-with-history-context-note (acknowledge that as of feature ship, adrs-migrated/ no longer exists)"},
+    {"path": "Issues/adr-placement-rootcause/analysis.md", "line": 161, "link_form": "prose-with-markdown-links", "target_adr_id": "adrs-migrated/ + blueprint-v2.md:379", "action_required": "no-change (Issue analysis prose preserved per ADR-0005)"},
+    {"path": "Issues/adr-placement-rootcause/analysis.md", "line": 214, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/", "action_required": "no-change"},
+    {"path": "Issues/adr-placement-rootcause/analysis.md", "line": 234, "link_form": "prose-mention", "target_adr_id": "Q4 adrs-migrated/", "action_required": "no-change"},
+    {"path": "Issues/adr-placement-rootcause/analysis.md", "line": 257, "link_form": "markdown-link", "target_adr_id": "working/feature/devcontainer-mcp-provisioning-r1/blueprint-v2.md:1226", "action_required": "no-change (link target is a Blueprint line, not an ADR)"},
+    {"path": "Issues/adr-placement-rootcause/analysis.md", "line": 258, "link_form": "code-fence-shell-command-example", "target_adr_id": "ADR-0024 (working/feature/frontend-design-knowledge-r1/adrs/)", "action_required": "update-path (path-only sweep)"},
+    {"path": "Issues/per-agent-design-evaluation-gap/analysis.md", "line": 16, "link_form": "yaml-list-item", "target_adr_id": "ADR-0040 (working/feature/devcontainer-mcp-provisioning-r1/adrs/)", "action_required": "update-path"},
+    {"path": "Issues/per-agent-design-evaluation-gap/analysis.md", "line": 64, "link_form": "backtick-path", "target_adr_id": "ADR-0040 (feature-scoped)", "action_required": "update-path"},
+    {"path": "Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md", "line": 11, "link_form": "yaml-list-item", "target_adr_id": "ADR-0040 (feature-scoped)", "action_required": "update-path"},
+    {"path": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md", "line": 18, "link_form": "prose-range", "target_adr_id": "ADR-0037..ADR-0041 (feature-scoped)", "action_required": "update-path (range expands to 5 individual canonical paths)"},
+    {"path": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md", "line": 41, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/ generic for ADR-0007 + ADR-0018", "action_required": "update-after-FR-8d (paths change when adrs-migrated/ is consolidated; ADR-0007 moves to adrs/, ADR-0018 stays at adrs/)"},
+    {"path": "working/feature/issue-capture-mechanism-r1/codebase-analysis-report.md", "line": 185, "link_form": "prose-with-backtick-path", "target_adr_id": "adrs-migrated/ADR-0008-issue-ledger-scope.md", "action_required": "update-path (after FR-8d, ADR-0008 lives at adrs/ADR-0008-issue-ledger-scope.md)"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v1.md", "line": 140, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/ generic for ADR-0008", "action_required": "update-after-FR-8d (Phase 3 path-only sweep; note this is a SHIPPED blueprint — FR-9b restricts to path-only)"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v1.md", "line": 352, "link_form": "table-row-prose", "target_adr_id": "adrs-migrated/, working/feature/issue-capture-mechanism-r1/adrs/", "action_required": "update-path (Phase 3 path-only; preserve table semantics)"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v1.md", "line": 1219, "link_form": "backtick-path", "target_adr_id": "adrs-migrated/ADR-0008-issue-ledger-scope.md", "action_required": "update-path"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "line": 179, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/ generic for ADR-0008", "action_required": "update-after-FR-8d"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "line": 407, "link_form": "table-row-prose", "target_adr_id": "adrs-migrated/, working/feature/issue-capture-mechanism-r1/adrs/", "action_required": "update-path"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md", "line": 1288, "link_form": "backtick-path", "target_adr_id": "adrs-migrated/ADR-0008-issue-ledger-scope.md", "action_required": "update-path"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v3.md", "line": 188, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/ generic for ADR-0008", "action_required": "update-after-FR-8d"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v3.md", "line": 418, "link_form": "table-row-prose", "target_adr_id": "adrs-migrated/, working/feature/issue-capture-mechanism-r1/adrs/", "action_required": "update-path"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v3.md", "line": 1346, "link_form": "backtick-path", "target_adr_id": "ADR-0047 (working/feature/issue-capture-mechanism-r1/adrs/)", "action_required": "update-path"},
+    {"path": "working/feature/issue-capture-mechanism-r1/blueprint-v3.md", "line": 1394, "link_form": "backtick-path", "target_adr_id": "adrs-migrated/ADR-0008-issue-ledger-scope.md", "action_required": "update-path"},
+    {"path": "working/feature/issue-capture-mechanism-r1/synthesis.md", "line": 330, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/ generic", "action_required": "update-after-FR-8d"},
+    {"path": "working/feature/issue-capture-mechanism-r1/synthesis.md", "line": 413, "link_form": "backtick-path", "target_adr_id": "adrs-migrated/ADR-0008-issue-ledger-scope.md", "action_required": "update-path"},
+    {"path": "working/feature/issue-capture-mechanism-r1/research-plan.md", "line": 101, "link_form": "backtick-path", "target_adr_id": "adrs-migrated/ADR-0008-issue-ledger-scope.md", "action_required": "update-path"},
+    {"path": "working/feature/issue-capture-mechanism-r1/research-plan.md", "line": 107, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/", "action_required": "update-after-FR-8d"},
+    {"path": "working/feature/issue-capture-mechanism-r1/research-plan.md", "line": 115, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/", "action_required": "update-after-FR-8d"},
+    {"path": "working/feature/issue-capture-mechanism-r1/research-plan.md", "line": 237, "link_form": "backtick-path", "target_adr_id": "adrs-migrated/ADR-0008-issue-ledger-scope.md", "action_required": "update-path"},
+    {"path": "working/feature/issue-capture-mechanism-r1/research-plan.md", "line": 363, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/", "action_required": "update-after-FR-8d"},
+    {"path": "working/feature/issue-capture-mechanism-r1/research-plan.md", "line": 374, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/", "action_required": "update-after-FR-8d"},
+    {"path": "working/feature/issue-capture-mechanism-r1/reconciliation-log-r2.md", "line": 127, "link_form": "backtick-path-range", "target_adr_id": "ADR-0044..0050 (working/feature/issue-capture-mechanism-r1/adrs/)", "action_required": "update-path (range expands to 7 canonical paths after FR-8b re-numbering + FR-8c relocation)"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/phase-validators.md", "line": 125, "link_form": "code-fence-grep-command", "target_adr_id": "adrs/ADR-0018-*.md OR adrs-migrated/ADR-0018-*.md", "action_required": "update-after-FR-8d (the OR clause becomes single-location)"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/phase-validators.md", "line": 126, "link_form": "code-fence-bash-command", "target_adr_id": "adrs-migrated/ADR-0007-*.md", "action_required": "update-after-FR-8d (this is a phase validator that ALREADY anticipates ADR-0007 moving to adrs/; the post-feature state matches the validator's success condition)"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/phase-validators.md", "line": 127, "link_form": "code-fence-git-grep", "target_adr_id": "adrs-migrated/ADR-0007", "action_required": "update-after-FR-8d (validator condition already aligned with post-FR-8d state)"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis-report.md", "line": 33, "link_form": "table-row-backtick-path", "target_adr_id": "adrs-migrated/ADR-0007-code-graph-mcp-selection.md", "action_required": "update-path"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis-report.md", "line": 65, "link_form": "ascii-diagram-text", "target_adr_id": "adrs-migrated/ADR-0007", "action_required": "update-path (preserve ASCII layout)"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/plan-v1.md", "line": 295, "link_form": "prose-with-backtick-paths", "target_adr_id": "adrs-migrated/ADR-0018, adrs-migrated/ADR-0007", "action_required": "update-after-FR-8d (note: this plan EXPLICITLY describes a partial relocation that this feature now completes; the prose can be updated to past-tense reference)"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/plan-v1.md", "line": 301, "link_form": "code-fence-grep-expectation", "target_adr_id": "adrs-migrated/ADR-0007", "action_required": "no-change-needed (the grep-zero-hits expectation is satisfied by FR-8d completion)"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/synthesis/03-verifications.md", "line": 307, "link_form": "prose-mention", "target_adr_id": "adrs-migrated/ADR-0007", "action_required": "update-after-FR-8d"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/adrs/ADR-0038-codebase-analysis-schema-v1-1-0.md", "line": 138, "link_form": "prose-with-backtick-paths", "target_adr_id": "adrs-migrated/ADR-0007-code-graph-mcp-selection.md, adrs/ADR-0007-code-graph-mcp-selection.md", "action_required": "FR-8a dedupe deletes this file (it's the feature-scoped duplicate of canonical ADR-0038); the canonical adrs/ADR-0038 also contains the same prose"},
+    {"path": "working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-2.md", "line": 65, "link_form": "absolute-path", "target_adr_id": "ADR-0040 (working/feature/devcontainer-mcp-provisioning-r1/adrs/)", "action_required": "update-path"},
+    {"path": "working/feature/audit-findings-remediation-r1/synthesis.md", "line": 12, "link_form": "yaml-list-item", "target_adr_id": "ADR-0029 (working/feature/audit-findings-remediation-r1/adrs/)", "action_required": "update-path"},
+    {"path": "adrs/ADR-0036-single-location-adr-placement.md", "line": 107, "link_form": "code-fence-shell-command-illustrative", "target_adr_id": "ADR-0032 (in illustrative symlink rejected-option example)", "action_required": "no-change (this is a hypothetical rejected-option example in the ADR's own decision rationale; not a real cross-reference)"},
+    {"path": "adrs/ADR-0019-naming-convention.md", "line": "various", "link_form": "various", "target_adr_id": "adrs-migrated/ + others", "action_required": "review-after-FR-8d (ADR-0019 may reference adrs-migrated/ files; if it does, update path; preserve ADR semantic content per FR-9b)"},
+    {"path": "adrs/ADR-0038-codebase-analysis-schema-v1-1-0.md", "line": 138, "link_form": "prose-with-backtick-paths", "target_adr_id": "adrs-migrated/ADR-0007", "action_required": "FR-8d makes the path stale; update to adrs/ADR-0007 (NOTE: this is a SHIPPED canonical ADR — FR-9b path-only sweep applies; verify with reviewer)"},
+    {"path": ".claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md", "line": 96, "link_form": "backtick-path-example", "target_adr_id": "ADR-0046 (working/feature/issue-capture-mechanism-r1/adrs/)", "action_required": "update-path (after FR-8c, the example path is canonical)"},
+    {"path": ".claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md", "line": 99, "link_form": "backtick-path-example", "target_adr_id": "ADR-0050 (working/feature/issue-capture-mechanism-r1/adrs/)", "action_required": "update-path"},
+    {"path": ".claude/skills/capture-issue/SKILL.md", "line": 44, "link_form": "backtick-path-example", "target_adr_id": "ADR-0044 (working/feature/issue-capture-mechanism-r1/adrs/)", "action_required": "update-path-AND-update-ID (the feature ADR-0044 is being re-numbered per FR-8b; the example must point to the new canonical ID)"},
+    {"path": ".claude/skills/KB-issue-capture/SKILL.md", "line": 72, "link_form": "prose-with-backtick-path", "target_adr_id": "working/feature/issue-capture-mechanism-r1/adrs/ (header for example block)", "action_required": "update-path"},
+    {"path": "README.md", "line": 18, "link_form": "tree-listing-prose", "target_adr_id": "adrs-migrated/ generic", "action_required": "update-after-FR-8d (remove adrs-migrated/ entry from tree listing; directory no longer exists)"}
+  ],
+  "skill_audit_findings": [
+    {"skill_name": "recipe-feature-pipeline", "file": ".claude/skills/recipe-feature-pipeline/SKILL.md", "line": 273, "has_feature_scoped_prose": false, "snippet": "`prd_path`, `per_layer_designs_dir`, ..., `output_adrs_dir`, `slug`. (parameter list, no default)", "recommended_action": "update-with-fix: add canonical-default annotation per FR-3 (e.g., 'output_adrs_dir (default: \"adrs/\" per ADR-0036)')"},
+    {"skill_name": "KB-documentation-criteria", "file": ".claude/skills/KB-documentation-criteria/references/disciplines/design-composition.md", "line": 36, "has_feature_scoped_prose": true, "snippet": "Plus zero or more ADR files at `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md`.", "recommended_action": "update-with-fix: replace with 'Plus zero or more ADR files at `adrs/ADR-NNNN-<slug>.md` per ADR-0036.'"},
+    {"skill_name": "KB-documentation-criteria", "file": ".claude/skills/KB-documentation-criteria/references/disciplines/design-composition.md", "line": 295, "has_feature_scoped_prose": true, "snippet": "Plus, separately, zero or more ADR files at `working/feature/<slug>/adrs/ADR-NNNN-<slug>.md`.", "recommended_action": "update-with-fix: same replacement as line 36"},
+    {"skill_name": "KB-documentation-criteria", "file": ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md", "line": 150, "has_feature_scoped_prose": true, "snippet": "Pre-ADR-0036 archives that contain `working/feature/<slug>/adrs/` directories are not retroactively cleaned. The validator ignores those directories (presence or absence is not a finding). New feature runs do not create them.", "recommended_action": "review-with-likely-update: after FR-8c completes, NO such directories exist anywhere. The clause becomes stale. Fix: remove the clause, OR rewrite as historical note: 'After the adr-placement-mechanism-repair-r1 feature, all such directories have been migrated; the validator no longer requires an allowlist for them.'"},
+    {"skill_name": "KB-documentation-criteria", "file": ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md", "line": "140, 144, 164, 181", "has_feature_scoped_prose": false, "snippet": "Post-ADR-0036 canonical-only statements (correct as-is).", "recommended_action": "no-change-with-rationale: aligned with ADR-0036"},
+    {"skill_name": "KB-documentation-criteria", "file": ".claude/skills/KB-documentation-criteria/references/shared-conventions.md", "line": 302, "has_feature_scoped_prose": false, "snippet": "ADRs live in exactly one canonical location: `adrs/ADR-NNNN-<slug>.md` at the project root. The dual-location convention from the original deliverable-archive-spec is retired. See ADR-0036 for full rationale.", "recommended_action": "no-change-with-rationale: aligned with ADR-0036"},
+    {"skill_name": "KB-documentation-criteria", "file": ".claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md", "line": "96, 99", "has_feature_scoped_prose": true, "snippet": "Example paths point to working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-* and ADR-0050-*.", "recommended_action": "update-with-fix (path-only): rewrite examples to canonical adrs/ADR-NNNN-* form post-FR-8c"},
+    {"skill_name": "KB-issue-capture", "file": ".claude/skills/KB-issue-capture/SKILL.md", "line": 72, "has_feature_scoped_prose": true, "snippet": "All ADR paths are relative to `working/feature/issue-capture-mechanism-r1/adrs/`:", "recommended_action": "update-with-fix (path-only): rewrite as canonical-path-form examples"},
+    {"skill_name": "capture-issue", "file": ".claude/skills/capture-issue/SKILL.md", "line": 44, "has_feature_scoped_prose": true, "snippet": "ADR-0044 per-issue folder model: `working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md`", "recommended_action": "update-with-fix (path-only + ID): after FR-8b renumber + FR-8c relocate, this becomes adrs/ADR-XXXX-per-issue-folder-model.md (XXXX = new ID assigned)"},
+    {"skill_name": "synthesize", "file": ".claude/skills/synthesize/SKILL.md", "line": "22, 240", "has_feature_scoped_prose": false, "snippet": "synthesize writes ADRs at `output/synthesis-<topic>/adrs/ADR-NNN-<slug>.md` (different output target from feature pipeline)", "recommended_action": "review-with-explicit-disposition: Design Composition must decide: (a) declare synthesize-ADRs out-of-scope for FR-10 validator (allowlist `output/synthesis-*/adrs/`); (b) re-target synthesize's ADR output to canonical adrs/ (large scope expansion); (c) deprecate synthesize's ADR-emission. Default expectation is (a) with explicit allowlist per AC-FR-10-f."},
+    {"skill_name": "auditing-shared (10 family members)", "file": "all auditing-* SKILL.md files", "line": "n/a", "has_feature_scoped_prose": false, "snippet": "All 10 auditing-* skills are CLEAN (no ADR-placement guidance prose)", "recommended_action": "no-change-with-rationale: family is clean per FR-11 scope check"},
+    {"skill_name": "KB-review-disciplines", "file": ".claude/skills/KB-review-disciplines/SKILL.md + references/", "line": "n/a", "has_feature_scoped_prose": false, "snippet": "No matches for ADR-placement guidance patterns", "recommended_action": "no-change-with-rationale: clean"},
+    {"skill_name": "synthesize-class knowledge skills (6: claim-extraction, entity-graph, decision-framing, report-composition, substrate-translation, verification)", "file": "respective SKILL.md + references/", "line": "n/a", "has_feature_scoped_prose": false, "snippet": "No ADR-placement-enabling prose; report-composition-knowledge mentions adrs/ADR- in citation examples (canonical form; correct)", "recommended_action": "no-change-with-rationale: clean"},
+    {"skill_name": "KB-task-decomposition", "file": ".claude/skills/KB-task-decomposition/", "line": "n/a", "has_feature_scoped_prose": false, "snippet": "No matches", "recommended_action": "no-change-with-rationale: clean"}
+  ],
+  "divergent_body_diffs": [
+    {
+      "id": "ADR-0024",
+      "root_body_summary": "Canonical (adrs/ADR-0024-frontend-design-knowledge-corpus-structure.md, status: Accepted): full ADR text describing frontend-design-knowledge corpus structure.",
+      "feature_scoped_body_summary": "Feature copy (working/feature/frontend-design-knowledge-r1/adrs/, status: Proposed): identical body, only frontmatter `status:` field differs (Accepted vs Proposed).",
+      "divergence_summary": "ONE-LINE frontmatter difference. Body is byte-identical apart from the status field.",
+      "recommendation_lean": "Keep canonical version (status: Accepted is the post-ratification truth). Delete feature-scoped copy. NO supersession archival required because no body content is being discarded — the body is preserved at canonical. The PRD's FR-8b framing of 'rejected body archived to adrs/superseded/' is OVERKILL for this case and need not apply."
+    },
+    {
+      "id": "ADR-0044",
+      "root_body_summary": "Canonical (adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md, status: Accepted, generated 2026-05-23): the execution-dispatch hierarchy decision per execute-orchestrator-dispatch-mechanism-repair-r1 feature.",
+      "feature_scoped_body_summary": "Feature copy (working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md, status: Proposed, generated 2026-05-23): the per-issue folder model decision per issue-capture-mechanism-r1 feature. ENTIRELY DIFFERENT DECISION.",
+      "divergence_summary": "NOT a divergent body — two distinct decisions sharing the numeric ID 0044 by accident. Both ADRs were authored 2026-05-23 in parallel pipelines; neither knew the other was claiming the ID. The 'subagent-agent-tool-grant-prohibition' decision (canonical ADR-0045) ALSO collided with the issue-capture-mechanism-r1 ADR-0045-three-doctypes-preserved.",
+      "recommendation_lean": "Re-number the issue-capture-mechanism-r1 ADR-0044-per-issue-folder-model to the next-available canonical ID. Sequence: (1) FR-8c relocations complete (ADR-0046-0050 claim those IDs); (2) re-number the ex-feature-scoped ADR-0044-per-issue-folder-model to ADR-0051; (3) update all cross-references (per IN-008 inventory ADR-0044 has 223 mentions, but most are not in the feature folder being relocated — the in-folder references need surgical update). The 'rejected body archived to adrs/superseded/' framing in PRD FR-8b is INAPPLICABLE — no body is rejected; both decisions are kept, only one is re-numbered. Blueprint must document the re-numbering scheme and update the IN-008 cross-reference inventory's expected post-state."
+    },
+    {
+      "id": "ADR-0045",
+      "root_body_summary": "Canonical (adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md, status: Accepted, generated 2026-05-23): the subagent Agent tool-grant prohibition decision per execute-orchestrator-dispatch-mechanism-repair-r1 feature.",
+      "feature_scoped_body_summary": "Feature copy (working/feature/issue-capture-mechanism-r1/adrs/ADR-0045-three-doctypes-preserved.md, status: Proposed, generated 2026-05-23): the three-doctypes-preserved decision per issue-capture-mechanism-r1 feature. ENTIRELY DIFFERENT DECISION.",
+      "divergence_summary": "Same shape as ADR-0044 collision. Two distinct decisions sharing ID by accident.",
+      "recommendation_lean": "Re-number to ADR-0052 (next-available after ADR-0046-0050 relocations + ADR-0051 from ADR-0044 collision resolution). Update all in-folder cross-references. Same INAPPLICABILITY of the 'archive rejected body' framing as ADR-0044."
+    }
+  ],
+  "numbering_collisions": {
+    "feature_scoped_vs_canonical_collisions": [
+      {"feature_adr": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md", "canonical_adr": "adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md", "collision_type": "distinct decisions same ID", "resolution": "re-number feature ADR (e.g., to ADR-0051)"},
+      {"feature_adr": "working/feature/issue-capture-mechanism-r1/adrs/ADR-0045-three-doctypes-preserved.md", "canonical_adr": "adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md", "collision_type": "distinct decisions same ID", "resolution": "re-number feature ADR (e.g., to ADR-0052)"}
+    ],
+    "adrs_migrated_vs_canonical_collisions": [
+      {"adrs_migrated_file": "ADR-0011-documentation-criteria-canonical-skill.md", "canonical_file": "ADR-0011-documentation-criteria-canonical-skill.md", "collision_type": "same name + same decision, different versions (canonical=v1.0.0 stale, archive=v2.0.0 post-naming-update)", "resolution": "Replace canonical with archive v2.0.0 (the more current truth); Git history preserves both"},
+      {"adrs_migrated_file": "ADR-0012-prd-stage.md", "canonical_file": "ADR-0012-prd-stage.md", "collision_type": "same as ADR-0011", "resolution": "same"},
+      {"adrs_migrated_file": "ADR-0013-blueprint-template-adoption.md", "canonical_file": "ADR-0013-blueprint-template-adoption.md", "collision_type": "same as ADR-0011", "resolution": "same"},
+      {"adrs_migrated_file": "ADR-0014-adr-template-adoption-and-migration.md", "canonical_file": "ADR-0014-adr-template-adoption-and-migration.md", "collision_type": "same as ADR-0011", "resolution": "same"},
+      {"adrs_migrated_file": "ADR-0015-ears-acceptance-criteria.md", "canonical_file": "ADR-0015-ears-acceptance-criteria.md", "collision_type": "same as ADR-0011", "resolution": "same"},
+      {"adrs_migrated_file": "ADR-0016-per-layer-fanout-composer-fanin.md", "canonical_file": "ADR-0016-per-layer-fanout-composer-fanin.md", "collision_type": "same as ADR-0011", "resolution": "same"},
+      {"adrs_migrated_file": "ADR-0017-document-reviewer-integration.md", "canonical_file": "ADR-0017-document-reviewer-integration.md", "collision_type": "same as ADR-0011", "resolution": "same"},
+      {"adrs_migrated_file": "ADR-0018-codebase-analysis-schema.md", "canonical_file": "ADR-0018-codebase-analysis-schema.md", "collision_type": "INVERSE — canonical is more current (carries supersession-by-ADR-0038 marker); archive is older despite v2.0.0 number (no supersession marker)", "resolution": "KEEP canonical; DELETE archive (preserved in Git history)"}
+    ]
+  },
+  "known_issues": [
+    {
+      "description": "PRD framing of ADR-0044 + ADR-0045 as 'divergent bodies' is structurally incorrect — they are numbering collisions (distinct decisions sharing ID by accident). FR-8b 'archive rejected body' framing is inapplicable.",
+      "files": ["working/feature/adr-placement-mechanism-repair-r1/prd-v1.md (FR-8b prose)"],
+      "severity": "major (affects Blueprint design; design-composer must propose re-numbering scheme rather than rejected-body archival)"
+    },
+    {
+      "description": "PRD assumption 'feature-scoped ADRs from 2 features only (frontend-design-knowledge-r1, issue-capture-mechanism-r1)' is materially under-specified. Discovery surfaced FIVE feature folders with feature-scoped ADRs: audit-machinery-fixes-r1, audit-findings-remediation-r1, devcontainer-mcp-provisioning-r1, pipeline-skill-design-fixes-r1, frontend-design-knowledge-r1, issue-capture-mechanism-r1. The 12 byte-identicals span 4 folders; the 'divergent' ADR-0024 is in frontend; the collision-numbered ADRs are in issue-capture; the 5 truly-relocate ADRs (ADR-0046-0050) are in issue-capture.",
+      "files": ["working/feature/adr-placement-mechanism-repair-r1/prd-v1.md (Background)"],
+      "severity": "minor (Phase 0 Discovery correctly enumerates; Plan Phase 2a tasks can adapt — but the Blueprint migration map must list per-source-folder dispositions)"
+    },
+    {
+      "description": "PRD assumption 'adrs-migrated/ contains ADRs 0001-0010 only' is wrong. The archive contains 18 distinct ADR IDs (0001-0018), of which 8 (IDs 0011-0018) have name collisions with canonical adrs/. The collisions are content-divergent.",
+      "files": ["working/feature/adr-placement-mechanism-repair-r1/prd-v1.md (Phase Scope Outline Phase 2d)"],
+      "severity": "major (FR-8d AC-FR-8d-2 collision-resolution surfaces 8 cases requiring per-ID semantic decision; Blueprint must document)"
+    },
+    {
+      "description": "PRD Open Item OI-5 (redirect-note format) has NO project precedent. Discovery found no prior plan creating redirect stubs; the symlink alternative was REJECTED in adrs/ADR-0036. Design Composition is doing fresh-design here, not inheriting a pattern.",
+      "files": ["working/feature/adr-placement-mechanism-repair-r1/prd-v1.md (OI-5)"],
+      "severity": "minor (Design Composition's freedom to design; not a defect)"
+    },
+    {
+      "description": "Canonical shipped ADR adrs/ADR-0038-codebase-analysis-schema-v1-1-0.md:138 references adrs-migrated/ADR-0007-* paths. After FR-8d, these paths are stale. FR-9b says shipped Blueprint prose is path-only edits; does that policy extend to shipped canonical ADR prose?",
+      "files": ["adrs/ADR-0038-codebase-analysis-schema-v1-1-0.md:138"],
+      "severity": "minor (Design Composition decides; path-only update preserves semantics, fits FR-9b's spirit)"
+    },
+    {
+      "description": "Numerical scheme for re-numbered collision ADRs (FR-8b 0044/0045) must account for FR-8c relocations (ADR-0046-0050) and any new ADRs this very feature authors. Current Discovery proposal: ADR-0051 (ex-ADR-0044-per-issue-folder-model) + ADR-0052 (ex-ADR-0045-three-doctypes-preserved) assumes this feature's own ADR(s) take ADR-0053+. Blueprint must confirm.",
+      "files": ["n/a (this is a Design Composition decision point)"],
+      "severity": "minor (numerical-scheme choice; defer to Blueprint)"
+    }
+  ],
+  "open_questions_for_human": [
+    {
+      "question": "PRD FR-8b assumes ADR-0044/ADR-0045 are divergent-body cases. Discovery confirms they are NUMBERING COLLISIONS (distinct decisions accidentally sharing IDs). Recommendation: re-number the feature-side ADRs to next-available canonical IDs (ADR-0051/ADR-0052 if this feature authors no ADRs first). Should the PRD be amended or should the Blueprint propose the re-numbering scheme as an FR-8b sub-action?",
+      "context": "PRD §FR-8b currently says 'rejected body archived to adrs/superseded/<id>-feature-scoped-body.md'. Discovery finds no body is being rejected; both decisions stand on their own merits. Archival framing is inapplicable.",
+      "blocks": "Blueprint composition (design-composer must know whether to propose re-numbering or to follow PRD literally)"
+    },
+    {
+      "question": "PRD §FR-8d hypothesis 'canonical lacks ADRs 0001-0010' is correct only for that ID range. Archive extends to ADR-0018, and IDs 0011-0018 have content-divergent name collisions with canonical. Recommendation: for ADRs 0011-0017 the archive version (v2.0.0 with naming-convention updates) replaces the stale canonical v1.0.0; for ADR-0018 the canonical version (carrying ADR-0038 supersession marker) stays; archive deleted. Blueprint approval required.",
+      "context": "FR-8d AC-FR-8d-2 says 'if collision-resolution enumeration produced by Phase 0 Discovery finds a canonical-vs-archive name collision, then the system shall record the resolution decision in the Blueprint and apply it consistently'. Discovery has surfaced; Blueprint must record.",
+      "blocks": "Phase 2d task authoring (8 per-ID resolution decisions needed before Plan can sequence)"
+    },
+    {
+      "question": "synthesize SKILL.md emits ADRs at output/synthesis-<topic>/adrs/ — a non-canonical-adrs/ location. Design Composition must decide: (a) allowlist this in FR-10 validator; (b) re-target synthesize to canonical adrs/; (c) deprecate synthesize's ADR-emission. Default is (a) with explicit Blueprint enumeration per AC-FR-10-f.",
+      "context": "PRD FR-11 audit scope includes synthesize-class; Discovery surfaces synthesize as the only non-FR-pipeline ADR-author in the repo. It is a deliberate design (synthesize is for cross-project research synthesis with its own output dir), not a placement drift.",
+      "blocks": "FR-10 Blueprint design (validator scope) + FR-11 audit-table disposition"
+    },
+    {
+      "question": "FR-9b says shipped Blueprint prose is path-only edits. Does this extend to shipped canonical ADRs (e.g., adrs/ADR-0038:138 referencing adrs-migrated/ADR-0007 paths)? Both contain a-prose-and-paths; both are 'shipped'. Recommendation: yes, path-only sweep applies to shipped ADRs the same way it applies to shipped Blueprints; the supersession-discipline preservation (ADR-0005) is honored because path-only edits don't change the decision recorded.",
+      "context": "ADR-0005 supersession-discipline forbids in-place semantic edits of accepted ADRs; path-only edits to fix broken references are arguably not semantic. Blueprint should ratify.",
+      "blocks": "Phase 3 sweep scope (whether canonical ADRs are in the sweep set)"
+    },
+    {
+      "question": "finalize-deliverable-packager.md tools: frontmatter does NOT include Bash. The FR-10 packager-side validator integration may require subprocess invocation. Options: (a) add Bash to packager tools list; (b) invoke validator via orchestrator hook (orchestrator already has Bash); (c) author the validator as a callable Python module the packager imports (not subprocess).",
+      "context": "Packager today emits BLOCKER prose without external subprocess. FR-10 inserts a validator-subprocess pattern. The tool-grant change has security implications (Bash is unrestricted per execute-task-quality-handler convention).",
+      "blocks": "FR-10 packager-surface design (Blueprint must propose one of the 3 options)"
+    }
+  ]
+}

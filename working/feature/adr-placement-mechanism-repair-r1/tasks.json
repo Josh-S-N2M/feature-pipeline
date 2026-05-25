@@ -1,0 +1,1019 @@
+{
+  "schema_version": "1.0.0",
+  "pipeline_run_id": "adr-placement-mechanism-repair-r1",
+  "generated_at": "2026-05-25T04:00:00Z",
+  "feature_slug": "adr-placement-mechanism-repair-r1",
+  "source_artifacts": {
+    "prd": "working/feature/adr-placement-mechanism-repair-r1/prd-v1.md",
+    "prd_version": "1.0.2",
+    "blueprint": "working/feature/adr-placement-mechanism-repair-r1/blueprint-v1.md",
+    "blueprint_version": "1.2.0",
+    "plan": "working/feature/adr-placement-mechanism-repair-r1/plan-v1.md",
+    "plan_version": "1.0.1",
+    "acceptance_tests": "working/feature/adr-placement-mechanism-repair-r1/acceptance-tests.md",
+    "acceptance_tests_version": "1.0.0",
+    "phase_validators": "working/feature/adr-placement-mechanism-repair-r1/phase-validators.md",
+    "phase_validators_version": "1.0.0",
+    "codebase_analysis": "working/feature/adr-placement-mechanism-repair-r1/codebase-analysis.json",
+    "adrs": [
+      "adrs/ADR-0005-fact-disposition-table-required-in-blueprint.md",
+      "adrs/ADR-0017-reviewer-gate-0-1-discipline.md",
+      "adrs/ADR-0019-pipeline-run-summary-required.md",
+      "adrs/ADR-0027-discovery-default-scan-path.md",
+      "adrs/ADR-0031-deliverable-archive-spec.md",
+      "adrs/ADR-0035-subprocess-timeout-and-exit-codes.md",
+      "adrs/ADR-0036-canonical-adr-placement.md",
+      "adrs/ADR-0042-bash-tool-grant-narrow-scope.md",
+      "adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md",
+      "adrs/ADR-0053-adr-renumbering-collision-resolution-algorithm.md",
+      "adrs/ADR-0054-canonical-helper-three-surface-enforcement-pattern.md",
+      "adrs/ADR-0055-archive-wins-consolidation-policy-for-version-divergent-collisions.md"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "T0.1",
+      "name": "Confirm migration map inputs are loadable",
+      "phase": "P-0",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/codebase-analysis.json",
+        "working/feature/adr-placement-mechanism-repair-r1/blueprint-v1.md",
+        "adrs/ADR-0053-adr-renumbering-collision-resolution-algorithm.md",
+        "adrs/ADR-0054-canonical-helper-three-surface-enforcement-pattern.md",
+        "adrs/ADR-0055-archive-wins-consolidation-policy-for-version-divergent-collisions.md"
+      ],
+      "description": "Read codebase-analysis.json IN-001 through IN-012; confirm each row's data is loadable for downstream phases. Confirm Blueprint Migration map enumerates every off-canonical ADR with disposition. Confirm ADRs 0053/0054/0055 at canonical (v1.0.1).",
+      "depends_on": [],
+      "satisfies_ac": ["N/A — setup"],
+      "verified_by_test": ["AT-019", "AT-020"],
+      "validated_by_phase": "PV-0",
+      "size": "S",
+      "parallelizable_with": [],
+      "per_task_skills": ["KB-documentation-criteria", "KB-task-decomposition"]
+    },
+    {
+      "id": "T0.2",
+      "name": "Confirm 32-entry path-form cross-reference inventory is loadable",
+      "phase": "P-0",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/codebase-analysis.json"
+      ],
+      "description": "Confirm codebase-analysis.json IN-008 enumerates 14 feature-scoped + 18 adrs-migrated/ path-form references, complete with file + line for each. This is the Phase 3 path-form input.",
+      "depends_on": ["T0.1"],
+      "satisfies_ac": ["AC-FR-9-c (partial)", "N/A — setup"],
+      "verified_by_test": ["AT-041"],
+      "validated_by_phase": "PV-0",
+      "size": "S",
+      "parallelizable_with": ["T0.3"],
+      "per_task_skills": ["KB-documentation-criteria"]
+    },
+    {
+      "id": "T0.3",
+      "name": "Establish migration-log.md scaffolding",
+      "phase": "P-0",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Create migration-log.md as the Plan-execution audit substrate. Per-task per-ADR entries will be appended at each Phase 2 task. Initial content: header + empty table per ADR ID covering 38 ADR-touching operations.",
+      "depends_on": ["T0.1"],
+      "satisfies_ac": ["AC-FR-8a-2 (supports)", "N/A — setup"],
+      "verified_by_test": [],
+      "validated_by_phase": "PV-0",
+      "size": "S",
+      "parallelizable_with": ["T0.2"],
+      "per_task_skills": ["KB-documentation-criteria"]
+    },
+    {
+      "id": "T1.1",
+      "name": "Delete retired dual-location BLOCKER prose in packager",
+      "phase": "P-1",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/agents/finalize-deliverable-packager.md"
+      ],
+      "description": "Delete lines 56-63 of finalize-deliverable-packager.md (the retired dual-location BLOCKER check prose pinned by IN-006). Replace with a placeholder anchor pointing at FR-10-d, where T5.3 will wire the validator subprocess invocation.",
+      "depends_on": ["T0.1"],
+      "satisfies_ac": ["AC-FR-1-a", "AC-FR-1-b (partial)"],
+      "verified_by_test": ["AT-009"],
+      "validated_by_phase": "PV-1",
+      "size": "S",
+      "parallelizable_with": ["T1.2", "T1.3", "T1.4"],
+      "per_task_skills": ["KB-claude-code-design", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T1.2",
+      "name": "Delete contradictory dual-location BLOCKER prose in reviewer",
+      "phase": "P-1",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/agents/shared-document-reviewer.md"
+      ],
+      "description": "Delete line 349 of shared-document-reviewer.md (the contradictory dual-location check pinned by IN-006). Leave lines 470-472 unchanged (sole canonical-only statement post-edit).",
+      "depends_on": ["T0.1"],
+      "satisfies_ac": ["AC-FR-2-a", "AC-FR-2-b"],
+      "verified_by_test": ["AT-011"],
+      "validated_by_phase": "PV-1",
+      "size": "S",
+      "parallelizable_with": ["T1.1", "T1.3", "T1.4"],
+      "per_task_skills": ["KB-claude-code-design", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T1.3",
+      "name": "Codify canonical-root default for output_adrs_dir in orchestrator SKILL.md",
+      "phase": "P-1",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "description": "At line 273, annotate the output_adrs_dir parameter with 'default: \"adrs/\" per ADR-0036'. Ensure pass-through fidelity prose: if caller passes output_adrs_dir explicitly, orchestrator forwards unmodified; if absent, orchestrator passes 'adrs/'.",
+      "depends_on": ["T0.1"],
+      "satisfies_ac": ["AC-FR-3-a", "AC-FR-3-b", "AC-US-4-a (partial)"],
+      "verified_by_test": ["AT-013", "AT-014", "AT-007"],
+      "validated_by_phase": "PV-1",
+      "size": "S",
+      "parallelizable_with": ["T1.1", "T1.2", "T1.4"],
+      "per_task_skills": ["KB-claude-code-design", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T1.4",
+      "name": "Update design-composer.md output_adrs_dir parameter description (3 anchors + override subsection)",
+      "phase": "P-1",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/agents/design-composer.md"
+      ],
+      "description": "Edit lines 48, 129, 187 of design-composer.md (the three output_adrs_dir mentions per IN-007). Each mention shall cite ADR-0036, state canonical-root as the default, reference the test-only override mechanism. Add a new 'Test-only override for output_adrs_dir' subsection.",
+      "depends_on": ["T0.1"],
+      "satisfies_ac": ["AC-FR-4-a", "AC-FR-4-b", "AC-FR-5-a", "AC-FR-5-b"],
+      "verified_by_test": ["AT-015", "AT-016", "AT-017", "AT-018"],
+      "validated_by_phase": "PV-1",
+      "size": "M",
+      "parallelizable_with": ["T1.1", "T1.2", "T1.3"],
+      "per_task_skills": ["KB-claude-code-design", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T1.5",
+      "name": "Convergence check across the four operator files",
+      "phase": "P-1",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/agents/finalize-deliverable-packager.md",
+        ".claude/agents/shared-document-reviewer.md",
+        ".claude/agents/design-composer.md",
+        ".claude/skills/recipe-feature-pipeline/SKILL.md",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "After T1.1-T1.4 land, read the four edited files in sequence and verify: (a) no file mentions a dual-location convention; (b) each file that touches the convention cites ADR-0036; (c) no file contradicts another. Record check result in migration-log.md as Phase-1 closeout.",
+      "depends_on": ["T1.1", "T1.2", "T1.3", "T1.4"],
+      "satisfies_ac": ["AC-US-2-b", "AC-OP-2 (first-pass)"],
+      "verified_by_test": ["AT-004", "AT-059"],
+      "validated_by_phase": "PV-1",
+      "size": "S",
+      "parallelizable_with": [],
+      "per_task_skills": ["KB-claude-code-design", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T2a.1",
+      "name": "Byte-equality re-verification + delete for the 12 byte-identical ADRs",
+      "phase": "P-2a",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/audit-machinery-fixes-r1/adrs/",
+        "working/feature/pipeline-skill-design-fixes-r1/adrs/",
+        "working/feature/audit-findings-remediation-r1/adrs/",
+        "working/feature/devcontainer-mcp-provisioning-r1/adrs/",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "For each of 12 ADRs (0026, 0028, 0029, 0030, 0031, 0037, 0038, 0039, 0040, 0041, 0042, 0043): execute per-ADR routine: diff -q for byte-equality re-verification, git rm feature-scoped copy, append entry to migration-log.md. If byte-equality fails, HALT via AskUserQuestion.",
+      "depends_on": ["T0.1", "T0.3"],
+      "satisfies_ac": ["AC-FR-8a-1", "AC-FR-8a-2"],
+      "verified_by_test": ["AT-022", "AT-023"],
+      "validated_by_phase": "PV-2a",
+      "size": "M",
+      "parallelizable_with": ["T2b.1", "T2c.1", "T2d.1"],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T2b.1",
+      "name": "ADR-0024 status-lift dedupe with fail-safe per AC-FR-8b-1.1",
+      "phase": "P-2b",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/frontend-design-knowledge-r1/adrs/ADR-0024-frontend-design-knowledge.md",
+        "adrs/ADR-0024-frontend-design-knowledge.md",
+        "adrs/superseded/ADR-0024-feature-scoped-body.md",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "For ADR-0024: diff canonical vs feature-scoped bodies excluding frontmatter status: line. If zero non-frontmatter divergence, git rm feature-scoped copy. If divergence, HALT, archive feature-scoped body to adrs/superseded/ with provenance footer, then git rm. Log disposition.",
+      "depends_on": ["T0.1", "T0.3"],
+      "satisfies_ac": ["AC-FR-8b-1", "AC-FR-8b-1.1"],
+      "verified_by_test": ["AT-024", "AT-025", "AT-026"],
+      "validated_by_phase": "PV-2b",
+      "size": "S",
+      "parallelizable_with": ["T2a.1", "T2c.1", "T2d.1"],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T2b.2",
+      "name": "ADR-0044 + ADR-0045 renumber per ADR-0053",
+      "phase": "P-2b",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0044-per-issue-folder-model.md",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0045-three-doctypes-preserved.md",
+        "adrs/ADR-0051-per-issue-folder-model.md",
+        "adrs/ADR-0052-three-doctypes-preserved.md",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Per ADR-0053 v1.0.1 renumber baseline = ADR-0050 + 1. Targets: ADR-0051 (for ADR-0044), ADR-0052 (for ADR-0045). git mv from working/feature/issue-capture-mechanism-r1/adrs/ to adrs/. Edit renumbered files' frontmatter to add original_id and update id: field. Append migration-log entries. Sequenced last in Phase 2 per ADR-0053.",
+      "depends_on": ["T0.1", "T0.3", "T2c.1", "T2d.4"],
+      "satisfies_ac": ["AC-FR-8b-2", "AC-NFR-5-a"],
+      "verified_by_test": ["AT-027", "AT-028", "AT-070"],
+      "validated_by_phase": "PV-2b",
+      "size": "S",
+      "parallelizable_with": [],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T2c.1",
+      "name": "git mv ADRs 0046–0050 to canonical + write .tombstone redirect notes",
+      "phase": "P-2c",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-issue-capture-orchestration.md",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-issue-doctype-taxonomy.md",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0048-issue-frontmatter-discipline.md",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0049-issue-doctype-structural-spec.md",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0050-issue-capture-skill-architecture.md",
+        "adrs/ADR-0046-issue-capture-orchestration.md",
+        "adrs/ADR-0047-issue-doctype-taxonomy.md",
+        "adrs/ADR-0048-issue-frontmatter-discipline.md",
+        "adrs/ADR-0049-issue-doctype-structural-spec.md",
+        "adrs/ADR-0050-issue-capture-skill-architecture.md",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0046.tombstone",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0047.tombstone",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0048.tombstone",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0049.tombstone",
+        "working/feature/issue-capture-mechanism-r1/adrs/ADR-0050.tombstone",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "For each of ADR-0046 through ADR-0050: git mv from working/feature/issue-capture-mechanism-r1/adrs/ to adrs/; write .tombstone file with 3-line template; append migration-log entry. NFR-5 dictates git mv (not copy-and-delete). .tombstone extension intentional (validator's ADR-*.md rglob won't match).",
+      "depends_on": ["T0.1", "T0.3"],
+      "satisfies_ac": ["AC-FR-8c-1", "AC-FR-8c-2", "AC-NFR-5-a", "AC-NFR-5-b"],
+      "verified_by_test": ["AT-029", "AT-030", "AT-070", "AT-071"],
+      "validated_by_phase": "PV-2c",
+      "size": "M",
+      "parallelizable_with": ["T2a.1", "T2b.1", "T2d.1"],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T2d.1",
+      "name": "Sub-procedure (i) — No-collision adds for ADRs 0001-0006, 0008-0010 (9 IDs)",
+      "phase": "P-2d",
+      "layer": "claude-code",
+      "target_files": [
+        "adrs-migrated/",
+        "adrs/ADR-0001-canonical-process-naming.md",
+        "adrs/ADR-0002-six-stage-pipeline-architecture.md",
+        "adrs/ADR-0003-l1-l2-l3-verification-discipline.md",
+        "adrs/ADR-0004-prd-as-product-contract.md",
+        "adrs/ADR-0005-fact-disposition-table-required-in-blueprint.md",
+        "adrs/ADR-0006-blueprint-as-engineering-contract.md",
+        "adrs/ADR-0008-blueprint-template-discipline.md",
+        "adrs/ADR-0009-rationale-brief-discipline.md",
+        "adrs/ADR-0010-shared-conventions-frontmatter.md",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "For each of 9 IDs (0001-0006, 0008-0010): git mv adrs-migrated/ADR-NNNN-<slug>-final.md to adrs/ADR-NNNN-<slug>.md (strip -final suffix); git rm pre-naming-convention and pre-template-migration variants; append migration-log entry. 9 mvs + 18 variant rms.",
+      "depends_on": ["T0.1", "T0.3"],
+      "satisfies_ac": ["AC-FR-8d-1 (partial)"],
+      "verified_by_test": ["AT-032"],
+      "validated_by_phase": "PV-2d",
+      "size": "M",
+      "parallelizable_with": ["T2a.1", "T2b.1", "T2c.1"],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T2d.2",
+      "name": "Sub-procedure (ii) — Archive-wins for ADRs 0011-0017 (7 IDs)",
+      "phase": "P-2d",
+      "layer": "claude-code",
+      "target_files": [
+        "adrs-migrated/",
+        "adrs/ADR-0011-prd-vs-blueprint-layer-split.md",
+        "adrs/ADR-0012-ears-acceptance-criteria.md",
+        "adrs/ADR-0013-plan-as-execution-contract.md",
+        "adrs/ADR-0014-discovery-as-discrete-stage.md",
+        "adrs/ADR-0015-rationale-brief-section-required.md",
+        "adrs/ADR-0016-blueprint-template-discipline.md",
+        "adrs/ADR-0017-reviewer-gate-0-1-discipline.md",
+        "adrs/superseded/ADR-0011-pre-consolidation-canonical.md",
+        "adrs/superseded/ADR-0012-pre-consolidation-canonical.md",
+        "adrs/superseded/ADR-0013-pre-consolidation-canonical.md",
+        "adrs/superseded/ADR-0014-pre-consolidation-canonical.md",
+        "adrs/superseded/ADR-0015-pre-consolidation-canonical.md",
+        "adrs/superseded/ADR-0016-pre-consolidation-canonical.md",
+        "adrs/superseded/ADR-0017-pre-consolidation-canonical.md",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "For each of 7 archive-wins IDs (0011-0017): (i) read existing canonical body; (ii) write to adrs/superseded/ADR-NNNN-pre-consolidation-canonical.md with provenance footer; (iii) git mv adrs-migrated/ADR-NNNN-<archive-slug>-final.md to adrs/ADR-NNNN-<archive-slug>.md (overwriting); (iv) edit new canonical's frontmatter (add superseded_by_consolidation + superseded_canonical_archived_to); (v) git rm pre-naming-convention variants. Per ADR-0055 v1.0.1.",
+      "depends_on": ["T0.1", "T0.3"],
+      "satisfies_ac": ["AC-FR-8d-2", "AC-FR-8d-1 (partial)"],
+      "verified_by_test": ["AT-033"],
+      "validated_by_phase": "PV-2d",
+      "size": "L",
+      "parallelizable_with": ["T2d.3"],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T2d.3",
+      "name": "Sub-procedure (iii) — Canonical-wins for ADR-0018",
+      "phase": "P-2d",
+      "layer": "claude-code",
+      "target_files": [
+        "adrs-migrated/ADR-0018-codebase-analysis-schema-final.md",
+        "adrs-migrated/ADR-0018-codebase-analysis-schema-pre-naming-convention.md",
+        "adrs/ADR-0018-codebase-analysis-schema.md",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Canonical adrs/ADR-0018-codebase-analysis-schema.md retained (carries ADR-0038 supersession marker per IN-004). git rm adrs-migrated/ADR-0018-* (final + pre-naming-convention variants). Append migration-log entry.",
+      "depends_on": ["T0.1", "T0.3"],
+      "satisfies_ac": ["AC-FR-8d-1 (partial)"],
+      "verified_by_test": ["AT-032"],
+      "validated_by_phase": "PV-2d",
+      "size": "S",
+      "parallelizable_with": ["T2d.2"],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T2d.4",
+      "name": "Sub-procedure (iv) — Canonical-only for ADR-0007 with v1-superseded variant deletion per AA-003",
+      "phase": "P-2d",
+      "layer": "claude-code",
+      "target_files": [
+        "adrs-migrated/ADR-0007-code-graph-mcp-selection-pre-naming-convention.md",
+        "adrs-migrated/ADR-0007-code-graph-mcp-selection-v1-superseded.md",
+        "adrs/ADR-0007-code-graph-mcp-selection.md",
+        "adrs-migrated/",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Canonical adrs/ADR-0007-code-graph-mcp-selection.md retained. Per ADR-0055 v1.0.1 / AA-003: git rm adrs-migrated/ADR-0007-code-graph-mcp-selection-pre-naming-convention.md, git rm adrs-migrated/ADR-0007-*-pre-template-migration.md (× any present), git rm adrs-migrated/ADR-0007-code-graph-mcp-selection-v1-superseded.md (critical AA-003 inclusion). git rm -r adrs-migrated/ (directory now empty).",
+      "depends_on": ["T2d.1", "T2d.2", "T2d.3"],
+      "satisfies_ac": ["AC-FR-8d-1 (full)", "AC-FR-8d-2.1", "AC-FR-8d-3"],
+      "verified_by_test": ["AT-031", "AT-034", "AT-035"],
+      "validated_by_phase": "PV-2d",
+      "size": "S",
+      "parallelizable_with": [],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T3.1",
+      "name": "Enumerate the 368-occurrence bare-ID inventory at start of Phase 3",
+      "phase": "P-3",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/bare-id-inventory.json"
+      ],
+      "description": "Execute grep -rn 'ADR-0044|ADR-0045' against repo root, minus path-form entries in IN-008 + minus excluded paths (.tombstone, migration-log, per-task execution result files, this Plan, Blueprint cycle-1/cycle-2 prose, ADRs 0053/0054/0055). Produce bare-id-inventory.json enumerating per-occurrence path, line, ≥3 lines context, baseline-heuristic classification. Expected: 368 occurrences (ADR-0044: 223; ADR-0045: 145).",
+      "depends_on": ["T2b.2", "T2c.1", "T2d.4"],
+      "satisfies_ac": ["AC-FR-9-c", "AC-NFR-3-a"],
+      "verified_by_test": ["AT-041", "AT-066"],
+      "validated_by_phase": "PV-3",
+      "size": "M",
+      "parallelizable_with": [],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T3.2",
+      "name": "Execute 32 path-form mechanical edits per IN-008",
+      "phase": "P-3",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "For each of 32 path-form references (14 feature-scoped + 18 adrs-migrated/) in IN-008: execute path-only substitution per D5 Option B extended pattern set. Per-substitution: read file at target line, rewrite path token to canonical, re-read to confirm path-only diff. Update migration-log Phase-3 entries.",
+      "depends_on": ["T2a.1", "T2b.1", "T2b.2", "T2c.1", "T2d.4"],
+      "satisfies_ac": ["AC-FR-9-a (partial)", "AC-FR-9-b (partial)", "AC-FR-9-c (path-form subset)"],
+      "verified_by_test": ["AT-036", "AT-037"],
+      "validated_by_phase": "PV-3",
+      "size": "M",
+      "parallelizable_with": ["T3.3"],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T3.3",
+      "name": "Execute 368-occurrence bare-ID disambiguation per AC-FR-9-b.1",
+      "phase": "P-3",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/bare-id-inventory.json",
+        "working/feature/issue-capture-mechanism-r1/"
+      ],
+      "description": "Per AC-FR-9-b.1: for each of 368 bare-ID occurrences, (i) read surrounding ≥3 lines context, (ii) apply baseline heuristic as starting point, (iii) make per-occurrence judgment (feature-meaning = renumber to ADR-0051/0052 OR canonical-meaning = preserve), (iv) if ambiguous, surface via AskUserQuestion, (v) record per-occurrence disposition. Largest single Plan task. Sub-batch by source folder for tractability.",
+      "depends_on": ["T3.1", "T3.2"],
+      "satisfies_ac": ["AC-FR-9-a (full)", "AC-FR-9-b (full)", "AC-FR-9-b.1"],
+      "verified_by_test": ["AT-036", "AT-038", "AT-039", "AT-040"],
+      "validated_by_phase": "PV-3",
+      "size": "L",
+      "parallelizable_with": ["T3.2"],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T3.4",
+      "name": "Cross-reference sweep convergence check",
+      "phase": "P-3",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md",
+        "working/feature/adr-placement-mechanism-repair-r1/bare-id-inventory.json"
+      ],
+      "description": "After T3.2 + T3.3 land, re-run IN-008 grep pattern set + T3.1's bare-ID extraction grep against post-sweep repo. Confirm zero matches for the 14 feature-scoped + 18 adrs-migrated/ former paths (excluding documented exclusions); confirm bare-ID extraction count equals disposition-tagged preserved count + zero new occurrences. Record convergence in migration-log Phase-3 closeout.",
+      "depends_on": ["T3.2", "T3.3"],
+      "satisfies_ac": ["AC-OP-5 (partial)"],
+      "verified_by_test": ["AT-036", "AT-062"],
+      "validated_by_phase": "PV-3",
+      "size": "S",
+      "parallelizable_with": [],
+      "per_task_skills": ["KB-task-decomposition", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T4.1",
+      "name": "Author validate_adr_placement.py per Contract Definitions",
+      "phase": "P-4",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/validate_adr_placement.py"
+      ],
+      "description": "Create validate_adr_placement.py per Blueprint Component 1 + Contract Definitions. Python 3 stdlib only (argparse, pathlib, json, sys, time); positional scan_path (default '.'); optional --allowlist flag; rglob ADR-*.md; parent-directory check vs canonical adrs/ + structural exception for adrs/superseded/; emit JSON with validator/verdict/findings/scan_path/elapsed_ms; exit 0=PASS, 2=BLOCK per ADR-0035. NFR-2: elapsed_ms<5000.",
+      "depends_on": ["T0.1"],
+      "satisfies_ac": ["AC-FR-10-a", "AC-CC-1 (partial)", "AC-NFR-8-a"],
+      "verified_by_test": ["AT-042", "AT-051", "AT-076"],
+      "validated_by_phase": "PV-4",
+      "size": "M",
+      "parallelizable_with": [],
+      "per_task_skills": ["KB-general-coding-principles", "KB-claude-code-design"]
+    },
+    {
+      "id": "T4.2",
+      "name": "Extend smoke_test_auditing_shared.py with positive + negative coverage for validate_adr_placement",
+      "phase": "P-4",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py"
+      ],
+      "description": "Add two test cases for validate_adr_placement: (a) positive — run against post-Phase-3 clean repo, expect exit 0/PASS/empty; (b) negative — create transient working/feature/test-fixture/adrs/ADR-9999-fixture.md, run, expect exit 2/BLOCK with feature-scoped finding. Cleanup fixture after test.",
+      "depends_on": ["T4.1"],
+      "satisfies_ac": ["AC-CC-2", "AC-FR-10-e (partial)", "AC-CC-1 (full)"],
+      "verified_by_test": ["AT-046", "AT-052"],
+      "validated_by_phase": "PV-4",
+      "size": "S",
+      "parallelizable_with": [],
+      "per_task_skills": ["KB-general-coding-principles", "KB-claude-code-design"]
+    },
+    {
+      "id": "T5.1",
+      "name": "Wire validator at orchestrator Step 8 (surface a per ADR-0054)",
+      "phase": "P-5",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "description": "In recipe-feature-pipeline/SKILL.md Step 8 area, insert prose describing validator subprocess invocation between design-composer return and shared-document-reviewer invocation. Orchestrator stage gate invokes python3 .claude/skills/auditing-shared/scripts/validate_adr_placement.py (no allowlist at this surface); 120s timeout per ADR-0035; halts on exit 2 (surfaces JSON via AskUserQuestion).",
+      "depends_on": ["T4.1", "T1.3"],
+      "satisfies_ac": ["AC-FR-10-b", "AC-CC-5", "AC-NFR-6-a (partial)"],
+      "verified_by_test": ["AT-043", "AT-055"],
+      "validated_by_phase": "PV-5",
+      "size": "S",
+      "parallelizable_with": ["T5.2", "T5.3", "T5.4", "T5.5", "T5.6"],
+      "per_task_skills": ["KB-claude-code-design", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T5.2",
+      "name": "Wire validator at run_phase_checks.py dispatch (surface b per ADR-0054)",
+      "phase": "P-5",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/run_phase_checks.py"
+      ],
+      "description": "Add validate_adr_placement.py to parallel-dispatch set at lines 39-44. Dispatch passes --allowlist output/synthesis-*/adrs/ (this surface is the only one with allowlist per ADR-0054 commitment 2). Findings fold into existing validator dimension per Q-CC-7 Option A — extend dimension rollup logic. Non-zero exit blocks phase progression.",
+      "depends_on": ["T4.1"],
+      "satisfies_ac": ["AC-FR-10-c", "AC-CC-3", "AC-FR-10-f (re-verification)", "AC-NFR-6-a (partial)"],
+      "verified_by_test": ["AT-044", "AT-047", "AT-053"],
+      "validated_by_phase": "PV-5",
+      "size": "M",
+      "parallelizable_with": ["T5.1", "T5.3", "T5.4", "T5.5", "T5.6"],
+      "per_task_skills": ["KB-general-coding-principles", "KB-claude-code-design"]
+    },
+    {
+      "id": "T5.3",
+      "name": "Wire validator at packager + add Bash tool grant + .claude/settings.json allow-list entry (surface c per ADR-0054)",
+      "phase": "P-5",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/agents/finalize-deliverable-packager.md",
+        ".claude/settings.json"
+      ],
+      "description": "Three coordinated edits: (a) replace placeholder anchor from T1.1 with subprocess-invocation prose (python3 .claude/skills/auditing-shared/scripts/validate_adr_placement.py; no allowlist; 120s timeout; non-zero exit raises BLOCKER finding into packager-report.json); (b) edit packager frontmatter tools: to add Bash; (c) edit .claude/settings.json to add narrow allow-list entry: Bash(python3 .claude/skills/auditing-shared/scripts/validate_adr_placement.py*) per ADR-0054 commitment 3.",
+      "depends_on": ["T1.1", "T4.1"],
+      "satisfies_ac": ["AC-FR-10-d", "AC-CC-4", "AC-FR-1-b (full)", "AC-NFR-6-a (partial)"],
+      "verified_by_test": ["AT-045", "AT-054", "AT-010"],
+      "validated_by_phase": "PV-5",
+      "size": "M",
+      "parallelizable_with": ["T5.1", "T5.2", "T5.4", "T5.5", "T5.6"],
+      "per_task_skills": ["KB-claude-code-design", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T5.4",
+      "name": "Skill audit remediation — KB-documentation-criteria (4 file updates)",
+      "phase": "P-5",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/disciplines/design-composition.md",
+        ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md",
+        ".claude/skills/KB-documentation-criteria/references/templates/issue-register-template.md",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Per Blueprint Skill audit table: (i) design-composition.md:36 — replace working/feature/<slug>/adrs/... with adrs/... per ADR-0036; (ii) design-composition.md:295 — same; (iii) deliverable-archive-spec.md:150 — remove stale backward-compat clause; (iv) issue-register-template.md:96,99 — rewrite example paths to canonical. Append per-file disposition to migration-log Phase-5 section.",
+      "depends_on": ["T0.1"],
+      "satisfies_ac": ["AC-FR-11-a (partial)", "AC-FR-11-b (partial)", "AC-FR-11-c", "AC-CC-7 (partial)", "AC-NFR-4-a (partial)", "AC-US-4-b (partial)"],
+      "verified_by_test": ["AT-008", "AT-048", "AT-049"],
+      "validated_by_phase": "PV-5",
+      "size": "S",
+      "parallelizable_with": ["T5.1", "T5.2", "T5.3", "T5.5", "T5.6"],
+      "per_task_skills": ["KB-documentation-criteria"]
+    },
+    {
+      "id": "T5.5",
+      "name": "Skill audit remediation — KB-issue-capture + capture-issue (2 file updates)",
+      "phase": "P-5",
+      "layer": "claude-code",
+      "target_files": [
+        ".claude/skills/KB-issue-capture/SKILL.md",
+        ".claude/skills/capture-issue/SKILL.md",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Per Blueprint Skill audit table: (i) KB-issue-capture/SKILL.md:72 — rewrite worked-example header to canonical-path-form examples; (ii) capture-issue/SKILL.md:44 — same pattern. Path-only refresh edits. Append per-file disposition to migration-log Phase-5 section.",
+      "depends_on": ["T0.1"],
+      "satisfies_ac": ["AC-FR-11-a (partial)", "AC-FR-11-b (partial)", "AC-CC-7 (partial)", "AC-US-4-b (partial)"],
+      "verified_by_test": ["AT-008", "AT-048", "AT-049"],
+      "validated_by_phase": "PV-5",
+      "size": "S",
+      "parallelizable_with": ["T5.1", "T5.2", "T5.3", "T5.4", "T5.6"],
+      "per_task_skills": ["KB-issue-capture", "KB-documentation-criteria"]
+    },
+    {
+      "id": "T5.6",
+      "name": "Skill audit — recipe-feature-pipeline + synthesize disposition recording",
+      "phase": "P-5",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Two coordinated actions: (i) record migration-log Phase-5 disposition entry pointing at T1.3 as executor for recipe-feature-pipeline/SKILL.md:273; (ii) record no-edit disposition for synthesize/SKILL.md:22, 240 with rationale citing Q-CC-4 + ADR-0054 commitment 2 (validator allowlist entry covers synthesize's output/synthesis-*/adrs/ path).",
+      "depends_on": ["T1.3", "T5.2"],
+      "satisfies_ac": ["AC-FR-11-a (full)", "AC-FR-11-b (full)", "AC-FR-11-c (full)", "AC-CC-7 (full)", "AC-NFR-4-a (full)", "AC-US-4-b (partial)"],
+      "verified_by_test": ["AT-008", "AT-048", "AT-050", "AT-057", "AT-068"],
+      "validated_by_phase": "PV-5",
+      "size": "S",
+      "parallelizable_with": ["T5.1", "T5.2", "T5.3", "T5.4", "T5.5"],
+      "per_task_skills": ["KB-documentation-criteria"]
+    },
+    {
+      "id": "T6.1",
+      "name": "Reviewer Gate confirmation — Phase 1 operator-file convergence (AC-OP-2 / AC-FR-2-b empirical)",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Invoke shared-document-reviewer on a representative Blueprint with canonical-only ADR references (current Blueprint v1.2.0 is natural specimen). Confirm zero flag for ADR-placement. Cross-check four operator files in sequence; record empirical AC-OP-2 confirmation in migration-log Phase-6 section.",
+      "depends_on": ["T1.5"],
+      "satisfies_ac": ["AC-OP-2", "AC-FR-2-b", "AC-US-2-a", "AC-US-2-b"],
+      "verified_by_test": ["AT-003", "AT-012", "AT-059"],
+      "validated_by_phase": "PV-6",
+      "size": "S",
+      "parallelizable_with": ["T6.3", "T6.5", "T6.8", "T6.10"],
+      "per_task_skills": ["KB-documentation-criteria"]
+    },
+    {
+      "id": "T6.2",
+      "name": "Fresh feature-pipeline-run probe — AC-OP-1 empirical",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Invoke contrived recipe-feature-pipeline micro-run (or 2-step simulation) exercising Step 8 design-composer invocation with no output_adrs_dir override; confirm orchestrator passes 'adrs/' per FR-3 default; confirm any authored ADR lands at canonical; confirm packager returns zero ADR-placement BLOCKERs.",
+      "depends_on": ["T1.3", "T4.1", "T5.1", "T5.3"],
+      "satisfies_ac": ["AC-OP-1", "AC-US-1-a", "AC-US-4-a", "AC-FR-3-a", "AC-FR-1-b (empirical)", "AC-CC-5"],
+      "verified_by_test": ["AT-001", "AT-005", "AT-007", "AT-058"],
+      "validated_by_phase": "PV-6",
+      "size": "M",
+      "parallelizable_with": ["T6.4", "T6.6", "T6.7", "T6.9"],
+      "per_task_skills": ["KB-claude-code-design"]
+    },
+    {
+      "id": "T6.3",
+      "name": "Validator latency confirmation — NFR-2",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Time the validator's elapsed_ms from its own stdout JSON on the post-Phase-5 repo. Average across 5 invocations. Record in migration-log Phase-6 section. Confirm < 5000ms per NFR-2.",
+      "depends_on": ["T4.1"],
+      "satisfies_ac": ["AC-NFR-2-a"],
+      "verified_by_test": ["AT-051", "AT-065"],
+      "validated_by_phase": "PV-6",
+      "size": "S",
+      "parallelizable_with": ["T6.1", "T6.5", "T6.8", "T6.10"],
+      "per_task_skills": ["KB-general-coding-principles"]
+    },
+    {
+      "id": "T6.4",
+      "name": "Validator scan empirical — AC-OP-3",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Run python3 .claude/skills/auditing-shared/scripts/validate_adr_placement.py against repo root; confirm exit 0 + verdict PASS + empty findings. Record output JSON in migration-log Phase-6 section. Highest-confidence empirical confirmation that Phase 2 (migration) + Phase 3 (sweep) closed cleanly.",
+      "depends_on": ["T2d.4", "T3.4", "T4.1"],
+      "satisfies_ac": ["AC-OP-3", "AC-FR-10-a (empirical)", "AC-FR-8d-3", "AC-CC-1"],
+      "verified_by_test": ["AT-042", "AT-051", "AT-060"],
+      "validated_by_phase": "PV-6",
+      "size": "S",
+      "parallelizable_with": ["T6.2", "T6.6", "T6.7", "T6.9"],
+      "per_task_skills": ["KB-general-coding-principles"]
+    },
+    {
+      "id": "T6.5",
+      "name": "Reap empty feature-scoped working/feature/<slug>/adrs/ directories",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/audit-machinery-fixes-r1/adrs/",
+        "working/feature/pipeline-skill-design-fixes-r1/adrs/",
+        "working/feature/audit-findings-remediation-r1/adrs/",
+        "working/feature/devcontainer-mcp-provisioning-r1/adrs/",
+        "working/feature/frontend-design-knowledge-r1/adrs/",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "After Phase 2 + Phase 3 land, several working/feature/<slug>/adrs/ directories should be empty (4 dedupe-source folders for FR-8a; possibly frontend-design-knowledge-r1 for FR-8b). For each empty directory: rmdir (not rm -rf). Record action in migration-log. Absorbs Blueprint Reviewer MINOR-3.",
+      "depends_on": ["T2d.4", "T3.4"],
+      "satisfies_ac": ["N/A — cleanup"],
+      "verified_by_test": [],
+      "validated_by_phase": "PV-6",
+      "size": "S",
+      "parallelizable_with": ["T6.1", "T6.3", "T6.8", "T6.10"],
+      "per_task_skills": ["KB-task-decomposition"]
+    },
+    {
+      "id": "T6.6",
+      "name": "Cross-reference sweep re-confirmation — AC-OP-5 empirical (NFR-3-b)",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Re-run IN-008 path-form pattern set + T3.1 bare-ID extraction grep against post-Phase-5 repo. Confirm zero matches for 14+18=32 known former paths (excluding documented exclusions); bare-ID extraction preserved-count matches inventory disposition. Also: file-count arithmetic — adrs/=55 files; adrs/superseded/=7; adrs-migrated/ absent; working/feature/*/adrs/=5 .tombstone+0 .md. Absorbs Blueprint Reviewer MINOR-2.",
+      "depends_on": ["T3.4", "T6.4", "T6.5"],
+      "satisfies_ac": ["AC-OP-5", "AC-NFR-3-b", "AC-FR-9-a (empirical)", "AC-FR-9-b (empirical)"],
+      "verified_by_test": ["AT-036", "AT-062", "AT-067"],
+      "validated_by_phase": "PV-6",
+      "size": "S",
+      "parallelizable_with": ["T6.2", "T6.4", "T6.7", "T6.9"],
+      "per_task_skills": ["KB-task-decomposition"]
+    },
+    {
+      "id": "T6.7",
+      "name": "Three-surface negative-path harness — AC-OP-4 + AC-FR-10-e empirical",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/test-fixture/adrs/ADR-9999-fixture.md",
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Author + execute contrived negative-path harness: (i) write ADR-9999-fixture.md to working/feature/test-fixture/adrs/; (ii) invoke each of 3 surfaces against post-Phase-5 repo with this fixture present, confirm each blocks: (a) orchestrator gate (validator standalone) exit 2/BLOCK; (b) run_phase_checks.py non-zero/BLOCK; (c) packager subprocess exit 2/BLOCKER; (iii) clean up fixture. Record per-surface outcomes.",
+      "depends_on": ["T5.1", "T5.2", "T5.3", "T4.2"],
+      "satisfies_ac": ["AC-OP-4", "AC-US-1-b", "AC-US-3-b", "AC-FR-10-e", "AC-CC-2 (full)", "AC-FR-10-b (empirical)", "AC-FR-10-c (empirical)", "AC-FR-10-d (empirical)"],
+      "verified_by_test": ["AT-002", "AT-006", "AT-043", "AT-044", "AT-045", "AT-046", "AT-061"],
+      "validated_by_phase": "PV-6",
+      "size": "M",
+      "parallelizable_with": ["T6.2", "T6.4", "T6.6", "T6.9"],
+      "per_task_skills": ["KB-general-coding-principles", "KB-claude-code-design"]
+    },
+    {
+      "id": "T6.8",
+      "name": "Skill audit completeness empirical — AC-CC-7 + NFR-4",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Read migration-log Phase-5 section; confirm all 13 dispositions (8 file-level updates + 5 family-CLEAN entries) present per AC-CC-7. Spot-check 3 of 8 file-level remediations: re-read target file, confirm prescribed edit landed. Record completeness-check in migration-log Phase-6. Per NFR-4-a: no TBDs; per NFR-4-b: no unclassifiable findings.",
+      "depends_on": ["T5.4", "T5.5", "T5.6"],
+      "satisfies_ac": ["AC-CC-7 (full empirical)", "AC-NFR-4-a", "AC-NFR-4-b", "AC-FR-11-a (empirical)", "AC-FR-11-c"],
+      "verified_by_test": ["AT-048", "AT-050", "AT-057", "AT-068", "AT-069"],
+      "validated_by_phase": "PV-6",
+      "size": "S",
+      "parallelizable_with": ["T6.1", "T6.3", "T6.5", "T6.10"],
+      "per_task_skills": ["KB-documentation-criteria"]
+    },
+    {
+      "id": "T6.9",
+      "name": "NFR-1 atomicity verification + rollback documentation closure",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Per AC-NFR-1-a + AC-NFR-1-b: confirm each Phase 2 task corresponds to one atomic git-reversible operation (or logical group with explicit rationale; T2a.1's 12-ADR-as-one-task is documented exception). For each FR-8 sub-phase, confirm Blueprint rollback subsection reachable. Record in migration-log.",
+      "depends_on": ["T2d.4", "T2c.1", "T2b.2", "T2a.1", "T2b.1", "T6.4"],
+      "satisfies_ac": ["AC-NFR-1-a", "AC-NFR-1-b", "AC-NFR-5-a", "AC-NFR-5-b"],
+      "verified_by_test": ["AT-063", "AT-064", "AT-070", "AT-071"],
+      "validated_by_phase": "PV-6",
+      "size": "S",
+      "parallelizable_with": ["T6.2", "T6.4", "T6.6", "T6.7"],
+      "per_task_skills": ["KB-task-decomposition"]
+    },
+    {
+      "id": "T6.10",
+      "name": "NFR-7 no-—no-verify audit + NFR-8 dependency-posture audit",
+      "phase": "P-6",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/adr-placement-mechanism-repair-r1/migration-log.md"
+      ],
+      "description": "Grep entire Plan + per-task execution result files + validator script for '--no-verify'; expect zero matches (NFR-7). Inspect validate_adr_placement.py imports; expect Python stdlib only (NFR-8). Record both checks in migration-log Phase-6 section.",
+      "depends_on": ["T4.1", "T2d.4", "T3.4", "T5.6"],
+      "satisfies_ac": ["AC-NFR-7-a", "AC-NFR-7-b", "AC-NFR-8-a"],
+      "verified_by_test": ["AT-074", "AT-075", "AT-076"],
+      "validated_by_phase": "PV-6",
+      "size": "S",
+      "parallelizable_with": ["T6.1", "T6.3", "T6.5", "T6.8"],
+      "per_task_skills": ["KB-general-coding-principles"]
+    },
+    {
+      "id": "TR.1",
+      "name": "Close devcontainer-mcp-provisioning-r1 Gate-6 PKG-BLOCKER-001 deferral",
+      "phase": "P-R",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/devcontainer-mcp-provisioning-r1/"
+      ],
+      "description": "Locate deferral entry in working/feature/devcontainer-mcp-provisioning-r1/ (Gate-6 audit-trail or per-task execution result documenting the deferral) and append closure note: 'Deferral closed by adr-placement-mechanism-repair-r1 completion 2026-05-25; PKG-BLOCKER-001 replaced by validator-backed canonical-only check per FR-10-d.'",
+      "depends_on": ["T6.1", "T6.2", "T6.3", "T6.4", "T6.5", "T6.6", "T6.7", "T6.8", "T6.9", "T6.10"],
+      "satisfies_ac": ["N/A — communication"],
+      "verified_by_test": [],
+      "validated_by_phase": "PV-R",
+      "size": "S",
+      "parallelizable_with": ["TR.2"],
+      "per_task_skills": ["KB-documentation-criteria"]
+    },
+    {
+      "id": "TR.2",
+      "name": "Informed-stakeholder notifications",
+      "phase": "P-R",
+      "layer": "claude-code",
+      "target_files": [
+        "working/feature/frontend-design-knowledge-r1/",
+        "working/feature/issue-capture-mechanism-r1/"
+      ],
+      "description": "Append notification notes per PRD Communication plan: (a) to frontend-design-knowledge-r1: notify of ADR-0024 status-lift dedupe disposition; (b) to issue-capture-mechanism-r1: notify of FR-8c relocation of ADRs 0046-0050 + FR-8b renumber ADR-0044→0051/ADR-0045→0052 + 368-occurrence bare-ID sweep impact.",
+      "depends_on": ["T6.1", "T6.2", "T6.3", "T6.4", "T6.5", "T6.6", "T6.7", "T6.8", "T6.9", "T6.10"],
+      "satisfies_ac": ["N/A — communication"],
+      "verified_by_test": [],
+      "validated_by_phase": "PV-R",
+      "size": "S",
+      "parallelizable_with": ["TR.1"],
+      "per_task_skills": ["KB-documentation-criteria"]
+    }
+  ],
+  "edges": [
+    {"from": "T0.1", "to": "T0.2", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T0.3", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T1.1", "kind": "phase_predecessor"},
+    {"from": "T0.1", "to": "T1.2", "kind": "phase_predecessor"},
+    {"from": "T0.1", "to": "T1.3", "kind": "phase_predecessor"},
+    {"from": "T0.1", "to": "T1.4", "kind": "phase_predecessor"},
+    {"from": "T1.1", "to": "T1.5", "kind": "data_flow"},
+    {"from": "T1.2", "to": "T1.5", "kind": "data_flow"},
+    {"from": "T1.3", "to": "T1.5", "kind": "data_flow"},
+    {"from": "T1.4", "to": "T1.5", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T2a.1", "kind": "phase_predecessor"},
+    {"from": "T0.3", "to": "T2a.1", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T2b.1", "kind": "phase_predecessor"},
+    {"from": "T0.3", "to": "T2b.1", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T2c.1", "kind": "phase_predecessor"},
+    {"from": "T0.3", "to": "T2c.1", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T2d.1", "kind": "phase_predecessor"},
+    {"from": "T0.3", "to": "T2d.1", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T2d.2", "kind": "phase_predecessor"},
+    {"from": "T0.3", "to": "T2d.2", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T2d.3", "kind": "phase_predecessor"},
+    {"from": "T0.3", "to": "T2d.3", "kind": "data_flow"},
+    {"from": "T2d.1", "to": "T2d.4", "kind": "resource_serialization"},
+    {"from": "T2d.2", "to": "T2d.4", "kind": "resource_serialization"},
+    {"from": "T2d.3", "to": "T2d.4", "kind": "resource_serialization"},
+    {"from": "T0.1", "to": "T2b.2", "kind": "phase_predecessor"},
+    {"from": "T0.3", "to": "T2b.2", "kind": "data_flow"},
+    {"from": "T2c.1", "to": "T2b.2", "kind": "ordering_per_ADR_0053"},
+    {"from": "T2d.4", "to": "T2b.2", "kind": "ordering_per_ADR_0053"},
+    {"from": "T2b.2", "to": "T3.1", "kind": "data_flow"},
+    {"from": "T2c.1", "to": "T3.1", "kind": "data_flow"},
+    {"from": "T2d.4", "to": "T3.1", "kind": "data_flow"},
+    {"from": "T2a.1", "to": "T3.2", "kind": "data_flow"},
+    {"from": "T2b.1", "to": "T3.2", "kind": "data_flow"},
+    {"from": "T2b.2", "to": "T3.2", "kind": "data_flow"},
+    {"from": "T2c.1", "to": "T3.2", "kind": "data_flow"},
+    {"from": "T2d.4", "to": "T3.2", "kind": "data_flow"},
+    {"from": "T3.1", "to": "T3.3", "kind": "data_flow"},
+    {"from": "T3.2", "to": "T3.3", "kind": "ordering_preference"},
+    {"from": "T3.2", "to": "T3.4", "kind": "data_flow"},
+    {"from": "T3.3", "to": "T3.4", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T4.1", "kind": "phase_predecessor"},
+    {"from": "T4.1", "to": "T4.2", "kind": "data_flow"},
+    {"from": "T4.1", "to": "T5.1", "kind": "data_flow"},
+    {"from": "T1.3", "to": "T5.1", "kind": "data_flow"},
+    {"from": "T4.1", "to": "T5.2", "kind": "data_flow"},
+    {"from": "T1.1", "to": "T5.3", "kind": "data_flow"},
+    {"from": "T4.1", "to": "T5.3", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T5.4", "kind": "phase_predecessor"},
+    {"from": "T0.1", "to": "T5.5", "kind": "phase_predecessor"},
+    {"from": "T1.3", "to": "T5.6", "kind": "data_flow"},
+    {"from": "T5.2", "to": "T5.6", "kind": "data_flow"},
+    {"from": "T1.5", "to": "T6.1", "kind": "data_flow"},
+    {"from": "T1.3", "to": "T6.2", "kind": "data_flow"},
+    {"from": "T4.1", "to": "T6.2", "kind": "data_flow"},
+    {"from": "T5.1", "to": "T6.2", "kind": "data_flow"},
+    {"from": "T5.3", "to": "T6.2", "kind": "data_flow"},
+    {"from": "T4.1", "to": "T6.3", "kind": "data_flow"},
+    {"from": "T2d.4", "to": "T6.4", "kind": "data_flow"},
+    {"from": "T3.4", "to": "T6.4", "kind": "data_flow"},
+    {"from": "T4.1", "to": "T6.4", "kind": "data_flow"},
+    {"from": "T2d.4", "to": "T6.5", "kind": "data_flow"},
+    {"from": "T3.4", "to": "T6.5", "kind": "data_flow"},
+    {"from": "T3.4", "to": "T6.6", "kind": "data_flow"},
+    {"from": "T6.4", "to": "T6.6", "kind": "data_flow"},
+    {"from": "T6.5", "to": "T6.6", "kind": "data_flow"},
+    {"from": "T5.1", "to": "T6.7", "kind": "data_flow"},
+    {"from": "T5.2", "to": "T6.7", "kind": "data_flow"},
+    {"from": "T5.3", "to": "T6.7", "kind": "data_flow"},
+    {"from": "T4.2", "to": "T6.7", "kind": "data_flow"},
+    {"from": "T5.4", "to": "T6.8", "kind": "data_flow"},
+    {"from": "T5.5", "to": "T6.8", "kind": "data_flow"},
+    {"from": "T5.6", "to": "T6.8", "kind": "data_flow"},
+    {"from": "T2a.1", "to": "T6.9", "kind": "data_flow"},
+    {"from": "T2b.1", "to": "T6.9", "kind": "data_flow"},
+    {"from": "T2b.2", "to": "T6.9", "kind": "data_flow"},
+    {"from": "T2c.1", "to": "T6.9", "kind": "data_flow"},
+    {"from": "T2d.4", "to": "T6.9", "kind": "data_flow"},
+    {"from": "T6.4", "to": "T6.9", "kind": "data_flow"},
+    {"from": "T4.1", "to": "T6.10", "kind": "data_flow"},
+    {"from": "T2d.4", "to": "T6.10", "kind": "phase_predecessor"},
+    {"from": "T3.4", "to": "T6.10", "kind": "phase_predecessor"},
+    {"from": "T5.6", "to": "T6.10", "kind": "phase_predecessor"},
+    {"from": "T6.1", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.2", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.3", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.4", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.5", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.6", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.7", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.8", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.9", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.10", "to": "TR.1", "kind": "phase_predecessor"},
+    {"from": "T6.1", "to": "TR.2", "kind": "phase_predecessor"},
+    {"from": "T6.2", "to": "TR.2", "kind": "phase_predecessor"},
+    {"from": "T6.3", "to": "TR.2", "kind": "phase_predecessor"},
+    {"from": "T6.4", "to": "TR.2", "kind": "phase_predecessor"},
+    {"from": "T6.5", "to": "TR.2", "kind": "phase_predecessor"},
+    {"from": "T6.6", "to": "TR.2", "kind": "phase_predecessor"},
+    {"from": "T6.7", "to": "TR.2", "kind": "phase_predecessor"},
+    {"from": "T6.8", "to": "TR.2", "kind": "phase_predecessor"},
+    {"from": "T6.9", "to": "TR.2", "kind": "phase_predecessor"},
+    {"from": "T6.10", "to": "TR.2", "kind": "phase_predecessor"}
+  ],
+  "critical_path": [
+    "T0.1",
+    "T2c.1",
+    "T2d.4",
+    "T2b.2",
+    "T3.1",
+    "T3.3",
+    "T3.4",
+    "T4.1",
+    "T4.2",
+    "T5.3",
+    "T6.7",
+    "TR.1"
+  ],
+  "critical_path_rationale": "T3.3 (368 bare-ID disambiguations, L-sized) is the single largest task. T2b.2 sequences after T2c.1 + T2d.4 per ADR-0053 algorithm. Phase 4 sequences after Phase 3 per Q-CC-6 (validator's first repo-wide run must be clean). T5.3 wires the packager surface (M-sized); T6.7 is the 3-surface negative-path harness (M-sized).",
+  "phases": [
+    {"phase_id": "P-0", "phase_name": "Discovery + Setup (carry-over formalization)", "tasks": ["T0.1", "T0.2", "T0.3"], "validator": "PV-0"},
+    {"phase_id": "P-1", "phase_name": "Operator-file repairs (FR-1 through FR-5)", "tasks": ["T1.1", "T1.2", "T1.3", "T1.4", "T1.5"], "validator": "PV-1"},
+    {"phase_id": "P-2a", "phase_name": "Byte-identical dedupes (12 ADRs)", "tasks": ["T2a.1"], "validator": "PV-2a"},
+    {"phase_id": "P-2b", "phase_name": "Status-lift dedupe + numbering-collision renumber", "tasks": ["T2b.1", "T2b.2"], "validator": "PV-2b"},
+    {"phase_id": "P-2c", "phase_name": "Feature-scoped relocations (ADRs 0046-0050)", "tasks": ["T2c.1"], "validator": "PV-2c"},
+    {"phase_id": "P-2d", "phase_name": "adrs-migrated/ consolidation (4 sub-procedures)", "tasks": ["T2d.1", "T2d.2", "T2d.3", "T2d.4"], "validator": "PV-2d"},
+    {"phase_id": "P-3", "phase_name": "Cross-reference sweep (FR-9)", "tasks": ["T3.1", "T3.2", "T3.3", "T3.4"], "validator": "PV-3"},
+    {"phase_id": "P-4", "phase_name": "Validator authoring + smoke test (FR-10-a)", "tasks": ["T4.1", "T4.2"], "validator": "PV-4"},
+    {"phase_id": "P-5", "phase_name": "Validator wiring (3 surfaces) + skill audit + remediation", "tasks": ["T5.1", "T5.2", "T5.3", "T5.4", "T5.5", "T5.6"], "validator": "PV-5"},
+    {"phase_id": "P-6", "phase_name": "Verification (AC-OP-N)", "tasks": ["T6.1", "T6.2", "T6.3", "T6.4", "T6.5", "T6.6", "T6.7", "T6.8", "T6.9", "T6.10"], "validator": "PV-6"},
+    {"phase_id": "P-R", "phase_name": "Rollout — Closeout + deferral closure", "tasks": ["TR.1", "TR.2"], "validator": "PV-R"}
+  ],
+  "parallelization_summary": {
+    "max_parallel_within_phase": {
+      "P-0": 2,
+      "P-1": 4,
+      "P-2a": 1,
+      "P-2b": 1,
+      "P-2c": 1,
+      "P-2d": 3,
+      "P-3": 2,
+      "P-4": 1,
+      "P-5": 6,
+      "P-6": 5,
+      "P-R": 2
+    },
+    "candidate_parallel_clusters": [
+      {
+        "phase": "P-0",
+        "tasks": ["T0.2", "T0.3"],
+        "rationale": "Both depend only on T0.1; no shared writers. T0.2 reads codebase-analysis.json, T0.3 writes new migration-log.md scaffold."
+      },
+      {
+        "phase": "P-1",
+        "tasks": ["T1.1", "T1.2", "T1.3", "T1.4"],
+        "rationale": "Each task edits a different operator file independently; no shared writers. T1.5 is convergence check and depends on all four."
+      },
+      {
+        "phase": "P-2-cross-subphase",
+        "tasks": ["T2a.1", "T2b.1", "T2c.1", "T2d.1"],
+        "rationale": "Each touches different ADR ID ranges and different feature folders / different archive sub-procedures. T2d.2 and T2d.3 can also parallelize with T2d.1 (different ID ranges within adrs-migrated/). T2d.4 sequences last in Phase 2d (removes empty directory). T2b.2 (renumber) sequences last in all of Phase 2 per ADR-0053."
+      },
+      {
+        "phase": "P-2d",
+        "tasks": ["T2d.1", "T2d.2", "T2d.3"],
+        "rationale": "Different ID ranges within adrs-migrated/ (T2d.1: 0001-0006,0008-0010; T2d.2: 0011-0017; T2d.3: 0018). T2d.4 sequences last."
+      },
+      {
+        "phase": "P-3",
+        "tasks": ["T3.2", "T3.3"],
+        "rationale": "After T3.1 produces the inventory, T3.2 (32 path-form edits) and T3.3 (368 bare-ID disambiguation) can run concurrently — different reference types, no shared writers (T3.2 edits .md files at IN-008 paths; T3.3 edits .md files at inventory paths)."
+      },
+      {
+        "phase": "P-5",
+        "tasks": ["T5.1", "T5.2", "T5.3", "T5.4", "T5.5", "T5.6"],
+        "rationale": "T5.1/T5.2/T5.3 (3-surface wiring) are independent file edits. T5.4/T5.5/T5.6 (skill audit) are independent file edits. All 6 parallelizable. Internal serialization: T5.3 depends on T1.1 (placeholder anchor); T5.6 depends on T1.3 + T5.2 (cross-references)."
+      },
+      {
+        "phase": "P-6",
+        "tasks": ["T6.1", "T6.3", "T6.5", "T6.8", "T6.10"],
+        "rationale": "Independent verifications: T6.1 (reviewer gate), T6.3 (latency timing), T6.5 (rmdir cleanup), T6.8 (skill-audit completeness), T6.10 (NFR-7/8 audit). T6.2/T6.4/T6.6/T6.7/T6.9 form a second parallel cluster with light intra-dependencies."
+      },
+      {
+        "phase": "P-6-second-cluster",
+        "tasks": ["T6.2", "T6.4", "T6.7", "T6.9"],
+        "rationale": "T6.2 (pipeline-run probe), T6.4 (validator scan), T6.7 (negative-path harness), T6.9 (atomicity audit) — all parallelizable; T6.6 has minor sequencing on T6.4+T6.5."
+      },
+      {
+        "phase": "P-R",
+        "tasks": ["TR.1", "TR.2"],
+        "rationale": "Independent communications to different feature folders; no shared writers."
+      }
+    ]
+  },
+  "phase_totals": {
+    "P-0": {"tasks": 3, "effort_buckets": {"S": 3, "M": 0, "L": 0, "XL": 0}},
+    "P-1": {"tasks": 5, "effort_buckets": {"S": 4, "M": 1, "L": 0, "XL": 0}},
+    "P-2a": {"tasks": 1, "effort_buckets": {"S": 0, "M": 1, "L": 0, "XL": 0}},
+    "P-2b": {"tasks": 2, "effort_buckets": {"S": 2, "M": 0, "L": 0, "XL": 0}},
+    "P-2c": {"tasks": 1, "effort_buckets": {"S": 0, "M": 1, "L": 0, "XL": 0}},
+    "P-2d": {"tasks": 4, "effort_buckets": {"S": 2, "M": 1, "L": 1, "XL": 0}},
+    "P-3": {"tasks": 4, "effort_buckets": {"S": 1, "M": 2, "L": 1, "XL": 0}},
+    "P-4": {"tasks": 2, "effort_buckets": {"S": 1, "M": 1, "L": 0, "XL": 0}},
+    "P-5": {"tasks": 6, "effort_buckets": {"S": 4, "M": 2, "L": 0, "XL": 0}},
+    "P-6": {"tasks": 10, "effort_buckets": {"S": 8, "M": 2, "L": 0, "XL": 0}},
+    "P-R": {"tasks": 2, "effort_buckets": {"S": 2, "M": 0, "L": 0, "XL": 0}}
+  },
+  "task_totals": {
+    "total_tasks": 40,
+    "total_edges": 103,
+    "total_acs_covered": 60,
+    "total_ats_covered": 76,
+    "total_phase_validators": 11,
+    "critical_path_length": 12
+  },
+  "open_items_for_orchestrator": [
+    "T3.3 is estimated L (could exceed if many bare-ID occurrences require AskUserQuestion escalation per AC-FR-9-b.1). The Plan's largest single task; consider sub-batching by source folder for tractability (4 batches: issue-capture-mechanism-r1 source files; canonical adrs/ADR-0044+0045 source files; cross-feature Blueprint prose; orchestrator/agent/skill prose). Per Plan §Estimation Methodology, this is the only L; not flagged XL but watch for execution-time scope creep.",
+    "T2d.2 is L (7 archive-wins cases × 5 sub-steps each); could parallelize internally across the 7 IDs if execution agent supports it.",
+    "Setup tasks (T0.1, T0.2, T0.3), cleanup task (T6.5), and communication tasks (TR.1, TR.2) have `satisfies_ac: ['N/A — setup'|'N/A — cleanup'|'N/A — communication']` per Plan §Orphan-task check. These are not mapped to PRD ACs by design; their verified_by_test arrays are empty (no AT directly tests setup/cleanup/communication tasks).",
+    "Inherited AC dispositions: AC-FR-6-a, AC-FR-6-b, AC-FR-7-a, AC-FR-10-f, AC-CC-6, AC-NFR-1-b, AC-NFR-3-a, AC-NFR-6-b are Blueprint-composition-resolved or design-precondition-met; per Plan §Acceptance Test Cross-Reference, no separate Plan task is required for these (each has explicit Plan re-verification or no-Plan-task rationale).",
+    "ADR cross-link: tasks T2b.2 (renumber sequencing), T5.1/T5.2/T5.3 (three-surface enforcement), T5.3 (Bash narrow grant), T2d.1-T2d.4 (archive-wins consolidation policy) bind to ADRs 0053/0054/0055 respectively. Execution agents should consult those ADRs during task implementation."
+  ]
+}

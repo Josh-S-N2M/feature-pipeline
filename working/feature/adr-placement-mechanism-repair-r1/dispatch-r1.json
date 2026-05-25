@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "adr-placement-mechanism-repair-r1-20260524-183201",
+  "slug": "adr-placement-mechanism-repair-r1",
+  "cycle_number": 1,
+  "cycle_cap": 4,
+  "is_terminal_cycle": false,
+  "auditor_verdict_triaged": "conditional_pass",
+  "issue_inventory": {
+    "total": 15,
+    "major": 7,
+    "minor": 8,
+    "blocker": 0,
+    "blocking_advance_to_plan": ["AA-011"]
+  },
+  "dispatches": [
+    {
+      "order": 1,
+      "target_agent": "design-composer",
+      "rationale": "Consolidated re-authoring brief: Blueprint v1.1.0 + ADR-0053 v1.0.1 + ADR-0054 v1.0.1 + ADR-0055 v1.0.1. Composer is the sole authoring agent for cross-cutting Blueprint sections AND ADRs (per KB-documentation-criteria FR-5); all 10 dispatched issues route through this single agent.",
+      "expected_output_revision": {
+        "blueprint": "blueprint-v1.1.md (frontmatter: version: 1.1.0, predecessor: blueprint-v1.md)",
+        "adr_0053": "ADR-0053 v1.0.1 (in-place same-version-bump frontmatter-stable amendment per ADR-0005; change_summary updated to note algorithm baseline clarification)",
+        "adr_0054": "ADR-0054 v1.0.1 (prose-semantics refinement on commitments 1 and 2)",
+        "adr_0055": "ADR-0055 v1.0.1 (Decision item 3 count correction; Canonical-only procedure glob extension)"
+      },
+      "priority": "P0",
+      "depends_on": ["user_resolution_AA-011"],
+      "issues_referenced": ["AA-001", "AA-002", "AA-003", "AA-004", "AA-006", "AA-007", "AA-008", "AA-012", "AA-013", "AA-014", "AA-015"],
+      "feedback_brief": {
+        "overview": "Architecture audit returned conditional_pass with 7 MAJOR / 8 MINOR. Most findings are an arithmetic-error chain + three ADR-prose / fail-safe refinements + one self-referential algorithm bug in ADR-0053. AA-011 (the bare-ID semantic-disambiguation scope) is escalated to user; once the user ratifies a heuristic, you will receive an updated brief with the codified FR-9 scope statement.",
+        "blueprint_edits": [
+          {
+            "issue": "AA-001 + AA-002",
+            "edit": "Recompute the post-feature canonical file count. Replace the figure '51' with '55' (or recompute precisely per the audit's enumeration: 36 pre-existing + 5 relocated + 2 renumbered + 3 new + 9 no-collision-adds = 55) at ALL THREE occurrences: blueprint line 494 (Architecture Overview ASCII), line 788 (Conventions Touched table), line 1026 (Output Comparison). Also correct line 650 'no-collision (10 IDs: 0001-0010, excluding 0007)' to 'no-collision (9 IDs: 0001-0006, 0008-0010)'."
+          },
+          {
+            "issue": "AA-003",
+            "edit": "Add a Blueprint §Migration map FR-8d sub-bullet under sub-procedure (iv): 'ADR-0007 v1-superseded variant (adrs-migrated/ADR-0007-code-graph-mcp-selection-v1-superseded.md): delete via git rm; Git history preserves the supersession event.' Also drives the ADR-0055 amendment (see below)."
+          },
+          {
+            "issue": "AA-004",
+            "edit": "Edit §biggest_risks (line 113): remove or rephrase the 'Divergent-body reconciliation (FR-8b ADR-0024) picks the wrong canonical body' bullet. Suggested rephrase: 'Divergent-body reconciliation hypothesis from PRD reframed: ADR-0024 is status-lift only (no body archival needed); ADR-0044/0045 are numbering collisions (renumber per ADR-0053) - risk reframing per Discovery IN-002.'"
+          },
+          {
+            "issue": "AA-006",
+            "edit": "Update AC-FR-8b-2, Migration map FR-8b, and Interface Change Matrix line 444 to KEEP the 0051/0052 targets (Blueprint's user-gate-telegraphed commitment) and add a cross-reference to the ADR-0053 v1.0.1 amendment that clarifies the algorithm's effective baseline. Recommended phrasing addition to AC-FR-8b-2: 'per ADR-0053 v1.0.1, the renumber baseline is max-canonical-ID immediately prior to this feature's design-composer authoring run (= 0050), yielding ADR-0051 + ADR-0052.'"
+          },
+          {
+            "issue": "AA-012",
+            "edit": "Blueprint §Agreement Checklist line 156: replace '47 archive consolidation actions' with '47 source files in adrs-migrated/ touched by Phase 2d' to disambiguate 'actions' vs 'source files'. Cross-check the '29 -pre-* variants' figure against IN-003's '18 + 11 + 1 = 30' (the +1 being the v1-superseded variant per AA-003); raise to 30 in the relevant Blueprint sub-bullet if confirmed."
+          },
+          {
+            "issue": "AA-013",
+            "edit": "Add a new Blueprint sub-section under §Risks or §Design: 'Bootstrapping note (FR-3 pre-codification).' Document: (a) how this run's design-composer landed ADR-0053/0054/0055 at canonical (was an explicit output_adrs_dir override passed by the orchestrator, or did the implicit default happen to resolve correctly, or was the directory manually moved post-authoring?); (b) confirmation that FR-3's codification at SKILL.md:273 makes the canonical-default reliable for future runs; (c) forward-traceability note for incident-reviewers."
+          },
+          {
+            "issue": "AA-014",
+            "edit": "Amend AC-FR-8b-1 (or add AC-FR-8b-1.1) to operationalize the OI-1 fail-safe: 'Where Phase 2b processes ADR-0024 (status-lift case), the Plan task shall include a re-verification step (diff against canonical excluding frontmatter status: field) prior to delete; if any non-frontmatter body line differs, halt and apply OI-1 adrs/superseded/<id>-feature-scoped-body.md archival default.'"
+          },
+          {
+            "issue": "AA-011 (pending user)",
+            "edit": "Once user ratifies a scope option (see user_escalations), update Blueprint §Change Impact Map line 432 ('No Ripple Effect' bullet) and FR-9 AC / Phase 3 task scope to reflect the chosen disambiguation policy. DO NOT proceed with Blueprint v1.1 finalization until this decision lands; partial Blueprint can be drafted but the FR-9 paragraph is the blocking section."
+          }
+        ],
+        "adr_0053_amendment": {
+          "version_bump": "1.0.0 -> 1.0.1 (frontmatter-stable amendment per ADR-0005; same change_summary spirit, refined to reference the bootstrap-self-reference clarification)",
+          "edits": [
+            "Decision Details / Decision row: replace 'max(canonical_ids) + 1 AFTER all consolidation phases settle' with 'max(canonical_ids that pre-existed this feature's design-composer run) + 1 AFTER all consolidation phases for the affected ID space have completed; the baseline EXCLUDES ADRs authored by this feature's design-composer (which carry their own monotonic-next-ID assignment via the same algorithm at authoring time).' ",
+            "Implementation Guidance: add a worked example demonstrating the algorithm with the bootstrap-self-reference case: 'In adr-placement-mechanism-repair-r1, pre-feature canonical max-ID = 0045; FR-8c relocations land 0046-0050; renumber baseline = 0050; renumber targets = 0051 + 0052; the 3 ADRs authored during Design Composition of THIS feature (0053, 0054, 0055) are assigned via the SAME max+1 algorithm applied AT design-composer authoring time (pre-renumber), and the renumber phase does NOT re-derive against them.'",
+            "Add Known Unknown #3: 'Whether a future feature authors more than ~5 ADRs simultaneously could compress the bootstrap window such that the design-composer's intra-run authoring sequence becomes order-sensitive. Mitigation: each design-composer run is single-threaded; intra-run authoring order is deterministic.'"
+          ],
+          "rationale": "Per AA-006 finding option (a) per orchestrator dispatch brief. Preserves the Blueprint's 0051/0052 commitment (telegraphed at the user gate); refines the algorithm's effective baseline definition. This is the cleanest reconciliation because the de-facto on-disk state already matches: ADR-0053/0054/0055 landed at canonical via design-composer authoring; renumber targets resolve to 0051/0052 against the pre-this-feature baseline."
+        },
+        "adr_0054_amendment": {
+          "version_bump": "1.0.0 -> 1.0.1 (frontmatter-stable prose refinement)",
+          "edits": [
+            "Decision item 1 (commitment 1): replace 'Same script, same args, same exit-codes, same JSON shape at all three surfaces' with 'Same script, same default args, same exit-code semantics, same JSON shape at all three surfaces; allowlist content is per-surface contextual (orchestrator + packager pass none; run_phase_checks.py passes --allowlist output/synthesis-*/adrs/ per the synthesize-skill carve-out documented in the consuming Blueprint).'",
+            "Decision item 2 (commitment 2): distinguish steady-state vs mid-migration allowlist entries. Suggested phrasing: 'Per-invocation CLI-flag allowlist (--allowlist <comma-separated-paths>). Empty default. No persistent config file. Two intended usage modes: (a) steady-state allowlist entries (e.g., the synthesize carve-out output/synthesis-*/adrs/) passed at every dispatch of the consuming script - these are hard-coded into the dispatch site; (b) mid-migration allowlist entries (e.g., during in-flight Phase 2 folders) passed once and removed when the migration phase ends. Both modes use the same CLI flag mechanism; the steady-state usage carries no persistent config file because the dispatch site itself is the persistent declaration surface.'"
+          ],
+          "rationale": "Per AA-007 + AA-015. Both findings target ADR-0054 prose semantics; bundled into single v1.0.1 amendment."
+        },
+        "adr_0055_amendment": {
+          "version_bump": "1.0.0 -> 1.0.1 (frontmatter-stable count + glob correction)",
+          "edits": [
+            "Decision item 1: replace '8 archive-wins cases (ADRs 0011-0017)' with '7 archive-wins cases (ADRs 0011-0017)' and add a clarifying sentence: 'Note: Discovery IN-004 surfaced 8 total collisions across IDs 0011-0018; 7 are archive-wins (0011-0017) and 1 is canonical-wins (0018, retained because canonical carries a supersession-by-ADR-0038 marker the archive lacks).'",
+            "Decision item 3: change '10 no-collision cases (ADRs 0001-0010)' to '9 no-collision cases (ADRs 0001-0006, 0008-0010)' to reflect the ADR-0007 carve-out.",
+            "Implementation Guidance / Canonical-only procedure: change 'git rm the archive's -pre-* variants (no final variant in archive)' to 'git rm the archive's -pre-* variants AND the v1-superseded variant (no final variant in archive)' to close the AA-003 gap. Also add the v1-superseded variant explicitly to any enumerated -pre-* counts elsewhere in the ADR (the '29 -pre-* variants' figure should likely become '30 -pre-and-supersession variants' to match IN-003's actual file inventory).",
+            "Decision Details / Why-this: add a one-sentence cross-reference to ADR-0053 noting that the post-Phase-2d max-ID computation for the ADR-0053 renumber algorithm operates on the same canonical ID space ADR-0055 reshapes."
+          ],
+          "rationale": "Per AA-003 + AA-008. Both findings target ADR-0055 counts / glob coverage; bundled into single v1.0.1 amendment."
+        },
+        "ordering_constraint": "Composer should produce ADR amendments BEFORE Blueprint v1.1 (because Blueprint v1.1's cross-references to 'per ADR-0053 v1.0.1' and 'per ADR-0055 v1.0.1' should resolve to the amended texts). Alternatively, author all four in one pass and cross-link at the end.",
+        "do_not_edit": [
+          "PRD (prd-v1.md): no findings target PRD; do not re-invoke intake-prd-author.",
+          "Synthesis (synthesis.md): no findings target Discovery/Synthesis output.",
+          "Intent Clarification: no findings target this artifact.",
+          "Per-layer cc-design.md: no findings target the per-layer design; the composer-level Blueprint is the target."
+        ]
+      }
+    }
+  ],
+  "user_escalations": [
+    {
+      "issue_id": "AA-011",
+      "severity": "MAJOR",
+      "blocking_advance_to_plan": true,
+      "summary": "Bare-ID semantic-disambiguation scope decision for the 368 occurrences of 'ADR-0044' / 'ADR-0045' in repo prose. The Blueprint asserts 'No Ripple Effect' but ADR-0053 requires bare-ID updates for renumbered IDs. Each occurrence requires semantic check (does this prose mean the feature-scoped ADR being renumbered to 0051/0052, or the canonical ADR with different meaning?). User must ratify one of three scope options before Blueprint v1.1 FR-9 wording can finalize.",
+      "options": [
+        {
+          "id": "option_i",
+          "label": "Accept full 368-occurrence sweep as Plan scope",
+          "effort": "~8-16 hours of semantic review per occurrence",
+          "completeness": "maximal",
+          "risk": "Plan effort balloons by orders of magnitude beyond the current 32-edit estimate",
+          "recommendation": "NOT recommended per orchestrator dispatch brief"
+        },
+        {
+          "id": "option_ii",
+          "label": "Heuristic-restricted sweep: bare-IDs inside working/feature/issue-capture-mechanism-r1/* default to feature-meaning (rewrite to 0051/0052); bare-IDs outside default to canonical-meaning (no edit)",
+          "effort": "~1-2 hours (estimated ~145 of 368 occurrences fall inside the heuristic boundary)",
+          "completeness": "high-signal majority captured",
+          "risk": "Any cross-feature bare-ID reference outside issue-capture-mechanism-r1/* that meant the feature-scoped ADR is left stale",
+          "recommendation": "RECOMMENDED per orchestrator dispatch brief; pragmatic middle ground"
+        },
+        {
+          "id": "option_iii",
+          "label": "Defer bare-ID sweep entirely to a follow-up feature; capture as outside-pipeline issue per ADR-0049",
+          "effort": "minimal (this feature)",
+          "completeness": "lowest",
+          "risk": "Stale bare-ID references confuse future readers until follow-up feature lands",
+          "recommendation": "Available but not endorsed by orchestrator"
+        }
+      ],
+      "user_action_required": "Ratify one of option_i / option_ii / option_iii. Decision shapes Blueprint v1.1 FR-9 paragraph and Phase 3 Plan task. Blueprint v1.1 finalization is blocked on this decision (composer can draft other sections in parallel).",
+      "recommended_default": "option_ii"
+    }
+  ],
+  "deferrals": [
+    {
+      "issue_id": "AA-005",
+      "severity": "MINOR",
+      "rationale": "Auditor self-recorded as VERIFIED PASS / 'NOT an issue'. Informational CoVe traceability entry; no remediation needed."
+    },
+    {
+      "issue_id": "AA-009",
+      "severity": "MINOR",
+      "rationale": "Auditor self-recorded as PASS for ADR-0029/0033 transparency adjacency check; 'No action.'"
+    },
+    {
+      "issue_id": "AA-010",
+      "severity": "MINOR",
+      "rationale": "Auditor self-recorded as PASS for ADR-0042 consumer-extension adjacency check; 'No action.'"
+    },
+    {
+      "issue_id": "AA-007",
+      "severity": "MINOR",
+      "rationale": "Not a true deferral; this prose-nit is rolled into Dispatch 1 (composer ADR-0054 amendment) alongside AA-015. Listed here for triage transparency."
+    }
+  ],
+  "convergence_assessment": {
+    "verdict": "n/a (first cycle)",
+    "persistent_issues": [],
+    "next_cycle_posture": "regular",
+    "risk_factors": [
+      "If user defers AA-011 past Cycle 2, Plan stage cannot start.",
+      "If composer's ADR-0053 v1.0.1 amendment is flagged as ambiguous by next-cycle reviewer, recommend escalation to ADR-0053 v2.0.0 supersession in Cycle 2."
+    ]
+  },
+  "counter_increment_note": "Per ADR-0017 + ADR-0033 D-12: reconciliation-cycle counter increments at this dispatch. Counter state after this cycle: 1/4."
+}

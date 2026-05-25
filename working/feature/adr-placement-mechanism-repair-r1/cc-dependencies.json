@@ -1,0 +1,374 @@
+{
+  "schema_version": "1.0.0",
+  "doc_type": "per-layer-dependencies",
+  "layer": "claude-code",
+  "feature_slug": "adr-placement-mechanism-repair-r1",
+  "generated": "2026-05-24T18:50:00Z",
+  "generated_by": "design-cc",
+  "derived_from": [
+    "working/feature/adr-placement-mechanism-repair-r1/cc-design.md"
+  ],
+
+  "primitives_introduced": [
+    {
+      "name": "validate_adr_placement",
+      "kind": "auditing-shared-script",
+      "path": ".claude/skills/auditing-shared/scripts/validate_adr_placement.py",
+      "purpose": "FR-10 ADR-location validator; scans repo for ADR-*.md files outside canonical adrs/; emits JSON findings; exit 0=clean / exit 2=block per IN-010 convention.",
+      "language": "python",
+      "dependencies_runtime": ["python3", "stdlib:argparse", "stdlib:pathlib", "stdlib:json", "stdlib:sys", "stdlib:time"],
+      "nfr_constraints": {
+        "latency_budget_seconds": 5,
+        "dependency_posture": "stdlib-only per NFR-8"
+      },
+      "consumed_by": [
+        "recipe-feature-pipeline (orchestrator Step 8 stage gate)",
+        "auditing-shared/scripts/run_phase_checks.py (execution-pipeline parallel dispatch)",
+        "finalize-deliverable-packager (Step 14 packager check, replacing FR-1-deleted prose)"
+      ]
+    }
+  ],
+
+  "primitives_modified": [
+    {
+      "name": "finalize-deliverable-packager",
+      "kind": "sub-agent",
+      "path": ".claude/agents/finalize-deliverable-packager.md",
+      "change_kind": "modify",
+      "edits": [
+        {
+          "anchor": "lines 56-63",
+          "change": "Delete retired '### 3. ADR cross-location check' dual-location BLOCKER prose; replace with '### 3. ADR placement validator' that subprocess-invokes validate_adr_placement.py and lifts findings into packager-report.json.",
+          "fr": "FR-1, FR-10-d"
+        },
+        {
+          "anchor": "frontmatter tools",
+          "change": "Add 'Bash' to tools list (per Q-CC-5-A recommendation) to enable subprocess invocation of validate_adr_placement.py.",
+          "fr": "FR-10-d (Q-CC-5)"
+        }
+      ],
+      "reasoning_config_unchanged": {"model": "opus", "effort": "medium"},
+      "skills_array_unchanged": true
+    },
+    {
+      "name": "shared-document-reviewer",
+      "kind": "sub-agent",
+      "path": ".claude/agents/shared-document-reviewer.md",
+      "change_kind": "modify",
+      "edits": [
+        {
+          "anchor": "line 349",
+          "change": "Delete contradictory dual-location BLOCKER check; post-ADR-0036 statement at lines 470-472 becomes sole ADR-placement convention in the file.",
+          "fr": "FR-2"
+        }
+      ]
+    },
+    {
+      "name": "design-composer",
+      "kind": "sub-agent",
+      "path": ".claude/agents/design-composer.md",
+      "change_kind": "modify",
+      "edits": [
+        {
+          "anchor": "line 48",
+          "change": "Expand output_adrs_dir parameter description to cite default 'adrs/' (canonical-root) per ADR-0036 and reference the test-only override mechanism.",
+          "fr": "FR-4"
+        },
+        {
+          "anchor": "lines 129, 187",
+          "change": "Form unchanged (output_adrs_dir/ADR-<NNNN>.md continues); semantics now flow from the new line-48 default.",
+          "fr": "FR-4"
+        },
+        {
+          "anchor": "new subsection",
+          "change": "Add a short 'Test override for output_adrs_dir' subsection (3-6 lines) documenting fixture-only override surface.",
+          "fr": "FR-4"
+        }
+      ],
+      "reasoning_config_unchanged": {"model": "opus", "effort": "xhigh"},
+      "skills_array_unchanged": true
+    },
+    {
+      "name": "recipe-feature-pipeline",
+      "kind": "skill",
+      "path": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "change_kind": "modify",
+      "edits": [
+        {
+          "anchor": "line 273",
+          "change": "Modify design-composer parameter-list entry from bare 'output_adrs_dir' to explicit-default form citing 'adrs/' default and ADR-0036.",
+          "fr": "FR-3"
+        },
+        {
+          "anchor": "Step 8 (lines 270-278 area)",
+          "change": "Add orchestrator-stage validator gate: subprocess-invoke validate_adr_placement.py between design-composer return and shared-document-reviewer invocation; on exit 2, halt stage and surface BLOCKER via AskUserQuestion.",
+          "fr": "FR-10-b"
+        }
+      ]
+    },
+    {
+      "name": "auditing-shared:run_phase_checks",
+      "kind": "auditing-shared-script",
+      "path": ".claude/skills/auditing-shared/scripts/run_phase_checks.py",
+      "change_kind": "modify",
+      "edits": [
+        {
+          "anchor": "lines 39-44 (dispatch constants) + parallel-dispatch block",
+          "change": "Add validate_adr_placement.py to the parallel-dispatch set; fold its findings into the 'validator' dimension (per Q-CC-7 Option A).",
+          "fr": "FR-10-c"
+        }
+      ]
+    },
+    {
+      "name": "auditing-shared:smoke_test_auditing_shared",
+      "kind": "auditing-shared-script",
+      "path": ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py",
+      "change_kind": "modify",
+      "edits": [
+        {
+          "anchor": "test list",
+          "change": "Add positive-path smoke (clean repo state → exit 0) and negative-path smoke (fixture with feature-scoped ADR → exit 2) for validate_adr_placement.py.",
+          "fr": "FR-10 NFR-2 verification"
+        }
+      ]
+    },
+    {
+      "name": "KB-documentation-criteria",
+      "kind": "skill-references",
+      "path": ".claude/skills/KB-documentation-criteria/",
+      "change_kind": "modify",
+      "edits": [
+        {
+          "anchor": "references/disciplines/design-composition.md:36",
+          "change": "Replace 'working/feature/<slug>/adrs/ADR-NNNN-<slug>.md' with 'adrs/ADR-NNNN-<slug>.md per ADR-0036'.",
+          "fr": "FR-11"
+        },
+        {
+          "anchor": "references/disciplines/design-composition.md:295",
+          "change": "Same substitution as line 36.",
+          "fr": "FR-11"
+        },
+        {
+          "anchor": "references/deliverable-archive-spec.md:150",
+          "change": "Remove or amend the stale backward-compat clause; recommend remove (consistent with FR-10 empty-allowlist post-condition).",
+          "fr": "FR-11"
+        },
+        {
+          "anchor": "references/templates/issue-register-template.md:96, :99",
+          "change": "Rewrite example paths to canonical 'adrs/ADR-NNNN-*' form or generic <slug>/<id> placeholders.",
+          "fr": "FR-11"
+        }
+      ]
+    },
+    {
+      "name": "KB-issue-capture",
+      "kind": "skill",
+      "path": ".claude/skills/KB-issue-capture/SKILL.md",
+      "change_kind": "modify",
+      "edits": [
+        {
+          "anchor": "line 72",
+          "change": "Rewrite worked-example header to canonical-path-form examples.",
+          "fr": "FR-11"
+        }
+      ]
+    },
+    {
+      "name": "capture-issue",
+      "kind": "skill",
+      "path": ".claude/skills/capture-issue/SKILL.md",
+      "change_kind": "modify",
+      "edits": [
+        {
+          "anchor": "line 44",
+          "change": "Rewrite path-only example to canonical form.",
+          "fr": "FR-11"
+        }
+      ]
+    },
+    {
+      "name": "synthesize",
+      "kind": "skill",
+      "path": ".claude/skills/synthesize/SKILL.md",
+      "change_kind": "review-with-explicit-disposition",
+      "edits": [
+        {
+          "anchor": "lines 22, 240",
+          "change": "Per Q-CC-4: ADR-output target output/synthesis-<topic>/adrs/ remains; the validator allowlists this path (default expectation). No SKILL.md text edit unless Composer selects Option B (re-target) or Option C (deprecate).",
+          "fr": "FR-11 / Q-CC-4"
+        }
+      ]
+    }
+  ],
+
+  "primitives_unchanged": [
+    {"family": "CLAUDE.md", "rationale": "Per KB-cc-design Principle 5 (one-source-of-truth) and Principle 1 (lowest-cost), the canonical-only convention already lives in ADR-0036, deliverable-archive-spec.md post-amendment, and shared-conventions.md:302. Adding a CLAUDE.md directive duplicates existing sources."},
+    {"family": "rules (.claude/rules/)", "rationale": "Per Principle 2 (path-gate everything) + Principle 1: validator enforcement is mechanical/deterministic; an instruction-based rule would be guidance-only, not enforced. Validator is the lower-cost + higher-guarantee mechanism."},
+    {"family": "Claude Code lifecycle hooks (PreToolUse/PostToolUse/etc.)", "rationale": "The 'execution-pipeline hook' surface per FR-10-c is the existing run_phase_checks.py subprocess hook, NOT a Claude Code settings.json lifecycle hook. A PostToolUse hook would only fire on model edit-tool usage, missing orchestrator-side writes; would also pollute every CC session in the repo."},
+    {"family": "MCP servers", "rationale": "Validator is pure Python stdlib; no external service."},
+    {"family": "plugins", "rationale": "Per Principle 7 (plugins-for-distribution-not-organization): scope is repo-internal; nothing distributed cross-project."},
+    {"family": "output-styles", "rationale": "Out of scope; no non-coding mode addition."}
+  ],
+
+  "permission_policy_changes": [
+    {
+      "file": ".claude/settings.json",
+      "change_kind": "modify",
+      "section": "allow",
+      "entry": "Bash(python3 .claude/skills/auditing-shared/scripts/validate_adr_placement.py*)",
+      "scope": "narrow",
+      "rationale": "Per KB-cc-design Principle 6 (permissions-as-safety-net): smallest possible grant to enable Q-CC-5-A. Broader pattern (auditing-shared/scripts/*.py) rejected as lowering safety-net specificity.",
+      "depends_on_decision": "Q-CC-5"
+    }
+  ],
+
+  "internal_dependencies": [
+    {
+      "from": "validate_adr_placement.py",
+      "to": "filesystem:adrs/ (read-only)",
+      "kind": "scan",
+      "edge_notes": "rglob ADR-*.md; verifies each match's parent dir == adrs/ or adrs/superseded/."
+    },
+    {
+      "from": "validate_adr_placement.py",
+      "to": "filesystem:working/feature/**/adrs/ (read-only)",
+      "kind": "scan",
+      "edge_notes": "Detects feature-scoped placement violations."
+    },
+    {
+      "from": "validate_adr_placement.py",
+      "to": "filesystem:adrs-migrated/ (read-only)",
+      "kind": "scan",
+      "edge_notes": "After FR-8d completes, this directory no longer exists; the scan is a no-op. During mid-migration (Phase 2 in-flight) the validator is NOT yet wired into the three surfaces (per Q-CC-6 Option B); no allowlist needed."
+    },
+    {
+      "from": "recipe-feature-pipeline.SKILL.md",
+      "to": "validate_adr_placement.py",
+      "kind": "subprocess",
+      "via": "orchestrator stage-gate at Step 8",
+      "fr": "FR-10-b"
+    },
+    {
+      "from": "auditing-shared/scripts/run_phase_checks.py",
+      "to": "validate_adr_placement.py",
+      "kind": "subprocess",
+      "via": "parallel-dispatch with 120s timeout",
+      "fr": "FR-10-c"
+    },
+    {
+      "from": "finalize-deliverable-packager",
+      "to": "validate_adr_placement.py",
+      "kind": "subprocess",
+      "via": "Bash tool (per Q-CC-5-A) invoked at Step 14 '### 3. ADR placement validator'",
+      "fr": "FR-10-d"
+    },
+    {
+      "from": "execute-phase-quality-reviewer",
+      "to": "validate_adr_placement.py",
+      "kind": "transitive-via-run_phase_checks",
+      "via": "run_phase_checks.py parallel dispatch (line 18 + 54 invocation)",
+      "fr": "FR-10-c"
+    }
+  ],
+
+  "provides_to": [
+    {
+      "downstream_layer": "future-feature-pipeline-runs",
+      "artifact": "canonical-only ADR placement enforcement at 3 surfaces",
+      "guarantees": [
+        "validator at orchestrator Step 8 blocks author-time violations",
+        "validator at run_phase_checks.py blocks runtime violations during execution",
+        "validator at packager blocks finalize-time violations as last line of defense"
+      ],
+      "depends_on_completion_of": ["Phase 4 validator authoring", "Phase 5 surface wiring"]
+    },
+    {
+      "downstream_consumer": "devcontainer-mcp-provisioning-r1 Gate-6 PKG-BLOCKER-001 deferral chain",
+      "artifact": "closure of deferred BLOCKER",
+      "mechanism": "FR-1 deletes the dual-location BLOCKER prose; FR-10-d replaces with canonical-only check; the deferred disposition is closeable when this feature ships."
+    }
+  ],
+
+  "depends_on_external": [
+    {
+      "system": "git",
+      "operations": ["git mv (FR-8b-renumber + FR-8c + FR-8d sub-i)", "git rm (FR-8a + FR-8d sub-ii pre-* variants)", "git log --follow (NFR-5-b verification)"],
+      "constraint": "No --no-verify per NFR-7"
+    },
+    {
+      "system": "Python 3 runtime",
+      "operations": ["validate_adr_placement.py execution"],
+      "constraint": "Stdlib only per NFR-8"
+    }
+  ],
+
+  "cross_layer_concerns": [
+    {
+      "candidate_layer": "CI/CD (GitHub Actions)",
+      "status": "NOT APPLICABLE",
+      "rationale": "Codebase analysis confirms no .github/workflows/*.yml currently invokes Claude Code or any auditing-shared script. The validator runs locally (in Codespace, during the pipeline) and at three CC-internal surfaces. No CI integration needed."
+    }
+  ],
+
+  "open_items_for_composer": [
+    {
+      "id": "Q-CC-1",
+      "title": "Final re-numbering scheme for ADR-0044 / ADR-0045 (synthesis D1)",
+      "recommended_option": "C (compute next-available number post-Phase-2d)",
+      "needs_adr": "likely (algorithm for renumber + provenance frontmatter)"
+    },
+    {
+      "id": "Q-CC-2",
+      "title": "Redirect-note extension for relocated feature-scoped ADRs (OI-5 / synthesis D6)",
+      "recommended_option": "C (.tombstone non-md extension)",
+      "needs_adr": "no (design ratification at Blueprint Approval Gate suffices)"
+    },
+    {
+      "id": "Q-CC-3",
+      "title": "Validator allowlist mechanism: per-invocation arg vs. config-file",
+      "recommended_option": "A (per-invocation CLI flag with empty default)",
+      "needs_adr": "no"
+    },
+    {
+      "id": "Q-CC-4",
+      "title": "Synthesize skill's ADR-output disposition (FR-11)",
+      "recommended_option": "A (validator allowlists output/synthesis-*/adrs/)",
+      "needs_adr": "no (Blueprint enumeration per AC-FR-10-f suffices)"
+    },
+    {
+      "id": "Q-CC-5",
+      "title": "Packager tools-list expansion vs. orchestrator-side validator invocation",
+      "recommended_option": "A (add narrowly-scoped Bash to packager + matching settings.json allow-list)",
+      "needs_adr": "no"
+    },
+    {
+      "id": "Q-CC-6",
+      "title": "Mid-migration validator allowlist policy (this feature's own execution)",
+      "recommended_option": "B (wire validator at Phase 5, after Phase 2 + 3 complete; Phase 4 = author script + smoke-test only)",
+      "needs_adr": "no (Plan sequencing)"
+    },
+    {
+      "id": "Q-CC-7",
+      "title": "Validator dimension placement in run_phase_checks.py",
+      "recommended_option": "A (fold into existing 'validator' dimension)",
+      "needs_adr": "no"
+    }
+  ],
+
+  "blast_radius_inherited_from_codebase_analysis": {
+    "high_blast_radius_touchpoints": [
+      "recipe-feature-pipeline.SKILL.md (transitive: all downstream consumers of authored ADRs)",
+      "auditing-shared (transitive: all future feature-pipeline runs + execution-pipeline runs)",
+      "canonical adrs/ tree (transitive: repo-wide; 4000+ ADR mentions overall, but FR-9 only touches the 32 path-form references)"
+    ],
+    "medium_blast_radius_touchpoints": [
+      "shared-document-reviewer.md (5 invocation points; 28 sub-agents pass through)",
+      "adrs-migrated/ (FR-8d collisions; semantic content differs between canonical and archive)"
+    ],
+    "low_blast_radius_touchpoints": [
+      "finalize-deliverable-packager.md (end-of-pipeline; no downstream prose consumers)",
+      "design-composer.md (prose-only edits; no behavioral change beyond parameter description)",
+      "feature-scoped adrs/ source folders (bounded by IN-008's 14 path-form references)"
+    ]
+  }
+}
