@@ -3,7 +3,7 @@
   "feature_slug": "issue-capture-mechanism-r1",
   "started_at": "2026-05-23T16:48:32Z",
   "completed_at": null,
-  "current_stage": "execution_pipeline_complete",
+  "current_stage": "feature_complete_ready_for_merge",
   "stage_status": "pipeline_complete",
   "gate_history": [
     {
@@ -464,11 +464,13 @@
   "tasks_completed_total": 55,
   "tasks_total": 55,
   "feature_acceptance": {
-    "verdict": "READY-FOR-MERGE-WITH-DEFERRED-LIVE-SMOKE",
-    "merge_preconditions": [
-      "Open fresh Claude Code session to pick up Phase-5 settings.json hooks block",
-      "Execute T7.1/T7.2/T7.3 live smoke procedures (documented in working/feature/issue-capture-mechanism-r1/smoke-test-*.txt)",
-      "On live-smoke PASS, proceed to merge"
+    "verdict": "READY-FOR-MERGE",
+    "verdict_promoted_from": "READY-FOR-MERGE-WITH-DEFERRED-LIVE-SMOKE",
+    "verdict_promoted_at": "2026-05-25T00:00:00Z",
+    "live_smoke_result": "ALL PASS (user-confirmed) \u2014 smoke-test-create-mode.txt, smoke-test-update-mode.txt, smoke-test-cancel-and-fastpath.txt all green in fresh Claude Code session",
+    "merge_preconditions_satisfied": [
+      "Fresh Claude Code session opened (settings.json hooks block live)",
+      "T7.1/T7.2/T7.3 live smoke procedures executed \u2192 ALL PASS"
     ],
     "post_merge_followups": [
       "Repo-level convention review on KB-* skill-name uppercase (NCB-002)",
