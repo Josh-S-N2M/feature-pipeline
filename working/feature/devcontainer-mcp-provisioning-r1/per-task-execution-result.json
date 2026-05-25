@@ -1,11 +1,16 @@
 {
-  "task_id": "T2.3",
+  "task_id": "T2.4",
+  "revision_cycle": 1,
   "status": "COMPLETED",
   "files_modified": [
-    ".claude/skills/recipe-feature-pipeline/SKILL.md"
+    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-adopted_at-adopted.md",
+    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-resolution_summary-complete.md",
+    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-superseded_by_issue_id-superseded.md",
+    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-wontfix_rationale-wontfix.md",
+    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-decided_at-wontfix.md"
   ],
   "files_created": [],
   "scope_deviations": [],
   "phase_4_gate_passed": true,
-  "notes": "Replaced the T2.3 stub sentence at SKILL.md line 453 with a 25-line H3 sub-section '### invoking_agent — Logical-Owner Invariant'. The verbatim invariant from ADR-0044 §Implementation Guidance is blockquoted with attribution. The section covers: literal emitter vs. logical owner distinction, three bullet-point rationale items, cross-references to ADR-0044 §Implementation Guidance / state-transitions-log-entry-template.md / AC-FR-6-a / AC-NFR-2-b, and an informational future-evolution note scoped to v2+. T2.2's Contract 6 section is untouched. The 'Hook failure is observer-only' sentence remains in place immediately after the new sub-section. All content assertions pass; section length is 25 lines (within 20-35 target)."
+  "notes": "All 5 fixture id fields corrected to use underscore-containing topic slugs matching their synthetic paths (e.g. ANALYSIS-test-analysis-missing-adopted_at instead of the prior hyphenated form). Both proposal fixtures (resolution_summary and decided_at) also received proposes_future_feature additions to suppress the confounding advisory info finding. The T2.5 self-verification script confirms all 6 negative fixtures now produce exactly 1 blocker finding each with zero spurious id-vs-path mismatches."
 }

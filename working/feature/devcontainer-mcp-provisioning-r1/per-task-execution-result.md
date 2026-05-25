@@ -1,44 +1,48 @@
-# T2.3 Execution Result
+# Per-Task Execution Result — T2.4 (Revision Cycle 1)
 
-**Status:** COMPLETED
-**Phase 4 gate passed:** yes
+**Status**: COMPLETED
+**Phase 4 gate**: PASSED
 
-## Files modified
+## Files Modified
 
-- `.claude/skills/recipe-feature-pipeline/SKILL.md`
+1. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-adopted_at-adopted.md`
+2. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-resolution_summary-complete.md`
+3. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-superseded_by_issue_id-superseded.md`
+4. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-wontfix_rationale-wontfix.md`
+5. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-decided_at-wontfix.md`
 
-## What was done
-
-Replaced the T2.3 stub sentence (which read "T2.3 elaborates this invariant") with a proper H3 sub-section `### invoking_agent — Logical-Owner Invariant` inside the "State-transitions.log Emission" sub-section of the "Execution Phase Dispatch" section. The insertion is additive — T2.2's Contract 6 section and the surrounding prose are untouched.
-
-### Sub-section content summary
-
-The 25-line sub-section (within the 20–35 line target) contains:
-
-**Verbatim invariant (blockquoted with attribution).** The exact invariant text from ADR-0044 §Implementation Guidance:
-
-> The state-transitions-log `invoking_agent` field is interpreted as the logical owner of the state transition (always `"execute-orchestrator"` in v1), not the literal emitting agent. This is a v1 invariant clarification, not a schema evolution.
->
-> — ADR-0044 §Implementation Guidance
-
-**Literal emitter vs. logical owner paragraph.** Explains that under the ADR-0044 flatten pattern the parent `recipe-feature-pipeline` orchestrator physically writes entries (because only the parent holds the `Agent` tool per ADR-0045), but populates `invoking_agent` with `"execute-orchestrator"`. The advisor file `.claude/agents/execute-orchestrator.md` is the canonical state-machine reference and receives the logical attribution.
-
-**"Why the invariant matters" bullet list.** Three bullets:
-- Audit-trail consumers expect `invoking_agent: "execute-orchestrator"` across all entries; literal-emitter interpretation would break them without schema evolution.
-- In-flight artifact `devcontainer-mcp-provisioning-r1/state-transitions.log` already uses `"execute-orchestrator"` (per Plan T4.1 + NFR-6-a); the invariant preserves that artifact without migration.
-- Decouples *who emits* (mutable across patterns) from *who owns* (stable across patterns).
-
-**Cross-references list.** ADR-0044 §Implementation Guidance, `state-transitions-log-entry-template.md`, AC-FR-6-a, AC-NFR-2-b.
-
-**Future evolution note.** Informational-only mention that v2+ could add a `literal_emitter` field; v1 keeps the single-owner invariant. Out of scope for this feature.
-
-## Quality checks
-
-- Phase 1 (structural lint): Python script verified stub removed, H3 heading present, verbatim invariant phrases present, ADR-0044 citation present, AC-FR-6-a and AC-NFR-2-b cross-refs present, template cross-ref present, T2.2 Contract 6 section intact, Hook-failure sentence intact.
-- Phase 2 (build): Markdown file; no compilation applicable.
-- Phase 3 (tests): No automated test suite covers SKILL.md prose content; structural invariants validated by the Phase 1 script.
-- Phase 4 (final gate): All checks green. Section line count = 25 (within 20–35 target).
-
-## Scope deviations
+## Files Created
 
 None.
+
+## Scope Deviations
+
+None.
+
+## Changes Applied
+
+### 3 register/analysis fixtures — id correction only
+
+| Fixture | Old id | New id |
+|---|---|---|
+| negative-missing-adopted_at-adopted.md | ANALYSIS-test-analysis-missing-adopted-at | ANALYSIS-test-analysis-missing-adopted_at |
+| negative-missing-superseded_by_issue_id-superseded.md | REGISTER-test-register-missing-superseded-by | REGISTER-test-register-missing-superseded_by_issue_id |
+| negative-missing-wontfix_rationale-wontfix.md | ANALYSIS-test-analysis-missing-wontfix-rationale | ANALYSIS-test-analysis-missing-wontfix_rationale |
+
+### 2 proposal fixtures — id correction + proposes_future_feature added
+
+| Fixture | Old id | New id | proposes_future_feature added |
+|---|---|---|---|
+| negative-missing-resolution_summary-complete.md | PROPOSAL-test-proposal-missing-resolution-summary | PROPOSAL-test-proposal-missing-resolution_summary | resolution-summary-future-r1 |
+| negative-missing-decided_at-wontfix.md | PROPOSAL-test-proposal-missing-decided-at | PROPOSAL-test-proposal-missing-decided_at | decided-at-future-r1 |
+
+## 4-Phase Gate
+
+- **Phase 1 (lint)**: n/a for fixture content; pre-existing MD022/MD025 warnings appear on all similar fixtures and are not in scope for this revision.
+- **Phase 2 (build)**: n/a — no Python source modified.
+- **Phase 3 (test)**: T2.5 self-verification script executed. Output: `PASS: all 6 negative fixtures now produce exactly 1 blocker each`.
+- **Phase 4 (final gate)**: PASSED. All 6 negative fixtures produce exactly 1 blocker finding each with no spurious id-vs-path mismatch findings.
+
+## Notes
+
+All 5 fixture id fields were corrected to use underscore-containing topic slugs that match their synthetic paths, resolving the Check 5 id-vs-path mismatch that was causing each fixture to produce 2 findings instead of 1. The two proposal fixtures additionally received `proposes_future_feature` fields to eliminate the confounding advisory info finding, isolating each test to exactly the intended missing-companion-field blocker.

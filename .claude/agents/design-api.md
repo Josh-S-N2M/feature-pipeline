@@ -3,7 +3,7 @@ name: design-api
 description: Authors the API Design subsection of the Blueprint during per-layer Design. One invocation per pipeline run when the API layer is in scope. Reads PRD + Research Plan + codebase-analysis.json + research-notes/*; produces `api-design.md` + `api-dependencies.json`. Surfaces architectural questions as `Q-API-N` open items for design-composer. Does NOT author ADRs (per FR-5).
 model: opus
 effort: high
-tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate, mcp__mcp-openapi-schema__*]
+tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
 skills: [KB-api-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
 memory: project
 ---

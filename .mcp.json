@@ -25,13 +25,9 @@
         "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1"
       }
     },
-    "mcp-openapi-schema": {
-      "command": "npx",
-      "args": ["-y", "mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}"]
-    },
     "serena": {
-      "command": "uvx",
-      "args": ["--from", "git+https://github.com/oraios/serena@${SERENA_REF}", "serena"]
+      "command": "serena",
+      "args": ["start-mcp-server"]
     },
     "terraform-mcp": {
       "command": "terraform-mcp",

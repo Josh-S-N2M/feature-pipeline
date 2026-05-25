@@ -6,12 +6,15 @@
 # `install_complete` JSONL record per server, then runs auth-probes against
 # the 2 HTTP servers (context7, exa) with MCP_AUTH_PROBE=1.
 #
-# Servers installed here (5):
-#   - serena              (uvx --from git+https://github.com/oraios/serena@${SERENA_REF})
-#   - mcp-openapi-schema  (npm install -g; STALE_PACKAGE per H-3)
+# Servers installed here (4 — post-2026-05-24 postmortem; was 5):
+#   - serena              (uv tool install -p 3.13 serena-agent==${SERENA_VERSION} --prerelease=allow;
+#                          canonical upstream install per MCP-provisioning-postmortem 2026-05-24)
 #   - actionlint-mcp      (go install github.com/hongkongkiwi/actionlint-mcp@${ACTIONLINT_MCP_SHA})
 #   - terraform-mcp       (via .devcontainer/install/terraform-mcp.sh — binary + sha256 + gpg)
 #   - gitnexus            (npm install -g gitnexus@${GITNEXUS_TAG} with GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1)
+#
+# mcp-openapi-schema removed 2026-05-24 per postmortem: no spec source available;
+# upstream npm package abandoned; design-api had no working spec server anyway.
 #
 # context7 and exa are HTTP-transport hosted servers — no install step (but auth-probed at end).
 #
@@ -53,51 +56,38 @@ check_installed() {
 }
 
 # ---------------------------------------------------------------------------
-# Install: serena (uvx)
+# Install: serena (uv tool install — canonical upstream method)
+# Per MCP-provisioning-postmortem 2026-05-24:
+#   - upstream README explicitly disrecommends `uvx --from git+...@<ref>`
+#   - canonical install: `uv tool install -p 3.13 serena-agent==${SERENA_VERSION} --prerelease=allow`
+#   - PyPI package name is `serena-agent`; the installed binary is `serena`
+#   - runtime invocation: `serena start-mcp-server` (per .mcp.json)
 # ---------------------------------------------------------------------------
 install_serena() {
-  local sentinel="${SENTINEL_DIR}/.install-sentinel-serena-${SERENA_REF}"
-  if check_installed "${sentinel}" "uvx"; then
-    log_mcp_event "$(jq -n -c --arg v "${SERENA_REF}" \
-      '{event:"install_complete", timestamp:(now|todateiso8601), server:"serena", install_method:"uvx", version:$v, duration_ms:0, status:"ok", note:"sentinel present; install skipped"}')"
+  local sentinel="${SENTINEL_DIR}/.install-sentinel-serena-${SERENA_VERSION}"
+  if check_installed "${sentinel}" "serena"; then
+    log_mcp_event "$(jq -n -c --arg v "${SERENA_VERSION}" \
+      '{event:"install_complete", timestamp:(now|todateiso8601), server:"serena", install_method:"uv-tool", version:$v, duration_ms:0, status:"ok", note:"sentinel present; install skipped"}')"
     return 0
   fi
 
-  local start; start=$(date +%s%3N)
-  # uvx --from git pulls + builds on first use; we just verify it resolves
-  if uvx --from "git+https://github.com/oraios/serena@${SERENA_REF}" serena --version >/dev/null 2>&1; then
-    touch "${sentinel}"
-    local end; end=$(date +%s%3N)
-    log_mcp_event "$(jq -n -c --arg v "${SERENA_REF}" --argjson dur "$((end - start))" \
-      '{event:"install_complete", timestamp:(now|todateiso8601), server:"serena", install_method:"uvx", version:$v, duration_ms:$dur, status:"ok"}')"
-  else
-    log_mcp_event "$(jq -n -c --arg v "${SERENA_REF}" \
-      '{event:"install_complete", timestamp:(now|todateiso8601), server:"serena", install_method:"uvx", version:$v, duration_ms:0, status:"failed", note:"uvx serena --version failed"}')"
-    echo "[postCreate] serena install failed" >&2
+  if ! command -v uv >/dev/null 2>&1; then
+    log_mcp_event "$(jq -n -c --arg v "${SERENA_VERSION}" \
+      '{event:"install_complete", timestamp:(now|todateiso8601), server:"serena", install_method:"uv-tool", version:$v, duration_ms:0, status:"failed", note:"uv binary not on PATH; Dockerfile uv install missing or image not rebuilt"}')"
+    echo "[postCreate] serena install failed: uv not installed (rebuild Codespace for Dockerfile changes to take effect)" >&2
     return 1
   fi
-}
-
-# ---------------------------------------------------------------------------
-# Install: mcp-openapi-schema (npm)
-# ---------------------------------------------------------------------------
-install_mcp_openapi_schema() {
-  local sentinel="${SENTINEL_DIR}/.install-sentinel-mcp-openapi-schema-${MCP_OPENAPI_SCHEMA_VERSION}"
-  if check_installed "${sentinel}" "mcp-openapi-schema"; then
-    log_mcp_event "$(jq -n -c --arg v "${MCP_OPENAPI_SCHEMA_VERSION}" \
-      '{event:"install_complete", timestamp:(now|todateiso8601), server:"mcp-openapi-schema", install_method:"npm", version:$v, duration_ms:0, status:"ok", note:"STALE_PACKAGE per H-3; sentinel present"}')"
-    return 0
-  fi
 
   local start; start=$(date +%s%3N)
-  if npm install -g "mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}" >/dev/null 2>&1; then
+  if uv tool install -p 3.13 "serena-agent==${SERENA_VERSION}" --prerelease=allow >/dev/null 2>&1; then
     touch "${sentinel}"
     local end; end=$(date +%s%3N)
-    log_mcp_event "$(jq -n -c --arg v "${MCP_OPENAPI_SCHEMA_VERSION}" --argjson dur "$((end - start))" \
-      '{event:"install_complete", timestamp:(now|todateiso8601), server:"mcp-openapi-schema", install_method:"npm", version:$v, duration_ms:$dur, status:"ok", note:"STALE_PACKAGE per H-3"}')"
+    log_mcp_event "$(jq -n -c --arg v "${SERENA_VERSION}" --argjson dur "$((end - start))" \
+      '{event:"install_complete", timestamp:(now|todateiso8601), server:"serena", install_method:"uv-tool", version:$v, duration_ms:$dur, status:"ok"}')"
   else
-    log_mcp_event "$(jq -n -c --arg v "${MCP_OPENAPI_SCHEMA_VERSION}" \
-      '{event:"install_complete", timestamp:(now|todateiso8601), server:"mcp-openapi-schema", install_method:"npm", version:$v, duration_ms:0, status:"failed", note:"npm install -g failed"}')"
+    log_mcp_event "$(jq -n -c --arg v "${SERENA_VERSION}" \
+      '{event:"install_complete", timestamp:(now|todateiso8601), server:"serena", install_method:"uv-tool", version:$v, duration_ms:0, status:"failed", note:"uv tool install serena-agent failed"}')"
+    echo "[postCreate] serena install failed" >&2
     return 1
   fi
 }
@@ -165,10 +155,9 @@ install_gitnexus() {
 # Run installs (warn-and-continue posture — single failure shouldn't bring
 # the Codespace down per ADR-0037 banner pattern)
 # ---------------------------------------------------------------------------
-echo "[postCreate] installing 5 OSS-local MCP servers..."
+echo "[postCreate] installing 4 OSS-local MCP servers..."
 
 install_serena              || emit_degraded_banner "serena"              "<no fallback>"
-install_mcp_openapi_schema  || emit_degraded_banner "mcp-openapi-schema"  "<no fallback>"
 install_actionlint_mcp      || emit_degraded_banner "actionlint-mcp"      "<no fallback>"
 install_terraform_mcp       || emit_degraded_banner "terraform-mcp"       "<no fallback>"
 install_gitnexus            || emit_degraded_banner "gitnexus"            "<no fallback>"
