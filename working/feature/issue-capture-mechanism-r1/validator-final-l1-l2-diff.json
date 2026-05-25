@@ -1,0 +1,889 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-05-25T01:55:57Z",
+  "head_sha": "b217e72d0f4e63b70b9aafad73b534f53b084a86",
+  "purpose": "AC-FR-7-b + PV-7.C5 final NFR-8 regression diff. Re-runs validator against T0.1 baseline corpus (git-reconstructed at 814924a). Verifies all Phase 2-6 work preserves baseline behavior.",
+  "baseline_path": "working/feature/issue-capture-mechanism-r1/validator-baseline-l1-l2.json",
+  "baseline_commit": "814924a",
+  "baseline_corpus_size": 133,
+  "post_extension_run": {
+    "corpus_size": 133,
+    "corpus_source": "git ls-tree -r 814924a | grep .md | exclude handoff/ | maxdepth-2",
+    "findings_total": 95,
+    "findings": [
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/acceptance-matrix.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/acceptance-tests-v1.1.0.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/acceptance-tests.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/blueprint-v1.1.0.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/blueprint-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/cc-design.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/codebase-analysis-report.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/cross-artifact-audit-final.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/final-audit-report.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/implementation-notes.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/intent-clarification.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/observations.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/phase-validators-v1.1.0.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/phase-validators.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/plan-v1.1.0.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/plan-v1.2.0.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/plan-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/prd-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/reconciliation-log-cycle1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/reconciliation-log-cycle2.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/research-plan.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-findings-remediation-r1/synthesis.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-machinery-fixes-r1/acceptance-tests.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-machinery-fixes-r1/blueprint-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-machinery-fixes-r1/intent-clarification.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-machinery-fixes-r1/phase-validators.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-machinery-fixes-r1/plan-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/audit-machinery-fixes-r1/prd-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/acceptance-tests.md",
+        "message": "doc_type 'AcceptanceTests' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "info",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md",
+        "message": "file does not exist",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/cc-design.md",
+        "message": "doc_type 'per-layer-design-subsection' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/codespaces-design.md",
+        "message": "doc_type 'per_layer_design_subsection' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/deliverable-archive.md",
+        "message": "doc_type 'deliverable-archive' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/follow-ups.md",
+        "message": "doc_type 'follow-up-register' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/gate-6-hard-gate-contract.md",
+        "message": "doc_type 'gate-6-contract' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/per-task-execution-result.md",
+        "message": "no YAML frontmatter found (file must start with `---\\n...---\\n`)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/phase-validators.md",
+        "message": "doc_type 'PhaseValidators' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/plan-v1.md",
+        "message": "doc_type 'Plan' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-1.md",
+        "message": "required universal field 'feature_slug' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-2.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/reconciliation-log-cycle-3.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/synthesis.md",
+        "message": "no YAML frontmatter found (file must start with `---\\n...---\\n`)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/task-execution-result.md",
+        "message": "no YAML frontmatter found (file must start with `---\\n...---\\n`)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/tasks-summary.md",
+        "message": "doc_type 'TasksSummary' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/devcontainer-mcp-provisioning-r1/verify-at-execution.md",
+        "message": "no YAML frontmatter found (file must start with `---\\n...---\\n`)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/cc-design.md",
+        "message": "doc_type 'DesignDoc' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/intent-clarification.md",
+        "message": "status 'ratified' not in gated vocabulary ['accepted', 'draft', 'rejected', 'superseded'] for doc_type intent-clarification",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/open-items.md",
+        "message": "doc_type 'open-items' not in known category; cannot validate state vocabulary",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/per-task-execution-result.md",
+        "message": "no YAML frontmatter found (file must start with `---\\n...---\\n`)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "minor",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execute-orchestrator-dispatch-mechanism-repair-r1/synthesis.md",
+        "message": "status 'ready-for-design-composer' not in analysis vocabulary ['complete', 'draft', 'superseded'] for doc_type synthesis",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/blueprint-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/blueprint-v2.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/blueprint-v3.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/blueprint-v4.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/cc-design.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/codebase-analysis.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/plan-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/plan-v2-review-report.md",
+        "message": "required universal field 'feature_slug' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/plan-v2-review-report.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/prd-v1.1.0.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/prd-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/reconciliation-log-cycle1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/reconciliation-log-cycle2.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/research-plan.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/execution-pipeline-design-r1/synthesis.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/acceptance-tests.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/blueprint-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/cc-design.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/codebase-analysis-report.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/intent-clarification.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/intent-clarification.v1.0.0.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/intent-clarification.v1.1.0.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/phase-validators.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/plan-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/prd-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/research-plan.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/frontend-design-knowledge-r1/synthesis.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/issue-capture-mechanism-r1/blueprint-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/issue-capture-mechanism-r1/blueprint-v2.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/issue-capture-mechanism-r1/blueprint-v3.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/issue-capture-mechanism-r1/plan-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/issue-capture-mechanism-r1/plan-v2.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/issue-capture-mechanism-r1/reconciliation-log-r1.md",
+        "message": "no YAML frontmatter found (file must start with `---\\n...---\\n`)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/issue-capture-mechanism-r1/reconciliation-log-r2.md",
+        "message": "no YAML frontmatter found (file must start with `---\\n...---\\n`)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/pipeline-skill-design-fixes-r1/acceptance-tests.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/pipeline-skill-design-fixes-r1/blueprint-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/pipeline-skill-design-fixes-r1/cc-design.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/pipeline-skill-design-fixes-r1/intent-clarification.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/pipeline-skill-design-fixes-r1/phase-validators.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/pipeline-skill-design-fixes-r1/plan-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/pipeline-skill-design-fixes-r1/prd-v1.md",
+        "message": "required universal field 'doc_type' missing (ADR-0032)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/synthetic-test-feature-T6/PASS-criteria.md",
+        "message": "no YAML frontmatter found (file must start with `---\\n...---\\n`)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/synthetic-test-feature-T6/README.md",
+        "message": "no YAML frontmatter found (file must start with `---\\n...---\\n`)",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      },
+      {
+        "domain": "validator",
+        "severity": "major",
+        "source_activity": "frontmatter-validator",
+        "file_path": "working/feature/synthetic-test-feature-T6/intent-clarification.md",
+        "message": "status 'None' not in gated vocabulary ['accepted', 'draft', 'rejected', 'superseded'] for doc_type intent-clarification",
+        "dispatch_hint": "the agent that authored the artifact",
+        "depth_level": "0"
+      }
+    ]
+  },
+  "diff": {
+    "new_findings": [
+      [
+        "working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md",
+        "info",
+        "file does not exist"
+      ]
+    ],
+    "removed_findings": [
+      [
+        "working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md",
+        "minor",
+        "doc_type 'agent-roster-impact-matrix' not in known category; cannot validate state vocabulary"
+      ]
+    ],
+    "modified_findings": []
+  },
+  "verdict": "FAIL_REGRESSION"
+}

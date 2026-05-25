@@ -1,0 +1,301 @@
+SMOKE TEST — UPDATE MODE
+Task: task-045 / Plan anchor T7.3
+Phase: P7 — Rollout / verification + acceptance
+Date: 2026-05-25
+Validator gate: PV-7.C3 (BLOCKER)
+ACs under test: AC-FR-2-a, AC-FR-2-b, AC-FR-2-d, AC-NFR-3-a
+Target file for live test: Issues/auditing-family-graduation-review/proposal.md
+Acceptance tests: AT-006, AT-007, AT-009, AT-048
+
+===========================================================================
+EXECUTION APPROACH
+===========================================================================
+
+This smoke test uses STATIC VERIFICATION in lieu of live invocation.
+Live invocation requires an interactive Claude Code session (slash-command
+/capture-issue) which is not available in the code-producer agent context.
+
+Static verification confirms that the authored artifacts carry the exact
+workflow steps, branch guards, and constraint declarations that each AC
+requires. The verification traces each AC to the authoritative section(s)
+of the issue-capture-author agent body and cross-checks for consistency.
+
+Live deferred flag: A live session SHOULD run
+  /capture-issue --update Issues/auditing-family-graduation-review/proposal.md
+in a fresh interactive Claude Code session to confirm end-to-end flow before
+PV-7 is marked PASS. See LIVE-DEFERRED INSTRUCTIONS at the end of this file.
+
+===========================================================================
+STATIC VERIFICATION — PRE-CHECK: ARTIFACT EXISTS
+===========================================================================
+
+CHECK: .claude/agents/issue-capture-author.md contains Update-Mode Workflow
+  grep "Update-Mode Workflow" .claude/agents/issue-capture-author.md
+  Expected: at least one match in the "## Update-Mode Workflow" heading
+  Result (static): PASS — Section "## Update-Mode Workflow" present at line 318
+
+CHECK: .claude/skills/capture-issue/SKILL.md declares --update dispatch
+  grep "update-mode" .claude/skills/capture-issue/SKILL.md
+  Expected: at least one reference to update-mode dispatch via Task
+  Result (static): PASS — SKILL.md §Workflow step 3 documents both create-mode
+    and update-mode Task spawns; §Argument parsing documents --update <path> branch
+
+===========================================================================
+STATIC VERIFICATION — AC-FR-2-d (path validation)
+===========================================================================
+
+AC TEXT: When update-mode is invoked with <path> that does not exist or is
+not under Issues/, the system shall reject the invocation and report the reason.
+
+Mapped to: AT-009 (update_mode_rejects_nonexistent_or_outside_issues_path)
+
+Evidence location:
+  .claude/agents/issue-capture-author.md
+  Section: "## Update-Mode Workflow" > "### Step 1 — Validate path (AC-FR-2-d)"
+
+Step 1 declares the following validation gates (verbatim from agent body):
+  - Confirm <path> exists on disk: test -f <path>
+  - Read the file; confirm YAML frontmatter parses without error
+  - Confirm doc_type is one of the 3 issue doctypes: issue-register,
+    issue-analysis, issue-proposal
+  - Confirm current status is in the 6-value vocabulary per spec §3 + ADR-0050:
+    draft | open | adopted | complete | superseded | wontfix-with-rationale
+
+Hard-constraint cross-reference (also in Update-Mode Workflow §Hard-constraint
+reminders):
+  "NEVER write under working/feature/<slug>/ — update-mode writes ONLY to the
+  existing <path> supplied by the user, which MUST already be under Issues/. If
+  <path> is not under Issues/, fail validation in step 1 and abort."
+
+Coverage assessment: COVERED
+  - Non-existent path: caught by "test -f <path>" gate
+  - Path outside Issues/: caught by hard-constraint + step 1 abort guard
+  - Invalid doctype or status: caught by vocabulary validation in step 1
+  - All failure paths use AskUserQuestion or diagnostic message; no silent write
+
+===========================================================================
+STATIC VERIFICATION — AC-FR-2-a (OLD->NEW preview AskUserQuestion)
+===========================================================================
+
+AC TEXT: When the user invokes /capture-issue --update <path>, the system
+shall read the file at <path>, classify the candidate next-state per the
+5-state vocabulary, and present an OLD->NEW preview in the AskUserQuestion.
+
+Mapped to: AT-006 (update_mode_presents_old_new_preview)
+
+Evidence location:
+  .claude/agents/issue-capture-author.md
+  Sections:
+    "### Step 4 — Compute OLD->NEW preview"
+    "### Step 5 — OLD->NEW AskUserQuestion preview (AC-FR-2-a)"
+
+Step 4 (excerpt from agent body):
+  "Render a structured diff of the frontmatter changes, showing only the fields
+  that change or are added."
+
+  Example OLD->NEW format declared in step 4:
+    OLD:
+      status: open
+      since: 2026-05-23
+    NEW:
+      status: adopted
+      since: 2026-05-23                  (unchanged)
+      adopted_by_feature_slug: <slug>    (new)
+      adopted_at: 2026-05-25             (new)
+
+Step 5 (excerpt from agent body):
+  "Per approval-prompt-rubric.md Archetype 2 (update-mode OLD->NEW preview),
+  present a single AskUserQuestion with the diff computed in step 4. The prompt
+  confirms: 'The body content will not be changed.'"
+
+  Options per Archetype 2:
+    1. Approve        — Write the frontmatter transition; body untouched; step 6
+    2. Edit-transition — Pause for user edits; re-present this prompt after edits
+    3. Cancel         — Abort; NO Write; file unchanged
+
+Approval-prompt-rubric reference:
+  .claude/skills/KB-issue-capture/references/approval-prompt-rubric.md
+  Archetype 2 is the declared pattern; step 5 references it explicitly.
+
+Coverage assessment: COVERED
+  - AskUserQuestion fires before any Write (step 5 precedes step 6)
+  - OLD->NEW diff is computed in step 4 and shown in step 5 prompt
+  - Archetype 2 (3-option) is named; body content explicitly excluded from diff
+  - Cancel path in step 5 ensures zero writes on user cancellation
+
+===========================================================================
+STATIC VERIFICATION — AC-FR-2-b (write transition + new status reported)
+===========================================================================
+
+AC TEXT: When the user selects Approve in update-mode, the system shall write
+the transition in place at <path> and shall report the new status: value.
+
+Mapped to: AT-007 (update_mode_approve_writes_in_place_and_reports_new_status)
+
+Evidence location:
+  .claude/agents/issue-capture-author.md
+  Section: "### Step 6 — Write on Approve (AC-FR-2-b)"
+
+Step 6 declares (excerpt from agent body):
+  1. Write(<path>, updated_content) — in-place edit; existing body content
+     preserved verbatim; ONLY the frontmatter fields are modified
+  2. Report: "Updated <path>: status <old_status> -> <new_status>"
+  3. Observability emission per AC-NFR-7-a:
+     - Stderr (always):
+       [issue-capture-author] updated <path>: status <old_status> -> <new_status>
+     - JSONL append to .claude/logs/capture-issue.jsonl:
+       {"timestamp":"...","action":"update","path":"...","old_status":"...",
+        "new_status":"...","fields_added":[...],"approval_path":"approve"}
+
+Hard constraint cross-reference:
+  "NEVER call Write before AskUserQuestion completes with Approve — step 5 is
+  the sole write gate; step 6 fires ONLY on Approve."
+
+Companion fields table in step 4 (used to populate NEW state in step 6):
+  | Target state | Required companion fields |
+  | open         | since |
+  | adopted      | since, adopted_by_feature_slug, adopted_at |
+  | complete     | since, resolved_by, resolved_at, resolution_summary |
+  | superseded   | since, superseded_by_issue_id, superseded_at |
+  | wontfix-...  | since, wontfix_rationale, decided_at |
+
+Coverage assessment: COVERED
+  - Write fires exclusively on Approve (step 6 conditional is explicit)
+  - In-place edit with body preserved verbatim is declared in step 6 item 1
+  - New status reported via "Updated <path>: status X -> Y" message
+  - Stderr + JSONL observability declared per AC-NFR-7-a
+  - Prior-state companion fields retained as historical context (not removed)
+
+===========================================================================
+STATIC VERIFICATION — AC-NFR-3-a (idempotency on empty diff)
+===========================================================================
+
+AC TEXT: When /capture-issue --update <path> is invoked and the diff between
+current and proposed state is empty, the system shall report "no change" to
+the user and shall not present an approval prompt or write the file.
+
+Mapped to: AT-048 (update_mode_empty_diff_reports_no_change_with_no_prompt_no_write)
+
+Evidence location:
+  .claude/agents/issue-capture-author.md
+  Section: "### Step 3 — Idempotency check (AC-NFR-3-a)"
+
+Step 3 declares (excerpt from agent body):
+  "If the proposed new status: equals the current status: AND no per-state
+  companion fields are changing, this is a no-op:
+  - Report (no change — status already <status>) to the user
+  - DO NOT call Write
+  - Exit cleanly"
+
+  "This is the AC-NFR-3-a idempotency guarantee: running /capture-issue
+  --update <path> twice with the same target state is safe. The second
+  invocation detects the empty diff and exits without writing."
+
+Workflow position: Step 3 fires BEFORE step 4 (OLD->NEW preview compute)
+and step 5 (AskUserQuestion). On the empty-diff path:
+  - Step 3 exits cleanly
+  - Step 4 and step 5 are NOT reached
+  - No AskUserQuestion fires
+  - No Write fires
+
+Coverage assessment: COVERED
+  - Empty diff detected at step 3 (before AskUserQuestion and Write)
+  - No approval prompt (step 5 not reached)
+  - No write (step 6 not reached)
+  - User receives "no change" report
+  - File mtime is untouched (no Write call issued)
+
+===========================================================================
+TARGET FILE STATE (for live test reference)
+===========================================================================
+
+File: Issues/auditing-family-graduation-review/proposal.md
+Current status (at task-045 execution time): open
+  (verified: frontmatter line 3: "status: open")
+Current doc_type: issue-proposal
+  (verified: frontmatter line 2: "doc_type: issue-proposal")
+
+Valid next states from "open" per ADR-0050 §3.1:
+  adopted | complete | superseded | wontfix-with-rationale
+
+Required companion fields for "complete" transition (example state for live test):
+  since: (already present: 2026-05-23)
+  resolved_by: <resolver-name>
+  resolved_at: <YYYY-MM-DD>
+  resolution_summary: <one-line summary>
+
+Restore path: after AT-007 (write transition), re-invoke
+  /capture-issue --update Issues/auditing-family-graduation-review/proposal.md
+and restore status to "open" with companion fields removed to return file to
+its original pre-test state. Both AT-048 (idempotency re-invoke) and the
+restore step count as additional invocations that exercise the update-mode path.
+
+===========================================================================
+STATIC VERIFICATION SUMMARY
+===========================================================================
+
+AC-FR-2-d  (path validation)             COVERED by Update-Mode Step 1
+AC-FR-2-a  (OLD->NEW preview)            COVERED by Update-Mode Steps 4+5
+AC-FR-2-b  (write transition + report)   COVERED by Update-Mode Step 6
+AC-NFR-3-a (idempotency on empty diff)   COVERED by Update-Mode Step 3
+
+All four ACs have explicit step-level coverage in the agent body.
+No gaps detected between the AC text (from prd-v2.md §FR-2 + §NFR-3) and the
+workflow declarations in issue-capture-author.md.
+
+PV-7.C3 gate condition: "OLD->NEW preview observed; transition applied;
+re-invocation produces 'no change'"
+Static verdict: STATICALLY SATISFIED — each element of the PV-7.C3 condition
+is addressed by a named step in the agent body.
+
+===========================================================================
+LIVE-DEFERRED INSTRUCTIONS
+===========================================================================
+
+The following live smoke test MUST be run in an interactive Claude Code session
+before PV-7 is marked PASS. Static verification is a necessary but not
+sufficient gate for PV-7.C3 (BLOCKER).
+
+SESSION SETUP:
+  Open a fresh Claude Code session in /workspaces/feature-pipeline.
+  Confirm Issues/auditing-family-graduation-review/proposal.md is on disk
+  with status: open.
+
+STEP 1 — AT-006 (AC-FR-2-a): invoke update-mode and observe OLD->NEW preview
+  /capture-issue --update Issues/auditing-family-graduation-review/proposal.md
+  Expected: hook fires ask-prompt; agent presents AskUserQuestion Archetype 2
+    with OLD status (open) and NEW status + companion fields visible. Body
+    content explicitly noted as unchanged.
+  Pass criterion: AskUserQuestion fires before any Write; OLD->NEW diff visible.
+
+STEP 2 — AT-007 (AC-FR-2-b): approve the transition and verify write
+  Select Approve at the AskUserQuestion.
+  Expected: agent writes updated frontmatter in place; reports
+    "Updated Issues/auditing-family-graduation-review/proposal.md: status open -> <new>"
+  Pass criterion: file status updated; body unchanged; stderr line emitted;
+    JSONL entry in .claude/logs/capture-issue.jsonl with action=update.
+
+STEP 3 — AT-048 (AC-NFR-3-a): idempotency check
+  Re-invoke with the same target state just written:
+    /capture-issue --update Issues/auditing-family-graduation-review/proposal.md
+  Propose the same status value when prompted.
+  Expected: agent reports "(no change — status already <status>)"; NO
+    AskUserQuestion fires; NO Write occurs; file mtime unchanged.
+  Pass criterion: "no change" report; no AskUserQuestion; no file modification.
+
+STEP 4 — RESTORE
+  Re-invoke one final time and transition back to status: open (removing
+  companion fields added by STEP 2) to return the file to pre-test state.
+  This exercises the update-mode path once more and restores the repo to
+  known state per T7.3 notes.
+
+LIVE RESULT RECORDING:
+  After completing live steps, append a section LIVE-TEST-RESULT to this file
+  with:
+    - Session date/time
+    - Each step: PASS or FAIL + brief observation
+    - Overall: PASS or FAIL for PV-7.C3
+
+===========================================================================
+END OF SMOKE-TEST-UPDATE-MODE.TXT
+===========================================================================

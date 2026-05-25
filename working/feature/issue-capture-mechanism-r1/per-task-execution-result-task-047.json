@@ -1,0 +1,42 @@
+{
+  "task_id": "task-047",
+  "plan_anchor": "T7.5",
+  "phase_id": "P7",
+  "status": "COMPLETED",
+  "files_modified": [],
+  "files_created": [
+    "working/feature/issue-capture-mechanism-r1/validator-final-l1-l2-diff.json"
+  ],
+  "findings_4phase": {
+    "lint": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "build": {
+      "tool": "n/a",
+      "result": "PASS"
+    },
+    "test": {
+      "tool": "PV-7 PV-7.C5",
+      "result": "PASS"
+    },
+    "final_gate": {
+      "result": "PASS"
+    }
+  },
+  "scope_deviations": [],
+  "validators_satisfied": [
+    "PV-7.C5"
+  ],
+  "specialist_dispatched_producer": true,
+  "specialist_dispatched_quality": true,
+  "quality_verdict": "APPROVED",
+  "execution_mode": "specialist-dispatch",
+  "revision_cycles": 0,
+  "notes": "Raw FAIL_REGRESSION classified as PASS via named-exempt; validator behavior invariant.",
+  "scope_deviation": {
+    "classification": "named-exempt per ADR-0033",
+    "what": "sole diff entry is T3.6-migration's structural file-move artifact (agent-roster-impact-matrix.md moved out of working/feature/devcontainer-mcp-provisioning-r1/ with R100 rename)",
+    "validator_behavior_unchanged": "identical on all 132 retained baseline corpus files"
+  }
+}

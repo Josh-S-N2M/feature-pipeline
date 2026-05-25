@@ -1,0 +1,111 @@
+# T7.1 — /capture-issue create-mode happy-path smoke test
+# Captured: 2026-05-25T00:00:00Z
+# HEAD: b217e72d0f4e63b70b9aafad73b534f53b084a86
+
+## A. STATIC VERIFICATION (this session)
+
+### A.1 capture-issue/SKILL.md structure
+PASS: file exists (.claude/skills/capture-issue/SKILL.md)
+PASS: argument-hint declared
+
+### A.2 issue-capture-author.md structure
+PASS: file exists (.claude/agents/issue-capture-author.md)
+PASS: Create-Mode Workflow section present (## Create-Mode Workflow)
+PASS: Update-Mode Workflow section present (## Update-Mode Workflow)
+PASS: F-003 — skills: absent (top-level skills: key is not present)
+
+### A.3 KB-issue-capture structure
+PASS: references dir exists (.claude/skills/KB-issue-capture/references/)
+PASS: 4 reference files present
+  - references/approval-prompt-rubric.md
+  - references/examples.md
+  - references/non-pollution-contract.md
+  - references/triage-criteria.md
+
+### A.4 KB-documentation-criteria templates + spec
+PASS: issue-doctypes-spec.md exists and references 3 issue templates
+PASS: templates dir exists (.claude/skills/KB-documentation-criteria/references/templates/)
+PASS: issue-analysis-template.md present
+PASS: issue-proposal-template.md present
+PASS: issue-register-template.md present
+
+### A.5 Hook script + golden-file tests
+PASS: .claude/hooks/intercept-issue-capture-agent.sh exists
+PASS: hook is executable
+PASS: shellcheck clean (zero warnings)
+
+Golden-file suite (5/5 PASS):
+  PASS  fixture_1: issue-capture-author → ask
+  PASS  fixture_2: cc-critique → allow
+  PASS  fixture_3: discovery-codebase-researcher → allow
+  PASS  fixture_4: empty stdin → fail-open allow
+  PASS  fixture_5: malformed JSON → fail-open allow
+
+### A.6 Hook latency benchmark
+Source: working/feature/issue-capture-mechanism-r1/hook-latency-results.json
+  allow_path p95: 143.691ms  (target <= 200ms)  PASS
+  ask_path   p95: 292.651ms  (target <= 500ms)  PASS
+  overall verdict: PASS
+
+### A — Summary
+Static verification passes: 15
+Static verification fails:  0
+
+---
+
+## B. DEFERRED LIVE-SESSION VERIFICATION
+
+The hook + agent + slash-command surface is registered in committed settings.json,
+but:
+- The hook block was added to settings.json mid-session (commit 98ca985).
+- Claude Code reads settings.json at session start; hooks added after session start
+  are NOT active in the current session.
+- True end-to-end smoke verification therefore requires starting a NEW Claude Code
+  session after the settings.json commit is present at session-open time.
+
+Live-session steps (to be performed in a fresh session):
+  1. Start a new Claude Code session in this repo (repo root).
+  2. Type:  /capture-issue test-smoke-noticing
+  3. EXPECTED: hook intercepts; user sees `ask` prompt with spawn-prompt preview
+     showing the issue-capture-author sub-agent invocation.
+  4. Approve → sub-agent runs; executes KB-load Read sequence for
+     KB-issue-capture/SKILL.md and references.
+  5. Sub-agent presents WHY/WHAT/WHERE AskUserQuestion (4 options).
+  6. Respond to AskUserQuestion → sub-agent writes to
+     Issues/test-smoke-noticing/<doctype>.md.
+  7. Verify stderr line emitted by hook and JSONL entry appended to
+     .claude/logs/capture-issue.jsonl.
+  8. Cleanup: /capture-issue --update Issues/test-smoke-noticing/<doctype>.md
+     → set status: wontfix-with-rationale (NFR-6 no-deletion preserved).
+
+---
+
+## C. AC Coverage
+
+ACs verified statically (this session):
+  AC-FR-3-b   Hook emits ask for issue-capture-author agent   (fixture_1 golden-file)
+  AC-FR-3-c   Hook emits allow for non-capture agents          (fixture_2, fixture_3)
+  AC-NFR-2-a  Fail-open on empty/malformed stdin               (fixture_4, fixture_5)
+  AC-NFR-1-a  Latency budget met: allow p95=143ms, ask p95=293ms (hook-latency-results)
+
+ACs deferred to live session:
+  AC-FR-1-a   Live Task spawn via hook ask path
+  AC-FR-1-b   Live AskUserQuestion during sub-agent run
+  AC-FR-1-c   Live Write to Issues/<topic>/<doctype>.md
+  AC-FR-3-d   AskUserQuestion-before-Write sequencing observed end-to-end
+  AC-FR-4-a   JSONL append to .claude/logs/capture-issue.jsonl observed live
+  AC-FR-4-b   stderr diagnostic line emitted live
+  AC-FR-4-c   Doctype correctly classified from user input
+  AC-FR-4-d   Frontmatter fields populated per issue-doctypes-spec
+
+---
+
+## Verdict
+
+Static verification: PASS — all 15 checks passed; all components are present,
+  structurally correct, and functional in isolation (golden-file suite 5/5,
+  shellcheck clean, latency budget met).
+
+Live verification: DEFERRED — requires a fresh Claude Code session with the
+  settings.json hooks block active at session start; documented above for the
+  post-merge smoke pass.

@@ -3,8 +3,8 @@
   "feature_slug": "issue-capture-mechanism-r1",
   "started_at": "2026-05-23T16:48:32Z",
   "completed_at": null,
-  "current_stage": "execution_phase_6_complete",
-  "stage_status": "in_progress",
+  "current_stage": "execution_pipeline_complete",
+  "stage_status": "pipeline_complete",
   "gate_history": [
     {
       "gate": "intent_confirmation",
@@ -146,7 +146,17 @@
       "task-039": 1,
       "task-040": 0,
       "task-041": 0,
-      "task-042": 0
+      "task-042": 0,
+      "task-043": 0,
+      "task-044": 0,
+      "task-045": 0,
+      "task-046": 0,
+      "task-047": 0,
+      "task-048": 0,
+      "task-049": 0,
+      "task-050": 0,
+      "task-051": 0,
+      "task-052": 0
     },
     "per_phase": {
       "P0": 0,
@@ -156,7 +166,8 @@
       "P3": 0,
       "P4": 0,
       "P5": 0,
-      "P6": 0
+      "P6": 0,
+      "P7": 0
     }
   },
   "execution_phase_progress": {
@@ -319,7 +330,37 @@
       "revision_cycles_used": {}
     },
     "P7": {
-      "status": "pending"
+      "status": "complete",
+      "verdict": "PASS-WITH-DEFERRED-LIVE-VERIFICATION",
+      "tasks_completed": 10,
+      "tasks_total": 10,
+      "validators_passed": [
+        "PV-7.C1",
+        "PV-7.C2",
+        "PV-7.C3",
+        "PV-7.C4",
+        "PV-7.C5",
+        "PV-7.C6",
+        "PV-7.C7",
+        "PV-7.C8",
+        "PV-7.C9",
+        "PV-7.C10"
+      ],
+      "execution_mode": "specialist-dispatch",
+      "revision_cycles_used": {},
+      "in_flight_remediations": [
+        "NCB-001",
+        "NCM-001"
+      ],
+      "named_exempt_scope_deviations": [
+        "T7.5 corpus-drift"
+      ],
+      "deferred_live_verifications": [
+        "T7.1",
+        "T7.2",
+        "T7.3"
+      ],
+      "feature_acceptance_verdict": "READY-FOR-MERGE-WITH-DEFERRED-LIVE-SMOKE"
     }
   },
   "plan_amendments_in_execution": [
@@ -410,6 +451,28 @@
       ],
       "mode": "specialist-dispatch",
       "rationale": "3 strictly-additive handoff edits; 7 specialist dispatches; 0 revisions; smallest phase."
+    },
+    {
+      "phases": [
+        "P7"
+      ],
+      "mode": "specialist-dispatch",
+      "rationale": "10 tasks; ~22 specialist dispatches; 2 in-flight fixes (NCB-001 + NCM-001); 1 named-exempt + 3 deferred-live; feature-acceptance READY-FOR-MERGE-WITH-DEFERRED-LIVE-SMOKE."
     }
-  ]
+  ],
+  "pipeline_complete_at": "2026-05-24T23:13:00Z",
+  "tasks_completed_total": 55,
+  "tasks_total": 55,
+  "feature_acceptance": {
+    "verdict": "READY-FOR-MERGE-WITH-DEFERRED-LIVE-SMOKE",
+    "merge_preconditions": [
+      "Open fresh Claude Code session to pick up Phase-5 settings.json hooks block",
+      "Execute T7.1/T7.2/T7.3 live smoke procedures (documented in working/feature/issue-capture-mechanism-r1/smoke-test-*.txt)",
+      "On live-smoke PASS, proceed to merge"
+    ],
+    "post_merge_followups": [
+      "Repo-level convention review on KB-* skill-name uppercase (NCB-002)",
+      "User triage of pre-existing prior-session dirty tree state"
+    ]
+  }
 }

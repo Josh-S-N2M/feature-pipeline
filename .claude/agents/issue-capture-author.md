@@ -9,7 +9,7 @@ description: |
   on sub-agents). Writes exactly one file per approved invocation under
   Issues/<topic-slug>/<doctype>.md. Never writes under working/feature/<slug>/.
   Never deletes Issues/*.md (supersession only via superseded_by_issue_id field).
-tools: Read, Glob, Grep, Write, AskUserQuestion
+tools: Read, Glob, Grep, Write, Edit, Bash(mkdir:*), AskUserQuestion
 model: sonnet
 permissionMode: default
 ---

@@ -1,0 +1,39 @@
+# T7.6 — Migration history verification (AC-FR-8-b + AC-FR-9-b)
+# Captured: 2026-05-25T01:55:56Z
+# Per CPI: git log --follow MUST return pre-migration history for all 5 destinations
+
+## Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md
+405bb23 chore(issues): migrate adr-placement-rootcause analysis to canonical Issues/<topic>/<doctype>.md path
+364bf85 feat: devcontainer-mcp-provisioning-r1 — full pipeline run + deferral register
+
+PASS — 2 commits traced (pre-migration history preserved)
+
+## Issues/per-agent-design-evaluation-gap/analysis.md
+405bb23 chore(issues): migrate adr-placement-rootcause analysis to canonical Issues/<topic>/<doctype>.md path
+8819534 chore: capture pipeline-wide issues feeding issue-capture-mechanism-r1
+
+PASS — 2 commits traced (pre-migration history preserved)
+
+## Issues/adr-placement-rootcause/analysis.md
+93582c2 docs(issues): adr-placement-rootcause/analysis.md — spec-conformant frontmatter + content extensions
+405bb23 chore(issues): migrate adr-placement-rootcause analysis to canonical Issues/<topic>/<doctype>.md path
+924b815 chore(issues): extend ADR placement analysis with execute-orchestrator-dispatch run findings
+8819534 chore: capture pipeline-wide issues feeding issue-capture-mechanism-r1
+
+PASS — 4 commits traced (pre-migration history preserved)
+
+## Issues/auditing-family-graduation-review/proposal.md
+405bb23 chore(issues): migrate adr-placement-rootcause analysis to canonical Issues/<topic>/<doctype>.md path
+8819534 chore: capture pipeline-wide issues feeding issue-capture-mechanism-r1
+
+PASS — 2 commits traced (pre-migration history preserved)
+
+## Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md
+3061323 chore(issues): migrate agent-roster-impact-matrix.md to evidence/ subdirectory
+6f46d14 feat: devcontainer-mcp-provisioning-r1 Phase 0-4 — modifications to existing files
+364bf85 feat: devcontainer-mcp-provisioning-r1 — full pipeline run + deferral register
+
+PASS — 3 commits traced (pre-migration history preserved)
+
+---
+## Verdict: PASS — all 5 migrated paths have pre-migration history via git log --follow

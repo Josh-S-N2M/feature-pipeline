@@ -1,6 +1,6 @@
 ---
 name: capture-issue
-description: Slash-command entry point for outside-pipeline issue capture. Parses `/capture-issue <hint>` (create-mode) or `/capture-issue --update <path>` (update-mode); spawns the issue-capture-author sub-agent via Task. Mutually exclusive: create-mode positional hint XOR update-mode `--update <path>`.
+description: "Slash-command entry point for outside-pipeline issue capture. Parses `/capture-issue <hint>` (create-mode) or `/capture-issue --update <path>` (update-mode); spawns the issue-capture-author sub-agent via Task. Mutually exclusive create-mode positional hint XOR update-mode `--update <path>`."
 disable-model-invocation: true
 allowed-tools: Task, AskUserQuestion
 argument-hint: <hint> | --update <path>

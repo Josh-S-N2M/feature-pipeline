@@ -1,0 +1,213 @@
+SMOKE TEST: Negative — Cancel Branch + Non-Issue-Capture Fast-Path
+Task: task-044 / Plan anchor T7.2
+Phase: P7
+Date: 2026-05-25
+Acceptance criteria: AC-FR-1-d, AC-FR-3-c
+Validators: PV-7.C2, AT-004, AT-012
+Author: execute-task-code-producer (task-044)
+
+===========================================================================
+SECTION A — STATIC + DISPATCH-LEVEL VERIFICATION (completed in this session)
+===========================================================================
+
+A.1  AC-FR-3-c — Hook fast-path ALLOW on non-issue-capture spawns
+---------------------------------------------------------------------------
+Method: Re-execute hook golden-file test suite (all 5 fixtures).
+Command run: python3 /workspaces/feature-pipeline/.claude/hooks/test_intercept_issue_capture_agent.py
+
+Results (verbatim stdout):
+  PASS  fixture_1: issue-capture-author → ask
+  PASS  fixture_2: cc-critique → allow
+  PASS  fixture_3: discovery-codebase-researcher → allow
+  PASS  fixture_4: empty stdin → fail-open allow
+  PASS  fixture_5: malformed JSON → fail-open allow
+
+  Results written to: working/feature/issue-capture-mechanism-r1/hook-golden-results.json
+  ALL PASS (5/5 fixtures)
+
+Fixture detail relevant to AC-FR-3-c:
+  fixture_2  subagent_type="cc-critique"
+             expected: permissionDecision="allow"
+             actual:   permissionDecision="allow"
+             elapsed:  62.3 ms
+             verdict:  PASS
+
+  fixture_3  subagent_type="discovery-codebase-researcher"
+             expected: permissionDecision="allow"
+             actual:   permissionDecision="allow"
+             elapsed:  54.9 ms
+             verdict:  PASS
+
+Hook code path confirmed (intercept-issue-capture-agent.sh lines 59-61):
+  # ---- All other subagent_types: fast-path allow ----
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse",
+          "permissionDecision":"allow","permissionDecisionReason":
+          "subagent_type %s not intercepted; fast-path allow"}}\n' "$SUBAGENT_TYPE"
+  exit 0
+
+Fast-path fires for ANY subagent_type != "issue-capture-author". No ask prompt.
+No permissionDecisionReason surfaces to the user (reason field is internal telemetry only).
+
+AC-FR-3-c static verdict: PASS
+
+
+A.2  AC-FR-1-d — Cancel results in zero Write calls
+---------------------------------------------------------------------------
+Method: Documentation review of issue-capture-author.md and Create-Mode Workflow.
+
+Evidence 1 — Hard Constraint #3 (issue-capture-author.md lines 33-34):
+  "3. NEVER call Write before AskUserQuestion completes with Approve.
+   Every file write is gated by user approval (AC-FR-1-c + AC-NFR-4-a).
+   The AskUserQuestion's options include Cancel and Edit-content;
+   only the Approve option leads to Write."
+
+Evidence 2 — Create-Mode Workflow Step 5 table (issue-capture-author.md):
+  | 4. Cancel | Abort; NO file is written; agent exits cleanly |
+
+Evidence 3 — Cancel path narrative (issue-capture-author.md line ~200):
+  "Cancel path: Per AC-FR-1-d, selecting Cancel results in zero Write calls.
+   The agent [confirms cancellation] and exits."
+
+The Hard Constraint is categorized as a constraint the agent "must NEVER violate"
+(issue-capture-author.md §Hard constraints heading). The constraint is structural
+(declared in the agent body, enforced at the CC layer via tool-call sequencing) and
+does not depend on runtime model judgment to activate — it specifies a required
+tool-call order that the AskUserQuestion response tree enforces.
+
+The Cancel option in AskUserQuestion produces a response branch that does not
+include a Write call. There is no code path by which Cancel → Write.
+
+AC-FR-1-d static verdict: PASS (documentation-confirmed; live verification deferred — see Section B)
+
+
+A.3  AT-012 — Golden-file unit test: hook allow on other subagent_type
+---------------------------------------------------------------------------
+Covered by A.1 fixture_2 (cc-critique) and fixture_3 (discovery-codebase-researcher).
+
+AT-012 spec (acceptance-tests.md §AT-012):
+  Steps: Pipe {"tool_input": {"subagent_type": "cc-critique"}, "session_id": "<uuid>"} to hook.
+  Expected: stdout contains "permissionDecision": "allow"; no user-facing prompt; exit 0; stderr empty.
+
+Observation from fixture_2 execution:
+  - stdout: permissionDecision="allow" — CONFIRMED
+  - no user-facing permissionDecisionReason prompt — CONFIRMED (reason field is tool metadata, not shown to user)
+  - exit code: 0 — CONFIRMED
+  - stderr: empty — CONFIRMED
+
+AT-012 verdict: PASS
+
+
+A.4  AT-004 — cancel_writes_no_file
+---------------------------------------------------------------------------
+AT-004 is typed as "Integration (manual) + filesystem assertion" in acceptance-tests.md.
+The filesystem assertion component requires a live Claude Code session with real
+AskUserQuestion interaction. Static documentation review provides supporting evidence;
+full verification is in Section B.
+
+Supporting static evidence:
+  - issue-capture-author.md Hard Constraint #3: "NEVER call Write before AskUserQuestion
+    completes with Approve" — structurally prevents any Write on Cancel.
+  - Create-Mode Workflow step table: Cancel row maps to "NO file is written".
+  - No Write call appears in any Cancel-path branch of the Create-Mode workflow steps.
+
+AT-004 status: Partial — static evidence PASS; live filesystem assertion deferred to Section B.
+
+
+A.5  PV-7.C2 — Negative smoke tests PASS
+---------------------------------------------------------------------------
+PV-7.C2 requires:
+  (a) Cancel branch: no file written under Issues/
+  (b) Non-issue spawn (e.g., cc-critique): hook silently allows, no ask prompt
+
+PV-7.C2(b) — PASS via Section A.1 (golden-file suite PASS for fixture_2, fixture_3).
+PV-7.C2(a) — Deferred to Section B (live session required for Cancel branch filesystem check).
+
+PV-7.C2 partial status: (b) PASS; (a) deferred.
+
+
+===========================================================================
+SECTION B — DEFERRED STEPS (live Claude Code session required)
+===========================================================================
+
+The following steps require a live interactive Claude Code session where a real
+AskUserQuestion can be presented and Cancel selected. They cannot be executed in an
+automated context because AskUserQuestion is a blocking interactive tool that awaits
+a human response before proceeding.
+
+B.1  Cancel branch — live execution procedure (AT-004 / AC-FR-1-d / PV-7.C2-a)
+---------------------------------------------------------------------------
+Precondition: task-043 (T7.1 create-mode smoke) completed first — a session is running
+and the issue-capture-author agent is accessible via /capture-issue skill.
+
+Steps:
+  1. Record a session-start marker:
+       SESSION_MARKER=$(mktemp /tmp/smoke-cancel-marker-XXXX)
+       touch "$SESSION_MARKER"
+
+  2. Note pre-cancel Issues/ state:
+       find Issues/ -newer "$SESSION_MARKER" -type f
+     Expected: empty (no files written since marker)
+
+  3. Invoke /capture-issue with a test hint (e.g., "smoke-test-cancel-do-not-save"):
+       /capture-issue smoke-test-cancel-do-not-save
+
+  4. Hook fires; user sees ask prompt with "About to spawn issue-capture-author" preview.
+     Select Approve (to let the sub-agent proceed to its own AskUserQuestion).
+
+  5. Sub-agent presents AskUserQuestion with WHY/WHAT/WHERE preview and options:
+     Approve / Approve-with-edits / Change-doctype / Cancel.
+
+  6. Select Cancel.
+
+  7. Verify:
+     (a) Agent emits cancellation confirmation message (e.g., "No file written. Cancelled.")
+     (b) find Issues/ -newer "$SESSION_MARKER" -type f  →  empty output
+
+  8. Record outcome in this file under B.1 Results.
+
+Pass criteria (AT-004):
+  - Post-cancel find output is empty (no new file under Issues/)
+  - Agent's text response acknowledges cancellation and explicitly states no file was written
+
+B.2  Non-issue fast-path — live confirmation (AC-FR-3-c / PV-7.C2-b supplement)
+---------------------------------------------------------------------------
+Section A.1 provides definitive golden-file verification (fixture_2, fixture_3 PASS).
+The following live step provides supplementary end-to-end confirmation that no visible
+ask prompt appears in the actual session UI for a non-issue-capture Task spawn.
+
+Steps:
+  1. Invoke any non-issue-capture subagent (e.g., cc-critique via skill or Task).
+  2. Observe: no ask prompt surfaces in the Claude Code UI.
+  3. The Task proceeds without interruption.
+
+Note: This step is low priority given the golden-file PASS already covers AC-FR-3-c.
+The hook contract is deterministic (shell script with fixed logic); golden-file coverage
+is sufficient for AC-FR-3-c. Live session adds UI-layer confirmation only.
+
+
+===========================================================================
+SUMMARY
+===========================================================================
+
+AC-FR-1-d (Cancel: no file written)
+  Static verdict:  PASS (documentation-confirmed)
+  Live verdict:    DEFERRED (B.1 procedure documented above)
+  Overall:         PARTIAL — static evidence complete; live filesystem assertion pending
+
+AC-FR-3-c (Hook fast-path allow on non-issue-capture)
+  Static verdict:  PASS (golden-file fixture_2 + fixture_3; 5/5 suite PASS)
+  Live verdict:    DEFERRED (B.2 supplementary; non-blocking given golden-file PASS)
+  Overall:         PASS (golden-file is the typed test for AC-FR-3-c per AT-012)
+
+AT-004 (cancel_writes_no_file):
+  Status:  PARTIAL — supporting evidence PASS; live integration step B.1 deferred
+
+AT-012 (hook_emits_permission_decision_allow_on_other_subagent_types_silently):
+  Status:  PASS (golden-file suite, fixture_2)
+
+PV-7.C2:
+  (a) Cancel branch:  DEFERRED (live session, procedure in B.1)
+  (b) Non-issue fast-path:  PASS (golden-file)
+
+Hook golden suite re-run timestamp: 2026-05-25T00:00:00Z (approx session time)
+Hook golden suite result file: working/feature/issue-capture-mechanism-r1/hook-golden-results.json

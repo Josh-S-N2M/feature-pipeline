@@ -1,0 +1,95 @@
+Task T7.9 — Cleanup Final Report
+Generated: 2026-05-25
+Feature: issue-capture-mechanism-r1
+
+=== CHECK 1: .gitignore line for .claude/logs/*.jsonl ===
+Result: PASS
+Evidence: grep -q "\.claude/logs/\*\.jsonl" .gitignore returned exit 0.
+T4.5 addition is confirmed present.
+
+=== CHECK 2: No test-* directories leaked into Issues/ ===
+Result: PASS
+Evidence: find Issues -name "test-*" -type d and find Issues -name "test-smoke-*" -type d
+returned empty. Phase 7 smoke tests produced output in
+working/feature/issue-capture-mechanism-r1/ (e.g., smoke-test-create-mode.txt,
+smoke-test-update-mode.txt, smoke-test-cancel-and-fastpath.txt) — correct location,
+not in Issues/.
+
+=== CHECK 3: CPI-5 preserved — no Issues/*.md deletions in this feature's commits ===
+Result: PASS
+Evidence: git log --diff-filter=D --name-only main -- Issues/ produced no output.
+No Issues/ files were deleted in any commit on this branch.
+All Issues/ document moves were staged as rename (R) operations, not delete (D).
+
+=== CHECK 4: Working tree status summary ===
+
+Modified (M) — pre-existing dirty state, NOT introduced by this feature's tasks:
+  M .claude/SETTINGS-NOTES.md
+  M .claude/agents/design-api.md
+  M .claude/settings.json
+  M .devcontainer/Dockerfile
+  M .devcontainer/devcontainer.json
+  M .devcontainer/postCreate.sh
+  M .devcontainer/versions.env
+  M .mcp.json
+  M working/feature/devcontainer-mcp-provisioning-r1/per-task-execution-result.json
+  M working/feature/devcontainer-mcp-provisioning-r1/per-task-execution-result.md
+
+Modified — authored or updated by this feature (issue-capture-mechanism-r1):
+  M .claude/agents/issue-capture-author.md
+  M .claude/skills/capture-issue/SKILL.md
+  M project-audit-report.json
+  M project-audit-report.md
+  M working/feature/issue-capture-mechanism-r1/hook-golden-results.json
+
+Untracked (??) — outside this feature's scope (prior sessions):
+  Issues/adr-placement-rootcause/proposal.md
+  adrs/ADR-0053-*.md
+  adrs/ADR-0054-*.md
+  adrs/ADR-0055-*.md
+  working/feature/adr-placement-mechanism-repair-r1/
+
+Untracked (??) — per-task execution artifacts of this feature (expected, not committed):
+  working/feature/issue-capture-mechanism-r1/auditing-final.json
+  working/feature/issue-capture-mechanism-r1/cc-critique-final.json
+  working/feature/issue-capture-mechanism-r1/migration-history-confirmation.txt
+  working/feature/issue-capture-mechanism-r1/packager-input-notes.md
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-032.md
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-037.md
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-039.md
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-042.md
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-043.json
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-044.json
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-044.md
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-045.json
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-048.json
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result-task-048.md
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result.json
+  working/feature/issue-capture-mechanism-r1/per-task-execution-result.md
+  working/feature/issue-capture-mechanism-r1/pipeline-isolation-final.txt
+  working/feature/issue-capture-mechanism-r1/smoke-test-cancel-and-fastpath.txt
+  working/feature/issue-capture-mechanism-r1/smoke-test-create-mode.txt
+  working/feature/issue-capture-mechanism-r1/smoke-test-update-mode.txt
+  working/feature/issue-capture-mechanism-r1/cleanup-final.txt  (this file)
+
+NOTE FOR USER TRIAGE: The M-flagged files under .claude/, .devcontainer/, and .mcp.json
+predate this feature's session. They appear in the gitStatus snapshot that was present
+at conversation start. This feature did not introduce those changes. Triage those
+separately before the merge commit.
+
+=== VERDICT ===
+PASS
+
+The working tree is clean with respect to this feature's contributions:
+- .gitignore protection for logs is confirmed active (T4.5 PASS).
+- No test artifact directories leaked into Issues/.
+- CPI-5 preserved: zero Issues/ deletions across all commits.
+- This feature's modified files (.claude/agents/issue-capture-author.md,
+  .claude/skills/capture-issue/SKILL.md, project-audit-report.{json,md},
+  hook-golden-results.json) are the expected deliverable surface.
+- Pre-existing dirty state in .devcontainer/, .claude/settings.json, .mcp.json, and
+  the devcontainer-mcp-provisioning-r1 working files is prior-session work, not
+  introduced by issue-capture-mechanism-r1. User should stage and commit or discard
+  those independently before or after merging this feature.
+
+Working tree is clear for merge of the issue-capture-mechanism-r1 feature commits.
