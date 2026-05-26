@@ -9,10 +9,14 @@ generated: 2026-05-24
 generated_by: claude (orchestrator) — dogfood authoring during issue-capture-mechanism-r1 Phase 1 post-review
 # --- Per-state companion fields for status: open (per issue-doctypes-spec.md §4) ---
 # since: 2026-05-24  (the date the open state was first set; required for status: open)
-# --- Optional cross-link fields (per ADR-0046; omitted because this is the root analysis) ---
+# --- Optional cross-link fields (per ADR-0046; partial adoption 2026-05-25 — analysis remains open) ---
 # escalates_from: <none — this is the root analytical capture of the unified pattern>
-# escalated_to:   <none yet — when a future feature is opened to harden the gates, this file
-#                  will be amended to add `escalated_to: PROPOSAL-<future-feature-slug>`>
+escalated_to: PROPOSAL-cross-artifact-divergence-detection-gap
+# Note: the sibling proposal carves out only the quick-wins subset (verdict-vs-findings consistency,
+# single-agent fallback ban for full features, .mcp.json↔install-taxonomy parity rule, GitNexus
+# install smoke test, CI mcp-list smoke test). The remaining hardening (design-realization audit,
+# cross-file invariant catalog, reachability handshake, drift detection, per-agent design discipline)
+# is deferred to a follow-on proposal for a separate feature run, so this analysis stays open.
 # rolled_into_register: <none — no register absorbs this analysis>
 ---
 
