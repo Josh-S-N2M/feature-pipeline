@@ -1,6 +1,6 @@
 ---
 id: ADR-0037
-version: 1.0.0
+version: 1.0.2
 status: Accepted
 generated: 2026-05-23
 generated_by: design-composer
@@ -12,11 +12,22 @@ applies_to:
 template_format: per KB-documentation-criteria ADR template v1.0
 change_summary: >-
   Establishes `.claude/runtime/mcp-events.jsonl` JSONL schema (event types
-  primary_degraded / readiness_probe / structured_failure) plus stderr-banner
+  install_complete / readiness_probe / structured_failure) plus stderr-banner
   companion as the canonical UI-15 primary→fallback transition-surfacing
   contract. Resolves Q-CC-5 (prose-only-with-audit vs structured-frontmatter-field)
   in favor of prose-only for the per-agent declaration; the structured surface
-  lives in the event file, not in the agent frontmatter.
+  lives in the event file, not in the agent frontmatter. v1.0.2 prose-only
+  amendment per pipeline-quickwins-hardening-r1 Architecture Audit cycle 1:
+  the event-type triad in §Decision item 2 was incorrectly written as
+  "primary_degraded / readiness_probe / structured_failure" — the actual
+  on-disk vocabulary per audit_op7_events_schema.py and per .devcontainer/postCreate.sh
+  emissions is "install_complete / readiness_probe / structured_failure"
+  (primary_degraded exists only as a boolean sub-field of structured_failure,
+  not as a distinct event type); and §Architecture Impact item 4 referenced
+  the wrong OP rule for schema validation (OP-6 actually audits credential
+  redaction; OP-7 is the schema-validation rule). Both corrections are
+  prose-only; the decision content (event surface, three event types as a
+  closed enum, prose-only declaration with audit-rule discipline) is unchanged.
 ---
 
 # ADR-0037: MCP transition surfacing — `mcp-events.jsonl` + stderr banner (UI-15)
@@ -51,8 +62,8 @@ The decision is one-way (reach=36 sub-agents, blast-radius=tenant, Wardley stage
 ## Decision
 
 1. Adopt **`.claude/runtime/mcp-events.jsonl`** as the durable cross-server event surface. The file is JSONL, append-only, project-local, and not committed to git (the directory is committed; the file is gitignored — see ADR-0037 Implementation Guidance).
-2. The file carries **three event types**: `primary_degraded` (primary→fallback transition), `readiness_probe` (postCreate / postStart probe outcome), `structured_failure` (FR-9 mid-run failure record).
-3. **Every primary_degraded event** also produces a one-line stderr banner from whichever component detected the transition. The banner is ephemeral operator hint; the JSONL record is the durable contract.
+2. The file carries **three event types**: `install_complete` (per-server install completion record written by postCreate.sh), `readiness_probe` (postCreate / postStart probe outcome), `structured_failure` (FR-9 mid-run failure record — carries a `primary_degraded` boolean sub-field when the failure record corresponds to a primary→fallback transition). [Prose-only correction in v1.0.2 per pipeline-quickwins-hardening-r1 Architecture Audit cycle 1: the v1.0.0 / v1.0.1 prose listed `primary_degraded` here as a distinct event type, but the actual on-disk vocabulary per `audit_op7_events_schema.py` `VALID_EVENT_TYPES` and per the live `.devcontainer/postCreate.sh` emissions is `install_complete`. `primary_degraded` is a boolean sub-field of `structured_failure`, not a top-level event type. The decision content — three event types as a closed enum — is unchanged.]
+3. **Every `structured_failure` event whose `primary_degraded: true` sub-field is set** also produces a one-line stderr banner from whichever component detected the transition. The banner is ephemeral operator hint; the JSONL record is the durable contract.
 4. The per-agent primary/fallback declaration **remains prose** — in the existing four corpus layers (ADR-0007 v2.2.0, ADR-0018, KB-codebase-research/SKILL.md, `.claude/agents/discovery-codebase-researcher.md`). No new structured agent-file frontmatter field is introduced. The convention is made machine-checkable by an `auditing-mcp` rule (OP-4 per cc-design): for any agent whose `tools:` allowlist contains both a primary and a documented-fallback MCP, the agent body MUST contain prose matching `/primary.*fallback/` semantics naming both servers.
 5. Agents do NOT template-print transition acknowledgements in their own output. The JSONL is the FR-9 contract; the banner is the operator-visible hint.
 
@@ -65,6 +76,7 @@ The decision is one-way (reach=36 sub-agents, blast-radius=tenant, Wardley stage
 | Why this | Combines machine-readability (JSONL) with ephemeral operator hint (stderr banner). Rejects the four corpus-surfaced alternatives that each fail one of {operator-visible-at-the-moment, machine-readable, uniform-across-agents}. Prose-only avoids inventing a 36-agent-wide convention to address one agent's needs. |
 | Known unknowns | (a) Whether the stderr banner is visible inside subagent contexts (Claude Code captures stderr; the banner reaches the host, not the parent agent). (b) Rotation policy for the JSONL — single file; plan-author may add a `.previous` rollover if file size becomes a felt constraint. |
 | Kill criteria | If, six months after ship, the operator workflow shows the JSONL is being ignored and the stderr banner is the only surface used, drop the JSONL or move to a leaner format. Conversely, if the OP-4 audit rule fires no matches for >90 days, revisit by promoting the convention into structured frontmatter (which this ADR explicitly defers, not rejects forever). |
+| v1.0.2 prose-correction note | The original v1.0.0 prose of this ADR (and the v1.0.1 record-count amendment) misnamed the event-type triad as `{primary_degraded, readiness_probe, structured_failure}` and named the schema-validation audit rule as OP-6. Both errors are corrected in v1.0.2: the actual on-disk triad per the running script `audit_op7_events_schema.py` and per the live `.devcontainer/postCreate.sh` emissions is `{install_complete, readiness_probe, structured_failure}` (with `primary_degraded` as a boolean sub-field of `structured_failure`, not a top-level type), and the schema-validation rule is OP-7 (OP-6 audits credential redaction in the runtime log — a distinct concern). The discrepancy was discovered during the Architecture Audit cycle 1 of `pipeline-quickwins-hardening-r1`, a feature whose entire mission is preventing exactly this kind of documentation-vs-realization drift; the irony of the very ADR motivating that mission carrying the drift is recorded here for the next reader. The decision content of ADR-0037 is unchanged. |
 
 ## Rationale
 
@@ -109,7 +121,7 @@ The substrate map (synthesis §3 D-0005) enumerated four alternatives. The combi
 - Every primary→fallback transition is operator-visible AND machine-readable.
 - The augmented `auditing-mcp` skill (rule OP-4) can validate primary/fallback declaration without an agent-file schema change.
 - Future MCP additions inherit a stable contract; no per-server schema invention.
-- The JSONL surface composes with `auditing-mcp` rule OP-5 (lifecycle completeness) and OP-6 (runtime log redaction integrity).
+- The JSONL surface composes with `auditing-mcp` rule OP-5 (lifecycle completeness), OP-6 (runtime log redaction integrity — credential scanning), and OP-7 (event-schema validation — verifies each record's event-type vocabulary and per-type required fields).
 
 ### Negative Consequences
 
@@ -129,11 +141,11 @@ The substrate map (synthesis §3 D-0005) enumerated four alternatives. The combi
    - `KB-mcp-platform/references/mcp-events-jsonl.md` (NEW) — usage-side documentation.
    - `auditing-mcp` augmentation rule OP-4 (NEW) — primary/fallback prose presence.
    - `.devcontainer/postStart.sh` (NEW) — writes `readiness_probe` records.
-   - In-product fallback-detection code-site (in MCP client-side handler — exact location decided at plan-author time) — writes `primary_degraded` and `structured_failure` records.
+   - In-product fallback-detection code-site (in MCP client-side handler — exact location decided at plan-author time) — writes `structured_failure` records whose `primary_degraded: true` sub-field is set on the primary→fallback transition. The transition-record event type is `structured_failure`; the `primary_degraded` sub-field is the discriminator.
 3. **New dependencies introduced.** None at the runtime level; the JSONL is a project-local file. `jq` is used in `postStart.sh` for record construction (devcontainer base image ships jq via Dockerfile per codebase-analysis).
 4. **Architectural constraints added.**
    - The `.claude/runtime/` directory is reserved for ephemeral runtime state.
-   - The `mcp-events.jsonl` schema is the only schema permitted in this file; ad-hoc fields are rejected by the OP-6 audit rule.
+   - The `mcp-events.jsonl` schema is the only schema permitted in this file; ad-hoc fields are rejected by the OP-7 audit rule (`audit_op7_events_schema.py` — the schema-validation rule). OP-6 audits credential redaction within the runtime-log surface — a distinct concern. [v1.0.2 prose correction: the v1.0.0 / v1.0.1 prose of this item incorrectly referenced OP-6 for schema validation; the actual rule is OP-7. The decision content — closed-schema discipline on the event surface — is unchanged.]
    - The `extraction_method` enum is closed at `transport_error / tool_error_response / manual_operator_invocation`.
 
 ## Implementation Guidance
@@ -161,3 +173,4 @@ The stderr banner format is one line, `[mcp:server-name] primary degraded → fa
 |------|---------|---------|--------|
 | 2026-05-23 | 1.0.0 | Initial ADR authoring during Blueprint v1 composition. Established `.claude/runtime/mcp-events.jsonl` schema, three event types, prose-only-with-OP-4 agent declaration. Bootstrap semantics specified eight `readiness_probe` records (seven primary + one ADR-0007 fallback). | design-composer |
 | 2026-05-23 | 1.0.1 | Implementation Guidance edit (in-place, no version bump of decision content): bootstrap-semantics record count reverted from "eight" to "seven" `readiness_probe` records. Trigger: Blueprint v3 Gate-4 OI-1 closure — the user dropped the codebase-memory-mcp fallback from `.mcp.json` inventory (now 7 named MCP servers, no fallback entry). Cross-reference: Blueprint v3 AC-X-2 (PRD-bound inventory of 7 servers) and Blueprint v3 §Open Items / OI-1 closure. The decision content of this ADR (event surface, event types, prose-only declaration, OP-4 audit rule) is unchanged. | design-composer |
+| 2026-05-26 | 1.0.2 | Prose-only amendment, no decision-content change. Triggered by `pipeline-quickwins-hardening-r1` Architecture Audit cycle 1 (findings I-AA-001 and I-AA-002). Two corrections: (a) §Decision item 2's event-type triad was incorrectly written as `primary_degraded / readiness_probe / structured_failure`; the actual on-disk triad per `audit_op7_events_schema.py` `VALID_EVENT_TYPES` and per `.devcontainer/postCreate.sh` live emissions is `install_complete / readiness_probe / structured_failure` (with `primary_degraded` as a boolean sub-field of `structured_failure`, not a top-level event type) — corrected. (b) §Architecture Impact item 4 referenced "OP-6 audit rule" for schema validation; the actual schema-validation rule is OP-7 (`audit_op7_events_schema.py`). OP-6 audits credential redaction in the runtime log — a distinct concern — corrected. Both edits are prose-only per ADR-0005's append-only discipline (decision content unchanged, only the description of pre-existing state moves to match the on-disk implementation). The Decision Details "v1.0.2 prose-correction note" row records the rationale for the future reader and acknowledges the irony that the ADR motivating the documentation-vs-realization drift carve-out carried that very drift in its own prose. | design-composer |
