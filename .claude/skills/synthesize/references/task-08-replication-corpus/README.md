@@ -123,7 +123,7 @@ Continued from Phase 2 → Phase 3 (Framer + Substrate + Synthesizer compose-rep
 - `final-output/report.md` — main synthesis report (~280 lines)
 - `final-output/citations.md` — citation registry (53/53 cited)
 - `final-output/substrate-options.md` — three-option appendix
-- `final-output/adrs/ADR-001-substrate-choice.md` through `ADR-005-confirmation-gate.md` — 5 MADR-shaped ADRs
+- `final-output/adrs/adr-001-substrate-choice.example.md` through `adr-005-confirmation-gate.example.md` — 5 MADR-shaped ADRs
 
 ## Phase 3 verifications (Layer A + Layer B + invariants)
 
@@ -186,9 +186,9 @@ final-output/
 ├── citations.md               Claim-to-source registry (53/53 cited)
 ├── substrate-options.md       Three-option enumeration appendix
 └── adrs/
-    ├── ADR-001-substrate-choice.md
-    ├── ADR-002-memory-architecture.md (with surfaced uncertainty)
-    ├── ADR-003-verification-regime.md (cross-source bridge — strongest signal)
-    ├── ADR-004-recursion-safety.md
-    └── ADR-005-confirmation-gate.md
+    ├── adr-001-substrate-choice.example.md
+    ├── adr-002-memory-architecture.example.md (with surfaced uncertainty)
+    ├── adr-003-verification-regime.example.md (cross-source bridge — strongest signal)
+    ├── adr-004-recursion-safety.example.md
+    └── adr-005-confirmation-gate.example.md
 ```

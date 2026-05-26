@@ -42,14 +42,14 @@ Both source documents converge on the early-verification-point discipline [techn
 ### D-0001: Substrate choice — Claude Code primitives
 
 **Class:** Architectural (one-way) | **Blast radius:** Tenant | **Wardley:** Product
-**Recommendation:** `native` (Claude Code primitives only) — see [ADR-001](adrs/ADR-001-substrate-choice.md)
+**Recommendation:** `native` (Claude Code primitives only) — see [ADR-001](adrs/adr-001-substrate-choice.example.md)
 
 The corpus is grounded entirely in Claude Code primitives, with LangGraph, Temporal, and AWS Step Functions explicitly named as out-of-scope alternatives [synthesis-pipeline-technical-design.md](/mnt/user-data/uploads/synthesis-pipeline-technical-design.md). Native realization is direct; substrate change would be 16 effort-weeks for properties (deterministic replay, declared cycles) the corpus has already accepted as out-of-scope.
 
 ### D-0002: Memory architecture — two-tier (orchestrator + per-sub-agent)
 
 **Class:** Architectural (two-way) | **Blast radius:** Service | **Wardley:** Custom
-**Recommendation:** `native` (two-tier engineering proposal) — see [ADR-002](adrs/ADR-002-memory-architecture.md)
+**Recommendation:** `native` (two-tier engineering proposal) — see [ADR-002](adrs/adr-002-memory-architecture.example.md)
 **Risk surfaced:** This decision rests on a single-sourced claim flagged 🔶 engineering proposal. See Limitations.
 
 The corpus proposes layering per-sub-agent memory as a file-system convention because Claude Code's documented memory system is main-agent oriented [synthesis-pipeline-technical-design.md](/mnt/user-data/uploads/synthesis-pipeline-technical-design.md). The convention is two-way reversible — if it doesn't work, single-tier MEMORY.md remains a viable fallback at lower implementation cost.
@@ -57,21 +57,21 @@ The corpus proposes layering per-sub-agent memory as a file-system convention be
 ### D-0003: Verification regime — vertical-slice early verification gate
 
 **Class:** Architectural (one-way) | **Blast radius:** Tenant | **Wardley:** Product
-**Recommendation:** `native` (vertical-slice gate) — see [ADR-003](adrs/ADR-003-verification-regime.md)
+**Recommendation:** `native` (vertical-slice gate) — see [ADR-003](adrs/adr-003-verification-regime.example.md)
 
 Both source documents converge here [technical-designer.md](/mnt/user-data/uploads/technical-designer.md), [synthesis-pipeline-technical-design.md](/mnt/user-data/uploads/synthesis-pipeline-technical-design.md). The output comparison method is the binding mechanism; reference artifacts captured per the gate's success criteria become the smoke-run baseline for future runs [technical-designer.md](/mnt/user-data/uploads/technical-designer.md). Adapter (per-phase incremental verification) is non-viable because per-phase isolation cannot reveal substrate-level integration failures — exactly the failure mode the gate is designed to catch.
 
 ### D-0004: Recursion safety — hard rule with defense-in-depth
 
 **Class:** Architectural (one-way) | **Blast radius:** Tenant | **Wardley:** Commodity
-**Recommendation:** `native` (hard rule, orchestrator + agent both check) — see [ADR-004](adrs/ADR-004-recursion-safety.md)
+**Recommendation:** `native` (hard rule, orchestrator + agent both check) — see [ADR-004](adrs/adr-004-recursion-safety.example.md)
 
 The corpus states the input scan is `output/**/*.md` minus `output/synthesis-*/**` as a hard rule [synthesis-pipeline-technical-design.md](/mnt/user-data/uploads/synthesis-pipeline-technical-design.md). Adapter (soft rule via naming convention) is non-viable because the failure mode — silent corpus pollution via re-ingestion — is irreversible by the time it's noticed. Defense-in-depth costs ~0.5 effort-weeks; the irreversibility cost of getting this wrong is significant.
 
 ### D-0005: User confirmation — required AskUserQuestion gate
 
 **Class:** Architectural (one-way) | **Blast radius:** Tenant | **Wardley:** Product
-**Recommendation:** `native` (required AskUserQuestion gate with three concurrent questions) — see [ADR-005](adrs/ADR-005-confirmation-gate.md)
+**Recommendation:** `native` (required AskUserQuestion gate with three concurrent questions) — see [ADR-005](adrs/adr-005-confirmation-gate.example.md)
 
 The Confirmation Gate is a required interrupt before Phase 1 with three concurrent questions covering input set, target substrate, and hard constraints [synthesis-pipeline-technical-design.md](/mnt/user-data/uploads/synthesis-pipeline-technical-design.md). Cancellation is dismissal-with-empty-answers, exiting cleanly without allocating a run-id [synthesis-pipeline-technical-design.md](/mnt/user-data/uploads/synthesis-pipeline-technical-design.md). Adapter (configuration file with prompt-on-missing) is viable but introduces UX ambiguity around cancellation that the corpus explicitly resolves.
 

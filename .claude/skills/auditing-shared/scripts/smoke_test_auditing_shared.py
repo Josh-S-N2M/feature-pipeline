@@ -47,8 +47,14 @@ SCRIPTS = {
 # Repo root — used by ADR placement tests to anchor paths.
 REPO_ROOT = str(Path(__file__).resolve().parents[4])
 
-# Allowlist for the known corpus fixture directory (exempts it from non-canonical checks).
-CORPUS_ALLOWLIST = ".claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/"
+# Corpus-fixture exemption is no longer required after the 2026-05-26 rename
+# (per pipeline-quickwins-hardening-r1 user direction): the synthesize-skill
+# replication corpus at
+# .claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/
+# now holds files named adr-NNN-*.example.md (not ADR-NNN-*.md), so the
+# validator's rglob('ADR-*.md') no longer matches them. The smoke tests
+# below therefore invoke the validator without any --allowlist flag, matching
+# the orchestrator surface's canonical-only posture per ADR-0054 + ADR-0056.
 
 
 class SmokeFailure(Exception):
@@ -490,16 +496,16 @@ def scenario_positive_control_non_issues_unknown_doctype() -> None:
 # Scenario L — validate_adr_placement positive: clean repo → exit 0 / PASS / [].
 # -----------------------------------------------------------------------------
 def scenario_adr_placement_positive() -> None:
-    """Positive test (AT-046): validate_adr_placement against the full repo with
-    the corpus allowlist returns exit 0, verdict PASS, and an empty findings
-    array.  This exercises the post-Phase-3 clean-repo state."""
+    """Positive test (AT-046): validate_adr_placement against the full repo
+    returns exit 0, verdict PASS, and an empty findings array.  This exercises
+    the post-Phase-3 clean-repo state.  No --allowlist flag is passed — after
+    the 2026-05-26 corpus-fixture rename (see CORPUS_ALLOWLIST removal note
+    above), the canonical-only posture holds without any exemption."""
     proc = run(
         [
             "python3",
             SCRIPTS["adr_placement"],
             REPO_ROOT,
-            "--allowlist",
-            CORPUS_ALLOWLIST,
         ],
         cwd=REPO_ROOT,
     )
@@ -542,8 +548,6 @@ def scenario_adr_placement_negative() -> None:
                 "python3",
                 SCRIPTS["adr_placement"],
                 REPO_ROOT,
-                "--allowlist",
-                CORPUS_ALLOWLIST,
             ],
             cwd=REPO_ROOT,
         )
