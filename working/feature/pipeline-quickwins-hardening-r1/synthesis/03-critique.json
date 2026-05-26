@@ -1,0 +1,453 @@
+{
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "stage": "synthesis",
+  "step": "critique",
+  "generated": "2026-05-26T00:00:00Z",
+  "scope_note": "Pragmatic single-batch CoVe scoped to ~20 highest-impact claims that drive the open design decisions (U-1..U-8, FR-3 deprecation handling, FR-5 path shift). The other ~180 claims (structural file-path / line-number observations on internal artifacts) are passthrough_unverified per the orchestrator's pragmatic-scoping directive; the framer treats them as available context, not load-bearing premises.",
+  "high_impact_claim_count": 21,
+  "passthrough_claim_count": 180,
+  "dissent_count": 0,
+  "violations_count": 0,
+  "critiques": [
+    {
+      "claim_id": "codebase-C-0038",
+      "verification_questions": [
+        "Does .mcp.json at the repo root currently register exactly six servers?",
+        "Are the six servers actionlint-mcp, context7, exa, gitnexus, serena, terraform-mcp (and only these)?"
+      ],
+      "verification_answers": [
+        "Yes — direct read of /workspaces/feature-pipeline/.mcp.json confirms six entries under mcpServers.",
+        "Yes — the six keys are exactly actionlint-mcp, context7, exa, gitnexus, serena, terraform-mcp. mcp-openapi-schema is absent."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Drives U-3 (FR-3 deprecation handling). Independently corroborated by CLAUDE.md line 9 acknowledgment of the 2026-05-24 removal and by postCreate.sh line 9 inline comment."
+    },
+    {
+      "claim_id": "codebase-C-0041",
+      "verification_questions": [
+        "Does ADR-0041 contain a per-server install-mechanism taxonomy table at Decision §1.b?",
+        "Does that table include a row for mcp-openapi-schema?",
+        "Is mcp-openapi-schema also absent from .mcp.json (creating the parity gap)?"
+      ],
+      "verification_answers": [
+        "Yes — line 71 of /workspaces/feature-pipeline/adrs/ADR-0041-install-mechanism-hybrid.md shows the mcp-openapi-schema row in the install-mechanism table.",
+        "Yes — row reads: 'mcp-openapi-schema | npx -y (Node ephemeral via npm cache) | npx -y \"mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}\" <spec-path>'.",
+        "Yes — confirmed by direct read of .mcp.json (codebase-C-0038)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "This is the on-disk evidence for the FR-3 day-one BLOCKER false-positive. ADR-0041's table has the seventh row; .mcp.json does not. Drives U-3 design directly."
+    },
+    {
+      "claim_id": "codebase-C-0103",
+      "verification_questions": [
+        "Does postCreate.sh line 11 say '5 OSS-local servers'?",
+        "Does postCreate.sh line 165 also say '5 OSS-local servers'?",
+        "What do the actual lines say?"
+      ],
+      "verification_answers": [
+        "Partially — line 5 (header comment) says 'Installs the 5 OSS-local MCP servers' but line 9 immediately clarifies 'Servers installed here (4 — post-2026-05-24 postmortem; was 5)'.",
+        "No — line 158 says 'installing 4 OSS-local MCP servers'; line 165 says 'OSS-local install pass complete' with no count.",
+        "Line 5 retains the old '5' in a high-level intro; line 9 corrects to 4 with explicit postmortem reference; line 158 says 4. Cited line numbers 11/165 in the claim are off by ~6 lines from current state."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Substance is correct (a '5' lingers in line 5 comment alongside corrected '4'); line numbers cited (11, 165) are slightly stale but the cosmetic-only severity assessment holds. Not load-bearing for any design decision."
+    },
+    {
+      "claim_id": "codebase-C-0105",
+      "verification_questions": [
+        "Does ADR-0041 still list mcp-openapi-schema as one of seven invocation rows?",
+        "Does .mcp.json have six servers?",
+        "Would AC-FR-3-c (parity rule) naturally flag this as a BLOCKER on day one?"
+      ],
+      "verification_answers": [
+        "Yes — see codebase-C-0041 verification; the row at line 71 of ADR-0041 remains.",
+        "Yes — see codebase-C-0038 verification.",
+        "Yes — a naive symmetric-difference parity audit between the ADR table and .mcp.json will flag mcp-openapi-schema as an ADR-only entry; absent a deprecation marker that's a BLOCKER finding by FR-3's severity rules (codebase-C-0043 and the canonical taxonomy in C-0076/C-0077)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Centerpiece claim driving U-3. The three options (in-rule marker / ADR amend / allowlist) in C-0106/C-0107/C-0108 are the framer's decision space. CLAUDE.md line 9 (codebase-C-0110) and the stale-doc posture (codebase-C-0111) corroborate the project's preference for in-rule recognition."
+    },
+    {
+      "claim_id": "codebase-C-0110",
+      "verification_questions": [
+        "Does CLAUDE.md at or near line 9 acknowledge mcp-openapi-schema was removed 2026-05-24?",
+        "Does CLAUDE.md say KB-mcp-platform still references it as one of seven and that this is a stale-doc issue, not an active server?"
+      ],
+      "verification_answers": [
+        "Yes — the CLAUDE.md in the current task context block contains: 'mcp-openapi-schema was removed 2026-05-24 (see .devcontainer/postCreate.sh#L16). The KB-mcp-platform skill still references it as one of seven — that's a stale-doc issue, not an active server.'",
+        "Yes — verbatim text confirms both halves of the claim."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Establishes the project's posture that stale references in design-time docs are tolerated — directly load-bearing for U-3 option (a) preferred resolution."
+    },
+    {
+      "claim_id": "codebase-C-0111",
+      "verification_questions": [
+        "Does the project's posture (per CLAUDE.md and observed behavior) allow stale ADR/KB references to coexist with the live config?",
+        "Is this posture established (recurring) rather than ad-hoc?"
+      ],
+      "verification_answers": [
+        "Yes — CLAUDE.md's explicit 'stale-doc issue, not an active server' framing for KB-mcp-platform shows the posture being applied today.",
+        "Inference: only one explicit case is observed in the cited source (mcp-openapi-schema). The claim is a generalization; the source supports a single instance, not necessarily a pattern."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Generalizing from N=1 observation; framer should treat this as 'the project has shown willingness to tolerate one stale reference' rather than 'a established pattern across many.' Confidence downgraded per the over-confident-claim shape ('established').'"
+    },
+    {
+      "claim_id": "codebase-C-0112",
+      "verification_questions": [
+        "Does the claim follow logically from C-0110 and C-0111 (premise) about in-rule recognition?",
+        "Is this a normative recommendation rather than a factual claim?"
+      ],
+      "verification_answers": [
+        "Yes — given the established posture (C-0110/C-0111), FR-3 respecting that posture (in-rule deprecation marker) is the consistent design choice.",
+        "Yes — this is a recommendation/normative claim, not a factual one. It's framer-facing guidance."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Normative claim resting on C-0110/C-0111. Framer should weigh it but it's not load-bearing fact — it's an inference."
+    },
+    {
+      "claim_id": "codebase-C-0028",
+      "verification_questions": [
+        "Is scope_class read at line 350 of /workspaces/feature-pipeline/.claude/skills/recipe-feature-pipeline/SKILL.md?",
+        "Is the read site inside 'Stage 12 (Deliverable Packaging)' as the claim asserts?",
+        "Is scope_class read anywhere else in the recipe?"
+      ],
+      "verification_answers": [
+        "Yes — direct read of SKILL.md line 350 shows: '`scope_class` — read from `working/feature/<slug>/intent-clarification.md`'s `scope_class:` frontmatter (FULL / MINOR / PATCH per ADR-0023).'",
+        "Partial mismatch — the SKILL.md header at line 346 reads 'Step 14 — Stage 13: Deliverable Packaging (added in v4.5.0)', not Stage 12. The 'Deliverable Packaging' descriptor matches; the stage NUMBER does not.",
+        "No — Grep for `scope_class` across .claude/skills/recipe-feature-pipeline/ returns only line 350. It is the sole read site."
+      ],
+      "verdict": "verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Line number (350) and read-site-uniqueness verified. Stage label is mismatched (claim says Stage 12, file says Stage 13). The mismatch is minor — both refer to Deliverable Packaging — but design-claude-code under U-2 should use the line-number citation, not the stage number, to avoid confusion. Framer: flag this as a small stale-stage-number issue in the claim."
+    },
+    {
+      "claim_id": "codebase-C-0029",
+      "verification_questions": [
+        "Is FR-2's self-check semantically required at the start of dispatch (i.e., before scope_class is currently read)?",
+        "Does design-claude-code own the decision to hoist the read or add a second read?"
+      ],
+      "verification_answers": [
+        "Yes — the PRD/intent framing for FR-2 places the self-check at orchestrator-entry, well before Stage 13/Deliverable Packaging. Direct read of recipe-feature-pipeline confirms scope_class is read once, at line 350, late in the flow.",
+        "Yes — design-claude-code is the named designer for U-2; the codebase-analysis-report explicitly assigns the decision."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Directly load-bearing for FR-2 design. The single-read-site verification (codebase-C-0028) substantiates the hoist-or-duplicate decision space."
+    },
+    {
+      "claim_id": "codebase-C-0016",
+      "verification_questions": [
+        "Does .claude/agents/execute-task-quality-handler.md exist?",
+        "Is the agent positioned as a per-task quality verdict issuer (i.e., emits a verdict + findings pair, matching FR-1's intent)?"
+      ],
+      "verification_answers": [
+        "Yes — direct read of /workspaces/feature-pipeline/.claude/agents/execute-task-quality-handler.md confirms existence.",
+        "Yes — line 12 says 'You issue per-task quality verdicts'; the YAML frontmatter description and Contract 1 output structure confirm verdict+findings emission."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Foundation for U-1 (FR-1 scope completeness). Combined with C-0017 below, makes the case that this agent meets FR-1's binding framing ('any reviewer that emits a verdict+findings pair')."
+    },
+    {
+      "claim_id": "codebase-C-0017",
+      "verification_questions": [
+        "Does the agent emit status enum {APPROVED, NEEDS_REVISION, STUB_DETECTED, BLOCKER}?",
+        "Does the findings array contain domain, severity, source_activity, file_path, locator, message fields?"
+      ],
+      "verification_answers": [
+        "Yes — line 33 of the agent file: 'status: APPROVED | NEEDS_REVISION | STUB_DETECTED | BLOCKER'.",
+        "Mostly — lines 34-44 show domain, severity, source_activity, file_path, message, dispatch_hint, depth_level. The claim mentions 'locator' which is not present (the actual field is dispatch_hint + depth_level)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Status enum verified verbatim. 'locator' in the claim doesn't appear in the contract — minor extraction inaccuracy. Substance (status enum + findings array with domain/severity/source_activity/file_path/message) is correct and substantiates FR-1 in-scope assessment."
+    },
+    {
+      "claim_id": "codebase-C-0018",
+      "verification_questions": [
+        "Can the agent emit APPROVED status alongside a finding with severity blocker?",
+        "Does the agent's contract prevent this contradiction today?"
+      ],
+      "verification_answers": [
+        "Structurally yes — the status enum and findings array are independent fields; nothing in the JSON contract syntactically prevents APPROVED + severity:blocker co-occurrence.",
+        "No — the agent file does not contain an explicit verdict-vs-findings parity check. The verdict-logic section (line 50+) orders the checks (Stub → 4-phase → final gate) but the post-hoc validator FR-1 would enforce is absent."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Substantiates FR-1's recommended inclusion of execute-task-quality-handler — the exact failure mode US-1 targets can occur in this agent's output without an FR-1 guard. Strong case for U-1 sweep recommendation."
+    },
+    {
+      "claim_id": "codebase-C-0019",
+      "verification_questions": [
+        "Does .claude/agents/finalize-deliverable-packager.md exist?",
+        "Does it emit a verdict in the FR-1-relevant shape?"
+      ],
+      "verification_answers": [
+        "Yes — direct read confirms.",
+        "Yes — line 81 of the file shows `\"verdict\": \"PASS|BLOCK|REVIEW\"` in the output contract."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Foundation for the moderate-candidate FR-1 inclusion case."
+    },
+    {
+      "claim_id": "codebase-C-0020",
+      "verification_questions": [
+        "Does finalize-deliverable-packager emit a {PASS, BLOCK, REVIEW} verdict?",
+        "Are reviewer_findings chained from a doc_type:DeliverableArchive invocation of shared-document-reviewer?"
+      ],
+      "verification_answers": [
+        "Yes — line 81 verifies the verdict enum.",
+        "Yes — line 87 shows `reviewer_findings: [...]` adjacent to summary; the surrounding context (lines 50, 122-125) confirms BLOCKER/MAJOR/MINOR findings feed through, and shared-document-reviewer's section in its own file (line 352) confirms the chained-pass-through pattern."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Substantiates the 'chained findings' concern in U-1 — if shared-document-reviewer's invocation here already passed an FR-1 check, re-running FR-1 at the packager would be redundant. design-claude-code decides under U-1."
+    },
+    {
+      "claim_id": "t001-C-0001",
+      "verification_questions": [
+        "Does .devcontainer/versions.env line 36 (or thereabouts) pin GITNEXUS_TAG=1.6.5?",
+        "Does the research note cite this correctly?"
+      ],
+      "verification_answers": [
+        "Yes — the research note states GITNEXUS_TAG=1.6.5 at versions.env line 36; this is consistent with codebase-C-0048 which independently confirms the pin.",
+        "Yes — the research note (t-001-gitnexus-grammar-skip-contract.md) is internally consistent with the codebase-analysis-report finding."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Two independent internal sources (research note + codebase audit) agree."
+    },
+    {
+      "claim_id": "t001-C-0002",
+      "verification_questions": [
+        "Does the research note cite scripts/build-tree-sitter-dart.cjs and scripts/build-tree-sitter-proto.cjs as the env-var contract implementation?",
+        "Does the note cite an upstream URL for verification?"
+      ],
+      "verification_answers": [
+        "Yes — F-1 and F-2 of the research note explicitly name both scripts and quote the postinstall hook from gitnexus@1.6.5's package.json.",
+        "Yes — raw URLs at https://raw.githubusercontent.com/abhigyanpatwari/GitNexus/v1.6.5/gitnexus/scripts/build-tree-sitter-{dart,proto}.cjs are cited at F-1 source line and F-2 source line."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Single-sourced upstream-citation. The note is internal (researcher's read of upstream) — counter-verification would require fetching the raw URLs, which is out of scope for this batch. Confidence remains high given the citation discipline."
+    },
+    {
+      "claim_id": "t001-C-0003",
+      "verification_questions": [
+        "Does the research note assert strict `=== '1'` comparison?",
+        "Does the note cite specific line numbers (dart line 9, proto lines 28-34)?"
+      ],
+      "verification_answers": [
+        "Yes — F-1 quote 'Strict `=== '1'` only' from the dart comment at line 7 (verbatim ≤15 words).",
+        "Yes — F-1 cites line 9 dart, F-2 cites lines 28-34 proto."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "The 'strict-string `=== '1'`' nuance is the calibration finding (DM-4 drift mode) that the dry-run must respect."
+    },
+    {
+      "claim_id": "t001-C-0033",
+      "verification_questions": [
+        "Does signal 1 (stderr prefix assertion) appear as a recommended observable in the research note?",
+        "Is the literal-string fragility risk acknowledged?"
+      ],
+      "verification_answers": [
+        "Yes — F-1/F-2 of the note document the stable prefixed warnings; the Synthesis section lists signal 1 as recommended.",
+        "Yes — t001-C-0040 (DM-1) explicitly warns about literal-string fragility and recommends regex `GITNEXUS_SKIP_OPTIONAL_GRAMMARS.*[Ss]kip` instead of the full sentence."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Drives FR-4 dry-run design (signal-1-AND-signal-3 recommended pair per t001-C-0037)."
+    },
+    {
+      "claim_id": "t001-C-0022",
+      "verification_questions": [
+        "Does the README of GitNexus claim the env-var skips Swift?",
+        "Does the actual code only skip Dart + Proto?"
+      ],
+      "verification_answers": [
+        "Yes — F-4 of the note documents the README/Quick Start claim that env-var skips Swift.",
+        "Yes — F-1/F-2 cite only Dart and Proto scripts in the postinstall hook; no swift builder script is referenced at v1.6.5."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Critical for FR-4 design — dry-run must NOT assert anything about Swift via env-var (per t001-C-0038). Swift's non-build is governed by npm's optionalDependencies tolerance, not the env-var."
+    },
+    {
+      "claim_id": "t001-C-0038",
+      "verification_questions": [
+        "Does the note recommend the dry-run NOT assert anything about Swift via the env-var?",
+        "Is the basis for this recommendation the README/code divergence at v1.6.5?"
+      ],
+      "verification_answers": [
+        "Yes — Synthesis 'On Swift' bullet explicitly recommends 'the dry-run should NOT assert anything about Swift via this env-var.'",
+        "Yes — same bullet cites the divergence between README claim and script-level reality."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Drives FR-4 design. The dissent is INTERNAL TO GITNEXUS (README vs code), not between research sources — handled inside the research note rather than flagged as dissent between this critique's source-set."
+    },
+    {
+      "claim_id": "t002-C-0001",
+      "verification_questions": [
+        "Does the research note assert the canonical docs are silent on the exit-code contract of `claude mcp list`?",
+        "Are the specific upstream URLs (cli-reference and mcp pages) cited?",
+        "Did the researcher demonstrate the silence by contrast with documented sibling commands?"
+      ],
+      "verification_answers": [
+        "Yes — Executive summary and Finding 1 of t-002-claude-mcp-list-contract.md assert silence on exit-code for `claude mcp list`.",
+        "Yes — https://code.claude.com/docs/en/cli-reference and https://code.claude.com/docs/en/mcp are cited.",
+        "Yes — Findings 3-5 of the note contrast with documented exit codes for `claude auth status` (0/1), `claude daemon status` (1 if not running), `claude ultrareview` (0/1, --json) — making the absence-by-contrast structurally meaningful."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Single-sourced (research note citing upstream). The 'silence is the finding' framing is calibration-aware: the researcher acknowledges absence-of-doc != absence-of-behavior. Drives FR-5 design (path shifts from `claude mcp list` to `claude --bare -p | jq system/init.mcp_servers[].status`)."
+    },
+    {
+      "claim_id": "t002-C-0002",
+      "verification_questions": [
+        "Does the note assert silence on stdout format of `claude mcp list`?",
+        "Is this distinct from the exit-code silence (i.e., two independent observations)?"
+      ],
+      "verification_answers": [
+        "Yes — Finding 2 documents no example of `claude mcp list` output, no --json mention, no status-token enumeration.",
+        "Yes — exit-code (Finding 1/3) and stdout format (Finding 2) are independently established silences."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Reinforces FR-5 design rationale."
+    },
+    {
+      "claim_id": "t002-C-0008",
+      "verification_questions": [
+        "Does the note conclude that a workflow depending on `claude mcp list` exit code is depending on undocumented behavior?",
+        "Is this conclusion grounded in the silence finding plus the contrast with documented sibling commands?"
+      ],
+      "verification_answers": [
+        "Yes — Finding 1 paragraph 4 states 'a workflow that depends on `claude mcp list` returning non-zero on a non-connected server is depending on undocumented behavior.'",
+        "Yes — the conclusion is explicitly grounded in the contrast pattern (sibling commands document their exit codes; this one doesn't)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Load-bearing for FR-5's path shift (supersedes `claude mcp list` with `claude --bare -p` SDK-event path). The graph edge {E-0093 to E-0099, relation: supersedes} captures this."
+    }
+  ],
+  "passthrough_unverified": {
+    "reason": "Pragmatic CoVe scoping for MINOR feature; remaining claims are low-impact structural observations (file paths, line numbers, agent inventory). Framer treats as available context, not load-bearing premises.",
+    "claim_ids_skipped": [
+      "codebase-C-0001", "codebase-C-0002", "codebase-C-0003", "codebase-C-0004",
+      "codebase-C-0005", "codebase-C-0006", "codebase-C-0007", "codebase-C-0008",
+      "codebase-C-0009", "codebase-C-0010", "codebase-C-0011", "codebase-C-0012",
+      "codebase-C-0013", "codebase-C-0014", "codebase-C-0015", "codebase-C-0021",
+      "codebase-C-0022", "codebase-C-0023", "codebase-C-0024", "codebase-C-0025",
+      "codebase-C-0026", "codebase-C-0027", "codebase-C-0030", "codebase-C-0031",
+      "codebase-C-0032", "codebase-C-0033", "codebase-C-0034", "codebase-C-0035",
+      "codebase-C-0036", "codebase-C-0037", "codebase-C-0039", "codebase-C-0040",
+      "codebase-C-0042", "codebase-C-0043", "codebase-C-0044", "codebase-C-0045",
+      "codebase-C-0046", "codebase-C-0047", "codebase-C-0048", "codebase-C-0049",
+      "codebase-C-0050", "codebase-C-0051", "codebase-C-0052", "codebase-C-0053",
+      "codebase-C-0054", "codebase-C-0055", "codebase-C-0056", "codebase-C-0057",
+      "codebase-C-0058", "codebase-C-0059", "codebase-C-0060", "codebase-C-0061",
+      "codebase-C-0062", "codebase-C-0063", "codebase-C-0064", "codebase-C-0065",
+      "codebase-C-0066", "codebase-C-0067", "codebase-C-0068", "codebase-C-0069",
+      "codebase-C-0070", "codebase-C-0071", "codebase-C-0072", "codebase-C-0073",
+      "codebase-C-0074", "codebase-C-0075", "codebase-C-0076", "codebase-C-0077",
+      "codebase-C-0078", "codebase-C-0079", "codebase-C-0080", "codebase-C-0081",
+      "codebase-C-0082", "codebase-C-0083", "codebase-C-0084", "codebase-C-0085",
+      "codebase-C-0086", "codebase-C-0087", "codebase-C-0088", "codebase-C-0089",
+      "codebase-C-0090", "codebase-C-0091", "codebase-C-0092", "codebase-C-0093",
+      "codebase-C-0094", "codebase-C-0095", "codebase-C-0096", "codebase-C-0097",
+      "codebase-C-0098", "codebase-C-0099", "codebase-C-0100", "codebase-C-0101",
+      "codebase-C-0102", "codebase-C-0104", "codebase-C-0106", "codebase-C-0107",
+      "codebase-C-0108", "codebase-C-0109", "codebase-C-0113", "codebase-C-0114",
+      "codebase-C-0115", "codebase-C-0116",
+      "t001-C-0004", "t001-C-0005", "t001-C-0006", "t001-C-0007", "t001-C-0008",
+      "t001-C-0009", "t001-C-0010", "t001-C-0011", "t001-C-0012", "t001-C-0013",
+      "t001-C-0014", "t001-C-0015", "t001-C-0016", "t001-C-0017", "t001-C-0018",
+      "t001-C-0019", "t001-C-0020", "t001-C-0021", "t001-C-0023", "t001-C-0024",
+      "t001-C-0025", "t001-C-0026", "t001-C-0027", "t001-C-0028", "t001-C-0029",
+      "t001-C-0030", "t001-C-0031", "t001-C-0032", "t001-C-0034", "t001-C-0035",
+      "t001-C-0036", "t001-C-0037", "t001-C-0039", "t001-C-0040", "t001-C-0041",
+      "t001-C-0042", "t001-C-0043", "t001-C-0044", "t001-C-0045", "t001-C-0046",
+      "t001-C-0047",
+      "t002-C-0003", "t002-C-0004", "t002-C-0005", "t002-C-0006", "t002-C-0007",
+      "t002-C-0009", "t002-C-0010", "t002-C-0011", "t002-C-0012", "t002-C-0013",
+      "t002-C-0014", "t002-C-0015", "t002-C-0016", "t002-C-0017", "t002-C-0018",
+      "t002-C-0019", "t002-C-0020", "t002-C-0021", "t002-C-0022", "t002-C-0023",
+      "t002-C-0024", "t002-C-0025", "t002-C-0026", "t002-C-0027", "t002-C-0028",
+      "t002-C-0029", "t002-C-0030", "t002-C-0031", "t002-C-0032", "t002-C-0033",
+      "t002-C-0034", "t002-C-0035", "t002-C-0036", "t002-C-0037", "t002-C-0038"
+    ]
+  },
+  "summary": {
+    "verified": 20,
+    "single_sourced": 1,
+    "unverifiable": 0,
+    "contradicted": 0,
+    "passthrough_unverified": 180,
+    "dissent_findings": 0,
+    "constraint_violations": 0,
+    "notable_calibration_downgrades": [
+      "codebase-C-0103 — line numbers (11, 165) cited are slightly stale; substance (a '5' lingers in line 5 comment) is correct.",
+      "codebase-C-0017 — 'locator' field in the claim is not in the agent contract; actual fields are dispatch_hint + depth_level. Substance otherwise correct.",
+      "codebase-C-0028 — claim says 'Stage 12 (Deliverable Packaging)' but SKILL.md line 346 labels it 'Stage 13 (Deliverable Packaging)'. Line number (350) and read-site uniqueness verified. Framer: use line-number citation, not stage number.",
+      "codebase-C-0111 — generalization from N=1 (mcp-openapi-schema). Downgraded to single_sourced."
+    ]
+  }
+}

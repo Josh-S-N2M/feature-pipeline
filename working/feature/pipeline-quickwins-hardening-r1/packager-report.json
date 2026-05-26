@@ -1,0 +1,217 @@
+{
+  "schema_version": "1.0.0",
+  "report_id": "PR-pipeline-quickwins-hardening-r1",
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "scope_class": "MINOR",
+  "scope_class_source": "orchestrator-invocation (authoritative); also declared in intent-clarification.md Q&A table row 2 and PRD v0.3.0 / blueprint v2.3.0; preserved through r1/r2/r3 reconciliation",
+  "version_tag": null,
+  "generated": "2026-05-26T00:00:00Z",
+  "generated_by": "finalize-deliverable-packager",
+  "spec_reference": ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md",
+  "verdict": "PASS",
+  "verdict_rationale": "All MINOR-scope required artifacts present at canonical paths. Both ADRs authored in this run (ADR-0057, ADR-0058) exist at canonical adrs/ placement and validate_adr_placement.py reports PASS. Optional artifacts (research-plan, research-notes, codebase-analysis, synthesis, cross-artifact audit, tasks DAG) are present and were exercised by reconciliation cycles 1-3. Three MINOR findings (one frontmatter-hygiene, one expected-artifact-this-stage-produces, one unexpected-byproduct) are non-blocking.",
+  "artifacts_present": [
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/intent-clarification.md", "size_bytes": 12706, "spec_category": "required"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/prd-v1.md", "size_bytes": 81763, "spec_category": "required", "version": "v0.3.0"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/research-plan.md", "size_bytes": 37634, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/research-notes/t-001-gitnexus-grammar-skip-contract.md", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/research-notes/t-002-claude-mcp-list-contract.md", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/codebase-analysis.json", "size_bytes": 53522, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/codebase-analysis-report.md", "size_bytes": 22452, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis.md", "size_bytes": 43733, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/01-claims.json", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/02-graph-summary.md", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/02-graph.json", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/03-critique.json", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/03-verifications.md", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/04-decision-frames.json", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/05-substrate-map.json", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/claims-codebase.json", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/claims-t001.json", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/synthesis/claims-t002.json", "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/cc-design.md", "size_bytes": 69796, "spec_category": "required"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/cc-dependencies.json", "size_bytes": 16588, "spec_category": "required"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/codespaces-design.md", "size_bytes": 51629, "spec_category": "required"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/codespaces-dependencies.json", "size_bytes": 16012, "spec_category": "required"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/cicd-design.md", "size_bytes": 81735, "spec_category": "required"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/cicd-dependencies.json", "size_bytes": 18717, "spec_category": "required"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/blueprint-v1.md", "size_bytes": 120157, "spec_category": "audit-trail-history"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.md", "size_bytes": 176688, "spec_category": "required", "version": "v2.3.0"},
+    {"path": "adrs/ADR-0057-checkpoint-execution-mode-first-class-field.md", "spec_category": "conditional-required-blueprint-listed"},
+    {"path": "adrs/ADR-0058-calibration-result-event-type-additive-extension.md", "spec_category": "conditional-required-blueprint-listed"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/architecture-audit-issues.json", "size_bytes": 24012, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/architecture-audit-issues-r2.json", "size_bytes": 25111, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/plan-v1.md", "size_bytes": 90348, "spec_category": "required", "version": "v1.0.2"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/acceptance-tests.md", "size_bytes": 100785, "spec_category": "required", "version": "v1.0.1"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/phase-validators.md", "size_bytes": 68911, "spec_category": "required", "version": "v1.0.1"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/cross-artifact-audit-issues.json", "size_bytes": 31759, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/cross-artifact-audit-issues-r2.json", "size_bytes": 23362, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/reconciliation-log-r1.md", "size_bytes": 19694, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/reconciliation-log-r2.md", "size_bytes": 18559, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/reconciliation-log-r3.md", "size_bytes": 24891, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/dispatch-r1.json", "size_bytes": 12592, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/dispatch-r2.json", "size_bytes": 7318, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/dispatch-r3.json", "size_bytes": 12321, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/tasks.json", "size_bytes": 54525, "spec_category": "conditional-minor-extension"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/checkpoint.json", "size_bytes": 4782, "spec_category": "required"},
+    {"path": "working/feature/pipeline-quickwins-hardening-r1/blueprint-diff-v2.patch", "size_bytes": 273490, "spec_category": "unexpected-byproduct"}
+  ],
+  "artifacts_missing_required": [],
+  "artifacts_missing_conditional_unjustified": [],
+  "artifacts_missing_conditional_justified": [],
+  "artifacts_unexpected": [
+    {
+      "path": "working/feature/pipeline-quickwins-hardening-r1/blueprint-diff-v2.patch",
+      "severity": "MINOR",
+      "rationale": "Not enumerated in deliverable-archive-spec.md. Plausibly a v1->v2 reconciliation diff byproduct retained as supplementary audit-trail material. Recommend either documenting this byproduct in the spec (forward-compat extension) or removing it before final commit; either is acceptable. Non-blocking."
+    }
+  ],
+  "adr_cross_location_findings": [],
+  "adr_canonical_placement_validator": {
+    "validator": "validate_adr_placement.py",
+    "invocation": "subprocess (per ADR-0036, ADR-0054 surface c)",
+    "verdict": "PASS",
+    "findings": [],
+    "scan_path": "/workspaces/feature-pipeline"
+  },
+  "adrs_authored_this_run": [
+    {
+      "id": "ADR-0057",
+      "canonical_path": "adrs/ADR-0057-checkpoint-execution-mode-first-class-field.md",
+      "blueprint_v2_classification": "adrs_referenced",
+      "actual_provenance": "authored in this run (Gate 3 approved 2026-05-26); blueprint-v2 frontmatter places it under adrs_referenced because v2.3.0 only amended the AC inheritance preamble, not the ADR itself; ADR-0057 v1.0.0 was authored during cc-design composition and amended to v1.0.1 (framing 'introduce' -> 'promote-and-formalize') during Architecture Audit cycle 1 reconciliation",
+      "amendments": [{"from": "v1.0.0", "to": "v1.0.1", "reason": "framing softened from 'introduce' to 'promote-and-formalize' per Architecture Audit blast-radius finding that execution_mode field already exists as undocumented field"}]
+    },
+    {
+      "id": "ADR-0058",
+      "canonical_path": "adrs/ADR-0058-calibration-result-event-type-additive-extension.md",
+      "blueprint_v2_classification": "adrs_authored",
+      "actual_provenance": "authored in this run (Gate 3 approved 2026-05-26); additive extension to the MCP events JSONL event-type vocabulary for the FR-4b calibration_result mechanism"
+    }
+  ],
+  "side_actions_acknowledged": [
+    {
+      "category": "corpus-fixture-housekeeping",
+      "description": "5 example ADRs in .claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/ renamed from ADR-NNN-*.md to adr-NNN-*.example.md to resolve a pre-existing canonical-placement validator BLOCK that surfaced at Design Composition stage.",
+      "files_modified": [
+        ".claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/adr-001-substrate-choice.example.md",
+        ".claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/adr-002-memory-architecture.example.md",
+        ".claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/adr-003-verification-regime.example.md",
+        ".claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/adr-004-recursion-safety.example.md",
+        ".claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/adr-005-confirmation-gate.example.md",
+        ".claude/skills/synthesize/references/task-08-replication-corpus/README.md",
+        ".claude/skills/synthesize/references/task-08-replication-corpus/final-output/report.md",
+        ".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py"
+      ],
+      "recorded_in": "checkpoint.json shared_document_reviewer_history",
+      "severity": "INFO",
+      "note": "Pre-existing condition encountered and resolved opportunistically; not caused by this feature's authored artifacts."
+    },
+    {
+      "category": "adr-amendment-prose-only",
+      "adr_id": "ADR-0037",
+      "from_version": "v1.0.1",
+      "to_version": "v1.0.2",
+      "description": "Event-type triad corrected from stale prose {primary_degraded, ...} to actual on-disk {install_complete, readiness_probe, structured_failure} per audit_op7_events_schema.py VALID_EVENT_TYPES. The feature's mission applied retroactively to the ADR that motivated it. Performed during Architecture Audit cycle 1 reconciliation.",
+      "severity": "INFO"
+    },
+    {
+      "category": "adr-amendment-framing",
+      "adr_id": "ADR-0057",
+      "from_version": "v1.0.0",
+      "to_version": "v1.0.1",
+      "description": "'introduce' softened to 'promote-and-formalize' per Architecture Audit blast-radius finding that execution_mode already exists as an undocumented field.",
+      "severity": "INFO"
+    },
+    {
+      "category": "adr-row-annotation",
+      "adr_id": "ADR-0041",
+      "description": "Row 70 (Serena) and row 71 (mcp-openapi-schema) both carry the inline [DEPRECATED INVOCATION FORM ...] annotation per the FR-3 design's annotation-not-rewrite framing.",
+      "severity": "INFO"
+    }
+  ],
+  "reviewer_findings": [
+    {
+      "id": "I-DR-DA-001",
+      "severity": "MINOR",
+      "category": "frontmatter-hygiene",
+      "location": "working/feature/pipeline-quickwins-hardening-r1/intent-clarification.md frontmatter (lines 1-12)",
+      "description": "scope_class is not present as a frontmatter field. The deliverable-archive-spec.md expects scope_class: in intent-clarification.md frontmatter so the validator can read it directly without parsing the body. In this archive, scope class MINOR is declared in body row 2 of the Clarifying Questions table and is reaffirmed by the PRD/blueprint frontmatter and the orchestrator-invocation prompt; the value is unambiguous, but the frontmatter field is missing.",
+      "suggestion": "In a future intent-clarification authoring pass (or as a one-line forward-compat fix), add 'scope_class: MINOR' to the frontmatter alongside doc_type and user_token. Non-blocking for this run because three independent sources concur on MINOR.",
+      "status": "open",
+      "verdict_effect": "none"
+    },
+    {
+      "id": "I-DR-DA-002",
+      "severity": "MINOR",
+      "category": "unexpected-artifact",
+      "location": "working/feature/pipeline-quickwins-hardening-r1/blueprint-diff-v2.patch (273490 bytes)",
+      "description": "Patch file not enumerated in deliverable-archive-spec.md. Appears to be a reconciliation byproduct (v1->v2 diff). Either acceptable as supplementary audit-trail material or removable; spec is silent.",
+      "suggestion": "Either (a) leave as-is and let the spec evolve to enumerate reconciliation diffs as a recognized supplementary artifact, or (b) remove before final commit. Either choice is defensible; this finding is informational.",
+      "status": "open",
+      "verdict_effect": "none"
+    },
+    {
+      "id": "I-DR-DA-003",
+      "severity": "INFO",
+      "category": "checkpoint-state",
+      "location": "working/feature/pipeline-quickwins-hardening-r1/checkpoint.json",
+      "description": "checkpoint.json current_stage shows 'task_decomposition' with stage_status 'in_progress'. This is expected because the packager runs at the close of Stage 13 (Deliverable Packaging) following Stage 12 (Task Decomposition), and the orchestrator updates the checkpoint after Gate 6 closes. No action needed.",
+      "suggestion": "Orchestrator will update checkpoint to current_stage: 'deliverable_packaging' / 'complete' after Gate 6 closure.",
+      "status": "open",
+      "verdict_effect": "none"
+    }
+  ],
+  "blueprint_adrs_authored_cross_check": {
+    "blueprint_path": "working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.md",
+    "blueprint_version": "v2.3.0",
+    "adrs_authored_declared": ["ADR-0058"],
+    "adrs_referenced_declared": ["ADR-0005", "ADR-0017", "ADR-0029", "ADR-0033", "ADR-0036", "ADR-0037", "ADR-0039", "ADR-0040", "ADR-0041", "ADR-0042", "ADR-0043", "ADR-0044", "ADR-0056", "ADR-0057"],
+    "orchestrator_attests_authored_this_run": ["ADR-0057", "ADR-0058"],
+    "reconciliation_note": "ADR-0057 lives in adrs_referenced rather than adrs_authored in the blueprint-v2.3.0 frontmatter because v2.3.0 is a purely additive amendment that only added an AC inheritance preamble. ADR-0057 was authored upstream (during cc-design composition for blueprint-v2.0.0) and amended at v1.0.1 during Architecture Audit cycle 1. The blueprint-frontmatter classification is technically accurate for v2.3.0 specifically (no ADR authored in the v2.2->v2.3 step), but the gate_history records ADR-0057 as approved at Gate 3 alongside ADR-0058 — so for archive-completeness purposes both are 'authored this run'. Both are at canonical adrs/ placement (validator: PASS).",
+    "all_canonical_placements_verified": true
+  },
+  "shared_document_reviewer_invocation": {
+    "invoked": true,
+    "mode": "inline-by-packager (per finalize-deliverable-packager step 4)",
+    "doc_type": "DeliverableArchive",
+    "target_path": "working/feature/pipeline-quickwins-hardening-r1/",
+    "scope_class": "MINOR",
+    "gate_0_verdict": "pass",
+    "gate_0_notes": "All required structural artifacts for MINOR scope present; spec_reference resolvable; canonical ADR validator passes.",
+    "gate_1_verdict": "approved",
+    "gate_1_notes": "Conditional-extension artifacts (research, codebase analysis, synthesis, cross-artifact audit, reconciliation logs, tasks DAG) all present, indicating a fully-exercised pipeline at MINOR scope. Reconciliation history (r1, r2, r3) shows the run consumed three reviewer cycles, all with reconciliation logs preserved.",
+    "score_summary": {
+      "BLOCKER": 0,
+      "MAJOR": 0,
+      "MINOR": 2,
+      "INFO": 4
+    }
+  },
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 2,
+    "INFO": 4
+  },
+  "gate_6_handoff": {
+    "verdict_to_surface_to_user": "PASS",
+    "approval_action_required": "review-and-approve",
+    "blocking_items_for_human": [],
+    "advisory_items_for_human": [
+      "Frontmatter hygiene: intent-clarification.md should carry scope_class: MINOR in frontmatter for direct validator consumption (currently in body row 2). Non-blocking; three independent sources concur.",
+      "blueprint-diff-v2.patch is a reconciliation byproduct not enumerated in the deliverable-archive spec. Keep or remove per preference; either is defensible.",
+      "Side-action: 5 corpus-fixture ADR files were renamed during this run to resolve a pre-existing canonical-placement BLOCK (recorded in checkpoint.json shared_document_reviewer_history). Not caused by this feature."
+    ],
+    "tasks_json_present": true,
+    "tasks_json_path": "working/feature/pipeline-quickwins-hardening-r1/tasks.json"
+  },
+  "related_artifacts": {
+    "predecessor_stage": "finalize-task-decomposer -> tasks.json",
+    "concurrent_artifact": "tasks.json (presented at Gate 6 alongside this report)",
+    "spec": ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md",
+    "scope_taxonomy_adr": "adrs/ADR-0023-discipline-refinements-from-integration-test.md",
+    "packager_gap_adr": "adrs/ADR-0027-pipeline-skill-design-gap.md",
+    "adr_placement_adr": "adrs/ADR-0036-single-location-adr-placement-convention.md"
+  }
+}

@@ -1,0 +1,1101 @@
+{
+  "entities": [
+    {
+      "id": "E-0001",
+      "name": "FR-1 verdict/findings parity guard",
+      "type": "control",
+      "aliases": ["FR-1", "verdict-findings parity check", "FR-1 check"],
+      "claims": [
+        "codebase-C-0001", "codebase-C-0002", "codebase-C-0004", "codebase-C-0013",
+        "codebase-C-0016", "codebase-C-0018", "codebase-C-0019", "codebase-C-0021",
+        "codebase-C-0022", "codebase-C-0061", "codebase-C-0062", "codebase-C-0063",
+        "codebase-C-0064", "codebase-C-0065", "codebase-C-0072", "codebase-C-0075",
+        "codebase-C-0078", "codebase-C-0080", "codebase-C-0104"
+      ]
+    },
+    {
+      "id": "E-0002",
+      "name": "FR-2 single-agent fallback self-check",
+      "type": "control",
+      "aliases": ["FR-2", "single-agent fallback self-check"],
+      "claims": [
+        "codebase-C-0001", "codebase-C-0004", "codebase-C-0029", "codebase-C-0031",
+        "codebase-C-0032", "codebase-C-0033", "codebase-C-0034", "codebase-C-0066",
+        "codebase-C-0072", "codebase-C-0080", "codebase-C-0101"
+      ]
+    },
+    {
+      "id": "E-0003",
+      "name": "FR-3 ADR-0041 / .mcp.json parity audit",
+      "type": "control",
+      "aliases": ["FR-3", "ADR/.mcp.json parity audit", "OP-11 parity rule"],
+      "claims": [
+        "codebase-C-0001", "codebase-C-0003", "codebase-C-0004", "codebase-C-0042",
+        "codebase-C-0043", "codebase-C-0067", "codebase-C-0070", "codebase-C-0072",
+        "codebase-C-0083", "codebase-C-0084", "codebase-C-0085", "codebase-C-0086",
+        "codebase-C-0087", "codebase-C-0105", "codebase-C-0106", "codebase-C-0107",
+        "codebase-C-0108", "codebase-C-0112", "codebase-C-0113"
+      ]
+    },
+    {
+      "id": "E-0004",
+      "name": "FR-4 GitNexus install dry-run",
+      "type": "control",
+      "aliases": ["FR-4", "GitNexus dry-run", "install dry-run probe"],
+      "claims": [
+        "codebase-C-0001", "codebase-C-0004", "codebase-C-0047", "codebase-C-0051",
+        "codebase-C-0052", "codebase-C-0057", "codebase-C-0068", "codebase-C-0090",
+        "codebase-C-0093", "codebase-C-0095", "codebase-C-0102", "codebase-C-0109",
+        "codebase-C-0113"
+      ]
+    },
+    {
+      "id": "E-0005",
+      "name": "FR-5 greenfield CI workflow",
+      "type": "control",
+      "aliases": ["FR-5", "first GitHub Actions workflow", "B-1 CI smoke"],
+      "claims": [
+        "codebase-C-0001", "codebase-C-0053", "codebase-C-0054", "codebase-C-0055",
+        "codebase-C-0057", "codebase-C-0069", "codebase-C-0079", "codebase-C-0096",
+        "codebase-C-0097", "codebase-C-0113"
+      ]
+    },
+    {
+      "id": "E-0006",
+      "name": "FR-6 actionable diagnostics",
+      "type": "control",
+      "aliases": ["FR-6"],
+      "claims": ["codebase-C-0094", "codebase-C-0095"]
+    },
+    {
+      "id": "E-0007",
+      "name": "FR-7 deferral-register marker tightening",
+      "type": "control",
+      "aliases": ["FR-7"],
+      "claims": [
+        "codebase-C-0001", "codebase-C-0004", "codebase-C-0056", "codebase-C-0057",
+        "codebase-C-0058", "codebase-C-0059", "codebase-C-0060", "codebase-C-0072",
+        "codebase-C-0098", "codebase-C-0099", "codebase-C-0100"
+      ]
+    },
+    {
+      "id": "E-0008",
+      "name": "U-1 FR-1 scope completeness",
+      "type": "control",
+      "aliases": ["U-1"],
+      "claims": ["codebase-C-0002", "codebase-C-0078", "codebase-C-0104"]
+    },
+    {
+      "id": "E-0009",
+      "name": "U-2 FR-2 self-check site & configuration surface",
+      "type": "control",
+      "aliases": ["U-2"],
+      "claims": ["codebase-C-0029", "codebase-C-0034"]
+    },
+    {
+      "id": "E-0010",
+      "name": "U-3 FR-3 deprecation handling",
+      "type": "control",
+      "aliases": ["U-3"],
+      "claims": [
+        "codebase-C-0105", "codebase-C-0106", "codebase-C-0107", "codebase-C-0108",
+        "codebase-C-0110", "codebase-C-0111", "codebase-C-0112"
+      ]
+    },
+    {
+      "id": "E-0011",
+      "name": "U-4 FR-4 sentinel posture",
+      "type": "control",
+      "aliases": ["U-4"],
+      "claims": ["codebase-C-0089", "codebase-C-0090", "codebase-C-0102", "codebase-C-0109"]
+    },
+    {
+      "id": "E-0012",
+      "name": "U-7 FR-7 marker tightening confirmation",
+      "type": "control",
+      "aliases": ["U-7"],
+      "claims": ["codebase-C-0058", "codebase-C-0059", "codebase-C-0100"]
+    },
+    {
+      "id": "E-0013",
+      "name": "shared-document-reviewer",
+      "type": "service",
+      "canonical_uri": ".claude/agents/shared-document-reviewer.md",
+      "aliases": ["shared-document-reviewer.md"],
+      "claims": [
+        "codebase-C-0005", "codebase-C-0006", "codebase-C-0007", "codebase-C-0020",
+        "codebase-C-0021", "codebase-C-0027", "codebase-C-0061"
+      ]
+    },
+    {
+      "id": "E-0014",
+      "name": "review-architecture-auditor",
+      "type": "service",
+      "canonical_uri": ".claude/agents/review-architecture-auditor.md",
+      "aliases": ["Stage 8 auditor"],
+      "claims": [
+        "codebase-C-0008", "codebase-C-0009", "codebase-C-0010", "codebase-C-0063",
+        "codebase-C-0115"
+      ]
+    },
+    {
+      "id": "E-0015",
+      "name": "review-cross-artifact-auditor",
+      "type": "service",
+      "canonical_uri": ".claude/agents/review-cross-artifact-auditor.md",
+      "aliases": ["Stage 11 auditor"],
+      "claims": [
+        "codebase-C-0011", "codebase-C-0012", "codebase-C-0013", "codebase-C-0064"
+      ]
+    },
+    {
+      "id": "E-0016",
+      "name": "execute-phase-quality-reviewer",
+      "type": "service",
+      "canonical_uri": ".claude/agents/execute-phase-quality-reviewer.md",
+      "aliases": ["T7-transition per-phase reviewer"],
+      "claims": ["codebase-C-0014", "codebase-C-0015", "codebase-C-0065"]
+    },
+    {
+      "id": "E-0017",
+      "name": "execute-task-quality-handler",
+      "type": "service",
+      "canonical_uri": ".claude/agents/execute-task-quality-handler.md",
+      "aliases": ["Gate-3 sub-object"],
+      "claims": [
+        "codebase-C-0016", "codebase-C-0017", "codebase-C-0018", "codebase-C-0078",
+        "codebase-C-0104"
+      ]
+    },
+    {
+      "id": "E-0018",
+      "name": "finalize-deliverable-packager",
+      "type": "service",
+      "canonical_uri": ".claude/agents/finalize-deliverable-packager.md",
+      "aliases": ["packager"],
+      "claims": [
+        "codebase-C-0019", "codebase-C-0020", "codebase-C-0021", "codebase-C-0061",
+        "codebase-C-0104"
+      ]
+    },
+    {
+      "id": "E-0019",
+      "name": "synth-critic",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0022"]
+    },
+    {
+      "id": "E-0020",
+      "name": "synth-framer",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0023"]
+    },
+    {
+      "id": "E-0021",
+      "name": "synth-synthesizer",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0023"]
+    },
+    {
+      "id": "E-0022",
+      "name": "finalize-reconciler",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0024", "codebase-C-0063"]
+    },
+    {
+      "id": "E-0023",
+      "name": "execute-finalize-reconciler",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0065"]
+    },
+    {
+      "id": "E-0024",
+      "name": "execute-orchestrator (advisor)",
+      "type": "service",
+      "canonical_uri": ".claude/agents/execute-orchestrator.md",
+      "aliases": ["execute-orchestrator"],
+      "claims": ["codebase-C-0030", "codebase-C-0031", "codebase-C-0101"]
+    },
+    {
+      "id": "E-0025",
+      "name": "recipe-feature-pipeline",
+      "type": "tool",
+      "canonical_uri": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "aliases": ["parent skill", "parent orchestrator", "dispatch nexus"],
+      "claims": [
+        "codebase-C-0025", "codebase-C-0026", "codebase-C-0027", "codebase-C-0028",
+        "codebase-C-0029", "codebase-C-0063", "codebase-C-0066", "codebase-C-0071",
+        "codebase-C-0072", "codebase-C-0082"
+      ]
+    },
+    {
+      "id": "E-0026",
+      "name": "auditing-mcp skill",
+      "type": "tool",
+      "canonical_uri": ".claude/skills/auditing-mcp/",
+      "aliases": ["auditing-mcp", "audit_mcp.py family"],
+      "claims": [
+        "codebase-C-0035", "codebase-C-0036", "codebase-C-0037", "codebase-C-0067",
+        "codebase-C-0083", "codebase-C-0084", "codebase-C-0085", "codebase-C-0086",
+        "codebase-C-0087"
+      ]
+    },
+    {
+      "id": "E-0027",
+      "name": ".mcp.json",
+      "type": "tool",
+      "canonical_uri": ".mcp.json",
+      "aliases": ["repo MCP config"],
+      "claims": [
+        "codebase-C-0038", "codebase-C-0039", "codebase-C-0041", "codebase-C-0070",
+        "codebase-C-0105"
+      ]
+    },
+    {
+      "id": "E-0028",
+      "name": "ADR-0041 install-mechanism hybrid",
+      "type": "standard",
+      "canonical_uri": "adrs/ADR-0041-install-mechanism-hybrid.md",
+      "aliases": ["ADR-0041", "ADR-0041 v1.0.1", "ADR-0041 invocation table"],
+      "claims": [
+        "codebase-C-0040", "codebase-C-0041", "codebase-C-0046", "codebase-C-0052",
+        "codebase-C-0089", "codebase-C-0105"
+      ]
+    },
+    {
+      "id": "E-0029",
+      "name": "mcp-openapi-schema (removed)",
+      "type": "service",
+      "aliases": ["mcp-openapi-schema"],
+      "claims": [
+        "codebase-C-0038", "codebase-C-0041", "codebase-C-0045", "codebase-C-0105",
+        "codebase-C-0110"
+      ]
+    },
+    {
+      "id": "E-0030",
+      "name": "actionlint-mcp",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0038", "codebase-C-0045"]
+    },
+    {
+      "id": "E-0031",
+      "name": "context7",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0038"]
+    },
+    {
+      "id": "E-0032",
+      "name": "exa",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0038"]
+    },
+    {
+      "id": "E-0033",
+      "name": "gitnexus MCP server",
+      "type": "service",
+      "aliases": ["gitnexus"],
+      "claims": ["codebase-C-0038", "codebase-C-0045", "codebase-C-0047"]
+    },
+    {
+      "id": "E-0034",
+      "name": "serena",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0038", "codebase-C-0045"]
+    },
+    {
+      "id": "E-0035",
+      "name": "terraform-mcp",
+      "type": "service",
+      "aliases": [],
+      "claims": ["codebase-C-0038", "codebase-C-0045"]
+    },
+    {
+      "id": "E-0036",
+      "name": ".devcontainer/postCreate.sh",
+      "type": "tool",
+      "canonical_uri": ".devcontainer/postCreate.sh",
+      "aliases": ["postCreate.sh"],
+      "claims": [
+        "codebase-C-0044", "codebase-C-0045", "codebase-C-0046", "codebase-C-0047",
+        "codebase-C-0068", "codebase-C-0089", "codebase-C-0103", "codebase-C-0114"
+      ]
+    },
+    {
+      "id": "E-0037",
+      "name": ".devcontainer/versions.env",
+      "type": "tool",
+      "canonical_uri": ".devcontainer/versions.env",
+      "aliases": ["versions.env"],
+      "claims": ["codebase-C-0048", "codebase-C-0049", "t001-C-0001"]
+    },
+    {
+      "id": "E-0038",
+      "name": ".devcontainer/lib/log-mcp-event.sh",
+      "type": "tool",
+      "canonical_uri": ".devcontainer/lib/log-mcp-event.sh",
+      "aliases": ["log_mcp_event helper"],
+      "claims": ["codebase-C-0050", "codebase-C-0092"]
+    },
+    {
+      "id": "E-0039",
+      "name": "ADR-0037 MCP event schema",
+      "type": "standard",
+      "aliases": ["ADR-0037"],
+      "claims": ["codebase-C-0050", "codebase-C-0093", "codebase-C-0113"]
+    },
+    {
+      "id": "E-0040",
+      "name": "ADR-0039 redaction-at-source default-fail-closed",
+      "type": "standard",
+      "aliases": ["ADR-0039"],
+      "claims": ["codebase-C-0050"]
+    },
+    {
+      "id": "E-0041",
+      "name": "ADR-0040 sub-agent MCP allowlist policy",
+      "type": "standard",
+      "aliases": ["ADR-0040"],
+      "claims": ["codebase-C-0115"]
+    },
+    {
+      "id": "E-0042",
+      "name": "ADR-0042 graduated skill family",
+      "type": "standard",
+      "aliases": ["ADR-0042"],
+      "claims": ["codebase-C-0035"]
+    },
+    {
+      "id": "E-0043",
+      "name": "ADR-0043 Gate-6 hard gate",
+      "type": "standard",
+      "aliases": ["ADR-0043"],
+      "claims": ["codebase-C-0067"]
+    },
+    {
+      "id": "E-0044",
+      "name": "ADR-0044 flatten decision (non-invocable execute-orchestrator)",
+      "type": "standard",
+      "aliases": ["ADR-0044"],
+      "claims": ["codebase-C-0026", "codebase-C-0030", "codebase-C-0033", "codebase-C-0101"]
+    },
+    {
+      "id": "E-0045",
+      "name": "ADR-0017 reviewer invocation points",
+      "type": "standard",
+      "aliases": ["ADR-0017"],
+      "claims": ["codebase-C-0005"]
+    },
+    {
+      "id": "E-0046",
+      "name": "ADR-0005 append-only",
+      "type": "standard",
+      "aliases": ["ADR-0005"],
+      "claims": ["codebase-C-0106"]
+    },
+    {
+      "id": "E-0047",
+      "name": ".github/workflows/ (greenfield)",
+      "type": "tool",
+      "canonical_uri": ".github/workflows/",
+      "aliases": ["greenfield workflows dir"],
+      "claims": ["codebase-C-0053", "codebase-C-0054", "codebase-C-0069", "codebase-C-0096"]
+    },
+    {
+      "id": "E-0048",
+      "name": "KB-github-actions-platform skill",
+      "type": "tool",
+      "canonical_uri": ".claude/skills/KB-github-actions-platform/",
+      "aliases": ["KB-github-actions-platform"],
+      "claims": ["codebase-C-0055", "codebase-C-0097"]
+    },
+    {
+      "id": "E-0049",
+      "name": "KB-mcp-platform skill",
+      "type": "tool",
+      "aliases": ["KB-mcp-platform"],
+      "claims": ["codebase-C-0110"]
+    },
+    {
+      "id": "E-0050",
+      "name": "deferral register (devcontainer-mcp-provisioning-r1)",
+      "type": "tool",
+      "canonical_uri": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "aliases": ["deferral register"],
+      "claims": [
+        "codebase-C-0056", "codebase-C-0057", "codebase-C-0058", "codebase-C-0098",
+        "codebase-C-0099", "codebase-C-0100"
+      ]
+    },
+    {
+      "id": "E-0051",
+      "name": "cross-artifact-divergence-detection-gap proposal",
+      "type": "tool",
+      "canonical_uri": "Issues/cross-artifact-divergence-detection-gap/proposal.md",
+      "aliases": ["divergence-detection proposal"],
+      "claims": ["codebase-C-0057", "codebase-C-0060"]
+    },
+    {
+      "id": "E-0052",
+      "name": "design-claude-code",
+      "type": "role",
+      "aliases": [],
+      "claims": [
+        "codebase-C-0013", "codebase-C-0021", "codebase-C-0029", "codebase-C-0034",
+        "codebase-C-0059", "codebase-C-0072", "codebase-C-0075", "codebase-C-0115"
+      ]
+    },
+    {
+      "id": "E-0053",
+      "name": "design-codespaces",
+      "type": "role",
+      "aliases": [],
+      "claims": ["codebase-C-0109", "codebase-C-0115"]
+    },
+    {
+      "id": "E-0054",
+      "name": "design-cicd",
+      "type": "role",
+      "aliases": [],
+      "claims": ["codebase-C-0055", "codebase-C-0097", "codebase-C-0115"]
+    },
+    {
+      "id": "E-0055",
+      "name": "design-composer",
+      "type": "role",
+      "aliases": [],
+      "claims": ["codebase-C-0059", "codebase-C-0079"]
+    },
+    {
+      "id": "E-0056",
+      "name": "design-iac",
+      "type": "role",
+      "aliases": [],
+      "claims": ["codebase-C-0115"]
+    },
+    {
+      "id": "E-0057",
+      "name": "discovery-codebase-researcher",
+      "type": "role",
+      "aliases": [],
+      "claims": ["codebase-C-0115"]
+    },
+    {
+      "id": "E-0058",
+      "name": "discovery-external-researcher",
+      "type": "role",
+      "aliases": [],
+      "claims": ["codebase-C-0115"]
+    },
+    {
+      "id": "E-0059",
+      "name": "Verdict+findings emission contract",
+      "type": "pattern",
+      "aliases": ["verdict+findings pair", "verdict emission convention", "findings convention"],
+      "claims": [
+        "codebase-C-0006", "codebase-C-0009", "codebase-C-0012", "codebase-C-0015",
+        "codebase-C-0017", "codebase-C-0020", "codebase-C-0023", "codebase-C-0024",
+        "codebase-C-0073", "codebase-C-0074", "codebase-C-0075", "codebase-C-0080",
+        "codebase-C-0104"
+      ]
+    },
+    {
+      "id": "E-0060",
+      "name": "Canonical severity taxonomy (BLOCKER/MAJOR/MINOR/NIT)",
+      "type": "standard",
+      "aliases": ["severity tokens", "BLOCKER/MAJOR/MINOR/NIT"],
+      "claims": [
+        "codebase-C-0010", "codebase-C-0017", "codebase-C-0043", "codebase-C-0076",
+        "codebase-C-0077", "codebase-C-0078"
+      ]
+    },
+    {
+      "id": "E-0061",
+      "name": "Severity-to-verdict deterministic mapping",
+      "type": "pattern",
+      "aliases": [],
+      "claims": ["codebase-C-0010", "codebase-C-0077"]
+    },
+    {
+      "id": "E-0062",
+      "name": "Two-check idempotency (sentinel + binary-on-PATH)",
+      "type": "pattern",
+      "aliases": ["two-check pattern"],
+      "claims": ["codebase-C-0046", "codebase-C-0091"]
+    },
+    {
+      "id": "E-0063",
+      "name": "Sentinel-naming conventions (ADR-0041 vs live)",
+      "type": "pattern",
+      "aliases": ["sentinel-naming"],
+      "claims": ["codebase-C-0089", "codebase-C-0090", "codebase-C-0102"]
+    },
+    {
+      "id": "E-0064",
+      "name": "Dual-stream diagnostics (stderr + JSONL)",
+      "type": "pattern",
+      "aliases": ["dual-stream pattern"],
+      "claims": ["codebase-C-0094", "codebase-C-0095"]
+    },
+    {
+      "id": "E-0065",
+      "name": "OP-rule script contract",
+      "type": "pattern",
+      "aliases": ["audit_op<N>_<descriptor>.py contract"],
+      "claims": ["codebase-C-0037", "codebase-C-0083", "codebase-C-0084", "codebase-C-0085", "codebase-C-0086"]
+    },
+    {
+      "id": "E-0066",
+      "name": "Shell posture: set -euo pipefail",
+      "type": "pattern",
+      "aliases": [],
+      "claims": ["codebase-C-0044", "codebase-C-0088"]
+    },
+    {
+      "id": "E-0067",
+      "name": "Deferral-register row update convention",
+      "type": "pattern",
+      "aliases": [],
+      "claims": ["codebase-C-0057", "codebase-C-0098", "codebase-C-0100"]
+    },
+    {
+      "id": "E-0068",
+      "name": "NFR-13 MCP event surface compatibility",
+      "type": "control",
+      "aliases": ["NFR-13"],
+      "claims": ["codebase-C-0051", "codebase-C-0093", "codebase-C-0113", "codebase-C-0114"]
+    },
+    {
+      "id": "E-0069",
+      "name": "NFR-15 allowlist preservation",
+      "type": "control",
+      "aliases": ["NFR-15"],
+      "claims": ["codebase-C-0070", "codebase-C-0115", "codebase-C-0116"]
+    },
+    {
+      "id": "E-0070",
+      "name": "MCP event types (install_complete / readiness_probe / structured_failure)",
+      "type": "standard",
+      "aliases": ["MCP event surface", "ADR-0037 event types"],
+      "claims": ["codebase-C-0051", "codebase-C-0092", "codebase-C-0093", "codebase-C-0113", "codebase-C-0114"]
+    },
+    {
+      "id": "E-0071",
+      "name": "checkpoint.json",
+      "type": "tool",
+      "aliases": ["checkpoint state file"],
+      "claims": ["codebase-C-0032", "codebase-C-0033", "codebase-C-0082"]
+    },
+    {
+      "id": "E-0072",
+      "name": "agent frontmatter contract",
+      "type": "standard",
+      "aliases": ["frontmatter fields"],
+      "claims": ["codebase-C-0081", "codebase-C-0101"]
+    },
+    {
+      "id": "E-0073",
+      "name": "TaskUpdate logging convention",
+      "type": "pattern",
+      "aliases": [],
+      "claims": ["codebase-C-0082"]
+    },
+    {
+      "id": "E-0074",
+      "name": "CLAUDE.md",
+      "type": "tool",
+      "canonical_uri": "CLAUDE.md",
+      "aliases": [],
+      "claims": ["codebase-C-0106", "codebase-C-0110"]
+    },
+    {
+      "id": "E-0075",
+      "name": "GitNexus v1.6.5 (npm gitnexus@1.6.5 / GitHub v1.6.5)",
+      "type": "service",
+      "canonical_uri": "https://github.com/abhigyanpatwari/GitNexus/tree/v1.6.5",
+      "aliases": ["gitnexus@1.6.5", "GitNexus 1.6.5", "GITNEXUS_TAG=1.6.5"],
+      "claims": [
+        "t001-C-0001", "t001-C-0002", "t001-C-0005", "t001-C-0006", "t001-C-0008",
+        "t001-C-0009", "t001-C-0011", "t001-C-0016", "t001-C-0017", "t001-C-0019",
+        "t001-C-0029", "t001-C-0031", "t001-C-0047"
+      ]
+    },
+    {
+      "id": "E-0076",
+      "name": "GITNEXUS_SKIP_OPTIONAL_GRAMMARS env-var contract",
+      "type": "control",
+      "aliases": ["GITNEXUS_SKIP_OPTIONAL_GRAMMARS", "grammar-skip env var"],
+      "claims": [
+        "t001-C-0002", "t001-C-0003", "t001-C-0004", "t001-C-0006", "t001-C-0007",
+        "t001-C-0008", "t001-C-0009", "t001-C-0018", "t001-C-0019", "t001-C-0022",
+        "t001-C-0023", "t001-C-0028", "t001-C-0029", "t001-C-0030", "t001-C-0032",
+        "t001-C-0033", "t001-C-0038", "t001-C-0040", "t001-C-0041", "t001-C-0042",
+        "t001-C-0043", "t001-C-0044"
+      ]
+    },
+    {
+      "id": "E-0077",
+      "name": "build-tree-sitter-dart.cjs (postinstall guard)",
+      "type": "tool",
+      "aliases": ["dart builder"],
+      "claims": [
+        "t001-C-0002", "t001-C-0003", "t001-C-0005", "t001-C-0006", "t001-C-0007",
+        "t001-C-0008", "t001-C-0010", "t001-C-0011", "t001-C-0017", "t001-C-0024",
+        "t001-C-0025", "t001-C-0042"
+      ]
+    },
+    {
+      "id": "E-0078",
+      "name": "build-tree-sitter-proto.cjs (postinstall guard)",
+      "type": "tool",
+      "aliases": ["proto builder"],
+      "claims": [
+        "t001-C-0002", "t001-C-0003", "t001-C-0005", "t001-C-0009", "t001-C-0010",
+        "t001-C-0012", "t001-C-0026", "t001-C-0042"
+      ]
+    },
+    {
+      "id": "E-0079",
+      "name": "tree-sitter-dart grammar",
+      "type": "tool",
+      "aliases": ["tree-sitter-dart"],
+      "claims": ["t001-C-0016", "t001-C-0024", "t001-C-0025", "t001-C-0042"]
+    },
+    {
+      "id": "E-0080",
+      "name": "tree-sitter-proto grammar",
+      "type": "tool",
+      "aliases": ["tree-sitter-proto"],
+      "claims": ["t001-C-0016", "t001-C-0026", "t001-C-0042"]
+    },
+    {
+      "id": "E-0081",
+      "name": "tree-sitter-swift grammar",
+      "type": "tool",
+      "aliases": ["tree-sitter-swift", "tree-sitter-swift@0.6.0"],
+      "claims": [
+        "t001-C-0016", "t001-C-0017", "t001-C-0018", "t001-C-0019", "t001-C-0020",
+        "t001-C-0022", "t001-C-0023", "t001-C-0038", "t001-C-0039"
+      ]
+    },
+    {
+      "id": "E-0082",
+      "name": "tree-sitter-kotlin grammar",
+      "type": "tool",
+      "aliases": ["tree-sitter-kotlin"],
+      "claims": ["t001-C-0016", "t001-C-0041", "t001-C-0045"]
+    },
+    {
+      "id": "E-0083",
+      "name": "node-gyp",
+      "type": "tool",
+      "aliases": ["node-gyp rebuild"],
+      "claims": [
+        "t001-C-0011", "t001-C-0012", "t001-C-0013", "t001-C-0014", "t001-C-0015",
+        "t001-C-0024", "t001-C-0029", "t001-C-0034"
+      ]
+    },
+    {
+      "id": "E-0084",
+      "name": "npm optionalDependencies failure-tolerated install",
+      "type": "pattern",
+      "aliases": ["optionalDependencies tolerated-skip"],
+      "claims": ["t001-C-0016", "t001-C-0019", "t001-C-0045"]
+    },
+    {
+      "id": "E-0085",
+      "name": "GitNexus issue #1024 (Swift binding.gyp malformed)",
+      "type": "finding",
+      "canonical_uri": "https://github.com/abhigyanpatwari/GitNexus/issues/1024",
+      "aliases": ["issue #1024"],
+      "claims": ["t001-C-0020", "t001-C-0021", "t001-C-0023", "t001-C-0039", "t001-C-0042", "t001-C-0046"]
+    },
+    {
+      "id": "E-0086",
+      "name": "GitNexus README env-var description (Quick Start)",
+      "type": "standard",
+      "aliases": ["GitNexus README"],
+      "claims": ["t001-C-0018", "t001-C-0022", "t001-C-0028", "t001-C-0030", "t001-C-0038"]
+    },
+    {
+      "id": "E-0087",
+      "name": "Dry-run observable signal: stderr-prefix assertion (signal 1)",
+      "type": "finding",
+      "aliases": ["stderr signal", "signal 1"],
+      "claims": ["t001-C-0033", "t001-C-0037", "t001-C-0040"]
+    },
+    {
+      "id": "E-0088",
+      "name": "Dry-run observable signal: process-tree absence (signal 2)",
+      "type": "finding",
+      "aliases": ["process-tree signal", "signal 2"],
+      "claims": ["t001-C-0015", "t001-C-0034"]
+    },
+    {
+      "id": "E-0089",
+      "name": "Dry-run observable signal: artifact-absence (signal 3)",
+      "type": "finding",
+      "aliases": ["artifact-absence signal", "signal 3"],
+      "claims": ["t001-C-0024", "t001-C-0026", "t001-C-0027", "t001-C-0035", "t001-C-0037"]
+    },
+    {
+      "id": "E-0090",
+      "name": "Dry-run observable signal: wall-clock (signal 4, weak)",
+      "type": "finding",
+      "aliases": ["wall-clock signal", "signal 4"],
+      "claims": ["t001-C-0036"]
+    },
+    {
+      "id": "E-0091",
+      "name": "Recommended dry-run pair (signal 1 AND signal 3)",
+      "type": "pattern",
+      "aliases": [],
+      "claims": ["t001-C-0037", "t001-C-0038"]
+    },
+    {
+      "id": "E-0092",
+      "name": "Drift modes DM-1..DM-4 for env-var contract",
+      "type": "finding",
+      "aliases": ["drift modes", "DM-1", "DM-2", "DM-3", "DM-4"],
+      "claims": ["t001-C-0040", "t001-C-0041", "t001-C-0042", "t001-C-0043", "t001-C-0047"]
+    },
+    {
+      "id": "E-0093",
+      "name": "claude mcp list CLI subcommand",
+      "type": "tool",
+      "aliases": ["claude mcp list"],
+      "claims": [
+        "t002-C-0001", "t002-C-0002", "t002-C-0003", "t002-C-0007", "t002-C-0008",
+        "t002-C-0023", "t002-C-0024", "t002-C-0030", "t002-C-0038"
+      ]
+    },
+    {
+      "id": "E-0094",
+      "name": "claude --bare -p headless invocation (SDK-event path)",
+      "type": "tool",
+      "aliases": ["claude --bare -p", "claude -p", "headless mode"],
+      "claims": [
+        "t002-C-0012", "t002-C-0013", "t002-C-0025", "t002-C-0028", "t002-C-0035"
+      ]
+    },
+    {
+      "id": "E-0095",
+      "name": "claude install subcommand",
+      "type": "tool",
+      "aliases": ["claude install"],
+      "claims": ["t002-C-0021", "t002-C-0022"]
+    },
+    {
+      "id": "E-0096",
+      "name": "claude auth status",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["t002-C-0004"]
+    },
+    {
+      "id": "E-0097",
+      "name": "claude daemon status",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["t002-C-0005"]
+    },
+    {
+      "id": "E-0098",
+      "name": "claude ultrareview",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["t002-C-0006"]
+    },
+    {
+      "id": "E-0099",
+      "name": "/mcp in-session slash command",
+      "type": "tool",
+      "aliases": ["/mcp"],
+      "claims": ["t002-C-0015", "t002-C-0016", "t002-C-0023"]
+    },
+    {
+      "id": "E-0100",
+      "name": "claude --init-only flag",
+      "type": "tool",
+      "aliases": ["--init-only"],
+      "claims": ["t002-C-0032", "t002-C-0033"]
+    },
+    {
+      "id": "E-0101",
+      "name": "McpServerStatus enum (connected/failed/needs-auth/pending/disabled)",
+      "type": "standard",
+      "aliases": ["McpServerStatus", "MCP status enum"],
+      "claims": [
+        "t002-C-0009", "t002-C-0010", "t002-C-0014", "t002-C-0015", "t002-C-0016",
+        "t002-C-0017", "t002-C-0026", "t002-C-0027", "t002-C-0037"
+      ]
+    },
+    {
+      "id": "E-0102",
+      "name": "system/init event (mcp_servers payload)",
+      "type": "standard",
+      "aliases": ["system/init", "mcp_servers[] payload"],
+      "claims": ["t002-C-0010", "t002-C-0011", "t002-C-0012", "t002-C-0014", "t002-C-0025"]
+    },
+    {
+      "id": "E-0103",
+      "name": "Claude Code Agent SDK (TS / Python)",
+      "type": "service",
+      "aliases": ["Agent SDK"],
+      "claims": ["t002-C-0009", "t002-C-0011", "t002-C-0027", "t002-C-0037"]
+    },
+    {
+      "id": "E-0104",
+      "name": "Claude Code CLI canonical documentation",
+      "type": "standard",
+      "canonical_uri": "https://code.claude.com/docs/en/",
+      "aliases": ["cli-reference page", "mcp page", "headless page", "agent-sdk pages"],
+      "claims": [
+        "t002-C-0001", "t002-C-0002", "t002-C-0003", "t002-C-0004", "t002-C-0005",
+        "t002-C-0006", "t002-C-0007", "t002-C-0013", "t002-C-0024", "t002-C-0029",
+        "t002-C-0031", "t002-C-0035", "t002-C-0036", "t002-C-0038"
+      ]
+    },
+    {
+      "id": "E-0105",
+      "name": "Recommended CI MCP-health-check invocation (jq filter on system/init)",
+      "type": "pattern",
+      "aliases": ["claude --bare -p ... | jq SDK-event check"],
+      "claims": ["t002-C-0014", "t002-C-0025", "t002-C-0026", "t002-C-0027", "t002-C-0028"]
+    },
+    {
+      "id": "E-0106",
+      "name": "Documented undocumented behavior risk (claude mcp list exit code)",
+      "type": "finding",
+      "aliases": [],
+      "claims": ["t002-C-0001", "t002-C-0002", "t002-C-0007", "t002-C-0008", "t002-C-0029"]
+    },
+    {
+      "id": "E-0107",
+      "name": "Claude Code version pins documented (v2.1.64 / .111 / .121 / .144)",
+      "type": "finding",
+      "aliases": ["version-pin evidence"],
+      "claims": ["t002-C-0017", "t002-C-0018", "t002-C-0019", "t002-C-0020"]
+    },
+    {
+      "id": "E-0108",
+      "name": "Reviewer dispatch invocation table (recipe-feature-pipeline)",
+      "type": "pattern",
+      "aliases": ["reviewer dispatch points"],
+      "claims": ["codebase-C-0027", "codebase-C-0028"]
+    },
+    {
+      "id": "E-0109",
+      "name": "Per-server install-mechanism taxonomy table (ADR-0041 Decision §1.b)",
+      "type": "standard",
+      "aliases": ["ADR-0041 invocation table"],
+      "claims": ["codebase-C-0041", "codebase-C-0105"]
+    },
+    {
+      "id": "E-0110",
+      "name": "KB security non-negotiables for GitHub Actions",
+      "type": "control",
+      "aliases": ["SHA-pin / least-privilege / OIDC / concurrency / no-untrusted-interpolation"],
+      "claims": ["codebase-C-0055", "codebase-C-0097"]
+    },
+    {
+      "id": "E-0111",
+      "name": "Stale ADR/KB reference posture",
+      "type": "pattern",
+      "aliases": ["stale-doc tolerance"],
+      "claims": ["codebase-C-0110", "codebase-C-0111", "codebase-C-0112"]
+    },
+    {
+      "id": "E-0112",
+      "name": "checkpoint.execution_mode = parent-driven-workaround (historical fallback)",
+      "type": "pattern",
+      "aliases": ["parent-driven-workaround"],
+      "claims": ["codebase-C-0032", "codebase-C-0033"]
+    },
+    {
+      "id": "E-0113",
+      "name": "Verbatim guard-script warning text (literal-string fragility)",
+      "type": "finding",
+      "aliases": [],
+      "claims": ["t001-C-0004", "t001-C-0007", "t001-C-0008", "t001-C-0009"]
+    }
+  ],
+  "edges": [
+    {"from": "E-0001", "to": "E-0013", "relation": "requires", "claim_ids": ["codebase-C-0005", "codebase-C-0006", "codebase-C-0061"]},
+    {"from": "E-0001", "to": "E-0014", "relation": "requires", "claim_ids": ["codebase-C-0008", "codebase-C-0009", "codebase-C-0063"]},
+    {"from": "E-0001", "to": "E-0015", "relation": "requires", "claim_ids": ["codebase-C-0011", "codebase-C-0012", "codebase-C-0064"]},
+    {"from": "E-0001", "to": "E-0016", "relation": "requires", "claim_ids": ["codebase-C-0014", "codebase-C-0015", "codebase-C-0065"]},
+    {"from": "E-0001", "to": "E-0017", "relation": "requires", "claim_ids": ["codebase-C-0016", "codebase-C-0017", "codebase-C-0018", "codebase-C-0104"]},
+    {"from": "E-0001", "to": "E-0018", "relation": "requires", "claim_ids": ["codebase-C-0019", "codebase-C-0020", "codebase-C-0104"]},
+    {"from": "E-0001", "to": "E-0059", "relation": "requires", "claim_ids": ["codebase-C-0073", "codebase-C-0074", "codebase-C-0075", "codebase-C-0080", "codebase-C-0104"]},
+    {"from": "E-0001", "to": "E-0060", "relation": "requires", "claim_ids": ["codebase-C-0076", "codebase-C-0077", "codebase-C-0078"]},
+    {"from": "E-0001", "to": "E-0061", "relation": "implements", "claim_ids": ["codebase-C-0010", "codebase-C-0077"]},
+    {"from": "E-0001", "to": "E-0019", "relation": "conflicts_with", "claim_ids": ["codebase-C-0022"]},
+
+    {"from": "E-0013", "to": "E-0059", "relation": "implements", "claim_ids": ["codebase-C-0006"]},
+    {"from": "E-0014", "to": "E-0059", "relation": "implements", "claim_ids": ["codebase-C-0009"]},
+    {"from": "E-0015", "to": "E-0059", "relation": "implements", "claim_ids": ["codebase-C-0012"]},
+    {"from": "E-0016", "to": "E-0059", "relation": "implements", "claim_ids": ["codebase-C-0015"]},
+    {"from": "E-0017", "to": "E-0059", "relation": "implements", "claim_ids": ["codebase-C-0017"]},
+    {"from": "E-0018", "to": "E-0059", "relation": "implements", "claim_ids": ["codebase-C-0020"]},
+    {"from": "E-0014", "to": "E-0060", "relation": "implements", "claim_ids": ["codebase-C-0010"]},
+    {"from": "E-0017", "to": "E-0060", "relation": "implements", "claim_ids": ["codebase-C-0017", "codebase-C-0078"]},
+
+    {"from": "E-0008", "to": "E-0001", "relation": "requires", "claim_ids": ["codebase-C-0002", "codebase-C-0104"]},
+    {"from": "E-0008", "to": "E-0017", "relation": "requires", "claim_ids": ["codebase-C-0016", "codebase-C-0018", "codebase-C-0104"]},
+    {"from": "E-0008", "to": "E-0018", "relation": "requires", "claim_ids": ["codebase-C-0019", "codebase-C-0021", "codebase-C-0104"]},
+
+    {"from": "E-0013", "to": "E-0025", "relation": "requires", "claim_ids": ["codebase-C-0005", "codebase-C-0027", "codebase-C-0061"]},
+    {"from": "E-0014", "to": "E-0025", "relation": "requires", "claim_ids": ["codebase-C-0063"]},
+    {"from": "E-0016", "to": "E-0025", "relation": "requires", "claim_ids": ["codebase-C-0065"]},
+    {"from": "E-0018", "to": "E-0013", "relation": "requires", "claim_ids": ["codebase-C-0020", "codebase-C-0061"]},
+    {"from": "E-0014", "to": "E-0022", "relation": "requires", "claim_ids": ["codebase-C-0063"]},
+    {"from": "E-0016", "to": "E-0023", "relation": "requires", "claim_ids": ["codebase-C-0065"]},
+
+    {"from": "E-0025", "to": "E-0044", "relation": "implements", "claim_ids": ["codebase-C-0026"]},
+    {"from": "E-0025", "to": "E-0108", "relation": "implements", "claim_ids": ["codebase-C-0027"]},
+    {"from": "E-0025", "to": "E-0071", "relation": "requires", "claim_ids": ["codebase-C-0082"]},
+    {"from": "E-0013", "to": "E-0045", "relation": "implements", "claim_ids": ["codebase-C-0005"]},
+
+    {"from": "E-0024", "to": "E-0044", "relation": "implements", "claim_ids": ["codebase-C-0030", "codebase-C-0033"]},
+    {"from": "E-0024", "to": "E-0072", "relation": "conflicts_with", "claim_ids": ["codebase-C-0101"]},
+
+    {"from": "E-0002", "to": "E-0025", "relation": "requires", "claim_ids": ["codebase-C-0029", "codebase-C-0066", "codebase-C-0072"]},
+    {"from": "E-0002", "to": "E-0071", "relation": "requires", "claim_ids": ["codebase-C-0032", "codebase-C-0033"]},
+    {"from": "E-0002", "to": "E-0112", "relation": "requires", "claim_ids": ["codebase-C-0033"]},
+    {"from": "E-0009", "to": "E-0002", "relation": "requires", "claim_ids": ["codebase-C-0029", "codebase-C-0034"]},
+    {"from": "E-0009", "to": "E-0052", "relation": "requires", "claim_ids": ["codebase-C-0029", "codebase-C-0034"]},
+
+    {"from": "E-0003", "to": "E-0026", "relation": "requires", "claim_ids": ["codebase-C-0067", "codebase-C-0083", "codebase-C-0084", "codebase-C-0085", "codebase-C-0086", "codebase-C-0087"]},
+    {"from": "E-0003", "to": "E-0027", "relation": "requires", "claim_ids": ["codebase-C-0070", "codebase-C-0086", "codebase-C-0105"]},
+    {"from": "E-0003", "to": "E-0028", "relation": "requires", "claim_ids": ["codebase-C-0003", "codebase-C-0041", "codebase-C-0105"]},
+    {"from": "E-0003", "to": "E-0065", "relation": "implements", "claim_ids": ["codebase-C-0083", "codebase-C-0084", "codebase-C-0085", "codebase-C-0086"]},
+    {"from": "E-0003", "to": "E-0109", "relation": "requires", "claim_ids": ["codebase-C-0041", "codebase-C-0105"]},
+    {"from": "E-0003", "to": "E-0029", "relation": "conflicts_with", "claim_ids": ["codebase-C-0003", "codebase-C-0041", "codebase-C-0105"]},
+    {"from": "E-0026", "to": "E-0042", "relation": "implements", "claim_ids": ["codebase-C-0035"]},
+    {"from": "E-0026", "to": "E-0043", "relation": "requires", "claim_ids": ["codebase-C-0067"]},
+
+    {"from": "E-0027", "to": "E-0028", "relation": "implements", "claim_ids": ["codebase-C-0039", "codebase-C-0041"]},
+    {"from": "E-0029", "to": "E-0027", "relation": "conflicts_with", "claim_ids": ["codebase-C-0038", "codebase-C-0045", "codebase-C-0110"]},
+    {"from": "E-0029", "to": "E-0028", "relation": "conflicts_with", "claim_ids": ["codebase-C-0041", "codebase-C-0105", "codebase-C-0110"]},
+
+    {"from": "E-0010", "to": "E-0029", "relation": "requires", "claim_ids": ["codebase-C-0105", "codebase-C-0110"]},
+    {"from": "E-0010", "to": "E-0003", "relation": "requires", "claim_ids": ["codebase-C-0105", "codebase-C-0106", "codebase-C-0107", "codebase-C-0108"]},
+    {"from": "E-0010", "to": "E-0111", "relation": "implements", "claim_ids": ["codebase-C-0111", "codebase-C-0112"]},
+    {"from": "E-0010", "to": "E-0046", "relation": "requires", "claim_ids": ["codebase-C-0106"]},
+    {"from": "E-0010", "to": "E-0049", "relation": "requires", "claim_ids": ["codebase-C-0110"]},
+
+    {"from": "E-0004", "to": "E-0036", "relation": "requires", "claim_ids": ["codebase-C-0047", "codebase-C-0068", "codebase-C-0114"]},
+    {"from": "E-0004", "to": "E-0033", "relation": "requires", "claim_ids": ["codebase-C-0047"]},
+    {"from": "E-0004", "to": "E-0075", "relation": "requires", "claim_ids": ["t001-C-0001"]},
+    {"from": "E-0004", "to": "E-0076", "relation": "requires", "claim_ids": ["t001-C-0002", "t001-C-0029", "t001-C-0038"]},
+    {"from": "E-0004", "to": "E-0091", "relation": "implements", "claim_ids": ["t001-C-0037", "t001-C-0038"]},
+    {"from": "E-0004", "to": "E-0070", "relation": "requires", "claim_ids": ["codebase-C-0051", "codebase-C-0093"]},
+    {"from": "E-0004", "to": "E-0068", "relation": "requires", "claim_ids": ["codebase-C-0051", "codebase-C-0093", "codebase-C-0113"]},
+
+    {"from": "E-0036", "to": "E-0028", "relation": "implements", "claim_ids": ["codebase-C-0046", "codebase-C-0052"]},
+    {"from": "E-0036", "to": "E-0066", "relation": "implements", "claim_ids": ["codebase-C-0044"]},
+    {"from": "E-0036", "to": "E-0062", "relation": "implements", "claim_ids": ["codebase-C-0046", "codebase-C-0091"]},
+    {"from": "E-0036", "to": "E-0038", "relation": "requires", "claim_ids": ["codebase-C-0094", "codebase-C-0114"]},
+    {"from": "E-0036", "to": "E-0070", "relation": "implements", "claim_ids": ["codebase-C-0092", "codebase-C-0114"]},
+    {"from": "E-0038", "to": "E-0039", "relation": "implements", "claim_ids": ["codebase-C-0050"]},
+    {"from": "E-0038", "to": "E-0040", "relation": "implements", "claim_ids": ["codebase-C-0050"]},
+    {"from": "E-0070", "to": "E-0039", "relation": "implements", "claim_ids": ["codebase-C-0050", "codebase-C-0093"]},
+
+    {"from": "E-0011", "to": "E-0063", "relation": "requires", "claim_ids": ["codebase-C-0089", "codebase-C-0090", "codebase-C-0102"]},
+    {"from": "E-0011", "to": "E-0028", "relation": "requires", "claim_ids": ["codebase-C-0089"]},
+    {"from": "E-0011", "to": "E-0053", "relation": "requires", "claim_ids": ["codebase-C-0109"]},
+
+    {"from": "E-0006", "to": "E-0064", "relation": "implements", "claim_ids": ["codebase-C-0094", "codebase-C-0095"]},
+    {"from": "E-0006", "to": "E-0004", "relation": "requires", "claim_ids": ["codebase-C-0095"]},
+
+    {"from": "E-0075", "to": "E-0077", "relation": "requires", "claim_ids": ["t001-C-0002", "t001-C-0005", "t001-C-0017"]},
+    {"from": "E-0075", "to": "E-0078", "relation": "requires", "claim_ids": ["t001-C-0002", "t001-C-0005"]},
+    {"from": "E-0075", "to": "E-0079", "relation": "requires", "claim_ids": ["t001-C-0016"]},
+    {"from": "E-0075", "to": "E-0080", "relation": "requires", "claim_ids": ["t001-C-0016"]},
+    {"from": "E-0075", "to": "E-0081", "relation": "requires", "claim_ids": ["t001-C-0016", "t001-C-0017"]},
+    {"from": "E-0075", "to": "E-0082", "relation": "requires", "claim_ids": ["t001-C-0016", "t001-C-0045"]},
+    {"from": "E-0077", "to": "E-0076", "relation": "implements", "claim_ids": ["t001-C-0003", "t001-C-0006", "t001-C-0007", "t001-C-0008"]},
+    {"from": "E-0078", "to": "E-0076", "relation": "implements", "claim_ids": ["t001-C-0003", "t001-C-0009"]},
+    {"from": "E-0077", "to": "E-0083", "relation": "requires", "claim_ids": ["t001-C-0011", "t001-C-0013", "t001-C-0029"]},
+    {"from": "E-0078", "to": "E-0083", "relation": "requires", "claim_ids": ["t001-C-0012", "t001-C-0013", "t001-C-0029"]},
+    {"from": "E-0079", "to": "E-0084", "relation": "implements", "claim_ids": ["t001-C-0016", "t001-C-0019"]},
+    {"from": "E-0080", "to": "E-0084", "relation": "implements", "claim_ids": ["t001-C-0016"]},
+    {"from": "E-0081", "to": "E-0084", "relation": "implements", "claim_ids": ["t001-C-0016", "t001-C-0019"]},
+    {"from": "E-0082", "to": "E-0084", "relation": "implements", "claim_ids": ["t001-C-0016", "t001-C-0045"]},
+    {"from": "E-0081", "to": "E-0085", "relation": "implements", "claim_ids": ["t001-C-0020", "t001-C-0023"]},
+    {"from": "E-0086", "to": "E-0076", "relation": "conflicts_with", "claim_ids": ["t001-C-0018", "t001-C-0022", "t001-C-0038"]},
+    {"from": "E-0037", "to": "E-0075", "relation": "requires", "claim_ids": ["codebase-C-0048", "t001-C-0001"]},
+
+    {"from": "E-0091", "to": "E-0087", "relation": "requires", "claim_ids": ["t001-C-0037"]},
+    {"from": "E-0091", "to": "E-0089", "relation": "requires", "claim_ids": ["t001-C-0037"]},
+    {"from": "E-0087", "to": "E-0076", "relation": "implements", "claim_ids": ["t001-C-0033"]},
+    {"from": "E-0088", "to": "E-0083", "relation": "implements", "claim_ids": ["t001-C-0015", "t001-C-0034"]},
+    {"from": "E-0089", "to": "E-0079", "relation": "implements", "claim_ids": ["t001-C-0024", "t001-C-0025", "t001-C-0035"]},
+    {"from": "E-0089", "to": "E-0080", "relation": "implements", "claim_ids": ["t001-C-0026", "t001-C-0035"]},
+    {"from": "E-0092", "to": "E-0076", "relation": "conflicts_with", "claim_ids": ["t001-C-0040", "t001-C-0041", "t001-C-0042", "t001-C-0043", "t001-C-0047"]},
+    {"from": "E-0113", "to": "E-0087", "relation": "conflicts_with", "claim_ids": ["t001-C-0040"]},
+
+    {"from": "E-0093", "to": "E-0104", "relation": "implements", "claim_ids": ["t002-C-0001", "t002-C-0002", "t002-C-0003"]},
+    {"from": "E-0106", "to": "E-0093", "relation": "implements", "claim_ids": ["t002-C-0007", "t002-C-0008", "t002-C-0029"]},
+    {"from": "E-0093", "to": "E-0099", "relation": "supersedes", "claim_ids": ["t002-C-0023", "t002-C-0024"]},
+    {"from": "E-0099", "to": "E-0101", "relation": "implements", "claim_ids": ["t002-C-0015", "t002-C-0016"]},
+    {"from": "E-0094", "to": "E-0102", "relation": "requires", "claim_ids": ["t002-C-0012", "t002-C-0025"]},
+    {"from": "E-0094", "to": "E-0104", "relation": "implements", "claim_ids": ["t002-C-0013", "t002-C-0035"]},
+    {"from": "E-0102", "to": "E-0101", "relation": "requires", "claim_ids": ["t002-C-0010", "t002-C-0011", "t002-C-0014"]},
+    {"from": "E-0102", "to": "E-0103", "relation": "implements", "claim_ids": ["t002-C-0011"]},
+    {"from": "E-0101", "to": "E-0103", "relation": "implements", "claim_ids": ["t002-C-0009", "t002-C-0027", "t002-C-0037"]},
+    {"from": "E-0105", "to": "E-0094", "relation": "requires", "claim_ids": ["t002-C-0025", "t002-C-0028"]},
+    {"from": "E-0105", "to": "E-0102", "relation": "requires", "claim_ids": ["t002-C-0025", "t002-C-0026"]},
+    {"from": "E-0105", "to": "E-0101", "relation": "requires", "claim_ids": ["t002-C-0026", "t002-C-0027"]},
+    {"from": "E-0105", "to": "E-0093", "relation": "supersedes", "claim_ids": ["t002-C-0025", "t002-C-0029"]},
+    {"from": "E-0100", "to": "E-0104", "relation": "implements", "claim_ids": ["t002-C-0032", "t002-C-0033"]},
+    {"from": "E-0095", "to": "E-0107", "relation": "implements", "claim_ids": ["t002-C-0021", "t002-C-0022"]},
+    {"from": "E-0096", "to": "E-0104", "relation": "implements", "claim_ids": ["t002-C-0004"]},
+    {"from": "E-0097", "to": "E-0104", "relation": "implements", "claim_ids": ["t002-C-0005"]},
+    {"from": "E-0098", "to": "E-0104", "relation": "implements", "claim_ids": ["t002-C-0006"]},
+
+    {"from": "E-0005", "to": "E-0047", "relation": "requires", "claim_ids": ["codebase-C-0053", "codebase-C-0054", "codebase-C-0069"]},
+    {"from": "E-0005", "to": "E-0048", "relation": "requires", "claim_ids": ["codebase-C-0055", "codebase-C-0097"]},
+    {"from": "E-0005", "to": "E-0110", "relation": "implements", "claim_ids": ["codebase-C-0055", "codebase-C-0097"]},
+    {"from": "E-0005", "to": "E-0105", "relation": "requires", "claim_ids": ["t002-C-0025"]},
+    {"from": "E-0005", "to": "E-0095", "relation": "requires", "claim_ids": ["t002-C-0022"]},
+    {"from": "E-0005", "to": "E-0054", "relation": "requires", "claim_ids": ["codebase-C-0055", "codebase-C-0097"]},
+    {"from": "E-0005", "to": "E-0055", "relation": "requires", "claim_ids": ["codebase-C-0079"]},
+    {"from": "E-0005", "to": "E-0051", "relation": "implements", "claim_ids": ["codebase-C-0057"]},
+
+    {"from": "E-0007", "to": "E-0050", "relation": "requires", "claim_ids": ["codebase-C-0056", "codebase-C-0057", "codebase-C-0098"]},
+    {"from": "E-0007", "to": "E-0067", "relation": "implements", "claim_ids": ["codebase-C-0057", "codebase-C-0098", "codebase-C-0100"]},
+    {"from": "E-0007", "to": "E-0051", "relation": "implements", "claim_ids": ["codebase-C-0057", "codebase-C-0060"]},
+    {"from": "E-0012", "to": "E-0007", "relation": "requires", "claim_ids": ["codebase-C-0058", "codebase-C-0059", "codebase-C-0100"]},
+    {"from": "E-0012", "to": "E-0052", "relation": "requires", "claim_ids": ["codebase-C-0059"]},
+    {"from": "E-0012", "to": "E-0055", "relation": "requires", "claim_ids": ["codebase-C-0059"]},
+
+    {"from": "E-0069", "to": "E-0041", "relation": "implements", "claim_ids": ["codebase-C-0115"]},
+    {"from": "E-0069", "to": "E-0027", "relation": "requires", "claim_ids": ["codebase-C-0070", "codebase-C-0115", "codebase-C-0116"]},
+    {"from": "E-0014", "to": "E-0041", "relation": "implements", "claim_ids": ["codebase-C-0115"]},
+    {"from": "E-0052", "to": "E-0041", "relation": "implements", "claim_ids": ["codebase-C-0115"]},
+    {"from": "E-0053", "to": "E-0041", "relation": "implements", "claim_ids": ["codebase-C-0115"]},
+    {"from": "E-0054", "to": "E-0041", "relation": "implements", "claim_ids": ["codebase-C-0115"]},
+    {"from": "E-0056", "to": "E-0041", "relation": "implements", "claim_ids": ["codebase-C-0115"]},
+    {"from": "E-0057", "to": "E-0041", "relation": "implements", "claim_ids": ["codebase-C-0115"]},
+    {"from": "E-0058", "to": "E-0041", "relation": "implements", "claim_ids": ["codebase-C-0115"]},
+
+    {"from": "E-0001", "to": "E-0052", "relation": "requires", "claim_ids": ["codebase-C-0013", "codebase-C-0075"]},
+    {"from": "E-0002", "to": "E-0052", "relation": "requires", "claim_ids": ["codebase-C-0034"]},
+    {"from": "E-0003", "to": "E-0052", "relation": "requires", "claim_ids": ["codebase-C-0029"]},
+    {"from": "E-0004", "to": "E-0053", "relation": "requires", "claim_ids": ["codebase-C-0109"]},
+
+    {"from": "E-0074", "to": "E-0029", "relation": "conflicts_with", "claim_ids": ["codebase-C-0110"]},
+    {"from": "E-0049", "to": "E-0029", "relation": "conflicts_with", "claim_ids": ["codebase-C-0110"]}
+  ]
+}

@@ -1,0 +1,230 @@
+{
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "stage": "synthesis",
+  "step": "framing",
+  "generated": "2026-05-26T00:00:00Z",
+  "framing_notes": {
+    "scope_inference": "Manifest not present at expected path; orchestrator prompt supplied the full decision set (U-1..U-8 plus two Discovery-surfaced questions). Treated as 'broad' scope: ten decision frames covering the central design questions with no padding from passthrough-unverified claims.",
+    "verdict_integrity": "All claim_cluster_ids drawn exclusively from the 20 verified claims plus codebase-C-0111 (single_sourced, flagged in risks per invariant 5). The 180 passthrough-unverified claims are referenced only as context where the relevant entity already carries a verified claim.",
+    "house_classification": "Per the orchestrator's framing guidance — every decision in this corpus is LOCAL (component or service blast radius) and REVERSIBLE (two-way). None of them are one-way doors. None require ADRs by the routing rule: at most one of the three ADR-worthiness conditions is met (reversibility=two_way for all; blast_radius<service for all; cross-team coordination = no, the same designer pool owns the lot). They are all 'implementation' decisions in the framer's taxonomy — pipeline-internal mechanism choices."
+  },
+  "decisions": [
+    {
+      "id": "D-0001",
+      "title": "Set FR-1's blocking-severity set and pick its execution site (in-agent vs out-of-agent)",
+      "context": "FR-1 is the verdict-vs-findings parity guard: if a reviewer emits APPROVED but a finding carries severity:BLOCKER (or equivalent), the inconsistency is supposed to be caught and surfaced. Two sub-questions are open. (1) Which severity tokens count as blocking — at minimum BLOCKER, plausibly also MAJOR depending on whether MAJOR should be allowed to coexist with APPROVED. (2) Where the check runs: inside each reviewer agent (the agent self-validates before emitting), or out-of-agent (a hook/gate script downstream of the agent inspects the emitted JSON). Today the canonical severity tokens are BLOCKER/MAJOR/MINOR/NIT and the deterministic mapping (canonical-severity → verdict) is documented in the codebase but not enforced.",
+      "claim_cluster_ids": [
+        "codebase-C-0016", "codebase-C-0017", "codebase-C-0018", "codebase-C-0019", "codebase-C-0020"
+      ],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": {"reach": 7, "impact": 2.0, "confidence": 0.8, "effort": 1.0},
+      "options_summary": [
+        "Blocking set = {BLOCKER} only; check runs out-of-agent (hook on emitted JSON) — recommended for minimum scope and centralized enforcement",
+        "Blocking set = {BLOCKER, MAJOR}; check runs out-of-agent — broader catch but redefines what 'APPROVED with MAJOR finding' means today",
+        "Blocking set = {BLOCKER}; check runs in-agent (each reviewer self-validates) — closer to the source but multiplies the implementation surface by seven agents"
+      ],
+      "risks": [
+        "Substantiated by verified claim C-0018: nothing in execute-task-quality-handler's contract today prevents APPROVED + severity:BLOCKER co-occurrence, so the failure mode is real",
+        "If MAJOR is included in the blocking set, every existing APPROVED-with-MAJOR-finding output in the historical corpus would retroactively be 'inconsistent' — needs scoping decision",
+        "In-agent implementation means seven agents need parallel edits (shared-document-reviewer, review-architecture-auditor, review-cross-artifact-auditor, execute-phase-quality-reviewer, execute-task-quality-handler, finalize-deliverable-packager, synth-critic); the central-hook option avoids this multiplication"
+      ]
+    },
+    {
+      "id": "D-0002",
+      "title": "Decide FR-1's reviewer-scope inclusion: execute-task-quality-handler and finalize-deliverable-packager",
+      "context": "U-1 is whether FR-1's parity guard covers two additional agents beyond the obvious core. execute-task-quality-handler is a STRONG candidate — it emits status APPROVED|NEEDS_REVISION|STUB_DETECTED|BLOCKER alongside a findings array carrying domain/severity/source_activity/file_path/message, and verified claim C-0018 shows nothing prevents the contradiction FR-1 targets. finalize-deliverable-packager is a MODERATE candidate — it emits verdict PASS|BLOCK|REVIEW and chains reviewer_findings from a doc_type:DeliverableArchive invocation of shared-document-reviewer. If the upstream reviewer already passed FR-1, re-checking at the packager is redundant work.",
+      "claim_cluster_ids": [
+        "codebase-C-0016", "codebase-C-0017", "codebase-C-0018", "codebase-C-0019", "codebase-C-0020"
+      ],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": {"reach": 2, "impact": 1.0, "confidence": 0.8, "effort": 0.5},
+      "options_summary": [
+        "Include execute-task-quality-handler; exclude finalize-deliverable-packager (chain-trusts upstream FR-1) — recommended",
+        "Include both — defense-in-depth at the cost of redundant validation",
+        "Include neither — punts the genuine gap in execute-task-quality-handler and is hard to justify given C-0018"
+      ],
+      "risks": [
+        "Excluding finalize-deliverable-packager relies on the assumption that shared-document-reviewer's prior FR-1 pass is preserved through the chained pass-through; if a future refactor breaks that chain, the redundancy was actually load-bearing",
+        "Including execute-task-quality-handler is well-substantiated; the only risk is timing — FR-1 should run on the emitted JSON, not mid-execution"
+      ]
+    },
+    {
+      "id": "D-0003",
+      "title": "Locate FR-2's dispatch self-check and name the single-agent-fallback configuration surface",
+      "context": "FR-2 self-checks that, when the pipeline is configured to fall back to single-agent execution, that fallback is consistent across artifacts. Two open sub-questions. (1) Where the check runs: a Claude Code hook, the orchestrator agent's own logic, or a separate gate script. (2) How 'single-agent fallback configuration' is identified — today it is implicit in checkpoint.execution_mode='parent-driven-workaround' (a historical fallback marker) rather than a named config surface. Also: scope_class is read exactly once in recipe-feature-pipeline (verified line 350; the file labels its containing step 'Stage 13 Deliverable Packaging' though the PRD referred to it as Stage 12 — a stale stage-number mismatch flagged by the Critic). FR-2 needs scope_class at orchestrator-entry, well before line 350, so either the read hoists to the top of the orchestrator or it duplicates with a guard.",
+      "claim_cluster_ids": [
+        "codebase-C-0028", "codebase-C-0029"
+      ],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": {"reach": 5, "impact": 1.5, "confidence": 0.8, "effort": 1.5},
+      "options_summary": [
+        "Hoist scope_class read to orchestrator entry; self-check runs as orchestrator-internal logic; surface checkpoint.execution_mode='parent-driven-workaround' explicitly as the fallback config name — recommended (single-read pattern; no duplication)",
+        "Duplicate the scope_class read at orchestrator entry (keep the line-350 read as-is); self-check runs as a Claude Code hook on dispatch — defensive but introduces two read sites",
+        "Add a separate gate script invoked by the orchestrator; promotes 'single-agent-fallback' to a named config field — heaviest option, useful only if the configuration surface is expected to grow"
+      ],
+      "risks": [
+        "The 'Stage 12 vs Stage 13' label mismatch in the PRD is a small stale-citation issue (Critic flagged); the line-number citation (350) is the authoritative one — design-claude-code should cite the line, not the stage",
+        "Hoisting the scope_class read changes when the read happens; any downstream code that implicitly assumed late reading needs re-verification (gitnexus_impact-style audit recommended)",
+        "Naming 'parent-driven-workaround' as a first-class config surface canonicalizes a historical workaround; if the workaround was intended to be temporary this entrenches it"
+      ]
+    },
+    {
+      "id": "D-0004",
+      "title": "Choose FR-3's parity algorithm and ADR row normalization for .mcp.json ↔ ADR-0041",
+      "context": "FR-3 audits parity between the live .mcp.json (six servers as of 2026-05-24) and ADR-0041's per-server install-mechanism table (seven rows — still contains mcp-openapi-schema). Open: how to compare the two sources. Two axes. (1) Match shape: exact-string match on the command field vs canonicalized form (whitespace-normalized, variable-expanded). (2) Env-var indirection: ADR-0041 cites versions via ${VAR} placeholders; the live config also uses env-var indirection. The normalization rule must decide whether ${VAR} matches ${VAR} as a string (string-equal) or whether both sides resolve to the same expanded value (resolve-and-compare).",
+      "claim_cluster_ids": [
+        "codebase-C-0038", "codebase-C-0041"
+      ],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": {"reach": 6, "impact": 1.5, "confidence": 0.8, "effort": 1.0},
+      "options_summary": [
+        "Canonicalize both sides (whitespace-normalize, leave ${VAR} as opaque tokens, string-equal) — recommended: simplest, reproducible, doesn't depend on environment state",
+        "Resolve both sides against current env then string-equal — catches more drift but couples the audit to environment, makes test fixtures brittle",
+        "Exact-string match with no normalization — fragile to whitespace and ordering differences in either source"
+      ],
+      "risks": [
+        "Canonicalized comparison won't catch the case where ADR-0041 and .mcp.json reference different env-var names that happen to resolve to the same value — accepted as out-of-scope drift for a MINOR feature",
+        "ADR-0041 is currently at v1.0.1; if the table format changes, the canonicalizer needs maintenance"
+      ]
+    },
+    {
+      "id": "D-0005",
+      "title": "Handle the deprecated mcp-openapi-schema row in FR-3 — in-rule marker, ADR amendment, or audit allowlist",
+      "context": "ADR-0041 still lists mcp-openapi-schema as one of seven invocation rows; .mcp.json removed it on 2026-05-24 (verified directly — six servers remain). A naive symmetric-difference parity audit would flag this as a BLOCKER on day one — a false positive that would make FR-3 noisy out of the gate. Three sub-options surface. (a) Add an in-rule deprecation-marker convention to the audit script (e.g., a row prefixed with [DEPRECATED] is treated as expected-absent). (b) Amend ADR-0041 to remove the row — but the feature scope carved this out as 'no ADR edits'. (c) Add the server name to an audit allowlist. The codebase's stated posture (verified via CLAUDE.md line 9 and corroborated by KB-mcp-platform's own stale-doc tolerance) explicitly tolerates stale references in design-time docs, which aligns with option (a).",
+      "claim_cluster_ids": [
+        "codebase-C-0038", "codebase-C-0041", "codebase-C-0105", "codebase-C-0110", "codebase-C-0111", "codebase-C-0112"
+      ],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": {"reach": 6, "impact": 2.0, "confidence": 0.8, "effort": 0.5},
+      "options_summary": [
+        "Option (a) — in-rule deprecation-marker convention: ADR-0041 rows tagged [DEPRECATED] are expected-absent in .mcp.json. Recommended — matches the project's already-demonstrated stale-doc tolerance and stays inside the carve-out (no ADR edits)",
+        "Option (b) — amend ADR-0041 to drop the row. Rejected by scope: feature explicitly carves out ADR edits. Would also force ADRs to be living documents in a way the project's append-only posture (ADR-0005) resists",
+        "Option (c) — audit-script allowlist of expected-absent servers. Rejected as the inferior form of (a): allowlists drift silently; in-rule markers are self-documenting at the source"
+      ],
+      "risks": [
+        "Decision rests partly on a single-sourced generalization claim (C-0111): the project's stale-doc tolerance is established from N=1 observation (mcp-openapi-schema itself). The pattern may not generalize, but the immediate decision still holds since the immediate case IS that observation",
+        "In-rule markers in ADRs blur the line between 'append-only architectural decisions' and 'living config' — needs a clear convention statement to avoid drift"
+      ]
+    },
+    {
+      "id": "D-0006",
+      "title": "Pick FR-4's GitNexus dry-run exit-code contract and on-failure diagnostic message",
+      "context": "FR-4 adds a dry-run probe that confirms GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 is doing what it claims at v1.6.5. Verified evidence: the env-var's contract is strict ('=== 1' comparison) and lives in scripts/build-tree-sitter-dart.cjs and scripts/build-tree-sitter-proto.cjs. Two observable signals are recommended together: signal 1 (stderr substring '[tree-sitter-{dart,proto}] Skipping build (GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1)') AND signal 3 (artifact-path absence under node_modules/.../build/Release/). Signal 1 has literal-string fragility — a regex 'GITNEXUS_SKIP_OPTIONAL_GRAMMARS.*[Ss]kip' is recommended over the full sentence. Critically: the dry-run must NOT assert anything about Swift via this env-var. The README claims env-var gates Swift; at v1.6.5 it doesn't — Swift's skip is governed by npm's optionalDependencies tolerance, an unrelated mechanism.",
+      "claim_cluster_ids": [
+        "t001-C-0001", "t001-C-0002", "t001-C-0003", "t001-C-0022", "t001-C-0033", "t001-C-0038"
+      ],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": {"reach": 4, "impact": 1.5, "confidence": 0.8, "effort": 1.0},
+      "options_summary": [
+        "Exit 0 iff signal 1 (regex stderr match for dart AND proto) AND signal 3 (build/Release artifacts absent for both); exit 1 otherwise. Diagnostic message names which signal failed and quotes the observed stderr fragment. Swift is excluded from assertions. Recommended — directly matches the verified contract",
+        "Exit on signal 3 alone — simpler but doesn't catch the case where the skip happens for the wrong reason (e.g., grammar already built but env-var ignored)",
+        "Exit on signal 1 alone — fragile to upstream wording changes and to non-deterministic stderr ordering"
+      ],
+      "risks": [
+        "DM-4 drift mode: if upstream loosens the '=== 1' comparison to truthy, signal-1 wording may still match while behavior subtly changes — accepted; signal 3 absence catches the load-bearing outcome",
+        "Asserting on Swift would be wrong per t001-C-0038 (README/code divergence in upstream); the script must not do this even though it's tempting from the README",
+        "Literal-string assertion (rather than regex) on stderr is brittle if upstream restyles the warning — t001-C-0040 (DM-1) explicitly recommends the regex form"
+      ]
+    },
+    {
+      "id": "D-0007",
+      "title": "Define FR-5's path-trigger set and execution environment (and pick the MCP-health-check invocation)",
+      "context": "FR-5 introduces the repo's first GitHub Actions workflow — a CI smoke that verifies devcontainer + MCP setup. Two design questions. (1) Path triggers: which file paths should fire it? Likely .devcontainer/**, .mcp.json, adrs/ADR-0041*, and the new audit_op*.py scripts. (2) Execution environment: a clean ubuntu-latest container, or the devcontainer image. Plus the path shift from T-002: the canonical Claude Code docs are silent on 'claude mcp list' exit-code behavior — verified by Findings 1, 2, and 8 of the t-002 note. The documented alternative is 'claude --bare -p \"<noop>\" --output-format stream-json | jq -c \"select(.type==\\\"system\\\" and .subtype==\\\"init\\\") | .mcp_servers[] | select(.status != \\\"connected\\\")\"' — depending on McpServerStatus enum values from the system/init SDK event.",
+      "claim_cluster_ids": [
+        "t002-C-0001", "t002-C-0002", "t002-C-0008"
+      ],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": {"reach": 8, "impact": 2.0, "confidence": 0.8, "effort": 2.0},
+      "options_summary": [
+        "Path triggers: .devcontainer/**, .mcp.json, adrs/ADR-0041*, .claude/skills/auditing-mcp/**. Execution: devcontainer image (same as developers' local environment). MCP health check: 'claude --bare -p ... | jq' SDK-event path. Recommended — runs in the environment under test and uses the documented path",
+        "Triggers same; execution in clean ubuntu-latest — closer to typical Actions practice but doesn't test the devcontainer that developers actually use",
+        "Triggers same; MCP health check via 'claude mcp list' exit code — rejected: depends on undocumented behavior per verified t002-C-0008"
+      ],
+      "risks": [
+        "Running the workflow inside the devcontainer image adds image-build time on every trigger; budget against NFR-3 (Codespaces designer owns that threshold)",
+        "The SDK-event path depends on stable McpServerStatus enum values across Claude Code versions; version pin discipline (v2.1.64/.111/.121/.144 documented) helps but isn't bulletproof",
+        "Path-trigger over-inclusion (e.g., adding adrs/** broadly) would fire the workflow on unrelated ADR edits — keep the trigger set narrow to ADR-0041*"
+      ]
+    },
+    {
+      "id": "D-0008",
+      "title": "Choose PR shape: single bundled PR vs five sequenced PRs",
+      "context": "U-6 asks whether the seven FRs ship as one bundled PR or as five sequenced PRs (one per FR group, with FR-6/FR-7 either bundled with their parents or as small standalones). The decision matters mostly for review ergonomics and rollback granularity, not for system architecture. There are no verified claims directly addressing this — it's a process/governance call.",
+      "claim_cluster_ids": [],
+      "class": "operational",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "commodity",
+      "rice": {"reach": 3, "impact": 0.5, "confidence": 0.5, "effort": 0.25},
+      "options_summary": [
+        "Single bundled PR — recommended: the seven FRs are tightly coupled (FR-1/FR-2 both touch the orchestrator surface; FR-3 and FR-5 both consume ADR-0041; FR-4 and FR-5 share the devcontainer smoke). Splitting creates artificial dependency edges between PRs",
+        "Five sequenced PRs (FR-1, FR-2, FR-3+FR-7, FR-4, FR-5+FR-6) — finer rollback granularity but each PR depends on the previous, so they sequence rather than parallelize",
+        "Two PRs: (FR-1, FR-2, FR-6, FR-7) review-gates first; (FR-3, FR-4, FR-5) infra second — middle-ground but the split isn't load-bearing"
+      ],
+      "risks": [
+        "No supporting verified claims; recommendation rests on process judgment rather than evidence. If the bundled PR turns out to be too large for review, sequenced is a clean fallback",
+        "User memory has previously confirmed bundled-PR preference for refactors in this area, but that's not in this corpus — Synthesizer should ask, not assume"
+      ]
+    },
+    {
+      "id": "D-0009",
+      "title": "Decide where the deferral-register update lives — deliverable archive or housekeeping commit",
+      "context": "U-7 asks whether FR-7's deferral-register update belongs alongside the feature deliverable archive or in a separate housekeeping commit. The deferral register at Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md tracks items deferred from the prior feature; FR-7 tightens its marker convention. The question is about commit hygiene, not function.",
+      "claim_cluster_ids": [],
+      "class": "operational",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "commodity",
+      "rice": {"reach": 2, "impact": 0.5, "confidence": 0.5, "effort": 0.1},
+      "options_summary": [
+        "Include in the deliverable archive commit — recommended: the marker tightening IS part of the feature's quality-gates deliverable; separating it loses the audit trail",
+        "Separate housekeeping commit — cleaner blame but fragments the feature's record",
+        "Defer to a follow-up housekeeping PR — risks the register never getting tightened (deferral-register debt is itself the problem FR-7 is solving)"
+      ],
+      "risks": [
+        "No supporting verified claims; pure process judgment",
+        "If the deferral-register update touches unrelated rows, those should split off — but FR-7's scope is the marker convention only, so this should be tight"
+      ]
+    },
+    {
+      "id": "D-0010",
+      "title": "Set concrete latency thresholds for NFR-1, NFR-2, NFR-3",
+      "context": "U-8 asks for concrete numeric thresholds on the three non-functional requirements: NFR-1 and NFR-2 (Claude Code designer owns — typically about hook/dispatch latency and per-reviewer self-check overhead) and NFR-3 (Codespaces designer owns — devcontainer-environment-related, likely workflow execution time or postCreate impact). No verified claim in the current corpus sets numbers; the thresholds are to be picked by the named designers as part of their design responses.",
+      "claim_cluster_ids": [],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": {"reach": 5, "impact": 1.0, "confidence": 0.5, "effort": 0.5},
+      "options_summary": [
+        "Designer-set thresholds with explicit measurement methodology (sample size, percentile, environment). Recommended — punting to the named designers is the right move; framer should not invent numbers",
+        "Use round-number defaults (e.g., NFR-1/2 < 200ms p95; NFR-3 < 60s p95) — placeholders only, to be revised once the designers measure"
+      ],
+      "risks": [
+        "No supporting verified claims for any number; setting thresholds without measurement is anti-pattern",
+        "Different environments (local Codespaces vs GitHub Actions runner) will hit different latency floors; thresholds must specify environment"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,276 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.2.0",
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "layer": "claude-code",
+  "design_doc": "working/feature/pipeline-quickwins-hardening-r1/cc-design.md",
+  "generated_at": "2026-05-26T00:00:00Z",
+  "generated_by": "design-cc",
+  "revision_note": "v0.2.0 — Gate-1 conditional-approval revision; resolves I-DR-001..008. See cc-design.md frontmatter revision_history for the per-issue summary.",
+
+  "depends_on": {
+    "layers": {
+      "codespaces": {
+        "kind": "soft",
+        "rationale": "FR-4 (GitNexus install dry-run) is owned by design-codespaces; the CC layer's mechanisms (FR-1/2/3) do not require FR-4 to ship but share the FR-6 actionable-diagnostic contract. The CC layer's diagnostic shape is JSON-direct-to-stdout; the Codespaces layer's diagnostic shape is the existing log_mcp_event helper plus [postCreate] stderr echo. The composer audits FR-6 cross-cutting consistency.",
+        "shared_artifacts": [
+          ".mcp.json (read-only consumed by OP-11 / FR-3; written by no CC-layer mechanism)"
+        ]
+      },
+      "cicd": {
+        "kind": "soft",
+        "rationale": "FR-5 (CI claude mcp list smoke) is owned by design-cicd. The CC layer's OP-11 rule (FR-3) is invocable from any python3 context, so the CI workflow MAY ALSO invoke it at PR time in addition to the Gate-6 invocation. That is design-cicd's call. The CC layer commits to OP-11 being a no-extra-setup invocation.",
+        "shared_artifacts": [
+          ".mcp.json (read-only consumed by both FR-3 OP-11 and FR-5 connectivity smoke)",
+          "adrs/ADR-0041-install-mechanism-hybrid.md (FR-3 reads its invocation table; FR-5 may optionally cross-check)"
+        ]
+      }
+    },
+    "adrs": [
+      "ADR-0017",
+      "ADR-0029",
+      "ADR-0033",
+      "ADR-0037",
+      "ADR-0039",
+      "ADR-0040",
+      "ADR-0041",
+      "ADR-0042",
+      "ADR-0043",
+      "ADR-0044",
+      "ADR-0005",
+      "ADR-0056"
+    ],
+    "kbs": [
+      "KB-cc-platform",
+      "KB-cc-design",
+      "KB-mcp-platform",
+      "KB-mcp-design",
+      "KB-review-disciplines",
+      "KB-documentation-criteria"
+    ],
+    "mcp_servers": []
+  },
+
+  "provides_to": {
+    "layers": {
+      "cicd": {
+        "kind": "optional-consumption",
+        "what": "OP-11 audit rule (audit_op11_adr_parity.py) is python3-invocable from the FR-5 CI workflow's runner if design-cicd wants to layer the parity check at PR time in addition to the Gate-6 invocation. The OP-11 rule is self-contained: it takes one positional argument (.mcp.json path) and reads ADR-0041 at a project-root-relative path. No new environment variables, no new credentials.",
+        "interface": {
+          "invocation": "python3 .claude/skills/auditing-mcp/scripts/audit_op11_adr_parity.py <path-to-.mcp.json>",
+          "exit_codes": {"0": "no findings", "1": "BLOCKER finding(s) present", "2": "internal error"},
+          "stdout_shape": "JSON {rule, name, target, findings[], servers_checked, adr_servers_recognized, deprecated_rows_skipped}"
+        }
+      }
+    },
+    "future_features": {
+      "design-realization-audit-dimension": {
+        "kind": "extension-point",
+        "what": "The OP-11 rule is the first OP rule that consumes a markdown ADR (rather than .mcp.json alone). A future feature that lifts the broader design-realization audit dimension (currently in the PRD's Won't-Have list) can either reuse OP-11's inline ADR-table parser or refactor it out to auditing-shared/. Q-CC-3 surfaces this decision."
+      },
+      "verdict-parity-broader-severity-set": {
+        "kind": "extension-point",
+        "what": "The FR-1 validator's blocking-severity set is {BLOCKER} only (per D-0001). A future feature can widen to {BLOCKER, MAJOR} if the strictness-over-ergonomics tiebreaker calls for it — the validator's per-agent contract table is the single edit point."
+      }
+    }
+  },
+
+  "new_artifacts": [
+    {
+      "path": ".claude/skills/auditing-shared/scripts/verdict_findings_parity.py",
+      "type": "python-script",
+      "purpose": "FR-1 verdict-vs-findings parity validator",
+      "consumers": ["recipe-feature-pipeline (orchestrator skill, at 9 reviewer-completion invocation sites across the 5 reviewer-shaped agents in scope per D-0002)"],
+      "invocation_contract": {
+        "args": ["<reviewer-output.json>", "<agent-name>"],
+        "exit_codes": {"0": "no parity violation", "1": "parity violation", "2": "internal error"},
+        "stdout": "JSON {mechanism, agent, verdict, blocking_findings, diagnostic, remediation}"
+      }
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/scripts/audit_op11_adr_parity.py",
+      "type": "python-script",
+      "purpose": "FR-3 .mcp.json ↔ ADR-0041 invocation parity audit rule",
+      "consumers": ["auditing-mcp/scripts/audit_mcp.py coordinator", "Gate-6 audit dispatch per ADR-0043"],
+      "invocation_contract": {
+        "args": ["<path-to-.mcp.json>"],
+        "exit_codes": {"0": "no findings", "1": "BLOCKER finding(s)", "2": "internal error"},
+        "stdout": "JSON {rule, name, target, findings[], servers_checked, adr_servers_recognized, deprecated_rows_skipped}"
+      }
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/references/adr-parity.md",
+      "type": "markdown-reference",
+      "purpose": "FR-3 rationale + canonicalization rules + [DEPRECATED] marker convention",
+      "consumers": ["reviewers triaging an OP-11 finding"]
+    }
+  ],
+
+  "modified_artifacts": [
+    {
+      "path": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "changes": [
+        "Hoist scope_class read from line 350 (Step 14 / Stage 13) to after Stage 1 (intent-clarification.md exists)",
+        "Add dispatch self-check at orchestrator entry (FR-2): refuse FULL-scope + parent-driven-workaround configuration",
+        "Wire verdict_findings_parity.py invocation at 9 reviewer-completion invocation sites (FR-1) across the 5 reviewer-shaped agents in scope per D-0002: 5 shared-document-reviewer points + Stage 8 architecture auditor + Stage 11 cross-artifact auditor + T7 phase-quality-reviewer + T2 execute-task-quality-handler",
+        "Promote checkpoint.execution_mode as a first-class documented field on checkpoint.json schema with canonical enum {specialist-dispatch, parent-driven-workaround} (new schema field — not a rename; existing checkpoints without the field are treated as specialist-dispatch on resume)",
+        "Update shared-document-reviewer Invocation Points table to note the verdict-parity validator runs after each invocation"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/SKILL.md",
+      "changes": [
+        "Add row 11 to the Routing-table dimensions table: 'ADR-0041 invocation parity' → references/adr-parity.md",
+        "Update pedagogical_sections frontmatter to register references/adr-parity.md with its justification"
+      ]
+    },
+    {
+      "path": "adrs/ADR-0041-install-mechanism-hybrid.md",
+      "changes": [
+        "Append inline marker [DEPRECATED — removed 2026-05-24] at end of Server cell for row 71 (mcp-openapi-schema). This is an annotation, not a decision-text rewrite; the row's invocation form prescription is preserved verbatim. Justified at length in cc-design.md §FR-3."
+      ]
+    },
+    {
+      "path": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "changes": [
+        "Verify (and tighten if needed) the existing adoption parentheticals on rows B-1 (line 56) and H-4 (line 141). Canonical form: *(ADOPTED 2026-05-25 by pipeline-quickwins-hardening-r1 — see Issues/cross-artifact-divergence-detection-gap/proposal.md)*. Per codebase-analysis the parentheticals are already present; FR-7 confirms text-exact match."
+      ]
+    },
+    {
+      "path": "CLAUDE.md",
+      "changes": [
+        "Single counter update: 'MCP audit ruleset (OP-1..OP-10)' → 'MCP audit ruleset (OP-1..OP-11)' in the Deeper-reference table. No new sentence; no new rationale line."
+      ]
+    }
+  ],
+
+  "unchanged_by_design": {
+    ".claude/agents/*.md": "No frontmatter changes; no body changes. The 5 reviewer-shaped agents in scope per D-0002 (shared-document-reviewer, review-architecture-auditor, review-cross-artifact-auditor, execute-phase-quality-reviewer, execute-task-quality-handler) keep their existing model/effort/tools/skills/memory.",
+    ".claude/settings.json": "No permission policy changes. Bash(python3 *) is already in the allowlist for the agents that consume the new scripts.",
+    ".mcp.json": "Read-only consumed by FR-3 / OP-11; not perturbed by any CC-layer mechanism.",
+    "sub-agent allowlists": "Per ADR-0040 / NFR-15: no changes to the seven sub-agents with mcp__* allowlist entries.",
+    ".claude/runtime/mcp-events.jsonl": "Per NFR-13: no CC-layer mechanism writes to this file. The audit-script family does not emit MCP events."
+  },
+
+  "diagnostics_contract_fr_6": {
+    "mechanisms_owned": [
+      {
+        "mechanism_name": "verdict-findings-parity",
+        "owner": "FR-1 (CC layer)",
+        "format": "JSON {mechanism, agent, verdict, blocking_findings[], diagnostic, remediation}",
+        "fr_6_field_mapping": {
+          "mechanism_name": "mechanism field",
+          "offending_artifact_path": "echoed in diagnostic field (reviewer-output JSON path passed as positional arg)",
+          "rule_violated": "diagnostic field (cites the per-agent verdict/severity contract)",
+          "remediation_hint": "remediation field"
+        }
+      },
+      {
+        "mechanism_name": "dispatch-self-check",
+        "owner": "FR-2 (CC layer)",
+        "format": "orchestrator-surface JSON (exact field set documented in cc-design.md §FR-2)",
+        "fr_6_field_mapping": {
+          "mechanism_name": "literal string 'dispatch-self-check'",
+          "offending_artifact_path": "checkpoint.json path + stage names of stages with execution_mode=parent-driven-workaround",
+          "rule_violated": "FULL-scope dispatch with single-agent-fallback configuration",
+          "remediation_hint": "two-option canonical hint (reconfigure to specialist-dispatch; or downgrade scope_class)"
+        }
+      },
+      {
+        "mechanism_name": "OP-11 / adr-parity",
+        "owner": "FR-3 (CC layer)",
+        "format": "JSON {rule, name, target, findings[], servers_checked, adr_servers_recognized, deprecated_rows_skipped} (uniform with OP-1..OP-10)",
+        "fr_6_field_mapping": {
+          "mechanism_name": "rule field ('OP-11') + name field ('adr-parity')",
+          "offending_artifact_path": "target field (.mcp.json path) + per-finding server field",
+          "rule_violated": "per-finding diff_dimension and message fields",
+          "remediation_hint": "per-finding remediation field"
+        }
+      }
+    ]
+  },
+
+  "decisions_resolved": {
+    "U-1": "FR-1 blocking-severity set = {BLOCKER} only. Execution site = out-of-agent validator. (D-0001)",
+    "U-2": "FR-2 self-check lives in orchestrator-internal logic at orchestrator entry (refined: immediately after Stage 1 completes — see Q-CC-6 for D-0003 refinement note). scope_class read hoisted from line 350 to post-Stage-1. checkpoint.execution_mode introduced as a first-class documented field (NEW schema surface, not a rename), with parent-driven-workaround canonicalized as the named single-agent-fallback config surface. (D-0003, refined)",
+    "U-3": "FR-3 comparison algorithm = canonicalize whitespace + opaque ${VAR} tokens + string-equal. Deprecated-row handling = in-rule [DEPRECATED] marker on ADR-0041 row 71. (D-0004, D-0005)",
+    "U-7": "FR-7 update lives in the deliverable archive commit (recommended; defer to composer per D-0009).",
+    "U-8 (NFR-1, NFR-2 portion)": "Concrete latency thresholds set: NFR-1 verdict-parity validator p95 ≤ 250 ms; NFR-2 dispatch self-check p95 ≤ 100 ms; OP-11 audit rule p95 ≤ 300 ms total. Methodology documented in cc-design.md against the existing OP-1 / checkpoint-write latency floor."
+  },
+
+  "decisions_deferred_to_composer": {
+    "D-0008 (PR shape)": "Recommended: single bundled PR. The CC layer's mechanisms (FR-1/2/3/7) all touch recipe-feature-pipeline/SKILL.md or its adjacent skills, so they are tightly coupled at the implementation surface. Flagged for user confirmation per synthesis. (Q-CC-4)",
+    "D-0009 (deferral-register placement)": "Recommended: deliverable archive commit. Pure process judgment per synthesis. (Q-CC-5)"
+  },
+
+  "open_items": [
+    {
+      "id": "OI-CC-1",
+      "description": "The exact SKILL.md diff for FR-1 wire-in (9 distinct invocation sites across the 5 reviewer-shaped agents in scope per D-0002: 5 shared-document-reviewer points + Stage 8 architecture-auditor + Stage 11 cross-artifact-auditor + T7 phase-quality-reviewer + T2 execute-task-quality-handler) is mechanical but voluminous; the Plan author owns the exact line edits. This design specifies the intent, not the line numbers."
+    },
+    {
+      "id": "OI-CC-2",
+      "description": "OP-11's dependency on ADR-0041 table format stability is a known refactor-watch item. Recommend a tiny fixture-driven smoke test under .claude/skills/auditing-mcp/tests/op11_smoke/ so a future ADR table-format change is caught at audit time."
+    },
+    {
+      "id": "OI-CC-3",
+      "description": "Composer should CoVe-check that no other ADR contradicts the parent-driven-workaround naming canonicalization (per D-0003 risks-accepted)."
+    },
+    {
+      "id": "OI-CC-4",
+      "description": "Cosmetic Stage-12-vs-Stage-13 drift in SKILL.md is acknowledged but explicitly excluded from this carve-out. Track as future housekeeping."
+    },
+    {
+      "id": "OI-CC-5",
+      "description": "After FR-1 lands, recipe-feature-pipeline SKILL.md's 'shared-document-reviewer Invocation Points' table should be augmented with a footnote noting the verdict-parity validator runs after each invocation. Plan author owns placement."
+    }
+  ],
+
+  "architectural_questions": [
+    {
+      "id": "Q-CC-1",
+      "summary": "Elevate FR-1 validator to a Gate-7 hard gate, or keep as inline orchestrator-step rejection?",
+      "recommendation": "Inline rejection (status quo) for this carve-out; defer gate-elevation to a future feature."
+    },
+    {
+      "id": "Q-CC-2",
+      "summary": "Lift [DEPRECATED] marker convention from ADR-0041 to a project-wide ADR-row-status convention, or keep ADR-0041-only?",
+      "recommendation": "Keep ADR-0041-only for this carve-out; lift in a future feature if other ADR tables develop the same shape (per synthesis calibration note on codebase-C-0111)."
+    },
+    {
+      "id": "Q-CC-3",
+      "summary": "Inline ADR-table parser in OP-11, or extract to auditing-shared/scripts/ for future reuse?",
+      "recommendation": "Inline for this carve-out; lift to shared utility when the broader design-realization audit dimension lands."
+    },
+    {
+      "id": "Q-CC-4",
+      "summary": "Cross-layer: D-0008 PR shape (single bundled vs sequenced).",
+      "recommendation": "Single bundled PR — CC layer's mechanisms are tightly coupled at recipe-feature-pipeline/SKILL.md. Defer final call to composer."
+    },
+    {
+      "id": "Q-CC-5",
+      "summary": "Cross-layer: D-0009 deferral-register placement (deliverable archive vs separate housekeeping commit).",
+      "recommendation": "Deliverable archive commit. Defer final call to composer."
+    },
+    {
+      "id": "Q-CC-6",
+      "summary": "Refinement of synthesis D-0003: hoist scope_class read to 'earliest point at which scope_class is available — immediately after Stage 1 completes' rather than literal 'orchestrator entry' (data-dependency: scope_class is itself a Stage-1 output).",
+      "recommendation": "Composer accepts the post-Stage-1 refinement and treats it as the operative D-0003 reading. Alternative: composer amends D-0003 wording to match."
+    }
+  ],
+
+  "self_review": {
+    "all_subsections_present": true,
+    "every_ac_in_ears_format": true,
+    "every_primitive_has_lowest_cost_justification": true,
+    "claude_md_changes_minimal": "Single counter-update only (OP-1..OP-10 → OP-1..OP-11); no new sentence, no duplicated rationale per Principle 5",
+    "path_gating_used_where_applicable": "N/A — no new rules; path-gating is the rule-design principle. Audit scripts are not path-gated artifacts.",
+    "permission_policy_documented": true,
+    "q_cc_n_items_complete": true,
+    "no_adr_authored": true,
+    "no_design_beyond_prd_scope": true,
+    "no_subagent_added": true,
+    "no_hook_added": "yes — explicitly justified per Principles 1 and 3",
+    "no_plugin_added": true
+  }
+}

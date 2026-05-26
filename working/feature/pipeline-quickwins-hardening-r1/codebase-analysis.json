@@ -1,0 +1,623 @@
+{
+  "schema_version": "1.1.0",
+  "pipeline_run_id": "pipeline-quickwins-hardening-r1",
+  "generated_at": "2026-05-25T00:00:00Z",
+  "extraction_method": "mixed",
+  "extraction_notes": "Direct filesystem reads + git history (`git log -S`, `git log -p`) + ripgrep for symbol/string occurrences. GitNexus MCP was preferred per ADR-0007 v2.x, but for an indexed feature-pipeline repo dominated by Markdown agent contracts, shell scripts, Python audit modules, and JSON config (no large compiled-language symbol surface), direct Read/Grep is the higher-fidelity path. Where blast-radius queries would have used Cypher in a service-style repo, here the dependents are reviewer-callers in the parent orchestrator skill (one file) — grep against that single file gives ground truth.",
+  "scope": {
+    "repo": "feature-pipeline",
+    "branch": "main",
+    "commit": "8988be2",
+    "paths": [
+      ".claude/agents/shared-document-reviewer.md",
+      ".claude/agents/review-architecture-auditor.md",
+      ".claude/agents/review-cross-artifact-auditor.md",
+      ".claude/agents/execute-phase-quality-reviewer.md",
+      ".claude/agents/execute-orchestrator.md",
+      ".claude/agents/finalize-deliverable-packager.md",
+      ".claude/agents/execute-task-quality-handler.md",
+      ".claude/agents/finalize-reconciler.md",
+      ".claude/agents/synth-critic.md",
+      ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      ".claude/skills/auditing-mcp/",
+      ".mcp.json",
+      ".devcontainer/postCreate.sh",
+      ".devcontainer/versions.env",
+      ".devcontainer/devcontainer.json",
+      ".devcontainer/lib/log-mcp-event.sh",
+      ".github/workflows/",
+      "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "Issues/cross-artifact-divergence-detection-gap/proposal.md",
+      "adrs/ADR-0041-install-mechanism-hybrid.md"
+    ]
+  },
+  "components": [
+    {
+      "name": "shared-document-reviewer",
+      "path": ".claude/agents/shared-document-reviewer.md",
+      "layer": "cc",
+      "language": "markdown-agent-contract",
+      "framework": "Claude Code sub-agent",
+      "entry_points": ["doc_type: IntentClarification|PRD|DesignDoc|Plan|DeliverableArchive (5 invocation points per ADR-0017)"],
+      "dependencies": ["KB-review-disciplines", "auditing-shared/scripts/validate_pipeline_frontmatter.py"],
+      "notes": "Single largest reviewer in the project (26.7KB). Emits a structured verdict object at line 196 of its body, plus severity-tagged findings. Verdict-finding shape varies by doc_type — see report for the per-doc_type variants. Gate-0 mechanical validator dispatched via auditing-shared scripts; Gate-1 quality checks layered above it. The PRD's named subject for FR-1."
+    },
+    {
+      "name": "review-architecture-auditor",
+      "path": ".claude/agents/review-architecture-auditor.md",
+      "layer": "cc",
+      "language": "markdown-agent-contract",
+      "framework": "Claude Code sub-agent",
+      "entry_points": ["Stage 8 Architecture Audit (after shared-document-reviewer passes the Blueprint at Gate 4)"],
+      "dependencies": ["KB-review-disciplines", "GitNexus MCP", "codebase-memory-mcp (fallback)"],
+      "notes": "Emits a verdict from {fail, conditional_pass, pass} at line 129. Severity-to-verdict mapping is explicit at lines 135-137: BLOCKER→fail, MAJOR→conditional_pass, MINOR/INFO→pass. Output: architecture-audit-issues.json. The PRD's named subject for FR-1."
+    },
+    {
+      "name": "review-cross-artifact-auditor",
+      "path": ".claude/agents/review-cross-artifact-auditor.md",
+      "layer": "cc",
+      "language": "markdown-agent-contract",
+      "framework": "Claude Code sub-agent",
+      "entry_points": ["Stage 11 Cross-Artifact Audit (after Test Authoring; auditor-driven, no human gate)"],
+      "dependencies": ["KB-review-disciplines", "auditing-shared"],
+      "notes": "Emits a verdict from {fail, conditional_pass, pass, hard_capped} at line 148. Also emits a separate 'convergence' verdict ({converging, stalling, diverging, first_round}) at line 136 — this is structurally a second verdict in the same output payload. Severity rules deterministic; hard-cap triggers at round_number≥4 regardless of issue count. The PRD's named subject for FR-1."
+    },
+    {
+      "name": "execute-phase-quality-reviewer",
+      "path": ".claude/agents/execute-phase-quality-reviewer.md",
+      "layer": "cc",
+      "language": "markdown-agent-contract",
+      "framework": "Claude Code sub-agent",
+      "entry_points": ["T7 transition (per_task_approved → phase_quality_active; once per phase after all tasks APPROVED)"],
+      "dependencies": ["KB-cc-design", "ai-development-guide", "auditing-shared/scripts/run_phase_checks.py"],
+      "notes": "Emits a 5-dimensional verdict per Contract 2 of execution-pipeline-design-r1 Blueprint v5. Verdict enum: {PASS, NEEDS_RECONCILIATION, BLOCKER}. Findings array adjacent at line 44. PRD's named subject for FR-1. Per ADR-0033 surfaces Scope-Deviations as a fifth dimension."
+    },
+    {
+      "name": "finalize-deliverable-packager",
+      "path": ".claude/agents/finalize-deliverable-packager.md",
+      "layer": "cc",
+      "language": "markdown-agent-contract",
+      "framework": "Claude Code sub-agent",
+      "entry_points": ["Deliverable Packaging stage (v4.5.0+)"],
+      "dependencies": ["KB-documentation-criteria", "KB-review-disciplines", "shared-document-reviewer (doc_type: DeliverableArchive)"],
+      "notes": "REVIEWER-SHAPED beyond the four PRD-named agents. Emits a verdict enum {PASS, BLOCK, REVIEW} at line 81 of its body. Adjacent fields: artifacts_present, artifacts_missing_required, artifacts_missing_conditional_unjustified, artifacts_unexpected, adr_cross_location_findings, reviewer_findings. The reviewer_findings field aggregates the shared-document-reviewer's findings on the archive (a chain rather than a fresh emission), but the verdict is the packager's own — making this a candidate for FR-1 scope completeness (see scope_completeness_finding)."
+    },
+    {
+      "name": "execute-task-quality-handler",
+      "path": ".claude/agents/execute-task-quality-handler.md",
+      "layer": "cc",
+      "language": "markdown-agent-contract",
+      "framework": "Claude Code sub-agent",
+      "entry_points": ["T2 transition (per_task_active → quality_active; once per task after code-producer COMPLETED)"],
+      "dependencies": ["ai-development-guide", "KB-cc-design", "auditing-shared/scripts/detect_stubs.py"],
+      "notes": "REVIEWER-SHAPED beyond the four PRD-named agents. Emits a per-task verdict object (Contract 1 of execution-pipeline-design-r1 Blueprint v5). Status enum: {APPROVED, NEEDS_REVISION, STUB_DETECTED, BLOCKER}. Findings array at line 34 with severity {blocker, major, minor, info} and domain enumeration. Verdict_rationale field at line 46. The verdict-shape is the cleanest verdict+findings pair in the agent inventory — should be in FR-1 scope per the intent doc's framing."
+    },
+    {
+      "name": "synth-critic",
+      "path": ".claude/agents/synth-critic.md",
+      "layer": "cc",
+      "language": "markdown-agent-contract",
+      "framework": "Claude Code sub-agent",
+      "entry_points": ["Synthesis batch processing (one batch per invocation, parallel)"],
+      "dependencies": ["verification-knowledge"],
+      "notes": "Per-claim verdict enum: {verified, unverifiable, contradicted, single_sourced} at line 32-36. This is a verdict-per-claim shape (one batch → many verdicts inside a critique JSON), not a single overall verdict per invocation. The intent doc's framing 'verdict+findings pair' is plausibly interpretable to include or exclude this shape — surfaced for design-claude-code's scope decision."
+    },
+    {
+      "name": "finalize-reconciler",
+      "path": ".claude/agents/finalize-reconciler.md",
+      "layer": "cc",
+      "language": "markdown-agent-contract",
+      "framework": "Claude Code sub-agent",
+      "entry_points": ["Reconciliation stage; up to 4 cycles per ADR-0017"],
+      "dependencies": ["KB-review-disciplines"],
+      "notes": "Consumes verdicts; emits a 'convergence verdict' (line 142, choosing from {converging, stalling, diverging, terminal}) plus a dispatch JSON. NOT a fresh verdict+findings pair in the FR-1 sense — its job is downstream dispatch authoring, not artifact verdict-issuance. Mentioned here so design-claude-code can confirm exclusion."
+    },
+    {
+      "name": "recipe-feature-pipeline (parent orchestrator)",
+      "path": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "layer": "cc",
+      "language": "markdown-skill",
+      "framework": "Claude Code skill",
+      "entry_points": ["Whole-pipeline orchestration; called by Claude Code session as the operator-invoked skill"],
+      "dependencies": ["all sub-agents", "auditing-shared/scripts/validate_adr_placement.py"],
+      "notes": "The actual parent orchestrator per ADR-0044's flatten decision. 629 lines. Dispatches reviewers at 5 explicit invocation points (count of 'shared-document-reviewer' occurrences in body: 19; reviewer-arch: 4; reviewer-cross-artifact: 4; phase-quality-reviewer: 5). The scope_class is read from intent-clarification.md frontmatter at line 350 inside the Deliverable Packaging step (Stage 12), but FR-2's self-check needs it at the earliest dispatch point — that's a structural finding for design-claude-code."
+    },
+    {
+      "name": "execute-orchestrator (advisor)",
+      "path": ".claude/agents/execute-orchestrator.md",
+      "layer": "cc",
+      "language": "markdown-agent-contract",
+      "framework": "Claude Code sub-agent (advisor only per ADR-0044)",
+      "entry_points": ["NONE — non-invocable per ADR-0044"],
+      "dependencies": ["recipe-feature-pipeline (back-reference only)"],
+      "notes": "ADR-0044 flattened execution-phase dispatch into the parent. This file is now an advisor / canonical state-machine reference. The 12-substantive-state machine table lives here (T0..T13). FR-2's self-check candidate site is NOT here — it must live in the parent recipe-feature-pipeline."
+    },
+    {
+      "name": "auditing-mcp skill",
+      "path": ".claude/skills/auditing-mcp/",
+      "layer": "cc",
+      "language": "python-scripts + markdown-skill",
+      "framework": "Claude Code skill family-coordinator (graduated per ADR-0042)",
+      "entry_points": [
+        "Bash(python3 scripts/audit_mcp.py <path>) — invokable",
+        "Sub-skill family slot reserved but empty",
+        "Family-coordinator since ADR-0042"
+      ],
+      "dependencies": ["auditing-shared", "ADR-0042", "ADR-0043 (Gate-6 hard gate)"],
+      "notes": "Hosts 14 Python scripts: audit_mcp.py (coordinator), 10 OP-rule scripts (audit_op1..audit_op10), plus check_toxic_combinations.py, scan_mcp_secrets.py, validate_mcp_config.py. Each OP rule has a uniform contract: takes path-to-.mcp.json positional, prints JSON findings object to stdout, returns exit 1 if findings else 0 (exit 2 on internal error). Severity tokens: BLOCKER, MAJOR, MINOR, NIT. FR-3's new rule lands as audit_op11_*.py following this pattern. References/ has 4 docs: mcp-spec.md, toxic-combinations.md, anti-patterns.md, common-failures.md."
+    },
+    {
+      "name": ".mcp.json",
+      "path": ".mcp.json",
+      "layer": "cc",
+      "language": "json",
+      "framework": "Claude Code MCP server registry",
+      "entry_points": ["Claude Code parses this at session start; six mcpServers entries"],
+      "dependencies": ["env vars: CONTEXT7_API_KEY, EXA_API_KEY, GITNEXUS_TAG, TFE_TOKEN"],
+      "notes": "Six servers registered (not seven): actionlint-mcp, context7, exa, gitnexus, serena, terraform-mcp. mcp-openapi-schema absent (removed 2026-05-25 in commit bed4941 per the Gate-3 user-direction confirmation; see deprecation_finding). Each entry uses env-block indirection only (passes OP-1 + OP-9 + OP-10 cleanly). Both context7 and exa use type:http; the four others use stdio with command+args."
+    },
+    {
+      "name": ".devcontainer/postCreate.sh",
+      "path": ".devcontainer/postCreate.sh",
+      "layer": "codespaces",
+      "language": "bash",
+      "framework": "VS Code Devcontainer lifecycle hook",
+      "entry_points": ["postCreateCommand in devcontainer.json"],
+      "dependencies": [".devcontainer/versions.env", ".devcontainer/lib/log-mcp-event.sh", ".devcontainer/install/terraform-mcp.sh", ".devcontainer/lib/mcp-auth-probe.sh"],
+      "notes": "set -euo pipefail. Idempotency via .install-sentinel-<server>-<version> files in .claude/runtime/. Currently installs four OSS-local MCP servers (serena, actionlint-mcp, terraform-mcp, gitnexus) and runs auth probes against the two HTTP servers (context7, exa). The script's head comment is explicit that mcp-openapi-schema was removed 2026-05-24 per postmortem. The GitNexus install function (install_gitnexus) is the FR-4 dry-run's natural insertion site — sits between the sentinel check and the npm install -g step, lines ~127-150. Diagnostic convention: log_mcp_event emits a JSONL record per server with status:ok|failed and a note: field for context."
+    },
+    {
+      "name": ".devcontainer/versions.env",
+      "path": ".devcontainer/versions.env",
+      "layer": "codespaces",
+      "language": "bash-env-file",
+      "framework": "Devcontainer version pin source",
+      "entry_points": ["sourced by postCreate.sh and postStart.sh; ALSO duplicated in devcontainer.json containerEnv per the 2026-05-24 fix"],
+      "dependencies": ["none"],
+      "notes": "Five pins active: SERENA_VERSION=1.2.0, ACTIONLINT_MCP_SHA=7441fe04..., TERRAFORM_MCP_VERSION=0.5.2, GITNEXUS_TAG=1.6.5, plus an explicit mcp-openapi-schema removal rationale block (lines 18-24). Convention: one line per pin, full upstream rationale in adjacent comments. FR-4's dry-run reads GITNEXUS_TAG from here."
+    },
+    {
+      "name": ".devcontainer/lib/log-mcp-event.sh",
+      "path": ".devcontainer/lib/log-mcp-event.sh",
+      "layer": "codespaces",
+      "language": "bash",
+      "framework": "devcontainer helper",
+      "entry_points": ["sourced by postCreate.sh and postStart.sh"],
+      "dependencies": ["jq", ".claude/runtime/mcp-events.jsonl"],
+      "notes": "Implements ADR-0037 event schema + ADR-0039 redaction-at-source. Default-fail-closed: if redaction logic fails, emits nothing rather than partially-redacted output. FR-4 + FR-3 + FR-5 diagnostics should use this helper for cross-mechanism consistency."
+    },
+    {
+      "name": ".github/workflows/ (greenfield)",
+      "path": ".github/workflows/",
+      "layer": "cicd",
+      "language": "n/a",
+      "framework": "GitHub Actions",
+      "entry_points": ["NONE — directory does not exist"],
+      "dependencies": ["n/a"],
+      "notes": "Confirmed absent: `ls .github/workflows/` returns 'No such file or directory'. FR-5 is the first workflow this project introduces. No precedent for SHA-pin, permissions:, concurrency, path-filter, claude-cli-install, or runner choice — design-cicd authors from KB defaults."
+    },
+    {
+      "name": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "path": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "issue-register doc_type",
+      "entry_points": ["FR-7 target artifact"],
+      "dependencies": ["the seed proposal Issues/cross-artifact-divergence-detection-gap/proposal.md"],
+      "notes": "282 lines. Rows B-1 (CI claude mcp list smoke) and H-4 (GitNexus dry-run) are ALREADY marked '(ADOPTED 2026-05-25 by pipeline-quickwins-hardening-r1 — see Issues/cross-artifact-divergence-detection-gap/proposal.md)' inline in their item-name cells (lines 56 and 141). This means FR-7's authoring is partially already in place — design-composer/design-claude-code should treat FR-7 as confirming and tightening the adoption marker rather than adding it from scratch. The convention is: append the parenthetical (ADOPTED YYYY-MM-DD by <slug> — see <link>) to the existing Item cell; preserve the existing description verbatim. Section O (pattern observation on post-ship triggers) is preserved verbatim per user direction."
+    },
+    {
+      "name": "Issues/cross-artifact-divergence-detection-gap/proposal.md",
+      "path": "Issues/cross-artifact-divergence-detection-gap/proposal.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "issue-proposal doc_type",
+      "entry_points": ["Seed proposal for this feature"],
+      "dependencies": ["ADR-0048 (status promotion mechanism)"],
+      "notes": "Status: adopted (confirmed line 5 of frontmatter). The Research Plan asked the researcher to confirm; confirmed."
+    },
+    {
+      "name": "ADR-0041",
+      "path": "adrs/ADR-0041-install-mechanism-hybrid.md",
+      "layer": "cc",
+      "language": "markdown-adr",
+      "framework": "ADR template per KB-documentation-criteria",
+      "entry_points": ["FR-3 comparison target"],
+      "dependencies": ["KB-mcp-platform", "KB-codespaces-design", "ADR-0037", "ADR-0039", "ADR-0040"],
+      "notes": "v1.0.1 (cycle-3 reconciliation 2026-05-23). Decision section §1 contains the per-server install-mechanism taxonomy table (line 68 of the file). The table has SEVEN ROWS today: Serena, mcp-openapi-schema, actionlint-mcp, terraform-mcp, gitnexus, Context7, Exa. The mcp-openapi-schema row is intact in the ADR despite the server being removed from .mcp.json on 2026-05-25 (see deprecation_finding). For FR-3, the parity-rule design must decide how to handle this: (a) recognize a status marker on the ADR row, (b) amend ADR-0041 to remove the deprecated row, or (c) other. Out-of-scope to amend the ADR within this feature per the carve-out posture; design-claude-code chooses an in-rule strategy."
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "recipe-feature-pipeline (parent orchestrator)",
+      "to": "shared-document-reviewer",
+      "kind": "call",
+      "count": 19,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md"],
+      "confidence": "high"
+    },
+    {
+      "from": "recipe-feature-pipeline (parent orchestrator)",
+      "to": "review-architecture-auditor",
+      "kind": "call",
+      "count": 4,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md"],
+      "confidence": "high"
+    },
+    {
+      "from": "recipe-feature-pipeline (parent orchestrator)",
+      "to": "review-cross-artifact-auditor",
+      "kind": "call",
+      "count": 4,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md"],
+      "confidence": "high"
+    },
+    {
+      "from": "recipe-feature-pipeline (parent orchestrator)",
+      "to": "execute-phase-quality-reviewer",
+      "kind": "call",
+      "count": 5,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md", ".claude/agents/execute-orchestrator.md"],
+      "confidence": "high"
+    },
+    {
+      "from": "recipe-feature-pipeline (parent orchestrator)",
+      "to": "execute-task-quality-handler",
+      "kind": "call",
+      "count": 3,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md"],
+      "confidence": "high"
+    },
+    {
+      "from": "recipe-feature-pipeline (parent orchestrator)",
+      "to": "finalize-deliverable-packager",
+      "kind": "call",
+      "count": 2,
+      "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md"],
+      "confidence": "high"
+    },
+    {
+      "from": "finalize-deliverable-packager",
+      "to": "shared-document-reviewer",
+      "kind": "call",
+      "count": 1,
+      "representative_files": [".claude/agents/finalize-deliverable-packager.md"],
+      "confidence": "high"
+    },
+    {
+      "from": "finalize-reconciler",
+      "to": "shared-document-reviewer (input consumer)",
+      "kind": "config_reference",
+      "count": 1,
+      "representative_files": [".claude/agents/finalize-reconciler.md"],
+      "confidence": "high"
+    },
+    {
+      "from": ".mcp.json",
+      "to": "env: CONTEXT7_API_KEY, EXA_API_KEY, GITNEXUS_TAG, TFE_TOKEN",
+      "kind": "config_reference",
+      "count": 4,
+      "representative_files": [".mcp.json"],
+      "confidence": "high"
+    },
+    {
+      "from": ".devcontainer/postCreate.sh",
+      "to": ".devcontainer/versions.env",
+      "kind": "import",
+      "count": 1,
+      "representative_files": [".devcontainer/postCreate.sh"],
+      "confidence": "high"
+    },
+    {
+      "from": ".devcontainer/postCreate.sh",
+      "to": ".devcontainer/lib/log-mcp-event.sh",
+      "kind": "import",
+      "count": 1,
+      "representative_files": [".devcontainer/postCreate.sh"],
+      "confidence": "high"
+    },
+    {
+      "from": ".devcontainer/postCreate.sh",
+      "to": "mcp-events.jsonl (via log_mcp_event)",
+      "kind": "file_reference",
+      "count": 7,
+      "representative_files": [".devcontainer/postCreate.sh"],
+      "confidence": "high"
+    },
+    {
+      "from": "auditing-mcp/scripts/audit_mcp.py (coordinator)",
+      "to": "audit_op1..audit_op10 scripts",
+      "kind": "call",
+      "count": 10,
+      "representative_files": [".claude/skills/auditing-mcp/scripts/audit_mcp.py", ".claude/skills/auditing-mcp/scripts/audit_op1_env_block_coverage.py"],
+      "confidence": "medium"
+    },
+    {
+      "from": "ADR-0041 (taxonomy table)",
+      "to": ".mcp.json (the parity target)",
+      "kind": "config_reference",
+      "count": 7,
+      "representative_files": ["adrs/ADR-0041-install-mechanism-hybrid.md", ".mcp.json"],
+      "confidence": "high"
+    },
+    {
+      "from": "design-api / design-claude-code / design-codespaces / design-iac / design-cicd / discovery-codebase-researcher / discovery-external-researcher / review-architecture-auditor",
+      "to": ".mcp.json (via mcp__ tool allowlist entries per ADR-0040)",
+      "kind": "config_reference",
+      "count": 7,
+      "representative_files": [".claude/agents/design-claude-code.md", ".claude/agents/discovery-codebase-researcher.md", ".claude/agents/review-architecture-auditor.md"],
+      "confidence": "high"
+    }
+  ],
+  "blast_radius": [
+    {
+      "touch_point": "shared-document-reviewer (FR-1)",
+      "direct_dependents": [
+        "recipe-feature-pipeline (Stages 1, 2, 6, 7, 9; doc_type IntentClarification, PRD, DesignDoc, DesignDoc-Blueprint, Plan)",
+        "finalize-deliverable-packager (Stage 12; doc_type DeliverableArchive)"
+      ],
+      "transitive_dependents_3_hop": [
+        "intake-intent-clarifier (Gate-0 re-invocation target)",
+        "intake-prd-author (Gate-0 re-invocation target; Gate-1 → finalize-reconciler)",
+        "design-frontend, design-backend, design-api, design-query, design-database, design-cicd, design-iac, design-codespaces, design-claude-code (each per-layer designer re-invoked on Gate-0/1 fail)",
+        "design-composer (Gate-0 re-invocation target on Blueprint)",
+        "plan-author (Gate-0 re-invocation target on Plan; Gate-1 → finalize-reconciler)",
+        "finalize-reconciler (consumes Gate-1 issues JSON)"
+      ],
+      "test_files": [
+        "No automated tests cover the reviewer-output-shape pathway. The auditing-shared/scripts/validate_pipeline_frontmatter.py validator runs as a Gate-0 mechanical pre-pass but is not a test."
+      ],
+      "hop_tier_distribution": {"1": 2, "2": 10, "3": 1},
+      "risk_assessment": "MEDIUM — the change site (the reviewer's output-shape) is at the top of the pipeline's review surface; a bad shape change here cascades through every other reviewer-driven re-invocation path. However the carve-out is shape-validating not shape-changing, so the blast radius is contained as long as the validator is additive."
+    },
+    {
+      "touch_point": "review-architecture-auditor (FR-1)",
+      "direct_dependents": [
+        "recipe-feature-pipeline (Stage 8)",
+        "finalize-reconciler (consumes architecture-audit-issues.json)"
+      ],
+      "transitive_dependents_3_hop": [
+        "design-composer (re-invoked on fail/conditional_pass)"
+      ],
+      "test_files": ["No automated tests."],
+      "hop_tier_distribution": {"1": 2, "2": 1},
+      "risk_assessment": "LOW — single-stage reviewer with a single downstream reconciler path."
+    },
+    {
+      "touch_point": "review-cross-artifact-auditor (FR-1)",
+      "direct_dependents": [
+        "recipe-feature-pipeline (Stage 11)",
+        "finalize-reconciler (consumes cross-artifact-audit-issues.json)"
+      ],
+      "transitive_dependents_3_hop": [
+        "intake-prd-author, design-composer, plan-author, test-acceptance-author, test-phase-validator-author (any of these may be re-dispatched per the audit findings)"
+      ],
+      "test_files": ["No automated tests."],
+      "hop_tier_distribution": {"1": 2, "2": 5},
+      "risk_assessment": "MEDIUM — the cross-artifact auditor's hard-cap convergence verdict is structurally a SECOND verdict in the same payload (alongside the primary fail/conditional_pass/pass verdict). FR-1's check must decide whether it inspects only the primary verdict or both. Surfaced as an open question."
+    },
+    {
+      "touch_point": "execute-phase-quality-reviewer (FR-1)",
+      "direct_dependents": [
+        "recipe-feature-pipeline (T7 dispatch)",
+        "execute-finalize-reconciler (consumes phase-quality-report when verdict=NEEDS_RECONCILIATION)"
+      ],
+      "transitive_dependents_3_hop": [
+        "execute-task-code-producer (via finalize-reconciler dispatch_directives)",
+        "execute-task-quality-handler (via finalize-reconciler dispatch_directives)"
+      ],
+      "test_files": ["No automated tests; the agent itself wraps run_phase_checks.py coordinator output."],
+      "hop_tier_distribution": {"1": 2, "2": 2},
+      "risk_assessment": "LOW — execution-side verdict; downstream dispatch is via finalize-reconciler indirection (Contract 6) so the verdict-shape change is well-isolated."
+    },
+    {
+      "touch_point": "recipe-feature-pipeline (FR-2 self-check site)",
+      "direct_dependents": [
+        "intake-intent-clarifier, intake-prd-author, discovery-plan-author, discovery-codebase-researcher, discovery-external-researcher, design-* (×9 per-layer designers), design-composer, review-architecture-auditor, plan-author, test-acceptance-author, test-phase-validator-author, review-cross-artifact-auditor, finalize-task-decomposer, finalize-deliverable-packager, finalize-reconciler, execute-* (×4 execution specialists)"
+      ],
+      "transitive_dependents_3_hop": [
+        "All sub-agents are direct callees of the parent; 'transitive' for this orchestrator means via the dispatch_directives chain"
+      ],
+      "test_files": ["None"],
+      "hop_tier_distribution": {"1": 25, "2": 0, "3": 0},
+      "risk_assessment": "HIGH — the parent orchestrator is the single dispatch nexus. Inserting a self-check at the start of dispatch is structurally safe (single edit point) but the check's failure semantics must integrate with the existing checkpoint.execution_mode field (specialist-dispatch vs parent-driven-workaround) and the gate_history. The scope_class is currently read inside Stage 12 (Deliverable Packaging, line 350 of SKILL.md); FR-2's self-check needs it at the START of dispatch, so design-claude-code must add an earlier read site or hoist the existing read. The 'single-agent fallback' configuration concept is not currently a named state in checkpoint.json — it is implicit in the parent-driven-workaround execution_mode and in any future per-stage agent-selection logic. Design-claude-code must define the configuration surface FR-2 inspects."
+    },
+    {
+      "touch_point": ".claude/skills/auditing-mcp/ (FR-3 host)",
+      "direct_dependents": [
+        "All agents that invoke auditing-mcp via Bash(python3 *): the audit runs in Gate-6 per ADR-0043 hard-gate; the new rule inherits Gate-6 enforcement"
+      ],
+      "transitive_dependents_3_hop": [
+        "finalize-reconciler (consumes audit findings when BLOCKER)"
+      ],
+      "test_files": ["None — but each audit_op*.py script is self-contained and testable in isolation."],
+      "hop_tier_distribution": {"1": 1, "2": 1},
+      "risk_assessment": "LOW — additive new OP rule, no schema break, exit-code convention is uniform across existing scripts."
+    },
+    {
+      "touch_point": ".devcontainer/postCreate.sh (FR-4 host)",
+      "direct_dependents": [
+        "Every Codespace rebuild + every devcontainer post-create invocation"
+      ],
+      "transitive_dependents_3_hop": [
+        "mcp-events.jsonl readers — discovery-codebase-researcher reads recent structured_failure records before GitNexus traversals (per ADR-0007 v2.2.0 + ADR-0037)"
+      ],
+      "test_files": [
+        "No automated tests. The script's idempotency is exercised every rebuild but observed manually."
+      ],
+      "hop_tier_distribution": {"1": 1, "2": 1},
+      "risk_assessment": "MEDIUM — postCreate runs once per rebuild and is THE codespace boot path; a bad dry-run insertion (false positive) breaks devcontainer bring-up for every contributor. The kill criterion in PRD Rollout Plan covers this: if non-broken builds fail, the dry-run is disabled and re-designed. Insertion site is in install_gitnexus(), just before `npm install -g` line ~144. NFR-13: dry-run must use the existing install_complete or structured_failure event types — no new types."
+    },
+    {
+      "touch_point": ".github/workflows/ (FR-5 greenfield)",
+      "direct_dependents": ["No existing workflows; this is the first."],
+      "transitive_dependents_3_hop": ["PRs that modify the FR-5 path-trigger set (TBD at Design)"],
+      "test_files": ["n/a — greenfield"],
+      "hop_tier_distribution": {"1": 0, "2": 0, "3": 0},
+      "risk_assessment": "LOW for blast-radius (no existing workflows to perturb); MEDIUM for first-precedent (this workflow's shape becomes the project's convention for future workflows — design-cicd should be deliberate about path-trigger, runner choice, claude CLI install, permissions:, SHA-pinning)."
+    },
+    {
+      "touch_point": ".mcp.json (FR-3 + FR-5 probed artifact)",
+      "direct_dependents": [
+        "Claude Code session parser (at session start)",
+        "All sub-agents with mcp__server__tool allowlist entries (7 agents per ADR-0040 precedent: review-architecture-auditor, discovery-external-researcher, discovery-codebase-researcher, design-iac, design-codespaces, design-claude-code, design-cicd)"
+      ],
+      "transitive_dependents_3_hop": [
+        "Every sub-agent invocation that uses MCP tools — but per NFR-15 the existing ADR-0040 allowlist does not change as a result of this feature"
+      ],
+      "test_files": ["validate_mcp_config.py (in auditing-mcp/scripts/)"],
+      "hop_tier_distribution": {"1": 2, "2": 7},
+      "risk_assessment": "MEDIUM — .mcp.json is a single-point-of-failure config; FR-3 and FR-5 are both READ-ONLY against it, so the artifact itself is not perturbed. The risk is in misinterpreting it (FR-3 parity false-positive on mcp-openapi-schema row; see deprecation_finding)."
+    }
+  ],
+  "conventions": {
+    "cc": {
+      "file_naming": "Sub-agents at .claude/agents/<role>.md; skills at .claude/skills/<name>/SKILL.md; KBs at .claude/skills/KB-<topic>/SKILL.md; auditing modules under .claude/skills/auditing-<scope>/.",
+      "module_layout": "Each agent is a single markdown file with YAML frontmatter (name, description, model, effort, tools, skills, memory) + body. Skills are directories with SKILL.md + optional references/ + scripts/ + examples/.",
+      "agent_frontmatter": "Fields: name, description (Claude-Code routing decisions), model (opus|sonnet|haiku), effort (low|medium|high), tools (allowlist; explicit list like [Read, Glob, Grep, ...] or whole-server mcp__<server>__*), skills (preloaded skill identifiers), memory (project|user|none).",
+      "verdict_emission": "Verdicts emit as a single string field inside a structured JSON output object — never free prose. Field name is consistently 'verdict' or 'status' depending on the agent. Verdict enums vary by agent: shared-document-reviewer (pass|conditional_pass|fail per doc_type), review-architecture-auditor (pass|conditional_pass|fail), review-cross-artifact-auditor (pass|conditional_pass|fail|hard_capped + a secondary convergence verdict), execute-phase-quality-reviewer (PASS|NEEDS_RECONCILIATION|BLOCKER), execute-task-quality-handler (APPROVED|NEEDS_REVISION|STUB_DETECTED|BLOCKER), finalize-deliverable-packager (PASS|BLOCK|REVIEW). Findings are always a JSON array adjacent to the verdict; finding objects have severity, file_path, message, and rule/domain identifiers — but the exact field names vary by reviewer.",
+      "severity_taxonomy": "BLOCKER (won't load / contractual violation) → MAJOR (works but degraded) → MINOR (deviates from best practice) → NIT/INFO (taste). Maps to verdicts deterministically: any BLOCKER → fail; any MAJOR (no BLOCKER) → conditional_pass; only MINOR/INFO → pass. See review-architecture-auditor.md lines 135-137 for the canonical mapping in the auditor family.",
+      "logging": "Sub-agents log via TaskUpdate at start and end of work (one line each, with mechanism-name + slug + outcome). The recipe-feature-pipeline orchestrator writes checkpoint.json and state-transitions.log.",
+      "testing": "No traditional unit-test framework. The auditing-* skills are exercised by running them against project artifacts (live audit); each audit_op*.py is independently invocable. Phase validators (auditing-shared/scripts/run_phase_checks.py) exercise the pipeline-output artifacts via a coordinator pattern.",
+      "report_only_vs_enforcing": "Auditing skills are report-only (write findings, do not modify configs); the orchestrator uses the findings to halt or dispatch. Reviewers are also report-only — they emit verdicts; the orchestrator acts on them. The 'enforce vs instruct' choice for FR-1/FR-2 must add an enforcing layer ON TOP of these report-only contracts (not modify the reviewer-output discipline itself).",
+      "adr_authoring": "Per FR-5 of execution-pipeline-design-r1 and ADR-0036, only design-composer authors ADRs. All other sub-agents may CITE ADRs but not AUTHOR them. The orchestrator hard-rejects ADR writes from any other path."
+    },
+    "auditing-mcp": {
+      "rule_naming": "OP-N (where N is integer). OP-1 = env-block credential coverage; OP-2 = consumer-mapping; OP-3 = zero-mcp invariant; OP-4 = primary/fallback prose; OP-5 = lifecycle completeness; OP-6 = runtime log redaction; OP-7 = events schema; OP-8 = GitNexus-specific; OP-9 = URL-credential rejection; OP-10 = argv-leakage rejection. FR-3 lands as OP-11 by convention.",
+      "script_naming": "audit_op<N>_<short-descriptor>.py (e.g., audit_op1_env_block_coverage.py).",
+      "script_contract": "Each OP script: takes one positional argument (path to .mcp.json), prints a JSON findings object to stdout {rule, name, target, findings:[], servers_checked}, returns exit 0 if no findings, exit 1 if any BLOCKER finding, exit 2 on internal error / bad input.",
+      "finding_format": "{rule: 'OP-N', severity: BLOCKER|MAJOR|MINOR|NIT, server: <name>, field: <dotted-path>, message: <human-readable>}. FR-3 must include {prescribed_form, live_form, diff_dimension: argv|env|sentinel|...} in the finding to satisfy AC-FR-3-b.",
+      "rationale_placement": "Each OP rule's rationale + anti-pattern catalog lives in .claude/skills/auditing-mcp/references/<topic>.md (mcp-spec.md, anti-patterns.md, common-failures.md, toxic-combinations.md). The skill's SKILL.md routing table maps dimension → reference file."
+    },
+    "codespaces": {
+      "shell_posture": "set -euo pipefail at the top of every script (.devcontainer/postCreate.sh line 31; .devcontainer/postStart.sh; .devcontainer/lib/log-mcp-event.sh line 15).",
+      "sentinel_naming": "<server>@<version>.installed under .claude/runtime/install-sentinels/ — but the live postCreate.sh uses a different convention (.install-sentinel-<server>-<version>) under .claude/runtime/ directly. The ADR-0041 canonical form is the first; the live script's form is older. Surfaced as a minor discrepancy; FR-4 should NOT introduce a third convention.",
+      "idempotency": "sentinel-presence AND binary-on-PATH (the two-check pattern from ADR-0041 Decision item 3; live in postCreate.sh's check_installed() function lines 60-65). FR-4's dry-run should sit BEFORE the install step's sentinel short-circuit so it runs every rebuild.",
+      "event_emission": "log_mcp_event helper emits one JSONL record per install/probe to .claude/runtime/mcp-events.jsonl. Event types per ADR-0037: install_complete, readiness_probe, structured_failure. Record fields: event, timestamp (ISO 8601), server, install_method, version, duration_ms, status, note (optional). FR-4 should emit an install_complete with status:ok|failed, NOT a new event type (NFR-13 compatibility).",
+      "diagnostic_format": "echo '[postCreate] <message>' >&2 for plain-text operator diagnostics; structured JSON via log_mcp_event for machine-readable events. The two streams are deliberately separate. FR-6 actionable diagnostics for FR-4 should follow this dual pattern: a single-line plain-text echo for operator legibility, plus a structured JSONL record for downstream consumers."
+    },
+    "cicd": {
+      "status": "GREENFIELD — .github/workflows/ does not exist. No precedent for any workflow convention in this project.",
+      "kb_governance": "KB-github-actions-platform/references/security.md and KB-github-actions-design/references/principles.md are the only inputs design-cicd has. The 'five non-negotiables' (SHA-pin third-party actions, least-privilege permissions, no untrusted input interpolation in run:, OIDC over long-lived keys, concurrency on deploy workflows) are the baseline for FR-5's first workflow."
+    },
+    "documents": {
+      "deferral_register_row_update": "The convention observed in this register (rows B-1 and H-4) is to APPEND a parenthetical inside the Item-cell of the table row: '*(ADOPTED YYYY-MM-DD by <slug> — see <link>)*'. The Source, Why-excluded/deferred, and Re-examination-trigger cells are also updated: Why-excluded gets 'Now adopted: <summary>'; Re-examination-trigger gets 'Adopted by <slug>.'; Forgetting-risk gets 'Resolved by adoption.' The italics surround the inline marker. The register's TL;DR and counts are NOT incrementally updated row-by-row; the rationale is that the register is a snapshot doc, not a live ledger.",
+      "frontmatter": "All canonical docs carry YAML frontmatter with id, version, status, doc_type, generated, generated_by. Per KB-documentation-criteria."
+    }
+  },
+  "known_issues": [
+    {
+      "description": "The execute-orchestrator agent is documented as 'advisor; non-invocable per ADR-0044' but still carries a full skills+tools+model frontmatter block that looks like an invocable agent. The frontmatter's `skills: [recipe-feature-pipeline, ...]` is explicitly a 'documentation-consistency anchor, NOT an invocation hint' per its own body. This dual existence is intentional but is the kind of thing FR-2's self-check could plausibly stumble over if it enumerates 'agents' rather than 'invocable agents'.",
+      "files": [".claude/agents/execute-orchestrator.md:8"],
+      "severity": "minor"
+    },
+    {
+      "description": "Sentinel naming inconsistency between ADR-0041 canonical form (<server>@<version>.installed under .claude/runtime/install-sentinels/) and the live postCreate.sh form (.install-sentinel-<server>-<version> directly under .claude/runtime/). The discrepancy is acknowledged in the ADR (I-DR-CS-001 resolution language) but the script's form is what shipped. FR-4 should NOT introduce a third convention; design-codespaces may choose to (a) align FR-4 with the script's current form, (b) trigger a cleanup of the script's form to match the ADR (out-of-scope per the carve-out), or (c) tolerate the discrepancy by not creating any sentinel in the dry-run.",
+      "files": [".devcontainer/postCreate.sh:53", "adrs/ADR-0041-install-mechanism-hybrid.md:80"],
+      "severity": "minor"
+    },
+    {
+      "description": "The register documents an internal inconsistency: postCreate.sh's head-comment says 'Servers installed here (4 — post-2026-05-24 postmortem; was 5)' — 4 servers, not 5. The earlier description that mcp-openapi-schema removal would yield 5 OSS-local servers is now stale. ADR-0041's '5 OSS-local MCP servers' framing (Decision §1.b prereqs) needs the same update but is out-of-scope here.",
+      "files": [".devcontainer/postCreate.sh:11", ".devcontainer/postCreate.sh:165"],
+      "severity": "minor"
+    }
+  ],
+  "scope_completeness_finding": {
+    "purpose": "FR-1 scope-completeness sweep per Gate-3 user-direction. The PRD's named four reviewers (shared-document-reviewer, review-architecture-auditor, review-cross-artifact-auditor, execute-phase-quality-reviewer) are illustrative; the intent doc's binding framing is 'any reviewer that emits a verdict+findings pair'. The sweep ran `rg -nl 'verdict.*:' .claude/agents/` (10 hits) and per-hit inspection of output contracts. Six additional reviewer-shaped agents surfaced; three deserve FR-1 scope inclusion, three are clearer exclusions.",
+    "additional_reviewer_shaped_agents_for_FR_1_consideration": [
+      {
+        "agent": "execute-task-quality-handler",
+        "path": ".claude/agents/execute-task-quality-handler.md",
+        "verdict_field": "status",
+        "verdict_enum": "APPROVED | NEEDS_REVISION | STUB_DETECTED | BLOCKER",
+        "findings_field_present": true,
+        "findings_shape": "{domain, severity, source_activity, file_path, locator, message}[]",
+        "verdict_finding_pair_quality": "CLEAN — this is the cleanest verdict+findings pair in the inventory; severity tokens include 'blocker' so the verdict-vs-findings consistency check applies directly (APPROVED + any blocker finding is the contradiction FR-1 names).",
+        "blast_radius_per_invocation": "Per-task; T2 dispatch; consumed by recipe-feature-pipeline.",
+        "recommendation": "STRONG candidate for FR-1 scope. Excluding it would leave the execution-side per-task path open to the exact failure mode US-1 names."
+      },
+      {
+        "agent": "finalize-deliverable-packager",
+        "path": ".claude/agents/finalize-deliverable-packager.md",
+        "verdict_field": "verdict",
+        "verdict_enum": "PASS | BLOCK | REVIEW",
+        "findings_field_present": true,
+        "findings_shape": "adr_cross_location_findings[] + reviewer_findings[] (the latter is a chained pass-through from shared-document-reviewer's output)",
+        "verdict_finding_pair_quality": "MEDIUM — the verdict is the packager's own but the findings are chained from a downstream reviewer (shared-document-reviewer with doc_type: DeliverableArchive). A 'PASS + chained reviewer_findings with blocker' would be the contradiction.",
+        "blast_radius_per_invocation": "Once per feature run at Deliverable Packaging; consumed by the Final Approval Gate.",
+        "recommendation": "MODERATE candidate for FR-1 scope. The chained-findings shape complicates the consistency check — if the chained shared-document-reviewer already passed the FR-1 check at its own invocation, re-checking at the packager may be redundant. Design-claude-code should make a deliberate inclusion/exclusion call."
+      },
+      {
+        "agent": "synth-critic",
+        "path": ".claude/agents/synth-critic.md",
+        "verdict_field": "verdict (per-claim, not per-invocation)",
+        "verdict_enum": "verified | unverifiable | contradicted | single_sourced",
+        "findings_field_present": "indirect — adjacent fields are confidence, dissent_evidence, violates_constraint",
+        "verdict_finding_pair_quality": "WEAK — this is verdict-per-CLAIM (many verdicts inside a critique JSON), not verdict-per-INVOCATION. The intent doc's framing of 'a reviewer that emits a verdict+findings pair' is plausibly interpretable to exclude this shape, but a stricter reading includes it.",
+        "blast_radius_per_invocation": "Per batch during Synthesis stage.",
+        "recommendation": "WEAK candidate for FR-1 scope. Recommend EXCLUDE unless design-claude-code explicitly wants to extend FR-1 to per-claim verdicts. Excluding it keeps the FR-1 surface coherent (one verdict per invocation, not per item)."
+      }
+    ],
+    "agents_with_verdict_keyword_but_clearer_exclusion": [
+      {
+        "agent": "synth-framer",
+        "reason_excluded": "USES verdicts (consumes critic's per-claim verdicts) but DOES NOT EMIT them in a verdict+findings pair contract. Its output is decision-framing JSON."
+      },
+      {
+        "agent": "synth-synthesizer",
+        "reason_excluded": "USES verdicts (reads critic's verdicts to enumerate Limitations) but DOES NOT EMIT them in a contractual shape."
+      },
+      {
+        "agent": "finalize-reconciler",
+        "reason_excluded": "Emits a CONVERGENCE verdict ({converging, stalling, diverging, terminal}) at the end of its reconciliation log, but its primary output is the dispatch JSON — the convergence verdict is a downstream-of-other-verdicts summary, not a fresh artifact verdict that can contradict findings. EXCLUDE."
+      }
+    ],
+    "scope_completeness_summary": "The PRD's named four agents are correct as illustrative anchors. The substantive FR-1 scope should ALSO include `execute-task-quality-handler` (strong recommendation) and CONSIDER including `finalize-deliverable-packager` (with the chained-findings caveat). `synth-critic`, `synth-framer`, `synth-synthesizer`, and `finalize-reconciler` are clearer exclusions. design-claude-code makes the final inclusion decision under U-1's 'in-agent vs out-of-agent execution site' choice — the inclusion list shapes the validator's reach."
+  },
+  "deprecation_finding": {
+    "purpose": "FR-3 mcp-openapi-schema deprecation confirmation per Gate-3 user-direction. The PRD identifies the mismatch between ADR-0041 (still lists mcp-openapi-schema as one of seven invocation rows) and .mcp.json (post-2026-05-25 has six servers, no mcp-openapi-schema row); design-claude-code's FR-3 parity-rule design must handle deprecated ADR rows.",
+    "git_history_confirmation": {
+      "removal_commit": "bed4941",
+      "removal_commit_date": "2026-05-25T03:14:53Z (UTC)",
+      "removal_commit_author": "Josh-S-N2M <240005450+Josh-S-N2M@users.noreply.github.com>",
+      "removal_commit_message_excerpt": "chore(devcontainer-mcp-r1): devcontainer + MCP wiring + settings backfill — drops mcp-openapi-schema from .mcp.json + design-api allowlist; serena uvx→serena binary",
+      "files_changed_in_removal_commit": [".mcp.json (lines 25-31 removed)", ".claude/agents/design-api.md (mcp__mcp-openapi-schema__* tools removed)", ".devcontainer/Dockerfile (toolchain pins)", ".devcontainer/devcontainer.json", ".devcontainer/postCreate.sh", ".devcontainer/versions.env (mcp-openapi-schema removal rationale block lines 18-24)", ".claude/settings.json", "project-audit-report.{json,md}"],
+      "earlier_postmortem_commit": "5a80122 (2026-05-24T01:48:12Z) — first acknowledged the broken-MCP state when the schema/transport fix landed; the actual removal followed in bed4941",
+      "claudemd_reference": "CLAUDE.md (current) line 9 states: 'mcp-openapi-schema was removed 2026-05-24 (see .devcontainer/postCreate.sh:16). The KB-mcp-platform skill still references it as one of seven — that's a stale-doc issue, not an active server.' This confirms the project's posture is: removed-from-active-config but persistent stale references in ADR-0041 and KB-mcp-platform are tracked-but-not-yet-cleaned."
+    },
+    "live_state_confirmation": {
+      ".mcp.json": "Six servers total: actionlint-mcp, context7, exa, gitnexus, serena, terraform-mcp. ZERO references to mcp-openapi-schema (grep confirms count=0).",
+      ".devcontainer/postCreate.sh": "ONE reference to mcp-openapi-schema — but it's in the head-comment block (lines 14-16) explaining WHY the server was removed. The script does NOT install or probe it.",
+      "ADR-0041 invocation table": "TWO references to mcp-openapi-schema remain — both in the per-server install-mechanism taxonomy table at Decision §1.b (line 68 of the file). The row is intact: 'mcp-openapi-schema | `npx -y` (Node ephemeral via npm cache) | `npx -y \"mcp-openapi-schema@${MCP_OPENAPI_SCHEMA_VERSION}\" <spec-path>`'. The ADR has NO deprecation marker on this row.",
+      "KB-mcp-platform": "References still cite seven servers (per CLAUDE.md line 9 admission)."
+    },
+    "implications_for_FR_3_design": "Per AC-FR-3-c, 'If ADR-0041 contains no prescription for a server present in .mcp.json (or vice-versa), then the system shall emit a blocking finding naming the unmatched server and the side on which the prescription is missing.' Under the natural reading, FR-3's parity rule would emit a BLOCKER finding on day one against mcp-openapi-schema as 'prescribed-in-ADR-0041 but absent-from-.mcp.json'. This is a false-positive against a deliberately-decided removal. Design-claude-code under U-3 has three options: (a) define a 'status' / 'deprecated' marker convention for ADR-0041 rows and have the parity rule recognize it (the in-rule approach; preserves ADR-0041's append-only discipline per ADR-0005 by adding an annotation, not removing a row); (b) amend ADR-0041 to drop the mcp-openapi-schema row entirely (out-of-scope per carve-out posture; an ADR amendment is not a quick-wins-hardening artifact); (c) maintain an allowlist of known-deprecated row identifiers inside the audit_op11 script (the most localized but least transparent option). The CLAUDE.md framing ('stale-doc issue, not an active server') points toward (a) — a status marker convention is the durable fix and treats the same problem the project will face for any future deprecated ADR row. design-claude-code picks under U-3."
+  },
+  "open_questions_for_human": [
+    {
+      "question": "Should FR-1's reach include `execute-task-quality-handler` (the strong sweep-recommendation) and/or `finalize-deliverable-packager` (the moderate sweep-recommendation)?",
+      "context": "The PRD's named four agents are illustrative; the intent doc's framing is 'any reviewer that emits a verdict+findings pair'. The scope-completeness sweep surfaces two additional candidates with cleanly-shaped verdict+findings pairs. Excluding execute-task-quality-handler in particular leaves the execution-side per-task path open to the exact failure mode US-1 names.",
+      "blocks": "design-claude-code's contract decision for FR-1"
+    },
+    {
+      "question": "How should FR-3's parity rule handle the mcp-openapi-schema row in ADR-0041's invocation taxonomy table?",
+      "context": "ADR-0041 still lists the row; .mcp.json doesn't; the natural reading of AC-FR-3-c produces a day-one false-positive. The three options (in-rule deprecation marker, ADR amendment, audit-script allowlist) are described in deprecation_finding. The carve-out posture rules out (b); (a) is the durable fix.",
+      "blocks": "design-claude-code's FR-3 design under U-3"
+    },
+    {
+      "question": "Where should the FR-2 'single-agent fallback' configuration live as a named, inspectable surface?",
+      "context": "The 'single-agent fallback' concept is not currently a named state in checkpoint.json. It is implicit in checkpoint.execution_mode = 'parent-driven-workaround' AND in any future per-stage agent-selection logic. The recipe orchestrator currently reads scope_class only inside Stage 12 (line 350); FR-2's self-check needs it at the START of dispatch. design-claude-code under U-2 must (a) define the configuration surface the self-check inspects, (b) hoist the scope_class read to an earlier point, (c) decide where the self-check lives (hook, parent skill, or new gate script).",
+      "blocks": "design-claude-code's FR-2 design under U-2"
+    },
+    {
+      "question": "Should the FR-4 dry-run create or consult a sentinel? If yes, which naming convention?",
+      "context": "The live postCreate.sh uses .install-sentinel-<server>-<version> under .claude/runtime/; ADR-0041 canonical form is <server>@<version>.installed under .claude/runtime/install-sentinels/. The two coexist. FR-4 should NOT introduce a third convention. Likely answer: the dry-run is sentinel-LESS (runs every rebuild as a pre-check) — but design-codespaces under U-4 confirms.",
+      "blocks": "design-codespaces's FR-4 dry-run design under U-4"
+    },
+    {
+      "question": "For FR-7, does the existing partial adoption-marker on rows B-1 and H-4 (already in place inline as '*(ADOPTED 2026-05-25 by pipeline-quickwins-hardening-r1 ...)*') count as adoption, or does the design need to add/tighten anything?",
+      "context": "Rows B-1 and H-4 in Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md already carry the adoption parenthetical inline (lines 56 and 141). The Why-excluded / Re-examination-trigger / Forgetting-risk cells are also already updated to reference the adoption. Under the canonical row-update convention (see conventions.documents.deferral_register_row_update), FR-7 may already be substantively satisfied; the remaining work is verifying the marker text exactly matches the convention and is sufficient for design-composer's deliverable-archive packaging decision under U-7.",
+      "blocks": "design-claude-code / design-composer's FR-7 design under U-7"
+    }
+  ]
+}

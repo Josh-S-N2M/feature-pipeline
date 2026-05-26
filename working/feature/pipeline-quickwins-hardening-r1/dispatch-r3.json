@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0.0",
+  "dispatch_id": "DISPATCH-pipeline-quickwins-hardening-r1-r3",
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "family": "cross_artifact",
+  "cycle_number": 1,
+  "cap": 4,
+  "is_terminal_cycle": false,
+  "generated": "2026-05-26T00:00:00Z",
+  "generated_by": "finalize-reconciler",
+  "source_reconciliation_log": "working/feature/pipeline-quickwins-hardening-r1/reconciliation-log-r3.md",
+  "source_audit_issues": "working/feature/pipeline-quickwins-hardening-r1/cross-artifact-audit-issues.json",
+  "auditor_verdict": "conditional_pass",
+  "issue_counts": {
+    "critical": 0,
+    "important": 5,
+    "recommended": 3,
+    "total": 8
+  },
+  "next_audit_re_invocation": "review-cross-artifact-auditor",
+  "convergence_target_next_cycle": {
+    "important": 0,
+    "recommended": 0
+  },
+  "dispatches": [
+    {
+      "order": 1,
+      "parallelisable_with": [2, 3, 4],
+      "target_agent": "plan-author",
+      "target_artifact": "working/feature/pipeline-quickwins-hardening-r1/plan-v1.md",
+      "target_version_bump": "1.0.1 -> 1.0.2",
+      "rationale": "Three localised edits to the Plan: bump stale Blueprint v2.1 source pointer to v2.2, amend Update History v1.0.0 row to flag the 47->36 task-count correction, mark OI-1 resolved against Blueprint v2.2 NFR thresholds and AT-075/AT-076. No task-content changes, no AC-citation changes, no phase decomposition changes. Pointer updates and one Open Item rewrite only.",
+      "feedback_brief": "Three mechanical edits, no substantive plan changes:\n\n1. SOURCE POINTER (I-CA-003 partial - Plan side): replace 'Blueprint v2.1, status: approved' on plan-v1.md line 62 with 'Blueprint v2.2, status: approved'. Update any other 'Blueprint v2.1' citations in the Plan body (e.g., Purpose line 54). Extend revision_history v1.0.0 source field to record authored-against-v2.1, reconciled-to-v2.2.\n\n2. UPDATE HISTORY (I-CA-004): amend the v1.0.0 row in the Update History table (line 848) from '47 tasks; single bundled PR per D-0008' to '36 tasks (originally counted as 47; corrected in v1.0.1 per I-DR-001); single bundled PR per D-0008'. Preserves the historical fact that the row was authored at the 47-count state while making the corrected final state inline-visible.\n\n3. OPEN ITEM OI-1 (I-CA-005): rewrite OI-1 (Plan line 838) to: 'OI-1: RESOLVED in Blueprint v2.2 / Acceptance Tests v1.0.0. NFR-1 concrete threshold (250 ms p95) and NFR-2 concrete threshold (100 ms p95) are now defined inline in Blueprint v2.2 Non-Functional Requirements lines 367-371. Acceptance Tests AT-075 (NFR-1) and AT-076 (NFR-2) assert these thresholds. The deferral to cc-design v0.2.0 extraction is no longer required - the extraction was completed as part of the v2.1->v2.2 lift cycle.'\n\nAdd a v1.0.2 revision_history entry listing all three edits and citing reconciliation-log-r3.md as the source. Set status to 'approved' (was already approved at v1.0.1; the v1.0.2 bump is reconciliation-only). Total edit footprint: ~5-8 lines of Markdown. Do not touch any task description, AC citation, exit criteria, dependency, or estimate.",
+      "issues_referenced": ["I-CA-003-partial-plan", "I-CA-004", "I-CA-005"],
+      "depends_on_dispatch_order": []
+    },
+    {
+      "order": 2,
+      "parallelisable_with": [1, 3, 4],
+      "target_agent": "test-acceptance-author",
+      "target_artifact": "working/feature/pipeline-quickwins-hardening-r1/acceptance-tests.md",
+      "target_version_bump": "1.0.0 -> 1.0.1",
+      "rationale": "Two edits to the Acceptance Tests document: add a one-line preamble (or small alias table) to the Coverage Matrix mapping PRD-original AC-FR-N-x IDs to their Blueprint-expanded forms, and address the cross-workflow SHA-equality gap either by authoring AT-080 or by updating Open Coverage Gaps item 7 to point at PV-3.",
+      "feedback_brief": "Two edits:\n\n1. COVERAGE MATRIX PREAMBLE (I-CA-001, must-do): add a one-line preamble at the top of the Coverage Matrix (currently lines 51-128). Recommended wording: 'AC ID conventions. PRD-original AC-FR-N-x IDs are treated as aliases for their Blueprint-expanded forms (AC-CC-N-x for Claude-Code-layer FRs, AC-CS-Nx-y for Codespaces FRs, AC-CICD-N-x for CI/CD FRs). The matrix below indexes by the Blueprint-expanded form only; for reverse lookups from a PRD-original ID, consult plan-v1.md Acceptance Test Cross-Reference.' Alternatively a small alias table mapping each PRD-original family to its Blueprint-expanded counterpart. No test re-authoring; no Coverage Matrix row changes.\n\n2. SHA-EQUALITY GAP (I-CA-007, your call between two paths):\n\n   Path (a) - author AT-080. A small static-inspection test asserting that the 'uses:' SHA values in the FR-5 CI workflow and the FR-4c CI workflow are byte-identical for actions/checkout and for devcontainers/ci. Mirror the shape of AT-052 and AT-062 (which inspect each workflow's permissions/credentials separately). Map AT-080 to AC-CICD-4c-x and AC-CICD-5-x in the Coverage Matrix (or to AC-X-1 if the cross-mechanism framing fits better).\n\n   Path (b) - update Open Coverage Gaps item 7 (currently line 1381) to: 'Resolved by Phase Validator PV-3 Operational checks line 394, which asserts that FR-5 and FR-4c cite the SAME resolved SHA for actions/checkout and devcontainers/ci via SHA string-comparison across both files. No discrete AT-NNN is required; the cross-workflow SHA-equality check lives in the validator surface.'\n\n   Auditor's recommendation: path (b) is cheaper and PV-3 already covers it; the gap is documentary, not substantive. Choose path (b) unless you judge that the check should live in the test surface (e.g., to run on every change rather than only at phase-validator boundaries), in which case author AT-080.\n\nAdd a v1.0.1 entry to revision_history citing reconciliation-log-r3.md as the source and listing both edits (which path you chose for I-CA-007). No other changes - the matrix is exhaustive in both directions, all 79 ATs have AC coverage, and the rest of the document is sound.",
+      "issues_referenced": ["I-CA-001", "I-CA-007"],
+      "depends_on_dispatch_order": []
+    },
+    {
+      "order": 3,
+      "parallelisable_with": [1, 2, 4],
+      "target_agent": "test-phase-validator-author",
+      "target_artifact": "working/feature/pipeline-quickwins-hardening-r1/phase-validators.md",
+      "target_version_bump": "1.0.0 -> 1.0.1",
+      "rationale": "Three edits to the Phase Validators document: bump stale Blueprint v2.1 source pointer to v2.2, add AT-NNN cross-references in each PV-N's 'Acceptance tests scheduled' subsection (the AT mapping is now stable; the validators flagged this as future work that became possible once Tests v1.0.0 finalised), and add a one-line cross-reference to PV-5.C4 acknowledging that its compound severity reflects Plan T5.4's open-ended observation framing.",
+      "feedback_brief": "Three edits:\n\n1. SOURCE POINTER (I-CA-003 partial - Validators side): replace 'Blueprint: blueprint-v2.md (v2.1)' on phase-validators.md line 39 with 'Blueprint: blueprint-v2.md (v2.2)'. Update any other 'Blueprint v2.1' citations in Conventions, related-sections lines, or anywhere the Source is referenced.\n\n2. AT-NNN CROSS-REFERENCES (I-CA-006): in each PV-N's 'Acceptance tests scheduled for this phase' subsection (PV-1 lines 220-229, PV-2 lines 309-319, PV-3 lines 384-391, PV-4 lines 480-489, PV-5 lines 554-560), append the corresponding AT-NNN entries next to each AC ID. The canonical mapping source is acceptance-tests.md v1.0.0 Coverage Matrix (lines 51-145). Suggested format: 'AC-CC-1-a -> AT-001'; 'AC-CC-1-b -> AT-002, AT-003'. Approx 15 lines of additional citation per validator. Alternative: a single appendix table at the end of phase-validators.md with a one-line cross-reference pointing the reader to it from each subsection. Choose the form that minimises the diff. Also update the Open items entry at line 676 to mark this work complete.\n\n3. PV-5.C4 SEVERITY NOTE (I-CA-008): add a one-line note immediately after PV-5.C4's existing severity line (~line 550):\n\n   Note: PV-5.C4's compound severity (MAJOR for log existence; BLOCKER if kill-criterion fires) reflects Plan T5.4's open-ended observation framing - T5.4 is an ongoing post-merge observation task whose full-coverage window extends beyond the PV-5 phase boundary. The compound severity is intentional: MAJOR is acceptable at the PV-5 boundary because completeness can extend beyond it; BLOCKER fires only on a kill-criterion trigger that demands immediate action regardless of observation window state.\n\n   Cross-reference Plan Phase 5 Goal preamble line 520.\n\nAdd a v1.0.1 entry to revision_history citing reconciliation-log-r3.md as the source and listing all three edits. No other changes - the validators-to-Plan-phase 1-to-1 mapping is intact and the substantive checks are correct.",
+      "issues_referenced": ["I-CA-003-partial-validators", "I-CA-006", "I-CA-008"],
+      "depends_on_dispatch_order": []
+    },
+    {
+      "order": 4,
+      "parallelisable_with": [1, 2, 3],
+      "target_agent": "design-composer",
+      "target_artifact": "working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.md",
+      "target_version_bump": "2.2.0 -> 2.3.0",
+      "rationale": "One additive edit to the Blueprint: a short inheritance-convention note in the Acceptance Criteria preamble explaining why AC-NFR-1-a through AC-NFR-13-b remain inherited-by-reference from prd-v1.md while AC-CC-*, AC-CS-*, AC-CICD-*, AC-NFR-14, AC-NFR-15 are enumerated inline. Purely additive; no AC definitions added, removed, or modified.",
+      "feedback_brief": "One edit, purely additive:\n\nAdd a one-paragraph inheritance-convention note at the head of Acceptance Criteria (immediately after the section heading, before the AC enumeration begins). Recommended wording:\n\n  AC inheritance convention. This Blueprint enumerates inline only those Acceptance Criteria that arose from per-layer Design integration (the AC-CC-*, AC-CS-*, AC-CICD-* families) and the two cross-cutting NFR ACs added in v2.2 (AC-NFR-14, AC-NFR-15). AC-NFR-1-a through AC-NFR-13-b inherit verbatim from prd-v1.md Non-Functional Requirements (lines 340-407) and are not re-stated here. The inheritance mirrors the Functional Requirements convention ('see PRD FR-N') and is intentional: the v2.2 lift cycle scoped only to ACs that the Plan and Tests cited but Blueprint v2.1 did not define; AC-NFR-1-a..AC-NFR-13-b were already cited by ID and defined in the PRD canon, so the inheritance has always resolved cleanly.\n\nFrontmatter changes:\n- version: 2.2.0 -> 2.3.0\n- change_summary: 'additive only: one-line AC inheritance convention note in Acceptance Criteria preamble explaining why AC-NFR-1-a through AC-NFR-13-b remain inherited-by-reference from prd-v1.md NFR while AC-CC-*, AC-CS-*, AC-CICD-*, AC-NFR-14, AC-NFR-15 are enumerated inline. No AC definitions added, removed, or modified.'\n- predecessor: working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.md@v2.2.0\n\nDo NOT touch the AC enumerations themselves. Do NOT touch any other Blueprint section. Add a change_history entry citing reconciliation-log-r3.md as the source. The amendment is purely a preamble note; the substantive content is unchanged.",
+      "issues_referenced": ["I-CA-002"],
+      "depends_on_dispatch_order": []
+    }
+  ],
+  "user_escalations": [],
+  "deferrals": [],
+  "post_dispatch_action": {
+    "type": "re_audit",
+    "auditor_to_invoke": "review-cross-artifact-auditor",
+    "rationale": "All four dispatches address findings surfaced in the cycle-1 cross-artifact audit. Re-invoke the same auditor on the four updated artifacts (blueprint-v2.md v2.3.0, plan-v1.md v1.0.2, acceptance-tests.md v1.0.1, phase-validators.md v1.0.1) to confirm convergence.",
+    "expected_convergence": "0 critical, 0 important, 0 recommended -> pass verdict -> cross-artifact family closes at cycle 2"
+  },
+  "audit_trail": {
+    "prior_logs": [
+      "working/feature/pipeline-quickwins-hardening-r1/reconciliation-log-r1.md",
+      "working/feature/pipeline-quickwins-hardening-r1/reconciliation-log-r2.md"
+    ],
+    "prior_log_families": ["blueprint_architecture_audit", "plan_gate_1_review"],
+    "prior_families_closed": true,
+    "persistent_issues_from_prior_cycles": []
+  }
+}

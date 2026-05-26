@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "reconciliation_log": "working/feature/pipeline-quickwins-hardening-r1/reconciliation-log-r2.md",
+  "cycle_number": 1,
+  "cycle_cap": 4,
+  "artifact_family": "plan",
+  "is_terminal_cycle": false,
+  "parallelism_admissible": true,
+  "dispatches": [
+    {
+      "order": 1,
+      "target_agent": "design-composer",
+      "target_artifact": "blueprint",
+      "input_artifact_path": "working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.md",
+      "output_artifact_path": "working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.md",
+      "output_version_bump": "2.1 -> 2.2",
+      "revision_class": "additive_amendment",
+      "rationale": "Lift 18 Plan-cited AC definitions from per-layer designs (cc-design v0.2.0 + cicd-design v0.3.0) into Blueprint canonical AC catalog. Pre-empts Cross-Artifact Audit orphan-reference findings. Purely additive: no existing AC IDs or text change.",
+      "feedback_brief": "Produce Blueprint v2.2 as a purely additive amendment to v2.1. Preserve every existing Blueprint v2.1 section, AC ID, AC text, and prose passage. Lift the following AC definitions verbatim from their per-layer-design sources into their natural sections in the Blueprint AC catalog. From cc-design.md v0.2.0 FR-1 section: AC-CC-1-d, AC-CC-1-e, AC-CC-1-f, AC-CC-1-g. From cc-design.md v0.2.0 FR-2 section: AC-CC-2-d, AC-CC-2-e, AC-CC-2-f. From cc-design.md v0.2.0 FR-3 section: AC-CC-3-c, AC-CC-3-d, AC-CC-3-e, AC-CC-3-f, AC-CC-3-g, AC-CC-3-h, AC-CC-3-i, AC-CC-3-j, AC-CC-3-k (slot between existing AC-CC-3-b and AC-CC-3-l). From cc-design.md v0.2.0 FR-7 section: AC-CC-7-b, AC-CC-7-c. From cicd-design.md v0.3.0 FR-5 section: AC-CICD-5-c, AC-CICD-5-d, AC-CICD-5-e, AC-CICD-5-f. New AC to author from PRD NFR-14: AC-NFR-14 in EARS form covering the NFR-14 obligation as stated in the PRD; cross-check the PRD before authoring; do not invent a new obligation. Resolve AC-NFR-15 either by aliasing it to AC-X-3 in Blueprint v2.2 or by signaling back to the orchestrator that plan-author should repoint T4.2's AC-NFR-15 citation to AC-X-3 — pick whichever fits the Blueprint template alias discipline and document the choice in change_summary. Do NOT change any existing AC text, ID, cross-cutting prose, Fact Disposition Table entry, or ADR reference. Frontmatter bumps: version 2.1 to 2.2; status remains draft (will be re-reviewed); change_summary: 'Additive: lifted 18 per-layer-design ACs into Blueprint canon (4 from FR-1, 3 from FR-2, 9 from FR-3, 2 from FR-7, 4 from FR-5); authored AC-NFR-14; resolved AC-NFR-15. No existing AC IDs or text changed; no architectural decisions revisited. Pre-empts Cross-Artifact Audit orphan-reference findings (I-DR-002).' Update generated timestamp.",
+      "issues_referenced": ["I-DR-002"],
+      "depends_on_dispatch_order": [],
+      "blocking_for_next_stage": true
+    },
+    {
+      "order": 2,
+      "target_agent": "plan-author",
+      "target_artifact": "plan",
+      "input_artifact_path": "working/feature/pipeline-quickwins-hardening-r1/plan-v1.md",
+      "output_artifact_path": "working/feature/pipeline-quickwins-hardening-r1/plan-v1.md",
+      "output_version_bump": "1.0.0 -> 1.0.1",
+      "revision_class": "surgical_edit",
+      "rationale": "Three surgical edits: recount task total (frontmatter + Estimation Methodology), correct T2.6 server count to match live .mcp.json state (or remove T2.6 entirely if head comment already correct), add Phase 5 terminal-write-action clarification.",
+      "feedback_brief": "Produce Plan v1.0.1 as a surgical-edit pass against v1.0.0. Do not re-decompose any phase, do not re-author any task, do not change any L1/L2/L3 verification, do not change any Satisfies AC citation. Three edits only. EDIT 1 (I-DR-001): Recount rendered tasks per phase. Expected: P0=5, P1=9, P2=8, P3=3, P4=7, P5=4, total=36. If recount matches 36, change frontmatter total_tasks 47 to 36 and change Estimation Methodology sentence 'across all 47 tasks' to 'across all 36 tasks'. If recount differs, use the actual number and add an Update History entry explaining the divergence. EDIT 2 (I-DR-005): Read .devcontainer/postCreate.sh:5 first. If head comment is incorrect (says 5 servers or 4 servers), update T2.6 to reflect 'N to 6' where N is what is actually on disk; update all five locations of the '5 to 4' string (T2.6 heading line 304, T2.6 description line 307, Phase 2 success-criteria bullet line 341, Phase 2 dependency diagram line 578, Cross-Phase Dependencies setup-tasks listing line 778). If head comment already says '6 servers' correctly, remove T2.6 entirely: delete T2.6 task block, the Phase 2 success-criteria bullet about the cosmetic fix, the T2.6 row in the Phase 2 dependency diagram (adjust ASCII art accordingly), and the T2.6 line in the Cross-Phase Dependencies setup-tasks listing. EDIT 3 (I-DR-003): Locate the Phase 5 goal prose. Add one sentence immediately after the existing Phase 5 goal: 'T5.2 is the terminal write-action of this Plan — all subsequent Phase 5 tasks (T5.3, T5.4) are post-action observation tasks that do not modify repository state.' OUT OF SCOPE: I-DR-002 (Blueprint-side; handled in parallel by design-composer). I-DR-004 (no Plan change required; Plan correctly follows template). Do not re-cite any AC; existing Satisfies AC citations resolve correctly against the forthcoming Blueprint v2.2. Optional Update History entry: 'v1.0.0 to v1.0.1: surgical-edit pass per reconciliation-log-r2; recounted task total, corrected T2.6 server count to match live .mcp.json state, added Phase 5 terminal-write-action clarification.' Frontmatter bumps: version 1.0.0 to 1.0.1; status remains draft. Update generated timestamp.",
+      "issues_referenced": ["I-DR-001", "I-DR-005", "I-DR-003"],
+      "depends_on_dispatch_order": [],
+      "blocking_for_next_stage": true
+    }
+  ],
+  "user_escalations": [],
+  "deferrals": [
+    {
+      "issue_id": "I-DR-004",
+      "severity": "recommended",
+      "disposition": "accept-no-change",
+      "rationale": "The Plan template specifies L1/L2/L3 verification (not EARS) at task level per KB-documentation-criteria/references/disciplines/plan-authoring.md. Plan v1.0.0 correctly follows the template. Any change to task-level verification discipline is out of this feature's carve-out (would require amending KB-documentation-criteria, which is not in scope).",
+      "carry_to_prior_context": true,
+      "note_for_next_reviewer": "I-DR-004 is closed as accept-no-change. Do not re-surface unless the discipline question itself is added to feature scope."
+    }
+  ],
+  "next_stage_after_authors_return": {
+    "stage": "shared-document-reviewer",
+    "targets": [
+      "working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.md (v2.2)",
+      "working/feature/pipeline-quickwins-hardening-r1/plan-v1.md (v1.0.1)"
+    ],
+    "prior_context_input": "working/feature/pipeline-quickwins-hardening-r1/reconciliation-log-r2.md",
+    "convergence_expectation": "approved on both artifacts; if approved_with_conditions or needs_revision, open cycle 2 of 4 for the Plan family"
+  },
+  "convergence_assessment": {
+    "verdict": "converging",
+    "persistent_issues_count": 0,
+    "new_issues_count": 5,
+    "divergence_signals": []
+  }
+}

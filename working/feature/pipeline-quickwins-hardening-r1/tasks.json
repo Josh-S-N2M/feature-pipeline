@@ -1,0 +1,855 @@
+{
+  "schema_version": "1.0.0",
+  "pipeline_run_id": "pipeline-quickwins-hardening-r1",
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "generated": "2026-05-26T00:00:00Z",
+  "generated_by": "finalize-task-decomposer",
+  "source_artifacts": {
+    "prd": "working/feature/pipeline-quickwins-hardening-r1/prd-v1.md",
+    "prd_version": "v0.3.0",
+    "blueprint": "working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.md",
+    "blueprint_version": "v2.3.0",
+    "plan": "working/feature/pipeline-quickwins-hardening-r1/plan-v1.md",
+    "plan_version": "v1.0.2",
+    "acceptance_tests": "working/feature/pipeline-quickwins-hardening-r1/acceptance-tests.md",
+    "acceptance_tests_version": "v1.0.1",
+    "phase_validators": "working/feature/pipeline-quickwins-hardening-r1/phase-validators.md",
+    "phase_validators_version": "v1.0.1",
+    "codebase_analysis": "working/feature/pipeline-quickwins-hardening-r1/codebase-analysis.json",
+    "adrs_in_scope": [
+      "ADR-0005",
+      "ADR-0017",
+      "ADR-0029",
+      "ADR-0033",
+      "ADR-0036",
+      "ADR-0037 (v1.0.2; in-place amended this run)",
+      "ADR-0039",
+      "ADR-0040",
+      "ADR-0041 (rows 70 + 71 carry [DEPRECATED INVOCATION FORM] annotations this run)",
+      "ADR-0042",
+      "ADR-0043",
+      "ADR-0044",
+      "ADR-0056",
+      "ADR-0057 (v1.0.1; authored this run)",
+      "ADR-0058 (v1.0.0; authored this run)"
+    ]
+  },
+  "decomposition_notes": [
+    "1:1 mapping from Plan v1.0.2 tasks to DAG tasks. Plan-author already sized tasks at the L1/L2/L3 verifiable-atom level; no further splits. The one L-sized task (T2.4, FR-4b calibration script) is at the upper-bound for single-task scope per Plan §Estimation Methodology — Plan explicitly defers any split-decision to implementation time ('if implementation reveals it's larger, split into Signal 1 + Signal 3 only and negative-assertion + event emission + cleanup sub-tasks'). Surfaced here as a watch-flag in open_items_for_orchestrator, not pre-emptively split.",
+    "Edges are taken verbatim from Plan §Cross-Phase Dependencies (the ASCII diagram is the authoritative source); supplemented with the dispatch-prompt's two explicit sequencing constraints (T2.4 ← T2.1 for the OP-7-before-first-emission ordering; T5.3 ← T5.2 and T5.4 ← T5.2 for the post-merge observation chain). Cross-checked against Plan §Critical path: T0.1 → T1.2 → T2.1 → T2.4 → T2.5 → T3.2 → T3.3 → T4.3 → T4.4 → T4.7 → T5.1 → T5.2 (12-node chain).",
+    "Phase Validators PV-0..PV-5 are NOT modeled as standalone tasks here (they are operational gates run by the orchestrator at phase boundaries per phase-validators.md §Validator metadata, not work-units in the executor's DAG). They are surfaced per-task via verifies_with_pv pointing at the specific PV-N.Cn criteria each task contributes to. KB-task-decomposition's 'validator-setup' task pattern is folded into the host T-N task because each criterion's automation hook is either (a) a file the task itself produces, or (b) a shell one-liner the task description already specifies.",
+    "AC mapping is taken from Plan §Acceptance Test Cross-Reference (PRD/Blueprint AC IDs) and translated to AT-NNN IDs via the Acceptance Tests v1.0.1 Coverage Matrix as cited in phase-validators.md v1.0.1 (per I-CA-006 close). For Plan tasks tagged 'N/A — setup' the satisfies_ac field is an empty list and verifies_with_pv is non-empty (the setup task verifies a Phase Validator pass criterion without satisfying any AC).",
+    "All 80 AT-NNN IDs (AT-001..AT-080) are covered transitively: AT-001..AT-014 by T1.3+T1.7+T1.8 (FR-1/FR-2); AT-015 by T4.6 (resume smoke); AT-016..AT-027 by T1.4+T1.5+T1.9 (FR-3); AT-028..AT-037 by T2.2 (FR-4a); AT-038..AT-044 by T2.4+T2.5 (FR-4b); AT-045..AT-055 by T3.2+T5.2+T5.3 (FR-4c); AT-056..AT-062 by T3.1 (FR-5); AT-063 by T4.4 (FR-6 cross-cutting); AT-064..AT-067 by T4.1 (FR-7); AT-068..AT-069 by T4.3 (NFR-11); AT-070 by T1.2+T2.1+T2.4 (event-surface enum); AT-071 by T4.2 (NFR-15); AT-072..AT-074 by T2.3+T4.5 (Q-CS-1b banner); AT-075..AT-076 by T1.3+T1.7 (NFR-1/NFR-2 latency); AT-077..AT-078 by no-credential surfaces; AT-079..AT-080 by Phase 5 observation tasks. Test-implementation tasks are folded into the L2 verification step of the producing Plan task per Plan's L1/L2/L3 discipline — the Plan does not separate 'write the test' from 'write the code' into distinct tasks, so this DAG does not synthesize them.",
+    "DAG topology verified acyclic by manual topological ordering: Phase 0 (T0.1..T0.5) → Phase 1 (T1.1..T1.9) → Phase 2 (T2.1..T2.8) → Phase 3 (T3.1..T3.3) → Phase 4 (T4.1..T4.7) → Phase 5 (T5.1..T5.4). No back-edges. T4.2's dependencies (T1.4, T1.9) are within an earlier phase. T4.3's dependencies span Phases 1+2+3 but are all earlier in topological order.",
+    "All 36 Plan tasks are reachable from T0.1 (the branch-creation root). T0.2..T0.5 each depend on T0.1; every Phase 1 task either depends on T0.1 directly or on a T0.x setup output (T0.3 anchors → T1.5; T0.5 tooling → T1.3+T1.4). Every downstream task chains through Phase 1. No orphan tasks."
+  ],
+  "tasks": [
+    {
+      "task_id": "T0.1",
+      "phase": 0,
+      "layer": "cc",
+      "title": "Create feature branch and confirm clean working tree",
+      "description": "Create branch feature/pipeline-quickwins-hardening-r1 from main. Confirm git status clean and that .claude/, .devcontainer/, .github/workflows/, adrs/, Issues/, and working/feature/pipeline-quickwins-hardening-r1/ are all present.",
+      "target_files": [
+        "(branch creation; no file writes)"
+      ],
+      "dependencies": [],
+      "satisfies_ac": [],
+      "verifies_with_pv": ["PV-0.C1"],
+      "per_task_skills": [],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 0 — T0.1"
+    },
+    {
+      "task_id": "T0.2",
+      "phase": 0,
+      "layer": "cicd",
+      "title": "Resolve SHA pins for actions/checkout and devcontainers/ci",
+      "description": "Resolve the current major-version SHA for actions/checkout and for devcontainers/ci (third-party; SHA pin REQUIRED per KB-github-actions-platform non-negotiable #1). Both Phase 3 workflows MUST use the same resolved SHA for each action — one resolution effort per action, two reuses. Record in working/feature/pipeline-quickwins-hardening-r1/sha-pins.md.",
+      "target_files": [
+        "working/feature/pipeline-quickwins-hardening-r1/sha-pins.md"
+      ],
+      "dependencies": ["T0.1"],
+      "satisfies_ac": [],
+      "verifies_with_pv": ["PV-0.C2"],
+      "per_task_skills": ["KB-github-actions-platform"],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 0 — T0.2"
+    },
+    {
+      "task_id": "T0.3",
+      "phase": 0,
+      "layer": "cc",
+      "title": "Confirm current ADR-0041 row anchors (rows 70 and 71)",
+      "description": "Read adrs/ADR-0041-install-mechanism-hybrid.md lines 68-71 and confirm rows 70 (Serena) and 71 (mcp-openapi-schema) are addressable. Capture verbatim Form-column text in working/feature/pipeline-quickwins-hardening-r1/adr-0041-anchors.md for T1.5.",
+      "target_files": [
+        "working/feature/pipeline-quickwins-hardening-r1/adr-0041-anchors.md"
+      ],
+      "dependencies": ["T0.1"],
+      "satisfies_ac": [],
+      "verifies_with_pv": ["PV-0.C3"],
+      "per_task_skills": [],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 0 — T0.3"
+    },
+    {
+      "task_id": "T0.4",
+      "phase": 0,
+      "layer": "codespaces",
+      "title": "Confirm postCreate.sh line 197-198 anchor still resolves",
+      "description": "Read .devcontainer/postCreate.sh lines 195-201 and confirm the FR-4a insertion site is still between install_terraform_mcp (line 197) and install_gitnexus (line 198). Capture the resolved anchor (line number + 3-line context fragments) in working/feature/pipeline-quickwins-hardening-r1/postcreate-anchor.md.",
+      "target_files": [
+        "working/feature/pipeline-quickwins-hardening-r1/postcreate-anchor.md"
+      ],
+      "dependencies": ["T0.1"],
+      "satisfies_ac": [],
+      "verifies_with_pv": ["PV-0.C4"],
+      "per_task_skills": ["KB-codespaces-design"],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 0 — T0.4"
+    },
+    {
+      "task_id": "T0.5",
+      "phase": 0,
+      "layer": "cc",
+      "title": "Confirm tool availability — actionlint, jq, python3, bash, mktemp, gh",
+      "description": "Confirm the local environment has the tools the Plan invokes. Note any missing tool (with fallback) in working/feature/pipeline-quickwins-hardening-r1/tooling-check.md. jq, python3, npx MUST be on PATH (no fallback); actionlint may rely on the mcp__actionlint-mcp__lint_workflow MCP fallback.",
+      "target_files": [
+        "working/feature/pipeline-quickwins-hardening-r1/tooling-check.md"
+      ],
+      "dependencies": ["T0.1"],
+      "satisfies_ac": [],
+      "verifies_with_pv": ["PV-0.C5"],
+      "per_task_skills": [],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 0 — T0.5"
+    },
+    {
+      "task_id": "T1.1",
+      "phase": 1,
+      "layer": "cc",
+      "title": "Author ADR-0057 (checkpoint.execution_mode first-class field) at v1.0.1",
+      "description": "Write adrs/ADR-0057-checkpoint-execution-mode-first-class-field.md at v1.0.1. Decision content per Blueprint §ADR-0057; the v2.1 amendment reworded §Context from 'introduce' to 'promote-and-formalize' per Architecture Audit cycle 1 finding I-AA-004. Frontmatter: version 1.0.1, status accepted. Body documents the closed enum for execution_mode, the writer (orchestrator dispatch step), the reader (FR-2 self-check), and the absence-default rule (pre-feature checkpoints map to specialist-dispatch).",
+      "target_files": [
+        "adrs/ADR-0057-checkpoint-execution-mode-first-class-field.md"
+      ],
+      "dependencies": ["T0.1"],
+      "satisfies_ac": ["AT-009"],
+      "verifies_with_pv": ["PV-1.C1"],
+      "per_task_skills": ["KB-cc-design", "KB-documentation-criteria"],
+      "estimate_units": "S",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 1 — T1.1"
+    },
+    {
+      "task_id": "T1.2",
+      "phase": 1,
+      "layer": "cc",
+      "title": "Author ADR-0058 (calibration_result event-type additive extension to ADR-0037)",
+      "description": "Write adrs/ADR-0058-calibration-result-event-type-additive-extension.md at v1.0.0. Cite-and-extend (not in-place) ADR-0037 v1.0.2. Canonical payload: {event: calibration_result, timestamp, server, mechanism, version, duration_ms, outcome, signals, note}. Mechanism field as namespace discriminator (fr-4b-gitnexus-grammar-skip for this feature). Closed-enum discipline at four values; existing consumers ignore unknown types per ADR-0037 forward-compatibility.",
+      "target_files": [
+        "adrs/ADR-0058-calibration-result-event-type-additive-extension.md"
+      ],
+      "dependencies": ["T0.1"],
+      "satisfies_ac": ["AT-038", "AT-042", "AT-070"],
+      "verifies_with_pv": ["PV-1.C2"],
+      "per_task_skills": ["KB-cc-design", "KB-mcp-design", "KB-documentation-criteria"],
+      "estimate_units": "S",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 1 — T1.2"
+    },
+    {
+      "task_id": "T1.3",
+      "phase": 1,
+      "layer": "cc",
+      "title": "Implement verdict_findings_parity.py (FR-1 validator)",
+      "description": "Author .claude/skills/auditing-shared/scripts/verdict_findings_parity.py. CLI contract: inputs are a reviewer-output path and the agent name. Reads verdict+findings JSON, applies the structural check, exits 0/1/2 (pass-through / blocking finding present alongside approving verdict / internal error). Blocking-severity set per cc-design v0.2.0. Diagnostic on exit 1 includes the four FR-6 fields.",
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/verdict_findings_parity.py",
+        "working/feature/pipeline-quickwins-hardening-r1/fixtures/fr1/"
+      ],
+      "dependencies": ["T0.1", "T0.5"],
+      "satisfies_ac": ["AT-001", "AT-002", "AT-003", "AT-004", "AT-005", "AT-006", "AT-007", "AT-008", "AT-075"],
+      "verifies_with_pv": ["PV-1.C3"],
+      "per_task_skills": ["KB-cc-design", "KB-general-coding-principles"],
+      "estimate_units": "M",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 1 — T1.3"
+    },
+    {
+      "task_id": "T1.4",
+      "phase": 1,
+      "layer": "cc",
+      "title": "Implement audit_op11_adr_parity.py (FR-3 OP-11 audit rule)",
+      "description": "Author .claude/skills/auditing-mcp/scripts/audit_op11_adr_parity.py + .claude/skills/auditing-mcp/references/adr-parity.md. Iterate every .mcp.json server entry, locate the non-deprecated row in ADR-0041, apply canonicalize+opaque-tokens comparison. Skip rows annotated [DEPRECATED INVOCATION FORM]. Exit 0/1/2 per the existing OP-rule contract. Diagnostic includes the four FR-6 fields.",
+      "target_files": [
+        ".claude/skills/auditing-mcp/scripts/audit_op11_adr_parity.py",
+        ".claude/skills/auditing-mcp/references/adr-parity.md",
+        "working/feature/pipeline-quickwins-hardening-r1/fixtures/fr3/"
+      ],
+      "dependencies": ["T0.1", "T0.5", "T1.5"],
+      "satisfies_ac": ["AT-016", "AT-017", "AT-018", "AT-019", "AT-020", "AT-021", "AT-022", "AT-023", "AT-024", "AT-025", "AT-026", "AT-027"],
+      "verifies_with_pv": ["PV-1.C4", "PV-1.C6"],
+      "per_task_skills": ["KB-cc-design", "KB-mcp-design"],
+      "estimate_units": "M",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 1 — T1.4"
+    },
+    {
+      "task_id": "T1.5",
+      "phase": 1,
+      "layer": "cc",
+      "title": "Annotate ADR-0041 rows 70 and 71 with [DEPRECATED INVOCATION FORM] markers",
+      "description": "Edit adrs/ADR-0041-install-mechanism-hybrid.md to add inline [DEPRECATED INVOCATION FORM] annotations to row 70 (Serena) and row 71 (mcp-openapi-schema). Decision-text preserved verbatim per ADR-0005. Row 71: [DEPRECATED — removed 2026-05-24]. Row 70: [DEPRECATED INVOCATION FORM — actual installed via uv-tool; runtime invocation is serena start-mcp-server from PATH; see postCreate.sh:82 + .mcp.json:28-31]. Use the anchors captured in T0.3.",
+      "target_files": [
+        "adrs/ADR-0041-install-mechanism-hybrid.md"
+      ],
+      "dependencies": ["T0.3"],
+      "satisfies_ac": ["AT-018", "AT-027"],
+      "verifies_with_pv": ["PV-1.C5"],
+      "per_task_skills": ["KB-documentation-criteria"],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 1 — T1.5"
+    },
+    {
+      "task_id": "T1.6",
+      "phase": 1,
+      "layer": "cc",
+      "title": "Modify recipe-feature-pipeline/SKILL.md — hoist scope_class for FR-2 self-check",
+      "description": "Edit .claude/skills/recipe-feature-pipeline/SKILL.md. Today scope_class is read at line ~350 (inside Stage 13). The FR-2 dispatch self-check runs at orchestrator entry, so scope_class must be hoisted to the dispatch-entry section. Hoist lives inline; line ~350 site remains as Stage 13 consumer.",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "dependencies": ["T0.1"],
+      "satisfies_ac": ["AT-009"],
+      "verifies_with_pv": ["PV-1.C7"],
+      "per_task_skills": ["KB-cc-design"],
+      "estimate_units": "S",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 1 — T1.6"
+    },
+    {
+      "task_id": "T1.7",
+      "phase": 1,
+      "layer": "cc",
+      "title": "Modify recipe-feature-pipeline/SKILL.md — add FR-2 dispatch self-check block",
+      "description": "Add the FR-2 dispatch self-check inline at orchestrator entry (after the hoisted scope_class read from T1.6). Enumerates every stage's checkpoint.execution_mode per ADR-0057. If scope_class == FULL and any stage execution_mode == parent-driven-workaround, refuse to enter the dispatch loop and surface a diagnostic naming the offending stage. MINOR and PATCH scopes permit single-agent-fallback. Diagnostic includes the four FR-6 fields.",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md",
+        "working/feature/pipeline-quickwins-hardening-r1/fixtures/fr2/"
+      ],
+      "dependencies": ["T1.1", "T1.6"],
+      "satisfies_ac": ["AT-009", "AT-010", "AT-011", "AT-012", "AT-013", "AT-014", "AT-076"],
+      "verifies_with_pv": ["PV-1.C7", "PV-1.C8"],
+      "per_task_skills": ["KB-cc-design"],
+      "estimate_units": "M",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 1 — T1.7"
+    },
+    {
+      "task_id": "T1.8",
+      "phase": 1,
+      "layer": "cc",
+      "title": "Modify recipe-feature-pipeline/SKILL.md — wire FR-1 validator at all 9 reviewer-completion sites",
+      "description": "Add python3 verdict_findings_parity.py invocation at 9 reviewer-completion sites across 5 reviewer-shaped agents: shared-document-reviewer (5 sites per ADR-0017), review-architecture-auditor (1), review-cross-artifact-auditor (1), execute-phase-quality-reviewer (1), execute-task-quality-handler (1). On exit code 1, halt orchestrator advance and surface the diagnostic.",
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "dependencies": ["T1.3"],
+      "satisfies_ac": ["AT-001", "AT-002", "AT-003", "AT-004", "AT-005", "AT-006", "AT-007", "AT-008"],
+      "verifies_with_pv": ["PV-1.C7"],
+      "per_task_skills": ["KB-cc-design"],
+      "estimate_units": "M",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 1 — T1.8"
+    },
+    {
+      "task_id": "T1.9",
+      "phase": 1,
+      "layer": "cc",
+      "title": "Update auditing-mcp/SKILL.md routing table for OP-11",
+      "description": "Edit .claude/skills/auditing-mcp/SKILL.md to add OP-11 to the OP-rule routing table per ADR-0042 (auditing-mcp family graduation contract). Entry references audit_op11_adr_parity.py and references/adr-parity.md. CLAUDE.md counter update deferred to T4.2.",
+      "target_files": [
+        ".claude/skills/auditing-mcp/SKILL.md"
+      ],
+      "dependencies": ["T1.4"],
+      "satisfies_ac": ["AT-016"],
+      "verifies_with_pv": ["PV-1.C4"],
+      "per_task_skills": ["KB-mcp-design"],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 1 — T1.9"
+    },
+    {
+      "task_id": "T2.1",
+      "phase": 2,
+      "layer": "cc",
+      "title": "Extend audit_op7_events_schema.py to admit calibration_result",
+      "description": "Edit .claude/skills/auditing-mcp/scripts/audit_op7_events_schema.py. Extend VALID_EVENT_TYPES to add calibration_result; extend REQUIRED_FIELDS to admit the nine canonical fields per ADR-0058 (event, timestamp, server, mechanism, version, duration_ms, outcome, signals, note). Three pre-existing types preserved verbatim per ADR-0037 v1.0.2. Per Blueprint §Implementation Plan task 12: MUST land in the same PR as T2.4 (FR-4b script) — otherwise every emission triggers OP-7 MAJOR. Hard dependency: T2.4 ← T2.1 (sequencing constraint from dispatch prompt).",
+      "target_files": [
+        ".claude/skills/auditing-mcp/scripts/audit_op7_events_schema.py",
+        "working/feature/pipeline-quickwins-hardening-r1/fixtures/op7/"
+      ],
+      "dependencies": ["T1.2"],
+      "satisfies_ac": ["AT-070"],
+      "verifies_with_pv": ["PV-2.C1"],
+      "per_task_skills": ["KB-mcp-design", "KB-cc-design"],
+      "estimate_units": "S",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 2 — T2.1"
+    },
+    {
+      "task_id": "T2.2",
+      "phase": 2,
+      "layer": "codespaces",
+      "title": "Insert FR-4a static-shape check block in postCreate.sh at top-level",
+      "description": "Insert FR-4a static-shape check between lines 197 (install_terraform_mcp) and 198 (install_gitnexus) using the anchor from T0.4. Four assertions per AC-CS-4a-1: A1 GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1; A2 GITNEXUS_TAG format; A3 GITNEXUS_TAG matches versions.env; A4 npm root -g non-empty + writable. On fail: emit one structured_failure event with four FR-6 elements; echo plain-text diagnostic to stderr; set -euo pipefail halts before install_gitnexus. Top-level placement (not inside install_gitnexus()). No network access. No sentinel file.",
+      "target_files": [
+        ".devcontainer/postCreate.sh"
+      ],
+      "dependencies": ["T0.4"],
+      "satisfies_ac": ["AT-028", "AT-029", "AT-030", "AT-031", "AT-032", "AT-033", "AT-034", "AT-035", "AT-036", "AT-037"],
+      "verifies_with_pv": ["PV-2.C2"],
+      "per_task_skills": ["KB-codespaces-design"],
+      "estimate_units": "M",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 2 — T2.2"
+    },
+    {
+      "task_id": "T2.3",
+      "phase": 2,
+      "layer": "codespaces",
+      "title": "Insert Q-CS-1b staleness banner block in postCreate.sh adjacent to FR-4a",
+      "description": "Add Q-CS-1b staleness banner immediately after the FR-4a block and before install_gitnexus. jq the most recent calibration_result event for mechanism: fr-4b-gitnexus-grammar-skip from .claude/runtime/mcp-events.jsonl; compare timestamp to now - 2 weeks. Three variants: NEVER RUN / STALE / silent. Banner is informational; uses || true guard to never fail-close. Banner does NOT emit an mcp-events.jsonl event.",
+      "target_files": [
+        ".devcontainer/postCreate.sh"
+      ],
+      "dependencies": ["T2.2"],
+      "satisfies_ac": ["AT-072", "AT-073", "AT-074"],
+      "verifies_with_pv": ["PV-2.C3"],
+      "per_task_skills": ["KB-codespaces-design"],
+      "estimate_units": "S",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 2 — T2.3"
+    },
+    {
+      "task_id": "T2.4",
+      "phase": 2,
+      "layer": "codespaces",
+      "title": "Author .devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh (FR-4b script)",
+      "description": "FR-4b opt-in behavioral calibration script. Steps: read GITNEXUS_TAG from versions.env; scratch1=$(mktemp -d); trap cleanup EXIT; GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 npm install -g gitnexus@TAG; Signal 1 grep stderr.log for tree-sitter-{dart,proto} Skipping build; Signal 3 stat predicted artifact paths absent; optional negative-assertion (default ON per AC-CS-4b-1 step vi) with scratch2; compute outcome in {pass, fail, drift_detected}; emit exactly one calibration_result event per ADR-0058 via log_mcp_event; trap cleanup; exit 0 on pass else non-zero. Stdout names offending grammar + failing Signal-N. Hard dependency: T2.4 ← T2.1 (OP-7 schema must admit the event before first emission).",
+      "target_files": [
+        ".devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh"
+      ],
+      "dependencies": ["T1.2", "T2.1"],
+      "satisfies_ac": ["AT-038", "AT-039", "AT-040", "AT-041", "AT-042", "AT-043", "AT-044", "AT-070", "AT-077"],
+      "verifies_with_pv": ["PV-2.C4"],
+      "per_task_skills": ["KB-codespaces-design", "KB-mcp-design"],
+      "estimate_units": "L",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 2 — T2.4"
+    },
+    {
+      "task_id": "T2.5",
+      "phase": 2,
+      "layer": "codespaces",
+      "title": "Verify FR-4b script's event-emission integration with mcp-events.jsonl",
+      "description": "End-to-end: invoke FR-4b script against gitnexus@1.6.5 pin; confirm exactly one calibration_result event written to .claude/runtime/mcp-events.jsonl; payload conforms to ADR-0058 under OP-7 (from T2.1); on next rebuild, Q-CS-1b banner is silent (event < 2 weeks old). Second verification target per Blueprint §Verification Strategy.",
+      "target_files": [
+        ".claude/runtime/mcp-events.jsonl"
+      ],
+      "dependencies": ["T2.1", "T2.2", "T2.3", "T2.4"],
+      "satisfies_ac": ["AT-038", "AT-042", "AT-070", "AT-072"],
+      "verifies_with_pv": ["PV-2.C4"],
+      "per_task_skills": ["KB-codespaces-design"],
+      "estimate_units": "S",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 2 — T2.5"
+    },
+    {
+      "task_id": "T2.6",
+      "phase": 2,
+      "layer": "codespaces",
+      "title": "Cosmetic 5→4 servers fix in postCreate.sh line 5",
+      "description": "Edit .devcontainer/postCreate.sh line 5 to update the head-comment OSS-local-server count from 5 to 4 (matching lines 9 and 193). 4 OSS-local servers: serena, actionlint-mcp, terraform-mcp, gitnexus (mcp-openapi-schema removed 2026-05-24). Single-digit edit; no other lines change.",
+      "target_files": [
+        ".devcontainer/postCreate.sh"
+      ],
+      "dependencies": ["T0.1"],
+      "satisfies_ac": [],
+      "verifies_with_pv": ["PV-2.C5"],
+      "per_task_skills": [],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 2 — T2.6"
+    },
+    {
+      "task_id": "T2.7",
+      "phase": 2,
+      "layer": "cc",
+      "title": "Update KB-mcp-design/references/principles.md for four-type vocabulary",
+      "description": "Edit .claude/skills/KB-mcp-design/references/principles.md to document the four-type vocabulary (install_complete, readiness_probe, structured_failure, calibration_result). Cite ADR-0058 and ADR-0037 v1.0.2. Preserve all existing prose verbatim. Mechanical edit.",
+      "target_files": [
+        ".claude/skills/KB-mcp-design/references/principles.md"
+      ],
+      "dependencies": ["T1.2"],
+      "satisfies_ac": ["AT-070"],
+      "verifies_with_pv": ["PV-2.C6"],
+      "per_task_skills": ["KB-mcp-design", "KB-documentation-criteria"],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 2 — T2.7"
+    },
+    {
+      "task_id": "T2.8",
+      "phase": 2,
+      "layer": "cc",
+      "title": "Update KB-mcp-platform/references/mcp-events-jsonl.md with calibration_result example",
+      "description": "Edit .claude/skills/KB-mcp-platform/references/mcp-events-jsonl.md to add a calibration_result example record (JSON Lines) and document mechanism: as namespace discriminator. Cite ADR-0058. Preserve existing prose verbatim. Mechanical edit.",
+      "target_files": [
+        ".claude/skills/KB-mcp-platform/references/mcp-events-jsonl.md"
+      ],
+      "dependencies": ["T1.2", "T2.4"],
+      "satisfies_ac": ["AT-070"],
+      "verifies_with_pv": ["PV-2.C6"],
+      "per_task_skills": ["KB-mcp-design", "KB-documentation-criteria"],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 2 — T2.8"
+    },
+    {
+      "task_id": "T3.1",
+      "phase": 3,
+      "layer": "cicd",
+      "title": "Author .github/workflows/mcp-connectivity-smoke.yml (FR-5)",
+      "description": "Author FR-5 workflow. Triggers: pull_request.paths (.mcp.json, .devcontainer/**, adrs/ADR-0041-*.md, .claude/skills/auditing-mcp/**) + workflow_dispatch. Runner ubuntu-latest. timeout-minutes: 8. permissions: contents: read only. Steps: actions/checkout@<T0.2 SHA> → devcontainers/ci@<T0.2 SHA> builds the devcontainer image → claude --bare -p 'noop' --output-format stream-json | jq filter extracts system/init event's mcp_servers[].status. Empty bad-set → PASS; non-empty → FAIL with FR-6 diagnostic to $GITHUB_STEP_SUMMARY.",
+      "target_files": [
+        ".github/workflows/mcp-connectivity-smoke.yml"
+      ],
+      "dependencies": ["T0.2"],
+      "satisfies_ac": ["AT-056", "AT-057", "AT-058", "AT-059", "AT-060", "AT-061", "AT-062", "AT-063", "AT-077"],
+      "verifies_with_pv": ["PV-3.C1", "PV-3.C4"],
+      "per_task_skills": ["KB-cicd-design", "KB-github-actions-platform"],
+      "estimate_units": "M",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 3 — T3.1"
+    },
+    {
+      "task_id": "T3.2",
+      "phase": 3,
+      "layer": "cicd",
+      "title": "Author .github/workflows/gitnexus-grammar-skip-calibration.yml (FR-4c)",
+      "description": "Author FR-4c workflow. Triggers: schedule '0 7 * * 1' (Monday 07:00 UTC) + pull_request.paths (.devcontainer/versions.env, .devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh) + workflow_dispatch. Runner ubuntu-latest. timeout-minutes: 5. permissions: contents: read only. concurrency: gitnexus-calibration, cancel-in-progress: false. Steps: actions/checkout@<T0.2 SHA, same as FR-5> → devcontainers/ci@<T0.2 SHA, same as FR-5> with runCmd bash .devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh. Workflow consumes script's exit code only (does NOT re-implement Signal 1/3 per AC-CICD-4c-9; does NOT write any mcp-events.jsonl event per AC-CICD-4c-10). On non-zero: FR-6 Markdown to $GITHUB_STEP_SUMMARY.",
+      "target_files": [
+        ".github/workflows/gitnexus-grammar-skip-calibration.yml"
+      ],
+      "dependencies": ["T0.2", "T2.4"],
+      "satisfies_ac": ["AT-045", "AT-046", "AT-047", "AT-048", "AT-049", "AT-050", "AT-051", "AT-052", "AT-053", "AT-054", "AT-055", "AT-063", "AT-077"],
+      "verifies_with_pv": ["PV-3.C2", "PV-3.C4"],
+      "per_task_skills": ["KB-cicd-design", "KB-github-actions-platform"],
+      "estimate_units": "M",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 3 — T3.2"
+    },
+    {
+      "task_id": "T3.3",
+      "phase": 3,
+      "layer": "cicd",
+      "title": "Lint both workflow files atomically with actionlint",
+      "description": "Per Blueprint §Implementation Plan Cross-Layer Sequencing Note and cicd-design v0.3.0 §Plan task — actionlint deferral: BOTH workflow files MUST pass actionlint (or mcp__actionlint-mcp__lint_workflow) before EITHER is committed. A half-committed .github/workflows/ directory is not a valid intermediate state. This is the lint gate that wraps T3.1 and T3.2's exit.",
+      "target_files": [
+        ".github/workflows/mcp-connectivity-smoke.yml",
+        ".github/workflows/gitnexus-grammar-skip-calibration.yml"
+      ],
+      "dependencies": ["T3.1", "T3.2"],
+      "satisfies_ac": [],
+      "verifies_with_pv": ["PV-3.C3"],
+      "per_task_skills": ["KB-cicd-design"],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 3 — T3.3"
+    },
+    {
+      "task_id": "T4.1",
+      "phase": 4,
+      "layer": "cc",
+      "title": "FR-7 deferral-register verify-and-tighten — rows H-4 and B-1",
+      "description": "Edit Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md to verify and tighten rows H-4 (GitNexus install smoke) and B-1 (CI claude mcp list smoke) as adopted-by pipeline-quickwins-hardening-r1. Per Blueprint v1 §FR-7 the rows already carry the adoption parenthetical at lines 56 and 141; this task verifies and tightens any drifted prose.",
+      "target_files": [
+        "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md"
+      ],
+      "dependencies": ["T0.1"],
+      "satisfies_ac": ["AT-064", "AT-065", "AT-066", "AT-067"],
+      "verifies_with_pv": ["PV-4.C1"],
+      "per_task_skills": ["KB-documentation-criteria"],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 4 — T4.1"
+    },
+    {
+      "task_id": "T4.2",
+      "phase": 4,
+      "layer": "cc",
+      "title": "Update CLAUDE.md — OP-1..OP-10 → OP-1..OP-11 counter",
+      "description": "Edit AGENTS.md (the canonical file; CLAUDE.md is a symlink). Single-character counter update at the auditing-mcp OP-rule reference site: OP-1..OP-10 → OP-1..OP-11. No other prose changes per Blueprint §Non-Scope.",
+      "target_files": [
+        "AGENTS.md"
+      ],
+      "dependencies": ["T1.4", "T1.9"],
+      "satisfies_ac": ["AT-071"],
+      "verifies_with_pv": ["PV-4.C2"],
+      "per_task_skills": [],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 4 — T4.2"
+    },
+    {
+      "task_id": "T4.3",
+      "phase": 4,
+      "layer": "cross-cutting",
+      "title": "Per-mechanism isolation smoke — each of the five mechanisms run alone (AC-X-1)",
+      "description": "Exercise each of the five mechanisms in isolation against a workspace where the other four are disabled. Five sub-smokes: (a) FR-1 alone; (b) FR-2 alone; (c) FR-3 alone; (d) FR-4 family alone (three sub-sub-smokes for FR-4a/FR-4b/FR-4c per AC-X-1 second sentence); (e) FR-5 alone. Each sub-smoke confirms expected fail/refuse/halt outcome on named failure mode and pass outcome on the negation.",
+      "target_files": [
+        "working/feature/pipeline-quickwins-hardening-r1/smoke/per-mechanism/"
+      ],
+      "dependencies": ["T1.3", "T1.4", "T1.7", "T1.8", "T2.2", "T2.4", "T3.1", "T3.2"],
+      "satisfies_ac": ["AT-068", "AT-069"],
+      "verifies_with_pv": ["PV-4.C3"],
+      "per_task_skills": [],
+      "estimate_units": "M",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 4 — T4.3"
+    },
+    {
+      "task_id": "T4.4",
+      "phase": 4,
+      "layer": "cross-cutting",
+      "title": "End-to-end orchestrator smoke — all five mechanisms enabled",
+      "description": "Run the orchestrator end-to-end against a known-good fixture pipeline with ALL five mechanisms enabled. Confirm no false positives, no false negatives, no interaction failures. Repeat run produces byte-identical orchestrator outputs (determinism per AC-NFR-5-a). A fixture reviewer output the prior pipeline accepted continues to pass FR-1 (NFR-9 / AC-NFR-9-a).",
+      "target_files": [
+        "working/feature/pipeline-quickwins-hardening-r1/smoke/end-to-end/"
+      ],
+      "dependencies": ["T4.3"],
+      "satisfies_ac": ["AT-007", "AT-008", "AT-013", "AT-024", "AT-063"],
+      "verifies_with_pv": ["PV-4.C4"],
+      "per_task_skills": [],
+      "estimate_units": "M",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 4 — T4.4"
+    },
+    {
+      "task_id": "T4.5",
+      "phase": 4,
+      "layer": "cross-cutting",
+      "title": "Q-CS-1b banner integration smoke",
+      "description": "Real devcontainer rebuild with .claude/runtime/mcp-events.jsonl pre-populated in three states. Three rebuild fixtures: (i) empty / no calibration_result events → NEVER RUN banner; (ii) most recent calibration_result 3 weeks ago → STALE banner; (iii) most recent calibration_result 3 days ago → silent. Confirm banner is informational — none of the three rebuilds exits non-zero because of the banner.",
+      "target_files": [
+        "working/feature/pipeline-quickwins-hardening-r1/smoke/qcs1b/"
+      ],
+      "dependencies": ["T2.3", "T2.5"],
+      "satisfies_ac": ["AT-072", "AT-073", "AT-074"],
+      "verifies_with_pv": ["PV-4.C5"],
+      "per_task_skills": ["KB-codespaces-design"],
+      "estimate_units": "S",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 4 — T4.5"
+    },
+    {
+      "task_id": "T4.6",
+      "phase": 4,
+      "layer": "cc",
+      "title": "Pipeline migration verification — resume pre-feature checkpoint (AC-CC-2-g)",
+      "description": "Run the orchestrator against a checkpoint authored before this feature shipped. The pre-feature checkpoint lacks the execution_mode field on each stage; per ADR-0057's absence-default, each stage maps to execution_mode == specialist-dispatch. The FR-2 dispatch self-check accepts this configuration and enters the dispatch loop normally. Explicit migration smoke per ADR-0057.",
+      "target_files": [
+        "working/feature/pipeline-quickwins-hardening-r1/fixtures/pre-feature-checkpoint.json"
+      ],
+      "dependencies": ["T1.1", "T1.7"],
+      "satisfies_ac": ["AT-015"],
+      "verifies_with_pv": ["PV-4.C6"],
+      "per_task_skills": ["KB-cc-design"],
+      "estimate_units": "S",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 4 — T4.6"
+    },
+    {
+      "task_id": "T4.7",
+      "phase": 4,
+      "layer": "cross-cutting",
+      "title": "Open single bundled PR per D-0008",
+      "description": "Open the single bundled PR. Title: feat(pipeline-quickwins-hardening-r1): five-mechanism MCP-incident hardening carve-out. Description references PRD, Blueprint v2.3.0, ADR-0057 v1.0.1, ADR-0058 v1.0.0, and deferral-register row H-4 + B-1 adoption. Enumerates per-phase commits for reviewer ergonomics. Confirm both Phase 3 CI workflows fire on PR open. Both workflows must pass before merge. Depends on all Phase 1-4 task completions per dispatch prompt's single bundled PR shape.",
+      "target_files": [
+        "(PR open via gh; no file write)"
+      ],
+      "dependencies": ["T4.1", "T4.2", "T4.3", "T4.4", "T4.5", "T4.6"],
+      "satisfies_ac": [],
+      "verifies_with_pv": ["PV-4.C7"],
+      "per_task_skills": [],
+      "estimate_units": "S",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 4 — T4.7"
+    },
+    {
+      "task_id": "T5.1",
+      "phase": 5,
+      "layer": "rollout",
+      "title": "Merge the bundled PR to main",
+      "description": "Merge the bundled PR opened in T4.7 to main. The two new workflows are now on main's ref; the calibration script + FR-4a block + banner + ADRs + audit rule + FR-1 validator + orchestrator changes are live.",
+      "target_files": [
+        "(merge to main via gh; no file write)"
+      ],
+      "dependencies": ["T4.7"],
+      "satisfies_ac": [],
+      "verifies_with_pv": ["PV-5.C1"],
+      "per_task_skills": [],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 5 — T5.1"
+    },
+    {
+      "task_id": "T5.2",
+      "phase": 5,
+      "layer": "rollout",
+      "title": "Immediate post-merge invocation — gh workflow run gitnexus-grammar-skip-calibration.yml --ref main",
+      "description": "TERMINAL WRITE-ACTION of the run per Blueprint §Implementation Plan task 13 and dispatch prompt sequencing constraint #2. Immediately after T5.1's merge, invoke gh workflow run gitnexus-grammar-skip-calibration.yml --ref main once to land the first calibration_result event in .claude/runtime/mcp-events.jsonl. This retires the Q-CS-1b NEVER RUN banner before any operator's first post-merge devcontainer rebuild. From this point onward the Monday 07:00 UTC cron tick covers steady-state observability cadence.",
+      "target_files": [
+        "(gh workflow run invocation; observable effect: .claude/runtime/mcp-events.jsonl on main)"
+      ],
+      "dependencies": ["T5.1"],
+      "satisfies_ac": ["AT-049"],
+      "verifies_with_pv": ["PV-5.C2"],
+      "per_task_skills": [],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": false,
+      "plan_reference": "Plan §Phase 5 — T5.2"
+    },
+    {
+      "task_id": "T5.3",
+      "phase": 5,
+      "layer": "rollout",
+      "title": "Confirm Monday 07:00 UTC cron tick fires on first scheduled invocation",
+      "description": "OBSERVATION-ONLY task (no implementation). Within the first Monday after T5.1's merge, observe a run with event: schedule appears in gh run list --workflow=gitnexus-grammar-skip-calibration.yml. Confirm conclusion success and that a second calibration_result event is written. Steady-state observability confirmation per PRD §Success Criteria. Runs in parallel with T5.4 after T5.2 completes per dispatch prompt.",
+      "target_files": [
+        "(observation only; no file write)"
+      ],
+      "dependencies": ["T5.2"],
+      "satisfies_ac": ["AT-045"],
+      "verifies_with_pv": ["PV-5.C3"],
+      "per_task_skills": [],
+      "estimate_units": "XS",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 5 — T5.3"
+    },
+    {
+      "task_id": "T5.4",
+      "phase": 5,
+      "layer": "rollout",
+      "title": "Post-launch verification per PRD Success Criteria",
+      "description": "OBSERVATION-ONLY task; ongoing post-merge observation. Per PRD §Success Criteria, observe the first N feature runs / first three FULL-scope runs / first 20 PRs after ship to confirm eight success-criteria items i-viii (FR-1, FR-2, FR-3, FR-4a, FR-4b+FR-4c, FR-5 all working; no new flaky tests; no new credential prompts). Captured at working/feature/pipeline-quickwins-hardening-r1/post-launch-observations.md. Runs in parallel with T5.3 after T5.2 completes per dispatch prompt.",
+      "target_files": [
+        "working/feature/pipeline-quickwins-hardening-r1/post-launch-observations.md"
+      ],
+      "dependencies": ["T5.2"],
+      "satisfies_ac": ["AT-079", "AT-080"],
+      "verifies_with_pv": ["PV-5.C4"],
+      "per_task_skills": [],
+      "estimate_units": "S",
+      "parallelizable_within_phase": true,
+      "plan_reference": "Plan §Phase 5 — T5.4"
+    }
+  ],
+  "edges": [
+    {"from": "T0.1", "to": "T0.2", "kind": "phase_predecessor"},
+    {"from": "T0.1", "to": "T0.3", "kind": "phase_predecessor"},
+    {"from": "T0.1", "to": "T0.4", "kind": "phase_predecessor"},
+    {"from": "T0.1", "to": "T0.5", "kind": "phase_predecessor"},
+
+    {"from": "T0.1", "to": "T1.1", "kind": "phase_predecessor"},
+    {"from": "T0.1", "to": "T1.2", "kind": "phase_predecessor"},
+    {"from": "T0.1", "to": "T1.3", "kind": "phase_predecessor"},
+    {"from": "T0.5", "to": "T1.3", "kind": "tool_availability"},
+    {"from": "T0.1", "to": "T1.4", "kind": "phase_predecessor"},
+    {"from": "T0.5", "to": "T1.4", "kind": "tool_availability"},
+    {"from": "T1.5", "to": "T1.4", "kind": "data_flow", "rationale": "OP-11 must skip [DEPRECATED INVOCATION FORM] rows; fixture suite assumes annotations applied"},
+    {"from": "T0.3", "to": "T1.5", "kind": "data_flow", "rationale": "T1.5 uses anchors captured in T0.3"},
+    {"from": "T0.1", "to": "T1.6", "kind": "phase_predecessor"},
+    {"from": "T1.1", "to": "T1.7", "kind": "data_flow", "rationale": "FR-2 self-check reads ADR-0057's checkpoint.execution_mode schema"},
+    {"from": "T1.6", "to": "T1.7", "kind": "data_flow", "rationale": "FR-2 self-check reads the hoisted scope_class"},
+    {"from": "T1.3", "to": "T1.8", "kind": "data_flow", "rationale": "Orchestrator invokes the FR-1 validator script"},
+    {"from": "T1.4", "to": "T1.9", "kind": "data_flow", "rationale": "Routing table references audit_op11_adr_parity.py"},
+
+    {"from": "T1.2", "to": "T2.1", "kind": "data_flow", "rationale": "OP-7 admits the ADR-0058 canonical payload shape"},
+    {"from": "T0.4", "to": "T2.2", "kind": "data_flow", "rationale": "T2.2 inserts FR-4a block at the T0.4 anchor"},
+    {"from": "T2.2", "to": "T2.3", "kind": "data_flow", "rationale": "Q-CS-1b banner sits adjacent to FR-4a block"},
+    {"from": "T1.2", "to": "T2.4", "kind": "data_flow", "rationale": "FR-4b script emits events conforming to ADR-0058 payload"},
+    {"from": "T2.1", "to": "T2.4", "kind": "hard_sequencing", "rationale": "Dispatch prompt sequencing constraint #1: OP-7 schema extension MUST land before FR-4b script's first emission (Blueprint Plan-task 12)"},
+    {"from": "T2.1", "to": "T2.5", "kind": "data_flow"},
+    {"from": "T2.2", "to": "T2.5", "kind": "data_flow"},
+    {"from": "T2.3", "to": "T2.5", "kind": "data_flow"},
+    {"from": "T2.4", "to": "T2.5", "kind": "data_flow"},
+    {"from": "T0.1", "to": "T2.6", "kind": "phase_predecessor"},
+    {"from": "T1.2", "to": "T2.7", "kind": "data_flow", "rationale": "KB doc cites ADR-0058"},
+    {"from": "T1.2", "to": "T2.8", "kind": "data_flow", "rationale": "KB doc cites ADR-0058"},
+    {"from": "T2.4", "to": "T2.8", "kind": "data_flow", "rationale": "FR-4b script's emitted payload is the example record source"},
+
+    {"from": "T0.2", "to": "T3.1", "kind": "data_flow", "rationale": "FR-5 workflow cites the T0.2 resolved SHAs (sequencing constraint #4: SHA-pinning resolved once / reused twice)"},
+    {"from": "T0.2", "to": "T3.2", "kind": "data_flow", "rationale": "FR-4c workflow cites the same T0.2 resolved SHAs as FR-5"},
+    {"from": "T2.4", "to": "T3.2", "kind": "data_flow", "rationale": "FR-4c workflow invokes the FR-4b script existing in the devcontainer image (Plan phase-3 closure dependency)"},
+    {"from": "T3.1", "to": "T3.3", "kind": "data_flow", "rationale": "actionlint gate over both workflow files"},
+    {"from": "T3.2", "to": "T3.3", "kind": "data_flow", "rationale": "actionlint gate over both workflow files"},
+
+    {"from": "T0.1", "to": "T4.1", "kind": "phase_predecessor"},
+    {"from": "T1.4", "to": "T4.2", "kind": "data_flow", "rationale": "OP-11 rule must exist for the counter to point at"},
+    {"from": "T1.9", "to": "T4.2", "kind": "data_flow", "rationale": "Routing table must reference OP-11"},
+    {"from": "T1.3", "to": "T4.3", "kind": "data_flow"},
+    {"from": "T1.4", "to": "T4.3", "kind": "data_flow"},
+    {"from": "T1.7", "to": "T4.3", "kind": "data_flow"},
+    {"from": "T1.8", "to": "T4.3", "kind": "data_flow"},
+    {"from": "T2.2", "to": "T4.3", "kind": "data_flow"},
+    {"from": "T2.4", "to": "T4.3", "kind": "data_flow"},
+    {"from": "T3.1", "to": "T4.3", "kind": "data_flow"},
+    {"from": "T3.2", "to": "T4.3", "kind": "data_flow"},
+    {"from": "T4.3", "to": "T4.4", "kind": "phase_predecessor", "rationale": "Per-mechanism isolation confirmed before all-five end-to-end"},
+    {"from": "T2.3", "to": "T4.5", "kind": "data_flow"},
+    {"from": "T2.5", "to": "T4.5", "kind": "data_flow"},
+    {"from": "T1.1", "to": "T4.6", "kind": "data_flow", "rationale": "ADR-0057 absence-default rule"},
+    {"from": "T1.7", "to": "T4.6", "kind": "data_flow", "rationale": "FR-2 self-check is the consumer being exercised"},
+    {"from": "T4.1", "to": "T4.7", "kind": "phase_predecessor", "rationale": "Single bundled PR shape — sequencing constraint #5"},
+    {"from": "T4.2", "to": "T4.7", "kind": "phase_predecessor"},
+    {"from": "T4.3", "to": "T4.7", "kind": "phase_predecessor"},
+    {"from": "T4.4", "to": "T4.7", "kind": "phase_predecessor"},
+    {"from": "T4.5", "to": "T4.7", "kind": "phase_predecessor"},
+    {"from": "T4.6", "to": "T4.7", "kind": "phase_predecessor"},
+
+    {"from": "T4.7", "to": "T5.1", "kind": "phase_predecessor"},
+    {"from": "T5.1", "to": "T5.2", "kind": "hard_sequencing", "rationale": "Dispatch prompt sequencing constraint #2: T5.2 is the terminal write-action of the run"},
+    {"from": "T5.2", "to": "T5.3", "kind": "observation_post_action", "rationale": "T5.3 observes the first cron tick after T5.2's workflow run lands the first calibration_result event"},
+    {"from": "T5.2", "to": "T5.4", "kind": "observation_post_action", "rationale": "T5.4 captures post-launch evidence after T5.2 retires the NEVER RUN banner"}
+  ],
+  "critical_path": [
+    "T0.1",
+    "T1.2",
+    "T2.1",
+    "T2.4",
+    "T2.5",
+    "T3.2",
+    "T3.3",
+    "T4.3",
+    "T4.4",
+    "T4.7",
+    "T5.1",
+    "T5.2"
+  ],
+  "critical_path_rationale": "12-node chain through ADR-0058 → OP-7 schema extension → FR-4b script → FR-4b emission integration → FR-4c workflow → actionlint gate → per-mechanism isolation smoke → end-to-end smoke → bundled PR → merge → terminal post-merge workflow run. Sourced verbatim from Plan v1.0.2 §Critical path. The longest single sub-chain inside the PR is the Codespaces × CI/CD coupling. T5.3 and T5.4 are observation-only and not on the write-path critical chain.",
+  "parallelization_summary": {
+    "max_parallel_within_phase": {
+      "Phase 0": 4,
+      "Phase 1": 4,
+      "Phase 2": 4,
+      "Phase 3": 2,
+      "Phase 4": 4,
+      "Phase 5": 2
+    },
+    "candidate_parallel_clusters": [
+      {
+        "phase": 0,
+        "tasks": ["T0.2", "T0.3", "T0.4", "T0.5"],
+        "rationale": "All depend only on T0.1; no shared writers; independent pre-implementation discovery items."
+      },
+      {
+        "phase": 1,
+        "tasks": ["T1.1", "T1.2"],
+        "rationale": "Two independent ADRs authored at distinct paths."
+      },
+      {
+        "phase": 1,
+        "tasks": ["T1.3", "T1.4", "T1.5", "T1.6"],
+        "rationale": "Independent scripts/edits; T1.4 reads cleaner after T1.5 but L1/L2 don't strictly require it. T1.3 and T1.6 are independent of T1.4/T1.5 entirely."
+      },
+      {
+        "phase": 2,
+        "tasks": ["T2.1", "T2.2", "T2.6", "T2.7"],
+        "rationale": "T2.1 and T2.2 touch different scripts (auditing-mcp vs postCreate.sh). T2.6 is independent of everything else in Phase 2. T2.7 depends only on T1.2."
+      },
+      {
+        "phase": 3,
+        "tasks": ["T3.1", "T3.2"],
+        "rationale": "Two workflow files authored at distinct paths; can run in parallel once SHAs are resolved (sequencing constraint #4); T3.3 actionlint gate depends on both per dispatch prompt."
+      },
+      {
+        "phase": 4,
+        "tasks": ["T4.1", "T4.2", "T4.5", "T4.6"],
+        "rationale": "T4.1 (register) and T4.2 (CLAUDE.md counter) are independent of each other. T4.5 (Q-CS-1b smoke) and T4.6 (checkpoint resume smoke) are independent of each other and of T4.1/T4.2. T4.3 (per-mechanism isolation) and T4.4 (end-to-end) must run sequentially. T4.7 gates all."
+      },
+      {
+        "phase": 5,
+        "tasks": ["T5.3", "T5.4"],
+        "rationale": "Both are observation-only and downstream of T5.2 (terminal write-action) per dispatch prompt's parallelization opportunity #4."
+      }
+    ]
+  },
+  "phase_totals": {
+    "Phase 0": {
+      "tasks": 5,
+      "effort_buckets": {"XS": 5, "S": 0, "M": 0, "L": 0},
+      "tasks_list": ["T0.1", "T0.2", "T0.3", "T0.4", "T0.5"]
+    },
+    "Phase 1": {
+      "tasks": 9,
+      "effort_buckets": {"XS": 2, "S": 3, "M": 4, "L": 0},
+      "tasks_list": ["T1.1", "T1.2", "T1.3", "T1.4", "T1.5", "T1.6", "T1.7", "T1.8", "T1.9"]
+    },
+    "Phase 2": {
+      "tasks": 8,
+      "effort_buckets": {"XS": 3, "S": 3, "M": 1, "L": 1},
+      "tasks_list": ["T2.1", "T2.2", "T2.3", "T2.4", "T2.5", "T2.6", "T2.7", "T2.8"]
+    },
+    "Phase 3": {
+      "tasks": 3,
+      "effort_buckets": {"XS": 1, "S": 0, "M": 2, "L": 0},
+      "tasks_list": ["T3.1", "T3.2", "T3.3"]
+    },
+    "Phase 4": {
+      "tasks": 7,
+      "effort_buckets": {"XS": 2, "S": 2, "M": 3, "L": 0},
+      "tasks_list": ["T4.1", "T4.2", "T4.3", "T4.4", "T4.5", "T4.6", "T4.7"]
+    },
+    "Phase 5": {
+      "tasks": 4,
+      "effort_buckets": {"XS": 3, "S": 1, "M": 0, "L": 0},
+      "tasks_list": ["T5.1", "T5.2", "T5.3", "T5.4"]
+    }
+  },
+  "totals": {
+    "tasks": 36,
+    "edges": 56,
+    "phases": 6,
+    "critical_path_length": 12,
+    "effort_buckets": {"XS": 16, "S": 9, "M": 10, "L": 1}
+  },
+  "ac_coverage_summary": {
+    "acceptance_tests_total": 80,
+    "acceptance_tests_covered_in_dag": 80,
+    "coverage_strategy": "Per Plan §Acceptance Test Cross-Reference, every Blueprint AC maps to >= 1 Plan task. Acceptance Tests v1.0.1 Coverage Matrix (AT-001..AT-079; AT-080 added in cross-artifact reconciliation per audit cycle 2) maps each AT-NNN to its satisfying Plan task. Test-implementation work is folded into the L2 verification step of the producing task per Plan's L1/L2/L3 discipline (not split into separate test tasks).",
+    "ac_to_task_pointer": "Plan §Acceptance Test Cross-Reference (lines ~679-805 of plan-v1.md)"
+  },
+  "pv_coverage_summary": {
+    "phase_validators_total": 6,
+    "pass_criteria_total": 30,
+    "pass_criteria_covered_in_dag": 30,
+    "coverage_strategy": "Each PV-N.Cn pass criterion maps to one or more tasks via the verifies_with_pv field. Validators themselves are operational gates run by the orchestrator at phase boundaries (per phase-validators.md §Validator metadata), not work-units in this DAG. Validator-setup work is folded into each host task because each criterion's automation hook is either (a) a file the task itself produces, or (b) a shell one-liner specified in the task description.",
+    "pv_to_task_pointer": "phase-validators.md (lines 102-619 — PV-0..PV-5 pass criteria definitions)"
+  },
+  "open_items_for_orchestrator": [
+    "T2.4 is the single L-sized task in the Plan (FR-4b calibration script: ~150 lines bash, full AC-CS-4b-1..7 coverage). Plan §Estimation Methodology calls it 'at the upper bound of what a single task should carry' and explicitly defers any split decision to implementation time ('if implementation reveals it's larger, split into Signal 1 + Signal 3 only and negative-assertion + event emission + cleanup sub-tasks'). The orchestrator should hand T2.4 to the executor as a single unit; if mid-execution the executor flags scope growth beyond the L envelope, re-decompose into T2.4a (Signal 1 + Signal 3) and T2.4b (negative-assertion + event emission + cleanup) and rewrite the edge from T2.4 → T2.5 as T2.4a → T2.4b → T2.5.",
+    "PV-3.C3 (actionlint over both workflow files) has a known soft-fallback: if the actionlint binary is absent in the runtime environment, the validator falls back to mcp__actionlint-mcp__lint_workflow. If the MCP server's earlier schema-validation issue is still unresolved at execution time, treat PV-3.C3 as BLOCKER even on MCP-fallback degradation (per phase-validators.md §Open items bullet 2). The orchestrator should surface this to the user at the PV-3 boundary rather than auto-deferring.",
+    "PV-5.C3 (first Monday cron tick within 2 weeks of merge) has a soft real-time dependency the validator framework does not natively express. The runbook step 7 carve-out (option b — observation window elapsed) is the authoritative handling. The orchestrator should schedule a check-back at the 2-week boundary post-merge for PV-5.C3.",
+    "Plan OI-2 / OI-3 / OI-4 remain open as Blueprint completeness concerns rather than DAG concerns; they do not block task decomposition but the executor should resurface if any task's L2 fixture suite cannot be authored from the cited cc-design v0.2.0 content. OI-5 (postCreate.sh anchor stability) is a process risk T0.4 captures at branch creation; if intervening commits to main drift the file between T0.4 and T2.2, re-discover the anchor inline (no DAG re-decomposition needed).",
+    "T5.4 (post-launch verification) is open-ended observation per PRD §Success Criteria; full coverage extends beyond the PV-5 phase boundary. The DAG marks it complete when at least one observation per success-criterion item is recorded (per PV-5.C4 MAJOR severity); a kill-criterion trigger inside the observation window BLOCKS phase completion and invokes the per-mechanism revert path per Plan §Phase 5 Failure response."
+  ]
+}

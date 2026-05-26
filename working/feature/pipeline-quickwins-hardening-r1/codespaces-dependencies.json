@@ -1,0 +1,156 @@
+{
+  "id": "codespaces-dependencies-pipeline-quickwins-hardening-r1",
+  "version": "2.1.0",
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "layer": "codespaces",
+  "doc_type": "per-layer-dependencies",
+  "derived_from": "working/feature/pipeline-quickwins-hardening-r1/codespaces-design.md@v0.3.1",
+  "predecessor": "working/feature/pipeline-quickwins-hardening-r1/codespaces-dependencies.json@v2.0.0",
+  "generated": "2026-05-26T00:00:00Z",
+  "generated_by": "design-codespaces",
+  "change_summary": "v2.1.0 (2026-05-26) prose-only correction per pipeline-quickwins-hardening-r1 Architecture Audit cycle 1 finding I-AA-001 collateral repair: event-type triad references corrected from primary_degraded to install_complete (the on-disk top-level event type per ADR-0037 v1.0.2 and per audit_op7_events_schema.py VALID_EVENT_TYPES); primary_degraded is a boolean sub-field of structured_failure, not a top-level event type. derived_from bumped to track codespaces-design v0.3.1. No coupling-contract change; no new dependency edges. v2.0.0 (prior): Reshape to match codespaces-design.md v0.3.0 hybrid (FR-4a per-rebuild static + FR-4b opt-in behavioral calibration + FR-4c CI wiring owned by design-cicd). Adds the new FR-4c cross-layer handoff to cicd. Removes the v1.0.0 'dry-run inside install_gitnexus' anchor; new anchor is top-level postCreate.sh between current lines 197 and 198. Drops the load-bearing immutable-upstream-tag dependency (FR-4a is static-only; FR-4b is out-of-band-CI-scheduled). Adds the new standalone-script-path dependency: .devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh.",
+
+  "summary": "Codespaces layer adds TWO mechanisms (FR-4a per-rebuild static check in .devcontainer/postCreate.sh top-level flow between current lines 197 and 198; FR-4b opt-in behavioral calibration script at .devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh). FR-4c (CI wiring of FR-4b) is owned by design-cicd; this design states the cross-layer handoff contract only. Everything else inherits unchanged from devcontainer-mcp-provisioning-r1.",
+
+  "provides_to": [
+    {
+      "consumer_layer": "cicd",
+      "consumer_fr": "FR-5",
+      "what": "The devcontainer image (Dockerfile + postCreate.sh + the new FR-4a static-check block) that the FR-5 CI workflow runs against per synthesis D-0007 (execution environment = devcontainer image).",
+      "contract": "FR-5's `claude --bare -p` invocation runs inside this image; FR-4a runs on every container creation in sub-100 ms (cache-hit and cache-miss alike) and either silently green-lights into install_gitnexus or halts postCreate.sh via set -euo pipefail with a structured_failure event. If FR-4a halts on the CI runner, the CI job's image-build step fails before claude is invoked, surfacing the static-shape contract drift in CI output.",
+      "coupling": "loose",
+      "notes": "Both mechanisms fail-closed (NFR-6). FR-4a honors NFR-13 (uses only existing event types). FR-5 does not parse FR-4a's events; it only relies on the image being healthy."
+    },
+    {
+      "consumer_layer": "cicd",
+      "consumer_fr": "FR-4c (CI wiring of FR-4b calibration script)",
+      "what": "A standalone script at .devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh and its contract (no arguments + reads versions.env + mktemp scratch + Signal 1 + Signal 3 + optional negative-assertion + event emission to mcp-events.jsonl + cleanup). design-cicd OWNS the CI workflow that schedules and triggers this script.",
+      "contract": "design-cicd's workflow must (i) trigger the script on a weekly cron AND on-change-to .devcontainer/versions.env, (ii) persist or read .claude/runtime/mcp-events.jsonl before the runner cleans up so the calibration_result event is observable, (iii) NOT bundle calibration into the main FR-5 workflow's hot path. The Codespaces layer guarantees the script's contract is fixed by AC-CS-FR-4b-1; design-cicd guarantees the wiring conforms.",
+      "coupling": "tight (cross-layer handoff; the script's location and contract are load-bearing for design-cicd's workflow design)",
+      "notes": "This is a NEW provides_to row in v2.0.0; the v1.0.0 design did not have FR-4c. The user direction at 2026-05-26 specified: 'Wire it into CI on a schedule + on any change to versions.env, and emit results to the same mcp-events.jsonl event surface per ADR-0037.' If FR-4c is not wired (CI disabled / workflow broken), the v0.3.0 design's Q-CS-1b proposes a runtime staleness banner as a belt-and-suspenders defense; that mitigation is composer-decision.",
+      "fr": "FR-4c (design-cicd-owned)"
+    },
+    {
+      "consumer_layer": "cc",
+      "consumer_fr": "FR-6 (cross-cutting actionable diagnostics)",
+      "what": "FR-4a's diagnostic strings (the plain-text [postCreate] echo + the structured_failure event note: field) and FR-4b's calibration-script diagnostic strings both conform to FR-6's four-element template: mechanism name (FR-4a or FR-4b), offending artifact (env-var / pin / versions.env / npm root for FR-4a; the env-var contract at GITNEXUS_TAG for FR-4b), rule violated (one of four FR-4a tokens OR one of FR-4b's signals), remedial hint.",
+      "contract": "Composer's FR-6 audit at integration time should accept both FR-4a's and FR-4b's diagnostic strings as conformant without further edit.",
+      "coupling": "loose",
+      "notes": "FR-6 has no open question; this is conformance, not negotiation. v2.0.0 widens the conformance claim to cover BOTH mechanisms (v1.0.0 named only the single dry-run)."
+    },
+    {
+      "consumer_layer": "cc",
+      "consumer_fr": "discovery-codebase-researcher (per ADR-0007 v2.2.0 + ADR-0037)",
+      "what": "Continued production of well-formed install_complete and structured_failure events on .claude/runtime/mcp-events.jsonl. FR-4a may emit a structured_failure event on static-shape failure, which the researcher reads before GitNexus traversals to skip work against a broken install. FR-4b emits a calibration_result event (admitted by ADR-0058) which downstream analytics may read. [v0.3.1 prose correction per pipeline-quickwins-hardening-r1 Architecture Audit cycle 1: v0.3.0 wrote 'primary_degraded' here; the on-disk vocabulary per ADR-0037 v1.0.2 is install_complete; primary_degraded is a boolean sub-field of structured_failure, not a top-level event type.]",
+      "contract": "Event records remain ADR-0037 schema-conformant. FR-4a uses only existing event-type values (install_complete, structured_failure). FR-4b emits the new event-type value calibration_result (interpretation A; admitted by ADR-0058 at composer arbitration). NFR-13 acceptance criterion (AC-CS-NFR-13-a).",
+      "coupling": "tight (existing contract; not perturbed by FR-4a; FR-4b's extension is gated on Q-CS-1a)",
+      "notes": "NFR-13 acceptance criterion: AC-CS-NFR-13-a confirms FR-4a emits only events of types already defined. FR-4b's event-type extension is the load-bearing NFR-13 question for composer arbitration."
+    }
+  ],
+
+  "depends_on": [
+    {
+      "provider_layer": "codespaces (inherited from devcontainer-mcp-provisioning-r1)",
+      "what": ".devcontainer/postCreate.sh top-level flow + log_mcp_event helper + .devcontainer/versions.env (GITNEXUS_TAG=1.6.5) + the existing install_gitnexus() function (UNMODIFIED by this run) + the set -euo pipefail posture at script top.",
+      "contract": "postCreate.sh sources versions.env and exports its declared variables into the script's environment. log_mcp_event is the canonical JSONL emission helper. install_gitnexus() exists at .devcontainer/postCreate.sh line ~131 and is INVOKED at line 198 — FR-4a inserts a discrete static-check block BEFORE line 198 (between current lines 197 and 198) and does NOT modify install_gitnexus() itself. The script-top set -euo pipefail is what makes FR-4a's fail-closed posture work (non-zero return halts the script immediately, no || emit_degraded_banner masking because FR-4a is at top-level, not inside a function).",
+      "coupling": "tight (FR-4a inserts a block adjacent to install_gitnexus; FR-4b uses log_mcp_event for its event emission)",
+      "fr": "FR-4a + FR-4b"
+    },
+    {
+      "provider_layer": "codespaces (inherited)",
+      "what": ".devcontainer/devcontainer.json containerEnv block — specifically GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1 and GITNEXUS_TAG=1.6.5.",
+      "contract": "The env-vars are already exported into the container's environment at every shell session. FR-4a's sub-assertions A1 and A2 read both at execution time. FR-4b's script reads GITNEXUS_TAG from versions.env (not from containerEnv — the script is invocable in any shell, including CI runners that may not have the containerEnv export). This run does not modify devcontainer.json.",
+      "coupling": "tight",
+      "fr": "FR-4a + FR-4b"
+    },
+    {
+      "provider_layer": "upstream (gitnexus npm package at tag 1.6.5)",
+      "what": "Stable behavior of the postinstall hook: build-tree-sitter-dart.cjs and build-tree-sitter-proto.cjs perform strict === '1' env-var check and exit 0 with a stable [tree-sitter-(dart|proto)] Skipping build prefix on match; node-gyp rebuild path on no-match. The artifact paths under $(npm root -g)/gitnexus/node_modules/tree-sitter-{dart,proto}/build/Release/ are stable per T-001 F-5.",
+      "contract": "Per T-001 F-1 / F-2 / F-3 / F-5, this behavior holds at v1.6.5. FR-4b's Signal 1 and Signal 3 contracts depend on it; FR-4a's A1 sub-assertion is informed by it (asserts the env-var the install reads is set correctly) but does NOT depend on the upstream regex shape (FR-4a is static-only). Drift modes documented at T-001 AC-3 (DM-1..DM-4); the FR-4 design mitigates DM-1 via regex-over-literal in FR-4b's Signal 1 and DM-4 via the FR-4b optional negative-assertion (enabled-by-default).",
+      "coupling": "tight for FR-4b (the entire calibration mechanism is a contract assertion against this upstream behavior); loose for FR-4a (FR-4a is a static-shape check that pre-validates the inputs the install will consume — it does not directly depend on upstream's wording)",
+      "fr": "FR-4a (loose) + FR-4b (tight)",
+      "drift_risk": "If upstream loosens === '1' to truthy at a future tag, FR-4b's Signal 3 (artifact absence) remains the load-bearing check; Signal 1 (stderr regex) may degrade. FR-4b's optional negative-assertion confirmation (enabled-by-default) is the upstream-side mitigation. FR-4a's A1 (env-var set correctly) is unaffected by upstream wording drift; it asserts the input shape, not the upstream behavior."
+    },
+    {
+      "provider_layer": "cc (.claude/runtime/mcp-events.jsonl event surface per ADR-0037)",
+      "what": "Existing event types install_complete and structured_failure that FR-4a's diagnostics emit. For FR-4b: the new calibration_result event-type (interpretation A; admitted by ADR-0058). The schema is provider-owned (ADR-0037 v1.0.2); FR-4a is a consumer that does not extend it; FR-4b extends it additively per ADR-0058. [v0.3.1 prose correction: v0.3.0 wrote 'primary_degraded' in this row; the on-disk vocabulary per ADR-0037 v1.0.2 is install_complete; primary_degraded is a boolean sub-field of structured_failure.]",
+      "contract": "FR-4a emits only events of types already defined; no schema change. FR-4b's event-type extension is admitted by ADR-0058 at composer arbitration. NFR-13 acceptance criterion (AC-CS-NFR-13-a).",
+      "coupling": "tight (FR-4a is contractually bound to this schema; FR-4b's extension is gated)",
+      "fr": "FR-4a (no extension) + FR-4b (extension gated on Q-CS-1a)"
+    },
+    {
+      "provider_layer": "host (node + npm runtime in the container)",
+      "what": "Working npm runtime with `npm root -g` returning a non-empty path whose parent is writable. The Features-installed node@20 (per ADR-0041 Features registry) provides this. FR-4a's A4 sub-assertion verifies the precondition; FR-4b uses `npm install -g` into a scratch prefix.",
+      "contract": "The node@20 Feature is installed at Features layer (pre-postCreate); FR-4a runs at postCreateCommand (after Features) so the runtime is guaranteed present. FR-4b's `npm config set prefix` invocation scopes the install to a script-local subshell so the codespace's global npm state is not perturbed.",
+      "coupling": "loose (standard runtime; no contract beyond the Feature's own guarantees)",
+      "fr": "FR-4a (A4) + FR-4b (scratch install)"
+    }
+  ],
+
+  "shared_with": [
+    {
+      "other_layer": "cicd",
+      "what": "FR-5's CI workflow runs against the same devcontainer image FR-4a modifies. The image is a shared substrate; both layers' designers should review the other's design for any unintentional coupling. ADDITIONALLY: FR-4c is a cross-layer handoff — design-cicd OWNS the CI workflow that wires the FR-4b calibration script (weekly cron + on-change-to-versions.env). The script path and contract are owned by this design; the wiring is owned by design-cicd.",
+      "notes": "Synthesis D-0007 picks the devcontainer image as FR-5's execution environment. FR-4a's change to that image (the new top-level static-check block between current lines 197 and 198) is part of what FR-5 inherits. FR-4c is NEW in v2.0.0 (the v1.0.0 design did not have CI wiring of any calibration mechanism — it had only an opt-in maintainer script with no CI surface)."
+    }
+  ],
+
+  "explicit_non_dependencies": [
+    {
+      "layer": "iac",
+      "rationale": "No cloud auth or infrastructure provisioning is needed in the codespace for FR-4a or FR-4b. Both mechanisms read local env-vars, inspect local filesystem paths, and (for FR-4b only) install gitnexus from the npm registry — no cloud-specific auth."
+    },
+    {
+      "layer": "frontend",
+      "rationale": "Out of PRD scope."
+    },
+    {
+      "layer": "backend",
+      "rationale": "Out of PRD scope."
+    },
+    {
+      "layer": "api",
+      "rationale": "Out of PRD scope."
+    },
+    {
+      "layer": "query",
+      "rationale": "Out of PRD scope."
+    },
+    {
+      "layer": "database",
+      "rationale": "Out of PRD scope."
+    },
+    {
+      "layer": "claude-code-mcp-allowlist",
+      "rationale": "Per NFR-15 and ADR-0040, no MCP allowlist is changed by FR-4a or FR-4b. Both mechanisms are plain bash + grep + stat + npm; no MCP tool invocation."
+    }
+  ],
+
+  "open_items_propagated": [
+    {
+      "id": "Q-CS-1",
+      "summary": "REFRAMED in v2.0.0. v1.0.0's immutable-upstream-tag question is dissolved (FR-4a is static-only; FR-4b is out-of-band-CI-scheduled). Two reframed sub-questions: Q-CS-1a (does NFR-13 admit a new calibration_result event-type for FR-4b?); Q-CS-1b (add a runtime staleness banner if last calibration event is older than N weeks?). Composer to decide.",
+      "owner": "design-composer"
+    },
+    {
+      "id": "Q-CS-2",
+      "summary": "Pre-existing two-sentinel-format inconsistency is intentionally untouched here; composer may want to surface as a deferred-issue row. (Unchanged from v1.0.0.)",
+      "owner": "design-composer"
+    },
+    {
+      "id": "Q-CS-3",
+      "summary": "Stray '5 OSS-local MCP servers' in postCreate.sh head-comment line 5; composer may bundle a one-line cosmetic fix in the FR-4 commit. (Unchanged from v1.0.0.)",
+      "owner": "design-composer"
+    },
+    {
+      "id": "Q-CS-4",
+      "summary": "No prebuild adopted (NFR-14 carve-out); composer to flag if a pending org-level Codespaces policy mandates one. Both FR-4a (uncaptured at postCreateCommand) and FR-4b (out-of-band of lifecycle) are forward-compatible. (Unchanged from v1.0.0.)",
+      "owner": "design-composer"
+    },
+    {
+      "id": "Q-CS-5",
+      "summary": "U-6 PR shape (single bundled vs sequenced) is cross-cutting; Codespaces-layer impact is single-file-plus-one-new-file under v0.3.0 (one new top-level block in postCreate.sh + one new standalone script at .devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh). (Unchanged from v1.0.0 in conclusion; updated for v0.3.0 scope.)",
+      "owner": "design-composer"
+    }
+  ]
+}

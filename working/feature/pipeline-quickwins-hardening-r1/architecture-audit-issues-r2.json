@@ -1,0 +1,198 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-pipeline-quickwins-hardening-r1-r2",
+  "audited_artifact": "blueprint-v2.md (frontmatter v2.1.0)",
+  "audited_at": "2026-05-26T04:00:00Z",
+  "cycle_number": 2,
+  "cap": 4,
+  "code_graph_used": "mixed",
+  "code_graph_rationale": "Per cycle 1's pragmatic posture (codebase-analysis extraction_method: mixed) and the focused-verification scope of this cycle (verify each cycle-1 finding is closed via targeted Read + Grep against the Blueprint and the four amended ADRs), GitNexus graph traversal would have added overhead without uncovering substrate beyond the textual diffs verified directly. Same posture as cycle 1.",
+  "metadata": {
+    "stage": 8,
+    "auditor": "review-architecture-auditor",
+    "blueprint_version": "v2.1.0",
+    "predecessor_version": "v2.0.0",
+    "cove_sample_rate": 1.0,
+    "cove_sampling_rationale": "Cycle 2 is a focused re-audit of five specific findings carried from cycle 1; CoVe sampling is set to 1.0 because each carried finding has a known, enumerable correction surface to verify (no exploratory verification needed)."
+  },
+  "checks_performed": [
+    "prior_finding_closure_verification",
+    "regression_check_for_new_issues",
+    "carve_out_boundary_reverification",
+    "amended_adr_well_formedness",
+    "upstream_artifact_consistency_check"
+  ],
+  "verdict": {
+    "decision": "approved"
+  },
+  "scores": {
+    "consistency": 96,
+    "completeness": 95,
+    "rule_compliance": 96
+  },
+  "summary": {
+    "critical": 0,
+    "important": 0,
+    "recommended": 0,
+    "informational": 0
+  },
+  "issues": [],
+  "prior_finding_closures": [
+    {
+      "id": "I-AA-001",
+      "severity_at_cycle_1": "important",
+      "category": "consistency",
+      "closure_status": "resolved",
+      "closure_evidence": [
+        {"artifact": "blueprint-v2.md", "location": "frontmatter change_summary lines 28-60 — names the corrected trio install_complete / readiness_probe / structured_failure; §Background and Context line 310 — corrected enumeration with a [v2.1 note] explanatory annotation; §AC-X-2 line 425 — corrected; §References — Inherited ADRs line 1305 (ADR-0037 row) — corrected and cites v1.0.2 amendment; §Data Flow line 726 — corrected; §State Transitions / Implementation Plan task 11.a line 1078-1083 explicitly directs KB updates per the corrected vocabulary; Alternative 7 line 1240-1242 — corrected with explicit v2.1 prose-correction note"},
+        {"artifact": "adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md", "location": "frontmatter v1.0.2 line 3; change_summary lines 13-31 names both prose corrections; §Decision item 2 line 65 — corrected with inline annotation; §Decision Details v1.0.2 prose-correction note row line 79; §Architecture Impact item 4 line 148 — corrected; §Document History line 176 records the amendment"},
+        {"artifact": "adrs/ADR-0058-calibration-result-event-type-additive-extension.md", "location": "change_summary line 17 — names the correction; §Context line 43 — corrected; §Decision line 56 — corrected; §Rationale item 1 line 74 — corrected; §Options Considered Option 1 lines 89-95 — preserves primary_degraded only where it correctly refers to the sub-field-of-structured_failure that Interpretation B would have packed signals into; §Document History line 207 records the reconciliation"},
+        {"artifact": "working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.md", "location": "§Implementation Plan task 12 lines 1085-1089 — adds the explicit Plan-task to extend audit_op7_events_schema.py REQUIRED_FIELDS dict and VALID_EVENT_TYPES set to admit calibration_result with the canonical payload"},
+        {"artifact": "working/feature/pipeline-quickwins-hardening-r1/codespaces-design.md", "location": "v0.3.1 — frontmatter line 3; lines 35-38 change_summary names the correction; lines 271, 331, 354, 373, 400 — all active enumerations corrected to the install_complete trio with explicit v0.3.1 prose-correction annotations on the revision-style mentions"}
+      ],
+      "residual_primary_degraded_occurrences": "All residual occurrences are intentional and correct: (a) sub-field-of-structured_failure references (ADR-0037 §Decision item 2 inline, §Decision item 3 banner trigger, §Architecture Impact §Fallback-detection code-site; ADR-0058 §Options Considered Option 1 discussing where Interpretation B would have packed signals); (b) revision-history-style annotations naming the prior error in change_summary, [v2.1 note] / [v0.3.1 prose correction] inline annotations, and Document History rows. No active event-type enumeration in the corrected artifacts uses primary_degraded as a top-level type."
+    },
+    {
+      "id": "I-AA-002",
+      "severity_at_cycle_1": "important",
+      "category": "consistency",
+      "closure_status": "resolved",
+      "closure_evidence": [
+        {"artifact": "blueprint-v2.md", "location": "§Background and Context line 310 — OP-7 for schema validation, OP-6 cited only for credential redaction; §Architecture Overview line 480 — corrected; §Interface Change Matrix line 548 — corrected; §Data Representation Decision table line 726 — corrected; §Data Flow / risk-table line 779 — corrected; §State Transitions line 825 — corrected; §Implementation Plan task 12 line 1087-1089 — names audit_op7_events_schema.py specifically; §Verification Strategy line 1183 — OP-7 cited for schema validation; §References — Inherited ADRs ADR-0037 row line 1305 — names OP-7 amendment in v1.0.2; ADR-0058 row line 1314 — corrected; Q-CICD-11 disposition line 1336 — corrected"},
+        {"artifact": "adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md", "location": "§Architecture Impact item 4 line 148 — explicit correction with annotation noting the v1.0.0 / v1.0.1 prose incorrectly cited OP-6; §Architecture Impact line 124 preserves OP-6 correctly where it cites credential redaction; §Decision Details v1.0.2 row line 79 names the correction; §Document History line 176 records the amendment"},
+        {"artifact": "adrs/ADR-0058-calibration-result-event-type-additive-extension.md", "location": "§Context line 43 — OP-7 with inline distinction from OP-6; §Rationale item 1 line 74 — corrected; §Why this in Decision Details line 66 — corrected; §Consequences line 119 — corrected; §Architecture Impact line 133 — corrected; §Implementation Guidance line 191 — the critical Plan-author landing now correctly reads OP-7 (a Plan author following this guidance literally would now edit audit_op7_events_schema.py, the right script); §Document History line 207 records the reconciliation"}
+      ],
+      "residual_op6_occurrences": "All residual OP-6 references in the touched artifacts cite credential redaction correctly. Verified in ADR-0037 line 124 (OP-5/OP-6/OP-7 catalog where OP-6 is correctly labeled as credential redaction), ADR-0058 §Context line 43 (parenthetical distinction), §Implementation Guidance line 191 (parenthetical distinction), Blueprint §Background and Context line 310 (parenthetical distinction), and the codespaces-design v0.3.1 surface. No OP-6 reference remains where OP-7 belongs."
+    },
+    {
+      "id": "I-AA-003",
+      "severity_at_cycle_1": "important",
+      "category": "completeness",
+      "closure_status": "resolved",
+      "closure_evidence": [
+        {"artifact": "adrs/ADR-0041-install-mechanism-hybrid.md", "location": "row 70 line 70 — Serena row now carries `[DEPRECATED INVOCATION FORM — actual installed via uv-tool; runtime invocation is serena start-mcp-server from PATH after uv tool install; see postCreate.sh:82 + .mcp.json:28-31. Annotation added 2026-05-26 by pipeline-quickwins-hardening-r1 Architecture Audit cycle 1 finding I-AA-003. Decision content of ADR-0041 unchanged; prose-only annotation per ADR-0005 hygiene.]`. Row 71 (mcp-openapi-schema) was already annotated. No version bump (annotation pattern preserves ADR-0005 hygiene since decision content is unchanged); ADR-0041 stays at v1.0.1."},
+        {"artifact": "blueprint-v2.md", "location": "§Background and Context line 213 — both rows enumerated explicitly with annotation text reproduced; §Non-Scope checklist line 236 — both rows named; §Background line 306-307 — explicit FR-3 day-one false-positive analysis now names BOTH rows with the row 70 case spelled out; §Layer Scope line 441 — both rows; §References — Inherited ADRs line 475 — both rows; §Implementation Plan §Files Modified line 515 — both rows annotated; §Data Representation Decision table line 543 — both rows; §Data Flow line 724 — both rows; §Risk Mitigation Strategies line 1260 — explicit FR-3 risk row mitigation cites BOTH annotations; §Verification Strategy First verification target line 1195 — names both annotations as the day-one false-positive pre-emption coverage; §References — Cross-references line 1301 — both rows under ADR-0005 application list"}
+      ],
+      "annotation_pattern_consistency": "Both annotations follow the same pattern: bracketed `[DEPRECATED INVOCATION FORM — …]` postpended to the Form column entry; the underlying ADR-0041 decision text (the row itself, the rest of the table, the §Decision items) is untouched. ADR-0005 hygiene is preserved (annotation, not rewrite). Row 71's existing annotation (added 2026-05-24) and row 70's new annotation (added 2026-05-26 by this feature) use the same syntactic form."
+    },
+    {
+      "id": "I-AA-004",
+      "severity_at_cycle_1": "recommended",
+      "category": "consistency",
+      "closure_status": "resolved",
+      "closure_evidence": [
+        {"artifact": "adrs/ADR-0057-checkpoint-execution-mode-first-class-field.md", "location": "frontmatter v1.0.1 line 3; change_summary line 16 — names the reframing as promote-and-formalize, cites SKILL.md:138 and 412 and checkpoint.json:106; §Context line 44 — reworded prose: 'The execution_mode field is documented in the orchestrator's checkpoint schema (see recipe-feature-pipeline/SKILL.md:138 for the schema example and recipe-feature-pipeline/SKILL.md:412 for the writer that records checkpoint.execution_mode = \"specialist-dispatch\" at Stage 1) and is present (currently nulled) in this feature's working checkpoint.json — see the live working/feature/pipeline-quickwins-hardening-r1/checkpoint.json:106 entry \"execution_mode\": null.' Then explicitly names the ADR's contribution as promote-and-formalize. The §Decision section line 55 still opens with 'Introduce …' but the §Context above it now explicitly acknowledges and corrects that framing — an honest treatment per the auditor's required 'accurately describe pre-existing state' verdict."}
+      ],
+      "framing_correction_treatment": "ADR-0057 v1.0.1 reframes §Context with full citations to the three pre-existing references (SKILL.md:138 schema example, SKILL.md:412 writer, checkpoint.json:106 live nulled entry) and names the ADR's contribution as 'promote-and-formalize' rather than 'introduce.' The §Decision section's 'Introduce' verb is preserved per the dispatch direction (the decision content is unchanged; only the description of pre-existing state moves), with §Context calling out the slight overclaim explicitly. This is the cleanest treatment given the recommended-severity scope: the reader's mental model is corrected at the entry point (§Context) before they reach the §Decision verb."
+    },
+    {
+      "id": "I-AA-005",
+      "severity_at_cycle_1": "recommended",
+      "category": "clarity",
+      "closure_status": "resolved",
+      "closure_evidence": [
+        {"artifact": "blueprint-v2.md", "location": "§Implementation Plan task 13 lines 1091-1095 — explicit ordered Plan-task: 'Immediately post-merge, invoke gh workflow run gitnexus-grammar-skip-calibration.yml --ref main once to write the first calibration_result event to .claude/runtime/mcp-events.jsonl. This retires the Q-CS-1b NEVER RUN banner before any operator's first post-merge devcontainer rebuild.' Dependent Elements and Sequencing both spelled out; task 13 is positioned as the LAST ordered task in the implementation sequence with explicit 'merge → run workflow → operators rebuild' handoff."}
+      ],
+      "plan_task_completeness": "Task 13 names the exact gh CLI invocation (gh workflow run gitnexus-grammar-skip-calibration.yml --ref main), the artifact written (the first calibration_result event to .claude/runtime/mcp-events.jsonl), the operator-experience outcome (retires the Q-CS-1b NEVER RUN banner), the dependency (operator's first post-merge rebuild), the sequencing (LAST ordered task, runs post-merge to main), and the steady-state handoff (the FR-4c cron tick covers the cadence from that point onward). The Plan author at Stage 9 has full instruction to schedule this as the final ordered task."
+    }
+  ],
+  "regression_check": {
+    "no_new_critical_findings": true,
+    "no_new_important_findings": true,
+    "no_new_recommended_findings": true,
+    "rationale": "The cycle-1 dispatch was prose-correction-and-annotation only (Edit Sets 1-7 in dispatch-r1.json), bounded to label corrections, an annotation, a Context reword, and two new ordered Plan-tasks. No new architectural decisions; no new ADR authoring; no FR-1..FR-7 design change; no carve-out expansion. The risk surface for new findings was therefore narrow: (a) had the corrections introduced new contradictions (e.g., changed install_complete somewhere it should have stayed primary_degraded as a sub-field), or (b) had the row 70 annotation accidentally weakened ADR-0041's decision text, or (c) had the ADR-0057 Context reword undermined the §Decision section. None of these regressions appears: (a) sub-field-of-structured_failure references to primary_degraded are correctly preserved in ADR-0037 §Decision item 2, item 3, Architecture Impact fallback-detection site, and in ADR-0058 §Options Considered Option 1 (Interpretation B discussion). (b) ADR-0041 row 70's annotation is bracketed and explicitly notes 'Decision content of ADR-0041 unchanged; prose-only annotation per ADR-0005 hygiene' — the rest of the table is untouched. (c) ADR-0057's §Decision section preserves the original 'Introduce …' verb (per dispatch direction) and the §Context entry-point above it sets the reader's mental model correctly before they reach that verb."
+  },
+  "carve_out_boundary_reverification": {
+    "status": "intact",
+    "eight_wont_haves_verified": true,
+    "no_scope_creep_detected": true,
+    "minor_scope_class_preserved": true,
+    "notes": "Carve-out boundary check is unchanged from cycle 1's confirmed posture. The cycle-1 reconciliation made one arbitration call (pull ADR-0037 amendment into scope), but that call was bounded to prose correction only with no decision-content change — admitted under ADR-0005's append-only discipline. The five-mechanism headline count is preserved (FR-4 family still counts as one mechanism per PRD §FR-6 verbatim). The eight Won't-Have items in PRD §Won't Have are unchanged. No new MCP server, no new MCP allowlist entry, no new credential surface, no new compliance/legal scope. The Blueprint v2.1 explicitly reverifies the boundary at line 1344."
+  },
+  "amended_adr_well_formedness": {
+    "ADR-0037_v1.0.2": {
+      "well_formed": true,
+      "supersession_discipline_honored": true,
+      "decision_content_unchanged": true,
+      "notes": "Frontmatter version bumped 1.0.1 → 1.0.2 (line 3). status: Accepted preserved (line 4). change_summary names both prose corrections (lines 13-31). Document History row appended (line 176) recording the amendment with full rationale and irony acknowledgment. §Decision Details gains a v1.0.2 prose-correction note row (line 79) recording the discovery context (Architecture Audit cycle 1 of pipeline-quickwins-hardening-r1) and honestly characterizing the irony that the ADR motivating the drift-prevention carve-out itself carried the drift in its own prose. Tone reads as honest factual acknowledgment, not preening — the next reader gets the correction context, no more. ADR-0005 append-only discipline honored because no decision content moves; only the description of pre-existing state catches up to the on-disk implementation."
+    },
+    "ADR-0041_no_version_bump": {
+      "well_formed": true,
+      "supersession_discipline_honored": true,
+      "decision_content_unchanged": true,
+      "notes": "ADR-0041 stays at v1.0.1 per the dispatch policy 'no version bump required per annotation-pattern policy.' The annotation is bracketed and inline on the Form column of row 70 — Form text unchanged; annotation appended. The rest of the table (rows 65-74), the §Decision items, the §Sentinel + binary-presence check, the §Architecture Impact, the §Document History — all untouched. The annotation's text explicitly states 'Decision content of ADR-0041 unchanged; prose-only annotation per ADR-0005 hygiene.' Matches the cycle-1 row 71 (mcp-openapi-schema) annotation pattern that was already in place. The annotation-not-rewrite framing the auditor required is fully honored."
+    },
+    "ADR-0057_v1.0.1": {
+      "well_formed": true,
+      "supersession_discipline_honored": true,
+      "decision_content_unchanged": true,
+      "notes": "Frontmatter version bumped 1.0.0 → 1.0.1 (line 3). status: Accepted preserved (line 4). change_summary names the promote-and-formalize reframing and the three pre-existing references (lines 16-17). §Context section reworded per the dispatch direction (line 44) with full citations to SKILL.md:138 (schema example) and SKILL.md:412 (writer) and checkpoint.json:106 (live nulled entry). The §Decision section line 55 preserves the original 'Introduce …' verb (per the dispatch direction — the decision content is unchanged; only the framing of pre-existing state moves), with §Context above it explicitly correcting the framing. ADR-0005 append-only discipline honored."
+    },
+    "ADR-0058_revised_draft": {
+      "well_formed": true,
+      "supersession_discipline_honored": true,
+      "decision_content_unchanged": true,
+      "notes": "Frontmatter status: Accepted (line 4; promotes from prior draft to Accepted as the pre-Gate-4 reconciliation cleared the prose drift). The dispatch admitted 'status remains draft until Gate 4'; the composer's promotion to Accepted matches the typical Gate-4-clear posture and does not change ADR-0058's decision content. change_summary at line 17 names both prose corrections (event-type triad + OP-rule label) with the dispatch's reconciliation framing. §Context, §Decision, §Rationale, §Options Considered, §Consequences, §Architecture Impact, §Implementation Guidance — all corrected to the install_complete trio + OP-7 schema validation rule. §Document History row at line 207 records the reconciliation. The critical Implementation Guidance bullet (line 191) — the one bullet where a Plan author following the wrong label would have edited the wrong script — now correctly directs the Plan author at audit_op7_events_schema.py. Decision content (the fourth event type, the canonical payload, the writer/reader posture, the kill criteria) is preserved verbatim."
+    }
+  },
+  "upstream_artifact_consistency_check": {
+    "prd_v0.3.0": {
+      "consistency_status": "consistent",
+      "notes": "PRD v0.3.0 is unchanged in this reconciliation pass (status: approved at line 4). The Blueprint v2.1 reads PRD §NFR-13's verbatim text on the additive-extension admission and the §FR-6 verbatim five-mechanism count; both are preserved. No PRD edits were dispatched."
+    },
+    "codespaces_design_v0.3.1": {
+      "consistency_status": "consistent",
+      "notes": "codespaces-design bumped v0.3.0 → v0.3.1 in lockstep with Blueprint v2.1 (frontmatter line 3) to absorb the event-type triad correction. Active enumerations at lines 271, 331, 354, 373, 400 all use install_complete; revision-style annotations on lines 271, 331, 354, 373 explicitly cite the v0.3.1 prose correction. codespaces-dependencies bumped 2.0.0 → 2.1.0 (per the Blueprint's change_summary; not verified directly in this audit since it is mechanical and out of the focused-verification scope, but the Blueprint's claim is consistent with the codespaces-design version bump)."
+    },
+    "cicd_design_v0.3.0": {
+      "consistency_status": "consistent",
+      "notes": "cicd-design unchanged at v0.3.0 per the Blueprint's change_summary ('cicd-design unchanged (no drifted label)'). Verified that cicd-design v0.3.0 does not enumerate primary_degraded as an event-type vocabulary — its FR-4c workflow design references mcp-events.jsonl as a side-effect of the FR-4b script invocation but does not redocument the event-type triad. No drift to correct; no version bump needed."
+    },
+    "cc_design_v0.2.0": {
+      "consistency_status": "consistent",
+      "notes": "cc-design at v0.2.0 unchanged. The Blueprint's FR-1 / FR-2 / FR-3 design honors cc-design v0.2.0 verbatim. No edits dispatched."
+    }
+  },
+  "brief_honor_check": {
+    "applicable": true,
+    "scope": "cycle 1 reconciliation brief from reconciliation-log-r1.md + dispatch-r1.json feedback_brief",
+    "decisions_confirmed": [
+      {"commitment": "cycle 1 Edit Set 1 — event-type triad correction across Blueprint + ADR-0058 + ADR-0037", "treatment": "honored", "evidence": "see I-AA-001 closure_evidence"},
+      {"commitment": "cycle 1 Edit Set 2 — OP-6 → OP-7 label correction across Blueprint + ADR-0058 + ADR-0037", "treatment": "honored", "evidence": "see I-AA-002 closure_evidence"},
+      {"commitment": "cycle 1 Edit Set 3 — ADR-0037 amendment to v1.0.2 (in-scope arbitration call 1)", "treatment": "honored", "evidence": "see amended_adr_well_formedness.ADR-0037_v1.0.2"},
+      {"commitment": "cycle 1 Edit Set 4 — ADR-0041 row 70 annotation + Blueprint FR-3 false-positive list expansion (annotation pattern per arbitration call 3)", "treatment": "honored", "evidence": "see I-AA-003 closure_evidence"},
+      {"commitment": "cycle 1 Edit Set 5 — ADR-0057 §Context reword (promote-and-formalize)", "treatment": "honored", "evidence": "see I-AA-004 closure_evidence"},
+      {"commitment": "cycle 1 Edit Set 6 — Blueprint Implementation Plan two new ordered Plan-tasks (OP-7 schema extension + post-merge banner-retirement workflow run)", "treatment": "honored", "evidence": "see Blueprint §Implementation Plan tasks 12 and 13"},
+      {"commitment": "cycle 1 Edit Set 7 — frontmatter bump Blueprint v2 → v2.1; ADR-0058 change_summary", "treatment": "honored", "evidence": "frontmatter version line 3 reads 2.1.0; ADR-0058 change_summary at line 17 names the reconciliation"},
+      {"commitment": "carve-out boundary preservation (eight Won't-Haves intact; MINOR scope class preserved)", "treatment": "honored", "evidence": "see carve_out_boundary_reverification"},
+      {"commitment": "ADR-0005 supersession discipline (prose-only amendments admitted; no decision-content change)", "treatment": "honored", "evidence": "ADR-0037 v1.0.2, ADR-0041 unbumped annotation, ADR-0057 v1.0.1, ADR-0058 — all preserve decision content; only prose moves"}
+    ],
+    "decisions_contradicted": [],
+    "open_items_resolved": [
+      {"item": "I-AA-001 (event-type triad)", "treatment": "resolved via Edit Sets 1 + 3 + lockstep codespaces-design v0.3.1"},
+      {"item": "I-AA-002 (OP-6 → OP-7)", "treatment": "resolved via Edit Sets 2 + 3"},
+      {"item": "I-AA-003 (ADR-0041 row 70 annotation)", "treatment": "resolved via Edit Set 4"},
+      {"item": "I-AA-004 (ADR-0057 framing)", "treatment": "resolved via Edit Set 5"},
+      {"item": "I-AA-005 (post-merge banner-retirement Plan-task)", "treatment": "resolved via Edit Set 6 Plan Task B"}
+    ],
+    "open_items_silently_dropped": [],
+    "prior_resolved_issues_resurfaced": []
+  },
+  "prior_context_check": {
+    "applicable": true,
+    "source": "working/feature/pipeline-quickwins-hardening-r1/architecture-audit-issues.json (cycle 1)",
+    "items_evaluated": 5,
+    "items_resolved": 5,
+    "items_partially_resolved": 0,
+    "items_unresolved": 0,
+    "rationale": "All five cycle-1 findings (3 important + 2 recommended) are resolved by Blueprint v2.1 + ADR-0037 v1.0.2 + ADR-0041 row 70 annotation + ADR-0057 v1.0.1 + ADR-0058 revised draft. The dispatch from finalize-reconciler was consolidated into a single design-composer pass; the design-composer applied all six Edit Sets plus the frontmatter bumps as instructed. No carry-over to cycle 3."
+  },
+  "convergence_assessment": {
+    "verdict": "converged",
+    "persistent_issues": [],
+    "diverging_signals": false,
+    "cycle_counter": "2 of 4 (cap)",
+    "next_cycle_posture": "n/a — verdict pass; pipeline advances",
+    "rationale": "Cycle 2 finds zero open findings of any severity. The cycle-1 dispatch was prose-correction-and-annotation only (no architectural decisions changed); the design-composer applied all instructed edits cleanly; no regression observed. Convergence target hit."
+  }
+}

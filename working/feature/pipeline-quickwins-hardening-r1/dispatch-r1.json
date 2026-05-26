@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0.0",
+  "dispatch_id": "dispatch-pipeline-quickwins-hardening-r1-r1",
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "cycle_number": 1,
+  "cap": 4,
+  "is_terminal_cycle": false,
+  "generated": "2026-05-26T03:30:00Z",
+  "generated_by": "finalize-reconciler",
+  "audited_artifact": "blueprint-v2.md",
+  "verdict_received": "approved_with_conditions",
+  "issues_input_path": "working/feature/pipeline-quickwins-hardening-r1/architecture-audit-issues.json",
+  "log_path": "working/feature/pipeline-quickwins-hardening-r1/reconciliation-log-r1.md",
+  "dispatches": [
+    {
+      "order": 1,
+      "target_agent": "design-composer",
+      "rationale": "All five architecture-audit findings consolidate into one revision pass. design-composer owns Blueprint v2, ADR-0058 (draft), ADR-0057, ADR-0041 annotations, and per the in-scope arbitration call, the ADR-0037 v1.0.1 -> v1.0.2 prose amendment. Two findings (I-AA-001 part (a); I-AA-005) require new ordered Plan tasks landed in Blueprint Implementation Plan section, picked up by plan-author at Stage 9.",
+      "issues_referenced": ["I-AA-001", "I-AA-002", "I-AA-003", "I-AA-004", "I-AA-005"],
+      "depends_on_dispatch_order": [],
+      "expected_outputs": [
+        "working/feature/pipeline-quickwins-hardening-r1/blueprint-v2.1.md",
+        "adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md (amended v1.0.1 -> v1.0.2)",
+        "adrs/ADR-0041-install-mechanism-hybrid.md (row 70 annotation appended; no version bump required per annotation-pattern policy)",
+        "adrs/ADR-0057-checkpoint-execution-mode-first-class-field.md (Context reworded; version bump 1.0.0 -> 1.0.1)",
+        "adrs/ADR-0058-calibration-result-event-type-additive-extension.md (revised draft; remains status: draft until Gate 4)"
+      ],
+      "feedback_brief": "Blueprint v2 -> v2.1 revision pass. Five findings from architecture-audit-r1 (verdict approved_with_conditions). Plain-English summary of required edits below; full audit JSON at architecture-audit-issues.json for cross-reference.\n\nEDIT SET 1 — event-type triad correction (I-AA-001)\nAcross Blueprint v2 and ADR-0058 and ADR-0037, the phrase 'primary_degraded, readiness_probe, structured_failure' (in any order) must become 'install_complete, readiness_probe, structured_failure'. The on-disk vocabulary per audit_op7_events_schema.py REQUIRED_FIELDS dict and per postCreate.sh actual writes is install_complete (not primary_degraded). primary_degraded is a boolean sub-field of structured_failure, not a distinct event type. Specific locations in Blueprint v2: frontmatter change_summary; Background and Context section (ADR-0037 row); NFR-13 prose; AC-X-2; Interface Change Matrix (ADR-0037 row); Data Flow; State Transitions; References — Inherited ADRs (ADR-0037 row). In ADR-0058: Context line 43; Decision line 56; Rationale item 1. Add one sentence to Blueprint Background and Context (ADR-0037 row) noting that ADR-0037's prose was corrected as part of this feature because the feature's entire mission is preventing exactly this kind of documentation-vs-realization drift.\n\nEDIT SET 2 — OP-6 to OP-7 label correction (I-AA-002)\nAcross Blueprint v2 and ADR-0058 and ADR-0037, every instance of 'OP-6 audit rule' (or 'OP-6') used in the context of schema/vocabulary discipline must become 'OP-7 audit rule' (or 'OP-7'). OP-6 audits credential redaction in the runtime log; OP-7 validates event-type vocabulary and per-type required fields. Critical landing: ADR-0058 Implementation Guidance final bullet currently reads 'OP-6 audit rule discipline applies: any record in mcp-events.jsonl whose event: field is calibration_result MUST conform to the canonical payload shape; ad-hoc fields are rejected.' Change to OP-7. A plan author following the wrong label would edit audit_op6_runtime_log_redaction.py instead of audit_op7_events_schema.py. Other Blueprint locations: Background and Context (ADR-0037 row); Architecture Overview block discussing closed-enum; Interface Change Matrix (ADR-0037 -> ADR-0058 row); Data Representation Decision table. Other ADR-0058 locations: Context line 43; Why this in Decision Details; Rationale item 1 (line 74); Options Considered Option 1 cons; Consequences (line 119); Implementation Guidance final bullet (already cited).\n\nEDIT SET 3 — ADR-0037 amendment to v1.0.2 (in support of EDIT SETS 1 and 2)\nThis feature's scope expands by one tightly-bounded prose correction: amend ADR-0037 in place from v1.0.1 to v1.0.2 with change_summary 'prose corrections: primary_degraded -> install_complete in event-type triad; OP-6 audit rule -> OP-7 audit rule for schema validation.' The decision content of ADR-0037 is unchanged; only the description of pre-existing state moves to match the on-disk implementation. This is admitted under ADR-0005's append-only supersession discipline because no decision shifts. Specific ADR-0037 locations: Architecture Impact item 4 line 136 (OP-6 -> OP-7); and any prose enumerating the event-type triad as primary_degraded/readiness_probe/structured_failure (correct to install_complete/readiness_probe/structured_failure). Bump frontmatter version 1.0.1 -> 1.0.2 and add the change_summary.\n\nEDIT SET 4 — ADR-0041 row 70 annotation + Blueprint FR-3 false-positive list expansion (I-AA-003)\nCurrently Blueprint v2 Background and Context (ADR-0041 row) cites only row 71 (mcp-openapi-schema) as the [DEPRECATED]-annotation target for FR-3 day-one false-positive avoidance. Row 70 (Serena) has the same shape of drift: row 70 documents `uvx --from \"git+https://github.com/oraios/serena@${SERENA_REF}\" serena start-mcp-server` but `.mcp.json` runs `command: \"serena\", args: [\"start-mcp-server\"]` (binary install from `uv tool install` per postCreate.sh:82). Two edits: (a) in adrs/ADR-0041-install-mechanism-hybrid.md, add an annotation to row 70 reading `[DEPRECATED INVOCATION FORM — actual installed via uv-tool; runtime invocation is serena start-mcp-server from PATH after uv tool install; see postCreate.sh:82 + .mcp.json:28-31]`. (b) in Blueprint v2 Background and Context (ADR-0041 row), expand the deprecation-annotation list to enumerate both rows (row 70 Serena + row 71 mcp-openapi-schema). Update the Blueprint's FR-3 risk-table row 'FR-3 false positives on .mcp.json shapes ADR-0041 didn't anticipate' mitigation to cite both annotations.\n\nEDIT SET 5 — ADR-0057 Context reword (I-AA-004)\nIn adrs/ADR-0057-checkpoint-execution-mode-first-class-field.md Context line 44, the sentence 'there is no existing execution_mode field on checkpoint.json today' overclaims novelty. The field is documented in recipe-feature-pipeline/SKILL.md:138 and 412 and is present (currently nulled) in this feature's working checkpoint.json:106. Reword to: 'The execution_mode field is documented in the orchestrator's checkpoint schema (recipe-feature-pipeline/SKILL.md:138) and is written by the orchestrator at Stage 1 (recipe-feature-pipeline/SKILL.md:412), but is not yet a load-bearing audit surface for downstream sub-agents; this ADR canonicalizes the field as the FR-2 dispatch-self-check inspection surface, fixing the closed-enum values, the writer, the reader, and the absence-default rule.' Bump ADR-0057 patch version (1.0.0 -> 1.0.1) with change_summary 'Context section reworded to accurately describe pre-existing state of execution_mode field per architecture-audit-r1 I-AA-004.'\n\nEDIT SET 6 — Blueprint Implementation Plan two new ordered Plan tasks (from I-AA-001 part (a) and I-AA-005)\nAdd two ordered Plan tasks to Blueprint v2 Implementation Plan section (so the Stage 9 plan-author picks them up):\n  Plan Task A (from I-AA-001): 'Extend audit_op7_events_schema.py REQUIRED_FIELDS dict to admit calibration_result with its canonical payload shape per ADR-0058. Without this extension every FR-4b event emission produces an OP-7 MAJOR finding because the script default for unknown event types is MAJOR. Sequencing: this task must complete in the same PR as the FR-4b script and the new ADR-0058 record; OP-7 schema must learn the new vocabulary in lockstep with the first emission.' This task is bundled into the single-PR D-0008 decision; no scope creep.\n  Plan Task B (from I-AA-005): 'Immediately post-merge, invoke gh workflow run gitnexus-grammar-skip-calibration.yml once to write the first calibration_result event to .claude/runtime/mcp-events.jsonl. This retires the Q-CS-1b NEVER RUN banner before any operator first post-merge devcontainer rebuild. Without this task, every operator sees the banner on first rebuild, which is correct behavior but undermines the banner signal-to-noise (the banner is meant to flag long-stale calibration data, not first-deploy state).'\n\nEDIT SET 7 — frontmatter and change_summary\nBump Blueprint v2 -> v2.1 (patch bump; same blueprint family). frontmatter change_summary: 'Architecture-audit-r1 reconciliation: event-type triad corrected to install_complete (was primary_degraded across multiple sections; inherited from ADR-0037 prose error); OP-6 -> OP-7 label corrected for schema-validation rule references; ADR-0041 row 70 (Serena) added to FR-3 day-one [DEPRECATED]-annotation list; ADR-0057 Context reworded to accurately describe pre-existing execution_mode field; two new ordered Plan tasks (OP-7 schema extension; immediate post-merge banner-retirement workflow run); supporting ADR-0037 v1.0.1 -> v1.0.2 prose amendment in same PR.'\nBump ADR-0058 frontmatter status remains 'draft' (still pre-Gate-4); add change_summary 'Pre-finalization reconciliation: event-type triad corrected (was inheriting ADR-0037 prose error); OP-6 -> OP-7 label corrected for schema-validation rule references.'\n\nThe above six edit sets plus the frontmatter bumps are the complete revision brief. No new architectural decisions are made in this reconciliation; only label/triad corrections plus two ordered Plan tasks plus one in-scope-by-necessity ADR-0037 amendment. After applying, the Blueprint v2.1 should re-enter shared-document-reviewer (Gate 0/1) and then re-enter architecture-audit (cycle 2) for verification that all five findings are resolved."
+    }
+  ],
+  "user_escalations": [],
+  "deferrals": [],
+  "arbitration_calls_recorded": [
+    {
+      "call": "ADR-0037 amendment in scope vs out",
+      "decision": "in scope",
+      "rationale": "The feature's mission is documentation-vs-realization drift prevention; leaving the source of the drift live while fixing every downstream propagation would be incoherent. The amendment is prose-only (no decision shift), admitted under ADR-0005's append-only discipline as a v1.0.2 patch."
+    },
+    {
+      "call": "I-AA-001 resolution route (b)(i) acknowledge-inline vs (b)(ii) correct-everywhere",
+      "decision": "(b)(ii) correct everywhere",
+      "rationale": "The Blueprint should not perpetuate the very drift it is built to prevent. Combined with the ADR-0037 amendment decision above, the corrections land cleanly without leaving any inconsistency live."
+    },
+    {
+      "call": "I-AA-003 resolution annotate-row-70 vs amend-row-70",
+      "decision": "annotate row 70",
+      "rationale": "Matches the annotation pattern Blueprint already adopted for row 71 (mcp-openapi-schema). ADR-0005 supersession discipline is honored because no decision shifts; only the documented invocation form has moved on. Locality-of-truth: the annotation lives where the row lives."
+    },
+    {
+      "call": "I-AA-004 and I-AA-005 defer vs include in revision pass",
+      "decision": "include both",
+      "rationale": "Both are low-cost edits (ADR-0057 prose reword; one Plan task line in Blueprint Implementation Plan). Deferring would cost more reconciler cycles than fixing. Two recommended-severity findings ride with the three important findings in one dispatch."
+    }
+  ],
+  "convergence_assessment": {
+    "verdict": "n/a-cycle-1",
+    "persistent_issues": [],
+    "diverging_signals": false,
+    "next_cycle_posture": "regular"
+  },
+  "post_conditions": [
+    "design-composer produces Blueprint v2.1 + amended ADR-0037 + revised ADR-0058 + ADR-0057 v1.0.1 + ADR-0041 row 70 annotation per the feedback_brief above.",
+    "Orchestrator re-runs shared-document-reviewer (Gate 0/1) on Blueprint v2.1 and the four ADR products.",
+    "If Gate 0/1 passes, orchestrator re-runs review-architecture-auditor for cycle 2 with prior_context_check populated from reconciliation-log-r1.md.",
+    "If cycle 2 returns clean (no carry-over of I-AA-001..005), Blueprint family is finalized and Stage 9 plan-author is unblocked."
+  ]
+}

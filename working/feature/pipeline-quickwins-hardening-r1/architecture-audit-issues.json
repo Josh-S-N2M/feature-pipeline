@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-pipeline-quickwins-hardening-r1-r1",
+  "audited_artifact": "blueprint-v2.md",
+  "audited_at": "2026-05-26T03:00:00Z",
+  "code_graph_used": "mixed",
+  "code_graph_rationale": "Per the invocation prompt's pragmatic posture and the codebase-analysis's `extraction_method: mixed`, this audit used targeted Read + Grep against the substrate (postCreate.sh, ADR-0037, ADR-0041, KB-mcp-platform/references/*, audit_op7_events_schema.py, recipe-feature-pipeline/SKILL.md, .mcp.json) rather than GitNexus graph traversal. The feature's blast radius is shallow (5 mechanisms, all in shell / Python script files) and graph traversal would have added overhead without uncovering substrate not already visible in the targeted reads.",
+  "metadata": {
+    "stage": 8,
+    "auditor": "review-architecture-auditor",
+    "blueprint_version": "v2",
+    "cove_sample_rate": 1.0,
+    "cove_sampling_rationale": "Blueprint v2 has 7 framed FRs across 3 layers — small enough to verify every load-bearing synthesis claim and every new ADR claim. No sampling needed."
+  },
+  "checks_performed": [
+    "brief_honor_L3",
+    "blast_radius",
+    "synthesis_claim_verification",
+    "cross_section_consistency",
+    "carve_out_boundary",
+    "new_adr_well_formedness"
+  ],
+  "verdict": {
+    "decision": "approved_with_conditions"
+  },
+  "scores": {
+    "consistency": 82,
+    "completeness": 86,
+    "rule_compliance": 92
+  },
+  "issues": [
+    {
+      "id": "I-AA-001",
+      "severity": "important",
+      "category": "consistency",
+      "lens": "cove",
+      "summary": "Blueprint and ADR-0058 enumerate the 'three pre-existing event types' as {primary_degraded, readiness_probe, structured_failure}, but the actual on-disk vocabulary is {install_complete, readiness_probe, structured_failure} per OP-7 and postCreate.sh.",
+      "evidence": [
+        {"artifact": "blueprint-v2.md", "location": "frontmatter `change_summary`; §Background and Context (ADR-0037 row); §NFR-13 prose; §AC-X-2; Interface Change Matrix (ADR-0037 row); §Data Flow; §State Transitions; §References — Inherited ADRs (ADR-0037 row)"},
+        {"artifact": "adrs/ADR-0058-calibration-result-event-type-additive-extension.md", "location": "§Context (line 43); §Decision (line 56); §Rationale item 1"},
+        {"artifact": ".claude/skills/auditing-mcp/scripts/audit_op7_events_schema.py", "location": "REQUIRED_FIELDS dict (lines 23-29) — lists `install_complete`, `readiness_probe`, `structured_failure`; no `primary_degraded`"},
+        {"artifact": ".devcontainer/postCreate.sh", "location": "lines 70-184 — writes `install_complete` records exclusively for the install phase; no `primary_degraded` is ever emitted"},
+        {"artifact": ".claude/skills/KB-mcp-platform/references/mcp-events-jsonl.md", "location": "lines 30-90 — documents `install_complete`, `readiness_probe`, `structured_failure`; `primary_degraded` appears only as a sub-field of structured_failure"},
+        {"artifact": ".claude/skills/KB-mcp-platform/references/gitnexus-and-fallback.md", "location": "line 23 verbatim: 'schema includes a `structured_failure` event type with a `primary_degraded` sub-field' — confirming primary_degraded is a field, not a type"},
+        {"artifact": ".claude/runtime/mcp-events.jsonl", "location": "live records show only install_complete / readiness_probe / structured_failure events; primary_degraded appears only as a boolean sub-field of structured_failure"}
+      ],
+      "explanation": "ADR-0037's prose (line 54) names the three event types as `primary_degraded | readiness_probe | structured_failure`. That prose is itself inconsistent with ADR-0037's own OP-7 implementation, which validates `install_complete | readiness_probe | structured_failure`. The Blueprint v2 and the newly-authored ADR-0058 reproduce ADR-0037's prose trio verbatim. The carry-through is at least eight places in Blueprint v2 (frontmatter, NFR-13, AC-X-2, Interface Change Matrix, Data Flow, etc.) and three places in ADR-0058. The propagation matters because the Plan author is directed (per Blueprint Implementation Plan step 11 and Step 6) to update `KB-mcp-design/references/principles.md` and `KB-mcp-platform/references/mcp-events-jsonl.md` 'to document the four-type vocabulary per ADR-0058' — but the Blueprint's enumeration of the existing three is the wrong trio. The mcp-events-jsonl.md file already documents the correct trio (install_complete, readiness_probe, structured_failure); a Plan-author working from the Blueprint v2's enumeration could mistakenly demote install_complete and promote primary_degraded.",
+      "blast_radius_check": "Affected surfaces: Plan-task edits to KB-mcp-design/references/principles.md (currently lists `primary_degraded schema-level provision` per line 58 — already inconsistent with OP-7), KB-mcp-platform/references/mcp-events-jsonl.md (currently lists the correct trio), audit_op7_events_schema.py (would need extension to admit `calibration_result` and possibly also reconcile the stated-vs-actual trio). FR-4b script emits `calibration_result` which OP-7 currently rejects as `unknown event type` (MAJOR finding per the script's logic). Until OP-7 is extended in the Plan, every FR-4b event would generate an OP-7 MAJOR finding.",
+      "recommended_resolution": "Two-part fix. (a) Plan Authoring task: in addition to documenting `calibration_result` in KB-mcp-design/references/principles.md, extend audit_op7_events_schema.py's `REQUIRED_FIELDS` dict to admit `calibration_result` with its required fields per ADR-0058's canonical payload — otherwise FR-4b events generate OP-7 MAJOR findings on every emission. (b) Reconciliation: either (i) treat the Blueprint's enumeration `{primary_degraded, readiness_probe, structured_failure}` as faithful-to-ADR-0037-prose and acknowledge inline that the actual on-disk vocabulary at the schema-validation surface is `{install_complete, readiness_probe, structured_failure}` (the ADR-0037-vs-OP-7 divergence is pre-existing and not introduced by this feature); OR (ii) correct the enumeration in Blueprint v2 §NFR-13, §AC-X-2, Interface Change Matrix, Data Flow, and ADR-0058's Context / Decision / Rationale to read `{install_complete, readiness_probe, structured_failure}` and note that the prior ADR-0037 prose's `primary_degraded` is a sub-field of `structured_failure`, not a distinct type. Option (b)(ii) is cleaner because it removes the documentation-vs-realization drift this feature's whole rationale is built to prevent. Reconcile with `finalize-reconciler` choosing between (i) and (ii)."
+    },
+    {
+      "id": "I-AA-002",
+      "severity": "important",
+      "category": "consistency",
+      "lens": "cove",
+      "summary": "Blueprint v2 and ADR-0058 repeatedly cite 'OP-6 audit rule' as the rule that 'rejects ad-hoc fields' or 'validates the embedded shape' — but the actual schema-conformance rule is OP-7. OP-6 audits runtime-log redaction (credential scanning).",
+      "evidence": [
+        {"artifact": "blueprint-v2.md", "location": "§Background and Context (ADR-0037 row); §Architecture Overview block discussing closed-enum; §Interface Change Matrix (ADR-0037 → ADR-0058 row); §Data Representation Decision table"},
+        {"artifact": "adrs/ADR-0058-calibration-result-event-type-additive-extension.md", "location": "§Context line 43, §Why this in Decision Details, §Rationale item 1 (line 74), Options Considered Option 1 cons, §Consequences (line 119), §Implementation Guidance final bullet"},
+        {"artifact": "adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md", "location": "§Architecture Impact item 4 (line 136) — 'ad-hoc fields are rejected by the OP-6 audit rule' (this is the original source of the confusion; Blueprint v2 and ADR-0058 inherit the error)"},
+        {"artifact": ".claude/skills/auditing-mcp/scripts/audit_op6_runtime_log_redaction.py", "location": "header comment lines 1-15 — OP-6 scans for credential-shaped substrings in the JSONL; it does not validate event-type vocabulary"},
+        {"artifact": ".claude/skills/auditing-mcp/scripts/audit_op7_events_schema.py", "location": "header comment lines 1-15 — OP-7 verifies each line conforms to ADR-0037 schema; OP-7 is the rule that admits or rejects event types"}
+      ],
+      "explanation": "ADR-0037 itself misnames the rule (`OP-6 audit rule` for schema conformance) when the actual implementation is `OP-7`. Blueprint v2 and the newly-authored ADR-0058 propagate the error. Because ADR-0058 explicitly invokes 'OP-6 audit rule discipline' as the discipline-preserving property of the additive extension, the citation matters: the discipline preserved is OP-7's schema-validation, not OP-6's redaction-integrity. A reader of ADR-0058 looking for the audit rule that validates `calibration_result`'s shape would land in the wrong script.",
+      "blast_radius_check": "Affected surfaces: ADR-0058 §Implementation Guidance final bullet directs the Plan author 'OP-6 audit rule discipline applies: any record in mcp-events.jsonl whose event: field is calibration_result MUST conform to the canonical payload shape; ad-hoc fields are rejected.' A Plan author following this guidance literally would extend OP-6's redaction scanner with payload-shape validation — wrong rule.",
+      "recommended_resolution": "Correct every Blueprint v2 and ADR-0058 reference from 'OP-6 audit rule' to 'OP-7 audit rule' when speaking of schema/vocabulary discipline. Acknowledge that ADR-0037's original prose item 4 inherits the same confusion (a pre-existing project-level issue, not introduced by this feature) and either (a) note the inheritance and leave the error in the prose alongside the corrected reference, or (b) flag for a follow-on ADR amendment to ADR-0037 (out-of-scope for this feature per the carve-out, but worth surfacing as a deferral). The latter is cleaner; the former is feasible without a scope expansion."
+    },
+    {
+      "id": "I-AA-003",
+      "severity": "important",
+      "category": "completeness",
+      "lens": "blast_radius",
+      "summary": "FR-3 OP-11 audit's day-one false-positive analysis only addresses `mcp-openapi-schema` (row 71). ADR-0041 row 70 (Serena) still names `uvx --from \"git+https://github.com/oraios/serena@${SERENA_REF}\" serena start-mcp-server` as the invocation, but `.mcp.json` runs Serena via `command: \"serena\", args: [\"start-mcp-server\"]` (the installed binary). Under the Blueprint's canonicalize+opaque-tokens algorithm, this is a second drift the audit will surface.",
+      "evidence": [
+        {"artifact": "adrs/ADR-0041-install-mechanism-hybrid.md", "location": "row 70 — `Serena | uvx --from (Python; uv-managed; ephemeral) | uvx --from \"git+https://github.com/oraios/serena@${SERENA_REF}\" serena start-mcp-server`"},
+        {"artifact": ".mcp.json", "location": "lines 28-31 — `serena: { command: \"serena\", args: [\"start-mcp-server\"] }`"},
+        {"artifact": ".devcontainer/postCreate.sh", "location": "line 82 — `uv tool install -p 3.13 \"serena-agent==${SERENA_VERSION}\" --prerelease=allow` (binary install, not ephemeral `uvx --from`)"},
+        {"artifact": "blueprint-v2.md", "location": "§Background and Context (ADR-0041 row) — 'This Blueprint annotates row 71 (mcp-openapi-schema) with [DEPRECATED — removed 2026-05-24]'; only ONE row marked"}
+      ],
+      "explanation": "The synthesis (§4 Notable Structural Findings, third bullet) verifies the mcp-openapi-schema drift and supplies it as the day-one false-positive trigger. Synthesis does NOT verify the Serena row 70 drift, but the live state on disk is unambiguous: ADR-0041 row 70 documents `uvx --from git+...` form; `.mcp.json` documents the installed binary form (`command: \"serena\"`). The Blueprint's FR-3 algorithm specification ('canonicalize whitespace + treat ${VAR} placeholders as opaque tokens + string-equal') applied to the Form column of row 70 versus the `.mcp.json` invocation does not produce a match — distinct command verbs, distinct arg shape. Under the Blueprint's design, this is either (a) a second `[DEPRECATED]`-marker candidate, (b) a row that needs ADR-0041 amendment (out-of-scope per the no-ADR-edits carve-out), or (c) a row that needs the algorithm to special-case 'Form' column cells that mix install-time and runtime forms. Blueprint v2 doesn't anticipate the case.",
+      "blast_radius_check": "Affected surfaces: OP-11 audit (FR-3) at Gate 6 on first invocation will likely emit a BLOCKER for serena's row-vs-mcp.json mismatch. The Blueprint's risk-table row 'FR-3 false positives on .mcp.json shapes ADR-0041 didn't anticipate' is the relevant mitigation, but the Blueprint cites only the `mcp-openapi-schema` case as the false-positive scenario it solves.",
+      "recommended_resolution": "Plan Authoring task: before OP-11 ships, run audit_op11_adr_parity.py against the live `.mcp.json` and ADR-0041 (as the Blueprint's §Verification Strategy 'First verification target' already calls for) — if Serena's row 70 also produces a finding, the Blueprint must specify how to resolve it within the feature's no-ADR-edits carve-out. Options: (a) add an annotation to row 70 that says 'historical install form documented; runtime invocation is `serena start-mcp-server` from PATH after `uv tool install`' (annotation-pattern, ADR-0005-honored); (b) special-case the algorithm to split 'Form' column cells on `+` or `;` separator and check each sub-form against the appropriate substrate (postCreate.sh for install-time form; .mcp.json for runtime form); (c) escalate to user as a deferral. Recommend (a) for ADR-0005 hygiene + locality-of-truth (matches D-0005's posture on the `mcp-openapi-schema` row)."
+    },
+    {
+      "id": "I-AA-004",
+      "severity": "recommended",
+      "category": "consistency",
+      "lens": "cove",
+      "summary": "ADR-0057's framing 'no existing execution_mode field on checkpoint.json today' is technically inaccurate — the live recipe-feature-pipeline/SKILL.md already documents the field (line 138) and the orchestrator already writes it (line 412). The intent of ADR-0057 (canonicalize the field as a first-class load-bearing surface for FR-2) is clear, but the prose framing overclaims novelty.",
+      "evidence": [
+        {"artifact": "adrs/ADR-0057-checkpoint-execution-mode-first-class-field.md", "location": "§Context line 44 — 'there is no existing execution_mode field on checkpoint.json today'"},
+        {"artifact": ".claude/skills/recipe-feature-pipeline/SKILL.md", "location": "line 138 — `\"execution_mode\": \"specialist-dispatch | parent-driven-workaround\"`, lines 166-169 — `execution_mode — field semantics`, line 412 — `Parent records checkpoint.execution_mode = \"specialist-dispatch\"`"},
+        {"artifact": "working/feature/pipeline-quickwins-hardening-r1/checkpoint.json", "location": "line 106 — `\"execution_mode\": null` (the field IS present in this run's checkpoint, currently nulled)"}
+      ],
+      "explanation": "ADR-0057 framed the field as 'being introduced' after Gate-1 reviewer feedback. The framing is honest about the AC-FR-2 *load-bearing* canonicalization need but is technically inaccurate as a description of the current SKILL.md state. The field already exists in name in SKILL.md prose and as a key in checkpoint.json. ADR-0057's load-bearing claim — that FR-2 needs the field to be inspectable and that the field MUST canonicalize the closed enum and write semantics — is fully sound; the framing flaw is in describing the field as net-new rather than as 'promoting from documented-but-aspirational to authoritative.' ADR-0057 was authored in Blueprint v1 and v2 carries it forward verbatim; the architecture audit recorded this as INFO/recommended rather than important because it doesn't break any downstream consumer and ADR-0057 cleared review at Blueprint v1.",
+      "blast_radius_check": "Negligible — no downstream consumer reads ADR-0057's prose for behavior. The decision content (enum, writer, reader, absence-default rule) is correct.",
+      "recommended_resolution": "Optional and low-priority: at next ADR-0057 revision opportunity (e.g., a future feature that adds an enum value), reword the Context to 'The execution_mode field is documented in the orchestrator's checkpoint schema (recipe-feature-pipeline/SKILL.md:138) but is not yet a load-bearing audit surface; this ADR canonicalizes the field as the FR-2 dispatch-self-check inspection surface.' No change needed within this feature's scope; flagged for future ADR maintenance."
+    },
+    {
+      "id": "I-AA-005",
+      "severity": "recommended",
+      "category": "clarity",
+      "lens": "brief_honor",
+      "summary": "The Blueprint v2's FR-4 reshape rationale is honored throughout (FR-4a static-only sub-100ms; FR-4b behavioral on cadence; FR-4c CI wiring; Q-CS-1b banner as belt-and-suspenders). One minor clarity gap: the Q-CS-1b banner's 'NEVER RUN' variant is informational on first rebuild after this feature ships — which is expected and not a defect — but the Blueprint doesn't flag this expected-state-at-deploy posture to the Plan author.",
+      "evidence": [
+        {"artifact": "blueprint-v2.md", "location": "§Cross-Layer ACs AC-X-4 — the banner emits 'NEVER RUN' if no `calibration_result` event has ever been recorded; §Data Flow Q-CS-1b block emits the same"},
+        {"artifact": "blueprint-v2.md", "location": "§Verification Strategy First verification target (FR-4b smoke) — the verification target writes the first `calibration_result` event, which retires the 'NEVER RUN' state"}
+      ],
+      "explanation": "On deploy, the first devcontainer rebuild for any operator will produce a 'NEVER RUN' banner (no calibration_result events on disk yet). The Verification Strategy plan to run the FR-4b smoke as 'Second verification target' writes the first event and retires the banner. This is correct and intentional. The Plan author should be told to schedule the FR-4b smoke immediately on first deploy so the banner doesn't appear on every operator's first rebuild post-merge. The Blueprint doesn't make this sequencing concern explicit.",
+      "blast_radius_check": "Operator-experience surface only. Not a contract violation; not a blast-radius gap.",
+      "recommended_resolution": "Plan-author note (does not require Blueprint revision): add an ordered Plan task that the FR-4b script is invoked via `gh workflow run gitnexus-grammar-skip-calibration.yml` immediately after the feature's PR merges, before any operator's first devcontainer rebuild. This writes the first `calibration_result` event to the project's mcp-events.jsonl, retiring the 'NEVER RUN' banner from operator experience. The Blueprint's §Verification Strategy already supports this with the 'Second verification target'; the Plan task makes the sequencing explicit."
+    }
+  ],
+  "summary": {
+    "critical": 0,
+    "important": 3,
+    "recommended": 2
+  },
+  "brief_honor_check": {
+    "decisions_confirmed": [
+      {
+        "commitment": "PRD v0.3.0 §FR-4 reshape into FR-4a + FR-4b + FR-4c",
+        "treatment": "honored",
+        "evidence": "§Layer Scope, §Functional Requirements, §AC-CS-4a-*/AC-CS-4b-*/AC-CICD-4c-*"
+      },
+      {
+        "commitment": "PRD v0.3.0 §NFR-13 'admit additive extension via either ADR-0037 amendment or small new ADR'",
+        "treatment": "honored (chose new ADR-0058 path per ADR-0005 append-only)",
+        "evidence": "ADR-0058 §Rationale item 4; ADR-0058 §Options Considered Option 2 rejected"
+      },
+      {
+        "commitment": "User direction at Gate-4-prep 'defeat the maintainer-only script trap'",
+        "treatment": "honored (FR-4c cron + Q-CS-1b staleness banner as belt-and-suspenders)",
+        "evidence": "§Alternative 8 §Reason for Rejection; AC-X-4 §Q-CS-1b banner"
+      },
+      {
+        "commitment": "Synthesis D-0003 (hoist scope_class read to orchestrator entry)",
+        "treatment": "honored (refined to 'immediately after Stage 1' per Q-CC-6)",
+        "evidence": "ADR-0057 §Architecture Impact item 1; §Acceptance Criteria AC-CC-2-a"
+      },
+      {
+        "commitment": "Synthesis D-0007 (FR-5 path shift `claude mcp list` → `claude --bare -p`)",
+        "treatment": "honored",
+        "evidence": "§AC-CICD-5 reconciliation note; §Background ADR-0029 row"
+      },
+      {
+        "commitment": "Carve-out boundary (eight Won't-Have items remain out of scope)",
+        "treatment": "honored",
+        "evidence": "§Non-Scope checklist; §References — Cross-references — Unresolved Items 'Carve-out boundary check (v2 reverification)'"
+      },
+      {
+        "commitment": "Five mechanism count preserved (FR-4 family counts as one mechanism)",
+        "treatment": "honored",
+        "evidence": "§FR-6 verbatim; §AC-6-a; §AC-X-1"
+      },
+      {
+        "commitment": "Single bundled PR (D-0008)",
+        "treatment": "honored",
+        "evidence": "§Implementation Approach Selected Approach"
+      },
+      {
+        "commitment": "No new credential surface (NFR-7); no credentials in diagnostics (NFR-8)",
+        "treatment": "honored",
+        "evidence": "§Security Considerations CI/CD section; AC-CICD-4c-8"
+      },
+      {
+        "commitment": "No new MCP server, no new MCP allowlist entry (NFR-15 / ADR-0040)",
+        "treatment": "honored",
+        "evidence": "§Non-Scope item 1; AC-X-3"
+      }
+    ],
+    "decisions_contradicted": [],
+    "open_items_resolved": [
+      {"item": "Q-CS-1a (calibration event-type extension)", "treatment": "resolved via ADR-0058"},
+      {"item": "Q-CS-1b (runtime staleness banner)", "treatment": "resolved (N=2 weeks threshold admitted)"},
+      {"item": "Q-CICD-10 (banner ownership)", "treatment": "resolved (Codespaces-layer owner, cicd-design surfaced for traceability)"},
+      {"item": "Q-CICD-11 (ADR-0037 extension)", "treatment": "resolved via ADR-0058"},
+      {"item": "Q-CICD-1..9 + Q-CC-1..6", "treatment": "carried forward from Blueprint v1 verbatim"}
+    ],
+    "open_items_silently_dropped": [],
+    "prior_resolved_issues_resurfaced": []
+  },
+  "new_adr_check": {
+    "ADR-0057": {
+      "well_formed": true,
+      "addresses_real_decision": true,
+      "supersession_discipline_honored": true,
+      "kill_criteria_present": true,
+      "notes": "I-AA-004 flagged the 'no existing field' framing as technically inaccurate; intent is clear and the decision is sound. RECOMMENDED-severity; not blocking."
+    },
+    "ADR-0058": {
+      "well_formed": true,
+      "addresses_real_decision": true,
+      "supersession_discipline_honored": true,
+      "kill_criteria_present": true,
+      "notes": "I-AA-001 flagged the 'three pre-existing event types' enumeration as inheriting ADR-0037's error; ADR-0058 itself is otherwise well-formed. I-AA-002 flagged OP-6/OP-7 confusion as inherited from ADR-0037. Both are downstream-propagation issues, not flaws in ADR-0058's decision content."
+    }
+  },
+  "carve_out_boundary_check": {
+    "status": "intact",
+    "eight_wont_haves_verified": true,
+    "no_scope_creep_detected": true,
+    "notes": "The FR-4 reshape adds (a) one new script file FR-4b, (b) one new workflow file FR-4c, (c) one new ADR (ADR-0058 — explicitly admitted by PRD §NFR-13), (d) one new postCreate.sh block (Q-CS-1b banner — explicitly admitted by composer disposition of Q-CS-1b / Q-CICD-10). None expands into any of the eight Won't-Have items. The five-mechanism headline count is preserved (FR-4 family = one mechanism per PRD §FR-6 verbatim)."
+  },
+  "prior_context_check": {
+    "applicable": false,
+    "rationale": "No prior architecture-audit run on this Blueprint family. shared-document-reviewer's IP-4 returned approved_with_conditions; all four conditions were resolved before this audit per the invocation prompt's setup. The four conditions were Blueprint-quality items; the architecture audit's lens is distinct."
+  }
+}

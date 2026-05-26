@@ -1,0 +1,281 @@
+{
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "stage": "synthesis",
+  "step": "substrate-mapping",
+  "generated": "2026-05-26T00:00:00Z",
+  "mode": "implementation-strategy",
+  "mode_note": "Invoked by feature-pipeline orchestrator, not standalone synthesize. Decision space is 'within our single substrate (Claude Code + Codespaces + GitHub Actions), what implementation strategy for D-N?' — NOT 'native vs adapter vs substrate-change.' Three-option enumeration hard-exclusion DOES NOT APPLY. Option counts vary by decision with explicit rationale. Output is folded into synthesis.md as the decision-substrate section; no separate substrate-mapping JSON downstream.",
+  "registry_version": "n/a (implementation-strategy mode; no external substrate registry consulted — the substrate is the project itself)",
+  "mappings": [
+    {
+      "decision_id": "D-0001",
+      "title": "FR-1 blocking-severity set and execution site",
+      "option_count": 3,
+      "option_count_rationale": "Two orthogonal axes (blocking set: {BLOCKER} vs {BLOCKER,MAJOR}; execution site: in-agent vs out-of-agent) yield a 2x2, but the {BLOCKER,MAJOR} in-agent corner is dominated by both alternatives and was correctly elided by the framer. Three honest options remain.",
+      "options": [
+        {
+          "label": "blocker-only + out-of-agent hook",
+          "description": "Treat only severity:BLOCKER as inconsistent with verdict:APPROVED. Implement the check as a single hook downstream of each reviewer that inspects the emitted JSON. One implementation surface, seven agents trusted to emit faithfully.",
+          "recommended": true,
+          "rationale": "Minimum scope that closes the verified gap (C-0018). Out-of-agent centralizes enforcement, avoiding parallel edits to seven agent files. Stays inside the deterministic mapping the codebase already documents but does not enforce."
+        },
+        {
+          "label": "blocker+major + out-of-agent hook",
+          "description": "Include MAJOR in the blocking set. Same single-hook execution site. Broader catch surface.",
+          "recommended": false,
+          "rejection_rationale": "Broadens the definition of 'inconsistent with APPROVED' beyond what today's deterministic mapping says. Retroactively turns every historical APPROVED-with-MAJOR-finding output into an inconsistency — a scope expansion that needs its own ADR-grade decision, not a quickwin. Not obviously worse on engineering merit; deliberately deferred."
+        },
+        {
+          "label": "blocker-only + in-agent self-validation",
+          "description": "Each of the seven reviewer agents performs the parity check on its own output before emitting. Check lives at the source.",
+          "recommended": false,
+          "rejection_rationale": "Multiplies implementation surface by seven (shared-document-reviewer, review-architecture-auditor, review-cross-artifact-auditor, execute-phase-quality-reviewer, execute-task-quality-handler, finalize-deliverable-packager, synth-critic — per the framer's risk note). Future reviewer additions need the same edit. Closer to source but the centralized hook gives the same guarantee at one-seventh the maintenance cost. Legitimate alternative, not a straw-man — if the project later wants per-agent self-discipline this is the path."
+        }
+      ]
+    },
+    {
+      "decision_id": "D-0002",
+      "title": "FR-1 reviewer-scope inclusion (execute-task-quality-handler and finalize-deliverable-packager)",
+      "option_count": 3,
+      "option_count_rationale": "Each agent is independently in-or-out, yielding four combinations; the framer correctly noted 'include neither' as hard to justify given C-0018 — kept as the third option for completeness rather than as a serious contender.",
+      "options": [
+        {
+          "label": "include execute-task-quality-handler; exclude finalize-deliverable-packager",
+          "description": "FR-1 covers execute-task-quality-handler (the verified gap per C-0018). finalize-deliverable-packager is excluded because its findings are chained from a shared-document-reviewer invocation that already passes FR-1 — re-checking would be redundant.",
+          "recommended": true,
+          "rationale": "Closes the verified failure mode (C-0018) without redundant validation. Relies on a load-bearing assumption that the chained pass-through preserves shared-document-reviewer's FR-1 verdict — that assumption is true today and is a known refactor-watch item."
+        },
+        {
+          "label": "include both",
+          "description": "Run FR-1 at both execute-task-quality-handler and finalize-deliverable-packager. Defense-in-depth against a future refactor breaking the chained pass-through.",
+          "recommended": false,
+          "rejection_rationale": "Pays redundant validation cost today against a hypothetical future refactor. If/when that refactor lands, FR-1 at the packager is a small follow-up — cheap to add later, costly to maintain unnecessarily now."
+        },
+        {
+          "label": "include neither",
+          "description": "FR-1 covers only the obvious core reviewers; leave execute-task-quality-handler and finalize-deliverable-packager out.",
+          "recommended": false,
+          "rejection_rationale": "Punts the genuine gap C-0018 explicitly verifies. Hard to justify given the verification evidence shows the contradiction is structurally possible in execute-task-quality-handler today."
+        }
+      ]
+    },
+    {
+      "decision_id": "D-0003",
+      "title": "FR-2 dispatch self-check location and single-agent-fallback configuration surface",
+      "option_count": 3,
+      "option_count_rationale": "Two orthogonal axes (where scope_class is read; where the self-check runs) plus a third axis (whether to name fallback as a first-class config) collapse into three honest implementation strategies. A 4th 'gate script with no config naming' was elided as not materially different from option 1.",
+      "options": [
+        {
+          "label": "hoist scope_class read; orchestrator-internal self-check; surface execution_mode='parent-driven-workaround' explicitly",
+          "description": "Move the single scope_class read from line 350 of recipe-feature-pipeline up to orchestrator entry. The self-check runs as orchestrator-internal logic on dispatch. Document checkpoint.execution_mode='parent-driven-workaround' as the named fallback-config surface (it already exists as a value; naming canonicalizes it).",
+          "recommended": true,
+          "rationale": "Single-read pattern; no duplication; no new file surface. The check runs in the orchestrator that owns dispatch already. Naming the existing fallback value as a first-class config is a documentation move, not a behavior change."
+        },
+        {
+          "label": "duplicate scope_class read; hook-based self-check",
+          "description": "Keep the line-350 read where it is; add a second read at orchestrator entry. Self-check runs as a Claude Code hook on dispatch events.",
+          "recommended": false,
+          "rejection_rationale": "Two read sites for one value invites divergence over time. The hook adds a separate failure path (hook misconfigured, hook silently skipped) that orchestrator-internal logic doesn't have. Defensive in a way that costs more than it saves."
+        },
+        {
+          "label": "separate gate script; promote fallback to a named config field",
+          "description": "Extract the self-check into a standalone gate script invoked by the orchestrator. Add a new first-class config field (not reusing execution_mode) explicitly named for single-agent fallback.",
+          "recommended": false,
+          "rejection_rationale": "Heaviest option — new file surface, new config field, new invocation path. Useful only if the fallback-configuration surface is expected to grow (multiple fallback modes, complex predicates). Today it has one value. Premature factoring."
+        }
+      ]
+    },
+    {
+      "decision_id": "D-0004",
+      "title": "FR-3 parity algorithm and ADR row normalization",
+      "option_count": 3,
+      "option_count_rationale": "The two normalization axes (match shape: exact vs canonicalized; env-var handling: string-equal vs resolve-and-compare) collapse to three honest strategies once we exclude the canonicalized+resolve hybrid as not materially different from resolve-and-compare alone.",
+      "options": [
+        {
+          "label": "canonicalize-then-string-equal (whitespace-normalize, leave ${VAR} as opaque tokens)",
+          "description": "Normalize whitespace on both sides; treat ${VAR} placeholders as opaque tokens that must match literally. Compare with simple string equality after canonicalization.",
+          "recommended": true,
+          "rationale": "Simplest, reproducible across environments, doesn't depend on env state, makes test fixtures stable. Catches the parity drift FR-3 actually targets (rows present/absent, command verbs/flags) without coupling to the environment under test."
+        },
+        {
+          "label": "resolve-then-string-equal (expand ${VAR} against current env, then compare)",
+          "description": "Expand env-var placeholders against the running environment on both sides, then compare. Catches the case where ADR and .mcp.json reference different variable names that happen to resolve to the same value.",
+          "recommended": false,
+          "rejection_rationale": "Couples the audit's correctness to the environment it runs in — Codespaces vs local vs Actions runner may have different variables set, producing different verdicts for the same files. Test fixtures become brittle. The drift it catches (different-name-same-value) is accepted as out-of-scope per the framer's risk note."
+        },
+        {
+          "label": "exact-string match without normalization",
+          "description": "Byte-for-byte equality on the relevant fields between ADR and .mcp.json sources.",
+          "recommended": false,
+          "rejection_rationale": "Fragile to incidental whitespace, trailing newlines, ordering differences in either source. Generates false positives that overwhelm the signal. Not viable for a parity audit intended to surface meaningful drift."
+        }
+      ]
+    },
+    {
+      "decision_id": "D-0005",
+      "title": "Handling deprecated mcp-openapi-schema row in FR-3",
+      "option_count": 2,
+      "option_count_rationale": "Three sub-options were surfaced (in-rule deprecation marker, ADR amendment, audit-script allowlist), but ADR amendment is explicitly out-of-scope per the feature's no-ADR-edits carve-out. That leaves two real options: in-rule marker (recommended) and audit-script allowlist (legitimate alternative). Keeping ADR amendment in the enumeration would be dishonest — it is not in scope, not 'rejected on merit.'",
+      "options": [
+        {
+          "label": "in-rule deprecation-marker convention",
+          "description": "Add a convention to ADR-0041's table: rows tagged [DEPRECATED] are treated by the audit as expected-absent from .mcp.json. The marker is self-documenting at the source; FR-3 reads it.",
+          "recommended": true,
+          "rationale": "Matches the project's already-demonstrated stale-doc tolerance (CLAUDE.md line 9 — the same posture is already applied to KB-mcp-platform's seven-server reference). Stays inside the feature's carve-out (no ADR-text mutations beyond the marker convention itself, which is an in-rule annotation, not a decision-text edit). Self-documenting and locality-of-truth: the deprecation lives with the row it deprecates."
+        },
+        {
+          "label": "audit-script allowlist of expected-absent servers",
+          "description": "Maintain a list inside the FR-3 audit script (or a sibling YAML) naming servers that are known-absent from .mcp.json but still present in ADR-0041. The audit suppresses those rows.",
+          "recommended": false,
+          "rejection_rationale": "Inferior locality-of-truth: the deprecation marker lives in the audit script, not next to the row it annotates. Allowlists drift silently — a future reader of ADR-0041 sees the row and has no signal that the audit treats it specially. In-rule markers (option 1) are self-documenting at the source. Not obviously worse on engineering merit (allowlists are a well-known pattern); rejected on locality-of-truth grounds, which the project's stale-doc posture explicitly favors."
+        }
+      ],
+      "carve_out_excluded": [
+        {
+          "label": "amend ADR-0041 to drop the mcp-openapi-schema row",
+          "exclusion_reason": "Out of scope per the feature's explicit carve-out (no ADR edits). Also fights the project's append-only ADR posture (ADR-0005). Not evaluated on merit; not eligible."
+        }
+      ]
+    },
+    {
+      "decision_id": "D-0006",
+      "title": "FR-4 GitNexus dry-run exit-code contract and on-failure diagnostic",
+      "option_count": 3,
+      "option_count_rationale": "Three honest signal-combination strategies (signal-1 AND signal-3, signal-3 alone, signal-1 alone). The verified contract favors the conjunction; the singletons are legitimate alternatives with documented weaknesses.",
+      "options": [
+        {
+          "label": "signal-1 (regex) AND signal-3 (artifact absence), both for dart and proto, Swift excluded",
+          "description": "Exit 0 iff a regex on the stderr matches 'GITNEXUS_SKIP_OPTIONAL_GRAMMARS.*[Ss]kip' for both dart and proto AND the build/Release artifacts are absent for both. Exit 1 otherwise. Diagnostic message names which signal failed and quotes the observed stderr fragment. The dry-run asserts nothing about Swift (Swift's non-build is governed by npm optionalDependencies tolerance, not the env-var, per t001-C-0022/C-0038).",
+          "recommended": true,
+          "rationale": "Directly matches the verified contract at v1.6.5. Signal-1 detects intent (env-var was read and honored); signal-3 detects outcome (no compiled grammar landed). Regex form respects t001-C-0040 (DM-1 drift mode). Excluding Swift respects t001-C-0038 (README/code divergence). The conjunction catches the 'wrong-reason skip' case that singletons miss."
+        },
+        {
+          "label": "signal-3 alone (artifact absence)",
+          "description": "Exit 0 iff build/Release artifacts are absent for dart and proto. Ignore stderr entirely.",
+          "recommended": false,
+          "rejection_rationale": "Misses the case where the skip happens for the wrong reason — grammar already built from a previous run (artifact deleted on this run by hand or by clean), env-var ignored entirely, but artifacts happen to be absent. The dry-run would falsely report success. Captures outcome but not intent."
+        },
+        {
+          "label": "signal-1 alone (stderr regex)",
+          "description": "Exit 0 iff the stderr regex matches for dart and proto. Ignore artifact presence.",
+          "recommended": false,
+          "rejection_rationale": "Misses the case where the warning is emitted but the build proceeds anyway (e.g., a future upstream change loosens the strict '=== 1' comparison while preserving the warning text). Captures intent but not outcome. Also non-deterministic stderr ordering could foil simple regex matching under load. Legitimate alternative if upstream guarantees stricter contract; not viable today."
+        }
+      ]
+    },
+    {
+      "decision_id": "D-0007",
+      "title": "FR-5 path triggers, execution environment, and MCP health-check invocation",
+      "option_count": 2,
+      "option_count_rationale": "Single-option-with-rationale is acceptable for the MCP-health-check sub-decision per the doc-silence finding (T-002): 'claude mcp list' depends on undocumented behavior (t002-C-0008) and is genuinely excluded, not merely worse on merit. The execution-environment sub-decision retains two honest options (devcontainer image vs clean ubuntu-latest); path triggers have only one credible narrow set. Reported as two options on the dominating axis (execution environment) since the other axes are fixed by verification.",
+      "options": [
+        {
+          "label": "devcontainer image + narrow triggers + SDK-event MCP health check",
+          "description": "Path triggers: .devcontainer/**, .mcp.json, adrs/ADR-0041*, .claude/skills/auditing-mcp/**. Execution environment: the project's devcontainer image (same image developers run locally). MCP health check: 'claude --bare -p \"<noop>\" --output-format stream-json | jq -c \"select(.type==\\\"system\\\" and .subtype==\\\"init\\\") | .mcp_servers[] | select(.status != \\\"connected\\\")\"' — the SDK-event path documented at code.claude.com.",
+          "recommended": true,
+          "rationale": "Tests the actual environment developers use, not a parallel ubuntu-latest reality. Uses the documented health-check path; avoids depending on undocumented 'claude mcp list' exit-code behavior per verified t002-C-0008. Narrow triggers avoid the workflow firing on unrelated ADR edits."
+        },
+        {
+          "label": "clean ubuntu-latest + narrow triggers + SDK-event MCP health check",
+          "description": "Same triggers and health check; execution in a clean ubuntu-latest runner rather than the devcontainer image.",
+          "recommended": false,
+          "rejection_rationale": "Closer to typical GitHub Actions practice and faster cold-start (no devcontainer image build), but it doesn't test what developers actually run. The whole point of the smoke is to catch devcontainer + MCP setup drift; running outside the devcontainer parallels the problem instead of testing it. The NFR-3 latency cost of the devcontainer image build is a real tradeoff, but the smoke's value depends on environment fidelity."
+        }
+      ],
+      "doc_silence_excluded": [
+        {
+          "label": "'claude mcp list' exit-code health check",
+          "exclusion_reason": "Genuinely excluded per verified t002-C-0008: canonical docs are silent on both exit-code (t002-C-0001) and stdout format (t002-C-0002) for this command; a workflow that depends on its exit code is depending on undocumented behavior. Not 'rejected on merit' — actively unsafe path given the verified silence."
+        }
+      ]
+    },
+    {
+      "decision_id": "D-0008",
+      "title": "PR shape — single bundled vs multiple sequenced",
+      "option_count": 3,
+      "option_count_rationale": "Process/governance decision with no verified claims. Three honest groupings exist (single bundled, five-per-FR, two halves) and reflect distinct review/rollback tradeoffs — none are straw-men. Pure judgment call; recommendation rests on coupling analysis from the framer.",
+      "options": [
+        {
+          "label": "single bundled PR",
+          "description": "All seven FRs ship in one PR with one review pass.",
+          "recommended": true,
+          "rationale": "The seven FRs are tightly coupled at the implementation surface: FR-1 and FR-2 both touch the orchestrator; FR-3 and FR-5 both consume ADR-0041 and the .mcp.json table; FR-4 and FR-5 both touch the devcontainer smoke surface. Splitting introduces artificial dependency edges between PRs that have to merge in a sequence anyway. For a MINOR-scope feature with a small, coherent reviewer pool, one PR is the lower-overhead path."
+        },
+        {
+          "label": "five sequenced PRs (FR-1, FR-2, FR-3+FR-7, FR-4, FR-5+FR-6)",
+          "description": "One PR per FR group. Each PR sequenced after the previous; finer-grained rollback granularity.",
+          "recommended": false,
+          "rejection_rationale": "Finer rollback granularity is real, but the FRs sequence rather than parallelize (each depends on the orchestration surface the previous one establishes). The reviewer pays the cost of five context switches for a benefit (per-FR rollback) that is rarely exercised. Legitimate process choice if review capacity is the binding constraint, which it isn't here."
+        },
+        {
+          "label": "two PRs: (FR-1, FR-2, FR-6, FR-7) review-gates first; (FR-3, FR-4, FR-5) infra second",
+          "description": "Middle-ground: split along a review-gates-vs-infrastructure boundary.",
+          "recommended": false,
+          "rejection_rationale": "The split isn't load-bearing — FR-1/FR-2 are review-gates but FR-7 is a deferral-register marker (closer to housekeeping than to review-gating). The boundary is conceptual, not enforced by any actual file-overlap pattern. Worse, FR-5 consumes ADR-0041 just like FR-3; splitting them across two PRs forces ADR-0041's audit surface to be touched twice. Not a viable middle ground; one of the endpoints is the better choice."
+        }
+      ],
+      "judgment_note": "No verified claims drive this. The synthesizer should surface this as a question worth confirming with the user before commit — the recommendation rests on coupling analysis, not evidence."
+    },
+    {
+      "decision_id": "D-0009",
+      "title": "Deferral-register update placement",
+      "option_count": 3,
+      "option_count_rationale": "Process/governance decision with no verified claims. Three placements exist and reflect real tradeoffs (audit-trail completeness, blame hygiene, follow-up risk). None are straw-men.",
+      "options": [
+        {
+          "label": "include in the deliverable archive commit",
+          "description": "FR-7's marker tightening lands in the same commit as the rest of the feature's deliverable archive.",
+          "recommended": true,
+          "rationale": "The marker tightening IS part of the feature's quality-gates deliverable — FR-7 is one of the seven FRs the feature commits to. Separating it loses the audit trail (a future reader looking at the archive sees the feature's full scope in one commit). The blame-hygiene argument for separation is weak here because the register file is small and FR-7's scope is narrow (marker convention only)."
+        },
+        {
+          "label": "separate housekeeping commit (same PR)",
+          "description": "FR-7's register edit lands as its own commit alongside the deliverable archive commit. Same PR.",
+          "recommended": false,
+          "rejection_rationale": "Cleaner git blame on the register file (the FR-7 commit is the one to point to for the marker-convention change), but fragments the feature's archival record across two commits in the same PR — the reviewer has to mentally reconstruct what the feature actually delivered. Legitimate if the register file is large and the marker change is one of many edits, which it isn't here."
+        },
+        {
+          "label": "defer to a follow-up housekeeping PR",
+          "description": "Land the rest of the feature now; ship FR-7's register update in a separate later PR.",
+          "recommended": false,
+          "rejection_rationale": "Risks the register update never landing — deferral-register debt is exactly the problem FR-7 exists to solve, and adding a deferral about the deferral register would be self-defeating. If the register update doesn't happen with the feature, when will it?"
+        }
+      ]
+    },
+    {
+      "decision_id": "D-0010",
+      "title": "Concrete latency thresholds for NFR-1, NFR-2, NFR-3",
+      "option_count": 2,
+      "option_count_rationale": "Framer surfaced two honest options (designer-measured thresholds vs round-number placeholders). A third option of 'no thresholds at all' would violate the NFR's existence; not a real alternative.",
+      "options": [
+        {
+          "label": "designer-set thresholds with explicit measurement methodology",
+          "description": "Defer concrete numbers to the named designers (Claude Code designer for NFR-1/NFR-2; Codespaces designer for NFR-3). Each designer specifies sample size, percentile (p50/p95/p99), environment (local Codespaces vs Actions runner), and the measurement window before committing a number.",
+          "recommended": true,
+          "rationale": "The framer correctly punts. Setting a latency number without measuring is anti-pattern — the number either over-constrains (causing false alarms) or under-constrains (NFR is meaningless). The named designers own these surfaces and have the empirical access to set them. Synthesis should not invent the numbers."
+        },
+        {
+          "label": "round-number defaults pending measurement (e.g., NFR-1/2 < 200ms p95; NFR-3 < 60s p95)",
+          "description": "Set placeholder numbers in the deliverable now, flagged as 'to be revised once measured.'",
+          "recommended": false,
+          "rejection_rationale": "Placeholders that don't reflect measurement become load-bearing through inertia — the next reader treats them as 'the' threshold. If the project tolerance is to set a number and refine it later, that's defensible; but the verified posture here favors evidence-driven thresholds. Defer is the better default."
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "mode": "implementation-strategy",
+    "decisions_mapped": 10,
+    "decisions_with_single_option_rationale": 0,
+    "decisions_with_two_options": 3,
+    "decisions_with_three_options": 7,
+    "decisions_recommending_human_input": 0,
+    "decisions_flagged_for_user_confirmation": [
+      "D-0008 — PR shape: no verified claims drive this; coupling-analysis-based recommendation only. Synthesizer may surface to user before commit."
+    ],
+    "carve_out_or_silence_exclusions": [
+      "D-0005 — ADR-0041 amendment excluded by feature carve-out (no ADR edits)",
+      "D-0007 — 'claude mcp list' exit-code health check excluded by verified doc-silence finding (t002-C-0008)"
+    ]
+  }
+}

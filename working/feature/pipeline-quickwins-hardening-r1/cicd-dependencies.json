@@ -1,0 +1,245 @@
+{
+  "schema_version": "1.0.0",
+  "layer": "cicd",
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "generated_at": "2026-05-26T00:00:00Z",
+  "generated_by": "design-cicd (fallback-authored by main agent)",
+  "source_design": "working/feature/pipeline-quickwins-hardening-r1/cicd-design.md",
+  "source_design_version": "0.3.0",
+
+  "depends_on": [
+    {
+      "layer": "codespaces",
+      "what": "Devcontainer image with functional Claude Code CLI and provisioned MCP servers",
+      "contract": "The smoke runs inside the devcontainer image (`devcontainers/ci@<SHA>`). The image must include a Claude Code CLI on PATH that responds to `claude --bare -p \"noop\" --output-format stream-json` by emitting a `system/init` event whose payload includes `mcp_servers[]`. The image must run the project's existing `.devcontainer/postCreate.sh` so all four OSS-local MCP servers (Serena, actionlint-mcp, terraform-mcp, GitNexus) are installed and reachable, and so the two remote-HTTP servers (Context7, Exa) can initialize from their endpoints. If a future change breaks the `claude --bare -p` invocation at image-build time, the smoke degrades from MCP-state check to image-build check.",
+      "binding": "tight",
+      "evidence": [
+        "synthesis.md §3 D-0007 (execution environment = devcontainer image)",
+        "research-notes/t-002-claude-mcp-list-contract.md Finding 5 (claude -p --bare --output-format stream-json emits system/init event)",
+        "cicd-design.md §Workflow specification.Job and step shape",
+        "codebase-analysis-report.md (postCreate.sh installs four OSS-local servers; FR-5 GREENFIELD note)"
+      ]
+    },
+    {
+      "layer": "codespaces",
+      "what": "Claude Code CLI version pin",
+      "contract": "The smoke depends on the Agent SDK `system/init` event surface and the `McpServerStatus` enum (`connected | failed | needs-auth | pending | disabled`). Both are stable across the Claude Code 2.1.x family per T-002 Finding 7, but specific MCP behaviors pin to specific versions (e.g., v2.1.121 changed initial-connection retry). The devcontainer's `claude-code` Feature pin is therefore the CI-side stability anchor. If `version: latest` is ever adopted, the workflow becomes vulnerable to upstream-released breakage. Captured as Q-CICD-1 for design-composer arbitration.",
+      "binding": "tight",
+      "evidence": [
+        "research-notes/t-002-claude-mcp-list-contract.md Finding 7 (CLI version pinning recommended)",
+        "cicd-design.md §D-0007 Version-pinning of the Claude Code CLI",
+        "cicd-design.md Q-CICD-1"
+      ]
+    },
+    {
+      "layer": "codespaces",
+      "what": "FR-4b calibration script — invocation contract for FR-4c workflow",
+      "contract": "design-codespaces owns `.devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh` (FR-4b). The FR-4c CI workflow at `.github/workflows/gitnexus-grammar-skip-calibration.yml` invokes this script and treats its exit code as the pass/fail contract. The cross-layer contract requires the script to: (a) exist at the named path and be executable, (b) exit 0 on pass (no behavioral drift), (c) exit non-zero on drift (the workflow's FR-6 diagnostic treats any non-zero as drift), (d) name the offending grammar (Dart or Proto) and the failing Signal-N in its stdout/stderr so the workflow's `$GITHUB_STEP_SUMMARY` can re-surface it, (e) emit a `calibration_result` event to `.claude/runtime/mcp-events.jsonl` per ADR-0037 before exiting. The workflow does NOT duplicate the event emission. The workflow does NOT re-implement Signal 1 / Signal 3 logic. If the script's contract changes (e.g., exit code 2 added for environment errors distinct from drift), the FR-4c workflow's FR-6 diagnostic should be revised in tandem.",
+      "binding": "tight",
+      "evidence": [
+        "cicd-design.md §FR-4c — Calibration CI wiring",
+        "cicd-design.md §FR-4c.Job and step shape (exit-code-as-contract design)",
+        "cicd-design.md §FR-4c.Trap-avoidance observability"
+      ]
+    },
+    {
+      "layer": "codespaces",
+      "what": "FR-4b script's `versions.env` pin and the `pull_request.paths` trigger",
+      "contract": "The FR-4c workflow triggers on changes to `.devcontainer/versions.env` (the GitNexus tag pin) and `.devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh` (the script itself). design-codespaces owns both. The trigger paths assume both files live at exactly those paths; renaming either is a coordinated cross-layer change. If a future feature relocates `versions.env` or the script, the workflow's `paths:` filter must be updated in lockstep — otherwise the calibration silently stops triggering on pin bumps.",
+      "binding": "tight",
+      "evidence": [
+        "cicd-design.md §FR-4c.Trigger configuration",
+        ".devcontainer/versions.env (Codespaces-owned)"
+      ]
+    },
+    {
+      "layer": "claude-code",
+      "what": ".mcp.json as the artifact under test",
+      "contract": "design-claude-code owns `.mcp.json`. The smoke reads it indirectly: Claude Code's initialization is what populates `system/init.mcp_servers[]`, and that array reflects exactly the servers `.mcp.json` declares. If `.mcp.json` adopts new fields or new transport types in a future feature, the smoke remains compatible as long as `system/init.mcp_servers[]` continues to be the canonical event surface (per the Anthropic Agent SDK contract). The smoke's correctness is therefore decoupled from `.mcp.json`'s internal shape changes, as long as Claude Code itself still parses `.mcp.json` and emits per-server status.",
+      "binding": "tight",
+      "evidence": [
+        ".mcp.json (six servers as of 2026-05-26: actionlint-mcp, context7, exa, gitnexus, serena, terraform-mcp)",
+        "research-notes/t-002-claude-mcp-list-contract.md Finding 4 (McpServerStatus enum)",
+        "research-notes/t-002-claude-mcp-list-contract.md Finding 5 (system/init.mcp_servers[] structure)"
+      ]
+    },
+    {
+      "layer": "claude-code",
+      "what": "ADR-0037 `mcp-events.jsonl` event-surface schema (FR-4c indirect)",
+      "contract": "The FR-4b script writes a `calibration_result` event type to `.claude/runtime/mcp-events.jsonl`. ADR-0037 owns the event-type taxonomy for that file. If the taxonomy is closed-set, `calibration_result` requires an additive amendment (existing consumers ignore unknown types per ADR-0037's forward-compatibility posture, so the addition is backward-safe). If the taxonomy is open-set by convention, no amendment is needed. The CI workflow itself does not read the events file, so the dependency is indirect — surfaced for the composer as Q-CICD-11.",
+      "binding": "loose",
+      "evidence": [
+        "cicd-design.md §FR-4c.NFR alignment (NFR-13)",
+        "cicd-design.md Q-CICD-11",
+        "ADR-0037 (mcp-events.jsonl event surface)"
+      ]
+    },
+    {
+      "layer": "claude-code",
+      "what": "FR-3 audit rule does NOT chain into the workflow",
+      "contract": "design-claude-code's FR-3 parity rule (`audit_op11_*.py` in `auditing-mcp`) reads the same `.mcp.json` and ADR-0041 but is a static-analysis check that runs at the Gate-6 hard-gate per ADR-0043. The CI smoke is a runtime connectivity check. The two are complementary; this design keeps them in separate execution surfaces. Cross-layer contract: design-claude-code owns the parity rule; design-cicd owns the connectivity smoke; design-composer arbitrates if a future feature wants to chain them (Q-CICD-7). The contract is not to integrate.",
+      "binding": "loose",
+      "evidence": [
+        "synthesis.md §3 D-0005 (FR-3 in-rule deprecation marker; audit-skill surface)",
+        "codebase-analysis-report.md (auditing-mcp graduated family; OP-rule convention)",
+        "cicd-design.md Q-CICD-7"
+      ]
+    },
+    {
+      "layer": "upstream-external",
+      "what": "Anthropic Claude Code SDK contract stability",
+      "contract": "The smoke depends on the canonical Anthropic Agent SDK contracts: the `system/init` event with `mcp_servers[]` (documented at `https://code.claude.com/docs/en/agent-sdk/mcp` Error handling), the `McpServerStatus` enum (documented at `https://code.claude.com/docs/en/agent-sdk/typescript` and `.../python`), and the `claude --bare -p ... --output-format stream-json` invocation (documented at `https://code.claude.com/docs/en/headless`). All three are primary-source-backed canonical surfaces. The smoke breaks silently if any of the three is deprecated upstream without a migration. Mitigation: Claude Code version pin (Q-CICD-1) and Q-CICD-8 (auth-state evolution).",
+      "binding": "tight",
+      "evidence": [
+        "research-notes/t-002-claude-mcp-list-contract.md Sources 3-6 (canonical Anthropic docs)",
+        "cicd-design.md Q-CICD-1, Q-CICD-8"
+      ]
+    },
+    {
+      "layer": "upstream-external",
+      "what": "Third-party action stability and SHA-pinning surface (both workflows)",
+      "contract": "Both workflows `uses:` the same two third-party actions: `actions/checkout` (GitHub first-party — major-version tag acceptable, SHA preferred) and `devcontainers/ci` (Microsoft `devcontainers` org — third-party per KB classification; SHA pin REQUIRED per KB-github-actions-platform non-negotiable #1). All four `uses:` lines (two per workflow) are deferred to the implementation operator to resolve on the implementation date from each project's release page. The contract: the operator MUST paste a 40-character commit SHA and a `# v<X.Y.Z>` comment for each `uses:` line. Neither workflow MUST ship with tag-pinned third-party `uses:` references. The same SHA is used for the same action across both workflows in this initial commit (one resolution, four pastes) — future deliberate divergence is fine but not the default.",
+      "binding": "tight",
+      "evidence": [
+        "cicd-design.md §SHA-pinning of third-party actions",
+        ".claude/skills/KB-github-actions-platform/SKILL.md (non-negotiable #1)",
+        ".claude/skills/KB-github-actions-platform/references/security.md"
+      ]
+    }
+  ],
+
+  "provides_to": [
+    {
+      "layer": "claude-code",
+      "what": "PR-gated MCP connectivity invariant",
+      "contract": "The workflow gates any PR that touches one of the configured trigger paths (`.mcp.json`, `.devcontainer/**`, `adrs/ADR-0041-*`, `.claude/skills/auditing-mcp/**`). A PR cannot be merged with a failing check status. This means: any PR change that would result in one or more MCP servers reporting `status != \"connected\"` from a freshly-provisioned devcontainer is blocked at merge. The Claude Code layer (and downstream pipeline users) can assume that, post-merge, every server in `.mcp.json` is in a known-connected state — closing the failure mode the MCP incident exposed.",
+      "binding": "tight",
+      "evidence": [
+        "prd-v1.md FR-5 + AC-FR-5-a/b/c",
+        "cicd-design.md §Trigger configuration",
+        "synthesis.md §3 D-0007 (path triggers)"
+      ]
+    },
+    {
+      "layer": "maintainer-direct",
+      "what": "Actionable diagnostic on failure",
+      "contract": "On any failing run, the GitHub job summary at `$GITHUB_STEP_SUMMARY` contains the four FR-6-required fields: the mechanism name (`FR-5 MCP connectivity smoke`), the offending artifact path (`.mcp.json` or the devcontainer install step), the rule violated (`every server must report status: connected`), and a one-line remedial hint (rebuild devcontainer locally, inspect `system/init`, check matching install step). The maintainer can act on the failure without re-running the workflow or grepping the codebase. NFR-15 honored: no new credentials surfaced; no env-var values reproduced in the diagnostic (only server names and the status enum value).",
+      "binding": "tight",
+      "evidence": [
+        "prd-v1.md FR-6 + AC-FR-6-a",
+        "cicd-design.md §Workflow specification.Job and step shape (GITHUB_STEP_SUMMARY block)",
+        "prd-v1.md NFR-7, NFR-8"
+      ]
+    },
+    {
+      "layer": "codespaces",
+      "what": "Forced-cadence invocation of the FR-4b calibration",
+      "contract": "The FR-4c workflow's weekly cron + on-change-to-versions.env + workflow_dispatch triggers ensure the FR-4b calibration script is invoked at a known cadence (weekly), at the moment of every relevant change (pin bump or script edit), and on demand. The Codespaces layer can rely on the calibration_result event in mcp-events.jsonl having a recency floor of roughly one week (worst case: one missed cron + queued next). The Q-CICD-10 stale-calibration banner can use this floor as its threshold (suggested 4 weeks = 4x worst-case cron interval).",
+      "binding": "tight",
+      "evidence": [
+        "cicd-design.md §FR-4c.Trigger configuration",
+        "cicd-design.md §FR-4c.Trap-avoidance observability",
+        "cicd-design.md Q-CICD-10"
+      ]
+    },
+    {
+      "layer": "future-cicd-features",
+      "what": "Project convention for `.github/workflows/`",
+      "contract": "Until a future feature deliberately revises it, the two-workflow shape is the convention: file naming (`<purpose>-<verb>.yml`), workflow `name:` (Title Case), job-id (short, single word), SHA-pinning policy (all third-party actions, `# v<X.Y.Z>` comment, same SHA reused across workflows for the same action+release), default permissions (`contents: read` baseline, expand only on demonstrated need), explicit `timeout-minutes:` right-sized per workflow, FR-6-shaped diagnostics in `$GITHUB_STEP_SUMMARY` (with delegation to in-repo scripts for event-surface emission when applicable), path-filtered `pull_request:` triggers, `schedule:` cron for cadence-driven checks (Monday 07:00 UTC slot established), `workflow_dispatch:` on every workflow for manual re-runs, `concurrency:` with constant group + `cancel-in-progress: false` when the workflow has side effects, no secrets / no OIDC / no environments unless required.",
+      "binding": "loose",
+      "evidence": [
+        "cicd-design.md §Convention this layer establishes",
+        "codebase-analysis-report.md (.github/workflows/ greenfield)"
+      ]
+    }
+  ],
+
+  "questions_for_composer": [
+    {
+      "id": "Q-CICD-1",
+      "summary": "Claude Code CLI version pin in the devcontainer Feature",
+      "owner_layer": "codespaces",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-2",
+      "summary": "Mitigation if NFR-4 (5-minute CI budget) is breached — Codespaces-side prebuild",
+      "owner_layer": "codespaces",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-3",
+      "summary": "Merge-time (push-to-main) variant of the smoke",
+      "owner_layer": "out-of-scope",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-4",
+      "summary": "Nightly schedule trigger for upstream-health smoke",
+      "owner_layer": "out-of-scope",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-5",
+      "summary": "PR-level concurrency cancel-in-progress for force-pushes",
+      "owner_layer": "maintainer-ergonomics",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-6",
+      "summary": "Slack/email notification routing on failure",
+      "owner_layer": "maintainer-ergonomics",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-7",
+      "summary": "Chaining FR-3 parity audit and FR-5 smoke into one workflow vs keeping them separate",
+      "owner_layer": "composer",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-8",
+      "summary": "Claude Code auth-state evolution — if `--bare -p noop` requires auth in a future version, the smoke needs an API key secret. Upgraded in v0.2.0 from monitoring to Plan task (pre-merge validation).",
+      "owner_layer": "maintainer",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-9",
+      "summary": "AC-FR-5-a/b/c PRD-literal reconciliation — Blueprint AC text references `claude mcp list` but the design substitutes `claude --bare -p noop --output-format stream-json | jq`. Recommendation: rewrite the AC in the Blueprint.",
+      "owner_layer": "composer",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-10",
+      "summary": "Stale-calibration banner in `postCreate.sh` — emit a maintainer warning if the most recent `calibration_result` event in `mcp-events.jsonl` is older than ~4 weeks. Belt-and-braces against the FR-4c CI cron going silent. Mechanism is Codespaces-side.",
+      "owner_layer": "codespaces",
+      "blocking": false
+    },
+    {
+      "id": "Q-CICD-11",
+      "summary": "ADR-0037 event-surface schema extension for the `calibration_result` event type emitted by the FR-4b script. Either the schema is open-set (no amendment needed) or a small additive amendment is required to allow the new type.",
+      "owner_layer": "composer",
+      "blocking": false
+    }
+  ],
+
+  "lint_status": {
+    "tool_used": "hand-check against KB-github-actions-platform review checklist",
+    "actionlint_mcp_available": false,
+    "actionlint_binary_on_path": false,
+    "reason_for_no_binary_lint": "mcp__actionlint-mcp tools unavailable (deferred-tool-schema issue that triggered fallback authoring); actionlint binary not on PATH in this main-agent runtime",
+    "findings": "PASS on all applicable KB review-checklist items; SHA pins are intentionally deferred to implementation operator (named in design); recommend actionlint binary be run against the file before commit at implementation time",
+    "evidence": "cicd-design.md §Lint findings"
+  },
+
+  "blast_radius": {
+    "tier": "LOW",
+    "notes": [
+      "Two new files under `.github/workflows/` (FR-5 connectivity smoke + FR-4c grammar-skip calibration); no edits to existing project files.",
+      "Both workflows run in CI only — no production deployment, no shared state mutation, no external service writes. FR-4c invokes a Codespaces-owned in-repo script that emits to `.claude/runtime/mcp-events.jsonl`, but the emission is from the script's process inside the runner container; CI itself does not write to the repo.",
+      "FR-5 false-positive is high-friction (blocks PRs); PRD Kill-criterion covers reverting if NFR-4 budget is breached.",
+      "FR-4c false-positive on a `pull_request` run blocks the pin-bump PR (correct — drift requires investigation). FR-4c false-positive on a cron run produces a failing workflow visible in the GitHub Actions tab; no PR is blocked because no PR is open. Failure remediation is the FR-6 diagnostic + the remedial-hint multi-option block.",
+      "Convention-setting in `.github/workflows/` is medium-blast for future CI features but low-blast for this feature's scope. The two-workflow shape (rather than one) means the convention now demonstrates both PR-time and cadence-driven patterns, which is broader precedent than v0.2.0 set."
+    ]
+  }
+}
