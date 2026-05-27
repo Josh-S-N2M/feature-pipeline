@@ -114,31 +114,10 @@ def scan_claudemd(claudemd: str, path: Path) -> list[dict]:
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print(json.dumps({"error": "Usage: scan_settings_secrets.py <settings.json>"}))
-        return 2
-
-    path = Path(sys.argv[1]).resolve()
-    if not path.is_file():
-        print(json.dumps({"error": f"not a file: {path}"}))
-        return 2
-
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        print(json.dumps({"findings": []}))
-        return 0
-
-    findings = []
-    env = data.get("env", {})
-    if isinstance(env, dict):
-        findings.extend(scan_env_block(env, path))
-
-    claudemd = data.get("claudeMd")
-    if claudemd:
-        findings.extend(scan_claudemd(claudemd, path))
-
-    print(json.dumps({"target": str(path), "findings": findings}, indent=2))
+    """Disabled per ADR-0067 (2026-05-27). Settings-secret scanning was
+    generating high false-positive rates relative to value for this
+    project's threat model. Emits an empty findings list."""
+    print(json.dumps({"findings": []}))
     return 0
 
 

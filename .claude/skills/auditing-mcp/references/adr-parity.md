@@ -16,14 +16,14 @@ The comparison proceeds in two steps:
 
 2. **Opaque-token matching.** After canonicalization the strings are split into
    whitespace-separated tokens. Any token that fully matches `${...}` (an env-var
-   placeholder, e.g. `${GITNEXUS_TAG}`, `${localEnv:SERENA_REF}`) is treated as an
+   placeholder, e.g. `${SERENA_VERSION}`, `${localEnv:TFE_TOKEN}`) is treated as an
    opaque token. Two opaque tokens compare equal regardless of the variable name they
    hold. This means the audit never needs to read the environment variables, satisfying
    NFR-7/NFR-8 (no credential access at audit time).
 
-   Example: `.mcp.json` contains `npx -y gitnexus@${GITNEXUS_TAG} mcp` and ADR-0041
-   documents ``npx -y "gitnexus@${GITNEXUS_TAG}" mcp``. After stripping surrounding
-   quotes and canonicalizing whitespace these compare as equal.
+   Example: `.mcp.json` contains `serena start-mcp-server` and ADR-0041 documents
+   ``serena start-mcp-server``. After stripping surrounding quotes and canonicalizing
+   whitespace these compare as equal.
 
 ## Deprecated-row skip convention
 
@@ -32,8 +32,9 @@ A row whose **Form** cell contains the substring `[DEPRECATED INVOCATION FORM` i
 by OP-11. Such rows record superseded invocation forms or removed servers but do not
 represent active `.mcp.json` entries.
 
-Currently rows 70 (Serena) and 71 (mcp-openapi-schema) carry this annotation. OP-11
-therefore neither requires nor checks for these servers in `.mcp.json`.
+Currently rows for the historical Serena invocation form, mcp-openapi-schema, and the
+historical gitnexus row (removed 2026-05-27 per ADR-0066) carry this annotation. OP-11
+therefore neither requires nor checks for these servers / superseded forms in `.mcp.json`.
 
 When a server is removed from `.mcp.json`, annotate its ADR-0041 row with the marker to
 prevent a spurious `absent-from-mcp-json` BLOCKER on the next OP-11 run.

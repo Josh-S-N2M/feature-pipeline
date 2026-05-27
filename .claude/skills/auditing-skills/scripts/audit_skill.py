@@ -68,11 +68,27 @@ def find_orphans(skill_dir: Path, frontmatter_result: dict, refs_result: dict) -
                 rel = str(f.relative_to(skill_dir))
                 referenced.add(rel)
 
+    # Directories whose contents are tooling-internal, not documentation. Files
+    # under these paths are implementation details that don't need explicit
+    # SKILL.md references. (Adding __pycache__ closes a class of false-positives
+    # where the orphan check fires on Python bytecode caches.)
+    IMPLICIT_DIRS = ("__pycache__", "test_fixtures", "smoke_fixtures",
+                     "fixtures", "_corpus", "_data")
+    IMPLICIT_SUFFIXES = (".pyc", ".pyo")
+
     all_files = []
     for p in skill_dir.rglob("*"):
-        if p.is_file() and not any(part.startswith(".") for part in p.relative_to(skill_dir).parts):
-            rel = str(p.relative_to(skill_dir))
-            all_files.append(rel)
+        if not p.is_file():
+            continue
+        rel_parts = p.relative_to(skill_dir).parts
+        if any(part.startswith(".") for part in rel_parts):
+            continue
+        if any(d in rel_parts for d in IMPLICIT_DIRS):
+            continue
+        if p.suffix in IMPLICIT_SUFFIXES:
+            continue
+        rel = str(p.relative_to(skill_dir))
+        all_files.append(rel)
 
     # If any sibling file in the same directory is referenced, treat the whole
     # directory as expected. Supports fixture/corpus/example/sample directories
@@ -235,18 +251,28 @@ def main() -> int:
             "what": f"Orphaned files (in skill dir but never referenced from SKILL.md): {orphans}",
             "fix": "Either link from SKILL.md or remove.",
         })
-    if report["skill_md_lines"] > 1000:
+    # Per-skill-class line thresholds. Orchestrator recipes ("recipe-*") and
+    # platform-knowledge bases ("KB-*-platform") are reference-heavy and may
+    # legitimately exceed the default 500-line cap for short, model-invocable
+    # routing skills. Thresholds are still bounded to keep model attention from
+    # degrading on very long SKILL.md bodies.
+    skill_name = report.get("skill_name", "")
+    if skill_name.startswith("recipe-") or skill_name.startswith("KB-"):
+        major_threshold, blocker_threshold = 1500, 3000
+    else:
+        major_threshold, blocker_threshold = 500, 1000
+    if report["skill_md_lines"] > blocker_threshold:
         findings.append({
             "dimension": 4,
             "severity": "BLOCKER",
-            "what": f"SKILL.md is {report['skill_md_lines']} lines (>1000).",
-            "fix": "Split into reference files. The body should be under 500 lines.",
+            "what": f"SKILL.md is {report['skill_md_lines']} lines (>{blocker_threshold}).",
+            "fix": f"Split into reference files. Body should be under {major_threshold} lines.",
         })
-    elif report["skill_md_lines"] > 500:
+    elif report["skill_md_lines"] > major_threshold:
         findings.append({
             "dimension": 4,
             "severity": "MAJOR",
-            "what": f"SKILL.md is {report['skill_md_lines']} lines (>500).",
+            "what": f"SKILL.md is {report['skill_md_lines']} lines (>{major_threshold}).",
             "fix": "Move detailed content to references/ and link from SKILL.md.",
         })
 

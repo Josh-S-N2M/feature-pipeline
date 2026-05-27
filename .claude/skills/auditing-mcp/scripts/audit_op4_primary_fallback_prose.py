@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 """
-audit_op4_primary_fallback_prose.py — OP-4 primary/fallback prose preservation.
+audit_op4_primary_fallback_prose.py — OP-4 extraction-method prose preservation.
 
-Verifies that the four canonical prose references to GitNexus primary + codebase-memory-mcp
-fallback policy in discovery-codebase-researcher.md are present (per ADR-0007 v2.2.0).
-Per Plan T1.5 — preserve lines 3, 20, 29, 156 verbatim (the OP-4 audit rule depends on them).
+Verifies that the canonical prose references to the code-graph fallback
+discipline in discovery-codebase-researcher.md and KB-codebase-research/SKILL.md
+are present. Per ADR-0066 (2026-05-27), gitnexus was removed; the canonical
+posture is now Read+Grep+Glob plus serena symbol tools, with `extraction_method`
+recorded in `codebase-analysis.json`.
 
-Note: line numbers in the plan refer to KB-codebase-research/SKILL.md and
-discovery-codebase-researcher.md collectively. After T1.5 cycle-3-aware updates
-("ADR-0018 + ADR-0038"), the line numbers shift; the audit checks by content
-substring, not by exact line number.
+Per Plan T1.5 — the audit checks by content substring, not by exact line number.
 
 Usage:
     python3 audit_op4_primary_fallback_prose.py <repo-root>
@@ -20,10 +19,9 @@ from pathlib import Path
 
 
 REQUIRED_SUBSTRINGS = [
-    # Primary/fallback policy mentions (any of these are sufficient per occurrence-count check)
-    "GitNexus",
-    "codebase-memory-mcp",
-    "primary",
+    # Extraction-method discipline tokens (any of these are sufficient per occurrence-count check)
+    "serena",
+    "extraction_method",
     "fallback",
 ]
 

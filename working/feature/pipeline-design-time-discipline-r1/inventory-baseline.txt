@@ -1,0 +1,207 @@
+INVENTORY BASELINE SNAPSHOT
+===========================
+Feature: pipeline-design-time-discipline-r1
+Snapshot timestamp (UTC): 2026-05-27T13:07:15Z
+Purpose: Pre-execution baseline for FR-6 matrix authoring (Phase 8)
+Gate: PV-0.C2
+
+NOTE: This baseline is the canonical input for FR-6 agent/skill coverage matrix
+authoring. It captures counts and names at the start of execution so that Phase 8
+can reference a stable snapshot rather than a moving working-tree state.
+
+---
+
+SECTION 1: AGENT FILES
+======================
+Count: 37
+
+.claude/agents/cc-critique.md
+.claude/agents/design-api.md
+.claude/agents/design-backend.md
+.claude/agents/design-cicd.md
+.claude/agents/design-claude-code.md
+.claude/agents/design-codespaces.md
+.claude/agents/design-composer.md
+.claude/agents/design-database.md
+.claude/agents/design-frontend.md
+.claude/agents/design-iac.md
+.claude/agents/design-query.md
+.claude/agents/discovery-codebase-researcher.md
+.claude/agents/discovery-external-researcher.md
+.claude/agents/discovery-plan-author.md
+.claude/agents/execute-finalize-reconciler.md
+.claude/agents/execute-orchestrator.md
+.claude/agents/execute-phase-quality-reviewer.md
+.claude/agents/execute-task-code-producer.md
+.claude/agents/execute-task-quality-handler.md
+.claude/agents/finalize-deliverable-packager.md
+.claude/agents/finalize-reconciler.md
+.claude/agents/finalize-task-decomposer.md
+.claude/agents/intake-intent-clarifier.md
+.claude/agents/intake-prd-author.md
+.claude/agents/issue-capture-author.md
+.claude/agents/plan-author.md
+.claude/agents/review-architecture-auditor.md
+.claude/agents/review-cross-artifact-auditor.md
+.claude/agents/shared-document-reviewer.md
+.claude/agents/synth-critic.md
+.claude/agents/synth-extractor.md
+.claude/agents/synth-framer.md
+.claude/agents/synth-grapher.md
+.claude/agents/synth-substrate.md
+.claude/agents/synth-synthesizer.md
+.claude/agents/test-acceptance-author.md
+.claude/agents/test-phase-validator-author.md
+
+---
+
+SECTION 2: SKILL FILES
+======================
+Count: 51
+Note: Recursive enumeration via `find .claude/skills -name SKILL.md`; cycle-1 revision of T0.2 per quality-handler finding.
+
+.claude/skills/KB-api-design/SKILL.md
+.claude/skills/KB-backend-design/SKILL.md
+.claude/skills/KB-cc-design/SKILL.md
+.claude/skills/KB-cc-platform/SKILL.md
+.claude/skills/KB-codebase-research/SKILL.md
+.claude/skills/KB-codespaces-design/SKILL.md
+.claude/skills/KB-codespaces-platform/SKILL.md
+.claude/skills/KB-component-architecture-design/SKILL.md
+.claude/skills/KB-database-design/SKILL.md
+.claude/skills/KB-design-system-design/SKILL.md
+.claude/skills/KB-documentation-criteria/SKILL.md
+.claude/skills/KB-frontend-design/SKILL.md
+.claude/skills/KB-general-coding-principles/SKILL.md
+.claude/skills/KB-github-actions-design/SKILL.md
+.claude/skills/KB-github-actions-platform/SKILL.md
+.claude/skills/KB-iac-design/SKILL.md
+.claude/skills/KB-issue-capture/SKILL.md
+.claude/skills/KB-mcp-design/SKILL.md
+.claude/skills/KB-mcp-platform/SKILL.md
+.claude/skills/KB-query-design/SKILL.md
+.claude/skills/KB-review-disciplines/SKILL.md
+.claude/skills/KB-storybook-platform/SKILL.md
+.claude/skills/KB-task-decomposition/SKILL.md
+.claude/skills/KB-ux-design/SKILL.md
+.claude/skills/KB-visual-design/SKILL.md
+.claude/skills/ai-development-guide/SKILL.md
+.claude/skills/auditing-cc-configs/SKILL.md
+.claude/skills/auditing-codespaces/SKILL.md
+.claude/skills/auditing-context-files/SKILL.md
+.claude/skills/auditing-github-actions/SKILL.md
+.claude/skills/auditing-hooks/SKILL.md
+.claude/skills/auditing-mcp/SKILL.md
+.claude/skills/auditing-settings/SKILL.md
+.claude/skills/auditing-shared/SKILL.md
+.claude/skills/auditing-skills/SKILL.md
+.claude/skills/auditing-subagents/SKILL.md
+.claude/skills/capture-issue/SKILL.md
+.claude/skills/claim-extraction-knowledge/SKILL.md
+.claude/skills/decision-framing-knowledge/SKILL.md
+.claude/skills/entity-graph-knowledge/SKILL.md
+.claude/skills/gitnexus/gitnexus-cli/SKILL.md
+.claude/skills/gitnexus/gitnexus-debugging/SKILL.md
+.claude/skills/gitnexus/gitnexus-exploring/SKILL.md
+.claude/skills/gitnexus/gitnexus-guide/SKILL.md
+.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md
+.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md
+.claude/skills/recipe-feature-pipeline/SKILL.md
+.claude/skills/report-composition-knowledge/SKILL.md
+.claude/skills/substrate-translation-knowledge/SKILL.md
+.claude/skills/synthesize/SKILL.md
+.claude/skills/verification-knowledge/SKILL.md
+
+---
+
+SECTION 3: ADR FILES
+====================
+Count: 65
+
+adrs/ADR-0001-orchestrator-placement.md
+adrs/ADR-0002-critique-1-discipline.md
+adrs/ADR-0003-critique-2-discipline.md
+adrs/ADR-0004-test-split.md
+adrs/ADR-0005-append-only-supersession.md
+adrs/ADR-0006-synthesis-inlined.md
+adrs/ADR-0007-code-graph-mcp-selection.md
+adrs/ADR-0008-issue-ledger-scope.md
+adrs/ADR-0009-rationale-brief-discipline.md
+adrs/ADR-0010-knowledge-skill-frontmatter-correction.md
+adrs/ADR-0011-documentation-criteria-canonical-skill.md
+adrs/ADR-0012-prd-stage.md
+adrs/ADR-0013-blueprint-template-adoption.md
+adrs/ADR-0014-adr-template-adoption-and-migration.md
+adrs/ADR-0015-ears-acceptance-criteria.md
+adrs/ADR-0016-per-layer-fanout-composer-fanin.md
+adrs/ADR-0017-document-reviewer-integration.md
+adrs/ADR-0018-codebase-analysis-schema.md
+adrs/ADR-0019-naming-convention.md
+adrs/ADR-0020-kb-structure.md
+adrs/ADR-0021-discovery-phase-architecture.md
+adrs/ADR-0022-subagent-reasoning-configuration.md
+adrs/ADR-0023-discipline-refinements-from-integration-test.md
+adrs/ADR-0024-frontend-design-knowledge-corpus-structure.md
+adrs/ADR-0025-pipeline-machinery-defects-integration-test-2.md
+adrs/ADR-0026-audit-machinery-fixes-v4-4-1.md
+adrs/ADR-0027-pipeline-skill-design-gap-deliverable-archive.md
+adrs/ADR-0028-skill-design-fixes-v4-5-0.md
+adrs/ADR-0029-no-silent-scope-changes-principle.md
+adrs/ADR-0030-mechanism-alpha-pedagogical-marker-justification.md
+adrs/ADR-0031-auditing-shared-skill-module.md
+adrs/ADR-0032-conventions-canonicalization.md
+adrs/ADR-0033-adr-0029-execution-extension.md
+adrs/ADR-0034-prd-mis-credit-cleanup.md
+adrs/ADR-0035-auditing-shared-skill-binding-convention.md
+adrs/ADR-0036-single-location-adr-placement.md
+adrs/ADR-0037-mcp-events-jsonl-transition-surfacing.md
+adrs/ADR-0038-codebase-analysis-schema-v1-1-0.md
+adrs/ADR-0039-credential-redaction-posture.md
+adrs/ADR-0040-serena-narrowed-always-on.md
+adrs/ADR-0041-install-mechanism-hybrid.md
+adrs/ADR-0042-auditing-mcp-family-graduation.md
+adrs/ADR-0043-auditing-mcp-gate-6-hard-gate.md
+adrs/ADR-0044-flatten-execution-dispatch-hierarchy.md
+adrs/ADR-0045-subagent-agent-tool-grant-prohibition.md
+adrs/ADR-0046-add-new-sibling-file-evolution.md
+adrs/ADR-0047-three-layer-enforcement.md
+adrs/ADR-0048-prior-context-handoff.md
+adrs/ADR-0049-structural-vs-discipline-kb-split.md
+adrs/ADR-0050-5-state-issues-vocabulary.md
+adrs/ADR-0051-per-issue-folder-model.md
+adrs/ADR-0052-three-doctypes-preserved.md
+adrs/ADR-0053-adr-renumbering-collision-resolution-algorithm.md
+adrs/ADR-0054-canonical-helper-three-surface-enforcement-pattern.md
+adrs/ADR-0055-archive-wins-consolidation-policy-for-version-divergent-collisions.md
+adrs/ADR-0056-no-carve-outs-in-canonical-placement.md
+adrs/ADR-0057-checkpoint-execution-mode-first-class-field.md
+adrs/ADR-0058-calibration-result-event-type-additive-extension.md
+adrs/ADR-0059-adr-prescriptions-companion-file.md
+adrs/ADR-0060-cross-file-invariant-catalog-hybrid.md
+adrs/ADR-0061-severity-vocabulary-bridge-table.md
+adrs/ADR-0062-mcp-tool-surface-drift-detection-pipeline.md
+adrs/ADR-0063-blocks-x-marker-grammar.md
+adrs/ADR-0064-agent-roster-impact-matrix-contract.md
+adrs/ADR-0065-skill-coverage-decision-discipline.md
+
+---
+
+SECTION 4: MCP SERVER KEYS (.mcp.json)
+=======================================
+Count: 6
+
+[
+  "actionlint-mcp",
+  "context7",
+  "exa",
+  "gitnexus",
+  "serena",
+  "terraform-mcp"
+]
+
+Note: mcp-openapi-schema was removed 2026-05-24 per CLAUDE.md. The six above are
+the ground truth as of this snapshot.
+
+---
+
+END OF BASELINE

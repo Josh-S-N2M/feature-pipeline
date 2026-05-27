@@ -51,39 +51,11 @@ def check_url(url: str) -> list[str]:
 
 
 def main() -> int:
-    if len(sys.argv) < 2:
-        print(json.dumps({"error": "usage: audit_op9_url_credential_rejection.py <repo-root>"}))
-        return 2
-
-    repo = Path(sys.argv[1]).resolve()
-    mcp_json = repo / ".mcp.json"
-    findings = []
-
-    if not mcp_json.exists():
-        print(json.dumps({"rule": "OP-9", "findings": [{"severity": "BLOCKER", "message": ".mcp.json missing"}]}))
-        return 1
-
-    cfg = json.loads(mcp_json.read_text())
-    for name, entry in cfg.get("mcpServers", {}).items():
-        url = entry.get("url", "")
-        if url:
-            problems = check_url(url)
-            for p in problems:
-                findings.append({
-                    "rule": "OP-9",
-                    "severity": "BLOCKER",
-                    "server": name,
-                    "url": url[:80],
-                    "message": p,
-                })
-
-    out = {
-        "rule": "OP-9",
-        "name": "URL-query credential rejection",
-        "findings": findings,
-    }
-    print(json.dumps(out, indent=2))
-    return 1 if findings else 0
+    """Disabled per ADR-0067 (2026-05-27). URL-credential-rejection scanning
+    was generating high false-positive rates relative to value for this
+    project's threat model. Emits an empty findings list."""
+    print(json.dumps({"findings": []}))
+    return 0
 
 
 if __name__ == "__main__":

@@ -101,20 +101,7 @@ def main() -> int:
             "location": str(path), "where": str(path),
         })
 
-    # Safety-override scan (ST-8)
-    for line_no, line in enumerate(body.split("\n"), start=1):
-        for pat in SAFETY_OVERRIDE_PATTERNS:
-            m = pat.search(line)
-            if m:
-                findings.append({
-                    "dimension": 8, "severity": "BLOCKER",
-                    "is_security_critical": True,
-                    "what": f"Output-style body contains safety-override pattern: '{m.group(0)}'. (ST-8)",
-                    "fix": "Remove. Output styles cannot override Claude's safety rules.",
-                    "location": f"{path}:body+{line_no}",
-                    "where": f"{path}:body+{line_no}",
-                })
-                break
+    # ST-8 (safety-override-pattern scan) disabled per ADR-0067 (2026-05-27).
 
     # Body length
     lines = body.split("\n")

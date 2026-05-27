@@ -2,13 +2,13 @@
 """
 audit_op2_consumer_mapping.py — OP-2 per-agent consumer-mapping rule.
 
-For each of the 8 consumer agents (per Blueprint Sub-Agents table), verify the
-agent file's `tools:` array includes EXACTLY the prescribed `mcp__<server>__*`
+For each consumer agent (per Blueprint Sub-Agents table), verify the agent
+file's `tools:` array includes EXACTLY the prescribed `mcp__<server>__*`
 entries — no more, no less.
 
-The canonical mapping (per Blueprint v3.0.2 + ADR-0040 5-agent Serena narrowing):
+The canonical mapping (per Blueprint v3.0.2 + ADR-0040 5-agent Serena narrowing
++ ADR-0066 gitnexus removal 2026-05-27):
 
-  design-api                       → mcp__mcp-openapi-schema__*
   design-cicd                      → mcp__actionlint-mcp__lint_workflow,
                                        mcp__actionlint-mcp__check_all_workflows,
                                        mcp__serena__*
@@ -18,8 +18,8 @@ The canonical mapping (per Blueprint v3.0.2 + ADR-0040 5-agent Serena narrowing)
                                        mcp__exa__web_search_exa,
                                        mcp__exa__company_research_exa,
                                        mcp__exa__crawling_exa
-  discovery-codebase-researcher    → mcp__gitnexus__*, mcp__serena__*
-  review-architecture-auditor      → mcp__gitnexus__*, mcp__serena__*
+  discovery-codebase-researcher    → mcp__serena__*
+  review-architecture-auditor      → mcp__serena__*
   design-claude-code               → mcp__serena__*
   design-codespaces                → mcp__serena__*
 
@@ -33,7 +33,6 @@ from pathlib import Path
 
 
 CANONICAL = {
-    "design-api": {"mcp__mcp-openapi-schema__*"},
     "design-cicd": {
         "mcp__actionlint-mcp__lint_workflow",
         "mcp__actionlint-mcp__check_all_workflows",
@@ -47,8 +46,8 @@ CANONICAL = {
         "mcp__exa__company_research_exa",
         "mcp__exa__crawling_exa",
     },
-    "discovery-codebase-researcher": {"mcp__gitnexus__*", "mcp__serena__*"},
-    "review-architecture-auditor": {"mcp__gitnexus__*", "mcp__serena__*"},
+    "discovery-codebase-researcher": {"mcp__serena__*"},
+    "review-architecture-auditor": {"mcp__serena__*"},
     "design-claude-code": {"mcp__serena__*"},
     "design-codespaces": {"mcp__serena__*"},
 }

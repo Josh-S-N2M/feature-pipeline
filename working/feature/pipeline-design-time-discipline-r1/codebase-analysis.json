@@ -1,0 +1,539 @@
+{
+  "schema_version": "1.1.0",
+  "pipeline_run_id": "pipeline-design-time-discipline-r1",
+  "generated_at": "2026-05-26T17:30:00Z",
+  "extraction_method": "mixed",
+  "extraction_method_notes": "Inheritance-aware thin overlay. Most components, dependencies, blast-radius entries, and mechanism-dependency-table rows are inherited verbatim from the parent run's codebase-analysis.json (see inherited_from). Re-traversal scoped to (a) the 3 newly-authored ADRs accepted since parent extraction, (b) mtime-delta confirmation against parent, (c) re-confirm of grep targets bearing on R2a's FR-1/6/7/8/9/10 surfaces, (d) the severity-vocabulary canonical numbers needed by the ADR-0061 bridge author. Substrate is markdown discipline artifacts; grep+Read gives identical evidence quality at lower cost than symbolic LSP traversal, per the parent's documented method choice.",
+  "inherited_from": "working/feature/pipeline-cross-artifact-discipline-r1/codebase-analysis.json",
+  "inherited_from_generated_at": "2026-05-26T13:30:00Z",
+  "inheritance_directive": "Per the research-plan §Codebase Research Scope inheritance directive, components / dependencies / blast_radius / mechanism_dependency_table rows for FR-1/6/7/8/9/10 touch points are inherited verbatim and referenced by parent component name. New content captured below as R2A-* IDs. See inheritance_disposition on each section.",
+  "scope": {
+    "repo": "Josh-S-N2M/feature-pipeline",
+    "branch": "main",
+    "commit": "8988be2a1236328699e581463e6caf49c8d96329",
+    "paths_inherited": "see parent",
+    "paths_new_or_revisited": [
+      "adrs/ADR-0059-adr-prescriptions-companion-file.md",
+      "adrs/ADR-0060-cross-file-invariant-catalog-hybrid.md",
+      "adrs/ADR-0061-severity-vocabulary-bridge-table.md",
+      "adrs/ADR-0062-mcp-tool-surface-drift-detection-pipeline.md",
+      "adrs/ADR-0063-blocks-x-marker-grammar.md",
+      ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md",
+      ".claude/skills/auditing-cc-configs/scripts/verdict_compute.py",
+      ".claude/skills/auditing-mcp/SKILL.md (severity meanings section)",
+      ".claude/agents/review-architecture-auditor.md (severity emission)",
+      ".claude/agents/review-cross-artifact-auditor.md (severity weights)"
+    ],
+    "layers": ["cc"]
+  },
+  "delta_since_parent": {
+    "summary": "Five new ADRs added since parent extraction (ADR-0059..ADR-0063); three are R2a-scope inherited (0059, 0061, 0063), two are R2b-scope (0060 cross-file invariants for FR-3; 0062 MCP tool-surface drift for FR-5) — captured for cross-reference but not load-bearing in R2a. ADR-0041 mtime also touched (no content delta verified at this layer; likely metadata-only re-touch). One agent-memory file under .claude/agent-memory/discovery-external-researcher/ touched (out-of-scope ephemeral). NO changes to: .claude/agents/*.md count (still 37), KB-cc-design/principles.md content, KB-review-disciplines/severity-taxonomy.md (still pre-bridge-content; ADR-0061 prescribes the additions this run authors), auditing-cc-configs/verdict_compute.py weights (-12/-5/-2/-0.5/0 unchanged).",
+    "agent_count_at_HEAD": 37,
+    "agent_count_at_parent_extraction": 37,
+    "agent_count_delta": 0,
+    "adrs_added_since_parent": ["ADR-0059", "ADR-0060", "ADR-0061", "ADR-0062", "ADR-0063"],
+    "files_revisited_with_no_content_drift": [
+      ".claude/skills/KB-review-disciplines/severity-taxonomy.md (still pre-bridge content)",
+      ".claude/skills/auditing-cc-configs/scripts/verdict_compute.py (weights unchanged)",
+      ".claude/skills/KB-cc-design/references/principles.md (Principle 9 text unchanged)"
+    ]
+  },
+  "components_inherited_verbatim": {
+    "inheritance_disposition": "inherited-verbatim",
+    "source": "parent codebase-analysis.json components[]",
+    "names": [
+      "review-architecture-auditor",
+      "review-cross-artifact-auditor",
+      "KB-review-disciplines",
+      "auditing-shared",
+      "discovery-codebase-researcher",
+      "KB-codebase-research",
+      "recipe-feature-pipeline",
+      "design-cc (filename design-claude-code.md, frontmatter name design-cc)",
+      "KB-cc-design",
+      "auditing-subagents",
+      "Issues/per-agent-design-evaluation-gap/",
+      "state-transitions-log-entry-template",
+      "test-phase-validator-author",
+      "KB-task-decomposition",
+      "agent-inventory",
+      "ADR-locus (canonical placement)"
+    ],
+    "note": "Components inherited covering FR-1/6/7/8/9/10. R2b-scope-only inherited components (auditing-mcp, auditing-cc-configs, .mcp.json, Issues/cross-artifact-divergence-detection-gap/, Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md) are also present in parent and remain available to downstream consumers but are not load-bearing for R2a. Update 2026-05-26 reconciliation cycle 1: review-cross-artifact-auditor added per audit I-AA-006 (canonical source of iteration-delta weights 10/3/1/0 used in the bridge table; absence was a forensic gap, not functional). consumer_set_at_HEAD in blast_radius_new_confirmations[4] also extended 20 → 24 per audit I-AA-003 in this same revision pass."
+  },
+  "update_history": [
+    {
+      "version": "1.0.0",
+      "date": "2026-05-26T17:30:00Z",
+      "change": "Initial R2a codebase analysis emitted by discovery-codebase-researcher.",
+      "driver": "R2a Discovery stage."
+    },
+    {
+      "version": "1.0.1",
+      "date": "2026-05-26",
+      "change": "Reconciliation cycle 1 patches per architecture-audit findings: (a) components_inherited_verbatim.names[] gains 'review-cross-artifact-auditor' per audit I-AA-006; (b) blast_radius_new_confirmations[4].consumer_set_at_HEAD enumeration extended 20 → 24 by adding execute-orchestrator, review-cross-artifact-auditor, intake-intent-clarifier, test-acceptance-author per audit I-AA-003 + grep verification at reconciliation cycle 1.",
+      "driver": "Audit findings I-AA-003 + I-AA-006 (architecture-audit cycle 1); reconciliation cycle 1 dispatch to design-composer."
+    }
+  ],
+  "components_new": [
+    {
+      "id": "R2A-C-001",
+      "inheritance_disposition": "new",
+      "name": "ADR-0059 — Companion-File Schema for ADR Design-Realization Audits",
+      "path": "adrs/ADR-0059-adr-prescriptions-companion-file.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "architecture-decision-record",
+      "entry_points": ["loaded by review-architecture-auditor at audit time (FR-1 mechanism)"],
+      "dependencies": ["ADR-0036", "ADR-0054", "ADR-0056", "ADR-0041 (canonical exemplar)", "ADR-0018", "ADR-0038"],
+      "frontmatter": {
+        "status": "Accepted",
+        "version": "1.0.0",
+        "applies_to": ["pipeline-cross-artifact-discipline-r1", "all-future-ADRs-with-machine-checkable-prescriptions"]
+      },
+      "decision_shape": {
+        "canonical_form": "adrs/ADR-NNNN-<slug>.prescriptions.yaml — sibling companion to each ADR with machine-checkable prescriptions",
+        "optionality": "companion is OPTIONAL; ADRs without prescriptions have no companion; auditor no-ops on absence per AC-FR-1-b",
+        "schema_version": "1.0.0",
+        "schema_evolution": "additive-minor for new assertion.kind values + new optional fields; breaking changes require major bump + deprecation window",
+        "required_predicate_entry_fields": ["target_path", "assertion.kind", "severity_floor"],
+        "assertion_kind_vocabulary": ["regex_present", "regex_not_present", "jsonpath_equals", "jsonpath_count", "file_exists", "file_not_exists", "substring_present", "substring_absent"],
+        "linter_target_path": "auditing-shared/scripts/validate_adr_prescriptions.py (new)",
+        "linter_enforces": ["schema validity", "ADR-to-companion slug match", "target-path existence"],
+        "placement_rule": "same canonical-placement as ADRs (no subdirectory, no extension carve-out); ADR-0036 + ADR-0054 + ADR-0056 inherited verbatim"
+      },
+      "prescribed_file_targets": [
+        ".claude/agents/review-architecture-auditor.md (new procedure phase reading companion files)",
+        ".claude/skills/auditing-shared/scripts/validate_adr_prescriptions.py (new linter)",
+        ".claude/skills/KB-review-disciplines/references/architecture-audit.md (Lens 4: Design Realization)",
+        "adrs/ (gains .prescriptions.yaml sibling file pattern)"
+      ],
+      "notes": "Resolves parent OI-A1. Load-bearing for FR-1. The ADR explicitly grounds its choice in T-002's 9/9 survey + 44.57% NLP misinterpretation rate (arXiv 2602.07609) + NFR-5 idempotency requirement. The hybrid escape hatch (NLP-as-draft, companion-as-canonical) is documented as a fallback if backfill burden bites; kill criterion at 30-min-per-ADR companion authoring time in steady state. No precedent of .yaml siblings in adrs/ today — the convention is being established by this ADR (confirmed in parent watch_item_evidence.OI_A1_companion_file_convention_precedent and re-confirmed at HEAD)."
+    },
+    {
+      "id": "R2A-C-002",
+      "inheritance_disposition": "new",
+      "name": "ADR-0061 — Severity Vocabulary Bridge Table Host",
+      "path": "adrs/ADR-0061-severity-vocabulary-bridge-table.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "architecture-decision-record",
+      "entry_points": ["consulted by FR-1/4/5/6/9/10 finding-emitters", "consumer of NFR-8 four-field shape"],
+      "dependencies": ["ADR-0017 (shared-document-reviewer invocation points)", "ADR-0020 (KB consolidation)"],
+      "frontmatter": {
+        "status": "Accepted",
+        "version": "1.0.0",
+        "applies_to": ["pipeline-cross-artifact-discipline-r1", "all-cross-surface-finding-emitters"]
+      },
+      "decision_shape": {
+        "approach": "preserve trifecta (auditor/reviewer/PV) + bridge table",
+        "rejected_alternatives": ["unify (audience-fit destroyed)", "canonicalize with translator (irreversibility cost on reviewer + PV surfaces)"],
+        "canonical_host_path": ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md",
+        "monotonic_mappings_documented": ["BLOCKER ↔ critical ↔ blocking", "MINOR ↔ recommended ↔ warning"],
+        "non_monotonic_edges_documented": ["NIT vs. recommended (auditor sub-divergence: NIT in auditing-mcp vs INFO in arch/cross auditors)", "MAJOR → {blocking, warning} (PV-vocabulary branch)"],
+        "optional_translator_path": "auditing-shared/scripts/translate_severity.py (new; non-monotonic edges surfaced as explicit rationale fields)",
+        "nfr8_co_located_shape": ["rule", "target", "divergence", "next_action"],
+        "kill_criterion": "two or more vocabularies converge naturally during a future feature → bridge table collapses accordingly"
+      },
+      "prescribed_file_targets": [
+        ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md (gains bridge table + NFR-8 shape spec — additive to existing trifecta-vocabulary content)",
+        ".claude/skills/auditing-shared/scripts/translate_severity.py (new optional utility)"
+      ],
+      "notes": "Load-bearing for FR-1 / FR-9 / FR-10 (R2a) and FR-4 / FR-5 (R2b). Authoring sequence per SPLIT-RECORD: R2a authors bridge content here; R2b inherits the populated table. The host file currently exists at the prescribed path with pre-bridge content (vocabulary definitions for critical/important/recommended, threshold mappings). The bridge-table addition is additive — re-confirmed at HEAD that no WIP edits collide with the bridge author's surface (OI-R2a-6 evidence)."
+    },
+    {
+      "id": "R2A-C-003",
+      "inheritance_disposition": "new",
+      "name": "ADR-0063 — Blocks-X Marker Grammar Canonicalization",
+      "path": "adrs/ADR-0063-blocks-x-marker-grammar.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "architecture-decision-record",
+      "entry_points": ["consumed by discovery-codebase-researcher (emission), execute-orchestrator (parser/gating logic)"],
+      "dependencies": ["ADR-0044 (free-string transition_name v1 invariant)", "ADR-0046 (new sibling file evolution discipline)"],
+      "frontmatter": {
+        "status": "Accepted",
+        "version": "1.0.0",
+        "applies_to": ["pipeline-cross-artifact-discipline-r1", "all-future-discovery-emissions"]
+      },
+      "decision_shape": {
+        "canonical_grammar": "<!-- BLOCKS: <stage-slug>-completion -->",
+        "token_literal": "BLOCKS: (uppercase, colon-suffixed)",
+        "stage_slug_examples": ["discovery-completion", "synthesis-completion", "design-cc-completion", "design-composition-completion", "plan-authoring-completion", "phase-validator-authoring-completion"],
+        "container": "HTML comment (CommonMark) — invisible in rendered markdown, greppable from CI",
+        "optional_payload_separator": " — ",
+        "optional_payload_example": "<!-- BLOCKS: design-cc-completion — A-5 grammar undecided -->",
+        "multiplicity": "multiple markers MAY appear in one output; each parsed independently",
+        "canonical_parser_regex": "<!--\\s*BLOCKS:\\s*([a-z0-9-]+)-completion(?:\\s+—\\s+[^\\n]*)?\\s*-->",
+        "reserved_transition_names": ["BLOCKS_X_RESOLVED", "BLOCKS_X_DEFERRED_WITH_OI", "BLOCKS_X_FALSE_POSITIVE"],
+        "schema_evolution_required": false,
+        "migration_discipline": "non-retroactive — the n=1 prior prose occurrence at working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis-report.md:198-202 is NOT migrated; going-forward grammar applies"
+      },
+      "prescribed_file_targets": [
+        ".claude/skills/KB-documentation-criteria/references/blocks-x-marker-grammar.md (new — canonical grammar spec)",
+        ".claude/agents/discovery-codebase-researcher.md (emission discipline)",
+        ".claude/agents/execute-orchestrator.md (parser + gating logic at stage-transition checkpoints)",
+        ".claude/skills/recipe-feature-pipeline/SKILL.md (checkpoint logic reference)",
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md (extended transition_name enumeration)"
+      ],
+      "notes": "Resolves parent OI-A5. Load-bearing for FR-9. The em-dash payload separator (U+2014) is the documented potential brittleness vector; kill criterion at editor-environment-fragility. Re-confirmed at HEAD that no parser/regex infrastructure for marker patterns exists yet in auditing-shared, review-architecture-auditor, or auditing-subagents (OI-R2a-3 evidence — the parser is genuinely new realization work)."
+    },
+    {
+      "id": "R2A-C-004",
+      "inheritance_disposition": "new-context-only",
+      "name": "ADR-0060 — Cross-File Invariant Catalog (Hybrid)",
+      "path": "adrs/ADR-0060-cross-file-invariant-catalog-hybrid.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "architecture-decision-record",
+      "entry_points": ["R2b-scope (FR-3 mechanism)"],
+      "dependencies": ["referenced for completeness; out-of-scope for R2a"],
+      "notes": "Captured for delta-since-parent completeness. R2b will be load-bearing on this ADR. R2a downstream consumers do NOT need to read this ADR. The FR-3 ↔ FR-9 share-point noted in parent mechanism_dependency_table is still relevant cross-cutting; design-cc should be aware of the ADR's existence but not its content."
+    },
+    {
+      "id": "R2A-C-005",
+      "inheritance_disposition": "new-context-only",
+      "name": "ADR-0062 — MCP Tool-Surface Drift Detection Pipeline",
+      "path": "adrs/ADR-0062-mcp-tool-surface-drift-detection-pipeline.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "architecture-decision-record",
+      "entry_points": ["R2b-scope (FR-5 mechanism)"],
+      "dependencies": ["referenced for completeness; out-of-scope for R2a"],
+      "notes": "Captured for delta-since-parent completeness. R2b-only. Not load-bearing for any R2a FR."
+    }
+  ],
+  "dependencies_inherited_verbatim": {
+    "inheritance_disposition": "inherited-verbatim",
+    "source": "parent codebase-analysis.json dependencies[]",
+    "edge_count": 21,
+    "note": "All 21 parent dependency edges remain valid at HEAD. Edge from review-architecture-auditor → KB-review-disciplines is the critical inheritance for FR-1 (auditor procedure phase reads architecture-audit.md Lens 4). Edge from design-cc → KB-cc-design Principle 9 (count=1, design-claude-code.md:56) is critical for FR-8 mutual-cross-reference. Edge from test-phase-validator-author → KB-review-disciplines is the FR-7 attachment surface candidate. Edges to codebase-analysis.json (12 designer/composer/plan/test agents) are critical for FR-2 schema-extension safety (R2b)."
+  },
+  "dependencies_new": [
+    {
+      "from": "R2A-C-001 (ADR-0059)",
+      "to": "ADR-0036, ADR-0054, ADR-0056",
+      "kind": "inherits_canonical_placement",
+      "count": 3,
+      "representative_files": ["adrs/ADR-0059-adr-prescriptions-companion-file.md (frontmatter adrs_inherited)"],
+      "confidence": "high"
+    },
+    {
+      "from": "R2A-C-001 (ADR-0059)",
+      "to": "auditing-shared/scripts/validate_adr_prescriptions.py (NEW)",
+      "kind": "prescribes_new_artifact",
+      "count": 1,
+      "representative_files": ["adrs/ADR-0059-adr-prescriptions-companion-file.md (Architecture Impact section)"],
+      "confidence": "high"
+    },
+    {
+      "from": "R2A-C-002 (ADR-0061)",
+      "to": "KB-review-disciplines/references/severity-taxonomy.md",
+      "kind": "prescribes_bridge_content_addition",
+      "count": 1,
+      "representative_files": ["adrs/ADR-0061-severity-vocabulary-bridge-table.md (Decision Details + Architecture Impact)"],
+      "confidence": "high"
+    },
+    {
+      "from": "R2A-C-002 (ADR-0061)",
+      "to": "auditing-shared/scripts/translate_severity.py (NEW, optional)",
+      "kind": "prescribes_new_artifact",
+      "count": 1,
+      "representative_files": ["adrs/ADR-0061-severity-vocabulary-bridge-table.md (Architecture Impact)"],
+      "confidence": "high"
+    },
+    {
+      "from": "R2A-C-003 (ADR-0063)",
+      "to": "KB-documentation-criteria/references/blocks-x-marker-grammar.md (NEW)",
+      "kind": "prescribes_new_artifact",
+      "count": 1,
+      "representative_files": ["adrs/ADR-0063-blocks-x-marker-grammar.md (Architecture Impact)"],
+      "confidence": "high"
+    },
+    {
+      "from": "R2A-C-003 (ADR-0063)",
+      "to": "state-transitions-log-entry-template.md (transition_name enumeration extension)",
+      "kind": "extends_existing_artifact",
+      "count": 1,
+      "representative_files": ["adrs/ADR-0063-blocks-x-marker-grammar.md (Decision)", ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md"],
+      "confidence": "high"
+    }
+  ],
+  "blast_radius_inherited_verbatim": {
+    "inheritance_disposition": "inherited-verbatim",
+    "source": "parent codebase-analysis.json blast_radius[]",
+    "entries_relevant_to_R2a": [
+      "review-architecture-auditor (FR-1) — direct dependents recipe-feature-pipeline + finalize-reconciler; 3-hop adds design-composer + review-cross-artifact-auditor + finalize-deliverable-packager",
+      "design-cc deliverable set (FR-6) — direct dependents design-composer + recipe-feature-pipeline; 3-hop adds shared-document-reviewer + review-architecture-auditor",
+      "KB-cc-design Principle 9 (FR-8) — concentrated: exactly 2 sites (TOC line 15 + design-claude-code.md:56)",
+      "state-transitions.log schema (FR-9) — direct dependents execute-orchestrator + log_state_transition.py",
+      "PV-author rubric (FR-7 candidate location) — direct dependents finalize-reconciler + plan-author"
+    ]
+  },
+  "blast_radius_new_confirmations": [
+    {
+      "touch_point": "KB-cc-design Principle 9 (R2a re-confirmation at HEAD)",
+      "direct_dependents": [
+        ".claude/skills/KB-cc-design/references/principles.md:15 (TOC entry)",
+        ".claude/skills/KB-cc-design/references/principles.md:182 (Principle 9 heading)",
+        ".claude/agents/design-claude-code.md:56 (cites 'per KB-cc-design Principle 9' verbatim, full sentence captured: 'Reasoning configuration is intentional, not default (per KB-cc-design Principle 9): explicitly justify the model: choice...')"
+      ],
+      "transitive_dependents_3_hop": "unchanged from parent (0 indirect citations)",
+      "hop_tier_distribution": {"1": 3, "2": 0, "3": 0},
+      "delta_from_parent": "parent reported '1 cross-reference' (counting design-claude-code.md:56); HEAD count is the same — TOC entry at principles.md:15 was always counted as self-reference, not cross-reference. Verbatim citing text confirmed unchanged. FR-8 rewording must edit principles.md:182 AND coordinate design-claude-code.md:56 cross-reference text.",
+      "fr8_propagation_targets_at_HEAD": [
+        ".claude/skills/KB-cc-design/references/principles.md:15 (TOC line — name update if Principle 9 is reworded; or new sibling Principle 11 supersedes 9 per ADR-0005)",
+        ".claude/skills/KB-cc-design/references/principles.md:182 (Principle 9 body — active-framing rewrite)",
+        ".claude/agents/design-claude-code.md:56 (cross-reference text — mutual update per AC-FR-8-b: Principle 9 cites FR-6 matrix discipline; design-cc cites updated Principle 9)"
+      ]
+    },
+    {
+      "touch_point": "review-architecture-auditor consumers (R2a FR-1 design-realization audit attachment)",
+      "direct_dependents_at_HEAD": [
+        "recipe-feature-pipeline (Stage 8 dispatch — unchanged from parent)",
+        "finalize-reconciler (consumes architecture-audit-issues.json — unchanged from parent)"
+      ],
+      "fr1_schema_extension_check": "additive — checks_performed[] gains 'design_realization' value; issues[].category gains 'design_realization' value. NFR-8 four-field shape (rule/target/divergence/next_action) co-locates per ADR-0061 — also additive to issues[]. No consumer of audit-issues.json indexes into fixed checks_performed[] today (parent confirmed); change is structurally safe."
+    },
+    {
+      "touch_point": "auditing-subagents rule call sites (R2a FR-10 attachment)",
+      "direct_dependents_at_HEAD": "parent inherited verbatim; no rules currently use 'feature working directory shape' as predicate (OI-R2a-5 evidence below).",
+      "oi_r2a_5_finding": "Grep over .claude/skills/auditing-subagents/ for 'working/feature\\|working-directory\\|feature working' returns ZERO matches. FR-10's new rule (matrix-missing at pre-deliverable-packaging) ADDS the first auditing-subagents predicate that reads from working/feature/<slug>/. No existing extension path; design-cc must add a NEW script + reference text + SA-NN check entry rather than extend an existing rule."
+    },
+    {
+      "touch_point": "KB-task-decomposition PV-author rubric consumers (R2a FR-7 attachment-location signal for OI-R2a-4)",
+      "consumer_set_at_HEAD": ".claude/skills/KB-task-decomposition/SKILL.md is the only file in that skill referencing PV-author concept; per parent finding, KB-task-decomposition is loaded ONLY by finalize-task-decomposer (not test-phase-validator-author). The actual PV-author rubric is INLINED in .claude/agents/test-phase-validator-author.md Phase 2 (parent Known Issue 3). KB-task-decomposition is NOT a natural attachment point for FR-7's Skill-Coverage Decisions section.",
+      "fr7_attachment_candidates": [
+        ".claude/skills/KB-documentation-criteria/references/templates/ — new section template (highest fit; this KB hosts other shared section templates)",
+        ".claude/agents/synth-synthesizer.md OR synth-framer.md Phase 2 — embed Skill-Coverage Decisions in Blueprint synthesis output (preserves authoring locality)",
+        ".claude/agents/design-composer.md Phase X — embed in Blueprint composition (composer is the natural authority on cross-cutting decisions like skill-coverage)"
+      ],
+      "oi_r2a_4_finding": "No precedent of standalone skill-coverage-decisions.md artifact in working/feature/* (grep returned zero matches). Standalone-artifact path is greenfield; embedded-section path is the lower-irreversibility option per the parent's analytical pattern (additive section in existing template vs new artifact convention)."
+    },
+    {
+      "touch_point": "KB-review-disciplines consumers (ADR-0061 bridge content propagation)",
+      "consumer_set_at_HEAD": [
+        "24 agents under .claude/agents/ load KB-review-disciplines: discovery-plan-author, finalize-reconciler, design-claude-code, design-database, plan-author, design-query, intake-prd-author, execute-finalize-reconciler, finalize-deliverable-packager, review-architecture-auditor, test-phase-validator-author, design-codespaces, execute-phase-quality-reviewer, design-cicd, design-composer, design-frontend, design-backend, shared-document-reviewer, design-iac, design-api, execute-orchestrator, review-cross-artifact-auditor, intake-intent-clarifier, test-acceptance-author (last 4 added at reconciliation cycle 1 per audit I-AA-003 + grep verification: grep -l KB-review-disciplines .claude/agents/*.md | wc -l → 24)"
+      ],
+      "fr1_fr9_fr10_propagation_check": "All 5 FR finding-emitters (review-architecture-auditor, design-composer for FR-9 marker handling, auditing-subagents for FR-10, etc.) already load KB-review-disciplines. Bridge content at severity-taxonomy.md will be visible to all 24 downstream consumers automatically — no separate propagation work needed for visibility. AC-FR-1-* / AC-FR-9-* / AC-FR-10-* emissions will reference the bridge by name (per ADR-0061 Implementation Guidance: 'reference by name, not by copy')."
+    }
+  ],
+  "severity_vocabularies_snapshot": {
+    "inheritance_disposition": "new",
+    "purpose": "Canonical-input dossier for design-composer's bridge-content authoring under ADR-0061. All four vocabularies + verdict-numeric mapping + finding-shape conventions consolidated. The bridge author can ingest this section verbatim without re-surveying.",
+    "vocab_1_auditor_agents": {
+      "values": ["BLOCKER", "MAJOR", "MINOR", "NIT", "INFO"],
+      "intra_auditor_divergence": "review-architecture-auditor.md + review-cross-artifact-auditor.md emit BLOCKER/MAJOR/MINOR/INFO (no NIT); auditing-mcp SKILL.md uses BLOCKER/MAJOR/MINOR/NIT (no INFO). The verdict_compute.py canonical set is the union: BLOCKER/MAJOR/MINOR/NIT/INFO.",
+      "sources": {
+        "review-architecture-auditor.md:27": "severity taxonomy (BLOCKER / MAJOR / MINOR / INFO)",
+        "review-architecture-auditor.md:119": "issue JSON schema severity: BLOCKER (illustrative)",
+        "review-cross-artifact-auditor.md:93": "BLOCKERs weighted 10, MAJORs 3, MINORs 1, INFO 0 (severity-weighted count delta for delta analysis — NOTE: different from verdict_compute.py weights)",
+        "review-cross-artifact-auditor.md:143-145": "summary counts: BLOCKER / MAJOR / MINOR (no NIT/INFO in summary block)",
+        "review-cross-artifact-auditor.md:154-156": "verdict mapping: any BLOCKER → fail; any MAJOR (no BLOCKER) → conditional_pass; only MINOR/INFO → pass",
+        "auditing-mcp/SKILL.md:100-105": "BLOCKER (won't load/exposes credentials/toxic), MAJOR (degrades security), MINOR (deviates from best practice), NIT (taste). Verdict thresholds: PASS 95+, PASS-WITH-MINOR-FIXES 85-94, NEEDS-WORK 70-84, FAIL <70. SECURITY-BLOCK on confirmed CRITICAL."
+      }
+    },
+    "vocab_2_reviewer_discipline": {
+      "values": ["critical", "important", "recommended"],
+      "source_file": ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md (current pre-bridge content)",
+      "verbatim_definitions": {
+        "critical": "The issue blocks acceptance. Architecturally wrong, security-breaking, contract violation, or fundamentally infeasible. Cannot be deferred or accepted with conditions — must be fixed.",
+        "important": "The issue should be fixed before approval but isn't architecturally fatal. Degrades the score. Can be deferred only with explicit user approval and a tracked ledger entry.",
+        "recommended": "Improvement suggestion. Non-blocking. Documents are approvable with `recommended` issues outstanding."
+      },
+      "verdict_mapping_in_file": {
+        "any_critical": "needs_revision (or rejected for fundamental problems)",
+        "important_only_small_count_AND_consistency_gt_80_AND_completeness_gt_75": "approved_with_conditions",
+        "only_recommended_AND_consistency_gt_90_AND_completeness_gt_85": "approved",
+        "many_critical_fundamental_rework": "rejected"
+      },
+      "category_dimension_present": ["consistency", "completeness", "compliance", "clarity", "feasibility"]
+    },
+    "vocab_3_phase_validator": {
+      "values": ["blocking", "warning", "informational"],
+      "source_file": ".claude/agents/test-phase-validator-author.md (Phase 2 — Severity rules section)",
+      "note": "Inlined in the agent prompt, not a separate KB file (per parent Known Issue 3)."
+    },
+    "verdict_numeric_mapping_canonical": {
+      "source_file": ".claude/skills/auditing-cc-configs/scripts/verdict_compute.py:54-58",
+      "weights": {
+        "BLOCKER": -12,
+        "MAJOR": -5,
+        "MINOR": -2,
+        "NIT": -0.5,
+        "INFO": 0
+      },
+      "additional_BLOCKER_penalty": "BLOCKER applies its -12 plus an additional -12 flat penalty per occurrence (24 total per BLOCKER). Source: verdict_compute.py:97, :158-160. 'This is what makes one BLOCKER decisively non-PASS.'",
+      "verdict_thresholds_in_file": "(85, PASS-WITH-MINOR-FIXES); see verdict_compute.py:64 for full threshold tuple",
+      "delta_analysis_weights_review_cross_artifact_auditor": {
+        "BLOCKER": 10,
+        "MAJOR": 3,
+        "MINOR": 1,
+        "INFO": 0,
+        "note": "DIFFERENT WEIGHT SET than verdict_compute.py. Used for severity-weighted count DELTA across review iterations (review-cross-artifact-auditor.md:93). The bridge table SHOULD note both weight sets exist; collapsing them silently would obscure the iteration-delta semantics."
+      }
+    },
+    "audit_issues_json_finding_shape_current": {
+      "fields_present_today": ["id", "severity", "category", "summary", "evidence[]", "recommended_resolution"],
+      "fields_prescribed_by_nfr8": ["rule", "target", "divergence", "next_action"],
+      "delta": "NFR-8's four fields are NOT currently in the audit-issues.json schema. ADR-0061 co-locates the four-field shape spec with the bridge table at severity-taxonomy.md. design-cc must add these as new sub-fields under issues[] (additive). Per parent's conclusion, the schema-extension is structurally safe across the 12 known downstream consumers."
+    },
+    "non_monotonic_edges_for_bridge_author": {
+      "edge_NIT_vs_recommended": {
+        "auditor_NIT": "taste; -0.5 point weight; verdict-impact minimal",
+        "reviewer_recommended": "non-blocking improvement; documents approvable with recommended outstanding",
+        "translation_difficulty": "NIT carries 'taste' framing (subjective); recommended carries 'improvement' framing (actionable). Auditor NIT often safely → recommended, but the reverse mapping (recommended → NIT) loses actionability. The translator surfaces 'taste-vs-improvement' rationale field."
+      },
+      "edge_MAJOR_branching_PV": {
+        "auditor_MAJOR": "should be fixed before approval; -5 point weight; conditional_pass verdict if no BLOCKER",
+        "pv_blocking_vs_warning": "blocking = gate refuses to advance; warning = gate advances with note. The MAJOR → {blocking, warning} branch depends on whether the PV's invariant is itself blocking-class (per FR-3 R2b). Bridge table documents the branch but cannot collapse it without per-PV-tier context.",
+        "translation_rule": "default MAJOR → blocking; downgrade to warning only with explicit per-finding rationale field stating why the PV-tier invariant is non-blocking"
+      },
+      "edge_NIT_vs_INFO_intra_auditor": {
+        "auditing_mcp": "uses NIT (-0.5 weight)",
+        "review_architecture_auditor_review_cross_artifact_auditor": "use INFO (0 weight)",
+        "verdict_compute_canonical": "supports both NIT (-0.5) and INFO (0) as distinct values",
+        "bridge_table_recommendation": "preserve both; document NIT for taste/style and INFO for neutral observations (different intent). This is the parent's Known Issue 2 — bridge author documents rather than collapses."
+      }
+    }
+  },
+  "watch_item_evidence_R2a": {
+    "inheritance_disposition": "augmented (parent OI-A1/A5 closed by inherited ADRs; new R2a OIs reported here)",
+    "OI_A1_status": "CLOSED by inherited ADR-0059. Parent watch_item_evidence retained for historical traceability: zero .yaml siblings to ADR-*.md at HEAD; convention is being established by the ADR.",
+    "OI_A5_status": "CLOSED by inherited ADR-0063. Parent watch_item_evidence retained: n=1 prior prose occurrence at working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis-report.md:198-202; non-retroactive migration discipline pinned.",
+    "OI_R2a_1_FR6_trigger_3_4_evaluator": {
+      "summary": "FR-7's Skill-Coverage Decisions table structural-suitability for mechanical predicate: HIGH SUITABILITY. The parent's mechanism_dependency_table['FR-7'] notes the section is mechanically parseable when authored as a table (concept | covering-skill | confidence | rationale). The OI-R2a-1 deterministic predicate ('skill-coverage decision names a NEW agent' → trigger FR-6 matrix) is straightforward when the section is structured.",
+      "evidence": ["Parent IN-014 mechanism_dependency_table[FR-7] notes table shape", "ADR-0061's bridge-table host pattern provides a structural analog"]
+    },
+    "OI_R2a_2_auditing_skills_reverse_check": {
+      "summary": "NOT INVESTIGATED IN THIS RUN per research-plan (carried as Blueprint Open Question per PRD policy).",
+      "carried_as": "Blueprint Open Question (per PRD)"
+    },
+    "OI_R2a_3_FR9_marker_parser_realization_host": {
+      "summary": "NO EXISTING PARSER/REGEX INFRASTRUCTURE at any candidate host. Grep over .claude/skills/auditing-shared/, .claude/agents/review-architecture-auditor.md, .claude/skills/auditing-subagents/ for 'BLOCKS:' or '<!-- BLOCKS' returned ZERO matches. The parser is genuinely new realization work — no extension path available.",
+      "candidate_hosts_analysis": {
+        "review_architecture_auditor_md_prompt": "Would inline parser into agent prompt — works but couples parser to auditor agent; not reusable from execute-orchestrator (per ADR-0063 the orchestrator is the parser host).",
+        "auditing_shared_scripts": "Cleanest host — auditing-shared is the canonical library-only home (per ADR-0031 + ADR-0042). A new scripts/parse_blocks_x_markers.py fits the existing pattern (log_state_transition.py, validate_adr_placement.py).",
+        "auditing_subagents_rule": "Wrong host — auditing-subagents audits .claude/agents/*.md; marker parsing is an orchestrator concern, not a sub-agent quality concern."
+      },
+      "recommendation_for_design_cc": "auditing-shared/scripts/parse_blocks_x_markers.py is the strongest fit; execute-orchestrator invokes via subprocess (consistent with log_state_transition.py invocation pattern)."
+    },
+    "OI_R2a_4_FR7_artifact_location": {
+      "summary": "NO PRECEDENT of standalone skill-coverage-decisions.md artifact in working/feature/*. Find returned zero matches. Embedded-section path is lower-irreversibility (additive to existing template) vs greenfield artifact convention. The KB-documentation-criteria/references/templates/ directory is the natural host for the embedded-section template.",
+      "embedded_attachment_candidates": [
+        "synthesis.md / blueprint.md template (synth-synthesizer or synth-framer Phase 2)",
+        "cc-design.md template (design-cc Phase 2)",
+        "blueprint composition (design-composer Phase X)"
+      ],
+      "evidence": ["find working/feature/ -name 'skill-coverage*' returns zero matches", "KB-documentation-criteria/references/templates/ already hosts shared section templates"]
+    },
+    "OI_R2a_5_FR10_rule_realization": {
+      "summary": "NO EXISTING RULE in auditing-subagents uses 'feature working directory shape' as predicate. Grep over .claude/skills/auditing-subagents/ for 'working/feature\\|working-directory\\|feature working' returns ZERO matches. FR-10 ADDS the first auditing-subagents predicate that reads from working/feature/<slug>/.",
+      "existing_predicates_in_auditing_subagents": "All existing SA-NN checks predicate on .claude/agents/*.md file content (frontmatter, body, scan_subagent_body.py output). None read from outside .claude/.",
+      "recommendation_for_design_cc": "FR-10's rule is a NEW SA-NN entry with a new scripts/audit_feature_touch_coverage.py that ALSO reads working/feature/<slug>/cc-design.md and the agent-roster-impact-matrix.md (if present). The script must accept the feature slug as input (new parameter shape relative to existing auditing-subagents scripts that take .claude/agents/<file>.md).",
+      "extension_vs_new_decision": "ADD new script — no extension path exists."
+    },
+    "OI_R2a_6_severity_bridge_sequencing": {
+      "summary": "NO COLLISION RISK with bridge author. KB-review-disciplines/references/severity-taxonomy.md exists at HEAD with pre-bridge content (vocabulary definitions, verdict mapping). git diff --stat returns no in-progress edits. The bridge author's additions are purely additive (new table sections appended); no merge conflict surface.",
+      "evidence": ["git diff --stat on severity-taxonomy.md returned no output", "File content at HEAD shows three vocab values + verdict mapping (pre-bridge)"]
+    }
+  },
+  "skill_coverage_dogfood_inputs_FR_7": {
+    "inheritance_disposition": "new",
+    "purpose": "Pre-survey of skill-coverage for the 6 new domain concepts FR-7 self-applies to (per PRD Eat-Own-Dogfood Deliverables). design-cc downstream uses this to populate the Skill-Coverage Decisions table with citations.",
+    "concepts": [
+      {
+        "concept": "design-realization audit (FR-1 mechanism)",
+        "covering_skill_existing": "KB-review-disciplines",
+        "covering_file_specific": "references/architecture-audit.md (current Lens 1/2/3: CoVe, Blast-Radius, Brief-Honor)",
+        "extension_shape": "additive — Lens 4 (Design Realization) added per ADR-0059",
+        "confidence": "high",
+        "dogfood_decision": "existing-skill"
+      },
+      {
+        "concept": "agent-roster impact matrix (FR-6 artifact)",
+        "covering_skill_existing": "KB-cc-design + KB-documentation-criteria",
+        "covering_file_specific": "KB-cc-design/references/principles.md (Principle 9 — discipline) + KB-documentation-criteria/references/templates/ (template host)",
+        "extension_shape": "additive — Principle 9 cites matrix discipline (FR-8); new template file at KB-documentation-criteria/references/templates/agent-roster-impact-matrix-template.md (per parent mechanism_dependency_table[FR-6])",
+        "confidence": "high",
+        "dogfood_decision": "existing-skill"
+      },
+      {
+        "concept": "skill-coverage decision check (FR-7 mechanism)",
+        "covering_skill_existing": "KB-documentation-criteria (for the section template) + KB-task-decomposition (consulted but not the host)",
+        "covering_file_specific": "KB-documentation-criteria/references/templates/ — new section template (new file)",
+        "extension_shape": "additive — new section template; embedded in existing synthesis / blueprint / cc-design templates per OI-R2a-4 resolution",
+        "confidence": "medium (location pending OI-R2a-4 resolution)",
+        "dogfood_decision": "existing-skill + new-section-template-file"
+      },
+      {
+        "concept": "Principle 9 active reframing (FR-8 mechanism)",
+        "covering_skill_existing": "KB-cc-design",
+        "covering_file_specific": "references/principles.md:182 (current text) + design-claude-code.md:56 (cross-reference site)",
+        "extension_shape": "in-place rewrite of Principle 9 body + coordinated cross-reference update at design-claude-code.md:56 (mutual citation per AC-FR-8-b)",
+        "confidence": "high",
+        "dogfood_decision": "existing-skill"
+      },
+      {
+        "concept": "Blocks-X marker grammar (FR-9 mechanism)",
+        "covering_skill_existing": "KB-documentation-criteria",
+        "covering_file_specific": "references/blocks-x-marker-grammar.md (NEW — prescribed by ADR-0063)",
+        "extension_shape": "new reference file in existing KB; new transition_name values in existing state-transitions-log-entry-template.md",
+        "confidence": "high",
+        "dogfood_decision": "existing-skill + new-reference-file"
+      },
+      {
+        "concept": "agent-roster matrix-missing audit rule (FR-10 mechanism)",
+        "covering_skill_existing": "auditing-subagents",
+        "covering_file_specific": "SKILL.md (new SA-NN check entry) + scripts/audit_feature_touch_coverage.py (NEW) + references/ (new discipline text)",
+        "extension_shape": "additive — new SA-NN check, new script, new discipline text within existing skill",
+        "confidence": "high",
+        "dogfood_decision": "existing-skill"
+      }
+    ],
+    "summary_for_design_cc": "All 6 concepts land in existing skills (no propose-new-skill signal). 4 of 6 require new reference/template files within existing skills; 2 of 6 (Principle 9 reframing, design-realization audit) are pure additions to existing files. The dogfood pass for FR-7 yields a 6-row Skill-Coverage Decisions table with all decisions = 'existing-skill' (the strongest possible inheritance posture)."
+  },
+  "conventions_inherited_verbatim": {
+    "inheritance_disposition": "inherited-verbatim",
+    "source": "parent codebase-analysis.json conventions.cc",
+    "preserved_subsections": [
+      "agent_file_frontmatter (37 agents at HEAD — re-confirmed)",
+      "skill_file_conventions",
+      "KB_cross_reference_conventions",
+      "audit_issues_finding_shape (the two-divergent-conventions finding stands)",
+      "severity_string_convention (the three-vocabulary trifecta — see severity_vocabularies_snapshot above for canonical data the bridge author needs)",
+      "Blocks_X_marker_grammar_OI_A5 (now CLOSED by ADR-0063 — see R2A-C-003)"
+    ],
+    "delta": "No new convention findings in R2a scope. The severity_vocabularies_snapshot above EXTENDS the parent's severity_string_convention with the consolidated canonical-data form the bridge author needs."
+  },
+  "known_issues_inherited_verbatim": {
+    "inheritance_disposition": "inherited-verbatim",
+    "source": "parent codebase-analysis.json known_issues[]",
+    "count": 7,
+    "note": "All 7 parent known_issues remain valid at HEAD. Specific to R2a: (1) audit_op2_consumer_mapping.py stale mcp-openapi-schema reference is exactly the design-realization gap FR-1 would catch — design-cc should consider this as the canonical exemplar test case for FR-1's audit mechanism. (2) Severity-vocabulary divergence is now CLOSED-IN-PROCESS by ADR-0061; bridge content authoring (this run) is the resolution. (3) PV-author rubric not in KB-task-decomposition is the parent finding informing OI-R2a-4 location decision."
+  },
+  "open_questions_for_human": [
+    {
+      "question": "Is the FR-7 Skill-Coverage Decisions section location to be embedded (in synthesis.md / cc-design.md / blueprint.md) or standalone (new skill-coverage-decisions.md artifact)?",
+      "context": "Discovery confirms NO precedent of standalone artifact in working/feature/*. Embedded path is lower-irreversibility. Listed as OI-R2a-4; carried as Blueprint Open Question per PRD policy.",
+      "blocks": "design-composition-completion"
+    },
+    {
+      "question": "Does the bridge table need to document BOTH verdict_compute.py weights (-12/-5/-2/-0.5/0) AND the review-cross-artifact-auditor delta weights (10/3/1/0)?",
+      "context": "Two distinct severity-weight sets exist in the codebase. verdict_compute.py weights drive verdict computation; review-cross-artifact-auditor delta weights drive iteration-delta analysis. Collapsing to one weight set in the bridge would obscure the iteration-delta semantics. Surfaced as a bridge-content authoring decision the composer must make explicitly.",
+      "blocks": "design-composition-completion"
+    },
+    {
+      "question": "Should FR-1's audit mechanism scan beyond .prescriptions.yaml predicates to catch stale-doc drift like audit_op2_consumer_mapping.py:11 (still maps design-api → mcp__mcp-openapi-schema__* after the server's 2026-05-24 removal)?",
+      "context": "Parent open_question_4 carried forward. The audit_op2_consumer_mapping.py example is the canonical exemplar of design-realization gap. If FR-1 scans only companion-file predicates, it misses this. If it has any structured-server-reference coverage, it catches it. The OI-A1 resolution (companion-file) implies it does NOT catch this without a separate prescription file — but ADR-0059's escape-hatch (hybrid NLP-as-draft) could.",
+      "blocks": "design-composition-completion"
+    }
+  ],
+  "mechanism_dependency_table_inherited_verbatim": {
+    "inheritance_disposition": "inherited-verbatim",
+    "source": "parent codebase-analysis.json mechanism_dependency_table",
+    "rows_relevant_to_R2a": ["FR-1 (H3)", "FR-6 (B1)", "FR-7 (B3)", "FR-8 (B2)", "FR-9 (B4)", "FR-10 (B5)"],
+    "rows_not_relevant_to_R2a_but_present_in_parent": ["FR-2 (H6)", "FR-3 (H9)", "FR-4 (H1)", "FR-5 (H8)", "FR-11 (§O)"],
+    "note": "R2a's design-composer reads the FR-1/6/7/8/9/10 subset directly from parent JSON. No re-derivation. ADR-0059 augments FR-1's mechanism row (prescription-extractor is companion-file, not NLP). ADR-0063 augments FR-9's mechanism row (canonical grammar pinned). ADR-0061 augments FR-1/9/10 mechanism rows (severity bridge host pinned)."
+  }
+}

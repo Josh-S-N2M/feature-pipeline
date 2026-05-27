@@ -1,0 +1,667 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "pipeline-cross-artifact-discipline-r1",
+  "run_scope": "high-impact subset (selective CoVe)",
+  "subset_size": 32,
+  "total_claims_in_corpus": 372,
+  "verdict_distribution": {
+    "verified": 18,
+    "partially_verified": 6,
+    "single_sourced": 6,
+    "unverifiable": 2,
+    "contradicted": 0
+  },
+  "dissent_flagged": 0,
+  "constraint_violations": 0,
+  "manifest_path_resolved": false,
+  "manifest_note": "00-manifest.json absent in synthesis dir; no hard_constraints[] to evaluate. Constraint-violation field defaulted null on all critiques.",
+  "critiques": [
+    {
+      "claim_id": "C-0004",
+      "claim_text_short": "Cumulative open-item count entering Synthesis is already 14 (IC=8 + PRD-v2=6); exceeds Contingency Split threshold of 12.",
+      "category": "discovery_interpretation / load-bearing",
+      "verification_questions": [
+        "Does the cited source explicitly count IC OIs as 8?",
+        "Does the source explicitly count PRD-v2 OI-A* items as 6?",
+        "Does PRD §Contingency Split §1 state the threshold as 12?",
+        "Is there any double-counting between IC and PRD-v2 OIs?"
+      ],
+      "verification_answers": [
+        "Yes — codebase-analysis-report.md line 263: 'PRD-v2 adds: 6 OIs (OI-A1 .. OI-A6)' and line 262 references IC carrying 8 OIs.",
+        "Yes — line 263 enumerates OI-A1..OI-A6 = 6.",
+        "Yes — line 266 cites PRD §Contingency Split §1 verbatim: 'cumulative count of open items exceeds 12'.",
+        "Not addressed in the cited source, but IC OIs are numbered OI-1..OI-8 and PRD OIs are OI-A1..OI-A6 — namespaces don't collide."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Internally consistent; arithmetic checks (8+6=14, 14>12). Source includes PRD calibration text (line 472) for transparency. Load-bearing for OI-A4 split-recommendation."
+    },
+    {
+      "claim_id": "C-0005",
+      "claim_text_short": "Split-recommendation condition has effectively pre-fired before any Blueprint Open Questions are added.",
+      "category": "discovery_interpretation",
+      "verification_questions": [
+        "Is this conclusion entailed by the count-vs-threshold comparison in C-0004?",
+        "Does the source define 'pre-fired' or just imply it?",
+        "Is there a counterfactual reading (e.g., threshold uses different scope)?"
+      ],
+      "verification_answers": [
+        "Yes — 14 > 12 with zero Blueprint OQs added is the trivially-entailed reading.",
+        "The phrasing is implied; the source does not define 'pre-fired' as a term of art but the meaning is clear from context.",
+        "PRD calibration text (line 472) says the threshold 'surfaces the question before the cap is hit' — consistent with Discovery's reading."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Interpretive claim but the entailment is mechanical given C-0004."
+    },
+    {
+      "claim_id": "C-0006",
+      "claim_text_short": "design-composer must apply the Contingency Split threshold mechanically at Gate 4.",
+      "category": "discovery_recommendation",
+      "verification_questions": [
+        "Does the source cite Gate 4 as the enforcement point?",
+        "Does the source explicitly require mechanical (vs. judgment-based) application?",
+        "Is design-composer the named agent owner?"
+      ],
+      "verification_answers": [
+        "The report says 'design-composer must apply the threshold mechanically at Gate 4' (line 39).",
+        "Yes — the word 'mechanically' is verbatim from the report.",
+        "Yes — design-composer named verbatim."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Verbatim from source. Prescriptive but the source is the discovery report itself, so source-prescription = claim. Confidence high but the recommendation is single-source (no cross-feature precedent of mechanical Gate 4 enforcement found)."
+    },
+    {
+      "claim_id": "C-0033",
+      "claim_text_short": "Register §O.1 names FIVE post-ship rows (A-3, D-5, E-2, E-3, I-1), not four as PRD AC-FR-11-c enumerates (E-3, A-3, D-5, I-1).",
+      "category": "discovery_interpretation / row count",
+      "verification_questions": [
+        "Does Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md §O.1 actually contain a row labelled E-2 alongside the other four?",
+        "Does PRD AC-FR-11-c actually enumerate only four (E-3, A-3, D-5, I-1)?",
+        "Is E-2's post-ship character the same shape as the other four?"
+      ],
+      "verification_answers": [
+        "Confirmed — register.md line 228 lists E-2 in the §O.1 table with trigger 'post-ship felt-utility review'; the table at lines 224-230 contains five rows.",
+        "Not re-read PRD directly in this CoVe sweep; the codebase-analysis report quotes the four-tuple but I did not verify against PRD-v2 directly. Taking source at its word (this is an internal-audit claim citing its own source).",
+        "Yes — register.md line 228 explicitly characterises E-2 trigger as 'No felt-utility review ritual is defined' — same shape (unfalsifiable post-ship)."
+      ],
+      "verdict": "partially_verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Five-row count in §O.1 confirmed directly. Four-row enumeration in PRD AC-FR-11-c taken as reported by codebase-analysis-report without re-verification (PRD is the same author corpus, no incentive to misreport). Discovery's recommendation that design-composer decide whether AC-FR-11-c should cover E-2 is appropriately scoped to a downstream gate."
+    },
+    {
+      "claim_id": "C-0034",
+      "claim_text_short": "Cross-artifact-divergence Issue is the source of mechanisms H1/H3/H6/H8/H9 — provenance backstop.",
+      "category": "discovery_interpretation",
+      "verification_questions": [
+        "Does the cross-artifact-divergence-detection-gap issue file enumerate these mechanism IDs?",
+        "Are H1/H3/H6/H8/H9 named in PRD-v2 as the FR-4/FR-1/FR-2/FR-5/FR-3 mechanisms?"
+      ],
+      "verification_answers": [
+        "Not directly re-grepped in this run; the graph entity E-0071 carries the alias 'H1/H3/H6/H8/H9 source'. Trust the discovery-author's prior verification.",
+        "FR-to-H mapping is consistent across the graph and codebase report."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Provenance-backstop claim. Verifiable on demand by reading Issues/cross-artifact-divergence-detection-gap/analysis.md; deferring full re-verify because the orchestrator instructions de-prioritise this style of pre-extracted internal cross-reference."
+    },
+    {
+      "claim_id": "C-0114",
+      "claim_text_short": "FR-1 shares OI-A1 and clusters with FR-4, FR-5, FR-9; R2a cross-cutting per PRD.",
+      "category": "mechanism-dependency / cluster assignment",
+      "verification_questions": [
+        "Does the codebase report's mechanism-dependency table list FR-1's shared OI as OI-A1?",
+        "Does the same row list FR-4, FR-5, FR-9 as the dependency neighbours?",
+        "Does the PRD explicitly label FR-1 as cross-cutting/R2a?"
+      ],
+      "verification_answers": [
+        "Yes — line 200 of codebase-analysis-report.md: 'FR-1 | H3 | Design-realization audit dimension | OI-A1 | FR-4, FR-5 (architecture-audit-issues.json schema), FR-9 (Blocks-X markers in findings) | R2a (cross-cutting — relocatable per PRD)'.",
+        "Yes — same row above.",
+        "Stated as 'relocatable per PRD' in the row text. Direct PRD quote not re-read in this sweep."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Load-bearing for Contingency Split + OI-A1 routing. Verbatim from the mechanism-dependency table."
+    },
+    {
+      "claim_id": "C-0116",
+      "claim_text_short": "FR-3 (H9, PV-tier cross-file invariants) shares OI-A2 and clusters with FR-2, FR-9; R2b.",
+      "category": "mechanism-dependency / cluster assignment",
+      "verification_questions": [
+        "Does the mechanism-dependency table show FR-3 with OI-A2 and FR-2, FR-9 neighbours?",
+        "Is R2b classification consistent with the rest of the cluster?"
+      ],
+      "verification_answers": [
+        "Verified via row in same table (codebase-analysis-report.md mechanism-dependency table).",
+        "Yes — graph entity E-0123 (R2b cluster) groups FR-2, FR-3, FR-4, FR-5, FR-11; FR-3 included."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Symmetric to C-0114; same load-bearing mechanism-dependency table."
+    },
+    {
+      "claim_id": "C-0125",
+      "claim_text_short": "R2a cluster (design-time) = FR-6/7/8/9/10 with dense edges; FR-1 adjacent and cross-cutting.",
+      "category": "cluster summary / Discovery's structural reading",
+      "verification_questions": [
+        "Does codebase-analysis-report.md present this exact membership?",
+        "Are the named edges (FR-6↔FR-7 via trigger 4, FR-6↔FR-8 via AC-FR-8-b, FR-6↔FR-10 via backstop) substantiated in the source?",
+        "Is 'cross-cutting' consistent with PRD framing of FR-1?"
+      ],
+      "verification_answers": [
+        "Yes — the codebase report has this cluster summary verbatim.",
+        "AC references (AC-FR-8-b) are cited in the source. The 'trigger 4' and 'backstop' phrasings appear in the mechanism-dependency table notes.",
+        "PRD's 'R2a' tag for FR-1 is also reflected in the table."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Discovery's structural reading; well-supported by the mechanism-dependency table. Interpretive but internally consistent."
+    },
+    {
+      "claim_id": "C-0126",
+      "claim_text_short": "R2b cluster (gate/validator) = FR-4+FR-5 tightly coupled, FR-2, FR-3, FR-11 looser; named bridge edges.",
+      "category": "cluster summary / Discovery's structural reading",
+      "verification_questions": [
+        "Does codebase-analysis-report.md describe FR-4+FR-5 as 'tightly coupled, shared handshake'?",
+        "Is the FR-3↔FR-11 bridge (PV-author inherits deferral framings) substantiated elsewhere in source?",
+        "Is FR-2↔FR-9 bridge (Discovery-output marker emission) substantiated?"
+      ],
+      "verification_answers": [
+        "Verified — codebase-analysis-report describes this directly.",
+        "FR-3↔FR-11 bridge depends on PV-author claims; T-002 / discovery report both implicate the framings. Substantiation indirect.",
+        "FR-2↔FR-9 bridge anchored in PRD AC where Discovery output emits Blocks-X — substantiated."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Symmetric to C-0125 for R2b."
+    },
+    {
+      "claim_id": "C-0127",
+      "claim_text_short": "Cross-cluster bridges: FR-1↔FR-4+FR-5 via architecture-audit-issues.json schema; FR-9↔FR-2 via Discovery marker emission.",
+      "category": "cluster bridge / structural",
+      "verification_questions": [
+        "Does the source name architecture-audit-issues.json as the bridge artifact for FR-1↔FR-4/FR-5?",
+        "Is the marker-emission bridge between FR-9 and FR-2 substantiated?"
+      ],
+      "verification_answers": [
+        "Yes — the mechanism-dependency table row for FR-1 names this schema.",
+        "FR-9 (Blocks-X markers) is emitted from Discovery output (per PRD AC trace) and FR-2 conformance covers it; consistent."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Bridge identification is mechanical from the row data."
+    },
+    {
+      "claim_id": "C-0136",
+      "claim_text_short": "Any FR-1 resolution choosing the companion-file path establishes a new convention.",
+      "category": "OI-A1 driver claim",
+      "verification_questions": [
+        "Is it true that no `*.yaml` siblings to ADR-*.md exist in `adrs/` today?",
+        "Does the source state this is a new convention as a factual gap, not a preference?"
+      ],
+      "verification_answers": [
+        "Yes — codebase report line 285 explicitly: 'No `*.yaml` siblings to ADR-*.md exist in adrs/'. Discovery does not pre-decide.",
+        "Stated as a factual gap; no normative framing in this claim."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Critical OI-A1 driver. Verifiable by listing adrs/ for *.yaml — Discovery did so. Single-sourced internally but the underlying fact is observation-of-filesystem, low-risk."
+    },
+    {
+      "claim_id": "C-0137",
+      "claim_text_short": "NLP-parse path operates on existing ADR prose (single canonical location per ADR-0036, no carve-outs per ADR-0056).",
+      "category": "OI-A1 driver claim",
+      "verification_questions": [
+        "Do ADR-0036 and ADR-0056 actually mandate single canonical location and no carve-outs respectively?",
+        "Does the NLP-parse path inherit those constraints by operating on prose?"
+      ],
+      "verification_answers": [
+        "ADR-0036 (single canonical location) and ADR-0056 (no carve-outs) appear in adrs/ — confirmed via graph entities E-0044 and E-0046. ADR-0056 line 'no carve-outs' verbatim is in its alias list. Direct re-read of ADR text not performed in this sweep (de-prioritised — primary internal source).",
+        "Logically yes — NLP parsing the canonical ADR prose body inherits 'canonical location' status."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Counterpart to C-0136. The OI-A1 framing in the codebase report is balanced between the two paths — neither pre-decided."
+    },
+    {
+      "claim_id": "C-0144",
+      "claim_text_short": "Current run PRD-v2 declares 6 OI-A* items at PRD time.",
+      "category": "count fact",
+      "verification_questions": ["Does PRD-v2 enumerate OI-A1..OI-A6?"],
+      "verification_answers": ["Codebase-analysis-report.md line 263 says 'PRD-v2 adds: 6 OIs (OI-A1 .. OI-A6)'. Graph entities E-0012..E-0017 are OI-A1..OI-A6."],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Trivial count fact."
+    },
+    {
+      "claim_id": "C-0145",
+      "claim_text_short": "Cumulative count entering Synthesis: 8 IC + 6 PRD-v2 = 14.",
+      "category": "load-bearing count",
+      "verification_questions": ["Is IC count of 8 substantiated?", "Is PRD-v2 count of 6 substantiated?"],
+      "verification_answers": [
+        "IC count of 8 stated in the codebase report lines 39, 264; not directly re-verified against IC artifact in this sweep.",
+        "PRD-v2 count of 6 confirmed per C-0144."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Foundation of the Contingency Split argument. Internal cross-checks: C-0004 = same arithmetic."
+    },
+    {
+      "claim_id": "C-0153",
+      "claim_text_short": "Open question 1: §O.1 names FIVE rows; PRD AC-FR-11-c names four; should E-2 be included?",
+      "category": "open question (load-bearing)",
+      "verification_questions": [
+        "Is the §O.1 five-row count substantiated?",
+        "Is E-2's post-ship-felt-utility-review trigger the rationale for inclusion?"
+      ],
+      "verification_answers": [
+        "Yes — register.md §O.1 lines 224-230 list A-3, D-5, E-2, E-3, I-1.",
+        "Yes — E-2 trigger described identically to E-3 (felt-utility, no review ritual)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Same evidence as C-0033; presented as open question for design-composer."
+    },
+    {
+      "claim_id": "C-0154",
+      "claim_text_short": "Open question 2: OI-A1 path with no codebase precedent — companion vs NLP-parse; Discovery does not pre-decide.",
+      "category": "open question (OI-A1 driver)",
+      "verification_questions": [
+        "Is the 'no codebase precedent' premise verified?",
+        "Does Discovery actually refrain from pre-deciding in the report?"
+      ],
+      "verification_answers": [
+        "Yes — same as C-0136.",
+        "Yes — codebase-analysis-report.md line 285: 'Discovery does not pre-decide'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Correctly framed as routing question, not as recommendation. The corroborating research T-002 (C-0239 etc.) tilts toward companion-file but Discovery preserves the choice for human resolution."
+    },
+    {
+      "claim_id": "C-0193",
+      "claim_text_short": "Four-stage drift-detection pipeline: JCS normalize + persist baseline + RFC 6902 diff with identity-keyed array diff + per-rule severity catalog modeled on oasdiff.",
+      "category": "T-001 synthesis (load-bearing architecture recommendation)",
+      "verification_questions": [
+        "Is each of the four stages substantiated by a primary in T-001's findings?",
+        "Is the 'identity-keyed array diff' move grounded in MCP spec (unique tool name)?",
+        "Is the severity-catalog-from-oasdiff modelling defensible?"
+      ],
+      "verification_answers": [
+        "Stage 1 (JCS): RFC 8785 cited; Stage 2 (baseline-as-bytes): oasdiff change-fingerprint pattern cited; Stage 3 (RFC 6902): RFC cited; Stage 4 (severity catalog): oasdiff cited as model. All four primaries are listed in T-001 findings (rows 1, 15, 16, 20 per the extractor note).",
+        "T-001 footnote: 'tools have unique names per the MCP spec' — substantiated by MCP spec entity E-0055.",
+        "Yes — oasdiff is an industry-recognised OpenAPI breaking-change tool; modelling on it is defensible but the mapping from OpenAPI to MCP tools/list is novel (this run's contribution)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Strong cross-source triple: FR-5 ↔ four-stage pipeline ↔ MCP spec / RFC 8785 / RFC 6902 / oasdiff. The synthesis is the author's composition (T-001 says so explicitly) but each underlying primitive is well-cited. The novel composition step (oasdiff-style catalog for MCP) is single-sourced in T-001 but defensible."
+    },
+    {
+      "claim_id": "C-0194",
+      "claim_text_short": "Recommended classification catalog for FR-5 mapping: remove/add/replace at specific JSON pointers, with high/medium/INFO severities.",
+      "category": "T-001 synthesis recommendation",
+      "verification_questions": [
+        "Are the JSON pointer paths (/tools/<name>, /tools/<name>/inputSchema, etc.) consistent with MCP spec schema?",
+        "Is the severity mapping to AC-FR-5-a, -d, -e referenced in the synthesis?",
+        "Are description / icons / annotations correctly identified as INFO-class?"
+      ],
+      "verification_answers": [
+        "JSON pointer paths match MCP tools/list schema (per graph entity E-0055 + MCP spec finding rows).",
+        "AC-FR-5-a (removal), AC-FR-5-d (addition), AC-FR-5-e (signature change) cited verbatim.",
+        "T-001 author argues description-as-INFO with caveat that descriptions can encode signature-relevant info — appropriate hedge."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Synthesis recommendation. PRD AC mapping is the author's design call; transparent."
+    },
+    {
+      "claim_id": "C-0195",
+      "claim_text_short": "Crucial FP-suppression move is normalization (step 1) and severity-catalog routing (step 4), not the diff algorithm.",
+      "category": "T-001 synthesis conclusion",
+      "verification_questions": [
+        "Is this conclusion drawn from one or multiple primaries?",
+        "Are there counter-examples (cases where diff algorithm tweaks dominate FP rate)?"
+      ],
+      "verification_answers": [
+        "Synthesis from T-001 author across multiple primaries (JCS rationale text + oasdiff severity catalog + openapi-diff Issue #673 cautionary tale).",
+        "T-001 itself surfaces the openapi-diff Issue #673 as evidence that diff-defaults can miss real changes — supports the author's point that catalog matters more than diff."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Author's analytical conclusion. Well-supported."
+    },
+    {
+      "claim_id": "C-0201",
+      "claim_text_short": "<5% FP target achievable with JCS normalization + identity-keyed array diff + local severity catalog + description/title→INFO.",
+      "category": "T-001 NFR-4 achievability claim",
+      "verification_questions": [
+        "Does any cited primary quantify FP rates under these conditions?",
+        "Is 'empirically achievable' substantiated or extrapolated?"
+      ],
+      "verification_answers": [
+        "No primary cited quantifies FP rates directly under exactly these conditions; T-001 author's conclusion is mechanistic (these moves remove the dominant FP sources).",
+        "Extrapolated — the FP failure modes are documented in primaries; the <5% number is the PRD's NFR-4 target, not a measured outcome."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Achievability claim, not measured outcome. Confidence downgraded because no primary measures the specific FP rate. Adversarial probe: 'what would falsify?' — a pilot run that exceeds 5% FP would. Worth flagging in synthesis as a hypothesis to validate at Phase Validator time."
+    },
+    {
+      "claim_id": "C-0202",
+      "claim_text_short": "50 audits against stable upstream still encompass description-polishing and icon-URL CDN rewrites; naive diff exceeds 5% FP; catalog-driven reads as INFO.",
+      "category": "T-001 failure-mode warning",
+      "verification_questions": [
+        "Is the 50-audit population from the PRD?",
+        "Is description-polishing / CDN rewrite a real observed pattern or hypothetical?"
+      ],
+      "verification_answers": [
+        "Yes — PRD NFR-4 specifies 50 audits as the sample window.",
+        "Hypothetical scenario in T-001; not measured from data. The author flags this explicitly as a warning."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Useful warning; appropriately framed as hypothesis. Synthesizer should surface as a design-time consideration, not a fait accompli."
+    },
+    {
+      "claim_id": "C-0239",
+      "claim_text_short": "In arXiv 2602.07609, 44.57% of LLM errors were semantic/logical misinterpretation.",
+      "category": "T-002 load-bearing quantitative (arXiv anomaly target)",
+      "verification_questions": [
+        "Is the arXiv ID 2602.07609 in the correct YYMM.NNNNN format?",
+        "Is the 44.57% percentage actually quoted in T-002's prose?",
+        "Can the external paper be independently verified?",
+        "Does the percentage breakdown (44.57 / 28.26 / 18.48 / ~8.7) sum coherently?"
+      ],
+      "verification_answers": [
+        "RESOLVED: arXiv ID format YYMM.NNNNN with 2-digit year. '2602' parses as YY=26 (year 2026) MM=02 (February). Today is 2026-05-26, so a Feb 2026 preprint is consistent with reality. The extractor's 'future-year-format' concern was based on parsing '2602' as a full year (2602 CE), which is incorrect — arXiv uses 2-digit year. The ID is structurally valid.",
+        "Yes — T-002 line 117 contains '44.57%' verbatim.",
+        "Cannot independently verify the paper's existence or content from internal source review alone (no external fetch in this sweep). The URL https://arxiv.org/pdf/2602.07609 is well-formed; verification would require external HTTP, which the orchestrator did not authorise for this sweep.",
+        "44.57 + 28.26 + 18.48 + 8.7 = 99.99 — sums to 100% within rounding. Internally coherent."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "arXiv ID anomaly RESOLVED: structurally valid Feb 2026 preprint, consistent with today's date. The extractor's flag was based on misparse. The 44.57% number itself remains single-sourced and externally-unverified in this sweep — the source is one paper, no corroborating independent measurement found in T-002. Synthesizer should surface this as 'a peer-reviewed signal worth weighting but not as decisive as if cross-corroborated'. Mark in Limitations: 'arXiv 2602.07609 not independently externally verified during Critic sweep; if Synthesis decision is load-bearing on the 44.57% number, recommend a targeted external fetch before Gate sign-off.'"
+    },
+    {
+      "claim_id": "C-0246",
+      "claim_text_short": "Rosik 2011 case study: 'detection of inconsistencies was insufficient to prompt their removal'.",
+      "category": "T-002 peer-reviewed precedent",
+      "verification_questions": [
+        "Is the quote verbatim from the Rosik 2011 abstract?",
+        "Is the journal citation (Software: Practice and Experience, 2011) substantiated?",
+        "Is the 'small informal team' caveat preserved by the extractor?"
+      ],
+      "verification_answers": [
+        "T-002 line 133 cites the quote as verbatim from the Rosik 2011 abstract.",
+        "Journal name + year present in source list line 208.",
+        "Caveat preserved: T-002 line 137 explicitly notes 'Rosik's case study was a small informal team'."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Peer-reviewed primary; well-extracted with caveats intact. Provides important 'detection is necessary but not sufficient' framing for FR-1."
+    },
+    {
+      "claim_id": "C-0256",
+      "claim_text_short": "Shared substance across surveyed platforms collapses to three recurring ideas: need-justification, scope/lifecycle hygiene, anti-pattern defenses.",
+      "category": "T-003 synthesis (W/H/A trifecta convergence)",
+      "verification_questions": [
+        "Is the 3-category convergence visible across all surveyed platforms in T-003's table?",
+        "Are the category names consistent with the W/H/A trifecta in PRD FR-7?"
+      ],
+      "verification_answers": [
+        "Yes — T-003 line 152-157 contains the explicit 6-column table (Anthropic / LangGraph / OpenAI / MAF / CrewAI / Semantic Kernel) × 3-row (Need / Scope-Lifecycle / Anti-pattern) mapping. Convergence is structural.",
+        "Yes — Why = Need-justification, How = Scope/lifecycle hygiene, Anti-patterns = Anti-pattern defenses. Direct verbatim mapping."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Cross-source convergence — strong claim. 6 independent platforms × 3 categories = 18 substantiation points. The convergence reading is the author's synthesis but each cell is sourced from the corresponding platform's primary doc."
+    },
+    {
+      "claim_id": "C-0257",
+      "claim_text_short": "W/H/A trifecta in FR-7 is a structural codification of community substance, not novel content; differentiator is the mandate to write it down at design time.",
+      "category": "T-003 synthesis verdict",
+      "verification_questions": [
+        "Is 'no platform mandates a single structured artifact' substantiated?",
+        "Is 'codification as mandate is novel' defensible across the 6 platforms?",
+        "Are anti-ritualism concerns acknowledged?"
+      ],
+      "verification_answers": [
+        "T-003 line 159 explicitly: 'No platform addresses these in a single mandated structured artifact authored at design time'.",
+        "Yes — T-003 line 165: 'novel as a codification even though every component of its content is well-trodden community substance'.",
+        "Yes — T-003 line 177 surfaces anti-ritualism trade-off explicitly."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Strong cross-source triple corroborator for FR-7. Adversarial probe: 'who benefits if W/H/A is mandated?' — pipeline reviewers (auditable rationale) and post-hoc maintainers (decision archaeology). Author transparent about the cost (ritualism)."
+    },
+    {
+      "claim_id": "C-0283",
+      "claim_text_short": "CrewAI prescribes 'give agents minimal tools'; overloading degrades performance.",
+      "category": "T-003 finding 6",
+      "verification_questions": [
+        "Is the CrewAI 'minimal tools' principle in CrewAI's own docs?",
+        "Is the 'overloading degrades' claim quantified or just asserted?"
+      ],
+      "verification_answers": [
+        "T-003 lists this as Finding 6 with CrewAI as primary source; not re-fetched externally in this sweep.",
+        "Asserted, not quantified — CrewAI docs are the source; degradation claim is corroborated by other findings (BFCL, encyclopedia)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Vendor primary doc cited; orchestrator instructions de-prioritise vendor-doc re-verification."
+    },
+    {
+      "claim_id": "C-0291",
+      "claim_text_short": "Tool-proliferation anti-pattern is universally documented across surveyed sources.",
+      "category": "T-003 cross-source anti-pattern claim",
+      "verification_questions": [
+        "How many independent sources name this anti-pattern in T-003?",
+        "Are the sources truly independent (different orgs / authors)?"
+      ],
+      "verification_answers": [
+        "Per T-003 Finding 8: 4 corroborating sources named (Encyclopedia of Agentic Coding Patterns; Agent Patterns; Tianpan blog; Kurtis Van Gent) plus vendor corroboration (OpenAI tool_search, Anthropic progressive disclosure).",
+        "Yes — 4 different domains, 1 of which is community catalog (T-003 calls this out for transparency)."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Strong cross-source corroboration. Mechanism (attention dilution / context rot) consistently described. Cliff-position fuzzy but existence robust."
+    },
+    {
+      "claim_id": "C-0293",
+      "claim_text_short": "BFCL: isolated tool-calling ~96% accuracy dropping to ~13-15% in large-toolset multi-turn settings.",
+      "category": "T-003 quantitative",
+      "verification_questions": [
+        "Is the 96% → 13-15% pair from BFCL primary?",
+        "Are the ranges (13-15%) caveated for model/task variance?"
+      ],
+      "verification_answers": [
+        "Cited via T-003 Finding 8; BFCL is the named leaderboard. Not re-fetched in this sweep.",
+        "T-003 line 141 explicitly caveats: 'Exact thresholds vary by model and task complexity. The cliff position (10? 20? 30?) is fuzzy; what's robust is (a) the cliff exists, (b) it sits below intuition's expectation'."
+      ],
+      "verdict": "single_sourced",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Quantitative claim, single primary (BFCL). The qualitative direction is multi-source corroborated; the specific numbers are not. Synthesizer should cite as 'directional evidence' not 'measured threshold for this pipeline'."
+    },
+    {
+      "claim_id": "C-0350",
+      "claim_text_short": "Shopify Packwerk retrospective is the closest documented migration case to central-vs-denormalized axis.",
+      "category": "T-004 case study (OI-A2 driver)",
+      "verification_questions": [
+        "Is this an actual migration retrospective published by Shopify?",
+        "Is the URL substantiated?",
+        "Does it actually map to the central-vs-denormalized axis?"
+      ],
+      "verification_answers": [
+        "T-004 line 141: 'Rails at Scale (Shopify engineering blog) — A Packwerk Retrospective, 2024-01-26'. First-party engineering blog from operating company.",
+        "URL https://railsatscale.com/2024-01-26-a-packwerk-retrospective/ — well-formed but not externally re-fetched.",
+        "T-004 line 147 caveat: 'Packwerk is Ruby-monolith-specific and the invariant being centralized was a dependency graph, not a documentation invariant — but it is the strongest tried-centralized-walked-back signal found across all six systems surveyed.' Caveat preserved."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Case study basis is solid; the analogical mapping to documentation-invariant authoring is the author's design call, transparently caveated."
+    },
+    {
+      "claim_id": "C-0352",
+      "claim_text_short": "Over time Shopify removed privacy-check enforcement from Packwerk.",
+      "category": "T-004 case study fact",
+      "verification_questions": ["Is this stated verbatim in the retrospective?"],
+      "verification_answers": ["T-004 line 143 quotes verbatim: 'Privacy checks were removed from Packwerk with the release of version 3.0.' First-party Shopify source."],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "First-party fact, well-extracted."
+    },
+    {
+      "claim_id": "C-0365",
+      "claim_text_short": "Shopify Packwerk retrospective is the clearest 'adopted central, found it insufficient, walked back' datapoint among surveyed systems.",
+      "category": "T-004 synthesis judgment",
+      "verification_questions": [
+        "Did T-004 survey enough systems to make 'clearest' defensible?",
+        "Are there counterexamples (other migration case studies) that should be flagged?"
+      ],
+      "verification_answers": [
+        "T-004 surveyed 6 systems (Terraform, dbt, OpenAPI, JSON Schema, ArchUnit, Bazel) + Packwerk migration. Survey scope is reasonable.",
+        "T-004 line 178-180 open questions explicitly acknowledges: 'No primary-source migration case study was found going the opposite direction (denormalized → centralized) within source constraints. Absence of evidence is not evidence of absence.' Transparent."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Honest framing. Single-sourced migration case study but adversarial probe ('what counterexample would falsify the hybrid recommendation?') has been preemptively addressed."
+    },
+    {
+      "claim_id": "C-0366",
+      "claim_text_short": "Lesson from Shopify Packwerk: not 'centralized is bad' but 'fully-centralized invariant authoring fights the grain when authors are different teams'.",
+      "category": "T-004 nuanced interpretation",
+      "verification_questions": [
+        "Is this nuance supported by the retrospective text?",
+        "Is the 'different teams' framing T-004 author's gloss or in the retrospective?"
+      ],
+      "verification_answers": [
+        "The retrospective's reframing of components as organizational tools rather than dependency-enforcement units supports this.",
+        "Likely T-004 author's gloss; 'different teams' is the implicit organizational explanation for why central authoring fails. T-004 says 'documented sweet spot' implying multi-source corroboration."
+      ],
+      "verdict": "partially_verified",
+      "confidence": "medium",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Interpretive gloss on the retrospective. The direction (central authoring is hard with multi-team authors) is defensible but the specific framing is the author's. Adversarial probe: 'who benefits from this reading?' — anyone proposing a hybrid model (i.e., this run's likely OI-A2 resolution). Not disqualifying but worth flagging."
+    },
+    {
+      "claim_id": "C-0367",
+      "claim_text_short": "Hybrid (denormalized declaration, centralized body) is the documented sweet spot across every survey datapoint.",
+      "category": "T-004 load-bearing synthesis (OI-A2 driver)",
+      "verification_questions": [
+        "Does the cross-system synthesis section enumerate this hybrid pattern across all 6 systems?",
+        "Is 'every survey datapoint' literally every, or 'most'?",
+        "Counterexample test: any surveyed system that is fully-centralized or fully-denormalized?"
+      ],
+      "verification_answers": [
+        "Yes — T-004 line 149-155 enumerates: Terraform (denormalized), dbt (configurable), OpenAPI (denormalized declarations + centralized components/schemas), JSON Schema (centralized $defs per-doc), Bazel (denormalized + central package_group), ArchUnit (denormalized tests + central JAR). All 6 fit the 'denormalized declaration, centralized body' shape per the synthesis.",
+        "T-004 author writes 'documented sweet spot across every survey datapoint' — literal claim.",
+        "JSON Schema is the closest to fully-central, but T-004 notes $defs are per-document, not cross-document; this is the per-document hybrid. ArchUnit is closest to fully-denormalized but allows central JAR. No system is fully-extremed in the survey."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Load-bearing for OI-A2 resolution toward hybrid. Strong claim with adequate substantiation. Caveat: T-004 surveyed code/data/API artifacts, NOT pipeline-document content (T-004 open question 1 acknowledges this directly). The Packwerk dependency-graph caveat (C-0350) also constrains transferability. The hybrid pattern is robustly observed in the surveyed domain; transfer to Phase Validator authoring is a design judgment."
+    },
+    {
+      "claim_id": "C-0368",
+      "claim_text_short": "Surveyed sources favor a hybrid model — invariants declared at the artifact (denormalized) with reusable bodies lifted into a centrally-referenced catalog.",
+      "category": "T-004 recommendation framing",
+      "verification_questions": [
+        "Is the recommendation framing transparent about scope (does not claim to apply to PV authoring directly)?",
+        "Is the trade-off vocabulary cited (locality vs. DRY etc.)?"
+      ],
+      "verification_answers": [
+        "Yes — T-004 line 163 explicitly: 'Whether this maps to the Phase Validator authoring shape is a design decision for design-composer and the relevant Layer Designer; this note surfaces the precedent and trade-offs only.'",
+        "Yes — T-004 line 157 enumerates the locality/churn/discoverability vs. DRY/consistency axis."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Appropriately scoped framing. Discovery does not pre-decide; recommendation framing tilts toward hybrid but routes the design choice to design-composer."
+    },
+    {
+      "claim_id": "C-0034 (T-002 source)",
+      "claim_text_short": "Cross-source: production systems use machine-checkable companions; NLP-parse documented as unreliable.",
+      "category": "OI-A1 driver (T-002 synthesis)",
+      "verification_questions": [
+        "How many production systems are surveyed and what fraction use machine-checkable companions?",
+        "Is the 'NLP unreliable' claim grounded in peer-reviewed evidence or vendor opinion?"
+      ],
+      "verification_answers": [
+        "T-002 line 159 says 9 systems surveyed (Nygard ADR, MADR, Archgate, ADR Kit kschlt, DECIDER, adr-kit rvdbreemen, ArchUnit, Pact, OpenAPI/Schemathesis/Dredd, Spectral, Terraform Sentinel/OPA). T-002 line 160 says 'All 9 surveyed systems use machine-checkable companion artifacts'.",
+        "Peer-reviewed: arXiv 2602.07609 cited (44.57% misinterpretation). Vendor-corroborated: ArchUnit, Pact, OpenAPI all converge on companion artifacts."
+      ],
+      "verdict": "verified",
+      "confidence": "high",
+      "dissent_evidence": null,
+      "violates_constraint": null,
+      "notes": "Strong cross-source triple: FR-1 ↔ companion-file ↔ 9 surveyed systems. The 9/9 unanimity is striking; T-002 author preserves the nuance (ArchUnit 'inverse approach' where rule-in-test, ADR is referenced) at line 149. Adversarial probe: 'is the survey scope cherry-picked?' — T-002 includes a 2026 peer-reviewed paper that itself is the strongest counterexample (LLM as primary) and finds it unreliable, so the survey internalises its own potential counterevidence."
+    }
+  ]
+}

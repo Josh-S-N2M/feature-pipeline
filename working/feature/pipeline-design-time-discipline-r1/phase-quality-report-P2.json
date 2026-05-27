@@ -1,0 +1,155 @@
+{
+  "report_id": "PQR-P2-pipeline-design-time-discipline-r1",
+  "version": "1.0.0",
+  "doc_type": "phase-quality-report",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "phase": "phase-2",
+  "phase_name": "FR-8 Principle 9 active reframing",
+  "generated": "2026-05-27T16:10:00Z",
+  "generated_by": "execute-phase-quality-reviewer",
+  "contract_version": "Contract-2-D-13-5-dim",
+  "tasks_in_scope": [
+    {
+      "task_id": "T2.1",
+      "title": "Replace Principle 9 leading sentence with active framing in .claude/skills/KB-cc-design/references/principles.md",
+      "final_status": "APPROVED",
+      "cycles": 0,
+      "findings_count": 0,
+      "findings_notes": "Cycle 0 APPROVED. Producer substantively exceeded the prompt sample: named the three reasoning fields (model:, effort:, skills:) explicitly, cited the agent-roster-impact-matrix.md artifact and FR-6 dependency, surfaced the anti-pattern ('bare no change is structurally indistinguishable from never evaluated'), and added an ADR-0064 cross-reference at Principle 9's close (cross-references block L200). Version-history entry appended at L234 documenting the leading-sentence replacement with AC-FR-8-a binding."
+    },
+    {
+      "task_id": "T2.2",
+      "title": "Update design-claude-code.md cross-reference at line 56 + reciprocal back-link in principles.md cross-references block",
+      "final_status": "APPROVED",
+      "cycles": 0,
+      "findings_count": 1,
+      "findings_notes": "Cycle 0 APPROVED with one INFO-level scope_deviation finding. design-claude-code.md L56 updated: now cites Principle 9 with new active wording, anchor link to principles.md, and the ADR-0064 structural-contract pointer. The reciprocal back-link was added to principles.md cross-references block (L200) — this file was not listed in T2.2's declared target_files, but the back-link is the minimum-necessary edit to satisfy AC-FR-8-b's mutual-cross-reference requirement (PV-2.C3 demands bidirectional resolution). Deviation surfaced with rationale; non-blocking."
+    }
+  ],
+  "verdict": "PASS",
+  "per_dimension_status": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "per_dimension_evidence": {
+    "tests": {
+      "status": "PASS",
+      "rationale": "Both PV-2 mechanical pass criteria verified by grep on the two edited files. AT-016 (active leading sentence) and AT-017 (mutual cross-reference both directions) satisfied at phase close.",
+      "criteria_results": [
+        {
+          "criterion": "PV-2.C1",
+          "description": "Active framing leading sentence present at .claude/skills/KB-cc-design/references/principles.md (Principle 9); defensive-framing absent at leading position",
+          "result": "PASS",
+          "evidence": "principles.md L184: 'For every agent on the touched agent surface — changed and unchanged alike — the Designer records the consideration performed on that agent's three independent reasoning fields (model:, effort:, skills:), even when the recorded outcome is no change.' Active voice ('the Designer records'), records-consideration phrasing per AC-FR-8-a, three reasoning fields enumerated, matrix file cited, anti-pattern explicit at L184 tail ('Bare no change is structurally indistinguishable from never evaluated and is therefore insufficient.')."
+        },
+        {
+          "criterion": "PV-2.C2",
+          "description": ".claude/agents/design-claude-code.md references Principle 9 with updated wording at the cited region (~line 56)",
+          "result": "PASS",
+          "evidence": "design-claude-code.md L56: 'Reasoning configuration is intentional, not default (per KB-cc-design Principle 9 — every agent on the touched surface is evaluated and the conclusion recorded in agent-roster-impact-matrix.md per FR-6 of pipeline-design-time-discipline-r1; ADR-0064 is the structural contract for the matrix)'. Cited text mirrors new active framing; anchor link resolves to #principle-9-sub-agent-reasoning-configuration-is-intentional-not-default."
+        },
+        {
+          "criterion": "PV-2.C3",
+          "description": "Mutual cross-reference bidirectional; both directions resolve",
+          "result": "PASS",
+          "evidence": "Forward direction: design-claude-code.md L56 → principles.md#principle-9 (verified). Reverse direction: principles.md L200 cross-references block names 'design-claude-code.md § Subagent patterns (the procedural site where this principle is applied — the Designer's step-by-step checklist for recording per-agent consideration in the matrix)'. Both directions resolve; AT-017 satisfied."
+        }
+      ],
+      "findings": []
+    },
+    "audits": {
+      "status": "PASS",
+      "audits_stub": false,
+      "rationale": "detect_stubs.py invoked against both edited files (principles.md, design-claude-code.md) at task-quality time per the per-task 4-phase pattern; zero findings on either file. No placeholder tokens, no TODO/TBD/FIXME, no stub-shape content. The Principle 9 leading sentence and the design-cc cross-reference are both substantive prose with explicit named fields and live anchor links. No other audit modules in scope for Phase 2 (FR-1 Lens 4 lands in Phase 4; FR-9 Blocks-X parser lands in Phase 3; SA-14 lands in Phase 7; FR-6 matrix audit lands in Phase 5).",
+      "findings": []
+    },
+    "validator": {
+      "status": "PASS",
+      "rationale": "All three PV-2 pass criteria verified. PV-2 has no C4 — no separate document-review gate; the per-task 4-phase pattern's shared-document-reviewer invocation against the file edits (T2.1, T2.2 both APPROVED cycle 0) satisfies the document-review discipline implicitly. PV-2 verdict: PASS. PV-2 unblocks PV-5 (FR-6 design-cc procedure consumes the active framing established here).",
+      "criteria_results": [
+        {
+          "criterion": "PV-2.C1",
+          "description": "Active framing leading sentence present",
+          "result": "PASS",
+          "evidence": "Verified at principles.md L184; producer exceeded sample wording with named three reasoning fields + matrix artifact citation + anti-pattern statement."
+        },
+        {
+          "criterion": "PV-2.C2",
+          "description": "design-claude-code.md L56 cites Principle 9 with new wording",
+          "result": "PASS",
+          "evidence": "Verified at design-claude-code.md L56; anchor link present; ADR-0064 structural-contract pointer included."
+        },
+        {
+          "criterion": "PV-2.C3",
+          "description": "Mutual cross-reference bidirectional",
+          "result": "PASS",
+          "evidence": "Both directions resolve: forward (design-cc → principles.md#principle-9), reverse (principles.md L200 cross-references block → design-claude-code.md § Subagent patterns)."
+        }
+      ],
+      "findings": []
+    },
+    "discipline": {
+      "status": "PASS",
+      "rationale": "4-phase task pattern observed on both tasks. Both tasks closed APPROVED in cycle 0; no revision loops required (0/4 cycle budget consumed). Frontmatter discipline: principles.md has no frontmatter by design (KB reference file; SKILL.md is the frontmatter-bearing entry point); design-claude-code.md frontmatter unchanged from baseline. No novel design decisions introduced at execution time — the active framing is verbatim-aligned with ADR-0064 and blueprint-v1.md FR-8, consistent with R2a's design-time-discipline charter. Content provenance: principle wording drawn from synthesis.md (FR-8) and ADR-0064 contract; design-cc cross-reference wording drawn from blueprint-v1.md FR-8 procedure block.",
+      "findings": []
+    },
+    "scope_deviations": {
+      "status": "PASS",
+      "rationale": "One INFO-level scope_deviation surfaced and dispositioned. T2.2's declared target_files listed only design-claude-code.md, but the back-link edit at principles.md L200 (cross-references block) was the minimum-necessary edit to satisfy AC-FR-8-b's mutual-cross-reference requirement and PV-2.C3's bidirectional-resolution assertion. The deviation is sound: without the reciprocal back-link, PV-2.C3 would fail (only one direction would resolve). The edit is narrowly scoped to the cross-references block (single sentence appended; no other content modified). Surfaced as info-level, non-blocking per the 5th-dimension contract.",
+      "findings": [
+        {
+          "finding_id": "F-P2-SD-001",
+          "domain": "scope_deviations",
+          "severity": "INFO",
+          "task_id": "T2.2",
+          "rule": "scope_deviation.target_file_not_declared",
+          "target": ".claude/skills/KB-cc-design/references/principles.md (cross-references block, L200)",
+          "divergence": "T2.2's declared target_files contained only .claude/agents/design-claude-code.md; the producer additionally edited principles.md's cross-references block to append the reciprocal back-link to design-claude-code.md § Subagent patterns.",
+          "next_action": "Informational only; no remediation required. The edit is the minimum-necessary expansion to satisfy AC-FR-8-b's mutual-cross-reference requirement (one-direction-only would fail PV-2.C3). Rationale recorded at task-quality time and carried forward to phase quality. No carve-out needed in plan-v1.md; the deviation is mechanically justified by the AC's bidirectional-resolution language.",
+          "blocking": false,
+          "revisable": false
+        }
+      ]
+    }
+  },
+  "rollup_rule_applied": "Contract 2: PASS = no blocking and no revisable findings in any of the 5 dimensions. One INFO-level scope_deviation finding (T2.2 back-link expansion, non-blocking, non-revisable, mechanically justified by AC-FR-8-b bidirectional-resolution requirement) does not gate advancement.",
+  "audit_counter_delta": {
+    "baseline_source": "working/feature/pipeline-design-time-discipline-r1/phase-quality-report-P1.json",
+    "gating": "informational",
+    "per_domain_delta": {
+      "tests": "0 -> 0 (no change; all PV-2 criteria pass at phase close)",
+      "audits": "1 -> 1 (Phase 1's INFO-level stub-detector false-positive F-P1-A-001 unchanged; no new Phase 2 audit findings)",
+      "validator": "0 -> 0 (no change; PV-2.C1-C3 all PASS)",
+      "discipline": "0 -> 0 (no change)",
+      "scope_deviations": "1 -> 2 (Phase 0's MINOR scope-deviation F-P0-SD-001 unchanged; new Phase 2 INFO-level scope-deviation F-P2-SD-001 added — T2.2 back-link expansion mechanically justified by AC-FR-8-b)"
+    },
+    "aggregate_delta": "2 -> 3 (one additional INFO-level scope_deviation finding; non-gating)",
+    "audit_severity_breakdown": null,
+    "audit_severity_breakdown_note": "Reserved per Q-CC-3 forward-extensibility; not populated."
+  },
+  "phase_advance_recommendation": "ADVANCE_TO_PHASE_3",
+  "downstream_dispatch": {
+    "action": "dispatch_phase_3",
+    "rationale": "PV-2 all-PASS; D-13 5-dimension verdict PASS; no reconciliation required. Phase 2's active framing in Principle 9 + mutual cross-reference is the citable substrate for Phase 5 T5.3 (FR-6 design-cc procedure extension cites the active wording verbatim). Phase 3 (FR-9 Blocks-X marker mechanism) is independent of PV-2 content and can dispatch in parallel-ready posture with Phase 5 pending PV-1 + PV-2 both being PASS.",
+    "reconciler_required": false
+  },
+  "open_items_forwarded": [],
+  "downstream_unblocks": [
+    "Phase 5 (FR-6 design-cc procedure extension) — T5.3 consumes Principle 9's active wording verbatim per Plan Cross-Phase Dependencies dependency 3."
+  ],
+  "references": {
+    "blueprint": "working/feature/pipeline-design-time-discipline-r1/blueprint-v1.md",
+    "plan": "working/feature/pipeline-design-time-discipline-r1/plan-v1.md",
+    "phase_validators": "working/feature/pipeline-design-time-discipline-r1/phase-validators.md",
+    "tasks": "working/feature/pipeline-design-time-discipline-r1/tasks.json",
+    "state_transitions_log": "working/feature/pipeline-design-time-discipline-r1/state-transitions.log",
+    "per_task_execution_result": "working/feature/pipeline-design-time-discipline-r1/per-task-execution-result.json",
+    "phase_quality_report_p1": "working/feature/pipeline-design-time-discipline-r1/phase-quality-report-P1.json",
+    "principles_file_edited": ".claude/skills/KB-cc-design/references/principles.md",
+    "design_cc_agent_edited": ".claude/agents/design-claude-code.md",
+    "governing_adr": "adrs/ADR-0064-agent-roster-impact-matrix-contract.md"
+  }
+}

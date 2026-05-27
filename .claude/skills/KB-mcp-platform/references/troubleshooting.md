@@ -1,10 +1,22 @@
 # Troubleshooting Catalog — MCP Failure Modes
 
-Per Plan T2.2. Failure → diagnosis → fix mapping for the six named MCP servers (was seven; `mcp-openapi-schema` removed 2026-05-24 per postmortem).
+## Contents
+
+- claude mcp list shows fewer than 5 servers
+- A stdio server fails to start at postStart
+- Context7 returns auth errors
+- Exa returns auth errors
+- A stdio server emits structured_failure mid-session
+- Redaction-applied alerts in JSONL
+- Augmented auditing-mcp returns BLOCKER
+- Cross-references
+
+
+Per Plan T2.2. Failure → diagnosis → fix mapping for the five named MCP servers (was seven; `mcp-openapi-schema` removed 2026-05-24 per postmortem; `gitnexus` removed 2026-05-27 per ADR-0066).
 
 > **Pedagogical note:** Contains anti-pattern examples (URL-query credential, argv-leaked API key) the auditor flags as DE-2 scanner anti-patterns — documenting what to refuse during debug, not what to execute. Also contains base64-shaped retry-token examples in API-error scenarios (e.g., `eyJhbG...` JWT-like strings) as illustrative payloads for `structured_failure` records, not live tokens.
 
-## `claude mcp list` shows fewer than 6 servers
+## `claude mcp list` shows fewer than 5 servers
 
 **Diagnosis**: `.mcp.json` syntax issue OR server entries removed.
 
@@ -12,7 +24,7 @@ Per Plan T2.2. Failure → diagnosis → fix mapping for the six named MCP serve
 jq '.mcpServers | keys' .mcp.json
 ```
 
-Should return `["actionlint-mcp", "context7", "exa", "gitnexus", "serena", "terraform-mcp"]`. If the array is shorter, the missing servers' entries are absent or `jq` failed (invalid JSON).
+Should return `["actionlint-mcp", "context7", "exa", "serena", "terraform-mcp"]`. If the array is shorter, the missing servers' entries are absent or `jq` failed (invalid JSON).
 
 **Fix**: restore from `KB-mcp-platform/assets/templates/mcp.json.tmpl` + re-apply your env-var substitutions.
 
@@ -21,7 +33,7 @@ Should return `["actionlint-mcp", "context7", "exa", "gitnexus", "serena", "terr
 **Diagnosis**: probably an install gap (postCreate failed for that server). Check `mcp-events.jsonl` for an `install_complete` record:
 
 ```bash
-jq 'select(.event == "install_complete" and .server == "gitnexus")' .claude/runtime/mcp-events.jsonl
+jq 'select(.event == "install_complete" and .server == "serena")' .claude/runtime/mcp-events.jsonl
 ```
 
 If no record, postCreate didn't complete that install. Re-run postCreate manually:
@@ -30,7 +42,7 @@ If no record, postCreate didn't complete that install. Re-run postCreate manuall
 bash .devcontainer/postCreate.sh
 ```
 
-If install fails persistently, check the install step output. For gitnexus specifically: `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` must be exported BEFORE `npm install -g gitnexus@${GITNEXUS_TAG}` per ADR-0041.
+If install fails persistently, check the install step output. For serena: `uv` must be on PATH and the `serena-agent` PyPI package install must succeed; for actionlint-mcp: `go install` from `github.com/hongkongkiwi/actionlint-mcp@${ACTIONLINT_MCP_SHA}` per ADR-0041; for terraform-mcp: see the binary install script's sha256 + gpg verification.
 
 ## Context7 returns auth errors
 
@@ -66,23 +78,15 @@ Should be `{"CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"}`. If it's `{"Authorizatio
 
 URL-query stays REJECTED regardless (OP-9).
 
-## GitNexus emits `primary_degraded` in `mcp-events.jsonl`
+## A stdio server emits `structured_failure` mid-session
 
-**Diagnosis**: GitNexus's stdio process is unhealthy. Could be OOM (exit 137), unhandled exception, or transport-level disconnect.
-
-```bash
-jq 'select(.server == "gitnexus" and .primary_degraded == true)' .claude/runtime/mcp-events.jsonl | tail -5
-```
-
-If `fallback_invoked: false` (likely, since codebase-memory-mcp is not registered per Gate-4 OI-1), Discovery's code-graph traversals will fail until GitNexus is restored.
-
-**Fix**: restart Claude Code (reloads stdio MCP servers). If the failure recurs, check the GitNexus indexer:
+**Diagnosis**: the server's stdio process is unhealthy. Could be OOM (exit 137), unhandled exception, or transport-level disconnect.
 
 ```bash
-gitnexus analyze /workspaces/feature-pipeline  # one-time re-index
+jq 'select(.event == "structured_failure")' .claude/runtime/mcp-events.jsonl | tail -5
 ```
 
-A future feature could register the codebase-memory-mcp fallback to restore Discovery operability during GitNexus outages.
+**Fix**: restart Claude Code (reloads stdio MCP servers). If the failure recurs for serena, check that the project is activated (`mcp__serena__check_onboarding_performed`) and that the language server stack is healthy. For actionlint-mcp or terraform-mcp, re-running `bash .devcontainer/postCreate.sh` re-installs the binary.
 
 ## Redaction-applied alerts in JSONL
 
@@ -118,7 +122,8 @@ Per ADR-0043 (hard gate at Gate 6): any BLOCKER halts the orchestrator. The reme
 - **references/operator-runbook.md** — routine actions
 - **references/credential-handling.md** — OP-9/OP-10 anti-patterns
 - **references/mcp-events-jsonl.md** — event schema
-- **ADR-0007 v2.2.0** — primary/fallback policy
+- **ADR-0007 v2.2.0** — code-graph fallback policy (selection moot post-ADR-0066)
 - **ADR-0037** — event surface
 - **ADR-0039** — redaction discipline
 - **ADR-0043** — hard-gate semantics
+- **ADR-0066** — gitnexus removal (2026-05-27)

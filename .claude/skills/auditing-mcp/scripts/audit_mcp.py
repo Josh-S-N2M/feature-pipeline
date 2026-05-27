@@ -62,11 +62,13 @@ def main() -> int:
     # OP-1..OP-10 augmented audit rules (per ADR-0042 family graduation +
     # ADR-0043 hard-gate Gate-6 check). Per the devcontainer-mcp-provisioning-r1
     # Phase 4 T4.3 augmentation, each OP rule is a separate script. The
-    # orchestrator dispatches all 10 and aggregates findings.
+    # orchestrator dispatches the remaining rules and aggregates findings.
     #
     # OP-1 / OP-9 / OP-10 take <.mcp.json> path directly (they parse the file).
-    # OP-2..OP-8 take <repo-root> (they walk the repo structure: agents,
+    # OP-2..OP-7 take <repo-root> (they walk the repo structure: agents,
     # devcontainer scripts, runtime logs, etc.).
+    # OP-8 (gitnexus-specific install/event/calibration parity) retired
+    # 2026-05-27 per ADR-0066 (gitnexus removed from the active server set).
     repo_root = target.parent if target.is_file() and target.name == ".mcp.json" else target
     op_rules = [
         ("audit_op1_env_block_coverage.py", [str(target)]),
@@ -76,7 +78,6 @@ def main() -> int:
         ("audit_op5_lifecycle_completeness.py", [str(repo_root)]),
         ("audit_op6_runtime_log_redaction.py", [str(repo_root)]),
         ("audit_op7_events_schema.py", [str(repo_root)]),
-        ("audit_op8_gitnexus.py", [str(repo_root)]),
         ("audit_op9_url_credential_rejection.py", [str(repo_root)]),
         ("audit_op10_argv_leakage.py", [str(repo_root)]),
     ]

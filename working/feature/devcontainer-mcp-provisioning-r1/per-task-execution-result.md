@@ -1,15 +1,11 @@
-# Per-Task Execution Result — T2.4 (Revision Cycle 1)
+# Per-Task Execution Result — T2.3
 
 **Status**: COMPLETED
 **Phase 4 gate**: PASSED
 
 ## Files Modified
 
-1. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-adopted_at-adopted.md`
-2. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-resolution_summary-complete.md`
-3. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-superseded_by_issue_id-superseded.md`
-4. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-wontfix_rationale-wontfix.md`
-5. `.claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-decided_at-wontfix.md`
+1. `.devcontainer/postCreate.sh`
 
 ## Files Created
 
@@ -21,28 +17,40 @@ None.
 
 ## Changes Applied
 
-### 3 register/analysis fixtures — id correction only
+Added the Q-CS-1b stale-calibration banner block to `.devcontainer/postCreate.sh`. The insertion point is immediately after `_fr4a_check` (the FR-4a block T2.2 landed) and before `install_gitnexus`, per spec.
 
-| Fixture | Old id | New id |
-|---|---|---|
-| negative-missing-adopted_at-adopted.md | ANALYSIS-test-analysis-missing-adopted-at | ANALYSIS-test-analysis-missing-adopted_at |
-| negative-missing-superseded_by_issue_id-superseded.md | REGISTER-test-register-missing-superseded-by | REGISTER-test-register-missing-superseded_by_issue_id |
-| negative-missing-wontfix_rationale-wontfix.md | ANALYSIS-test-analysis-missing-wontfix-rationale | ANALYSIS-test-analysis-missing-wontfix_rationale |
+The block consists of:
 
-### 2 proposal fixtures — id correction + proposes_future_feature added
+- `_fr4b_calibration_banner()` function — checks `.claude/runtime/mcp-events.jsonl` for the most-recent `calibration_result` event with `mechanism == "fr-4b-gitnexus-grammar-skip"` and emits one of three outcomes to stderr.
+- `_fr4b_calibration_banner || true` call site.
 
-| Fixture | Old id | New id | proposes_future_feature added |
-|---|---|---|---|
-| negative-missing-resolution_summary-complete.md | PROPOSAL-test-proposal-missing-resolution-summary | PROPOSAL-test-proposal-missing-resolution_summary | resolution-summary-future-r1 |
-| negative-missing-decided_at-wontfix.md | PROPOSAL-test-proposal-missing-decided-at | PROPOSAL-test-proposal-missing-decided_at | decided-at-future-r1 |
+### Three banner variants
+
+**NEVER RUN** — emitted when the events file is absent or contains no `calibration_result` event for the mechanism:
+```
+[postCreate] FR-4b calibration: NEVER RUN. Run 'gh workflow run gitnexus-grammar-skip-calibration.yml --ref main' OR './.devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh' to retire this banner.
+```
+
+**STALE** — emitted when the most-recent event timestamp is older than 14 days (day count interpolated):
+```
+[postCreate] FR-4b calibration: STALE. Most recent calibration_result event is N days old (threshold: 14). Re-run 'gh workflow run gitnexus-grammar-skip-calibration.yml --ref main'.
+```
+
+**Silent** — no output when within the 14-day threshold.
+
+### Compliance points
+
+- Never fail-close: `_fr4b_calibration_banner || true` at the call site; internal `return 0` on all paths; `jq` absence and `date -d` conversion failure both degrade to no-output via `|| return 0`.
+- No `mcp-events.jsonl` writes: the function only reads the file, never calls `log_mcp_event` (AC-X-4).
+- Three-field framing per Blueprint v2.3 AC-X-4: mechanism + staleness-age-as-offending-state + remedial hint; "rule violated" intentionally absent because no rule is violated.
 
 ## 4-Phase Gate
 
-- **Phase 1 (lint)**: n/a for fixture content; pre-existing MD022/MD025 warnings appear on all similar fixtures and are not in scope for this revision.
-- **Phase 2 (build)**: n/a — no Python source modified.
-- **Phase 3 (test)**: T2.5 self-verification script executed. Output: `PASS: all 6 negative fixtures now produce exactly 1 blocker each`.
-- **Phase 4 (final gate)**: PASSED. All 6 negative fixtures produce exactly 1 blocker finding each with no spurious id-vs-path mismatch findings.
-
-## Notes
-
-All 5 fixture id fields were corrected to use underscore-containing topic slugs that match their synthetic paths, resolving the Check 5 id-vs-path mismatch that was causing each fixture to produce 2 findings instead of 1. The two proposal fixtures additionally received `proposes_future_feature` fields to eliminate the confounding advisory info finding, isolating each test to exactly the intended missing-companion-field blocker.
+- **Phase 1 (lint/format)**: `bash -n .devcontainer/postCreate.sh` — clean.
+- **Phase 2 (build)**: Shell syntax verified; no compilation step applicable.
+- **Phase 3 (test)**: L2 grep confirms both banner strings present at correct position. L3 simulation of all three cases:
+  - (a) file absent: NEVER RUN banner emitted, exit 0.
+  - (b) stale event 30 days old: STALE banner emitted with "30 days old", exit 0.
+  - (c) recent event 2 days old: no output, exit 0.
+  All three proceed through to `install_gitnexus` without fail-close.
+- **Phase 4 (final gate)**: PASSED. `bash -n` clean post-edit.

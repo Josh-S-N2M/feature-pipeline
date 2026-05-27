@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "P5",
+  "phase_title": "FR-6 agent-roster-impact-matrix contract",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "generated_at": "2026-05-27T00:00:00Z",
+  "verdict": "PASS",
+  "per_dimension_status": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "phase_validator_results": {
+    "PV-5.C1": {
+      "status": "PASS",
+      "evidence": "agent-roster-impact-matrix-template.md exists at .claude/skills/KB-documentation-criteria/references/templates/agent-roster-impact-matrix-template.md (222 lines, 8 sections, worked example row + 'no bare no-change' rule documented); T5.1 APPROVED."
+    },
+    "PV-5.C2": {
+      "status": "PASS",
+      "evidence": "check_feature_touch_predicate.py present at .claude/skills/auditing-subagents/scripts/; smoke test 5/5 PASS including condition-1 (agent edit deterministic) and condition-2 (.mcp.json deterministic); T5.2 APPROVED."
+    },
+    "PV-5.C3": {
+      "status": "PASS",
+      "evidence": "Same smoke test exercises condition-3 (new SKILL.md added) and condition-4 (skill-coverage tokens in design) — both emit `triggered=True, mode=mechanical_only` (advisory) per ADR-0064 Clause 4; conditions 3+4 flagged for design-cc ratification; smoke PASS."
+    },
+    "PV-5.C4": {
+      "status": "PASS",
+      "evidence": "design-claude-code.md contains 5-step matrix-authoring procedure (Phase 2 extension); grep `agent-roster-impact-matrix` returns 2 hits, `Principle 9` returns 3 hits; T5.3 APPROVED. TRIGGER_OVERRIDE scope-attribution reframed (ADR-0064 Clause 4 reserves it; not a Blocks-X marker)."
+    },
+    "PV-5.C5": {
+      "status": "PASS",
+      "evidence": "recipe-feature-pipeline SKILL.md updated with agent-roster-impact-matrix.md row in Outputs table (line 29 cites ADR-0064 Clause 2 + AC-FR-6-c) and Stage 7 Design Composition gate sub-step 2.7 added; grep returns 3 hits; T5.4 APPROVED."
+    },
+    "PV-5.C6": {
+      "status": "DEFERRED",
+      "evidence": "AT-009 (valid matrix passes audit) — gates on the FR-10 SA-14 emitter authored in Phase 7. Phase 5 closes the contract authoring; the emitter that verifies AT-009/C10/C11 lands in Phase 7. Per the PV-5 dependency note ('Prerequisites: PV-0, PV-2 passed'), C6-C10 are AT-bound and exercised when their upstream emitter is authored. Not a Phase-5-blocking criterion."
+    },
+    "PV-5.C7": {
+      "status": "DEFERRED",
+      "evidence": "AT-010 (row-count divergence blocks) — same Phase 7 SA-14 dependency. Deferred per same rationale as C6."
+    },
+    "PV-5.C8": {
+      "status": "DEFERRED",
+      "evidence": "AT-011 (bare 'no change' rejected) — same Phase 7 SA-14 dependency. Deferred per same rationale as C6."
+    },
+    "PV-5.C9": {
+      "status": "DEFERRED",
+      "evidence": "AT-032 (NFR-8 four-field shape on FR-6 emitter) — same Phase 7 SA-14 dependency. Deferred per same rationale as C6."
+    },
+    "PV-5.C10": {
+      "status": "DEFERRED",
+      "evidence": "AT-033 (NFR-9 grep-reachable affordance from design-claude-code) — passes structurally (design-claude-code.md `skills:` chain reachable; matrix template grep-reachable from procedure body), but full AT-033 verification lands when SA-14 emitter is structurally complete in Phase 7. Phase 5 satisfies the design-cc end of the chain."
+    }
+  },
+  "findings": [
+    {
+      "id": "I-PQ-P5-001",
+      "severity": "INFO",
+      "domain": "audits",
+      "category": "pre_existing_validator_gap",
+      "summary": "validate_pipeline_frontmatter.py routes template files (template_for-bearing) into validate_skill_frontmatter — false-positive on T5.1 template; pre-existing validator gap, not introduced by Phase 5",
+      "evidence": [
+        {"artifact": ".claude/skills/auditing-skills/scripts/validate_pipeline_frontmatter.py", "section": "(template-routing branch)"},
+        {"artifact": ".claude/skills/KB-documentation-criteria/references/templates/agent-roster-impact-matrix-template.md", "section": "frontmatter (uses canonical template convention: id/version/status/template_for/derived_from/generated_by)"}
+      ],
+      "rationale": "T5.1's template uses the correct template-convention frontmatter per KB-documentation-criteria — the validator gap is the issue, not the template authoring. Surfaced as info-level, non-blocking, for a future validator-fix run."
+    },
+    {
+      "id": "I-PQ-P5-002",
+      "severity": "INFO",
+      "domain": "discipline",
+      "category": "scope_attribution_reframed",
+      "summary": "OI-P3-1 (TRIGGER_OVERRIDE scope-attribution question) resolved during T5.3 review — TRIGGER_OVERRIDE is legitimately reserved by ADR-0064 Clause 4 (matrix-contract scope), distinct from ADR-0063's Blocks-X marker closure-name set",
+      "evidence": [
+        {"artifact": "adrs/ADR-0064-agent-roster-impact-matrix-contract.md", "section": "Clause 4 (TRIGGER_OVERRIDE reservation)"},
+        {"artifact": "adrs/ADR-0063-blocks-x-marker-grammar.md", "section": "(Blocks-X transition-name set — does NOT include TRIGGER_OVERRIDE)"},
+        {"artifact": "working/feature/pipeline-design-time-discipline-r1/phase-validators.md", "section": "PV-3.C2 (wrongly enumerates TRIGGER_OVERRIDE as FR-9 Blocks-X transition name — validator-side drift)"}
+      ],
+      "rationale": "Cross-cutting scope-attribution resolved: TRIGGER_OVERRIDE belongs to FR-6 matrix-contract scope (ADR-0064), not FR-9 Blocks-X grammar (ADR-0063). PV-3.C2's enumeration is validator-authoring drift — not authoring drift on T3.x or T5.x. Recommended: future validator-fix run amends PV-3.C2 to remove TRIGGER_OVERRIDE from the FR-9 transition list.",
+      "next_action": "Log as open-item for next pipeline-discipline feature run that declares phase-validators.md in scope: remove TRIGGER_OVERRIDE from PV-3.C2 Blocks-X transition-name enumeration."
+    },
+    {
+      "id": "I-PQ-P5-003",
+      "severity": "INFO",
+      "domain": "discipline",
+      "category": "handler_false_alarm_resolved",
+      "summary": "T5.4's handler-side info-level 'task-ID bookkeeping' finding was a false alarm (handler read the wrong feature-slug's tasks.json) — not a real discipline issue on T5.4",
+      "evidence": [
+        {"artifact": "working/feature/pipeline-design-time-discipline-r1/tasks.json", "section": "T5.4 entries (correctly bookkept)"}
+      ],
+      "rationale": "Resolved at per-task review; recorded here for audit-trail completeness. No follow-up required."
+    }
+  ],
+  "cross_task_consistency_decision": {
+    "issue": "None — all four T5.x tasks landed without cross-task inconsistency at Phase 5 close.",
+    "note_on_mcp_init_pattern": "T5.3 edits to design-claude-code.md picked up the same `## MCP initialization (REQUIRED)` discipline already present in the committed body. Phase 4 reviewer (I-PQ-P4-001) already adjudicated that section as established project-wide discipline for the five ADR-0040-named MCP-consumer agents. No new scope-discipline question raised by Phase 5.",
+    "outcome": "Phase 5 PASS. No reconciliation dispatched."
+  },
+  "audit_counter_delta": {
+    "schema_version": "1.0.0",
+    "gating": "informational",
+    "audit_severity_breakdown": null,
+    "baseline_reference": "phase-quality-report-P4",
+    "per_domain_deltas": {
+      "tests": "0 → 0 (no change; PV-5.C1..C5 all PASS; C6-C10 deferred to Phase 7 SA-14 emitter)",
+      "audits": "0 → 1 (added I-PQ-P5-001 INFO — pre-existing validator gap on template-frontmatter routing; non-blocking; not introduced by Phase 5)",
+      "validator": "0 → 0 (PV-5.C1..C5 all PASS at L1/L2; C6-C10 deferred per dependency graph)",
+      "discipline": "2 → 4 (carried forward I-PQ-P4-001, I-PQ-P4-002; added I-PQ-P5-002 INFO scope-attribution reframe, I-PQ-P5-003 INFO false-alarm-resolved — both non-blocking)",
+      "scope_deviations": "0 → 0 (none introduced by Phase 5; T5.1-T5.4 all stayed in declared scope; the MCP init pattern T5.3 inherits was already adjudicated as project-wide discipline by P4 reviewer)"
+    },
+    "aggregate_delta": "2 → 5 (all additions non-blocking INFO)",
+    "audits_stub": true,
+    "audits_stub_note": "Coordinator audit dimension treated as not-measured per Q-CC-4 stub-vs-real distinction; detect_stubs.py clean is the positive signal, but the broader auditing-* coordinator is not yet invoked at phase-close. Not silently counted as clean."
+  },
+  "rollup_rule_applied": "All 5 dimensions PASS (no BLOCKER or revisable finding in any dimension). PV-5.C1..C5 (L1/L2 task-side criteria) all PASS; C6-C10 (AT-bound criteria) deferred to Phase 7 SA-14 emitter per dependency graph — deferral is not a Phase-5 failure. Findings I-PQ-P5-001/-002/-003 are all INFO and non-blocking. Aggregate verdict: PASS.",
+  "next_action": "Advance to Phase 6 (FR-7 skill-coverage discipline). Open items carried forward: I-PQ-P4-002 (discovery-codebase-researcher.md MCP init section), I-PQ-P5-002 (PV-3.C2 TRIGGER_OVERRIDE enumeration fix). Both for future feature runs that declare the relevant files in scope. Phase 5 unblocks Phase 8 eat-own-dogfood (matrix template + predicate now exist; the actual matrix authoring will exercise both)."
+}

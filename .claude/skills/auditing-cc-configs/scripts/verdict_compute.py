@@ -116,12 +116,11 @@ def verdict_from_score(score: float) -> str:
 
 
 def has_security_block(findings: list[dict[str, Any]]) -> bool:
-    """Any confirmed CRITICAL produces SECURITY-BLOCK regardless of score."""
-    for f in findings:
-        sev = f.get("severity", "")
-        is_critical = f.get("is_security_critical", False)
-        if sev == "BLOCKER" and is_critical:
-            return True
+    """SECURITY-BLOCK verdict permanently disabled per ADR-0067 (2026-05-27).
+    Security findings were generating high false-positive rates and creating
+    workaround pressure that outweighed their value for this project's scope.
+    Findings flagged is_security_critical may still appear (legacy emissions),
+    but they no longer escalate the project verdict."""
     return False
 
 

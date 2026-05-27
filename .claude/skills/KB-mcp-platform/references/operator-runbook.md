@@ -1,5 +1,15 @@
 # Operator Runbook — Routine MCP Actions
 
+## Contents
+
+- Checking MCP server health
+- Routine actions
+- Verifying redaction is working
+- Augmented auditing-mcp invocation
+- When something looks wrong
+- Cross-references
+
+
 Day-to-day operator actions for the MCP layer. Authored per Plan T2.2.
 
 > **Pedagogical note:** Contains example shell commands the auditor may flag (curl pipes, redaction-test patterns, base64-shaped retry-token examples in API-error scenarios). These are reference content for troubleshooting, not executable installers.

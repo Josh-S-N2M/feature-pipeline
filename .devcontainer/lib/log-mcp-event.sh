@@ -6,7 +6,7 @@
 # per AC-NFR-2-d).
 #
 # Usage:
-#   log_mcp_event '{"event":"install_complete","server":"gitnexus",...}'
+#   log_mcp_event '{"event":"install_complete","server":"serena",...}'
 #   log_mcp_event --stdin <<< '<json>'
 #
 # Exports the redact_credentials function for callers that need a standalone

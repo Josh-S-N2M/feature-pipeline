@@ -2,7 +2,7 @@
 
 ## Contents
 
-- 13 named subagent anti-patterns (SA-1 through SA-13)
+- 14 named subagent anti-patterns (SA-1 through SA-14)
 - 5 memory-specific anti-patterns (SAM-1 through SAM-5)
 - Detection map
 

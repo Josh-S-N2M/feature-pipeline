@@ -26,6 +26,7 @@ user-invocable: true
 | `synthesis.md` (or `synthesis/`) | synth-* fan-in | Synthesis |
 | `<layer>-design.md` + `<layer>-dependencies.json` | design-`<layer>` (×K activated) | per-layer Design |
 | `blueprint-v<N>.md` + `adrs/ADR-<NNNN>.md` (×0..M) | design-composer | Design Composition |
+| `agent-roster-impact-matrix.md` | design-cc (authoring contract per ADR-0064 Clause 2) + plan-author (actual rows) | Design Composition (contract recorded; predicate ratified) + Plan / Task Decomposition (matrix authored) + Deliverable Packaging (FR-10 SA-14 verifies presence + row-count parity). **Conditional** — only when `check_feature_touch_predicate.py` fires per ADR-0064 Clause 1. Cite AC-FR-6-c. |
 | `architecture-audit-issues.json` | review-architecture-auditor | Architecture Audit |
 | `plan-v<N>.md` | plan-author | Plan Authoring |
 | `acceptance-tests.md` | test-acceptance-author | Acceptance Test Authoring (parallel) |
@@ -41,7 +42,7 @@ user-invocable: true
 1. **No stage advance without gate pass.** The six human approval gates are mandatory; no orchestrator code path skips them.
 2. **No ADRs from anyone but design-composer.** Per FR-5. The orchestrator rejects ADR writes from any other sub-agent path.
 3. **No more than 4 reconciliation cycles per artifact family.** Per the convergence cap. Cycle 4 is terminal; surface to user.
-4. **No silent fallback from GitNexus to codebase-memory-mcp.** The fallback is recorded in `codebase-analysis.json`'s `extraction_method` field; provenance preserved.
+4. **No silent fallback from serena to grep-only.** The fallback is recorded in `codebase-analysis.json`'s `extraction_method` field; provenance preserved.
 5. **No pipeline-stage references by number.** Stage taxonomy is by name only (Intent Clarification, PRD Authoring, etc.); filenames are semantic. Per the v4.3.1 surgery.
 
 ## Working-directory precondition
@@ -119,7 +120,7 @@ Checkpoint at `working/feature/<slug>/checkpoint.json` is updated after every st
     "cross_artifact": 1
   },
   "activated_layers": ["frontend", "backend", "api", "database"],
-  "extraction_method": "gitnexus",
+  "extraction_method": "serena",
   "params": {
     "max_external_research_topics": 6,
     "reconciliation_cap": 4
@@ -265,7 +266,7 @@ Per ADR-0021, Discovery Research is fan-out: 1 codebase researcher + N external 
    - `research_plan_path`, `prd_path`.
    - `output_json_path` — `codebase-analysis.json`.
    - `output_report_path` — `codebase-analysis-report.md`.
-   - `code_graph_preference` — optional; default GitNexus, fall back on degradation.
+   - `extraction_method_override` — optional; default serena (symbol-level) + Read/Grep/Glob (structural), fall back to grep-only on serena degradation.
 2. **In parallel**, for each external-research topic in the research plan, invoke `discovery-external-researcher`:
    - `topic_name`, `research_question`, `kb_gap_justification`, `acceptance_criteria`, `source_constraints` — from the topic's entry.
    - `output_path` — `working/feature/<slug>/research-notes/<topic-slug>.md`.
@@ -336,6 +337,16 @@ Per FR-3 + ADR-0016, per-layer Design is fan-out: K parallel invocations, one pe
 
    Per ADR-0054 commitment 1 (no allowlist at this surface): the orchestrator-stage validator invocation MUST NOT pass `--allowlist`. The orchestrator gate is canonical-only.
 
+2.7. **Design Composition close-gate: agent-roster-impact-matrix.md (FR-6 / ADR-0064 / AC-FR-6-c).** After the ADR-placement validator passes and before invoking `shared-document-reviewer`, the orchestrator runs the agent-surface close-gate:
+
+   - Run `python3 .claude/skills/auditing-subagents/scripts/check_feature_touch_predicate.py` for this feature slug.
+   - **If predicate did not fire** (all four ADR-0064 Clause 1 conditions evaluate false): gate passes silently; advance.
+   - **If predicate fired and `working/feature/<slug>/agent-roster-impact-matrix.md` is absent**: surface a BLOCKER per FR-10 SA-14 — do NOT advance to `shared-document-reviewer` or Gate 4. Dispatch `finalize-reconciler` to author the matrix (plan-author is the expected executor), then re-run this gate.
+   - **If predicate fired and matrix is present**: confirm per-cell positive-evidence-string discipline per ADR-0064 Clause 2 — every cell must contain `<value> — <evidence>` (bare `no-change` without evidence string fails). Row count must equal the current `.claude/agents/*.md` file count. Any cell or row-count failure is a BLOCKER; surface and dispatch reconciler.
+   - **If predicate evaluation raises an error**: surface the error; treat as transient and retry once; if second failure, surface to user before advancing.
+
+   Cross-references: FR-6, ADR-0064 Clauses 1–3, AC-FR-6-c.
+
 3. After the Blueprint is written: invoke `shared-document-reviewer` with `doc_type: DesignDoc` (Blueprint variant).
    - After `shared-document-reviewer` returns its output, invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/blueprint-review.json shared-document-reviewer`. On exit 0, proceed with normal verdict handling. On exit 1, the orchestrator HALTS — the reviewer declared an approving verdict alongside a blocking finding (FR-1 structural failure); surface the FR-6 diagnostic fields to the operator; the reviewer must re-emit consistent output before the orchestrator advances to Gate 4. On exit 2 (internal error), surface the error and allow one retry before escalating.
 4. If Gate 0 fails: re-invoke `design-composer`. If Gate 1 fails: dispatch to `finalize-reconciler`.
@@ -346,7 +357,7 @@ Per FR-3 + ADR-0016, per-layer Design is fan-out: K parallel invocations, one pe
 1. Invoke `review-architecture-auditor`:
    - `blueprint_path`, `rationale_brief_path`, `synthesis_path`, `codebase_analysis_path`, `inherited_adrs_dir`, `new_adrs_dir`, `output_issues_path`, `slug`.
    - `prior_audit_path` if re-audit.
-   - `code_graph_preference` — default GitNexus.
+   - `extraction_method_override` — default serena.
 2. After `review-architecture-auditor` writes `architecture-audit-issues.json`, invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/architecture-audit-issues.json review-architecture-auditor`. On exit 0, proceed with normal verdict handling. On exit 1, the orchestrator HALTS — the auditor declared an approving verdict alongside a blocking finding (FR-1 structural failure); surface the FR-6 diagnostic fields to the operator; the auditor must re-emit its output with consistent verdict-vs-findings shape before the orchestrator can advance. On exit 2 (internal error), surface the error and allow one retry before escalating.
 3. Read the verdict from `architecture-audit-issues.json`:
    - `verdict: pass` → advance to Plan Authoring.
@@ -604,7 +615,7 @@ Per Blueprint v4.3.1 + ADR-0021 + the 4-cycle convergence cap:
 - **Sub-agent fails to write its output.** Retry once with explicit re-author prompt. On second failure: surface to user with the partial output + sub-agent's TaskUpdate messages.
 - **Sub-agent writes malformed output (fails schema or template Gate 0).** Re-invoke with shared-document-reviewer's structural feedback. On second failure: surface to user.
 - **Auditor returns fail.** Dispatch to finalize-reconciler. Increment cycle counter. At cycle 4: hard cap.
-- **GitNexus MCP degraded.** Fall back to codebase-memory-mcp. Record `extraction_method: codebase-memory-mcp` in `codebase-analysis.json`. Continue without re-invocation.
+- **serena MCP degraded.** Fall back to Read+Grep+Glob alone. Record `extraction_method: grep-only` in `codebase-analysis.json`. Continue without re-invocation.
 - **External research returns zero usable findings on a topic.** The topic's research note documents this with "Acceptance-criteria check: not satisfied; recommend escalation." Synthesis surfaces in Limitations. Pipeline continues.
 - **User declines at a gate.** Pause the pipeline. Update `checkpoint.stage_status = "awaiting_gate"`. The next `--resume` re-presents the gate. The user may modify upstream artifacts via direct file edit before resuming; checkpoint's `artifact_versions` reflects the latest written version on resume.
 - **Convergence hard cap (4 cycles on any artifact family).** The auditor returns `verdict: hard_capped` (in cross-artifact case) or the reconciler's log records it. Orchestrator surfaces to user with the remaining open-issue list and the user's options: ship with documented exceptions, defer the feature, or restart from an earlier stage.

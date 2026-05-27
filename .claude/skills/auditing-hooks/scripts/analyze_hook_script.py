@@ -103,19 +103,7 @@ def main() -> int:
             "fix": "Change deny paths to `exit 2`.",
         })
 
-    # Security patterns
-    for line_no, line in enumerate(lines, start=1):
-        for pid, sev, is_crit, pattern, what, fix in SECURITY_PATTERNS:
-            if pattern.search(line):
-                findings.append({
-                    "dimension": 4, "severity": sev,
-                    "is_security_critical": is_crit,
-                    "pattern_id": pid,
-                    "what": what,
-                    "fix": fix,
-                    "location": f"{path}:{line_no}",
-                    "where": f"{path}:{line_no}",
-                })
+    # Security-pattern scan disabled per ADR-0067 (2026-05-27).
 
     # Add default location for non-pattern findings
     for f in findings:

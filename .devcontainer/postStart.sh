@@ -2,8 +2,8 @@
 # .devcontainer/postStart.sh
 #
 # Per Plan T3.5. Runs at every container start (including resume from stop).
-# Emits exactly 7 readiness_probe JSONL records per cycle — one per server in
-# .mcp.json. Per AC-X-2 (7 readiness_probe records bootstrap semantics).
+# Emits one readiness_probe JSONL record per server in .mcp.json (5 servers
+# after gitnexus removal 2026-05-27 per ADR-0066; was 6).
 #
 # Per ADR-0041 D-0008: postStart runs with MCP_AUTH_PROBE=0 (avoid burning a
 # rate-limited call on every Codespace start; postCreate's auth probe is the
@@ -32,14 +32,17 @@ mkdir -p "${RUNTIME_DIR}"
 # postStart-default: no auth probe (per ADR-0041 D-0008)
 export MCP_AUTH_PROBE=0
 
-# Enumerate the 7 server names from .mcp.json
+# Enumerate the 5 server names from .mcp.json
+# (mcp-openapi-schema removed 2026-05-24 per MCP-provisioning-postmortem;
+#  gitnexus removed 2026-05-27 per ADR-0066 — see .devcontainer/versions.env
+#  header for full deprecation notes.)
 mapfile -t SERVERS < <(jq -r '.mcpServers | keys[]' "${MCP_JSON}")
 
-if [[ ${#SERVERS[@]} -ne 7 ]]; then
+if [[ ${#SERVERS[@]} -ne 5 ]]; then
   emit_degraded_banner "<config>" "<n/a>"
   log_mcp_event "$(jq -n -c --argjson n ${#SERVERS[@]} \
-    '{event:"structured_failure", timestamp:(now|todateiso8601), server:"<config>", failure_layer:"config", primary_degraded:false, fallback_invoked:false, fallback_server:null, redaction_applied:false, message:("expected 7 servers in .mcp.json; found " + ($n | tostring))}')"
-  echo "[postStart] WARN: expected 7 servers, found ${#SERVERS[@]}" >&2
+    '{event:"structured_failure", timestamp:(now|todateiso8601), server:"<config>", failure_layer:"config", primary_degraded:false, fallback_invoked:false, fallback_server:null, redaction_applied:false, message:("expected 5 servers in .mcp.json; found " + ($n | tostring))}')"
+  echo "[postStart] WARN: expected 5 servers, found ${#SERVERS[@]}" >&2
 fi
 
 echo "[postStart] probing ${#SERVERS[@]} MCP servers..."

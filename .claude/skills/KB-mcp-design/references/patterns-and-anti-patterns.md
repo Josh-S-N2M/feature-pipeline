@@ -1,5 +1,12 @@
 # Patterns and Anti-Patterns — MCP Layer Design Catalog
 
+## Contents
+
+- Patterns (do these)
+- Anti-patterns (refuse these)
+- Cross-references
+
+
 Pattern catalog (✓) + anti-pattern catalog (✗) for MCP layer design. Authored per Plan T2.3.
 
 > **Pedagogical note:** Contains anti-pattern examples (URL-embedded credentials, argv-leaked API keys per C-0259/C-0260/C-0094/E-0094) the auditor flags as DE-2 scanner anti-patterns. These exist to demonstrate what to refuse during review, not what to author.
@@ -52,26 +59,25 @@ Whole-server allowlist is appropriate when the server's tool set is tight and al
 
 ```env
 # .devcontainer/versions.env
-SERENA_REF=v1.2.0                                              # GitHub tag
+SERENA_VERSION=1.2.0                                            # PyPI version (serena-agent package)
 ACTIONLINT_MCP_SHA=7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef    # GitHub commit SHA
 TERRAFORM_MCP_VERSION=0.5.2                                    # HashiCorp release (+ SHA256 in install script)
-GITNEXUS_TAG=1.6.5                                              # npm package + version
 ```
 
 ### Primary/fallback registration with event-surface support
 
-When a future feature registers codebase-memory-mcp as the GitNexus fallback per ADR-0007 v2.2.0:
+When a future feature registers a primary/fallback code-graph pair (the schema field `primary_degraded` is preserved for this case; no active primary/fallback pair as of 2026-05-27 — gitnexus was removed per ADR-0066):
 
 ```jsonc
 {
   "mcpServers": {
-    "gitnexus": { ... },
-    "codebase-memory-mcp": { ... }
+    "<primary-server>": { ... },
+    "<fallback-server>": { ... }
   }
 }
 ```
 
-Plus `mcp-events.jsonl` records emit `primary_degraded: true` + `fallback_invoked: true` + `fallback_server: "codebase-memory-mcp"` when the primary fails.
+Plus `mcp-events.jsonl` records emit `primary_degraded: true` + `fallback_invoked: true` + `fallback_server: "<fallback-server>"` when the primary fails.
 
 ## Anti-patterns (✗ — refuse these)
 
@@ -121,7 +127,7 @@ When the server has > 2 tools AND the agent only needs a strict subset, whole-se
 
 ```env
 # .devcontainer/versions.env
-GITNEXUS_TAG=latest                  # ✗ — pin to specific version
+SERENA_VERSION=latest                  # ✗ — pin to specific version
 ```
 
 `latest` floats; reproducibility breaks across postCreate runs. **MAJOR finding** per the augmented `auditing-mcp` OP-N reproducibility rule.

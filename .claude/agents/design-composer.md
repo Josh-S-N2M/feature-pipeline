@@ -69,6 +69,91 @@ Read in this order:
 3. Build the **cross-layer dependency graph** from all sidecars: which layers depend on which (and for what).
 4. Catalog every Q-`<LAYER>`-N item from every layer's "Architectural Questions for Composer" section.
 
+### Phase 1b: Skill-Coverage Decisions review
+
+Per ADR-0065 Clause 2, `design-composer` is the substance reviewer for the `## Skill-Coverage Decisions` section that `synth-synthesizer` emits in `synthesis.md`. This phase runs as part of input ingestion, immediately after Phase 1, before cross-layer contradiction detection begins.
+
+#### Step 1 — Locate the section
+
+Read `synthesis_path` and locate `## Skill-Coverage Decisions`.
+
+- If the section is **present**: proceed to Step 2.
+- If the section is **absent**:
+  - Cross-check the PRD Glossary and the Blueprint's Component table (as drafted from per-layer designer inputs) for new domain concepts — noun-phrases not previously named in the project's KB / skill inventory.
+  - If **zero new concepts** are found: the omission is correct. Accept and proceed to Phase 2. No finding emitted.
+  - If **one or more new concepts** are found: emit MAJOR finding `FR-7.skill_coverage.section_missing` (see finding shape below). Do NOT proceed to Phase 2 until this finding is dispositioned (it blocks Design Composition completion).
+  - If the section is replaced by the one-line note "No new domain concepts": verify the claim by cross-checking PRD Glossary + Blueprint Components. If the cross-check confirms zero new concepts, accept. If the cross-check finds concepts the note denies, treat as section-absent with concepts present: emit MAJOR `FR-7.skill_coverage.section_missing`.
+
+#### Step 2 — Per-row substance review
+
+For each row in the `## Skill-Coverage Decisions` table, apply the review tier for the row's resolution type.
+
+**Type (a) — existing-skill rows:**
+
+Substance heuristic (reviewer judgment):
+- Does the named skill path resolve to a real skill in `.claude/skills/`?
+- Does the positive-evidence string credibly demonstrate that the named skill covers the stated domain concept — i.e., is the evidence specific enough that a reviewer can verify the claim without loading the full skill?
+- A citation with no supporting detail (e.g., "KB-cc-design covers it" with nothing further) fails the heuristic.
+
+If the (a) row fails the substance heuristic: emit MINOR finding for the specific row (see finding shape below).
+
+**Type (b) — propose-new-skill rows:**
+
+Two-tier review in order:
+
+1. **Structural mandate check (machine-checkable floor):** Verify that all three labelled headings are present and non-empty:
+   - `Why:` — the skill's purpose
+   - `How:` — at least one downstream agent or pipeline stage that would load it
+   - `Anti-patterns:` — at least one anti-pattern the skill prevents
+
+   If any of the three headings is absent or empty (or contains only boilerplate such as "TBD" or "see above" without content): emit MAJOR finding `FR-7.skill_coverage.wha_trifecta_incomplete` for the specific row. This check fails closed — a missing heading is a block regardless of the quality of the other headings.
+
+2. **Substance check (reviewer judgment):** Does the W/H/A content make architectural sense?
+   - Does "Why" distinguish this skill from existing neighbors?
+   - Does "How" name a real agent or pipeline stage?
+   - Does "Anti-patterns" describe a plausible failure mode the skill would prevent?
+
+   If the W/H/A passes the structural check but reads as vacuous (e.g., "Why: useful for agents. How: agents use it. Anti-patterns: none.") : emit MINOR finding for the specific row.
+
+**Type (c) — no-skill-warranted rows:**
+
+Substance heuristic (reviewer judgment):
+- Does the rationale credibly justify the absence of skill coverage?
+- A bare label ("no skill warranted") or a one-word rationale ("operational") fails the heuristic.
+- Useful frames: "This concept is operational discipline, not reusable knowledge"; "This concept is produced by agents, not consumed as reference material"; "This concept is already fully specified in [specific ADR/contract] and a skill would duplicate that source of truth."
+
+If the (c) row fails the substance heuristic: emit MINOR finding for the specific row.
+
+#### Step 3 — Emit findings
+
+Findings use the NFR-8 four-field shape from `KB-review-disciplines/references/severity-taxonomy.md`:
+
+```yaml
+rule:        <finding code, e.g., FR-7.skill_coverage.wha_trifecta_incomplete>
+target:      <synthesis.md §Skill-Coverage Decisions, row: "<concept name>">
+divergence:  <what is wrong — be specific: which heading is missing, what evidence is absent, what makes the rationale vacuous>
+next_action: <MAJOR: fix and resubmit synthesis.md before Design Composition can proceed | MINOR: synth-synthesizer should improve row before next Gate 1 review>
+```
+
+Severity summary:
+
+| Failure | Severity | Finding code |
+|---|---|---|
+| Section absent when ≥1 new domain concept exists | **MAJOR** | `FR-7.skill_coverage.section_missing` |
+| Type (b) row missing any W/H/A heading (structural mandate) | **MAJOR** | `FR-7.skill_coverage.wha_trifecta_incomplete` |
+| Type (a) row with vacuous positive evidence | **MINOR** | `FR-7.skill_coverage.vacuous_existing_skill_evidence` |
+| Type (b) row with vacuous W/H/A substance (headings present, content empty or nonsensical) | **MINOR** | `FR-7.skill_coverage.vacuous_wha_substance` |
+| Type (c) row with vacuous rationale | **MINOR** | `FR-7.skill_coverage.vacuous_no_skill_rationale` |
+
+MAJOR findings block Design Composition completion. MINOR findings are recorded but do not block; they are carried to the Gate 1 review by `shared-document-reviewer` (invocation 3 — Blueprint review) via the Blueprint's Eat-Own-Dogfood reference to the `synthesis.md` Skill-Coverage Decisions section.
+
+#### Cross-references for this procedure
+
+- **ADR-0065** — governing contract; Clause 2 establishes the hybrid mandate-substance trifecta reviewed here.
+- **`.claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section-template.md`** — the canonical section shape and worked examples; load when a row's resolution type is ambiguous.
+- **`.claude/agents/synth-synthesizer.md`** — the emitter of this section; when a concept was missed at Synthesis, `design-composer` backfills the row and notes it in `synthesis.md`'s Update History.
+- **`KB-review-disciplines/references/severity-taxonomy.md`** — NFR-8 four-field finding shape and the MAJOR / MINOR bridge table.
+
 ### Phase 2: Detect cross-layer contradictions
 
 For each pair of layers with a dependency edge, check for contradictions:

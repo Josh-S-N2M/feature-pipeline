@@ -18,13 +18,6 @@
         "x-api-key": "${EXA_API_KEY}"
       }
     },
-    "gitnexus": {
-      "command": "npx",
-      "args": ["-y", "gitnexus@${GITNEXUS_TAG}", "mcp"],
-      "env": {
-        "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1"
-      }
-    },
     "serena": {
       "command": "serena",
       "args": ["start-mcp-server"]

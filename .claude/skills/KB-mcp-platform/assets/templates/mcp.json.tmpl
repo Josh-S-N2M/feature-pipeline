@@ -2,9 +2,9 @@
   "//": [
     ".mcp.json TEMPLATE — KB-mcp-platform/assets/templates/mcp.json.tmpl",
     "Customized by Plan T2.4 + substituted at repo root .mcp.json.",
-    "Canonical inventory: 6 named MCP servers (was 7; mcp-openapi-schema removed",
-    "2026-05-24 per postmortem — see KB-mcp-platform/SKILL.md and",
-    ".devcontainer/postCreate.sh line 16 for the deprecation note).",
+    "Canonical inventory: 5 named MCP servers (was 7; mcp-openapi-schema removed",
+    "2026-05-24 per postmortem; gitnexus removed 2026-05-27 per ADR-0066 — see",
+    "KB-mcp-platform/SKILL.md and .devcontainer/postCreate.sh for deprecation notes).",
     "Credential handling: env-block indirection only (ADR-0039); env-var names from",
     ".devcontainer/versions.env or devcontainer.json containerEnv.",
     "Replace <PIN_TBD> with actual pin values from versions.env per Plan T1.3."
@@ -28,16 +28,9 @@
         "x-api-key": "${EXA_API_KEY}"
       }
     },
-    "gitnexus": {
-      "command": "npx",
-      "args": ["-y", "gitnexus@${GITNEXUS_TAG}", "mcp"],
-      "env": {
-        "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1"
-      }
-    },
     "serena": {
-      "command": "uvx",
-      "args": ["--from", "git+https://github.com/oraios/serena@${SERENA_REF}", "serena"]
+      "command": "serena",
+      "args": ["start-mcp-server"]
     },
     "terraform-mcp": {
       "command": "terraform-mcp",

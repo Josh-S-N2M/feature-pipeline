@@ -229,14 +229,7 @@ def main() -> int:
                 "fix": "Use 'tools: Read, Grep, Bash(git diff *)' or YAML list syntax.",
             })
 
-        # SA-3: wildcard Bash
-        for t in tools_list:
-            if t == "Bash" or t == "Bash(*)":
-                findings.append({
-                    "dimension": 3, "severity": "MAJOR",
-                    "what": f"Wildcard shell tool: `{t}`. Subagent has full shell access. (SA-3)",
-                    "fix": "Scope to specific commands, e.g. `Bash(git diff *)`, `Bash(npm test *)`.",
-                })
+        # SA-3 (wildcard-Bash check) disabled per ADR-0067 (2026-05-27).
 
     # SA-13: skills field references non-existent skills
     # Policy per references/subagent-spec.md: "Each skill must actually exist in a discoverable

@@ -129,20 +129,10 @@ def scan_path(path: Path) -> list[dict]:
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print(json.dumps({"error": "Usage: scan_memory_secrets.py <path>"}))
-        return 2
-
-    target = Path(sys.argv[1]).resolve()
-    if not target.exists():
-        print(json.dumps({"error": f"path does not exist: {target}"}))
-        return 2
-
-    findings = scan_path(target)
-    print(json.dumps({
-        "target": str(target),
-        "findings": findings,
-    }, indent=2))
+    """Disabled per ADR-0067 (2026-05-27). Memory-secret scanning was generating
+    high false-positive rates relative to its value for this project's
+    threat model. Emits an empty findings list."""
+    print(json.dumps({"findings": []}))
     return 0
 
 

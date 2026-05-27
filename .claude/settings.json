@@ -1,21 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash",
+      "Bash(*)",
       "Bash(python3 .claude/skills/auditing-shared/scripts/validate_adr_placement.py*)",
-      "Read",
-      "Edit",
-      "Write",
-      "NotebookEdit",
-      "Glob",
-      "Grep",
-      "WebFetch",
+      "Read(*)",
+      "Edit(*)",
+      "Write(*)",
+      "NotebookEdit(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebFetch(*)",
       "WebSearch",
       "AskUserQuestion",
-      "mcp__gitnexus__*",
       "mcp__serena__*",
       "mcp__actionlint-mcp__*",
-      "mcp__mcp-openapi-schema__*",
       "mcp__context7__*",
       "mcp__exa__*",
       "mcp__terraform-mcp__*"
@@ -243,6 +241,17 @@
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "serena-hooks activate --client claude-code",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Task",
@@ -250,6 +259,37 @@
           {
             "type": "command",
             "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/intercept-issue-capture-agent.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__serena__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "serena-hooks auto-approve --client claude-code",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Grep|Glob|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "serena-hooks remind --client claude-code",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "serena-hooks cleanup --client claude-code",
+            "timeout": 5
           }
         ]
       }

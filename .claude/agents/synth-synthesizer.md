@@ -67,6 +67,77 @@ When both validators pass, write `06-synthesis-draft.md` content to `final_path`
 - `citations_path`: a Markdown table mapping every `claim.id` cited in the report → `source_uri`.
 - `substrate_options_path`: an appendix of all decisions with their three-option enumerations (drawn from `05-substrate-map.json`), so readers can see what was considered, not just what was recommended.
 
+### Skill-Coverage Decisions emission procedure
+
+After composing the Limitations section and before running the Layer B validators, scan for new domain concepts and emit the `## Skill-Coverage Decisions` section into the draft if warranted.
+
+#### Step 1 — Trigger detection
+
+Scan the following sources for new domain concepts this feature introduces:
+
+- **PRD Glossary** — every term defined there that has no prior cross-reference in an existing `.claude/skills/` entry.
+- **PRD Functional Requirements** — named domain concepts (mechanism names, artifact types, discipline names) that are new to the project's KB / skill inventory.
+- **Blueprint Component table** — each component whose purpose is not captured by an existing skill.
+- **Blueprint design subsections** — any named mechanism, artifact type, or discipline that downstream agents or skill authors may need to learn from a KB.
+
+Enumerate the candidate concepts. For each, ask: does an existing skill in `.claude/skills/` credibly cover it? A concept counts as "new" only when it is a genuinely novel conceptual primitive — incremental additions to a well-covered concept are NOT new domain concepts.
+
+#### Step 2 — Section absence policy
+
+If the enumeration produces zero new domain concepts, omit the section entirely. Do not author an empty table or placeholder heading. Record a one-line note in your TaskUpdate message: "Skill-coverage section omitted — zero new domain concepts per ADR-0065." The section header `## Skill-Coverage Decisions` MUST NOT appear in the draft when there are zero new concepts.
+
+#### Step 3 — Emit one row per new domain concept
+
+For each new domain concept, choose exactly one resolution type and emit a row in the `## Skill-Coverage Decisions` section using the template at `.claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section-template.md`.
+
+The section header, preamble, and table shape from the template:
+
+```markdown
+## Skill-Coverage Decisions
+
+*Per ADR-0065 Clause 1; <review posture summary>.*
+
+For each new domain concept this feature introduces, one of:
+- **(a) existing-skill** — name the existing skill that covers the concept + positive-evidence string
+- **(b) propose-new-skill** — W/H/A trifecta (Why this skill exists; How agents use it; Anti-patterns it defends against)
+- **(c) no-skill-warranted** — rationale for why no skill coverage is needed
+
+| Domain concept | Resolution type | Covering skill (a) / Proposed skill name (b) / Rationale (c) | Positive evidence |
+|---|---|---|---|
+```
+
+Three resolution types:
+
+**(a) existing-skill** — an existing skill credibly covers the concept. Supply the skill path and a positive-evidence string citing the specific section or principle that provides coverage. Vacuous evidence ("covered by KB-X" with no supporting detail) fails the substance heuristic at `shared-document-reviewer`.
+
+**(b) propose-new-skill** — no existing skill covers the concept. Emit the W/H/A trifecta as three labelled blocks immediately below the table, keyed to the concept name. The table cell contains the proposed skill name plus "(W/H/A below)". All three blocks are mandatory — a missing block triggers a MAJOR finding at Design Composition (structural mandate, per ADR-0065 Clause 2):
+
+```
+Why:           <One paragraph naming the gap that necessitates this skill — what
+               conceptual territory it covers and why that territory is not already
+               served by any existing skill.>
+
+How:           <One paragraph describing the proposed skill's name, scope, and
+               authoring vector — at minimum, name the downstream agent or pipeline
+               stage that would load it and what decision the skill would inform.>
+
+Anti-patterns: <One paragraph naming pitfalls the new skill defends against.
+               "Without this skill, authors would..." is a useful frame.>
+```
+
+**(c) no-skill-warranted** — the concept is real but does not benefit from a dedicated skill (e.g., it is operational discipline already captured in an agent prompt, a purely run-time artifact that agents produce but do not consume, or a concept fully specified by a single ADR). Supply an explicit rationale sentence. "No skill warranted" with no explanation fails the substance heuristic.
+
+#### Step 4 — Place the section in the draft
+
+Insert `## Skill-Coverage Decisions` after `## Eat-Own-Dogfood Deliverables` and before `## Open Items Carried to Design Composition`. Append to draft. Free.
+
+#### Step 5 — Cross-references
+
+- Governing contract: `adrs/ADR-0065-skill-coverage-decision-discipline.md`
+- Section template: `.claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section-template.md`
+- Skill-loading principle: KB-cc-design Principle 2 ("skill loading on-demand")
+- Severity vocabulary: `.claude/skills/KB-review-disciplines/references/severity-taxonomy.md` (MAJOR / MINOR bridge table)
+
 ### TaskUpdate (compose-report mode)
 
 Start: "Composing report (audience: <audience_depth>, scope: <scope>, decisions: <N>)"

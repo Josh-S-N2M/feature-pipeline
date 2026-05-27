@@ -102,14 +102,31 @@ def collect_references(file: Path, skill_dir: Path) -> list[tuple[str, int]]:
     return refs
 
 
+_REPO_MARKERS = (".git", ".claude", "adrs")
+
+
+def _find_repo_root(start: Path) -> Path | None:
+    for parent in [start, *start.parents]:
+        if all((parent / m).exists() for m in (".git", ".claude")):
+            return parent
+        if (parent / ".git").exists():
+            return parent
+    return None
+
+
 def normalize(path: str, owner_file: Path, skill_dir: Path) -> Path:
     """Resolve a referenced path. Skill markdown typically uses skill-root-relative paths,
     so we try that first, then fall back to owner-file-relative.
 
     Cross-KB references (paths starting with `KB-`) get a third resolution attempt:
     try `<skills-root>/<path>` where skills-root is the parent of the current skill_dir.
-    This supports the project's KB cross-reference convention without forcing authors
-    to use ../-based relative paths."""
+
+    Repo-root-relative references (paths starting with `.claude/`, `.devcontainer/`,
+    `.github/`, `Issues/`, `adrs/`, `working/`, or any other top-level repo path) get a
+    final resolution attempt against the repo root, discovered by walking up from
+    skill_dir until a `.git` directory is found. This supports the common documentation
+    convention of writing paths relative to the workspace root rather than forcing
+    authors to use ../-laden relative paths."""
     p = Path(path)
     if p.is_absolute():
         return p
@@ -126,8 +143,24 @@ def normalize(path: str, owner_file: Path, skill_dir: Path) -> Path:
     skill_relative = (skill_dir / path).resolve()
     if skill_relative.exists():
         return skill_relative
-    # Fall back to owner-file-relative
-    return (owner_file.parent / path).resolve()
+    # Try owner-file-relative
+    owner_relative = (owner_file.parent / path).resolve()
+    if owner_relative.exists():
+        return owner_relative
+    # Repo-root-relative fallback (paths like '.claude/agents/foo.md' or 'Issues/bar/baz.md')
+    repo_root = _find_repo_root(skill_dir)
+    if repo_root is not None:
+        repo_relative = (repo_root / path).resolve()
+        if repo_relative.exists():
+            return repo_relative
+    # Skills-root-relative fallback (paths like 'recipe-feature-pipeline/SKILL.md' or
+    # 'auditing-shared/scripts/log_state_transition.py' that omit the '.claude/skills/' prefix)
+    skills_root = skill_dir.parent
+    skills_root_relative = (skills_root / path).resolve()
+    if skills_root_relative.exists():
+        return skills_root_relative
+    # Nothing resolved; return owner-relative as the canonical "this is broken" path
+    return owner_relative
 
 
 def main() -> int:

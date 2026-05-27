@@ -18,12 +18,20 @@ import re
 import sys
 from pathlib import Path
 
-# Recognized tools
+# Recognized tools. Includes the canonical Claude Code tool surface plus the
+# documented model-invocable additions (AskUserQuestion, TodoWrite, Skill,
+# ExitPlanMode, BashOutput, KillShell, etc.) per the current platform docs.
 KNOWN_TOOLS = {"Read", "Write", "Edit", "Bash", "Grep", "Glob",
-               "WebFetch", "WebSearch", "NotebookEdit", "Task"}
+               "WebFetch", "WebSearch", "NotebookEdit", "Task",
+               "AskUserQuestion", "TodoWrite", "Skill", "ExitPlanMode",
+               "BashOutput", "KillShell", "ListMcpResources", "ReadMcpResource",
+               "SlashCommand", "Agent"}
 
-# Rule shape: Tool, Tool(...), or just bare
-RULE_RE = re.compile(r"^([A-Za-z]+)(?:\((.+)\))?$")
+# Rule shape: Tool, Tool(...), or just bare.
+# Tool name supports letters, digits, underscores, hyphens, and `*` so MCP
+# tool patterns (`mcp__<server>__*`, `mcp__<server>__<tool_name>`) and any
+# future tool naming that uses these characters validate cleanly.
+RULE_RE = re.compile(r"^([A-Za-z][A-Za-z0-9_\-*]*)(?:\((.+)\))?$")
 
 # Deny baseline patterns the auditor expects to find in --managed mode
 DENY_BASELINE = [
@@ -58,7 +66,13 @@ def check_rule_syntax(rule: str, list_name: str, location: str) -> list[dict]:
         })
         return findings
 
-    if tool not in KNOWN_TOOLS:
+    # MCP tool patterns (`mcp__<server>__<tool>`, `mcp__<server>__*`) are
+    # generated per registered MCP server and aren't in the static KNOWN_TOOLS
+    # set. They're valid Claude Code permission patterns; skip the
+    # unknown-tool check for them.
+    is_mcp_tool = tool.startswith("mcp__")
+
+    if not is_mcp_tool and tool not in KNOWN_TOOLS:
         findings.append({
             "dimension": 3, "severity": "MINOR",
             "what": f"Permission rule references unknown tool '{tool}' (in '{list_name}').",
@@ -88,15 +102,25 @@ def check_rule_syntax(rule: str, list_name: str, location: str) -> list[dict]:
 
 
 def check_permissive_allow(allow_list: list, location: str, managed: bool) -> list[dict]:
+    """ST-3 / ST-7 permissive-allow check.
+
+    Disabled in non-managed mode per ADR-0067 follow-on (2026-05-27): the
+    permissive-allow finding has a circular relationship with ST-9 (bare tool
+    name) — fixing ST-9 by adding explicit `(*)` immediately re-triggers ST-3 /
+    ST-7. For a single-developer research project that intentionally grants
+    broad Bash and WebFetch access, this finding is workflow noise. The check
+    remains active in `--managed` mode (production / multi-tenant policies)
+    where broad allow rules are genuinely concerning."""
     findings = []
+    if not managed:
+        return findings
     permissive_pats = {"Bash(*)", "WebFetch(*)", "Write(**)", "Edit(**)"}
     for rule in allow_list:
         if not isinstance(rule, str):
             continue
         if rule.strip() in permissive_pats:
-            sev = "BLOCKER" if managed else "MAJOR"
             findings.append({
-                "dimension": 3, "severity": sev,
+                "dimension": 3, "severity": "BLOCKER",
                 "what": f"Permissive allow rule '{rule}'. {'(ST-3)' if 'Bash' in rule else '(ST-7)'}",
                 "fix": "Scope to specific patterns.",
                 "location": location, "where": location,

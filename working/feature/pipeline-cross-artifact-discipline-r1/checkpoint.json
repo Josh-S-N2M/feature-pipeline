@@ -1,0 +1,53 @@
+{
+  "run_id": "pipeline-cross-artifact-discipline-r1-20260526-123837",
+  "feature_slug": "pipeline-cross-artifact-discipline-r1",
+  "started_at": "2026-05-26T12:38:37Z",
+  "terminated_at": "2026-05-26T15:35:00Z",
+  "current_stage": "terminated_at_gate_4",
+  "stage_status": "terminated_by_user_decision",
+  "termination_reason": "User chose Contingency Split at Gate 4. Run terminated; follow-up runs R2a + R2b to be invoked separately. See SPLIT-RECORD.md.",
+  "gate_history": [
+    {"gate": "intent_confirmation", "decision": "approved_auto_mode", "timestamp": "2026-05-26T12:45:00Z"},
+    {"gate": "prd_approval", "decision": "approved_auto_mode", "timestamp": "2026-05-26T13:05:00Z"},
+    {"gate": "research_plan_approval", "decision": "approved_auto_mode", "timestamp": "2026-05-26T13:25:00Z"},
+    {
+      "gate": "blueprint_approval",
+      "decision": "split_into_r2a_r2b",
+      "timestamp": "2026-05-26T15:35:00Z",
+      "user_notes": "User chose to split rather than continue as single feature. Also ratified PRD AC-FR-11-c correction to enumerate all 5 post-ship deferral rows (A-3, D-5, E-2, E-3, I-1) — ratification carries forward into R2b follow-up run."
+    }
+  ],
+  "artifact_versions": {
+    "intent_clarification": 1,
+    "prd": 2,
+    "research_plan": 1,
+    "codebase_analysis": 1,
+    "research_notes": 4,
+    "synthesis": 1,
+    "cc_design": 1,
+    "blueprint": 1,
+    "adrs_authored": ["ADR-0059", "ADR-0060", "ADR-0061", "ADR-0062", "ADR-0063"]
+  },
+  "reconciliation_cycles": {"blueprint": 0, "cross_artifact": 0},
+  "activated_layers": ["claude-code"],
+  "extraction_method": "mixed",
+  "params": {"max_external_research_topics": 6, "reconciliation_cap": 4},
+  "split_lineage": {
+    "split_record_path": "working/feature/pipeline-cross-artifact-discipline-r1/SPLIT-RECORD.md",
+    "follow_up_run_r2a": {
+      "suggested_slug": "pipeline-design-time-discipline-r1",
+      "mechanism_subset": ["FR-1 (H3)", "FR-6 (B1)", "FR-7 (B3)", "FR-8 (B2)", "FR-9 (B4)", "FR-10 (B5)"],
+      "inherited_adrs": ["ADR-0059", "ADR-0061", "ADR-0063"]
+    },
+    "follow_up_run_r2b": {
+      "suggested_slug": "pipeline-gate-validator-hardening-r1",
+      "mechanism_subset": ["FR-2 (H6)", "FR-3 (H9)", "FR-4 (H1)", "FR-5 (H8)", "FR-11 (§O)"],
+      "inherited_adrs": ["ADR-0060", "ADR-0061", "ADR-0062"],
+      "ratified_correction": "PRD AC-FR-11-c enumerates 5 post-ship deferral rows: A-3, D-5, E-2, E-3, I-1"
+    },
+    "recommended_ordering": "R2a before R2b — establishes the agent-roster matrix contract before R2b exercises it, and populates ADR-0061's bridge table before R2b consumes it."
+  },
+  "execution_pipeline_state_transitions": [],
+  "execution_mode": "specialist-dispatch",
+  "execution_pipeline_cycle_counters": {"per_task": {}, "per_phase": {}}
+}

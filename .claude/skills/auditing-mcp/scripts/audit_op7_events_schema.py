@@ -26,7 +26,9 @@ REQUIRED_FIELDS = {
     "install_complete": {"event", "timestamp", "server", "install_method", "version", "status"},
     "readiness_probe": {"event", "timestamp", "server", "probe_method", "status"},
     "structured_failure": {"event", "timestamp", "server", "failure_layer", "message"},
-    # ADR-0058 / FR-4b: gitnexus grammar-skip calibration signal
+    # ADR-0058 calibration_result schema (the FR-4b gitnexus grammar-skip
+    # mechanism was retired with the 2026-05-27 gitnexus removal per ADR-0066;
+    # the schema is preserved for future calibration mechanisms).
     "calibration_result": {
         "event",
         "timestamp",
@@ -41,6 +43,33 @@ REQUIRED_FIELDS = {
 }
 
 VALID_EVENT_TYPES = set(REQUIRED_FIELDS.keys())
+
+# Backward-compatible field aliases. Historical records (pre-schema-ratification)
+# used different field names that conveyed the same information. The auditor
+# treats an alias as satisfying the canonical field requirement so historical
+# entries don't generate false-positive "missing required field" findings.
+FIELD_ALIASES = {
+    "readiness_probe": {
+        # Legacy `result: "fail"` is equivalent to `status: "fail"` (the
+        # records that use `result` predate the status-vocabulary ratification).
+        "status": ("result",),
+    },
+    "structured_failure": {
+        # Legacy `note` was used in place of `message` in some early records.
+        "message": ("note",),
+    },
+}
+
+
+def _canonical_keys(event: str, rec: dict) -> set:
+    """Return the set of canonical field names this record satisfies, treating
+    documented historical aliases as the canonical name."""
+    keys = set(rec.keys())
+    aliases = FIELD_ALIASES.get(event, {})
+    for canonical, alias_tuple in aliases.items():
+        if canonical not in keys and any(a in keys for a in alias_tuple):
+            keys.add(canonical)
+    return keys
 
 
 def main() -> int:
@@ -92,7 +121,7 @@ def main() -> int:
             })
             continue
 
-        missing = REQUIRED_FIELDS[event] - set(rec.keys())
+        missing = REQUIRED_FIELDS[event] - _canonical_keys(event, rec)
         if missing:
             findings.append({
                 "rule": "OP-7",

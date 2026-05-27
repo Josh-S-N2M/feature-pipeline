@@ -22,20 +22,19 @@ How the MCP layer wires into the devcontainer lifecycle. Authored per Plan T2.2 
 
 ## `postCreate.sh` responsibilities (Plan T3.4)
 
-1. Source `.devcontainer/versions.env` — establishes the 4 OSS-local pins (was 5; `MCP_OPENAPI_SCHEMA_VERSION` removed 2026-05-24 per postmortem).
-2. Install Serena via `uvx --from git+https://github.com/oraios/serena@${SERENA_REF} serena`.
+1. Source `.devcontainer/versions.env` — establishes the 3 OSS-local pins (was 5; `MCP_OPENAPI_SCHEMA_VERSION` removed 2026-05-24 per postmortem; `GITNEXUS_TAG` removed 2026-05-27 per ADR-0066).
+2. Install Serena via `uv tool install -p 3.13 serena-agent==${SERENA_VERSION} --prerelease=allow`.
 3. Install actionlint-mcp via `go install github.com/hongkongkiwi/actionlint-mcp@${ACTIONLINT_MCP_SHA}`.
 4. Install terraform-mcp via `.devcontainer/install/terraform-mcp.sh` (binary + sha256 + gpg).
-5. Install gitnexus via `npm install -g gitnexus@${GITNEXUS_TAG}` (with `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` exported).
-6. Emit one `install_complete` record per OSS-local server to `.claude/runtime/mcp-events.jsonl` (4 records total).
-7. Note: context7 and exa are HTTP-transport hosted servers; no install step.
+5. Emit one `install_complete` record per OSS-local server to `.claude/runtime/mcp-events.jsonl` (3 records total).
+6. Note: context7 and exa are HTTP-transport hosted servers; no install step.
 
 ## `postStart.sh` responsibilities (Plan T3.5)
 
-1. For each of the 6 registered servers in `.mcp.json`, probe readiness:
+1. For each of the 5 registered servers in `.mcp.json`, probe readiness:
    - If `claude mcp ping <server>` is available (per verify-at-execution §H-6), use it.
    - Else fall back to direct JSON-RPC `tools/list` per ADR-0041 (cycle-3 T0.6 verified `claude mcp ping` is NOT available in current Claude Code CLI — fallback applies).
-2. Emit one `readiness_probe` record per server to `.claude/runtime/mcp-events.jsonl` (6 records per postStart).
+2. Emit one `readiness_probe` record per server to `.claude/runtime/mcp-events.jsonl` (5 records per postStart).
 3. Each record has `status: ok | degraded | unreachable` + a `latency_ms` field + optional `error` field for non-ok.
 4. The script SHOULD NOT fail-closed on any single server's degradation — emit the record and continue (postStart must complete to make the Codespace usable).
 
@@ -43,14 +42,14 @@ How the MCP layer wires into the devcontainer lifecycle. Authored per Plan T2.2 
 
 - Both `postCreate.sh` and `postStart.sh` use the helper at `.devcontainer/lib/log-mcp-event.sh` for JSONL emission (per Plan T3.6).
 - The helper applies redaction-at-source per ADR-0039: any header/env-var value matching a credential-shaped pattern (`api[-_]?key`, `token`, `bearer`, etc.) is replaced with `<REDACTED>` before the JSONL record is appended.
-- The helper is idempotent on repeated postStart invocations (Codespace resume): the JSONL file is append-only; the 7 `readiness_probe` records add per cycle, the consumer reads the most recent batch.
+- The helper is idempotent on repeated postStart invocations (Codespace resume): the JSONL file is append-only; the 5 `readiness_probe` records add per cycle, the consumer reads the most recent batch.
 
 ## Stderr surfacing for degraded states
 
-When the primary server degrades (e.g., GitNexus crashes mid-session), the helper emits the structured failure to `mcp-events.jsonl` AND writes a one-line banner to stderr per ADR-0037:
+When a server degrades (e.g., serena crashes mid-session), the helper emits the structured failure to `mcp-events.jsonl` AND writes a one-line banner to stderr per ADR-0037:
 
 ```
-[mcp:gitnexus] primary degraded → falling back to <fallback>; see .claude/runtime/mcp-events.jsonl
+[mcp:serena] primary degraded → falling back to <fallback>; see .claude/runtime/mcp-events.jsonl
 ```
 
 This is the only stderr surface the helper uses — verbose error chatter goes to the JSONL file, not the terminal.

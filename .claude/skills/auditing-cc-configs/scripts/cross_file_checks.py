@@ -184,6 +184,14 @@ def check_X1_hook_script_missing(state: dict) -> list[dict]:
                     continue
                 first = cmd.split()[0] if cmd.split() else ""
                 if "/" in first or first.endswith(".sh") or first.endswith(".py"):
+                    # Expand documented hook-context variables before resolving on disk
+                    # so commands like '${CLAUDE_PROJECT_DIR}/.claude/hooks/foo.sh' resolve
+                    # against the real project root.
+                    if "${CLAUDE_PROJECT_DIR}" in first:
+                        first = first.replace("${CLAUDE_PROJECT_DIR}", str(state["root"]))
+                    if "${HOME}" in first:
+                        from os.path import expanduser
+                        first = first.replace("${HOME}", expanduser("~"))
                     p = Path(first)
                     if not p.is_absolute():
                         p = state["root"] / p

@@ -1,0 +1,801 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "implementation-strategy",
+  "mode_note": "Per recipe-feature-pipeline orchestrator instruction (R2a), synth-substrate operates in implementation-strategy mode; the three-option enumeration hard exclusion in substrate-translation-knowledge SKILL.md does NOT apply. Option count is justified by genuine option space, not by quota. CLOSED-by-inherited-ADR and CLOSED-by-user-split decisions record closure in a single paragraph without option enumeration; OPEN decisions enumerate genuine options with one marked recommended (per parent lean or codebase-researcher lean) and rejected siblings carrying one-line rationales. D-10 substrate is content authoring (the bridge mapping shape); not an option-choice.",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "registry_version": "n/a (implementation-strategy mode; no substrate registry consulted — target substrate is claude_code throughout)",
+  "parent_strategies_inherited_from": "working/feature/pipeline-cross-artifact-discipline-r1/synthesis/05-implementation-strategies.json",
+  "framer_lean_check": "For each OPEN decision the framer recorded a recommendation lean in 04-decision-frames.json (framer_notes) and an options_summary ordering. Recommended option is checked against that lean; any divergence is surfaced under recommendation_divergence at the end.",
+  "mappings": [
+    {
+      "decision_id": "D-1",
+      "title": "FR-1 ADR prescription-extraction mechanism",
+      "status": "closed_by_inherited_adr",
+      "closure_pointer": "ADR-0059 (companion `.prescriptions.yaml` sibling file)",
+      "options": [],
+      "summary_paragraph": "Closed in the parent run by ADR-0059, which the R2a PRD inherits. The decision adopts a sibling `.prescriptions.yaml` companion file next to each ADR-*.md as the canonical machine-checkable prescription source; `review-architecture-auditor` reads the companion as ground truth and no-ops on absence (AC-FR-1-b). Anchoring evidence in parent corpus: 9-of-9 unanimous companion-artifact convergence across surveyed production systems (T-002; merged_ids C-0017, C-0018, C-0019, C-0020, C-0021) plus the arXiv 2602.07609 44.57% LLM-misinterpretation finding for the rejected NLP-parse-of-prose branch (C-0128, C-0134, C-0144). The hybrid NLP-as-draft / companion-as-canonical escape hatch is documented in ADR-0059 but not in initial scope; defer to a future iteration only if ADR-author burden NFR breaches. No R2a re-litigation required; FR-1's contract already cites the companion file.",
+      "recommended_option": "companion_file (per ADR-0059)",
+      "viable": true
+    },
+    {
+      "decision_id": "D-3",
+      "title": "FR-10 `auditing-skills` reverse-check posture (OI-R2a-2)",
+      "status": "open_for_design_composition",
+      "options": [
+        {
+          "name": "separate_parallel_rule_in_auditing_skills",
+          "description": "Author a new reverse-check rule inside `.claude/skills/auditing-skills/` mirroring FR-10's matrix-presence predicate at the skill-side. When a new skill is authored, the rule checks whether agents whose `skills:` arrays should include it actually do. One small rule file; one new audit dimension.",
+          "pros": [
+            "Separation of concerns: auditing-subagents covers agent-side matrix presence (FR-10's existing scope); auditing-skills covers skill-side `skills:`-array completeness — each audit family stays internally coherent.",
+            "Low blast radius (one new rule file under one skill family).",
+            "Two-way reversible — rule can be relaxed or removed if the audit gap doesn't materialize.",
+            "Discoverability: skill-side audit findings surface under the skill-side skill, which is where authors look for skill-related issues."
+          ],
+          "cons": [
+            "Single-sourced supporting claim (C-0072 in R2a corpus); investigation deferred this run rather than researched.",
+            "Two audit families end up with structurally-similar rules; manual sync risk if either evolves.",
+            "Externally undecided (no T-corroborator in R2a corpus)."
+          ],
+          "evidence_anchors": ["C-0072 (R2a corpus — single-sourced; investigation deferred)"],
+          "single_sourced_flag": true,
+          "preconditions": [
+            "New rule entry in `.claude/skills/auditing-skills/SKILL.md` mirroring the FR-10 predicate shape at the skill level.",
+            "Predicate scoped to: 'when a new skill file is authored, audit whether existing agents whose load-rules indicate they should load it actually have it in `skills:`'."
+          ],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "low (two-way)"
+          },
+          "verdict": "recommended",
+          "parent_alignment": "Matches parent's D-3 lean (separate rule on auditing-skills, weak strength). R2a re-affirms because the audit-family symmetry argument still applies and codebase facts (parent C-0091: auditing-skills carries its own conventions) are unchanged."
+        },
+        {
+          "name": "fold_into_fr10_auditing_subagents_rule",
+          "description": "Extend FR-10's auditing-subagents rule predicate to also enumerate auditing-skills targets. One rule, two surfaces.",
+          "pros": [
+            "Single rule definition; no cross-family sync risk.",
+            "Simpler PRD-level traceability."
+          ],
+          "cons": [
+            "Conflates two audit dimensions (matrix presence vs skill-array completeness) — undermines FR-10's narrow scope.",
+            "Couples two audit families to one rule change cadence — auditing-skills inherits auditing-subagents schema changes unintentionally.",
+            "PRD policy explicitly carries OI-R2a-2 as Blueprint Open Question rather than folding (PRD §Product Policy); this option fights that policy."
+          ],
+          "evidence_anchors": ["C-0072 (deferred); parent C-0123 (FR-10's current narrow scope)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low-moderate (coupling)",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Conflates two audit dimensions PRD policy explicitly keeps separate. The two-way-reversibility argument does not save it because the FR-10 scope already shipped narrowly in parent."
+        },
+        {
+          "name": "defer_to_future_feature",
+          "description": "Decline to add the reverse-check in R2a; document why not (close OI-R2a-2). Revisit only if a real audit gap surfaces in practice.",
+          "pros": [
+            "Lowest immediate cost; honest about externally-undecided status.",
+            "Consistent with PRD §O event-triggered posture."
+          ],
+          "cons": [
+            "Leaves an asymmetric audit surface in the meantime.",
+            "Adds another deferral to the register, which competes with FR-11's goal (replace post-ship felt-utility with event-triggered triggers — adding deferrals can become its own ritual).",
+            "Contradicts the parent's lean toward the separate rule (which was the lean R2a is asked to re-affirm)."
+          ],
+          "evidence_anchors": ["C-0072"],
+          "preconditions": ["Deferral entry in issue register documenting why not."],
+          "cost": {
+            "effort_weeks": 0.1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "minimal",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Acceptable fallback but contradicts parent lean R2a is re-affirming. Deferring the audit-family symmetry indefinitely undermines the cumulative discipline FR-10 establishes."
+        }
+      ],
+      "recommended_option": "separate_parallel_rule_in_auditing_skills",
+      "rationale": "Re-affirms parent's lean. Symmetric audit surfaces; low cost; reversible. The single-sourced status (C-0072) is acknowledged but the codebase facts (audit-family separation is the existing pattern) make this the lowest-risk path forward. Blueprint may downgrade to defer if the Composer judges the audit gap unlikely to materialize.",
+      "loss_summary": ["none"],
+      "viable": true,
+      "single_sourced_decision_flag": true
+    },
+    {
+      "decision_id": "D-4",
+      "title": "FR-9 Blocks-X marker grammar canonicalization",
+      "status": "closed_by_inherited_adr",
+      "closure_pointer": "ADR-0063 (Blocks-X marker grammar canonicalization)",
+      "options": [],
+      "summary_paragraph": "Closed in the parent run by ADR-0063. R2a inherits the canonical grammar `<!-- BLOCKS: <stage-slug>-completion -->` (uppercase token, colon-suffixed, HTML-comment container, optional `\\u2014`-separated payload, parser regex `<!--\\s*BLOCKS:\\s*([a-z0-9-]+)-completion(?:\\s+\\u2014\\s+[^\\n]*)?\\s*-->`) per ADR-0063's Decision Details section. The grammar was selected because n=1 prior prose occurrence is not a grammar to honor and structured pragmas are greppable from CI, invisible in rendered markdown, and multi-slug-ready. Non-retroactive migration: the n=1 prior occurrence at `working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis-report.md:198-202` is not migrated. R2a authors realization concerns (parser placement decided separately under D-R2a-3); the grammar question itself is settled. Anchoring evidence in corpus: C-0026, C-0027, C-0028, C-0029, C-0030, C-0085, C-0088.",
+      "recommended_option": "structured_html_comment_pragma (per ADR-0063)",
+      "viable": true
+    },
+    {
+      "decision_id": "D-5",
+      "title": "FR-6 trigger conditions 3 & 4 mechanical evaluator (OI-R2a-1)",
+      "status": "open_for_design_composition",
+      "options": [
+        {
+          "name": "hybrid_advisory_mechanical_predicate_with_human_ratification",
+          "description": "A mechanical predicate scans Blueprint's Skill-Coverage Decisions table (FR-7's output) for trigger-shaped tokens: trigger 3 ('new skill that the feature's design indicates one or more existing agents will load' — predicate checks 'dogfood_decision' column for new-skill values cross-referenced against agents named in adjacent rows); trigger 4 ('new domain concept whose skill-coverage decision names an existing agent as a downstream consumer' — predicate checks for agent-name tokens in the 'covering-agent' or 'consumer' column). The predicate surfaces an advisory annotation at the Design Composition gate; design-composer (human) ratifies whether FR-6 matrix is required. Override events log to state-transitions.log for retrospective tuning.",
+          "pros": [
+            "FR-7 table is mechanically parseable per codebase researcher (C-0071) — HIGH suitability for the predicate route.",
+            "Balances mechanical determinism with human judgment on interpretive triggers.",
+            "Couples cleanly with D-8 (substance-not-presence heuristic) — predicate checks shape, human checks substance.",
+            "Logged overrides allow predicate tuning: high false-negative rate → tighten; low → promote to mandatory.",
+            "Cheap to ship; cheap to tune; two-way reversible."
+          ],
+          "cons": [
+            "Two-system maintenance (predicate code + human-checklist).",
+            "Externally undecided in R2a corpus — relies on parent's lean and inspectable codebase facts.",
+            "Risk of human ratification becoming a rubber stamp if predicate is over-trusted."
+          ],
+          "evidence_anchors": ["C-0062 (FR-6 trigger structure)", "C-0066 (FR-10 / auditing-subagents host for predicate)", "C-0071 (FR-7 table mechanically parseable — HIGH suitability)", "C-0082 (Design Composition gate as ratification surface)"],
+          "preconditions": [
+            "Predicate hosted in `.claude/skills/auditing-subagents/scripts/` (consistent with FR-10's rule realization under D-R2a-5).",
+            "`design-composer.md` procedure has a ratification step at Design Composition gate.",
+            "State-transitions.log entry shape extended for override events (auditing-shared/log_state_transition.py).",
+            "FR-7 table shape stable (concept | covering-skill | confidence | dogfood-decision | rationale) before predicate authoring."
+          ],
+          "cost": {
+            "effort_weeks": 1.5,
+            "runtime_overhead": "minor (one grep + one human checkpoint per Design Composition gate)",
+            "maintenance_burden": "moderate (predicate tuning over time)",
+            "irreversibility_cost": "low (two-way reversible)"
+          },
+          "verdict": "recommended",
+          "parent_alignment": "Re-affirms parent's hybrid lean. R2a strengthens the recommendation because C-0071 (FR-7 table mechanically parseable) is fresh codebase evidence supporting the predicate component."
+        },
+        {
+          "name": "full_machine_checkable_predicate_only",
+          "description": "Deterministic predicate over Blueprint's Skill-Coverage Decisions table gates the matrix-mandatory check with no human checkpoint. Triggers 3 and 4 evaluated by token-pattern match against the table cells.",
+          "pros": [
+            "Deterministic; auditable; fastest gate (no human-in-loop).",
+            "If FR-7 table substance is high-quality, false-negative rate is low."
+          ],
+          "cons": [
+            "Triggers 3 and 4 are interpretive — pattern-match brittleness yields false negatives when authors phrase 'cross-skill impact' or 'downstream consumer' in different ways.",
+            "Conflicts with D-8's substance-not-presence heuristic — predicate checks presence-of-phrasing, not substance-of-intent.",
+            "Single point of failure: a missed trigger is silently un-audited.",
+            "Even with high FR-7 table quality (C-0071), trigger 4's 'names an existing agent' is parseable but trigger 3's 'design indicates one or more existing agents will load' requires interpretive read of design context the table cell may not capture."
+          ],
+          "evidence_anchors": ["C-0062 (interpretive trigger nature)", "C-0071 (table parseable but substance-vs-shape distinction)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "high (chasing false-negative phrasings indefinitely)",
+            "irreversibility_cost": "moderate (downstream hardening on predicate output)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Interpretive triggers do not survive predicate-only enforcement; symmetric to T-003's anti-ritualism trade-off — checking phrasing is presence-not-substance."
+        },
+        {
+          "name": "human_in_loop_checkpoint_only",
+          "description": "design-composer (human) checks Blueprint's Skill-Coverage Decisions at Design Composition gate; no mechanical evaluator. Trigger 3 and 4 are judgment calls every time.",
+          "pros": [
+            "Highest signal fidelity on interpretive triggers.",
+            "No false-negative chase; no maintenance burden on a predicate.",
+            "Coheres with FR-7's substance-not-presence framing."
+          ],
+          "cons": [
+            "Highest ritual cost — every Design Composition repeats the full check.",
+            "No advisory annotation to focus reviewer attention; reviewer reads the whole section every time.",
+            "Inconsistent application across runs (reviewer-dependent).",
+            "Waste FR-7 table's mechanical parseability (C-0071) — passes up free signal."
+          ],
+          "evidence_anchors": ["C-0082 (Design Composition gate is the human checkpoint surface today)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "moderate (human time at every gate)",
+            "maintenance_burden": "low (no code to maintain)",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Wastes the table's mechanical parseability surfaced by C-0071. The advisory predicate is cheap and directly reduces reviewer load without claiming authoritative judgment."
+        }
+      ],
+      "recommended_option": "hybrid_advisory_mechanical_predicate_with_human_ratification",
+      "rationale": "Re-affirms parent's hybrid lean. Predicate-only loses signal on interpretive triggers; human-only wastes reviewer attention on shape-checks the machine can pre-filter. The hybrid pairs cheap pre-screening with authoritative human ratification and logs overrides for tuning. C-0071 (R2a-fresh codebase evidence) strengthens the predicate-feasibility argument.",
+      "loss_summary": ["pattern_fidelity: none (substance-checking remains human)"],
+      "viable": true,
+      "cross_decision_dependency": "Couples to D-8 (substance-not-presence heuristic). The predicate here MUST NOT score substance; it scores shape only."
+    },
+    {
+      "decision_id": "D-6",
+      "title": "R2a/R2b contingency split (whether to ship R2 as one run or two)",
+      "status": "closed_by_user_split",
+      "closure_pointer": "User decision at parent Gate 4 (Blueprint Approval); SPLIT-RECORD.md in parent run directory `working/feature/pipeline-cross-artifact-discipline-r1/SPLIT-RECORD.md`",
+      "options": [],
+      "summary_paragraph": "Closed by user at parent Gate 4: split adopted. R2a is the design-time half (this run — FR-1, FR-6, FR-7, FR-8, FR-9, FR-10); R2b is queued as `pipeline-gate-validator-hardening-r1` (FR-2, FR-3, FR-4, FR-5, FR-11). Recorded here for archeological completeness; no R2a re-litigation. Anchoring evidence: C-0004, C-0005. Canonical lineage in `working/feature/pipeline-cross-artifact-discipline-r1/SPLIT-RECORD.md`.",
+      "recommended_option": "split_adopted (per user decision)",
+      "viable": true
+    },
+    {
+      "decision_id": "D-8",
+      "title": "FR-7 W/H/A trifecta — substance heuristic vs structural mandate",
+      "status": "open_for_design_composition",
+      "graph_note": "Heaviest node in graph (E-0003 FR-7 with 23 claim back-pointers). Decision is the most consequential R2a architectural choice; framing choice ripples through FR-7 ACs, dogfood deliverable validation, and downstream consumer expectations.",
+      "options": [
+        {
+          "name": "hybrid_mandate_for_new_skill_proposals_substance_heuristic_for_existing_skill_rows",
+          "description": "W/H/A is the substance reviewers check for (need-justification / scope-lifecycle hygiene / anti-pattern defenses per T-003's 3-category convergence). Reviewers apply a substance-not-presence heuristic: the trifecta is satisfied if the substance is present, regardless of whether three labelled headings exist. EXCEPTION: when a Skill-Coverage Decision row proposes a NEW skill (dogfood_decision = 'propose-new-skill'), a structured W/H/A artifact with three labelled headings is mandated. For 'existing-skill' rows and 'no-skill-warranted' rows, the substance principle governs.",
+          "pros": [
+            "Preserves T-003's cross-platform-convergent substance (6 platforms verified) without inheriting the novel-ritualism risk (C-0257 identifies codification-as-mandate as the novel and risky move).",
+            "Reviewer cost is lowered exactly where it's highest (new-skill proposals are the most expensive review surface — they introduce ongoing maintenance debt).",
+            "Substance heuristic aligns with how reviewers actually catch missing rationale — substance-checking, not heading-counting.",
+            "Coheres with D-5's advisory-predicate design (machine checks shape; human checks substance).",
+            "Graph structural-novelty observation reinforces hybrid: FR-7 is the heaviest node (23 back-pointers), confirming codification-as-artifact is novel and warrants explicit risk-mitigation via the substance heuristic rather than open-ended mandate."
+          ],
+          "cons": [
+            "Substance heuristic is harder to mechanically evaluate — reviewer-dependent.",
+            "Drawing the new-skill-proposal boundary requires a clear definition (likely: 'dogfood_decision row indicates a propose-new-skill resolution, OR the row creates a new directory under `.claude/skills/`').",
+            "Quantitative BFCL evidence is directional (C-0184), not a measured threshold for this pipeline.",
+            "Skill-coverage decision codification is novel (genesis stage per framer) — no production precedent for the exact shape."
+          ],
+          "evidence_anchors": ["C-0068 (FR-7 mandate surface)", "C-0083 (skill-coverage decision concept)", "C-0090 (KB-task-decomposition / KB-documentation-criteria templates)", "C-0148 (Anthropic Skill Quality Checklist)", "C-0190 / C-0192 / C-0193 / C-0194 (T-003 cross-platform W/H/A convergence)", "C-0196 / C-0197 (anti-pattern category convergence)", "C-0199 (substance-vs-form framing)", "C-0256 (3-category convergence across 6 platforms)", "C-0257 (codification-as-mandate is the novel move; ritualism risk)"],
+          "preconditions": [
+            "KB-cc-design hosts the W/H/A rubric + substance heuristic.",
+            "FR-7 section template extended with three labelled headings (Why / How / Anti-patterns) for new-skill rows.",
+            "'New skill proposal' boundary defined in FR-7 template instructions.",
+            "design-composer.md procedure references the rubric at skill-coverage decision time."
+          ],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "low (two-way; relax to principle-only or tighten to universal-mandate later)"
+          },
+          "verdict": "recommended",
+          "parent_alignment": "Re-affirms parent's hybrid lean. R2a strengthens with graph structural-novelty observation: heaviest-node status (23 back-pointers) corroborates the parent's gloss that codification-as-artifact is the novel move warranting risk-mitigation."
+        },
+        {
+          "name": "full_structural_mandate_universally",
+          "description": "Every Skill-Coverage Decision row MUST produce a structured W/H/A artifact with three labelled headings — regardless of dogfood_decision resolution type. Reviewer checks presence; auditor checks each row has three non-empty cells.",
+          "pros": [
+            "Maximum auditability — mechanically gateable (does each row have three populated cells?).",
+            "Removes reviewer judgment on shape.",
+            "Easiest predicate for FR-10 audit (matrix-cell-population check)."
+          ],
+          "cons": [
+            "0/6 surveyed platforms mandate this (C-0257) — novel-ritualism risk explicitly identified by T-003.",
+            "Presence-not-substance: three filled headings can be empty of meaningful content and still pass the gate (the exact failure mode FR-7 is designed to prevent).",
+            "Drives authors toward ritualistic minimum-viable filings on existing-skill rows where the substance is already well-trodden community ground, undermining the actual goal.",
+            "PRD §Product Policy already codifies 'substance over form' — universal mandate fights that policy."
+          ],
+          "evidence_anchors": ["C-0257 (anti-ritualism trade-off; novel-risk)", "C-0199 (PRD substance-over-form policy)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "minor",
+            "maintenance_burden": "moderate (ritualism creeps)",
+            "irreversibility_cost": "moderate (relaxing a mandate is harder than tightening a principle)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "T-003 explicitly identifies codification-as-mandate as the novel and risky move; 0/6 surveyed platforms mandate. The recommended hybrid captures substance without the ritual. PRD policy alignment seals it."
+        },
+        {
+          "name": "principle_with_substance_heuristic_only_no_mandate",
+          "description": "W/H/A is a principle in KB-cc-design; reviewers apply substance heuristic to ALL skill-coverage decisions including new-skill proposals. No mandate anywhere; no required template headings.",
+          "pros": [
+            "Lightest authorial burden.",
+            "Maximum substance preservation (zero ritual).",
+            "Cleanest alignment with 'substance over form' PRD policy."
+          ],
+          "cons": [
+            "Loses the audit anchor for new-skill proposals — the most expensive review surface gets the least structure.",
+            "Higher reviewer cognitive load on new-skill proposals where structure pays for itself.",
+            "Drift risk: principle without occasional structured artifact tends to fade in practice.",
+            "No mechanical gate available for D-5's predicate to leverage when checking trigger 3 (new-skill triggering matrix-mandatory)."
+          ],
+          "evidence_anchors": ["C-0257 (anti-ritualism trade-off)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Defensible but loses the new-skill-proposal carve-out where structure pays for itself. The hybrid is the principled middle path; pure principle-only sacrifices a useful audit anchor for marginal additional substance-preservation."
+        }
+      ],
+      "recommended_option": "hybrid_mandate_for_new_skill_proposals_substance_heuristic_for_existing_skill_rows",
+      "rationale": "Re-affirms parent's hybrid lean with R2a graph-structural-novelty observation. The hybrid preserves T-003 cross-source-convergent substance; respects the documented anti-ritualism trade-off; concentrates structural mandate where it has the highest review-cost ROI (new-skill proposals). The 23-back-pointer heaviest-node status of FR-7 in the R2a graph corroborates the parent's framing that the codification-as-artifact is the novel move — explicit risk-mitigation via substance heuristic is the rational response. Couples cleanly with D-5's predicate-checks-shape / human-checks-substance split.",
+      "loss_summary": ["pattern_fidelity: none (substance preserved across the cross-platform convergence)"],
+      "viable": true,
+      "cross_decision_dependency": "Couples to D-5 (the advisory predicate there scores shape, not substance). Coupling is explicit and load-bearing: D-5's predicate trigger 3/4 evaluation MUST defer to the substance heuristic articulated here."
+    },
+    {
+      "decision_id": "D-10",
+      "title": "Severity-vocabulary bridge content (ADR-0061 host inherited; R2a authors content)",
+      "status": "partially_closed",
+      "closure_pointer": "Host decided by inherited ADR-0061 (canonical host `.claude/skills/KB-review-disciplines/references/severity-taxonomy.md`). R2a authors the bridge CONTENT.",
+      "options": [],
+      "substrate_work_type": "content_authoring (not option-choice)",
+      "bridge_mapping_shape": {
+        "purpose": "The bridge maps three audience-specific severity vocabularies into a single reference without collapsing audience-fit. It additionally preserves two distinct severity-weight sets (verdict-compute weights AND iteration-delta weights) that conflict_with each other and therefore MUST NOT be collapsed.",
+        "structural_form": "Markdown table with 5 columns (3 vocab columns + 1 non-monotonic-edge column + 1 iteration-delta-weight column) plus an explicit Weight Preservation Note section.",
+        "table_columns": [
+          {
+            "column_name": "auditor_vocab",
+            "values": ["BLOCKER", "MAJOR", "MINOR", "NIT", "INFO"],
+            "verdict_compute_weight_each": {"BLOCKER": -12, "MAJOR": -5, "MINOR": -2, "NIT": -0.5, "INFO": 0},
+            "additional_blocker_penalty": "BLOCKER applies its -12 plus an additional -12 flat penalty per occurrence (24 total per BLOCKER). Source: verdict_compute.py:97, :158-160.",
+            "intra_auditor_divergence_note": "review-architecture-auditor.md + review-cross-artifact-auditor.md emit BLOCKER/MAJOR/MINOR/INFO (no NIT); auditing-mcp SKILL.md uses BLOCKER/MAJOR/MINOR/NIT (no INFO). verdict_compute.py is the canonical union: BLOCKER/MAJOR/MINOR/NIT/INFO.",
+            "source_files": ["review-architecture-auditor.md:27", "review-cross-artifact-auditor.md:143-145", "auditing-mcp/SKILL.md:100-105", "auditing-cc-configs/scripts/verdict_compute.py:54-58"]
+          },
+          {
+            "column_name": "reviewer_vocab",
+            "values": ["critical", "important", "recommended"],
+            "definitions": {
+              "critical": "Issue blocks acceptance. Architecturally wrong, security-breaking, contract violation, or fundamentally infeasible. Cannot be deferred or accepted with conditions \\u2014 must be fixed.",
+              "important": "Issue should be fixed before approval but isn't architecturally fatal. Degrades score. Can be deferred only with explicit user approval + tracked ledger entry.",
+              "recommended": "Improvement suggestion. Non-blocking. Documents are approvable with `recommended` issues outstanding."
+            },
+            "source_file": ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md (pre-bridge content; bridge author appends bridge sections additively per OI-R2a-6)"
+          },
+          {
+            "column_name": "pv_vocab",
+            "values": ["blocking", "warning", "informational"],
+            "source_file": ".claude/agents/test-phase-validator-author.md (Phase 2 \\u2014 Severity rules section)",
+            "note": "Inlined in agent prompt (per parent Known Issue 3); not in a separate KB file."
+          },
+          {
+            "column_name": "non_monotonic_edges",
+            "purpose": "Captures cross-vocab mappings that are not strictly monotonic, with explicit rationale fields per edge. Bridge MUST surface (not collapse) these.",
+            "documented_edges": [
+              {
+                "edge_id": "NIT_vs_recommended",
+                "from_to": "auditor NIT \\u2194 reviewer recommended",
+                "auditor_NIT": "taste; -0.5 weight; verdict-impact minimal",
+                "reviewer_recommended": "non-blocking improvement; documents approvable with recommended outstanding",
+                "translation_difficulty": "NIT carries 'taste' framing (subjective); recommended carries 'improvement' framing (actionable). Auditor NIT often safely \\u2192 recommended, but reverse mapping (recommended \\u2192 NIT) loses actionability. Optional translator (auditing-shared/scripts/translate_severity.py) surfaces 'taste-vs-improvement' as an explicit rationale field."
+              },
+              {
+                "edge_id": "MAJOR_branching_PV",
+                "from_to": "auditor MAJOR \\u2192 pv {blocking, warning}",
+                "auditor_MAJOR": "should be fixed before approval; -5 weight; conditional_pass verdict if no BLOCKER",
+                "pv_blocking_vs_warning": "blocking = gate refuses to advance; warning = gate advances with note. MAJOR \\u2192 branch depends on whether PV's invariant is itself blocking-class (per FR-3 R2b).",
+                "translation_rule": "default MAJOR \\u2192 blocking; downgrade to warning only with explicit per-finding rationale stating why the PV-tier invariant is non-blocking."
+              },
+              {
+                "edge_id": "NIT_vs_INFO_intra_auditor",
+                "from_to": "auditing-mcp NIT \\u2194 architecture/cross-artifact INFO",
+                "auditing_mcp": "uses NIT (-0.5 weight)",
+                "architecture_cross_artifact": "use INFO (0 weight)",
+                "verdict_compute_canonical": "supports both NIT (-0.5) and INFO (0) as distinct values",
+                "bridge_recommendation": "preserve both; document NIT for taste/style and INFO for neutral observations (different intent). This is parent's Known Issue 2 \\u2014 documented rather than collapsed."
+              }
+            ]
+          },
+          {
+            "column_name": "iteration_delta_weight",
+            "purpose": "Preserves the SECOND severity-weight set used for review-iteration delta math, which conflicts with verdict-compute weights and MUST NOT be collapsed.",
+            "weights": {"BLOCKER": 10, "MAJOR": 3, "MINOR": 1, "INFO": 0},
+            "source_file": "review-cross-artifact-auditor.md:93",
+            "conflict_with_verdict_compute_weights": "verdict_compute.py uses {BLOCKER: -12, MAJOR: -5, MINOR: -2, NIT: -0.5, INFO: 0} for absolute verdict scoring; review-cross-artifact-auditor uses {BLOCKER: 10, MAJOR: 3, MINOR: 1, INFO: 0} for iteration-delta change-detection. Different mathematical roles; both must remain. The R2a graph surfaces this as a `conflicts_with` edge (E-0049 \\u2194 E-0046) that the bridge content MUST document, not collapse."
+          }
+        ],
+        "weight_preservation_note": {
+          "title": "Two Weight Sets \\u2014 Why Both Remain",
+          "content": "The bridge documents TWO distinct severity-weight mappings because they serve different mathematical roles: (1) verdict-compute weights (-12 / -5 / -2 / -0.5 / 0) drive absolute verdict scoring in verdict_compute.py \\u2014 they answer 'is this audit a PASS?'; (2) iteration-delta weights (10 / 3 / 1 / 0) drive severity-weighted count deltas across review iterations in review-cross-artifact-auditor.md:93 \\u2014 they answer 'did this iteration improve relative to the previous?'. Collapsing to one weight set would silently break the iteration-delta math (the inverse-sign relationship between absolute scoring and delta improvement is load-bearing). Documented, not reconciled. R2a graph edge: E-0049 conflicts_with E-0046 (claims C-0042, C-0043, C-0092, C-0094) \\u2014 surfaced explicitly here per the framer's note that 'collapsing would silently break iteration-delta verdict math'."
+        },
+        "nfr8_four_field_shape_co_located": {
+          "purpose": "Per ADR-0061, the bridge host file also documents the NFR-8 four-field finding shape that downstream FR-1/9/10 emitters use.",
+          "fields": ["rule", "target", "divergence", "next_action"],
+          "delta_from_existing_audit_issues_json": "NFR-8's four fields are NOT currently in audit-issues.json schema. design-composer adds these as new sub-fields under issues[] (additive). Parent's analysis confirmed schema-extension is structurally safe across the 12 known downstream consumers (codebase-analysis.json blast_radius_new_confirmations[2])."
+        },
+        "monotonic_mappings_for_reference": [
+          {"mapping": "BLOCKER \\u2194 critical \\u2194 blocking", "note": "Strictest tier in each vocabulary; consistent intent (gate-blocking)."},
+          {"mapping": "MINOR \\u2194 recommended \\u2194 warning", "note": "Lowest non-zero severity; consistent intent (non-blocking but actionable)."}
+        ],
+        "host_file_location": ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md (per ADR-0061). Additive to existing pre-bridge content (vocabulary definitions for critical/important/recommended, threshold mappings).",
+        "consumers": [
+          "20 agents load KB-review-disciplines (per codebase-analysis blast_radius_new_confirmations[4]) \\u2014 bridge visible to all automatically; no separate propagation work.",
+          "FR-1 finding emitters (review-architecture-auditor) reference bridge by name per ADR-0061 Implementation Guidance ('reference by name, not by copy').",
+          "FR-9 marker handling (orchestrator gating) consults bridge for severity vocabulary when emitting Blocks-X resolution events.",
+          "FR-10 audit rule emission references bridge for severity assignment on matrix-missing findings.",
+          "R2b consumers (FR-4, FR-5) inherit the populated bridge."
+        ]
+      },
+      "evidence_anchors": [
+        "C-0013 (KB-review-disciplines severity-taxonomy.md current state)",
+        "C-0022 (severity-vocabulary trifecta — auditor + reviewer + PV)",
+        "C-0023 / C-0024 (NFR-8 four-field shape co-located per ADR-0061)",
+        "C-0042 / C-0043 (verdict_compute weights vs iteration-delta weights conflict — the load-bearing graph edge)",
+        "C-0047 / C-0048 / C-0049 / C-0050 / C-0051 / C-0052 / C-0053 / C-0054 (reviewer-vocab definitions)",
+        "C-0055 (PV-vocab definitions inlined in test-phase-validator-author.md)",
+        "C-0056 / C-0057 / C-0058 (cross-vocab non-monotonic edge surface)",
+        "C-0079 / C-0080 (bridge sequencing — purely additive at HEAD, no collision)",
+        "C-0088 (cross-ADR references — ADR-0059, ADR-0061, ADR-0063 mutual)",
+        "C-0089 (severity-vocabulary trifecta canonical statement)",
+        "C-0092 / C-0094 (Open Question #2 surfaces — both weight sets must be documented)"
+      ],
+      "recommended_option": "preserve_both_weight_sets_with_explicit_documentation",
+      "rationale": "D-10 is content authoring, not option-choosing. The bridge mapping shape above is the substrate: a 5-column table (3 vocab + 1 non-monotonic edge + 1 iteration-delta weight) plus a Weight Preservation Note that documents both weight sets without collapsing them. The R2a graph's `conflicts_with` edge between E-0049 (iteration-delta weights) and E-0046 (verdict-compute weights) is load-bearing — collapsing would silently break iteration-delta verdict math. The 20-agent KB-review-disciplines consumer set means the bridge's correctness propagates broadly; design-composer's authoring discipline is the chokepoint. Non-monotonic edges are surfaced (not collapsed) per parent's Known Issue 2 resolution.",
+      "loss_summary": ["pattern_fidelity: none (each surface preserves its idiom; bridge is the translation reference)"],
+      "viable": true,
+      "deferred_to": "design-composer (ratifies bridge wording at Design Composition gate — cross-cuts layers per parent's D-10 routing)",
+      "open_sub_decision": "Optional translator at `auditing-shared/scripts/translate_severity.py` is named in ADR-0061 but not load-bearing for R2a; design-composer decides whether to author in this run or defer to first consumer FR's need."
+    },
+    {
+      "decision_id": "D-R2a-3",
+      "title": "FR-9 marker-parser realization location (OI-R2a-3)",
+      "status": "open_for_design_composition",
+      "options": [
+        {
+          "name": "shared_helper_in_auditing_shared_scripts",
+          "description": "New script `auditing-shared/scripts/parse_blocks_x_markers.py` exposing the canonical regex (per ADR-0063: `<!--\\s*BLOCKS:\\s*([a-z0-9-]+)-completion(?:\\s+\\u2014\\s+[^\\n]*)?\\s*-->`) as a reusable function. Consumers (orchestrator gating logic, review-architecture-auditor optional checks, future auditing-subagents rule, R2b FR-3 PV-tier invariants) all import/invoke via subprocess. Pattern matches existing auditing-shared scripts (log_state_transition.py, validate_adr_placement.py).",
+          "pros": [
+            "Reuse across multiple consumers — codebase researcher identified at least three prospective consumers (orchestrator gate, review-architecture-auditor, auditing-subagents rule) (C-0073).",
+            "auditing-shared is the canonical library-only home per ADR-0031 + ADR-0042 — fits established pattern.",
+            "Single source of truth for the regex; ADR-0063 grammar evolution updates one file.",
+            "Subprocess invocation pattern consistent with log_state_transition.py — reviewers/maintainers already understand the idiom.",
+            "Zero existing parser/regex infrastructure (C-0073, C-0074: grep returned no matches across auditing-shared, review-architecture-auditor, auditing-subagents) — this is greenfield placement with no extension constraint."
+          ],
+          "cons": [
+            "Single-sourced supporting claim (C-0073 in R2a corpus — codebase researcher's recommendation; no external corroboration).",
+            "Discipline-bound: the predicate is grep-checkable per NFR-9 but consuming agents must actually invoke it rather than reimplement.",
+            "Requires subprocess overhead on each invocation (~tens of ms; negligible relative to LLM call costs)."
+          ],
+          "evidence_anchors": ["C-0073 (researcher's recommendation; auditing-shared is the canonical library home)", "C-0074 (zero existing parser — greenfield)"],
+          "single_sourced_flag": true,
+          "preconditions": [
+            "New file `.claude/skills/auditing-shared/scripts/parse_blocks_x_markers.py` authored.",
+            "Function signature: `parse_blocks_x_markers(markdown_text: str) -> list[BlocksXMarker]` where BlocksXMarker is `{stage_slug: str, payload: str|None, line_number: int}`.",
+            "Subprocess CLI entry point for consumers that prefer subprocess over import.",
+            "Smoke test in `tests/` confirming parser handles ADR-0063 examples + the em-dash payload separator."
+          ],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "minor (subprocess invocation; <50ms per call)",
+            "maintenance_burden": "low (one file owns the regex)",
+            "irreversibility_cost": "low (two-way; consumers can inline the regex later if shared script proves over-engineered)"
+          },
+          "verdict": "recommended",
+          "researcher_alignment": "Re-affirms codebase researcher's recommendation. Reuse rationale is the load-bearing argument: multiple consumers (orchestrator + auditor + auditing-subagents + R2b consumers) all need the same regex; sharing it once minimizes drift surface."
+        },
+        {
+          "name": "inline_in_review_architecture_auditor_agent_prompt",
+          "description": "Embed parser regex/instructions inside `.claude/agents/review-architecture-auditor.md` prompt. LLM-side parsing using the regex inline in prompt instructions.",
+          "pros": [
+            "Single-file change; no new script convention.",
+            "Discoverable in the auditor's procedure phase directly."
+          ],
+          "cons": [
+            "Couples the parser to one agent — orchestrator gate (per ADR-0063 the orchestrator is the actual parser host) cannot reuse.",
+            "LLM-side regex execution is less deterministic than Python regex (LLM may interpret edge cases inconsistently).",
+            "Wastes the established auditing-shared scripts pattern (log_state_transition.py, etc.) which exists precisely for reusable predicates.",
+            "Doesn't serve R2b's prospective consumers (FR-3 PV-tier invariants may need the parser)."
+          ],
+          "evidence_anchors": ["C-0073 (researcher analysis flags this as 'works but couples parser to auditor agent; not reusable from execute-orchestrator')"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "none (no subprocess) but LLM-side parse non-determinism",
+            "maintenance_burden": "moderate (regex updates touch agent prompt)",
+            "irreversibility_cost": "moderate (extracting later requires touching all consumers)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Couples to one consumer; wastes the auditing-shared canonical-home pattern; LLM-side parse non-determinism is real for the em-dash payload edge cases."
+        },
+        {
+          "name": "inline_in_auditing_subagents_rule",
+          "description": "Implement parser as part of FR-10's new auditing-subagents rule script (per D-R2a-5 recommendation). Rule script reads markdown files and uses the regex inline.",
+          "pros": [
+            "Co-located with FR-10's audit predicate.",
+            "No new file outside auditing-subagents."
+          ],
+          "cons": [
+            "Wrong host per codebase researcher (C-0073): auditing-subagents audits `.claude/agents/*.md` quality; marker parsing is an orchestrator concern, not a sub-agent quality concern.",
+            "Orchestrator gate, review-architecture-auditor, R2b PV invariants cannot reuse.",
+            "Conflates two responsibilities (audit predicate logic + marker grammar parsing) in one script.",
+            "Schema mismatch: auditing-subagents scripts predicate on `.claude/agents/<file>.md` shape (C-0067), but parser is general-purpose."
+          ],
+          "evidence_anchors": ["C-0073 (researcher analysis flags auditing-subagents as 'wrong host \\u2014 auditing-subagents audits .claude/agents/*.md; marker parsing is an orchestrator concern, not a sub-agent quality concern')"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "minor",
+            "maintenance_burden": "moderate (responsibility-conflation)",
+            "irreversibility_cost": "moderate"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Wrong host per researcher; conflates two responsibilities; doesn't serve cross-consumer reuse."
+        }
+      ],
+      "recommended_option": "shared_helper_in_auditing_shared_scripts",
+      "rationale": "Re-affirms codebase researcher's recommendation. Reuse across multiple consumers (orchestrator gate, auditor, auditing-subagents rule, R2b PV invariants) is the load-bearing argument; auditing-shared is the established canonical-library-home pattern; greenfield placement (no extension constraint per C-0074) means clean separation. Single-sourced status (C-0073) is acknowledged but derives from inspectable codebase facts (zero existing parser; multiple prospective consumers).",
+      "loss_summary": ["pattern_fidelity: none (matches established auditing-shared library pattern)"],
+      "viable": true,
+      "single_sourced_decision_flag": true
+    },
+    {
+      "decision_id": "D-R2a-4",
+      "title": "FR-7 artifact location (OI-R2a-4)",
+      "status": "open_for_design_composition",
+      "options": [
+        {
+          "name": "section_embedded_in_synthesis_md",
+          "description": "FR-7's Skill-Coverage Decisions section is embedded as a new section template in synthesis.md (where decision candidates surface during Synthesis stage). The section is a markdown table with columns: concept | covering-skill | confidence | dogfood_decision | rationale (plus W/H/A sub-fields per D-8 for new-skill rows). Section template hosted at `.claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section.md`.",
+          "pros": [
+            "Surfaces in existing authoring workflow (synthesis.md is already authored every run) — zero discovery cost on authors.",
+            "Codebase researcher's recommendation (C-0069, C-0075, C-0076): no precedent for standalone artifact (find returned zero matches for skill-coverage*); embedded path has lower irreversibility.",
+            "Two-way reversible: if substance heuristic enforcement (D-8) later requires a more visible artifact, the embedded section can be promoted to standalone with mechanical migration.",
+            "Locality of context: synthesis is where domain concepts are first surfaced; capturing skill-coverage decisions in the same artifact preserves authoring locality.",
+            "KB-documentation-criteria already hosts other shared section templates (per parent codebase-analysis blast_radius), so the template-host pattern is established."
+          ],
+          "cons": [
+            "Embed risks dilution \\u2014 section may be skimmed under template clutter in a multi-section synthesis.md.",
+            "If multiple stages need to update skill-coverage decisions (synthesis surfaces candidates; design composition resolves), the embedded section may need cross-stage edit discipline.",
+            "Less greppable than a standalone artifact (must grep within synthesis.md, not for a file name)."
+          ],
+          "evidence_anchors": ["C-0069 (FR-7 mandate surface)", "C-0075 (codebase researcher recommendation; standalone has no precedent)", "C-0076 (zero existing skill-coverage* files)", "C-0083 (skill-coverage decision concept)", "C-0090 (KB-documentation-criteria template host)", "C-0093 (PRD Open Question #1)"],
+          "preconditions": [
+            "New section template at `.claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section.md`.",
+            "synthesize agent's synthesis.md template references the new section template.",
+            "D-8's hybrid mandate text scoped within the section template (mandate three labelled headings for new-skill rows; substance heuristic for existing-skill rows)."
+          ],
+          "cost": {
+            "effort_weeks": 1.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low (one template file; one synthesis.md reference)",
+            "irreversibility_cost": "low (two-way reversible — can promote to standalone artifact later if discovery-cost evidence is collected)"
+          },
+          "verdict": "recommended",
+          "researcher_alignment": "Re-affirms codebase researcher's recommendation per C-0069 / C-0075 / C-0076. The lower-irreversibility path is correct for a novel codification (genesis stage per D-8 framer notes); start embedded, observe, promote if needed."
+        },
+        {
+          "name": "standalone_file_skill_coverage_decisions_md",
+          "description": "FR-7's section is a standalone file at `working/feature/<slug>/skill-coverage-decisions.md`. Authors create the file as part of synthesis output.",
+          "pros": [
+            "Highly greppable (file name + standardized location).",
+            "Visible audit anchor: missing-file is mechanically detectable.",
+            "Bypasses the embed-dilution risk."
+          ],
+          "cons": [
+            "Discovery burden: authors must learn a new file convention (no precedent in working/feature/* per C-0076).",
+            "Higher irreversibility: once authors are trained on the standalone artifact, walking back to embedded requires migration of all existing files.",
+            "Adds a new artifact to the feature-directory shape \\u2014 competes with FR-11's posture of minimizing post-ship rituals."
+          ],
+          "evidence_anchors": ["C-0076 (zero existing standalone artifact \\u2014 greenfield)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 2,
+            "runtime_overhead": "none",
+            "maintenance_burden": "moderate (new file convention to teach)",
+            "irreversibility_cost": "moderate-high (training cost + migration cost)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Greenfield artifact convention with no precedent (C-0076). Embedded path is lower-irreversibility per researcher; only justified if substance-enforcement evidence later proves embed-dilution is breaking the principle. Reversibility-first stance preferred for novel codification."
+        },
+        {
+          "name": "section_embedded_in_cc_design_md_or_blueprint",
+          "description": "Embed in cc-design.md (where design-cc resolves concepts to skills) or blueprint.md (where design-composer arbitrates).",
+          "pros": [
+            "Locates section closer to the resolution point (Design Composition rather than Synthesis).",
+            "design-composer is the natural authority on cross-cutting skill-coverage decisions."
+          ],
+          "cons": [
+            "Loses synthesis-stage locality \\u2014 candidates surface during Synthesis but resolution happens later. Embedding in cc-design.md misses the candidate-surfacing window.",
+            "Doesn't serve the D-5 advisory predicate (which needs the table at the moment FR-6 matrix-mandatory check fires \\u2014 at Design Composition gate, when synthesis.md has already been authored).",
+            "Codebase researcher's recommendation (C-0069 / C-0075) prefers synthesis embed."
+          ],
+          "evidence_anchors": ["C-0075 (researcher recommends synthesis embed; cc-design/blueprint are listed as alternatives)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 1.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Synthesis-stage locality is the right authoring window per researcher; cc-design or blueprint host misses the candidate-surfacing window."
+        }
+      ],
+      "recommended_option": "section_embedded_in_synthesis_md",
+      "rationale": "Re-affirms codebase researcher's recommendation. Surfaces in existing authoring workflow (zero discovery cost); two-way reversible; codebase has no precedent for standalone artifact (C-0076), so embed is the lower-irreversibility path for a novel codification. Couples cleanly with D-5 (advisory predicate scans synthesis.md table) and D-8 (W/H/A mandate scoped within the section template).",
+      "loss_summary": ["pattern_fidelity: none (matches established section-template pattern in KB-documentation-criteria)"],
+      "viable": true,
+      "cross_decision_dependency": "Couples to D-5 (predicate reads from synthesis.md table) and D-8 (section template scopes the W/H/A mandate)."
+    },
+    {
+      "decision_id": "D-R2a-5",
+      "title": "FR-10 audit rule realization (OI-R2a-5)",
+      "status": "open_for_design_composition",
+      "options": [
+        {
+          "name": "add_new_rule_entry_sa_nn_and_new_script",
+          "description": "Add a new SA-NN rule entry under `.claude/skills/auditing-subagents/SKILL.md` plus a new script at `.claude/skills/auditing-subagents/scripts/audit_feature_touch_coverage.py`. The script accepts a feature slug parameter (new signature shape relative to existing scripts that take `.claude/agents/<file>.md`) and reads from `working/feature/<slug>/cc-design.md` plus the agent-roster-impact-matrix.md (if present).",
+          "pros": [
+            "Discoverability: new rule shows up under the established SA-NN sequence (reviewers know to look in SKILL.md for auditing-subagents rules).",
+            "Clean separation: zero existing rules predicate on 'feature working directory shape' (C-0066, C-0078: grep over auditing-subagents for `working/feature`/`working-directory` returned zero matches).",
+            "Script signature mismatch is load-bearing: new script accepts feature-slug parameter (C-0067), which differs from existing scripts' `.claude/agents/<file>.md` shape. Extending an existing rule would distort its contract.",
+            "Two-way reversible: a new rule can be retired without touching other rules' predicates.",
+            "Matches established auditing-subagents pattern (one rule entry + one script per check)."
+          ],
+          "cons": [
+            "New rule increases rule count \\u2014 minor discipline-tracking cost.",
+            "Reviewers must learn one more SA-NN entry."
+          ],
+          "evidence_anchors": ["C-0066 (FR-10 audit dimension)", "C-0067 (script signature mismatch with existing scripts)", "C-0077 (auditing-subagents rule registry)", "C-0078 (zero existing predicate on working/feature/ shape \\u2014 greenfield)", "C-0086 (matrix-missing audit rule pattern)"],
+          "preconditions": [
+            "New SA-NN entry added to `.claude/skills/auditing-subagents/SKILL.md`.",
+            "New script `audit_feature_touch_coverage.py` accepting `--feature-slug` parameter.",
+            "Script reads `working/feature/<slug>/cc-design.md` and `working/feature/<slug>/agent-roster-impact-matrix.md` (if present per FR-6's matrix mandate).",
+            "Predicate: 'if cc-design.md exists AND any FR-6 trigger condition fires (per D-5's advisory predicate), then agent-roster-impact-matrix.md MUST be present and the matrix MUST list at least the agents named in trigger evaluation'.",
+            "Severity emission references the D-10 bridge by name."
+          ],
+          "cost": {
+            "effort_weeks": 1.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low (one script + one SA-NN entry)",
+            "irreversibility_cost": "low (two-way reversible)"
+          },
+          "verdict": "recommended",
+          "researcher_alignment": "Re-affirms codebase researcher's recommendation. Three converging codebase facts (C-0066, C-0067, C-0078) all point one way; discoverability rationale closes the case."
+        },
+        {
+          "name": "extend_existing_auditing_subagents_rule_with_sub_predicate",
+          "description": "Bolt the matrix-missing predicate onto an existing SA-NN rule as a sub-predicate. Compresses code surface but conflates audit dimensions.",
+          "pros": [
+            "Lower rule-count growth (one rule, two predicates).",
+            "Single rule entry to maintain."
+          ],
+          "cons": [
+            "Script signature mismatch (C-0067): no existing script accepts feature-slug parameter; bolting on means either adding parameter to an existing script (touches all callers) or adding a script that the rule entry dispatches to conditionally (defeats the simplification).",
+            "Conflates two audit dimensions in one rule \\u2014 future readers can't distinguish 'predicate fires for agent-file shape issue' from 'predicate fires for matrix-missing'.",
+            "Risk of silently breaking existing consumers if predicate shape mutates.",
+            "Discoverability harm: new audit dimension is hidden inside an existing rule entry."
+          ],
+          "evidence_anchors": ["C-0067 (script signature mismatch)", "C-0078 (zero existing predicate on working/feature/ shape)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "moderate (conflation grows over time)",
+            "irreversibility_cost": "moderate (separating later requires rule-renumbering)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Three converging codebase facts (C-0066, C-0067, C-0078) all argue against. Compresses code surface at cost of audit-dimension conflation and discoverability."
+        }
+      ],
+      "recommended_option": "add_new_rule_entry_sa_nn_and_new_script",
+      "rationale": "Re-affirms codebase researcher's recommendation. Discoverability under SA-NN sequence + clean separation (no existing rule predicates on feature working directory shape per C-0078) + script signature mismatch (C-0067) all argue for the new rule. Reversibility cost is symmetric; extending an existing rule offers no real economy because the new script signature differs from existing-script shape regardless.",
+      "loss_summary": ["pattern_fidelity: none (matches one-rule-one-script pattern)"],
+      "viable": true,
+      "cross_decision_dependency": "Couples to D-5 (predicate the new rule invokes), D-R2a-3 (if shared marker-parser script is used by this rule), D-10 (severity emission references bridge)."
+    },
+    {
+      "decision_id": "D-R2a-6",
+      "title": "Plan-stage sequencing — severity-bridge content before FR-1/9/10 consumers (OI-R2a-6)",
+      "status": "open_for_plan_authoring",
+      "options": [
+        {
+          "name": "bridge_content_first_then_fr1_fr9_fr10_emitters",
+          "description": "Plan-stage sequencing authors D-10 severity bridge content first (additive edits to `.claude/skills/KB-review-disciplines/references/severity-taxonomy.md` per ADR-0061 / inherited host). Once bridge content is in place, FR-1 / FR-9 / FR-10 emitter sections that cite the bridge by name (per ADR-0061 'reference by name, not by copy') are authored against real content rather than placeholders.",
+          "pros": [
+            "Consumers reference real content, not placeholder \\u2014 no risk of placeholder citations leaking into shipped artifacts.",
+            "Bridge content is purely additive at HEAD (C-0079, C-0080: `git diff --stat` on severity-taxonomy.md returned empty) \\u2014 no collision surface to manage during sequencing.",
+            "Forces design-composer to ratify bridge wording (D-10 deferred to design-composer) early, which de-risks downstream consumer authoring.",
+            "Matches the natural dependency direction in the R2a graph: D-10 bridge is consumed by FR-1 / FR-9 / FR-10 emitters per codebase-analysis blast_radius_new_confirmations[4]."
+          ],
+          "cons": [
+            "Bridge content authoring (D-10) is in design-composer's queue; if composer is bottlenecked, downstream FR sections wait.",
+            "Plan-stage owner (plan-author) must enforce the sequencing discipline; no mechanical gate."
+          ],
+          "evidence_anchors": ["C-0079 (purely additive at HEAD)", "C-0080 (no collision surface)"],
+          "preconditions": [
+            "Plan sequence Phase A: D-10 bridge content authored in severity-taxonomy.md (design-composer).",
+            "Plan sequence Phase B: FR-1 audit-issues.json schema extension (review-architecture-auditor.md) cites bridge by name.",
+            "Plan sequence Phase C: FR-9 marker-parser realization (auditing-shared/parse_blocks_x_markers.py) cites bridge for severity assignment on parse-failure / payload-malformed findings.",
+            "Plan sequence Phase D: FR-10 audit rule (auditing-subagents/audit_feature_touch_coverage.py) cites bridge for matrix-missing finding severity."
+          ],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "n/a",
+            "maintenance_burden": "n/a (sequencing decision, not implementation)",
+            "irreversibility_cost": "low (two-way; can re-sequence if bottleneck observed)"
+          },
+          "verdict": "recommended",
+          "synthesis_recommendation": "This synthesis recommends Option (a) per codebase researcher's lean (C-0079, C-0080) and per the natural dependency direction. Plan author finalizes."
+        },
+        {
+          "name": "fr_sections_first_with_bridge_placeholders_then_back_fill",
+          "description": "FR-1 / FR-9 / FR-10 emitter sections authored first with `[BRIDGE-CITATION-PENDING]` placeholders for severity vocabulary. Plan back-fills with real bridge content once D-10 is authored.",
+          "pros": [
+            "Parallelism: design-cc work on FR sections can proceed without waiting for D-10 bridge ratification.",
+            "Plan author has discipline machinery (back-fill task entries) to enforce the closure."
+          ],
+          "cons": [
+            "Discipline risk: if back-fill task is missed, placeholders leak into shipped artifacts \\u2014 exactly the failure mode FR-1's design-realization audit is designed to catch (ironic if R2a's own deliverables exhibit it).",
+            "Authors must context-switch back to FR sections after D-10 completes, increasing cognitive cost.",
+            "Plan-stage owner must enforce back-fill mechanically (e.g., grep for `BRIDGE-CITATION-PENDING` at Plan completion gate)."
+          ],
+          "evidence_anchors": ["C-0079 (no collision, so placeholders are technically safe)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "n/a",
+            "maintenance_burden": "moderate (back-fill discipline)",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Discipline risk \\u2014 R2a's own deliverables exhibiting the failure mode FR-1 is designed to catch would be the worst possible dogfood signal. Sequencing cost is so low (bridge content is short; additive; no collision) that parallelism gains don't justify the discipline risk."
+        },
+        {
+          "name": "parallel_with_stub_bridge",
+          "description": "Plan authors a minimal stub bridge (vocab columns populated; non-monotonic edges deferred) in parallel with FR sections. Bridge is finalized after FR sections are drafted; stub citations carry forward.",
+          "pros": [
+            "Maximum parallelism.",
+            "Stub bridge is enough for FR sections to cite by name without placeholders."
+          ],
+          "cons": [
+            "Stub-to-final transition can leak inconsistencies if reviewers approve FR sections against stub content that the final bridge subsequently revises.",
+            "D-10's load-bearing content (non-monotonic edges, two weight sets) is exactly what gets deferred in the stub \\u2014 the parts that need the most ratification get the least authoring time.",
+            "Adds Plan complexity (two-phase bridge authoring) for marginal parallelism gain."
+          ],
+          "evidence_anchors": ["C-0079"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "n/a",
+            "maintenance_burden": "moderate (two-phase coordination)",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Defers the load-bearing parts of D-10 (non-monotonic edges, two weight sets) to the back-end of the sequence; FR sections may be approved against the parts of the bridge that don't matter and re-litigated against the parts that do."
+        }
+      ],
+      "recommended_option": "bridge_content_first_then_fr1_fr9_fr10_emitters",
+      "rationale": "Codebase researcher confirmed bridge content is purely additive (C-0079, C-0080) \\u2014 no collision penalty for sequencing it first. Consumers reference real content rather than placeholders, eliminating the discipline risk that would undermine R2a's dogfood signal (FR-1 audit catching its own placeholders would be the worst outcome). Plan author finalizes; this synthesis recommends Option (a).",
+      "loss_summary": ["n/a (sequencing decision; no implementation choice)"],
+      "viable": true,
+      "deferred_to": "plan-author (sequencing decision owner per framer)"
+    }
+  ],
+  "summary": {
+    "total_options_enumerated": 24,
+    "per_decision_option_count": {
+      "D-1": 0,
+      "D-3": 3,
+      "D-4": 0,
+      "D-5": 3,
+      "D-6": 0,
+      "D-8": 3,
+      "D-10": 0,
+      "D-R2a-3": 3,
+      "D-R2a-4": 3,
+      "D-R2a-5": 2,
+      "D-R2a-6": 3
+    },
+    "per_decision_option_count_note": "D-1, D-4, D-6 are CLOSED (by inherited ADR or user decision) and record closure in a single summary_paragraph without option enumeration per orchestrator discipline. D-10 is partially-closed (host inherited; content authored here) and substrate is a bridge mapping shape, not an option-choice \\u2014 zero options enumerated by design.",
+    "decisions_closed_by_inherited_adr": ["D-1 (ADR-0059)", "D-4 (ADR-0063)"],
+    "decisions_closed_by_user": ["D-6 (user split decision at parent Gate 4)"],
+    "decisions_partially_closed": ["D-10 (host inherited; content authored as bridge mapping shape)"],
+    "decisions_open_with_recommendation": ["D-3", "D-5", "D-8", "D-R2a-3", "D-R2a-4", "D-R2a-5", "D-R2a-6"],
+    "recommendation_divergence_from_framer_lean": [],
+    "recommendation_divergence_note": "All 7 open-decision recommendations match the framer's recorded lean (D-3, D-5, D-8 re-affirm parent leans; D-R2a-3, D-R2a-4, D-R2a-5 re-affirm codebase researcher's leans; D-R2a-6 re-affirms researcher's lean and the synthesizer-side recommendation noted in the framer prompt).",
+    "single_sourced_decisions_flagged": ["D-3 (C-0072 only; investigation deferred this run)", "D-R2a-3 (C-0073 only; codebase researcher recommendation derives from inspectable codebase facts \\u2014 zero existing parser per C-0074)"],
+    "cross_decision_dependencies": [
+      "D-5 \\u2194 D-8: predicate scores shape; human scores substance.",
+      "D-R2a-4 \\u2194 D-5: predicate reads from synthesis.md embedded table.",
+      "D-R2a-4 \\u2194 D-8: section template scopes the W/H/A mandate.",
+      "D-R2a-3 \\u2194 D-R2a-5: shared marker-parser script may be invoked by FR-10 audit rule.",
+      "D-R2a-5 \\u2194 D-10: matrix-missing finding severity emission references bridge.",
+      "D-10 \\u2194 D-R2a-6: bridge content first, then consumers (FR-1, FR-9, FR-10) cite by name.",
+      "D-R2a-6 sequences the entire R2a Plan: D-10 bridge content authoring is Phase A; D-R2a-3 / D-R2a-5 realization is Phase C/D after FR sections reference real bridge content."
+    ],
+    "graph_structural_observations": [
+      "FR-7 (E-0003) is the heaviest node with 23 claim back-pointers \\u2014 D-8 framing choice ripples through FR-7 ACs, dogfood validation, and consumer expectations. Substance-heuristic-with-new-skill-mandate hybrid is the risk-mitigation response.",
+      "E-0049 (iteration-delta weights) conflicts_with E-0046 (verdict-compute weights) \\u2014 D-10 bridge content MUST document both weight sets, not collapse. This is the load-bearing graph edge for D-10's substrate.",
+      "20 agents load KB-review-disciplines (per codebase-analysis blast_radius_new_confirmations[4]) \\u2014 D-10 bridge propagates broadly with no separate review surface; design-composer authoring discipline is the chokepoint."
+    ]
+  }
+}

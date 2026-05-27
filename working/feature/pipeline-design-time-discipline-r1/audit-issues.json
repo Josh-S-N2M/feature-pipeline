@@ -1,0 +1,68 @@
+{
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "audit_run_timestamp": "2026-05-27T19:26:56Z",
+  "sa14_verdict": "PASS",
+  "sa14_raw_output": {
+    "sa14_status": "clean",
+    "feature_slug": "pipeline-design-time-discipline-r1",
+    "matrix_path": "working/feature/pipeline-design-time-discipline-r1/agent-roster-impact-matrix.md",
+    "agent_count_expected": 37,
+    "row_count_observed": 37,
+    "findings": [],
+    "verdict": "PASS",
+    "elapsed_ms": 99
+  },
+  "sa14_findings": [],
+  "phase_quality_open_items_carried": [
+    {
+      "id": "I-PQ-P4-002",
+      "phase": "P4",
+      "severity": "MINOR",
+      "target": ".claude/agents/discovery-codebase-researcher.md",
+      "description": "Missing MCP init section per ADR-0040. The agent file does not include the required always-on MCP initialization section documented in ADR-0040 (narrowed always-on, 5-agent canonical list).",
+      "next_action": "Add the ADR-0040-compliant MCP init section to discovery-codebase-researcher.md before next agent update cycle."
+    },
+    {
+      "id": "I-PQ-P5-002",
+      "phase": "P5",
+      "severity": "MINOR",
+      "target": "working/feature/pipeline-design-time-discipline-r1/phase-validators.md",
+      "description": "PV-3.C2 lists TRIGGER_OVERRIDE under FR-9 Blocks-X. TRIGGER_OVERRIDE is actually within ADR-0064 scope, not FR-9 Blocks-X grammar scope. The cross-reference in the phase-validators table is misattributed.",
+      "next_action": "Correct PV-3.C2 attribution: move TRIGGER_OVERRIDE reference from FR-9 Blocks-X column to ADR-0064 column in the phase-validators table. Cosmetic correction; no behavioral impact."
+    },
+    {
+      "id": "I-PQ-P6-002",
+      "phase": "P6",
+      "severity": "NOTE",
+      "target": "working/feature/pipeline-design-time-discipline-r1/synthesis/synth-synthesizer.md",
+      "description": "Sub-section physical placement is cosmetically off. A sub-section appears outside its logical parent heading, creating an asymmetric document structure that may confuse downstream readers.",
+      "next_action": "Reorder the sub-section under its correct parent heading. Cosmetic only; no content change required."
+    },
+    {
+      "id": "I-PQ-P7-001",
+      "phase": "P7",
+      "severity": "NOTE",
+      "target": ".claude/skills/auditing-subagents/examples/good-subagent-annotated.md",
+      "description": "Line 89 contains a stale SA-1-through-SA-12 reference. The example fixture references the rule range SA-1..SA-12 but the catalog now extends through SA-14 (and SA-13 / SA-14 were added in this feature run). The stale range undercounts the catalog.",
+      "next_action": "Update line 89 to reference SA-1-through-SA-14 (or the current catalog end). Cosmetic fixture update; no audit logic change required."
+    },
+    {
+      "id": "I-PQ-P8-001",
+      "phase": "P8",
+      "severity": "MINOR",
+      "target": ".claude/skills/auditing-subagents/SKILL.md",
+      "description": "SA-14 reference documentation lag. The SKILL.md still describes the first-table parser behavior (pre-T7.1 patch), and 2 new rule constants (RULE_TABLE_NOT_FOUND, RULE_TABLE_AMBIGUOUS) added during the cycle-0-to-cycle-1 fix are undocumented in the reference section.",
+      "next_action": "Update SA-14 entry in SKILL.md to: (a) describe the multi-table scanner behavior, (b) document RULE_TABLE_NOT_FOUND and RULE_TABLE_AMBIGUOUS as new rule constants with their semantics and exit codes."
+    }
+  ],
+  "dogfood_validation_evidence": {
+    "narrative": "Phase 8 SA-14 cycle 0 returned FAIL on R2a's own matrix due to parser defect in T7.1's deliverable; cycle-1 cross-task patch fixed the defect; SA-14 re-run PASS. R2a's discipline caught a real bug in R2a's own machinery — exactly the recurrence-risk-cancellation the central thesis promised.",
+    "smoke_test_count": "6/6 (including new multi-table regression fixture F)",
+    "cycle_0_verdict": "FAIL",
+    "cycle_0_root_cause": "audit_feature_touch_coverage.py first-table parser selected a 2-column preamble table instead of the canonical 5-column matrix table, producing a false RULE_TABLE_NOT_FOUND finding",
+    "cycle_1_fix": "T7.1 patched to multi-table scanner (_collect_all_tables) with canonical-header matching (_is_canonical_matrix_table); regression fixture F (multi-table document) added to smoke suite",
+    "cycle_1_verdict": "PASS",
+    "agents_audited": 37,
+    "findings_after_fix": 0
+  }
+}
