@@ -1,0 +1,1 @@
+- [ADR machinery source clusters](reference_adr_machinery_sources.md) — for ADR-as-policy / verification topics, these search patterns surface primary-source-quality material in one pass.

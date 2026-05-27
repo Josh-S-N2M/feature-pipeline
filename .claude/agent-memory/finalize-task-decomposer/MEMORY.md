@@ -1,0 +1,1 @@
+- [Eat-own-dogfood edge pattern](eat-own-dogfood-edge-pattern.md) — Dogfood deliverable depends on contract-establishment tasks, NOT on contract-audit tasks. The audit consumes the dogfood at rollout.
