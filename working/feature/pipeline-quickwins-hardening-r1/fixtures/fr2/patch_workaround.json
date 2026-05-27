@@ -1,0 +1,19 @@
+{
+  "_fixture_id": "patch_workaround",
+  "_description": "PATCH scope, one stage has parent-driven-workaround. Expected: self-check passes.",
+  "scope_class": "PATCH",
+  "stages": [
+    {
+      "stage_name": "intent_clarification",
+      "checkpoint": {
+        "execution_mode": "specialist-dispatch"
+      }
+    },
+    {
+      "stage_name": "prd_authoring",
+      "checkpoint": {
+        "execution_mode": "parent-driven-workaround"
+      }
+    }
+  ]
+}

@@ -3,11 +3,13 @@
 audit_op7_events_schema.py — OP-7 mcp-events.jsonl schema conformance.
 
 Verifies each line in .claude/runtime/mcp-events.jsonl conforms to ADR-0037
-schema. Three event types:
+schema. Four event types:
   - install_complete: {event, timestamp, server, install_method, version, duration_ms, status}
   - readiness_probe:  {event, timestamp, server, probe_method, latency_ms, status}
   - structured_failure: {event, timestamp, server, failure_layer, primary_degraded, fallback_invoked,
                          fallback_server, redaction_applied, message}
+  - calibration_result: {event, timestamp, server, mechanism, version, duration_ms, outcome,
+                         signals, note}   (ADR-0058; FR-4b emission)
 
 Each record MUST be valid JSON on its own line. Records may carry optional fields
 (e.g., redaction_applied annotation per OP-6).
@@ -24,6 +26,18 @@ REQUIRED_FIELDS = {
     "install_complete": {"event", "timestamp", "server", "install_method", "version", "status"},
     "readiness_probe": {"event", "timestamp", "server", "probe_method", "status"},
     "structured_failure": {"event", "timestamp", "server", "failure_layer", "message"},
+    # ADR-0058 / FR-4b: gitnexus grammar-skip calibration signal
+    "calibration_result": {
+        "event",
+        "timestamp",
+        "server",
+        "mechanism",
+        "version",
+        "duration_ms",
+        "outcome",
+        "signals",
+        "note",
+    },
 }
 
 VALID_EVENT_TYPES = set(REQUIRED_FIELDS.keys())
@@ -88,6 +102,21 @@ def main() -> int:
                 "missing_fields": sorted(missing),
                 "message": f"record missing required fields for {event}",
             })
+
+        if event == "calibration_result" and not missing:
+            valid_outcomes = {"pass", "fail", "drift_detected"}
+            outcome_val = rec.get("outcome")
+            if outcome_val not in valid_outcomes:
+                findings.append({
+                    "rule": "OP-7",
+                    "severity": "MAJOR",
+                    "line": idx,
+                    "event": event,
+                    "message": (
+                        f"calibration_result outcome must be one of "
+                        f"{sorted(valid_outcomes)}, got: {outcome_val!r}"
+                    ),
+                })
 
     out = {
         "rule": "OP-7",

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "actionlint-mcp": {
+      "command": "actionlint-mcp",
+      "args": []
+    },
+    "gitnexus": {
+      "command": "npx",
+      "args": ["-y", "gitnexus@${GITNEXUS_TAG}", "mcp"],
+      "env": {
+        "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1"
+      }
+    }
+  }
+}

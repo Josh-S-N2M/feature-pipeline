@@ -1,0 +1,9 @@
+{
+  "verdict": "rejected",
+  "findings": [
+    {
+      "severity": "BLOCKER",
+      "message": "Required field 'derived_from' is missing."
+    }
+  ]
+}

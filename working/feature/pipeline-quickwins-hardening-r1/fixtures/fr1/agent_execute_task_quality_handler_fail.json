@@ -1,0 +1,9 @@
+{
+  "verdict": "APPROVED",
+  "findings": [
+    {
+      "severity": "BLOCKER",
+      "message": "Blocking finding alongside approving verdict."
+    }
+  ]
+}

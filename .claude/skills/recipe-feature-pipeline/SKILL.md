@@ -189,8 +189,53 @@ When a transition must be re-emitted — typically because the reconciler reclas
    - `output_path` — `working/feature/<slug>/intent-clarification.md`.
    - `slug`, `prior_context` (empty on fresh run).
 2. After write, invoke `shared-document-reviewer` with `doc_type: IntentClarification` and `target_path: working/feature/<slug>/intent-clarification.md`.
+   - After `shared-document-reviewer` returns its output, invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/intent-clarification-review.json shared-document-reviewer`. On exit 0, proceed with normal verdict handling. On exit 1, the orchestrator HALTS — `shared-document-reviewer` declared an approving verdict alongside a blocking finding, which is the FR-1 structural failure; surface the four FR-6 diagnostic fields to the operator and require the reviewer to re-emit its output with consistent verdict-vs-findings shape before advancing. On exit 2 (internal error), surface the error and treat it as transient; one retry permitted before escalating.
 3. If reviewer's Gate 0 or Gate 1 fails: re-invoke `intake-intent-clarifier` with `review_feedback` populated. Re-review. If 4th iteration without pass: surface to user.
 4. After reviewer pass: **Gate 1 (Intent Confirmation)** — present the intent-clarification.md to the user via the conversation; require explicit approval to advance. Update `checkpoint.gate_history`.
+
+### scope_class early read (after Stage 1, before Stage 2)
+
+After Stage 1 completes and Gate 1 passes, the orchestrator reads `scope_class` from `working/feature/<slug>/intent-clarification.md`'s frontmatter. This is the earliest point at which `scope_class` is available: it is a Stage 1 output (the `intake-intent-clarifier` writes `scope_class:` into the intent-clarification.md frontmatter per ADR-0023's FULL / MINOR / PATCH taxonomy). The early read is placed here — not at the start of orchestration — because Stage 1 produces the artifact that carries the field (synthesis D-0003 reinterpretation, cc-design Q-CC-6).
+
+If `prd-v<N>.md` is also present (re-run or resume scenario), the orchestrator confirms that its `scope_class:` frontmatter agrees with intent-clarification.md's value. A mismatch is surfaced to the user before advancing; it indicates an inconsistency that should be resolved manually rather than silently overridden.
+
+This early read serves two consumers:
+
+- **FR-2 dispatch self-check** (added in the pipeline-quickwins-hardening-r1 feature, in the Execution Phase Dispatch section): reads `scope_class` to gate whether `parent-driven-workaround` execution mode is acceptable. FULL-scope runs refuse to enter the dispatch loop if any stage carries `execution_mode == parent-driven-workaround`; MINOR and PATCH scopes permit single-agent-fallback.
+- **Stage 13 (Deliverable Packaging)**: the `finalize-deliverable-packager` receives `scope_class` as an input parameter. That late read is preserved in place (Step 14 below) per synthesis D-0003 reinterpretation noted as Q-CC-6 in the Blueprint — the Stage 13 consumer is independently legitimate; this hoist does not replace it.
+
+### FR-2 dispatch self-check (after scope_class read, before Stage 2)
+
+Immediately after reading `scope_class` above, the orchestrator performs the FR-2 dispatch self-check before advancing to Stage 2. This check runs once per orchestration entry — not once per task — so its overhead is negligible (NFR-2 target: p95 ≤ 100 ms). References: PRD §FR-2 (AC-FR-2-a..f), Blueprint v2.3 §AC-CC-2-a..g, ADR-0057 (closed enum + absence-default rule).
+
+**What the self-check reads.**
+For every stage in the feature's stage graph, the orchestrator reads the stage's `checkpoint.execution_mode` value. This field carries the closed enum defined in ADR-0057: `specialist-dispatch` (the ADR-0044 end-state pattern) or `parent-driven-workaround` (the pre-ADR-0044 historical fallback). Absence of the field on a pre-feature checkpoint is treated as `specialist-dispatch` per ADR-0057's absence-default rule — this is the backward-compatible safe default for checkpoints written before this field was formalized.
+
+**Gate logic.**
+
+- If `scope_class == FULL`:
+  - Enumerate every stage's `execution_mode` value (applying absence-default where the field is missing).
+  - If any stage has `execution_mode == parent-driven-workaround`: **refuse to enter the dispatch loop** and surface a structured diagnostic with the four FR-6 fields:
+    - `mechanism`: `"FR-2 dispatch self-check"`
+    - `offending_artifact`: the name of the stage carrying `execution_mode: parent-driven-workaround`
+    - `rule_violated`: `"FULL-scope features prohibit parent-driven-workaround execution mode per PRD §FR-2 and ADR-0057"`
+    - `remedial_hint`: `"either change scope_class to MINOR/PATCH OR reconfigure the stage to specialist-dispatch"`
+  - If all stages have `execution_mode == specialist-dispatch` (or absence-default): pass through; continue to Stage 2.
+
+- If `scope_class == MINOR` or `scope_class == PATCH`:
+  - All stages may carry either `specialist-dispatch` or `parent-driven-workaround`. No refusal is raised. Pass through; continue to Stage 2.
+
+**Fail-closed behavior.** If `intent-clarification.md` is missing or its `scope_class:` frontmatter is unparseable when the self-check reads it, treat the run as failed-closed: emit a diagnostic naming the missing or unparseable file and halt. Do not silently skip the self-check (AC-CC-2-f).
+
+**Determinism.** Two successive self-check runs against the same `intent-clarification.md` and the same `checkpoint.json` must produce the same verdict and the same diagnostic (AC-CC-2-e).
+
+**Scope-class permissibility summary.**
+
+| scope_class | all stages `specialist-dispatch` | any stage `parent-driven-workaround` |
+|---|---|---|
+| FULL | pass | refuse + diagnostic |
+| MINOR | pass | pass |
+| PATCH | pass | pass |
 
 ### Step 3 — Stage 2: PRD Authoring
 
@@ -199,6 +244,7 @@ When a transition must be re-emitted — typically because the reconciler reclas
    - `output_path` — `working/feature/<slug>/prd-v1.md` (or next version).
    - On re-author after reconciliation: `prior_prd_path` + `review_feedback`.
 2. Invoke `shared-document-reviewer` with `doc_type: PRD`.
+   - After `shared-document-reviewer` returns its output, invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/prd-review.json shared-document-reviewer`. On exit 0, proceed with normal verdict handling. On exit 1, the orchestrator HALTS — the reviewer declared an approving verdict alongside a blocking finding (FR-1 structural failure); surface the FR-6 diagnostic fields to the operator; the reviewer must re-emit consistent output before the orchestrator advances. On exit 2 (internal error), surface the error and allow one retry before escalating.
 3. If Gate 0 fails: re-invoke `intake-prd-author`. If Gate 1 fails: dispatch to `finalize-reconciler` with the issues JSON.
 4. After reviewer pass: **Gate 2 (PRD Approval)** — present to user; require approval. Update checkpoint.
 
@@ -264,7 +310,9 @@ Per FR-3 + ADR-0016, per-layer Design is fan-out: K parallel invocations, one pe
 2. **In parallel**, for each activated layer, invoke the corresponding `design-<layer>` sub-agent:
    - layer ∈ {frontend, backend, api, query, database, iac, cc (filename: design-claude-code), cicd, codespaces}.
    - Standard inputs per the per-layer designer template: `prd_path`, `research_plan_path`, `codebase_analysis_path`, `research_notes_dir`, `synthesis_path`, `rationale_brief_path`, `output_design_path`, `output_dependencies_path`, `slug`.
-3. For each completed per-layer Design output: invoke `shared-document-reviewer` with `doc_type: DesignDoc` and `codebase_analysis: <path-to-codebase-analysis.json>`. If Gate 0 fails: re-invoke that specific design-`<layer>`. If Gate 1 fails: re-invoke (lower-severity than the Blueprint-level re-author).
+3. For each completed per-layer Design output: invoke `shared-document-reviewer` with `doc_type: DesignDoc` and `codebase_analysis: <path-to-codebase-analysis.json>`.
+   - After `shared-document-reviewer` returns for each per-layer invocation, run the FR-1 parity validator before reading that layer's verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/<layer>-design-review.json shared-document-reviewer`. On exit 0, proceed with normal verdict handling. On exit 1, the orchestrator HALTS for that layer — the reviewer declared an approving verdict alongside a blocking finding (FR-1 structural failure); surface the FR-6 diagnostic fields to the operator; the reviewer must re-emit consistent output before the orchestrator advances. On exit 2 (internal error), surface the error and allow one retry before escalating.
+   - If Gate 0 fails: re-invoke that specific design-`<layer>`. If Gate 1 fails: re-invoke (lower-severity than the Blueprint-level re-author).
 4. After all per-layer Design outputs pass: advance to Design Composition (no human gate at per-layer level; the gate is on the integrated Blueprint).
 
 ### Step 8 — Stage 7: Design Composition
@@ -289,6 +337,7 @@ Per FR-3 + ADR-0016, per-layer Design is fan-out: K parallel invocations, one pe
    Per ADR-0054 commitment 1 (no allowlist at this surface): the orchestrator-stage validator invocation MUST NOT pass `--allowlist`. The orchestrator gate is canonical-only.
 
 3. After the Blueprint is written: invoke `shared-document-reviewer` with `doc_type: DesignDoc` (Blueprint variant).
+   - After `shared-document-reviewer` returns its output, invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/blueprint-review.json shared-document-reviewer`. On exit 0, proceed with normal verdict handling. On exit 1, the orchestrator HALTS — the reviewer declared an approving verdict alongside a blocking finding (FR-1 structural failure); surface the FR-6 diagnostic fields to the operator; the reviewer must re-emit consistent output before the orchestrator advances to Gate 4. On exit 2 (internal error), surface the error and allow one retry before escalating.
 4. If Gate 0 fails: re-invoke `design-composer`. If Gate 1 fails: dispatch to `finalize-reconciler`.
 5. After reviewer pass: **Gate 4 (Blueprint Approval)** — present to user; require approval. Update checkpoint.
 
@@ -298,11 +347,12 @@ Per FR-3 + ADR-0016, per-layer Design is fan-out: K parallel invocations, one pe
    - `blueprint_path`, `rationale_brief_path`, `synthesis_path`, `codebase_analysis_path`, `inherited_adrs_dir`, `new_adrs_dir`, `output_issues_path`, `slug`.
    - `prior_audit_path` if re-audit.
    - `code_graph_preference` — default GitNexus.
-2. Read the verdict from `architecture-audit-issues.json`:
+2. After `review-architecture-auditor` writes `architecture-audit-issues.json`, invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/architecture-audit-issues.json review-architecture-auditor`. On exit 0, proceed with normal verdict handling. On exit 1, the orchestrator HALTS — the auditor declared an approving verdict alongside a blocking finding (FR-1 structural failure); surface the FR-6 diagnostic fields to the operator; the auditor must re-emit its output with consistent verdict-vs-findings shape before the orchestrator can advance. On exit 2 (internal error), surface the error and allow one retry before escalating.
+3. Read the verdict from `architecture-audit-issues.json`:
    - `verdict: pass` → advance to Plan Authoring.
    - `verdict: conditional_pass` (MAJOR issues, no BLOCKER) → dispatch to `finalize-reconciler` (auditor-driven, no human gate).
    - `verdict: fail` (BLOCKER) → dispatch to `finalize-reconciler` (required revision).
-3. Reconciliation cycle increment: `checkpoint.reconciliation_cycles.blueprint += 1`. If `>= 4`: hard cap; surface to user.
+4. Reconciliation cycle increment: `checkpoint.reconciliation_cycles.blueprint += 1`. If `>= 4`: hard cap; surface to user.
 
 ### Step 10 — Stage 9: Plan Authoring
 
@@ -310,6 +360,7 @@ Per FR-3 + ADR-0016, per-layer Design is fan-out: K parallel invocations, one pe
    - `prd_path`, `blueprint_path`, `adrs_dir`, `codebase_analysis_path`, `output_path`, `slug`.
    - On re-author: `prior_plan_path` + `review_feedback`.
 2. Invoke `shared-document-reviewer` with `doc_type: Plan`.
+   - After `shared-document-reviewer` returns its output, invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/plan-review.json shared-document-reviewer`. On exit 0, proceed with normal verdict handling. On exit 1, the orchestrator HALTS — the reviewer declared an approving verdict alongside a blocking finding (FR-1 structural failure); surface the FR-6 diagnostic fields to the operator; the reviewer must re-emit consistent output before the orchestrator advances to Gate 5. On exit 2 (internal error), surface the error and allow one retry before escalating.
 3. If Gate 0 fails: re-invoke plan-author. If Gate 1 fails: dispatch to `finalize-reconciler`.
 4. After reviewer pass: **Gate 5 (Plan Approval)** — present to user; require approval.
 
@@ -331,11 +382,12 @@ Wait for both completions. **No shared-document-reviewer invocation** (these are
 2. Invoke `review-cross-artifact-auditor`:
    - `current_blueprint_path`, `prior_blueprint_path` (if any), `blueprint_diff_path` (if computed), `plan_path`, `acceptance_tests_path`, `phase_validators_path`, `output_issues_path`, `round_number` (1-indexed per cycle), `slug`.
    - Note: auditor uses `model: opus` (declared in frontmatter).
-3. Read verdict:
+3. After `review-cross-artifact-auditor` writes `cross-artifact-audit-issues.json`, invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/cross-artifact-audit-issues.json review-cross-artifact-auditor`. On exit 0, proceed with normal verdict handling. On exit 1, the orchestrator HALTS — the auditor declared an approving verdict alongside a blocking finding (FR-1 structural failure); surface the FR-6 diagnostic fields to the operator; the auditor must re-emit its output with consistent verdict-vs-findings shape before the orchestrator can advance. On exit 2 (internal error), surface the error and allow one retry before escalating.
+4. Read verdict:
    - `verdict: pass` → advance to Task Decomposition.
    - `verdict: conditional_pass` / `fail` → dispatch to `finalize-reconciler`.
    - `verdict: hard_capped` (round 4) → terminal; surface to user.
-4. Reconciliation cycle: `checkpoint.reconciliation_cycles.cross_artifact += 1`. Cap at 4.
+5. Reconciliation cycle: `checkpoint.reconciliation_cycles.cross_artifact += 1`. Cap at 4.
 
 ### Step 13 — Stage 12: Task Decomposition
 
@@ -413,6 +465,8 @@ The following summarizes the parent orchestrator's dispatch obligations at each 
 
 **T2 (per_task_active → quality_active):** When code-producer returns `COMPLETED`, parent dispatches `execute-task-quality-handler` with the task verdict context (task spec + code-producer's result JSON). Parent emits a T2 entry.
 
+**FR-1 parity check after execute-task-quality-handler:** After `execute-task-quality-handler` returns its output file (per-task-quality-result.json), invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/per-task-quality-result.json execute-task-quality-handler`. On exit 0, proceed with normal verdict handling (T3 or T4 path as appropriate). On exit 1, the orchestrator HALTS — the quality-handler declared an approving verdict (APPROVED) alongside a blocking finding, which is the FR-1 structural failure; surface the four FR-6 diagnostic fields to the operator; the quality-handler must re-emit its output with consistent verdict-vs-findings shape before the orchestrator can advance. On exit 2 (internal error), surface the error and allow one retry before escalating.
+
 **T3 (quality_active → per_task_approved):** When quality-handler returns `APPROVED`, parent marks the task APPROVED in its internal state, advances to the next task (T6 back to T1), and emits a T3 entry.
 
 **T4 (quality_active → per_task_active — NEEDS_REVISION path):** When quality-handler returns `NEEDS_REVISION`, parent:
@@ -426,6 +480,8 @@ Parent emits a T4 entry at the transition.
 **T6 (per_task_approved → pending, iterating to next task):** After T3, if tasks remain in the current phase, parent advances to the next eligible task and dispatches code-producer again (T1). Parent emits a T6 entry.
 
 **T7 (per_task_approved → phase_quality_active — last task in phase):** After the last task in a phase is APPROVED, parent dispatches `execute-phase-quality-reviewer`. Parent emits a T7 entry.
+
+**FR-1 parity check after execute-phase-quality-reviewer:** After `execute-phase-quality-reviewer` returns its output file (phase-quality-result.json), invoke the FR-1 parity validator before reading the verdict: `python3 .claude/skills/auditing-shared/scripts/verdict_findings_parity.py working/feature/<slug>/phase-quality-result.json execute-phase-quality-reviewer`. On exit 0, proceed with normal verdict handling (T8 PASS path or T9 NEEDS_RECONCILIATION path as appropriate). On exit 1, the orchestrator HALTS — the phase-quality-reviewer declared an approving verdict (PASS) alongside a blocking finding, which is the FR-1 structural failure; surface the four FR-6 diagnostic fields to the operator; the reviewer must re-emit its output with consistent verdict-vs-findings shape before the orchestrator can advance. On exit 2 (internal error), surface the error and allow one retry before escalating.
 
 **T8 (phase_quality_active → phase_complete — PASS path):** When phase-quality-reviewer returns `PASS`, parent advances to the next phase (T11 back to T1) or, if this is the last phase, emits T12 (pipeline_complete) and writes the pipeline-run-summary. Parent emits a T8 entry.
 

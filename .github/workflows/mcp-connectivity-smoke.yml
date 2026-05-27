@@ -1,0 +1,49 @@
+name: mcp-connectivity-smoke
+
+on:
+  pull_request:
+    paths:
+      - '.mcp.json'
+      - '.devcontainer/**'
+      - 'adrs/ADR-0041-*.md'
+      - '.claude/skills/auditing-mcp/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4.3.1
+
+      - uses: devcontainers/ci@b63b30de439b47a52267f241112c5b453b673db5  # v0.3.1900000449
+        with:
+          runCmd: |
+            set -euo pipefail
+            # || true after the jq invocation: jq exits 1 when no records match the filter,
+            # which is our PASS signal (no non-connected servers found). Don't let set -e terminate.
+            BAD=$(claude --bare -p "noop" --output-format stream-json \
+              | jq -c 'select(.type=="system" and .subtype=="init") | .mcp_servers[] | select(.status != "connected")' \
+              || true)
+            if [ -n "$BAD" ]; then
+              {
+                echo "## MCP connectivity smoke — FAIL"
+                echo ""
+                echo "**Mechanism:** FR-5 connectivity smoke"
+                echo "**Offending artifact:** .mcp.json (one or more registered servers did not reach status=connected)"
+                echo "**Rule violated:** every server in .mcp.json must initialize to status=connected per ADR-0058 status enum"
+                echo "**Remedial hint:** inspect the listed servers; check .devcontainer/postCreate.sh install logs; verify HTTP servers' auth state"
+                echo ""
+                echo '```'
+                echo "$BAD"
+                echo '```'
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+            {
+              echo "## MCP connectivity smoke — PASS"
+              echo "All MCP servers registered in .mcp.json reached status=connected."
+            } >> "$GITHUB_STEP_SUMMARY"

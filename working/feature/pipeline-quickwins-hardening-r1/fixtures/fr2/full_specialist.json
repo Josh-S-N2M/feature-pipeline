@@ -1,0 +1,31 @@
+{
+  "_fixture_id": "full_specialist",
+  "_description": "FULL scope, all stages specialist-dispatch. Expected: self-check passes.",
+  "scope_class": "FULL",
+  "stages": [
+    {
+      "stage_name": "intent_clarification",
+      "checkpoint": {
+        "execution_mode": "specialist-dispatch"
+      }
+    },
+    {
+      "stage_name": "prd_authoring",
+      "checkpoint": {
+        "execution_mode": "specialist-dispatch"
+      }
+    },
+    {
+      "stage_name": "discovery_planning",
+      "checkpoint": {
+        "execution_mode": "specialist-dispatch"
+      }
+    },
+    {
+      "stage_name": "task_decomposition",
+      "checkpoint": {
+        "execution_mode": "specialist-dispatch"
+      }
+    }
+  ]
+}

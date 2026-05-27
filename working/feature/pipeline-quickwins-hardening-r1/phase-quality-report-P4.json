@@ -1,0 +1,98 @@
+{
+  "verdict": "PASS",
+  "per_dimension_status": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "findings": [
+    {
+      "domain": "scope_deviations",
+      "severity": "major",
+      "source_activity": "execute-phase-quality-reviewer",
+      "file_path": ".github/workflows/gitnexus-grammar-skip-calibration.yml",
+      "message": "Carry-forward from Phase 2 (T2.5) and Phase 3 (T3.2): the FR-4c workflow will return non-zero on its first invocation post-merge because the underlying .devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh continues to return drift_detected (exit 2) against the live gitnexus@1.6.5. Phase 4's bundled-PR (T4.7) and the end-to-end smoke (T4.4) confirmed that the workflow YAML is correctly authored and that the in-repo mechanisms (FR-1, FR-2, FR-3, FR-4a, FR-4b named-failure path) all behave as designed; this finding is solely about the upstream-contract mismatch that will surface the first time the CI runner exercises the workflow. The expected behavior is documented in the bundled PR body so a reviewer is not surprised. Remediation belongs to a Phase 5 follow-on Issue or to the planned contract-redesign feature: re-research T-001 against live gitnexus@1.6.5 OR loosen signal_1 to the original D-0006 pre-tightening recommendation. NOT a Phase 4 BLOCKER. The Phase 4 bundle is otherwise complete and ready to merge.",
+      "dispatch_hint": "phase-5-rollout-or-follow-on-issue; identical remediation path to the Phase 2 and Phase 3 carry-forwards",
+      "depth_level": "3"
+    },
+    {
+      "domain": "scope_deviations",
+      "severity": "info",
+      "source_activity": "execute-phase-quality-reviewer",
+      "file_path": ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py",
+      "message": "Pre-existing systemic validator-tool gap (carried forward from every prior phase). validate_pipeline_frontmatter.py reports MAJOR findings on any file lacking pipeline-doc YAML frontmatter. Phase 4 authored four documents that inherently do not carry pipeline-document frontmatter: the four smoke-report.md files under working/feature/pipeline-quickwins-hardening-r1/smoke/{per-mechanism,end-to-end,qcs1b,t4-6}/. The validator is scoped to PRD/Blueprint/Plan/Tests/Validators only; smoke-report and ADR documents are out of its scope. Any findings the validator emits against these files are inapplicable false-positives. ADR-placement validator (the correct tool) is clean on all artifacts. Canonical placement and discipline checks pass cleanly. Not a Phase 4-introduced defect; the validator-scope gap needs to add path-prefix skips for adrs/ and working/.../smoke/ at the project-wide level outside this feature.",
+      "dispatch_hint": "no-action this phase; project-wide validator-targeting gap triaged outside this feature's scope",
+      "depth_level": "0"
+    },
+    {
+      "domain": "scope_deviations",
+      "severity": "info",
+      "source_activity": "execute-phase-quality-reviewer",
+      "file_path": "working/feature/devcontainer-mcp-provisioning-r1/per-task-execution-result.json",
+      "message": "Carry-forward from Phase 2: two per-task result files (one from T2.3, one from T2.6) landed in the sibling feature directory working/feature/devcontainer-mcp-provisioning-r1/ rather than working/feature/pipeline-quickwins-hardening-r1/. This is cosmetic process drift in the per-task-result emitter; the actual code edits (postCreate.sh Q-CS-1b banner, cosmetic 5->4 fix) landed at the correct repo paths. Phase 4 did not re-surface or amplify the issue; surfaced for completeness so a future cleanup pass can move or de-duplicate the orphan result files.",
+      "dispatch_hint": "no-action this phase; cosmetic working-dir cleanup triaged outside this feature",
+      "depth_level": "0"
+    },
+    {
+      "domain": "scope_deviations",
+      "severity": "info",
+      "source_activity": "execute-phase-quality-reviewer",
+      "file_path": ".claude/runtime/mcp-events.jsonl",
+      "message": "Carry-forward from Phase 1 baseline through Phase 3: pre-existing OP-7 baseline findings on lines 5, 6, 20 (readiness_probe missing status x2; structured_failure missing message x1) predate this feature entirely. Phase 4 did not touch mcp-events.jsonl in a way that would change these findings. Not a Phase 4 regression. Project-wide event-log housekeeping is outside this feature's scope.",
+      "dispatch_hint": "no-action this phase; project-wide event-log housekeeping triaged outside this feature",
+      "depth_level": "0"
+    }
+  ],
+  "audit_counter_delta": {
+    "baseline": "phase-quality-report-P3 (Phase 3 -> Phase 4 transition)",
+    "per_domain": {
+      "tests": "0 -> 0 (PV-4's 7 pass criteria all satisfied. PV-4.C1: H-4 and B-1 adoption parentheticals confirmed present in Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md; Section L forgetting-risk table corrected per T4.1. PV-4.C2: AGENTS.md line 69 carries OP-1..OP-11 (single-character bump); CLAUDE.md symlink inherits. PV-4.C3: per-mechanism isolation smoke at smoke/per-mechanism/smoke-report.md exercises all five mechanisms; 5 live sub-cases (FR-1, FR-2, FR-3, FR-4a, FR-4b named-failure via T2.5 empirical evidence); 3 documented-deferral cross-references (FR-4b negation, FR-4c, FR-5) requiring live CI runner. PV-4.C4: end-to-end smoke at smoke/end-to-end/smoke-report.md confirms known-good fixture pipeline exits 0 on all live-checkable mechanisms; deliberate FR-1 breakage isolates correctly (FR-1 exit 1 with FR-6 diagnostic; FR-2 + FR-3 exit 0); FR-1 + FR-3 selftests byte-identical across repeat runs (AC-NFR-5-a determinism); pass_clean + pass_with_minor still pass post-wire-in (AC-NFR-9-a backward compatibility). PV-4.C5: Q-CS-1b banner integration smoke at smoke/qcs1b/smoke-report.md exercises 3 fixtures (never-run / 21-day-stale / 3-day-fresh); 3/3 pass; AC-X-4 informational discipline confirmed (all exit 0). PV-4.C6: pre-feature checkpoint resume smoke at smoke/t4-6/smoke-report.md against ADR-0057 absence-default rule; fixture A (FULL scope, all 7 stages absent) -> exit 0 PASS with absence-default applied; fixture B (one explicit parent-driven-workaround) -> exit 1 REFUSE with 4 FR-6 fields; semantic distinction absence-default != workaround-default is confirmed. PV-4.C7: single bundled PR open at https://github.com/Josh-S-N2M/feature-pipeline/pull/1, five per-phase commits pushed, title and body shape per Plan T4.7, deferred-MAJOR drift Issue surfaced in PR body)",
+      "audits": "0 -> 0 (detect_stubs.py clean across all 7 Phase 4 tasks. The Python harness for T4.6 (fixtures/fr2/fr2_self_check.py invocation) and the bash test harness for T4.5 (smoke/qcs1b/run-banner-smoke.sh) are real code with no stubs, no FIXME/TODO, no NotImplementedError, no assert True/False sole-assertion patterns. No shell-injection or untrusted-input interpolation patterns in the smoke harnesses. No credentials in diagnostics)",
+      "validator": "0 -> 0 (ADR-placement validator PASS / 0 findings against the current state. No new ADRs introduced in Phase 4. check_pipeline_discipline.py clean on Phase 4 task surface. Pre-existing project-wide validate_pipeline_frontmatter.py scope gap on smoke-report.md + ADR files carries forward as informational; not a Phase 4 regression)",
+      "discipline": "0 -> 0 (4-phase quality discipline executed cleanly on all 7 Phase 4 tasks. Zero NEEDS_REVISION cycles consumed across T4.1, T4.2, T4.3, T4.4, T4.5, T4.6, T4.7. Atomic-task contracts honored throughout the phase. Single-bundled-PR shape per D-0008 preserved through to T4.7 PR open)",
+      "scope_deviations": "4 -> 4 (Phase 3 carried 1 major-deferred + 3 info; Phase 4 carries 1 major-deferred + 3 info. The MAJOR carries forward unchanged in semantics: same upstream contract drift, now visible at three surfaces (T2.5 script-level, T3.2 workflow-level, and explicitly called out in the Phase 4 bundled-PR body as the expected first-invocation behavior). Three info items: validator-scope coverage gap (newly applicable because Phase 4 introduced smoke-report.md artifacts); orphan per-task result files in sibling feature directory (carry-forward from Phase 2); pre-existing OP-7 baseline. The Phase-3-specific T3.3 Tier-3-hand-check info item did not recur in Phase 4 because Phase 4 did not exercise the actionlint surface. Net count unchanged at 4; severity mix unchanged at 1 major + 3 info)"
+    },
+    "aggregate_delta": "4 -> 4 (Phase 3 and Phase 4 each carry 1 MAJOR-deferred + 3 INFO = 4 total. The MAJOR-deferred finding is the same upstream contract drift first surfaced in Phase 2's T2.5, then in Phase 3's T3.2, now explicitly documented in the Phase 4 PR body. Three INFO items roll: the validator-scope coverage gap and the OP-7 baseline carry across all four phases; the orphan per-task result files item carries from Phase 2. The Phase-3-specific Tier-3-hand-check item dropped because Phase 4 did not touch the actionlint surface. Zero blocking findings. Zero NEEDS_REVISION cycles consumed across any of the 7 Phase 4 tasks)",
+    "audit_severity_breakdown": null,
+    "gating": "informational"
+  },
+  "phase": "phase-4",
+  "feature_slug": "pipeline-quickwins-hardening-r1",
+  "audits_stub": false,
+  "audits_stub_count": 0,
+  "post_processing_notes": [
+    "All 7 Phase 4 tasks (T4.1 through T4.7) returned per-task verdict APPROVED with 0 NEEDS_REVISION cycles consumed.",
+    "PV-4 pass criteria status (7 BLOCKER-severity criteria; all PASS):",
+    "- PV-4.C1: Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md carries H-4 and B-1 adopted-by parentheticals; Section L forgetting-risk table corrected to reflect H-4 now resolved (was the one remaining HIGH item before this feature). Diff against main is minimal and scoped to those rows + the Section L paragraph.",
+    "- PV-4.C2: AGENTS.md line 69 contains the literal OP-1..OP-11 at the auditing-mcp OP-rule reference site; the prior OP-1..OP-10 string is gone at that site. Single-character change. CLAUDE.md symlink inherits.",
+    "- PV-4.C3: smoke/per-mechanism/smoke-report.md records the eight expected sub-smokes per PV-4.C3's AC-X-1 / NFR-11 contract. Five sub-cases were live-exercised in this environment (FR-1, FR-2, FR-3, FR-4a, FR-4b named-failure via T2.5 empirical evidence); three sub-cases (FR-4b negation, FR-4c, FR-5) carry documented-deferral cross-references back to T3.x / T5.x because they require the live CI runner.",
+    "- PV-4.C4: smoke/end-to-end/smoke-report.md confirms (a) known-good fixture pipeline exits 0 on every live-checkable mechanism; (b) deliberate FR-1 breakage isolates correctly: FR-1 exits 1 with the four FR-6 diagnostic fields, FR-2 and FR-3 each isolated at exit 0; (c) AC-NFR-5-a determinism — FR-1 + FR-3 selftest outputs byte-identical across two consecutive runs; (d) AC-NFR-9-a backward compatibility — pass_clean and pass_with_minor reviewer-output fixtures continue to pass after the wire-in.",
+    "- PV-4.C5: smoke/qcs1b/smoke-report.md records 3 banner-state fixtures (never-run / 21-day-stale / 3-day-fresh). 3/3 pass; all three rebuilds exit 0; AC-X-4 informational-discipline contract honored (banner never fails-close under set -euo pipefail).",
+    "- PV-4.C6: smoke/t4-6/smoke-report.md records the pre-feature checkpoint resume per ADR-0057 absence-default rule. Fixture A (FULL scope, all 7 stages absent) -> exit 0 PASS — confirms absence-default routes to specialist-dispatch. Fixture B (one stage with explicit execution_mode: parent-driven-workaround) -> exit 1 REFUSE with the four FR-6 fields. The two fixtures together confirm the load-bearing semantic distinction: absence-default is not the same as workaround-default. AC-CC-2-g is satisfied.",
+    "- PV-4.C7: single bundled PR open at https://github.com/Josh-S-N2M/feature-pipeline/pull/1. Title: feat(pipeline-quickwins-hardening-r1): five-mechanism MCP-incident hardening carve-out. Five per-phase commits pushed to feature/pipeline-quickwins-hardening-r1. PR body enumerates the per-phase commits, references the PRD, Blueprint v2.2.0, ADR-0057 v1.0.1, ADR-0058 v1.0.0, and the deferral-register adoption; surfaces the drift Issue; documents the expected first-invocation behavior (FR-4c workflow will return non-zero against gitnexus@1.6.5 until the contract-redesign feature ships).",
+    "Per Contract 2 rollup rule: zero BLOCKING findings; one MAJOR-deferred finding (the FR-4c first-invocation drift, carried forward from Phase 2 and Phase 3, now explicitly documented in the bundled PR body); three INFO findings all carry-forward from prior phases. All five dimensions resolve to PASS once the documented degradations are filtered. Overall verdict PASS.",
+    "audits_stub=false this phase: detect_stubs.py was invoked directly on the Phase 4 artifact surface (smoke harnesses, fixture files, deferral-register edits). No stub patterns. Q-CC-4 stub-vs-real distinction does not change the verdict.",
+    "Phase 5 (rollout: merge to main, immediate post-merge gh workflow run for FR-4c, first cron tick observation, post-launch verification) is unblocked. The FR-4c first-invocation-failure is the known carry-forward; Phase 5 will surface the failure on the CI runner and confirm the documented expected behavior.",
+    "Phase 5 / follow-on Issue work item remains the same as recorded since Phase 2: refresh T-001 regex against live gitnexus@1.6.5 OR loosen signal_1 to the D-0006 original (pre-tightening) recommendation. This is the only MAJOR-deferred item; the bundled PR makes the expected first-invocation behavior visible to the post-merge reviewer."
+  ],
+  "task_verdicts_summary": {
+    "T4.1": "APPROVED -- Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md. H-4 and B-1 adoption parentheticals already present in the prior state (no edit needed). Section L forgetting-risk table corrected: H-4 was listed as the one remaining HIGH item; H-4 is now resolved by this feature's adoption, so the counts and accompanying paragraph were updated.",
+    "T4.2": "APPROVED -- AGENTS.md line 69 single-character bump from OP-1..OP-10 to OP-1..OP-11. CLAUDE.md symlink inherits. Diff is exactly one character.",
+    "T4.3": "APPROVED -- per-mechanism isolation smoke at smoke/per-mechanism/smoke-report.md. 5 live sub-cases (FR-1, FR-2, FR-3, FR-4a, FR-4b named-failure via T2.5 empirical evidence). 3 documented-deferral sub-cases with T3.x/T5.x cross-references (FR-4b negation, FR-4c, FR-5 — all require the live CI runner). AC-X-1 / NFR-11 contract honored across the eight expected sub-smokes.",
+    "T4.4": "APPROVED -- end-to-end smoke at smoke/end-to-end/smoke-report.md. Known-good fixture pipeline -> every live-checkable mechanism exits 0. Deliberate FR-1 breakage -> FR-1 exits 1 with the four FR-6 diagnostic fields; FR-2 and FR-3 each isolated at exit 0. FR-1 + FR-3 selftests byte-identical across two consecutive runs (AC-NFR-5-a determinism). pass_clean and pass_with_minor reviewer-output fixtures continue to pass post-wire-in (AC-NFR-9-a backward compatibility).",
+    "T4.5": "APPROVED -- Q-CS-1b banner integration smoke at smoke/qcs1b/smoke-report.md. Three fixtures: never-run, 21-day-stale, 3-day-fresh. 3/3 pass; all three rebuilds exit 0. AC-X-4 informational discipline confirmed: the banner never fail-closes under set -euo pipefail.",
+    "T4.6": "APPROVED -- pre-feature checkpoint resume smoke at smoke/t4-6/smoke-report.md per ADR-0057 absence-default rule. Fixture A (FULL scope, all 7 stages absent of execution_mode) -> exit 0 PASS with absence-default applied. Fixture B (one stage with explicit parent-driven-workaround) -> exit 1 REFUSE with the four FR-6 diagnostic fields. The two-fixture pair confirms the load-bearing semantic distinction: absence-default is not the same as workaround-default. AC-CC-2-g is satisfied.",
+    "T4.7": "APPROVED -- single bundled PR opened at https://github.com/Josh-S-N2M/feature-pipeline/pull/1. Five per-phase commits pushed to feature/pipeline-quickwins-hardening-r1. PR title: feat(pipeline-quickwins-hardening-r1): five-mechanism MCP-incident hardening carve-out. PR body enumerates per-phase commits, references PRD / Blueprint / ADRs, surfaces the deferred-MAJOR drift Issue, documents the expected first-invocation CI behavior. Single-bundled-PR shape per D-0008 honored end-to-end."
+  },
+  "pass_criteria_status": {
+    "PV-4.C1": "PASS (H-4 and B-1 adoption parentheticals present; Section L forgetting-risk table corrected for H-4 resolution)",
+    "PV-4.C2": "PASS (AGENTS.md OP-1..OP-11 at the auditing-mcp counter site; CLAUDE.md symlink inherits)",
+    "PV-4.C3": "PASS (per-mechanism isolation smoke records all eight expected sub-cases with the documented degradation split between live-exercised and CI-runner-required)",
+    "PV-4.C4": "PASS (end-to-end smoke confirms isolation, determinism per AC-NFR-5-a, and backward compatibility per AC-NFR-9-a)",
+    "PV-4.C5": "PASS (3/3 banner-state fixtures pass, all rebuilds exit 0, AC-X-4 informational discipline honored)",
+    "PV-4.C6": "PASS (pre-feature checkpoint absence-default vs workaround-default semantic distinction confirmed; AC-CC-2-g satisfied)",
+    "PV-4.C7": "PASS (bundled PR open at #1 with the correct title, body, and per-phase commit shape; deferred-MAJOR drift surfaced in PR body)"
+  }
+}

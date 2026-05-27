@@ -51,7 +51,7 @@ When delegating via the Agent tool, these are the sub-agents that already have M
 | Server | Sub-agents with access | Allowlist |
 | --- | --- | --- |
 | `gitnexus` | `discovery-codebase-researcher`, `review-architecture-auditor` | whole-server (`mcp__gitnexus__*`) |
-| `serena` | `discovery-codebase-researcher`, `review-architecture-auditor`, `design-cicd`, `design-codespaces`, `design-iac`, `design-claude-code` | whole-server (per ADR-0040 — narrowed always-on, 5-agent precedent) |
+| `serena` | `discovery-codebase-researcher`, `review-architecture-auditor`, `design-cicd`, `design-codespaces`, `design-claude-code` | whole-server (per ADR-0040 — narrowed always-on, 5-agent canonical list) |
 | `context7` | `discovery-external-researcher` | narrow (`resolve-library-id`, `query-docs`) |
 | `exa` | `discovery-external-researcher` | narrow (`web_search_exa`, `company_research_exa`, `crawling_exa`) |
 | `actionlint-mcp` | `design-cicd` | narrow (`lint_workflow`, `check_all_workflows`) |
@@ -66,7 +66,7 @@ The main agent (this session) has access to all six. Most workflows route throug
 | GitNexus deep dives — exploring, refactoring, debugging, impact | [.claude/skills/gitnexus/](.claude/skills/gitnexus/) (and the block below) |
 | MCP platform facts — install, lifecycle hooks, event surface, credentials | [KB-mcp-platform](.claude/skills/KB-mcp-platform/SKILL.md) skill |
 | MCP design discipline — when to add a server, allowlist sizing, OP-rule catalog | [KB-mcp-design](.claude/skills/KB-mcp-design/SKILL.md) skill |
-| MCP audit ruleset (OP-1..OP-10) | [auditing-mcp](.claude/skills/auditing-mcp/) skill |
+| MCP audit ruleset (OP-1..OP-11) | [auditing-mcp](.claude/skills/auditing-mcp/) skill |
 | MCP event surface (`.claude/runtime/mcp-events.jsonl`) | [KB-mcp-platform/references/mcp-events-jsonl.md](.claude/skills/KB-mcp-platform/references/mcp-events-jsonl.md) |
 
 ---
@@ -75,7 +75,7 @@ The main agent (this session) has access to all six. Most workflows route throug
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **feature-pipeline** (9417 symbols, 9411 relationships, 0 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **feature-pipeline** (11494 symbols, 11508 relationships, 0 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 

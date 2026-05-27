@@ -1,0 +1,65 @@
+{
+  "_fixture_id": "pre-feature-checkpoint",
+  "_description": "Simulated checkpoint.json from a FULL-scope feature run that completed before pipeline-quickwins-hardening-r1 shipped. No stage carries an execution_mode field — the field did not exist as a first-class checkpoint schema entry before ADR-0057. Per ADR-0057's absence-default rule, each absent stage maps to specialist-dispatch at resume time. Expected: FR-2 self-check passes with no diagnostic.",
+  "_authored_for": "T4.6 — pre-feature checkpoint resume smoke (AC-CC-2-g)",
+  "feature_slug": "example-pre-feature-run-r1",
+  "scope_class": "FULL",
+  "current_stage": "execution",
+  "stage_status": "awaiting_phase_continuation",
+  "gate_history": [
+    {
+      "gate": "intent_confirmation",
+      "decision": "approved",
+      "timestamp": "2026-04-10T10:00:00Z"
+    },
+    {
+      "gate": "prd_approval",
+      "decision": "approved",
+      "timestamp": "2026-04-10T11:00:00Z",
+      "prd_version": "0.1.0"
+    },
+    {
+      "gate": "blueprint_approval",
+      "decision": "approved",
+      "timestamp": "2026-04-10T13:00:00Z",
+      "blueprint_version": "v1"
+    },
+    {
+      "gate": "plan_approval",
+      "decision": "approved",
+      "timestamp": "2026-04-10T14:00:00Z",
+      "plan_version": "v1.0.0"
+    }
+  ],
+  "stages": [
+    {
+      "stage_name": "intent_clarification",
+      "status": "complete"
+    },
+    {
+      "stage_name": "prd_authoring",
+      "status": "complete"
+    },
+    {
+      "stage_name": "research_planning",
+      "status": "complete"
+    },
+    {
+      "stage_name": "per_layer_design",
+      "status": "complete"
+    },
+    {
+      "stage_name": "design_composition",
+      "status": "complete"
+    },
+    {
+      "stage_name": "plan_authoring",
+      "status": "complete"
+    },
+    {
+      "stage_name": "execution",
+      "status": "in_progress"
+    }
+  ],
+  "_note": "No stage above carries an execution_mode field. This models a checkpoint written before ADR-0057 promoted execution_mode to a first-class documented field. Per ADR-0057 absence-default rule: absence == specialist-dispatch for all stages."
+}

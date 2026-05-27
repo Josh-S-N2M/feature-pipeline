@@ -1,0 +1,9 @@
+{
+  "verdict": "approved",
+  "findings": [
+    {
+      "severity": "critical",
+      "message": "Schema invariant violated: output format does not match contract."
+    }
+  ]
+}

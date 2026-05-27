@@ -1,0 +1,7 @@
+verdict: REFUSE
+reason: scope_class is FULL and stage prd_authoring has execution_mode == parent-driven-workaround.
+diagnostic:
+  mechanism: "FR-2 dispatch self-check"
+  offending_artifact: "prd_authoring"
+  rule_violated: "FULL-scope features prohibit parent-driven-workaround execution mode per PRD §FR-2 and ADR-0057"
+  remedial_hint: "either change scope_class to MINOR/PATCH OR reconfigure the stage to specialist-dispatch"

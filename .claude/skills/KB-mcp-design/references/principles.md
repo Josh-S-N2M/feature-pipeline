@@ -50,6 +50,17 @@ For OSS-local servers (gitnexus, serena, actionlint-mcp, terraform-mcp), prefer 
 
 Per ADR-0037, all MCP events emit to `.claude/runtime/mcp-events.jsonl`. Per ADR-0039, the helper at `.devcontainer/lib/log-mcp-event.sh` redacts credential-shaped values from the substrate before appending. The file is per-Codespace and never committed.
 
+### Event-type vocabulary (closed enum)
+
+The vocabulary of valid `event` field values in `mcp-events.jsonl` is closed at four values as of pipeline-quickwins-hardening-r1 (ADR-0058):
+
+- `install_complete` — server started and is ready (established by ADR-0037 v1.0.2).
+- `readiness_probe` — periodic or on-demand liveness check (established by ADR-0037 v1.0.2).
+- `structured_failure` — server encountered a reportable error (established by ADR-0037 v1.0.2).
+- `calibration_result` — outcome of a calibration pass, added by ADR-0058 with a canonical 9-field payload: `event`, `timestamp`, `server`, `mechanism`, `version`, `duration_ms`, `outcome`, `signals`, `note`.
+
+The `mechanism` field on `calibration_result` is the namespace discriminator for future calibration mechanisms; the current defined value is `fr-4b-gitnexus-grammar-skip`. Adding a fifth event type requires a follow-on ADR — the closed-enum discipline is intentional and must not be bypassed.
+
 ## Principle 7 — Primary/fallback at project level; per-feature scope decides
 
 Per ADR-0007 v2.2.0, the GitNexus-primary / codebase-memory-mcp-fallback policy is documented at the project level. Per-feature scope decides whether to actually register the fallback:

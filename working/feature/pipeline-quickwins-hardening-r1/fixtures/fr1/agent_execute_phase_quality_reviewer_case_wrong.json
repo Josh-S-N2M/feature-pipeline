@@ -1,0 +1,9 @@
+{
+  "verdict": "pass",
+  "findings": [
+    {
+      "severity": "BLOCKER",
+      "message": "Blocking finding present."
+    }
+  ]
+}
