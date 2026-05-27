@@ -1,0 +1,9 @@
+{
+  "verdict": "pass",
+  "findings": [
+    {
+      "severity": "minor",
+      "message": "Nit: consider adding a trailing newline."
+    }
+  ]
+}

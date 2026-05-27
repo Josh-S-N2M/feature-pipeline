@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "actionlint-mcp": {
+      "command": "actionlint-mcp",
+      "args": []
+    },
+    "unknown-server": {
+      "command": "unknown-server",
+      "args": ["--some-arg"]
+    }
+  }
+}

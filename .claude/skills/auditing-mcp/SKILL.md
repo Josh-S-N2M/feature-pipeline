@@ -78,6 +78,14 @@ It writes one file: an audit report. It does not modify configs or contact serve
 | 9 | Cross-scope interactions | `references/common-failures.md` |
 | 10 | Runtime behavior (--with-runtime only) | `references/toxic-combinations.md` |
 
+## OP-rule routing table
+
+Each OP-rule is a discrete, scriptable invariant the auditor enforces. The table maps each rule to its implementation script, reference document, severity when a finding is raised, and a one-line rationale.
+
+| Rule | Name / Title | Script | Reference doc | Severity on finding | Rationale |
+|---|---|---|---|---|---|
+| OP-11 | `.mcp.json` ↔ ADR-0041 invocation-form parity | `scripts/audit_op11_adr_parity.py` | `references/adr-parity.md` | BLOCKER | Preserve ADR-prescribed invocation forms in the live `.mcp.json`; deprecated rows annotated `[DEPRECATED INVOCATION FORM]` are skipped. |
+
 ## Critical: MCP servers run untrusted code
 
 A `mcpServers` entry specifies a command Claude Code will spawn. The first MCP-server install of a new server is effectively trusting the supplier. The auditor's recommendations should always include: read the server source, check the publisher's reputation, prefer `npx -y <official-package>` over arbitrary commands.

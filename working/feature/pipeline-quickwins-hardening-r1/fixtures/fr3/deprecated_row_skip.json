@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "actionlint-mcp": {
+      "command": "actionlint-mcp",
+      "args": []
+    }
+  }
+}
