@@ -1,0 +1,1 @@
+{"event": "calibration_result", "timestamp": "2026-05-26T10:02:00Z", "server": "gitnexus", "mechanism": "fr-4b-gitnexus-grammar-skip", "version": "1.6.5", "duration_ms": 298, "outcome": "bogus", "signals": {"symbol_count": {"value": 9417, "status": "pass"}}, "note": "invalid outcome value — should fail validation"}
