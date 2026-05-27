@@ -1,5 +1,14 @@
 # Credential Handling — Redact-At-Source Discipline
 
+## Contents
+
+- The discipline
+- Anti-patterns the auditor flags
+- The five servers auth shapes (after compliant patterns applied)
+- Redaction at the JSONL helper (per ADR-0039)
+- Cross-references
+
+
 Per **ADR-0039** (credential redaction posture). All MCP credentials must enter the runtime via env-block indirection from Codespaces secrets; never via URL-query parameters (OP-9) or argv-passed flags (OP-10).
 
 > **Pedagogical note:** This document contains anti-pattern examples showing URL-query embedded API keys and argv-passed API keys. These exist to demonstrate what to REFUSE during audit, not what to execute. The example credential values use placeholder strings (e.g., `sk-...`, `eyJhbG...`) that are obvious placeholders, not real secrets.
@@ -72,14 +81,13 @@ Reasons it's a BLOCKER:
 
 The augmented `auditing-mcp` rule **OP-10** flags any `args` element matching `--api-key`, `--apikey`, `--api_key`, `--token`, `--auth`, `--bearer`, or a positional argument that looks like a credential (long string with `sk-`, `eyJ`, `ghp_`, etc. prefixes).
 
-## The six servers' auth shapes (after compliant patterns applied)
+## The five servers' auth shapes (after compliant patterns applied)
 
 | Server | Auth method | env-var name | Where it enters .mcp.json |
 |---|---|---|---|
 | actionlint-mcp | none | — | — |
 | context7 | `CONTEXT7_API_KEY` header (canonical per Upstash README) | `CONTEXT7_API_KEY` | `headers: {"CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"}` |
 | exa | `x-api-key` header | `EXA_API_KEY` | `headers: {"x-api-key": "${EXA_API_KEY}"}` |
-| gitnexus | none | — | — |
 | serena | none | — | — |
 | terraform-mcp | optional `TFE_TOKEN` (local-only is no-auth) | `TFE_TOKEN` | `env: {"TFE_TOKEN": "${TFE_TOKEN}"}` (optional block) |
 

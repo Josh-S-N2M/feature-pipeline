@@ -35,16 +35,15 @@ The generic Bearer form may work practically for some servers, but the README-ca
 
 `.devcontainer/versions.env` carries explicit pins. Never `latest`. Per-server pin types:
 
-- npm package + version (e.g., `gitnexus@1.6.5`)
+- PyPI package + version (e.g., `serena-agent==1.2.0`)
 - GitHub commit SHA (e.g., `actionlint-mcp@7441fe042c995cbb1bb4b97fce71f9ed3b36d5ef`)
-- GitHub tag (e.g., `serena@v1.2.0`)
 - Release version + SHA-256 (e.g., `terraform-mcp-server@0.5.2` with verification)
 
 Use `<PIN_TBD>` placeholder ONLY during pre-pin authoring (Plan §D-2). Phase 0 verify-at-execution settles the actual values; T1.3 writes versions.env with concrete values.
 
 ## Principle 5 — Stdio-by-default for OSS-local; HTTP only when hosted
 
-For OSS-local servers (gitnexus, serena, actionlint-mcp, terraform-mcp), prefer stdio transport. The benefits: no extra process to manage, no port to expose, less attack surface. HTTP is reserved for genuinely-hosted services (context7, exa — both Upstash-hosted endpoints).
+For OSS-local servers (serena, actionlint-mcp, terraform-mcp), prefer stdio transport. The benefits: no extra process to manage, no port to expose, less attack surface. HTTP is reserved for genuinely-hosted services (context7, exa — both Upstash-hosted endpoints).
 
 ## Principle 6 — Event surface is one file with redaction-at-source
 
@@ -59,11 +58,11 @@ The vocabulary of valid `event` field values in `mcp-events.jsonl` is closed at 
 - `structured_failure` — server encountered a reportable error (established by ADR-0037 v1.0.2).
 - `calibration_result` — outcome of a calibration pass, added by ADR-0058 with a canonical 9-field payload: `event`, `timestamp`, `server`, `mechanism`, `version`, `duration_ms`, `outcome`, `signals`, `note`.
 
-The `mechanism` field on `calibration_result` is the namespace discriminator for future calibration mechanisms; the current defined value is `fr-4b-gitnexus-grammar-skip`. Adding a fifth event type requires a follow-on ADR — the closed-enum discipline is intentional and must not be bypassed.
+The `mechanism` field on `calibration_result` is the namespace discriminator for future calibration mechanisms. (The historical `fr-4b-gitnexus-grammar-skip` mechanism was retired with the 2026-05-27 gitnexus removal per ADR-0066.) Adding a fifth event type requires a follow-on ADR — the closed-enum discipline is intentional and must not be bypassed.
 
 ## Principle 7 — Primary/fallback at project level; per-feature scope decides
 
-Per ADR-0007 v2.2.0, the GitNexus-primary / codebase-memory-mcp-fallback policy is documented at the project level. Per-feature scope decides whether to actually register the fallback:
+Per ADR-0007 v2.2.0, a code-graph primary / fallback policy is documented at the project level. (The historical primary, gitnexus, was removed 2026-05-27 per ADR-0066; the documented fallback to Read/Grep/Glob + serena symbol tools is the canonical posture for the two dependent sub-agents.) Per-feature scope decides whether to register a future code-graph server:
 
 - `devcontainer-mcp-provisioning-r1` (per Gate-4 OI-1 closure) ships with 7 servers, no codebase-memory-mcp fallback registered.
 - A future feature can register the fallback; the `primary_degraded` schema-level provision in `mcp-events.jsonl` is preserved so wire-up is clean.

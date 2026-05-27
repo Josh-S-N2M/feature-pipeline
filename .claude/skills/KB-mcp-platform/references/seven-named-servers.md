@@ -1,8 +1,8 @@
 # Named MCP Servers — Inventory + Per-Server Detail
 
-Canonical inventory: **six active servers** (originally seven per Gate-4 OI-1 closure of devcontainer-mcp-provisioning-r1; `mcp-openapi-schema` was removed 2026-05-24 — see the deprecation note below). No `codebase-memory-mcp` entry per OI-1; the fallback policy remains at the project level for any future feature that registers it.
+Canonical inventory: **five active servers** (originally seven; `mcp-openapi-schema` was removed 2026-05-24 per postmortem; `gitnexus` was removed 2026-05-27 per ADR-0066 — see deprecation notes below). The code-graph fallback policy (Read+Grep+Glob + serena) applies in lieu of any registered code-graph server.
 
-> **Filename note:** This file is named `seven-named-servers.md` for historical-link stability (the original inventory was seven; renaming would cascade through frozen phase-validator references in `working/feature/devcontainer-mcp-provisioning-r1/`). Content is now six servers.
+> **Filename note:** This file is named `seven-named-servers.md` for historical-link stability (the original inventory was seven; renaming would cascade through frozen phase-validator references in `working/feature/devcontainer-mcp-provisioning-r1/`). Content is now five servers.
 
 ## Inventory table
 
@@ -11,8 +11,7 @@ Canonical inventory: **six active servers** (originally seven per Gate-4 OI-1 cl
 | actionlint-mcp | stdio | `go install github.com/hongkongkiwi/actionlint-mcp@${ACTIONLINT_MCP_SHA}` | none | `lint_workflow`, `check_all_workflows` |
 | context7 | http | `https://mcp.context7.com/mcp` | `CONTEXT7_API_KEY` header | `resolve-library-id`, `query-docs` |
 | exa | http | `https://mcp.exa.ai/mcp` | `x-api-key` header | `web_search_exa`, `company_research_exa`, `crawling_exa` (+ others) |
-| gitnexus | stdio | `npx -y gitnexus@${GITNEXUS_TAG} mcp` (env `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1`) | none | code-graph (resolve, search, callers, etc.) |
-| serena | stdio | `uvx --from git+https://github.com/oraios/serena@${SERENA_REF} serena` | none | symbol-level Python audit (read/find/refs) |
+| serena | stdio | `uv tool install -p 3.13 serena-agent==${SERENA_VERSION} --prerelease=allow` | none | symbol-level Python audit (read/find/refs) |
 | terraform-mcp | stdio | binary on PATH (GPG-verified per ADR-0041) | optional `TFE_TOKEN` | Terraform-reasoning tools |
 
 ## Per-server detail
@@ -43,14 +42,12 @@ Canonical inventory: **six active servers** (originally seven per Gate-4 OI-1 cl
 - **Tools**: `web_search_exa`, `company_research_exa`, `crawling_exa` (+ others — design narrows to a 5-tool allowlist).
 - **Consumer**: `discovery-external-researcher` agent.
 
-### gitnexus
+### gitnexus (REMOVED 2026-05-27)
 
-- **Upstream**: `gitnexus` (npm package; the GitHub repo is `abhigyanpatwari/GitNexus`, but the npm package is the install target).
-- **Pin**: `GITNEXUS_TAG=1.6.5` (latest stable on npm at execution slot 2026-05-23).
-- **Install (cycle-3-corrected)**: `npm install -g gitnexus@${GITNEXUS_TAG}` (persistent) OR `npx -y gitnexus@${GITNEXUS_TAG} mcp` (one-shot). NOT `uvx` — that was a category error in pre-cycle-3 design; gitnexus is npm-only.
-- **Env-var**: `GITNEXUS_SKIP_OPTIONAL_GRAMMARS=1` — skips optional tree-sitter grammars at install time on architectures without prebuilds. On x86_64-linux Codespaces (canonical target), tree-sitter packages ship `prebuilds/linux-x64/*.node` so no C++ compilation runs; AC-CS-9 wrapping intent ("no C++ toolchain at cold-cache") holds.
-- **Tools**: code-graph (resolve symbol, search, find callers, file structure, etc. — whole-server allowlist).
-- **Consumer**: `discovery-codebase-researcher` agent (primary) + `review-architecture-auditor` agent.
+- **Status**: Removed per ADR-0066 — empirical unreliability in practice. The original selection in ADR-0007 was a theoretical-fit decision; in-practice failure modes (hooks conflict with long-lived MCP server, calibration churn for optional grammars, post-install warm cost, brittle index staleness behavior) made the server "broken and unusable" per user assessment.
+- **Replacement**: The two dependent sub-agents (`discovery-codebase-researcher`, `review-architecture-auditor`) fall back to Read+Grep+Glob plus serena's symbol-level MCP tools (`find_symbol`, `find_referencing_symbols`, `get_symbols_overview`) per ADR-0007's documented fallback. The `extraction_method` field on `codebase-analysis.json` now takes values `serena | grep-only | mixed`.
+- **Removal note**: ADR-0066-gitnexus-removal.md (Accepted 2026-05-27); supersedes the gitnexus selection in ADR-0007 v2.2.0.
+- **Historical pin**: `GITNEXUS_TAG=1.6.5` (recorded here for postmortem-trail completeness; the env var is no longer in `.devcontainer/versions.env`).
 
 ### mcp-openapi-schema (REMOVED 2026-05-24)
 
@@ -61,11 +58,12 @@ Canonical inventory: **six active servers** (originally seven per Gate-4 OI-1 cl
 
 ### serena
 
-- **Upstream**: `oraios/serena` on GitHub (Python; installed via `uvx`).
-- **Pin**: `SERENA_REF=v1.2.0` — latest tag strictly below v1.3.0 per ADR-0040 (pinned pre-v1.3.0 pending `base_modes`→`added_modes` migration review).
-- **Install**: `uvx --from git+https://github.com/oraios/serena@${SERENA_REF} serena`.
-- **Tools**: symbol-level Python audit operations (read/find/refs/etc. — whole-server allowlist on the **narrowed 5-agent set** per ADR-0040).
+- **Upstream**: `oraios/serena` on GitHub (Python; PyPI package `serena-agent`, binary `serena`).
+- **Pin**: `SERENA_VERSION=1.2.0` — latest tag strictly below v1.3.0 per ADR-0040 (pinned pre-v1.3.0 pending `base_modes`→`added_modes` migration review).
+- **Install**: `uv tool install -p 3.13 serena-agent==${SERENA_VERSION} --prerelease=allow` (canonical upstream method per MCP-provisioning-postmortem 2026-05-24).
+- **Tools**: symbol-level audit operations (read/find/refs/etc. — whole-server allowlist on the **narrowed 5-agent set** per ADR-0040).
 - **5-agent narrowed allowlist** (per ADR-0040): `review-architecture-auditor`, `design-claude-code` (frontmatter `name: design-cc`), `design-cicd`, `design-codespaces`, `discovery-codebase-researcher`. Other 31 agents do NOT carry `mcp__serena__*`.
+- **Post-gitnexus role (ADR-0066)**: serena is now the sole symbol-level MCP server. The two sub-agents previously also wired to gitnexus (`discovery-codebase-researcher`, `review-architecture-auditor`) retain their serena allowlist and use Read/Grep/Glob to cover what gitnexus's code-graph traversal previously served.
 - **Kill criterion**: design-time documentation only per Issues/register §O (no calendar machinery). Event trigger for re-eval: when `auditing-codespaces` stub-fill is undertaken (OI-6).
 
 ### terraform-mcp
@@ -79,7 +77,8 @@ Canonical inventory: **six active servers** (originally seven per Gate-4 OI-1 cl
 
 ## Cross-references
 
-- **ADR-0007 v2.2.0** — code-graph MCP selection policy (GitNexus primary, codebase-memory-mcp fallback documented at project level).
+- **ADR-0007 v2.2.0** — code-graph MCP selection policy (superseded for selection by ADR-0066; the documented fallback to Read/Grep/Glob + serena remains the canonical post-removal posture).
+- **ADR-0066** — gitnexus removal (2026-05-27).
 - **ADR-0037** — `.claude/runtime/mcp-events.jsonl` event surface.
 - **ADR-0039** — credential-redaction posture (env-block indirection; OP-9 URL-query REJECTED; OP-10 argv REJECTED).
 - **ADR-0040** — Serena narrowed always-on (5-agent allowlist).
