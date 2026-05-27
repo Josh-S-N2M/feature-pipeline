@@ -48,7 +48,7 @@ The Design Composition document-reviewer pass is structural-and-quality. The Arc
 Uses three techniques in combination:
 
 - **CoVe (Chain of Verification):** the auditor produces verification questions for each substantive claim in the Blueprint, then answers them by re-grounding against synthesis claims and the codebase. Inconsistent answers → issue.
-- **Blast-radius analysis:** uses GitNexus (primary) or codebase-memory-mcp (fallback) to enumerate everything that touches the components the Blueprint proposes to change. Surfaces any blast-radius items the Blueprint failed to acknowledge.
+- **Blast-radius analysis:** uses Read+Grep+Glob plus serena's symbol-level MCP tools (`find_referencing_symbols` is the canonical reverse-dependency lookup) to enumerate everything that touches the components the Blueprint proposes to change. Surfaces any blast-radius items the Blueprint failed to acknowledge.
 - **Brief-honor verification:** checks every Blueprint decision against the rationale brief's commitments. Decisions that contradict the brief, ignore an open item, or re-surface a previously-resolved issue → flagged.
 
 ### `review-cross-artifact-auditor` — cross-artifact consistency check

@@ -72,7 +72,7 @@ What existing patterns must the design respect? Per-layer convention discovery (
 
 ### Specific queries or grep targets (optional)
 
-If the topic is precise enough to specify, list the Cypher query (for GitNexus) or `grep` pattern (for direct codebase reads) the researcher should run. Otherwise, the researcher chooses based on the touch points.
+If the topic is precise enough to specify, list the `grep` / Glob pattern or the serena symbol-query (e.g. `find_referencing_symbols('OrderService.cancel')`) the researcher should run. Otherwise, the researcher chooses based on the touch points.
 
 ## External research topics
 

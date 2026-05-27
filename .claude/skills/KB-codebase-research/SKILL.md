@@ -2,19 +2,20 @@
 name: kb-codebase-research
 description: >-
   Discipline for analyzing an existing codebase during the Discovery Research
-  stage. Covers GitNexus MCP traversal patterns, dependency inference,
-  blast-radius previewing, structural archaeology (read what's there, not what
-  you'd write), and the canonical output schema for codebase-analysis.json
-  (per ADR-0018 + ADR-0038; schema v1.1.0 extended for blast-radius). Loaded by the
-  discovery-codebase-researcher sub-agent. Pairs with KB-cc-platform for
-  Claude Code primitives observed in the codebase and the per-layer design
-  KBs for layer-specific conventions to look for.
+  stage. Covers Read/Grep/Glob + serena symbol-tool traversal patterns,
+  dependency inference, blast-radius previewing, structural archaeology
+  (read what's there, not what you'd write), and the canonical output schema
+  for codebase-analysis.json (per ADR-0018 + ADR-0038; schema v1.1.0 extended
+  for blast-radius). Loaded by the discovery-codebase-researcher sub-agent.
+  Pairs with KB-cc-platform for Claude Code primitives observed in the
+  codebase and the per-layer design KBs for layer-specific conventions to
+  look for.
 allowed-tools: Read, Grep, Glob
 ---
 
 # KB-codebase-research — Codebase Analysis Discipline
 
-Discipline KB consumed by the `discovery-codebase-researcher` sub-agent during the Discovery Research stage. The sub-agent reads the existing codebase using GitNexus MCP (or the fallback `codebase-memory-mcp`), inferring structure, dependencies, and blast-radius for a proposed change, then writes `codebase-analysis.json` (canonical schema per ADR-0018 + ADR-0038; v1.1.0 extended for blast-radius preview) plus `codebase-analysis-report.md` (human-readable summary).
+Discipline KB consumed by the `discovery-codebase-researcher` sub-agent during the Discovery Research stage. The sub-agent reads the existing codebase using Read+Grep+Glob plus serena's symbol-level MCP tools (`find_symbol`, `find_referencing_symbols`, `get_symbols_overview`), inferring structure, dependencies, and blast-radius for a proposed change, then writes `codebase-analysis.json` (canonical schema per ADR-0018 + ADR-0038; v1.1.0 extended for blast-radius preview) plus `codebase-analysis-report.md` (human-readable summary).
 
 ## Contents
 
@@ -60,43 +61,22 @@ The PRD or Research Plan names the likely touch points (a service, a layer, a fl
 2. For each entry point, traverse outward: what does it call? What does it write to? What does it depend on?
 3. Bound the traversal at well-defined edges: bounded-context boundaries, layer boundaries, service-to-service calls.
 
-### GitNexus MCP query patterns
+### Serena symbol-tool patterns
 
-GitNexus exposes Cypher queries against the code graph. Useful queries:
+Serena exposes LSP-grade symbol queries. Useful calls:
 
-- **Who calls this function?**
-  ```
-  MATCH (caller)-[:CALLS]->(target {name: 'OrderService.cancel'})
-  RETURN caller.file, caller.name
-  ```
-- **What modules import this?**
-  ```
-  MATCH (m:Module)-[:IMPORTS]->(target:Module {name: 'orders.domain'})
-  RETURN m.name
-  ```
-- **What are the file's exported symbols?**
-  ```
-  MATCH (f:File {path: 'src/orders/service.ts'})-[:DEFINES]->(s)
-  WHERE s.exported = true
-  RETURN s.name, s.kind
-  ```
-- **What's the call depth from entry point X to module Y?**
-  ```
-  MATCH path = (entry {kind: 'http_handler', name: $entry})-[:CALLS*1..6]->(target {module: $module})
-  RETURN length(path), path
-  ORDER BY length(path) ASC
-  LIMIT 5
-  ```
+- **Who calls this function?** `mcp__serena__find_referencing_symbols` against the target symbol returns exact (file, line) reference set.
+- **What does a file export?** `mcp__serena__get_symbols_overview` on the file path returns the top-level symbol surface (functions, classes, methods).
+- **Where is a symbol defined?** `mcp__serena__find_symbol` with a name pattern returns the canonical definition site(s).
+- **Multi-hop call depth.** Serena returns 1-hop edges; for deeper traversal, iterate: feed each 1-hop caller into a second `find_referencing_symbols` call. Cap at N=3 hops by default per the blast-radius schema.
 
-For blast-radius preview: enumerate reverse-call dependents of the function or module the feature plans to modify. Capture the count, the names, and the test files that cover them (heuristic: `*.test.*` or `*.spec.*` in the same directory tree).
+For blast-radius preview: enumerate reverse-call dependents of the function or module the feature plans to modify via `find_referencing_symbols`. Capture the count, the names, and the test files that cover them (heuristic: `*.test.*` or `*.spec.*` in the same directory tree).
 
-### Use codebase-memory-mcp as fallback
+### Use Read + Grep + Glob for ground truth and as fallback
 
-When GitNexus is degraded for the user's language stack (e.g., the language isn't supported, or the index is stale), fall back to `codebase-memory-mcp`. The sub-agent's output schema is the same regardless of which MCP supplied the data; only the `extraction_method` field varies.
+When serena is degraded for the user's language stack (e.g., the language server doesn't support the language, the project hasn't been onboarded, or the symbol lookup returns empty for a known-good name), fall back to Read+Grep+Glob alone. The sub-agent's output schema is the same regardless of which method supplied the data; only the `extraction_method` field varies.
 
-### Use Read / Grep / Glob for ground truth
-
-GitNexus and codebase-memory MCPs index code; they can lag. For high-confidence claims, verify against the file system: `Read` the file, `Grep` for the symbol, `Glob` to confirm the path exists.
+Even when serena is healthy, prefer Read/Grep/Glob for ground truth on high-stakes claims — read the file, grep for the symbol, glob to confirm the path exists. Symbol-tool output can lag the working tree.
 
 ## What to record
 
@@ -122,7 +102,7 @@ Each dependency edge:
 - `kind`: one of {import, call, http_call, message_publish, message_consume, db_read, db_write, config_reference, file_reference}
 - `count`: how many instances of this edge (e.g., 12 separate places call OrderService.cancel)
 - `representative_files`: 1-3 example file paths to look at
-- `confidence`: high / medium / low (high = GitNexus + manual verification; medium = GitNexus only; low = inferred)
+- `confidence`: high / medium / low (high = serena + manual verification; medium = serena only or grep only; low = inferred)
 
 ### Blast radius (per proposed touch point)
 
@@ -160,7 +140,7 @@ Per ADR-0018 + ADR-0038 (schema v1.1.0 extended for blast-radius). The sub-agent
   "schema_version": "1.1.0",
   "pipeline_run_id": "<run id>",
   "generated_at": "<ISO 8601>",
-  "extraction_method": "gitnexus | codebase-memory-mcp | mixed",
+  "extraction_method": "serena | grep-only | mixed",
   "scope": {
     "repo": "<owner/repo>",
     "branch": "<branch>",
@@ -228,7 +208,7 @@ The sub-agent ALSO produces `codebase-analysis-report.md` — a human-readable s
 
 ## Common pitfalls
 
-- **Treating GitNexus output as ground truth without verification.** The index can lag. For high-stakes claims (especially blast-radius for the change), verify with `Read`/`Grep`.
+- **Treating serena symbol output as ground truth without verification.** Symbol-tool output can lag the working tree. For high-stakes claims (especially blast-radius for the change), verify with `Read`/`Grep`.
 - **Recording everything.** The output is noise if it captures every file in the repo. Scope to the PRD's likely touch points.
 - **Inferring intent from code.** "This looks unused" is often wrong. Surface as an open question rather than recording as fact.
 - **Skipping the conventions section.** The downstream per-layer designers need conventions to design with the codebase, not against it.
@@ -241,7 +221,7 @@ This KB has no `references/` subdirectory at this stage — the discipline lives
 
 Future expansion (after pilot use) may add a `references/` subdirectory covering:
 
-- A deeper GitNexus Cypher cookbook with worked traversal examples.
+- A deeper serena symbol-traversal cookbook with worked examples.
 - A comprehensive per-layer convention inspection checklist.
 
 For now, the SKILL.md is the complete reference.
