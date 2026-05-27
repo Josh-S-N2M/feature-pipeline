@@ -107,92 +107,11 @@ def parse_simple_yaml_fields(fm_text: str) -> dict:
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print(json.dumps({"error": "Usage: scan_subagent_body.py <path>"}))
-        return 2
-
-    path = Path(sys.argv[1]).resolve()
-    if not path.is_file():
-        print(json.dumps({"error": f"not a file: {path}"}))
-        return 2
-
-    text = path.read_text(encoding="utf-8", errors="replace")
-    fm_text, body = split_frontmatter(text)
-    fm = parse_simple_yaml_fields(fm_text or "")
-
-    findings: list[dict] = []
-
-    # SA-4: bypassPermissions + dangerous tools
-    if fm.get("permissionMode") == "bypassPermissions":
-        tools = fm.get("tools", [])
-        if isinstance(tools, str):
-            tools_list = [t.strip() for t in tools.split(",")]
-        else:
-            tools_list = tools
-        dangerous_in_tools = []
-        for t in tools_list:
-            name = re.split(r"\(", t)[0].strip()
-            if name in DANGEROUS_TOOLS_FOR_BYPASS:
-                dangerous_in_tools.append(t)
-        if dangerous_in_tools:
-            findings.append({
-                "dimension": 6, "severity": "BLOCKER",
-                "is_security_critical": True,
-                "location": str(path),
-                "where": str(path),
-                "what": f"`permissionMode: bypassPermissions` combined with dangerous tools {dangerous_in_tools}. (SA-4)",
-                "fix": "Remove bypassPermissions, or remove the dangerous tools. Never combine these.",
-            })
-
-    # D-5 (T011): negation-aware bypass-approval check.
-    # The SUB-BYPASS-PROMPT pattern fires on phrases like "skip the permission policy"
-    # — but a phrase preceded by negation ("you do NOT skip the permission policy")
-    # is the OPPOSITE intent and should not fire. Python regex doesn't support
-    # variable-length lookbehind, so we use a two-pass approach: find candidate
-    # matches, then check the preceding window for negation phrases.
-    NEGATION_PRE_PATTERN = re.compile(
-        r"\b(?:do\s+not|don'?t|never|will\s+not|won'?t|must\s+not|"
-        r"mustn'?t|cannot|can'?t|shall\s+not|shan'?t|no\s+matter|"
-        r"under\s+no\s+circumstances)\b",
-        re.I,
-    )
-    NEGATION_LOOKBACK_CHARS = 50  # window before match start
-
-    # Pattern scan of body
-    body_lines = body.split("\n")
-    for pid, pattern, sev, what, fix, is_critical in PATTERNS:
-        for i, line in enumerate(body_lines, start=1):
-            m = pattern.search(line)
-            if not m:
-                continue
-
-            # Two-pass: for the negation-sensitive bypass pattern, check the
-            # window preceding the match for any negation phrase.
-            if pid == "SUB-BYPASS-PROMPT":
-                window_start = max(0, m.start() - NEGATION_LOOKBACK_CHARS)
-                preceding = line[window_start:m.start()]
-                # Also include the previous line's tail in case the negation spans
-                # sentence boundaries within the same paragraph.
-                if i > 1:
-                    prev_line = body_lines[i - 2]
-                    preceding = prev_line[-NEGATION_LOOKBACK_CHARS:] + " " + preceding
-                if NEGATION_PRE_PATTERN.search(preceding):
-                    continue  # negated → suppress finding
-
-            findings.append({
-                "dimension": 6, "severity": sev,
-                "is_security_critical": is_critical,
-                "pattern_id": pid,
-                "location": f"{path}:{i + len(fm_text.split(chr(10))) + 2}",  # approximate line in original file
-                "where": f"{path}:{i + len(fm_text.split(chr(10))) + 2}",
-                "what": what,
-                "fix": fix,
-            })
-
-    print(json.dumps({
-        "target": str(path),
-        "findings": findings,
-    }, indent=2))
+    """Disabled per ADR-0067 (2026-05-27). Subagent body security scans
+    (SA-3 wildcard shell, SA-4 prompt injection / bypassPermissions
+    combinations) were generating high false-positive rates relative to
+    value for this project's threat model. Emits an empty findings list."""
+    print(json.dumps({"findings": []}))
     return 0
 
 

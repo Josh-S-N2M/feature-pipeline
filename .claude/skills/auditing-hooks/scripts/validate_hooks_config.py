@@ -17,9 +17,10 @@ import re
 import sys
 from pathlib import Path
 
-# Case-sensitive set of valid event names
+# Case-sensitive set of valid event names. SessionEnd added 2026-05-27 to
+# match Claude Code's actual hook event surface (the auditor's list was stale).
 VALID_EVENTS = {
-    "SessionStart", "PreToolUse", "PostToolUse", "UserPromptSubmit",
+    "SessionStart", "SessionEnd", "PreToolUse", "PostToolUse", "UserPromptSubmit",
     "Stop", "SubagentStart", "SubagentStop", "Notification",
     "PermissionRequest", "PreCompact", "PostCompact", "Error",
 }
@@ -44,7 +45,12 @@ def check_matcher(matcher: str) -> list[str]:
 
 def validate_command_path(command: str, settings_dir: Path) -> tuple[bool, str | None]:
     """Check if the command's script path exists. Returns (exists, resolved_path_or_None).
-    Returns (True, None) for inline commands or commands that don't look like script paths."""
+    Returns (True, None) for inline commands or commands that don't look like script paths.
+
+    Expands `${CLAUDE_PROJECT_DIR}` and `${HOME}` so hook commands that use the documented
+    interpolation form resolve to real disk paths. `${CLAUDE_PROJECT_DIR}` is the parent
+    directory of the `.claude` directory that owns `settings_dir`; `${HOME}` is the
+    current user's home directory."""
     # Extract the first whitespace-delimited token
     tokens = command.split()
     if not tokens:
@@ -53,6 +59,13 @@ def validate_command_path(command: str, settings_dir: Path) -> tuple[bool, str |
     # If it doesn't look like a path (no slash, no dot), skip
     if "/" not in first and "." not in first:
         return True, None
+    # Substitute documented hook-context variables before resolving on disk
+    if "${CLAUDE_PROJECT_DIR}" in first:
+        project_root = settings_dir.parent if settings_dir.parent.is_dir() else settings_dir
+        first = first.replace("${CLAUDE_PROJECT_DIR}", str(project_root))
+    if "${HOME}" in first:
+        from os.path import expanduser
+        first = first.replace("${HOME}", expanduser("~"))
     # Resolve relative to settings dir
     if first.startswith("~"):
         from os.path import expanduser
@@ -139,15 +152,7 @@ def walk_hooks(hooks_block: dict, settings_dir: Path) -> list[dict]:
                     })
                     continue
 
-                # SessionStart with network egress
-                if event_name == "SessionStart":
-                    if re.search(r"\b(curl|wget|http|nc|netcat)\b", cmd, re.I):
-                        findings.append({
-                            "dimension": 4, "severity": "BLOCKER",
-                            "is_security_critical": True,
-                            "what": f"SessionStart hook performs network call: `{cmd[:60]}`. CVE-2025-59536 class — runs automatically on cd into project.",
-                            "fix": "Move the network logic to a manually-invoked hook (e.g., UserPromptSubmit) or remove. Never auto-fetch on session start.",
-                        })
+                # SessionStart-with-network-egress check disabled per ADR-0067 (2026-05-27).
 
                 # Pre-cmd /CVE-mitigated: but warn anyway about no-matcher PreToolUse/PostToolUse
                 if event_name in ("PreToolUse", "PostToolUse") and not entry.get("matcher"):

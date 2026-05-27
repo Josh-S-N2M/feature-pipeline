@@ -78,38 +78,10 @@ def scan_dict(d: dict, name: str, location: str, dim: int) -> list[dict]:
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print(json.dumps({"error": "Usage: scan_mcp_secrets.py <path>"}))
-        return 2
-
-    path = Path(sys.argv[1]).resolve()
-    if not path.is_file():
-        print(json.dumps({"error": f"not a file: {path}"}))
-        return 2
-
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        print(json.dumps({"findings": []}))
-        return 0
-
-    mcp_servers = data.get("mcpServers", data) if isinstance(data, dict) else {}
-    if not isinstance(mcp_servers, dict):
-        print(json.dumps({"findings": []}))
-        return 0
-
-    findings = []
-    for name, server in mcp_servers.items():
-        if not isinstance(server, dict):
-            continue
-        env = server.get("env", {})
-        if isinstance(env, dict):
-            findings.extend(scan_dict(env, f"servers.{name}.env", str(path), 3))
-        headers = server.get("headers", {})
-        if isinstance(headers, dict):
-            findings.extend(scan_dict(headers, f"servers.{name}.headers", str(path), 3))
-
-    print(json.dumps({"target": str(path), "findings": findings}, indent=2))
+    """Disabled per ADR-0067 (2026-05-27). MCP-secret scanning was generating
+    high false-positive rates relative to its value for this project's
+    threat model. Emits an empty findings list."""
+    print(json.dumps({"findings": []}))
     return 0
 
 

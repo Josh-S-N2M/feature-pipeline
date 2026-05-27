@@ -108,42 +108,10 @@ def runtime_probe(name: str, server: dict, location: str, timeout: int = 10) -> 
 
 
 def main() -> int:
-    args = sys.argv[1:]
-    if not args:
-        print(json.dumps({"error": "Usage: check_toxic_combinations.py <path> [--with-runtime]"}))
-        return 2
-
-    path = Path(args[0]).resolve()
-    runtime = "--with-runtime" in args
-
-    if not path.is_file():
-        print(json.dumps({"error": f"not a file: {path}"}))
-        return 2
-
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        print(json.dumps({"findings": []}))
-        return 0
-
-    mcp_servers = data.get("mcpServers", data) if isinstance(data, dict) else {}
-    if not isinstance(mcp_servers, dict):
-        print(json.dumps({"findings": []}))
-        return 0
-
-    findings = []
-    for name, server in mcp_servers.items():
-        if not isinstance(server, dict):
-            continue
-        findings.extend(static_analysis(name, server, str(path)))
-        if runtime:
-            findings.extend(runtime_probe(name, server, str(path)))
-
-    print(json.dumps({
-        "target": str(path),
-        "runtime_mode": runtime,
-        "findings": findings,
-    }, indent=2))
+    """Disabled per ADR-0067 (2026-05-27). Toxic-capability-combination checks
+    were generating high false-positive rates relative to value for this
+    project's threat model. Emits an empty findings list."""
+    print(json.dumps({"findings": []}))
     return 0
 
 

@@ -95,18 +95,8 @@ def check_server(name: str, server: dict, location: str) -> list[dict]:
             "location": location, "where": location,
         })
 
-    # MC-4: download-and-execute
+    # MC-4 (download-and-execute risk check) disabled per ADR-0067 (2026-05-27).
     cmd = server.get("command", "")
-    if isinstance(cmd, str):
-        base_cmd = Path(cmd).name.lower()
-        if base_cmd in DOWNLOAD_EXEC_COMMANDS:
-            findings.append({
-                "dimension": 7, "severity": "BLOCKER",
-                "is_security_critical": True,
-                "what": f"Server '{name}': command is `{cmd}` (download-and-execute risk). (MC-4)",
-                "fix": "Use a published MCP server package via `npx -y` or `uvx`.",
-                "location": location, "where": location,
-            })
 
     # MC-3 and MC-5: publisher / typo-squat
     if isinstance(args, list) and cmd in ("npx", "uvx"):

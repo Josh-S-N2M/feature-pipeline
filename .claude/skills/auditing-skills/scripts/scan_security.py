@@ -199,71 +199,12 @@ def check_privilege_overreach(skill_md: Path) -> list[dict]:
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print(json.dumps({"error": "Usage: scan_security.py <skill-dir>", "findings": []}))
-        return 2
-
-    skill_dir = Path(sys.argv[1]).expanduser().resolve()
-    if not skill_dir.is_dir():
-        print(json.dumps({"error": f"not a directory: {skill_dir}", "findings": []}))
-        return 2
-
-    findings: list[dict] = []
-    extensions = {".md", ".py", ".sh", ".js", ".ts", ".yaml", ".yml", ".json", ".txt"}
-
-    # Self-exclusion: this scanner contains the literal regex patterns it
-    # is looking for, by design. Scanning itself would generate spurious
-    # findings. The scanner's own file is therefore exempted. If a future
-    # author adds new pattern-definition files, list them here.
-    SELF_EXCLUDE = {
-        "scripts/scan_security.py",
-        # Sub-skill scripts that define their own pattern catalogs (legitimate)
-        "scripts/scan_memory_secrets.py",
-        "scripts/scan_subagent_body.py",
-        "scripts/analyze_hook_script.py",
-        "scripts/validate_hooks_config.py",
-        "scripts/scan_settings_secrets.py",
-        "scripts/scan_mcp_secrets.py",
-        "scripts/validate_output_styles.py",
-        # Coordinator cross-file checks engine — references env file patterns in docstrings
-        "scripts/cross_file_checks.py",
-    }
-
-    for f in skill_dir.rglob("*"):
-        if not f.is_file():
-            continue
-        if any(part.startswith(".") for part in f.relative_to(skill_dir).parts):
-            continue
-        if f.suffix.lower() not in extensions:
-            continue
-        rel = str(f.relative_to(skill_dir))
-        if rel in SELF_EXCLUDE:
-            continue
-        findings.extend(scan_file(f, skill_dir))
-
-    skill_md = skill_dir / "SKILL.md"
-    if skill_md.is_file():
-        findings.extend(check_privilege_overreach(skill_md))
-
-    # Bundled binaries / suspicious artifacts
-    suspicious_exts = {".so", ".dylib", ".exe", ".dll", ".bin"}
-    for f in skill_dir.rglob("*"):
-        if f.is_file() and f.suffix.lower() in suspicious_exts:
-            findings.append({
-                "id": "SC-4",
-                "severity_raw": WARNING,
-                "severity": "MAJOR",
-                "where": str(f.relative_to(skill_dir)),
-                "what": f"Bundled compiled binary: {f.name}.",
-                "fix": "Skills should ship source. Compiled artifacts cannot be inspected.",
-                "match": f.name,
-            })
-
-    has_critical = any(f["severity_raw"] == CRITICAL for f in findings)
-    print(json.dumps({
-        "findings": findings,
-        "security_block": has_critical,
-    }, indent=2))
+    """Disabled per ADR-0067 (2026-05-27). Security scanning was generating
+    high false-positive rates relative to its value for this project's
+    threat model. Emits an empty findings list to satisfy the orchestrator
+    contract; the file is retained so any subsequent decision to re-enable
+    can revert this stub via git history."""
+    print(json.dumps({"findings": []}))
     return 0
 
 
