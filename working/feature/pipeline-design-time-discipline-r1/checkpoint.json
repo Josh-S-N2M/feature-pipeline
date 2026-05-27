@@ -1,0 +1,107 @@
+{
+  "run_id": "pipeline-design-time-discipline-r1-20260526-162313",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "started_at": "2026-05-26T16:23:13Z",
+  "current_stage": "complete",
+  "stage_status": "complete",
+  "gate_history": [
+    {
+      "gate": "intent_confirmation",
+      "decision": "approved_auto_mode",
+      "timestamp": "2026-05-26T16:35:00Z"
+    },
+    {
+      "gate": "prd_approval",
+      "decision": "approved_auto_mode",
+      "timestamp": "2026-05-26T16:55:00Z"
+    },
+    {
+      "gate": "research_plan_approval",
+      "decision": "approved_auto_mode",
+      "timestamp": "2026-05-26T17:00:00Z"
+    },
+    {
+      "gate": "blueprint_approval",
+      "decision": "approved_auto_mode",
+      "timestamp": "2026-05-26T17:55:00Z",
+      "user_notes": "2 new ADRs ratified (ADR-0064, ADR-0065). No user-facing redirect items at this gate."
+    },
+    {
+      "gate": "plan_approval",
+      "decision": "approved_auto_mode",
+      "timestamp": "2026-05-26T18:30:00Z"
+    }
+  ],
+  "artifact_versions": {
+    "intent_clarification": 1,
+    "prd": 1,
+    "research_plan": 1,
+    "codebase_analysis": 1,
+    "synthesis": 2,
+    "cc_design": 1,
+    "blueprint": 1,
+    "plan": 1,
+    "acceptance_tests": 1,
+    "phase_validators": 1,
+    "tasks": 1,
+    "adrs_authored": [
+      "ADR-0064",
+      "ADR-0065"
+    ]
+  },
+  "reconciliation_cycles": {
+    "blueprint": 2,
+    "cross_artifact": 0
+  },
+  "activated_layers": [
+    "claude-code"
+  ],
+  "extraction_method": "mixed",
+  "params": {
+    "max_external_research_topics": 6,
+    "reconciliation_cap": 4,
+    "adr_number_range_reserved": "0064-0069"
+  },
+  "split_lineage": {
+    "parent_run": "pipeline-cross-artifact-discipline-r1",
+    "split_record_path": "working/feature/pipeline-cross-artifact-discipline-r1/SPLIT-RECORD.md",
+    "this_run_role": "R2a \u2014 design-time discipline half",
+    "mechanism_subset": [
+      "FR-1 (H3)",
+      "FR-6 (B1)",
+      "FR-7 (B3)",
+      "FR-8 (B2)",
+      "FR-9 (B4)",
+      "FR-10 (B5)"
+    ],
+    "inherited_adrs": [
+      "ADR-0059",
+      "ADR-0061",
+      "ADR-0063"
+    ],
+    "queued_followup": "pipeline-gate-validator-hardening-r1 (R2b \u2014 separate session after R2a ships)"
+  },
+  "dogfood_validation_evidence": "Per audit finding I-AA-007: the architecture audit caught four independent occurrences of exactly the defect classes R2a's mechanisms (FR-1, FR-6, FR-7, FR-10) are designed to prevent. Strong evidence that R2a's central thesis holds against its own producing pipeline.",
+  "execution_pipeline_state_transitions": [],
+  "execution_mode": "specialist-dispatch",
+  "execution_pipeline_cycle_counters": {
+    "per_task": {
+      "T0.2": 1,
+      "T3.2": 1,
+      "T3.3": 1,
+      "T8.1": 1
+    },
+    "per_phase": {}
+  },
+  "execution_status": "SUCCESS",
+  "completed_at": "2026-05-27T19:45:25Z",
+  "task_count_total": 31,
+  "task_count_approved": 31,
+  "reconciliation_cycles_consumed": {
+    "T0.2": 1,
+    "T3.2": 1,
+    "T3.3": 1,
+    "T8.1": 1
+  },
+  "dogfood_validation_outcome": "Phase 8 SA-14 cycle 0 failed on R2a's own matrix due to parser defect in T7.1; cycle 1 patched the script; SA-14 PASS confirmed against the unchanged T8.1 matrix. R2a's central thesis tested under own contract \u2014 thesis held."
+}

@@ -1,0 +1,594 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "pipeline-cross-artifact-discipline-r1",
+  "layer": "claude-code",
+  "generated_at": "2026-05-26T15:10:00Z",
+  "generated_by": "design-cc",
+  "source_design": "working/feature/pipeline-cross-artifact-discipline-r1/cc-design.md",
+  "notes": "Per PRD Layer Scope, Claude Code is the sole activated layer for this feature. No depends_on / provides_to edges to other-layer designs. All edges below are intra-CC-layer between .claude/ artifacts (and the adrs/ + .mcp.json + Issues/ surfaces that the layer governs).",
+
+  "depends_on_other_layers": [],
+  "provides_to_other_layers": [],
+
+  "touches": [
+    {
+      "path": ".claude/agents/review-architecture-auditor.md",
+      "touch_type": "edit",
+      "frs": ["FR-1"],
+      "change_summary": "Add design-realization audit phase to the agent's procedure; cite KB-review-disciplines Lens 4; emit BLOCKER findings with NFR-8 four-field shape.",
+      "reverse_dependents_per_codebase_analysis": [
+        "recipe-feature-pipeline (stage 8 dispatch)",
+        "finalize-reconciler (consumes architecture-audit-issues.json)",
+        "design-composer (writes blueprint audited)",
+        "review-cross-artifact-auditor (sibling auditor)",
+        "finalize-deliverable-packager (consumes audit archive)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-review-disciplines/references/architecture-audit.md",
+      "touch_type": "edit",
+      "frs": ["FR-1", "FR-3"],
+      "change_summary": "Add Lens 4 (Design Realization); cross-reference cross-file invariants catalog under cross-artifact lens.",
+      "reverse_dependents_per_codebase_analysis": [
+        "review-architecture-auditor",
+        "shared-document-reviewer",
+        "review-cross-artifact-auditor"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md",
+      "touch_type": "edit",
+      "frs": ["FR-1", "FR-4", "FR-5", "FR-9", "FR-10", "D-10"],
+      "change_summary": "Add D-10 severity vocabulary bridge table (3 vocabularies × monotonic / non-monotonic edges); add NFR-8 four-field finding shape (rule/target/divergence/next_action).",
+      "reverse_dependents_per_codebase_analysis": [
+        "review-architecture-auditor",
+        "review-cross-artifact-auditor",
+        "shared-document-reviewer",
+        "auditing-cc-configs/scripts/verdict_compute.py"
+      ]
+    },
+    {
+      "path": "adrs/ADR-NNNN-<slug>.prescriptions.yaml",
+      "touch_type": "create",
+      "frs": ["FR-1"],
+      "change_summary": "New companion-file pattern (sibling to each ADR with machine-checkable prescriptions). Schema in §Companion-file schema of cc-design.md. Optional per ADR.",
+      "reverse_dependents_per_codebase_analysis": [
+        "review-architecture-auditor (consumer)",
+        "auditing-shared/scripts/validate_adr_prescriptions.py (linter)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-shared/scripts/validate_adr_prescriptions.py",
+      "touch_type": "create",
+      "frs": ["FR-1"],
+      "change_summary": "New helper: schema-validate companion-file YAML; verify adr_path / slug match; verify target_path existence; reject duplicate id.",
+      "reverse_dependents_per_codebase_analysis": [
+        "review-architecture-auditor (callable at audit time)",
+        "auditing-cc-configs/scripts/audit_project.py (may invoke)"
+      ]
+    },
+    {
+      "path": ".claude/agents/discovery-codebase-researcher.md",
+      "touch_type": "edit",
+      "frs": ["FR-2", "FR-9"],
+      "change_summary": "Add procedure step for §Protocol Conformance subsection emission; document Blocks-X marker emission grammar (D-4).",
+      "reverse_dependents_per_codebase_analysis": [
+        "review-architecture-auditor (Phase 1.6 reads codebase-analysis.json)",
+        "design-composer (lines 42, 154, 159)",
+        "design-cc (Phase 1)",
+        "design-frontend, design-backend, design-api, design-database, design-query, design-iac, design-cicd, design-codespaces (8 per-layer designers)",
+        "plan-author (line 38, 57)",
+        "test-acceptance-author (line 29, 87)",
+        "finalize-task-decomposer (line 35)",
+        "shared-document-reviewer (invocation 2)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-codebase-research/SKILL.md",
+      "touch_type": "edit",
+      "frs": ["FR-2"],
+      "change_summary": "Additive schema extension (v1.1.x or v1.2.0) — new top-level array protocol_conformance[]. Per ADR-0018 + ADR-0038 additive extension discipline.",
+      "reverse_dependents_per_codebase_analysis": [
+        "discovery-codebase-researcher (sole consumer of this KB)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-documentation-criteria/references/templates/protocol-conformance-subsection-template.md",
+      "touch_type": "create",
+      "frs": ["FR-2"],
+      "change_summary": "New subsection template referenced from KB-codebase-research SKILL.md (NFR-9 grep-checkability).",
+      "reverse_dependents_per_codebase_analysis": [
+        "discovery-codebase-researcher (via KB-documentation-criteria load)"
+      ]
+    },
+    {
+      "path": ".claude/agents/test-phase-validator-author.md",
+      "touch_type": "edit",
+      "frs": ["FR-3", "FR-11"],
+      "change_summary": "Phase 2 extended with required 'Cross-File Invariants' section (D-2 denormalized declaration) and deferral-framing check (D-9 three-host placement). Per codebase-analysis Known Issue 3, this agent body IS the PV-author rubric.",
+      "reverse_dependents_per_codebase_analysis": [
+        "finalize-reconciler (lines 33, 62)",
+        "plan-author (line 130)",
+        "review-cross-artifact-auditor (consumes phase-validators.md)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-task-decomposition/cross-file-invariants.md",
+      "touch_type": "create",
+      "frs": ["FR-3"],
+      "change_summary": "New catalog file: per CFI-NNN entries with predicate_logic, error_message_template, severity, applicable_phases. D-2 centralized body.",
+      "reverse_dependents_per_codebase_analysis": [
+        "test-phase-validator-author (declarations reference catalog by ID)",
+        "finalize-task-decomposer (sole KB consumer per SKILL.md line 24)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/scripts/audit_mcp.py",
+      "touch_type": "edit",
+      "frs": ["FR-4", "FR-5"],
+      "change_summary": "Rename --with-runtime → --with-mcp-reachability (line ~36); add reachability dispatch + drift-detection dispatch.",
+      "reverse_dependents_per_codebase_analysis": [
+        "auditing-cc-configs/scripts/audit_project.py (forwards flag, line 247)",
+        "cc-critique.md (lines 45, 74)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/scripts/check_toxic_combinations.py",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update --with-runtime references (lines 9, 14, 113, 117) → --with-mcp-reachability; preserve toxic-combination semantics.",
+      "reverse_dependents_per_codebase_analysis": [
+        "audit_mcp.py (subprocess dispatch, line 56-58)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/scripts/check_mcp_reachability.py",
+      "touch_type": "create",
+      "frs": ["FR-4"],
+      "change_summary": "New script: per-server live handshake (claude mcp ping or transport-equivalent JSON-RPC); 3000 ms timeout per NFR-2; redact credentials per NFR-6.",
+      "reverse_dependents_per_codebase_analysis": [
+        "audit_mcp.py (new subprocess dispatch)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/scripts/check_tool_surface_drift.py",
+      "touch_type": "create",
+      "frs": ["FR-5"],
+      "change_summary": "New script: four-stage pipeline (RFC 8785 canonicalize → baseline lookup → RFC 6902 JSON-Patch diff → severity-catalog routing) per D-7. NFR-3 500 ms/server budget.",
+      "reverse_dependents_per_codebase_analysis": [
+        "audit_mcp.py (new subprocess dispatch)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/baselines/",
+      "touch_type": "create",
+      "frs": ["FR-5"],
+      "change_summary": "New subdirectory: one canonical baseline JSON per MCP server (RFC 8785-canonicalized tools/list response). 6 baseline files at first encounter (actionlint-mcp, context7, exa, gitnexus, serena, terraform-mcp). Subject to Q-CC-4 design-composer ratification.",
+      "reverse_dependents_per_codebase_analysis": [
+        "check_tool_surface_drift.py (reads/writes baselines)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/references/drift-severity-catalog.md",
+      "touch_type": "create",
+      "frs": ["FR-5"],
+      "change_summary": "New reference: severity-catalog mapping for Stage 4 of drift detection. Aligns with AC-FR-5-a/-b/-c/-d/-e + D-10 bridge.",
+      "reverse_dependents_per_codebase_analysis": [
+        "check_tool_surface_drift.py (consumer)",
+        "review-architecture-auditor (consumer at design-realization audit time if ADR prescribes tool surface)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/SKILL.md",
+      "touch_type": "edit",
+      "frs": ["FR-4", "FR-5"],
+      "change_summary": "Update Routing-table dimension 10 + Runtime-mode section (lines 8, 37, 55, 79, 85) for flag rename; add drift-detection dimension.",
+      "reverse_dependents_per_codebase_analysis": [
+        "auditing-cc-configs (family coordinator)",
+        "operators (skill body is human-facing documentation)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/examples/good-mcp-annotated.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update flag references (lines 62, 73, 75).",
+      "reverse_dependents_per_codebase_analysis": ["auditing-mcp SKILL.md (cross-reference)"]
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/references/common-failures.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update flag reference (line 53).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/skills/auditing-mcp/references/toxic-combinations.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update flag references (lines 17, 59, 88).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/skills/auditing-cc-configs/scripts/audit_project.py",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update flag forwarding (lines 247, 407-408, 418, 433) + AC-FR-4-d loud-fail behavior on legacy --with-runtime.",
+      "reverse_dependents_per_codebase_analysis": [
+        "operators (entrypoint for whole-project audit)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-cc-configs/SKILL.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update references (lines 42, 182) — flag rename.",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/skills/auditing-cc-configs/assets/audit-checklist.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update reference (line 9).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/skills/auditing-cc-configs/references/audit-rubric.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update reference (line 125).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/skills/auditing-cc-configs/references/common-failures.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update reference (line 133).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/skills/KB-mcp-platform/references/operator-runbook.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update reference (line 87).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/skills/KB-mcp-platform/references/mcp-events-jsonl.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update reference (line 103).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/skills/KB-mcp-platform/references/troubleshooting.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update reference (line 109).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/agents/cc-critique.md",
+      "touch_type": "edit",
+      "frs": ["FR-4"],
+      "change_summary": "Update references (lines 45, 74) — flag rename.",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/agents/design-claude-code.md",
+      "touch_type": "edit",
+      "frs": ["FR-6", "FR-7", "FR-8"],
+      "change_summary": "Phase 2 extended: new mandatory output (agent-roster-impact-matrix.md when trigger fires); Skill-Coverage Decisions authoring step; line 56 cross-reference updated to match post-FR-8 Principle 9 active framing.",
+      "reverse_dependents_per_codebase_analysis": [
+        "design-composer (consumes cc-design.md + cc-dependencies.json)",
+        "recipe-feature-pipeline (outputs table line 24)",
+        "shared-document-reviewer (invocation 3 reviews per-layer Design outputs)",
+        "review-architecture-auditor (audits the composed Blueprint)"
+      ]
+    },
+    {
+      "path": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "touch_type": "edit",
+      "frs": ["FR-6", "FR-9"],
+      "change_summary": "Outputs table gets a third design-cc deliverable row (matrix); Design Composition close gate refuses when trigger fired and matrix absent; stage-transition checkpoint logic for Blocks-X markers.",
+      "reverse_dependents_per_codebase_analysis": [
+        "execute-orchestrator (orchestrator loads recipe)",
+        "all 28 sub-agents per routing table"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-subagents/scripts/check_feature_touch_predicate.py",
+      "touch_type": "create",
+      "frs": ["FR-6"],
+      "change_summary": "New advisory predicate (D-5 hybrid): scans synthesis.md + blueprint.md for trigger-shaped tokens (FR-6 conditions 3+4); emits advisory annotation; override events log to state-transitions.log.",
+      "reverse_dependents_per_codebase_analysis": [
+        "design-composer (consumes advisory at composition gate)",
+        "log_state_transition.py (helper used for override events)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-documentation-criteria/references/templates/agent-roster-impact-matrix-template.md",
+      "touch_type": "create",
+      "frs": ["FR-6"],
+      "change_summary": "New template: one row per .claude/agents/*.md; one cell per dimension (tools/skills/model/effort/prompt body); positive-evidence-string required per PRD Product Policy.",
+      "reverse_dependents_per_codebase_analysis": [
+        "design-cc (consumes template)",
+        "auditing-subagents SA-14 (validates against schema)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-cc-design/references/principles.md",
+      "touch_type": "edit",
+      "frs": ["FR-6", "FR-7", "FR-8", "FR-11"],
+      "change_summary": "Principle 9 rewritten from defensive to active framing (FR-8); W/H/A rubric + substance-not-presence heuristic added to Principle 9 neighborhood (FR-7); cross-reference to FR-6 matrix cell discipline per AC-FR-8-b; deferral-framing section added (FR-11 — sub-section under Principle 9 or as Principle 11 per Q-CC-8).",
+      "reverse_dependents_per_codebase_analysis": [
+        "design-claude-code.md:56 (verbatim citation)",
+        "design-cicd.md (loads KB-cc-design)",
+        "design-codespaces.md (loads KB-cc-design)"
+      ]
+    },
+    {
+      "path": ".claude/agents/synth-synthesizer.md",
+      "touch_type": "edit",
+      "frs": ["FR-7"],
+      "change_summary": "Emit Skill-Coverage Decisions section in synthesis output when new domain concepts identified. (Final agent target ratified by design-composer per Q-CC-6.)",
+      "reverse_dependents_per_codebase_analysis": [
+        "design-composer (consumes synthesis.md)"
+      ]
+    },
+    {
+      "path": ".claude/agents/design-composer.md",
+      "touch_type": "edit",
+      "frs": ["FR-7", "FR-11"],
+      "change_summary": "Blueprint composition reads Skill-Coverage Decisions rows; blocks completion on missing justification per AC-FR-7-b. Open Items prompt cross-references new deferral-framing conventions file.",
+      "reverse_dependents_per_codebase_analysis": [
+        "shared-document-reviewer (invocation 4 reviews Blueprint)",
+        "review-architecture-auditor (audits Blueprint)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section-template.md",
+      "touch_type": "create",
+      "frs": ["FR-7"],
+      "change_summary": "New template — one decision row per new domain concept with justification field.",
+      "reverse_dependents_per_codebase_analysis": [
+        "synth-synthesizer (consumes template)",
+        "design-composer (consumes template)"
+      ]
+    },
+    {
+      "path": ".claude/agents/execute-orchestrator.md",
+      "touch_type": "edit",
+      "frs": ["FR-9"],
+      "change_summary": "Gating logic at stage-transition checkpoints: parse Blocks-X markers from upstream outputs; refuse to mark named stage complete until each marker transitions; record transition rationale to state-transitions.log per ADR-0044 v1 invariant.",
+      "reverse_dependents_per_codebase_analysis": [
+        "recipe-feature-pipeline (invokes orchestrator)",
+        "all upstream-emission agents (discovery-codebase-researcher etc.)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-documentation-criteria/references/blocks-x-marker-grammar.md",
+      "touch_type": "create",
+      "frs": ["FR-9"],
+      "change_summary": "New canonical grammar spec (D-4 structured HTML-comment pragma). Hosts the regex parser shape + emission examples + transition_name reservations.",
+      "reverse_dependents_per_codebase_analysis": [
+        "discovery-codebase-researcher (emission site)",
+        "execute-orchestrator (parser consumer)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md",
+      "touch_type": "edit",
+      "frs": ["FR-9"],
+      "change_summary": "Extend transition_name string-value enumeration with BLOCKS_X_RESOLVED / BLOCKS_X_DEFERRED_WITH_OI / BLOCKS_X_FALSE_POSITIVE. No schema evolution (field is free-string per ADR-0044 v1).",
+      "reverse_dependents_per_codebase_analysis": [
+        "execute-orchestrator (sole writer)",
+        "auditing-shared/scripts/log_state_transition.py (the writer)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-subagents/SKILL.md",
+      "touch_type": "edit",
+      "frs": ["FR-10"],
+      "change_summary": "Add new rule SA-14 (feature-touch-coverage): verify presence of agent-roster-impact-matrix.md and row-count parity with .claude/agents/*.md when feature touched the agent surface.",
+      "reverse_dependents_per_codebase_analysis": [
+        "auditing-cc-configs (family coordinator)",
+        "finalize-deliverable-packager (pre-packaging audit pass)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-subagents/scripts/audit_feature_touch_coverage.py",
+      "touch_type": "create",
+      "frs": ["FR-10"],
+      "change_summary": "New script: reads working/feature/<slug>/ for trigger evidence; checks matrix presence + row count; emits BLOCKER finding per AC-FR-10-a/-b.",
+      "reverse_dependents_per_codebase_analysis": [
+        "auditing-subagents SKILL.md (rule SA-14 entrypoint)",
+        "auditing-cc-configs/scripts/audit_project.py (may invoke)"
+      ]
+    },
+    {
+      "path": ".claude/skills/auditing-subagents/references/",
+      "touch_type": "edit",
+      "frs": ["FR-10"],
+      "change_summary": "Add new reference text for SA-14 discipline (one of the eight existing references or as a new sibling file).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".claude/skills/auditing-skills/",
+      "touch_type": "edit",
+      "frs": ["FR-10"],
+      "change_summary": "(D-3 recommended; Q-CC-7 routes to composer) New separate reverse-check rule: when a new skill is authored, audit whether existing agents' skills: arrays should include it. Parallel to SA-14 but in auditing-skills surface.",
+      "reverse_dependents_per_codebase_analysis": [
+        "auditing-cc-configs (family coordinator)"
+      ]
+    },
+    {
+      "path": ".claude/skills/KB-documentation-criteria/references/disciplines/deferral-framing-conventions.md",
+      "touch_type": "create",
+      "frs": ["FR-11"],
+      "change_summary": "New canonical posture source: three permitted framings (event-trigger / honest-acceptance / concrete-machinery) replacing 'post-ship / N days post-ship'. Cross-referenced from intake-prd-author + design-composer + test-phase-validator-author + KB-cc-design.",
+      "reverse_dependents_per_codebase_analysis": [
+        "intake-prd-author (Undetermined Items prompt)",
+        "design-composer (Open Items prompt)",
+        "test-phase-validator-author (PV-author rubric)"
+      ]
+    },
+    {
+      "path": ".claude/agents/intake-prd-author.md",
+      "touch_type": "edit",
+      "frs": ["FR-11"],
+      "change_summary": "Undetermined Items section prompt cross-references the new conventions file (annotate-only — no body restructure).",
+      "reverse_dependents_per_codebase_analysis": [
+        "shared-document-reviewer (invocation 1 reviews PRD)"
+      ]
+    },
+
+    {
+      "path": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "touch_type": "annotate-only",
+      "frs": ["FR-11"],
+      "change_summary": "NO retroactive edit per AC-FR-11-c + register §O.5 user direction. Listed here for traceability: the design's FR-11 implementation grep-tests against the verbatim §O.1 rows (preserving all 5 per Q-CC-5 recommendation).",
+      "reverse_dependents_per_codebase_analysis": []
+    },
+    {
+      "path": ".mcp.json",
+      "touch_type": "annotate-only",
+      "frs": ["FR-1", "FR-4", "FR-5"],
+      "change_summary": "Read-only at design time: FR-1's design-realization audit may verify .mcp.json against ADR-0041 prescription via the companion file; FR-4 + FR-5 enumerate per-server reachability + drift. No edits to .mcp.json from this feature.",
+      "reverse_dependents_per_codebase_analysis": [
+        "Claude Code session start (loads .mcp.json)",
+        "auditing-mcp (audits .mcp.json)"
+      ]
+    }
+  ],
+
+  "summary_counts": {
+    "edits": 24,
+    "creates": 14,
+    "annotate_only": 3,
+    "total_paths": 41
+  },
+
+  "fr_to_paths_index": {
+    "FR-1": [
+      ".claude/agents/review-architecture-auditor.md",
+      ".claude/skills/KB-review-disciplines/references/architecture-audit.md",
+      ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md",
+      "adrs/ADR-NNNN-<slug>.prescriptions.yaml",
+      ".claude/skills/auditing-shared/scripts/validate_adr_prescriptions.py",
+      ".mcp.json"
+    ],
+    "FR-2": [
+      ".claude/agents/discovery-codebase-researcher.md",
+      ".claude/skills/KB-codebase-research/SKILL.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/protocol-conformance-subsection-template.md"
+    ],
+    "FR-3": [
+      ".claude/skills/KB-review-disciplines/references/architecture-audit.md",
+      ".claude/agents/test-phase-validator-author.md",
+      ".claude/skills/KB-task-decomposition/cross-file-invariants.md"
+    ],
+    "FR-4": [
+      ".claude/skills/auditing-mcp/scripts/audit_mcp.py",
+      ".claude/skills/auditing-mcp/scripts/check_toxic_combinations.py",
+      ".claude/skills/auditing-mcp/scripts/check_mcp_reachability.py",
+      ".claude/skills/auditing-mcp/SKILL.md",
+      ".claude/skills/auditing-mcp/examples/good-mcp-annotated.md",
+      ".claude/skills/auditing-mcp/references/common-failures.md",
+      ".claude/skills/auditing-mcp/references/toxic-combinations.md",
+      ".claude/skills/auditing-cc-configs/scripts/audit_project.py",
+      ".claude/skills/auditing-cc-configs/SKILL.md",
+      ".claude/skills/auditing-cc-configs/assets/audit-checklist.md",
+      ".claude/skills/auditing-cc-configs/references/audit-rubric.md",
+      ".claude/skills/auditing-cc-configs/references/common-failures.md",
+      ".claude/skills/KB-mcp-platform/references/operator-runbook.md",
+      ".claude/skills/KB-mcp-platform/references/mcp-events-jsonl.md",
+      ".claude/skills/KB-mcp-platform/references/troubleshooting.md",
+      ".claude/agents/cc-critique.md",
+      ".mcp.json"
+    ],
+    "FR-5": [
+      ".claude/skills/auditing-mcp/scripts/audit_mcp.py",
+      ".claude/skills/auditing-mcp/scripts/check_tool_surface_drift.py",
+      ".claude/skills/auditing-mcp/baselines/",
+      ".claude/skills/auditing-mcp/references/drift-severity-catalog.md",
+      ".claude/skills/auditing-mcp/SKILL.md",
+      ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md",
+      ".mcp.json"
+    ],
+    "FR-6": [
+      ".claude/agents/design-claude-code.md",
+      ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      ".claude/skills/auditing-subagents/scripts/check_feature_touch_predicate.py",
+      ".claude/skills/KB-documentation-criteria/references/templates/agent-roster-impact-matrix-template.md",
+      ".claude/skills/KB-cc-design/references/principles.md"
+    ],
+    "FR-7": [
+      ".claude/skills/KB-cc-design/references/principles.md",
+      ".claude/agents/design-claude-code.md",
+      ".claude/agents/synth-synthesizer.md",
+      ".claude/agents/design-composer.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section-template.md"
+    ],
+    "FR-8": [
+      ".claude/skills/KB-cc-design/references/principles.md",
+      ".claude/agents/design-claude-code.md"
+    ],
+    "FR-9": [
+      ".claude/skills/KB-documentation-criteria/references/blocks-x-marker-grammar.md",
+      ".claude/agents/discovery-codebase-researcher.md",
+      ".claude/agents/execute-orchestrator.md",
+      ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md"
+    ],
+    "FR-10": [
+      ".claude/skills/auditing-subagents/SKILL.md",
+      ".claude/skills/auditing-subagents/scripts/audit_feature_touch_coverage.py",
+      ".claude/skills/auditing-subagents/references/",
+      ".claude/skills/auditing-skills/",
+      ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md"
+    ],
+    "FR-11": [
+      ".claude/skills/KB-cc-design/references/principles.md",
+      ".claude/agents/test-phase-validator-author.md",
+      ".claude/skills/KB-documentation-criteria/references/disciplines/deferral-framing-conventions.md",
+      ".claude/agents/intake-prd-author.md",
+      ".claude/agents/design-composer.md",
+      "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md"
+    ]
+  },
+
+  "decisions_adopted": {
+    "D-1": "companion-file convention at adrs/ADR-NNNN-<slug>.prescriptions.yaml",
+    "D-2": "hybrid — denormalized declaration in PV body + centralized catalog at KB-task-decomposition/cross-file-invariants.md",
+    "D-3": "separate rule under auditing-skills (Q-CC-7 ratifies)",
+    "D-4": "structured HTML-comment pragma <!-- BLOCKS: <stage-slug>-completion -->",
+    "D-5": "hybrid advisory predicate + human ratification at Design Composition Gate",
+    "D-6": "forwarded to design-composer at Gate 4 (single-feature R1 default per synthesis)",
+    "D-7": "four-stage RFC-grounded pipeline (RFC 8785 → baseline → RFC 6902 → severity catalog)",
+    "D-8": "substance-as-rubric with mandate-for-new-skill-proposals carve-out",
+    "D-9": "three-host placement (KB-cc-design + test-phase-validator-author + KB-documentation-criteria deferral conventions)",
+    "D-10": "preserve trifecta + bridge table at KB-review-disciplines/references/severity-taxonomy.md (Q-CC-2 ratifies)"
+  },
+
+  "open_items_for_composer": [
+    "Q-CC-1: D-6 Contingency Split posture (R1 single vs R2a/R2b) — design-composer applies threshold at Gate 4.",
+    "Q-CC-2: D-10 severity vocabulary bridge table publication target.",
+    "Q-CC-3: FR-1 companion-file schema versioning policy (additive minor vs breaking major).",
+    "Q-CC-4: FR-5 baseline storage location (recommended .claude/skills/auditing-mcp/baselines/).",
+    "Q-CC-5: §O.1 row count correction — PRD AC-FR-11-c enumerates 4 rows but register has 5 (E-2 missing from PRD).",
+    "Q-CC-6: FR-7 synthesis-side emission agent (synth-synthesizer.md primary).",
+    "Q-CC-7: D-3 auditing-skills reverse-check separation (separate rule recommended).",
+    "Q-CC-8: FR-11 §O posture wording placement (sub-section under Principle 9 vs new Principle 11)."
+  ],
+
+  "eat_own_dogfood_compliance": {
+    "skill_coverage_decisions_count": 11,
+    "skill_coverage_decisions_all_option_a": true,
+    "skill_coverage_decisions_new_skills_proposed": 0,
+    "skill_coverage_decisions_no_skill_warranted": 0,
+    "agent_roster_matrix_authored_in_design": "deferred to Plan / Task Decomposition stage per FR-6 self-application discipline (Design records the contract; the matrix is a feature-deliverable artifact)",
+    "agent_roster_matrix_trigger_fired": true,
+    "agent_roster_matrix_trigger_conditions_fired": ["condition 1 — feature diff modifies several .claude/agents/*.md files"]
+  }
+}

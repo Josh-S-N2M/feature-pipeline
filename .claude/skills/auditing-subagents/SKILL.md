@@ -13,7 +13,7 @@ description: >-
 allowed-tools: Read Grep Glob Bash(python3 *)
 pedagogical_sections:
   - path: references/anti-patterns.md
-    justification: "Subagent anti-pattern reference catalog documenting what the SA-1 through SA-12 scanners detect"
+    justification: "Subagent anti-pattern reference catalog documenting what the SA-1 through SA-14 scanners detect"
   - path: references/safety-model.md
     justification: "Subagent safety-model reference; documents bypass-approval and prompt-injection patterns the auditor scans for"
   - path: references/common-failures.md
@@ -62,6 +62,30 @@ It does not modify the audited subagent. It writes one file: an audit report.
 | 10 | Agent-fit | `references/description-quality.md` |
 
 For cross-cutting symptoms, see `references/common-failures.md`.
+
+## SA-14: feature-touch-coverage (packaging-time hard gate)
+
+| Field | Value |
+|---|---|
+| **Rule ID** | SA-14 |
+| **Name** | feature-touch-coverage |
+| **Severity** | BLOCKER (matrix absent) / MAJOR (row-count or cell violations) |
+| **Governing ADR** | ADR-0064 (Agent-Roster Impact Matrix Contract) |
+| **When it runs** | FR-10 gate at deliverable packaging time (Phase 9 of recipe-feature-pipeline orchestrator) |
+| **Executor** | `.claude/skills/auditing-subagents/scripts/audit_feature_touch_coverage.py` |
+| **Reference doc** | `references/sa-14-feature-touch-coverage.md` |
+
+**What it checks.** When `check_feature_touch_predicate.py` (T5.2) fired during a feature run — indicating that the feature touched the agent surface per ADR-0064 Clause 1's four-condition trigger — SA-14 verifies at deliverable packaging time that:
+
+1. `working/feature/<slug>/agent-roster-impact-matrix.md` **exists**.
+2. The matrix has **exactly N rows**, where N = count of `.claude/agents/*.md` files at audit time (no agent evaluated by absence).
+3. Every cell in the five required columns (tools, skills, model, effort, prompt body) contains a **positive-evidence string** — bare `no-change` without `— <evidence>` fails.
+
+SA-14 is the **hard gate** backstop to the design-time advisory predicate. Unlike the predicate, it is not advisory: exit 1 blocks deliverable packaging. It is a new rule entry (not an extension of SA-1..SA-13), per synthesis decision D-R2a-5, because it audits a per-feature-run artifact rather than a per-subagent-file property.
+
+Findings use the NFR-8 four-field shape: `rule`, `target`, `divergence`, `next_action`.
+
+See `references/sa-14-feature-touch-coverage.md` for the full rule specification, severity calibration, and remediation guidance.
 
 ## Critical: subagents use `tools:`, not `allowed-tools:`
 

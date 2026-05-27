@@ -181,7 +181,9 @@ When migrating, the Designer documents the migration plan: which commands conver
 
 ## Principle 9: Sub-agent reasoning configuration is intentional, not default
 
-Every sub-agent's reasoning capacity is determined by three independent frontmatter fields: `model:`, `effort:`, and `skills:`. They control different things, and the Designer makes each choice deliberately — not by inheriting whatever default the carry-in template happened to use.
+For every agent on the touched agent surface — changed and unchanged alike — the Designer records the consideration performed on that agent's three independent reasoning fields (`model:`, `effort:`, `skills:`), even when the recorded outcome is no change. The artifact of the consideration is the `agent-roster-impact-matrix.md` cell (FR-6 of `pipeline-design-time-discipline-r1`); the matrix's positive-evidence-string discipline is the substance test for whether the consideration happened. Bare "no change" is structurally indistinguishable from "never evaluated" and is therefore insufficient.
+
+Every sub-agent's reasoning capacity is determined by those three independent frontmatter fields: `model:`, `effort:`, and `skills:`. They control different things, and the Designer makes each choice deliberately — not by inheriting whatever default the carry-in template happened to use.
 
 - **`model:`** chooses which Claude model executes the sub-agent. `sonnet` is the default-bounded choice for well-scoped transformations (a sub-agent that does one thing and returns). `opus` is the choice for cross-cutting reconciliation, cross-family critique, multi-artifact arbitration, or any work where reasoning quality is the load-bearing input. `haiku` is for narrow, repetitive transformations where speed and cost dominate. `inherit` defers to the parent — useful only when the sub-agent's reasoning load truly matches the parent's session.
 - **`effort:`** controls how eagerly the chosen model spends thinking tokens — `low` / `medium` / `high` / `xhigh` (Opus 4.7 only) / `max`. The Claude Code Agent SDK documents `high` as "deep reasoning." Effort is independent of model: a `sonnet` sub-agent with `effort: high` thinks more deeply within sonnet's class; an `opus` sub-agent with `effort: low` economizes on opus's default thoroughness. Pick `effort:` when the sub-agent's reasoning load warrants it, regardless of model.
@@ -194,6 +196,8 @@ The Designer's discipline:
 - Anti-pattern to avoid: using the `skills:` array to express reasoning-depth intent (e.g., a fictional `deep-reasoning` skill). This is a category error; Claude Code's skill loader silently skips missing references, and the sub-agent runs at default reasoning while the design document claims otherwise. Map "I want this sub-agent to reason deeply" to `model:` and/or `effort:`, not to `skills:`.
 
 A worked example from this project: the feature-pipeline uses `model: opus` uniformly across all 30 sub-agents, with the reasoning gradient shaped by `effort:` instead of by model class. Five sub-agents — `design-composer`, `review-architecture-auditor`, `review-cross-artifact-auditor`, `synth-synthesizer`, and `finalize-task-decomposer` — use `effort: xhigh` (extended reasoning) because each is a terminal compositional or gatekeeping agent whose output either composes upstream work into a load-bearing artifact (Blueprint, synthesis report, tasks.json) or gates downstream stages against unrecoverable defects (cross-artifact audit, architecture audit). The other twenty-five sub-agents use `effort: high` (deep reasoning) — each does judgment-heavy work within a bounded single-stage scope. The pipeline's per-agent reasoning configuration is intentional throughout: every choice records "the highest quality output within the context the agent is required to fulfill" as the calibration target, with `effort:` as the documented intermediate lever above default and below `xhigh`.
+
+**Cross-references.** ADR-0064 (agent-roster impact matrix contract — the structural realization of this principle's per-agent consideration discipline); `agent-roster-impact-matrix-template.md` in KB-documentation-criteria (canonical matrix shape per ADR-0064); `design-claude-code.md` § Subagent patterns (the procedural site where this principle is applied — the Designer's step-by-step checklist for recording per-agent consideration in the matrix).
 
 ## Principle 10: Uniform rules over named exceptions — no carve-outs in canonical-placement rules
 
@@ -222,3 +226,9 @@ The cost framing (preserved from the user's durable feedback that triggered ADR-
 **Reviewer enforcement.** `shared-document-reviewer` at Gate 0/1 reviews of Plan / Blueprint documents flags any proposed carve-out shape and cites ADR-0056. Future updates to the auditor / reviewer machinery make this enforcement load-bearing rather than aspirational.
 
 **Cross-references.** ADR-0056 (the canonical statement); ADR-0036 (the precedent canonical-placement rule); ADR-0005 (the `adrs/superseded/` category that demonstrates the "structural category with uniform rule" pattern); ADR-0054 (canonical-helper three-surface enforcement — the integration shape that ADR-0056 is consistent with).
+
+## Change Log
+
+| Version | Date | Change | AC |
+|---|---|---|---|
+| 1.1.0 | 2026-05-27 | Principle 9 leading sentence replaced: defensive framing ("the Designer makes each choice deliberately") → active framing requiring per-agent consideration to be recorded in `agent-roster-impact-matrix.md` even when the outcome is no change. ADR-0064 cross-reference added to Principle 9. (FR-8 / `pipeline-design-time-discipline-r1`) | AC-FR-8-a |

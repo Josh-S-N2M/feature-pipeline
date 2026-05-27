@@ -1,0 +1,186 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-pipeline-design-time-discipline-r1-R2a-cycle2",
+  "audited_artifact": "blueprint-v1.md (v1.0.1)",
+  "audited_at": "2026-05-26T20:15:00Z",
+  "code_graph_used": "grep_plus_read",
+  "code_graph_used_note": "Same substrate as cycle 1 — markdown discipline artifacts (Blueprint, ADRs, synthesis.md, codebase-analysis.json, KB skills). Grep + Read is the lowest-cost evidence-equivalent method per parent's documented choice. GitNexus index pre-warmed but not load-bearing for prose-document audit.",
+  "audit_round": 2,
+  "audit_scope": "narrow re-audit of cycle-1 dispatched fixes (I-AA-001..I-AA-004 MAJOR + I-AA-006 MINOR) plus spot-check for new findings introduced by patches",
+  "prior_audit_path": "working/feature/pipeline-design-time-discipline-r1/architecture-audit-issues.json (cycle 0)",
+  "reconciliation_log_path": "working/feature/pipeline-design-time-discipline-r1/reconciliation-log-r1.md (cycle 1)",
+  "checks_performed": [
+    "prior_finding_resolution_verification",
+    "spot_check_for_new_findings",
+    "patch_quality_audit",
+    "version_bump_consistency_check",
+    "update_history_completeness_check"
+  ],
+  "prior_context_check": {
+    "applicable": true,
+    "prior_audit_round": 1,
+    "prior_findings_count": {"BLOCKER": 0, "MAJOR": 4, "MINOR": 2, "INFO": 1},
+    "verifications": [
+      {
+        "prior_id": "I-AA-001",
+        "prior_severity": "MAJOR",
+        "prior_summary": "ADR-0064 ↔ ADR-0065 contradiction on Skill-Coverage Decisions section location",
+        "resolution_status": "resolved",
+        "evidence": [
+          {"artifact": "adrs/ADR-0064-agent-roster-impact-matrix-contract.md", "section": "Clause 3 (line 89)", "quote": "the predicate emits an advisory annotation by scanning the synthesis.md Skill-Coverage Decisions section for trigger-shaped tokens"},
+          {"artifact": "adrs/ADR-0064", "section": "Update History row 1.0.1 (line 43)", "quote": "Clause 3 + Options Considered Option B: corrected 'Blueprint's Skill-Coverage Decisions section' → 'synthesis.md Skill-Coverage Decisions section'"},
+          {"artifact": "grep verification", "section": "command", "quote": "grep 'Blueprint.s Skill-Coverage Decisions' adrs/ADR-0064*.md adrs/ADR-0065*.md blueprint-v1.md — only match is the Update History row describing the correction itself; no remaining substantive uses of the old wording in ADR-0064 Clause 3 or Options Considered Option B"}
+        ],
+        "notes": "ADR-0064 Clause 3 + Options Considered Option B now align with ADR-0065 Clause 1. Editorial in-place edit per ADR-0005; frontmatter version bumped to 1.0.1; Update History entry cites audit I-AA-001."
+      },
+      {
+        "prior_id": "I-AA-002",
+        "prior_severity": "MAJOR",
+        "prior_summary": "ADR-0065 cites a shared-document-reviewer invocation point that does not exist in ADR-0017",
+        "resolution_status": "resolved",
+        "evidence": [
+          {"artifact": "adrs/ADR-0065-skill-coverage-decision-discipline.md", "section": "Clause 2 (line 81)", "quote": "Substance review (`shared-document-reviewer` invocation 3 — Blueprint review, which cites the synthesis.md Skill-Coverage Decisions section in its Eat-Own-Dogfood content) is the human's responsibility for (a) and (c). Per inherited ADR-0017, invocation 2 reviews the PRD; invocation 3 is the existing reviewer pass that touches the substance-bearing artifact via the Blueprint's reference and the bundled deliverable check."},
+          {"artifact": "adrs/ADR-0065", "section": "Related Information (line 167)", "quote": "ADR-0017 — `shared-document-reviewer` invocation 3 reviews the Blueprint; the Blueprint's Eat-Own-Dogfood content cites the `synthesis.md` Skill-Coverage Decisions section, bringing it within reviewer scope at invocation 3. (Invocation 2 reviews the PRD per ADR-0017.)"},
+          {"artifact": "adrs/ADR-0065", "section": "Architecture Impact row design-composer.md (line 146)", "quote": "Substance review for (a) and (c) is the `shared-document-reviewer` invocation 3 (Blueprint review) responsibility, via the Blueprint's Eat-Own-Dogfood reference to the synthesis.md section."},
+          {"artifact": "adrs/ADR-0065", "section": "Implementation Guidance (line 156)", "quote": "shared-document-reviewer invocation 3 (Blueprint review) reviews substance via the Blueprint's Eat-Own-Dogfood reference"},
+          {"artifact": "adrs/ADR-0065", "section": "Update History row 1.0.1 (line 41)", "quote": "corrected stale references to 'shared-document-reviewer invocation 2 on synthesis.md' — per inherited ADR-0017, invocation 2 reviews the PRD; invocation 3 (Blueprint review) is the existing reviewer pass that touches the substance-bearing artifact via the Blueprint's Eat-Own-Dogfood reference to synthesis.md"}
+        ],
+        "notes": "Reconciler's path-1 recommendation (reassign substance review to invocation 3 — Blueprint review) was adopted by design-composer. All four occurrences of the invocation-2-on-synthesis.md error patched consistently across Clause 2, Architecture Impact, Implementation Guidance, and Related Information. ADR-0017 unchanged (no supersession). Editorial in-place edit per ADR-0005."
+      },
+      {
+        "prior_id": "I-AA-003",
+        "prior_severity": "MAJOR",
+        "prior_summary": "Bridge-consumer count of '20 agents load KB-review-disciplines' is undercount; actual count is 24",
+        "resolution_status": "partially_resolved",
+        "evidence_resolved": [
+          {"artifact": "blueprint-v1.md", "section": "Severity bridge content § Bridge consumers (line 327)", "quote": "24 agents load KB-review-disciplines (`execute-orchestrator`, `review-cross-artifact-auditor`, `intake-intent-clarifier`, `test-acceptance-author` added per cycle-1 reconciliation grep verification; per codebase-analysis `blast_radius_new_confirmations[4]` + grep at reconciliation cycle 1 per audit I-AA-003)"},
+          {"artifact": "blueprint-v1.md", "section": "Fact disposition table (lines 257, 261)", "quote": "24-agent KB-review-disciplines load; count corrected from inherited 20 at reconciliation cycle 1 per audit I-AA-003"},
+          {"artifact": "codebase-analysis.json", "section": "blast_radius_new_confirmations[4].consumer_set_at_HEAD", "quote": "24 agents under .claude/agents/ load KB-review-disciplines: ... execute-orchestrator, review-cross-artifact-auditor, intake-intent-clarifier, test-acceptance-author (last 4 added at reconciliation cycle 1 per audit I-AA-003 + grep verification: grep -l KB-review-disciplines .claude/agents/*.md | wc -l → 24)"},
+          {"artifact": "codebase-analysis.json", "section": "update_history[].version 1.0.1 (line 73)", "quote": "blast_radius_new_confirmations[4].consumer_set_at_HEAD enumeration extended 20 → 24 by adding execute-orchestrator, review-cross-artifact-auditor, intake-intent-clarifier, test-acceptance-author per audit I-AA-003 + grep verification at reconciliation cycle 1"},
+          {"artifact": "grep re-verification at HEAD (cycle 2)", "section": "command", "quote": "grep -l KB-review-disciplines /workspaces/feature-pipeline/.claude/agents/*.md | wc -l → 24 (same files enumerated; count holds)"}
+        ],
+        "evidence_unresolved": [
+          {"artifact": "synthesis.md", "section": "Bridge Consumers (line 191)", "quote": "20 agents load KB-review-disciplines (per codebase-analysis blast_radius_new_confirmations[4]) — bridge propagates broadly with no separate propagation work."},
+          {"artifact": "synthesis.md", "section": "Update History 1.0.1 (line 274)", "quote": "Only mentions adding the formal Skill-Coverage Decisions section; does NOT mention the bridge-consumer count correction."},
+          {"artifact": "reconciliation-log-r1.md", "section": "Dispatch 1 §3 (line 165)", "quote": "Patch three locations atomically: ... synthesis.md line 191 (Bridge Consumers): same correction. Update the inherited claim and enumerate the four newly-confirmed agents in the supporting prose."}
+        ],
+        "analysis": "Two of three required locations were patched (Blueprint line 327 and codebase-analysis.json blast_radius_new_confirmations[4]). The third — synthesis.md line 191 — was NOT patched. Synthesis.md still reads '20 agents load KB-review-disciplines' verbatim from cycle-0. The reconciliation log explicitly named all three locations as atomic; the synth-synthesizer dispatch (Dispatch 2) added the formal Skill-Coverage Decisions section but did not touch the unrelated Bridge Consumers paragraph, and the design-composer dispatch (Dispatch 1) corrected the Blueprint and codebase-analysis but did not reach into synthesis.md (Dispatch 1's target-artifacts list does not include synthesis.md). The patch fell between the two parallel dispatches. The synthesis.md Update History 1.0.1 entry also does not record the count correction. This is the same defect shape as the original I-AA-003: a documented surface diverges from HEAD reality, and the surface is consumed by future audit trails (synthesis.md is the canonical source of the consumer-set claim per codebase-analysis_blast_radius_new_confirmations[4]).",
+        "verdict": "MAJOR re-surfaces because the cross-artifact divergence persists. Severity preserved from cycle 0; this is not a regression in the architectural sense (the Blueprint and codebase-analysis are now correct) — but synthesis.md remains the canonical narrative substrate the Blueprint cites, and the divergence is exactly the cross-artifact-relationship defect class R2a is designed to prevent."
+      },
+      {
+        "prior_id": "I-AA-004",
+        "prior_severity": "MAJOR",
+        "prior_summary": "ADR-0065 Clause 3 mandates dogfood synthesis.md embedded section, but synthesis.md does not contain a Skill-Coverage Decisions section",
+        "resolution_status": "resolved",
+        "evidence": [
+          {"artifact": "synthesis.md", "section": "Section header at line 215", "quote": "## Skill-Coverage Decisions"},
+          {"artifact": "synthesis.md", "section": "lines 217-233", "quote": "Per ADR-0065 Clause 1; substance-heuristic review applies (all 6 rows resolve to existing-skill). [6-row table follows with all six R2a domain concepts, each with resolution type, covering skill, and positive evidence]"},
+          {"artifact": "synthesis.md", "section": "Update History row 1.0.1 (line 274)", "quote": "Added formal `## Skill-Coverage Decisions` section with the 6-row template-shape table (all rows resolve to existing-skill / substance-heuristic review). ... Audit finding I-AA-004"},
+          {"artifact": "synthesis.md", "section": "frontmatter version (line 3)", "quote": "version: 1.0.1"},
+          {"artifact": "blueprint-v1.md", "section": "Eat-own-dogfood deliverables (lines 342-346)", "quote": "Per ADR-0065 Clause 1, the canonical Skill-Coverage Decisions for this run are embedded in `synthesis.md` §Skill-Coverage Decisions (synthesis.md v1.0.1+; back-filled cycle 1 per audit I-AA-004). See that section for the 6-row table; all 6 resolve to type (a) existing-skill (substance-heuristic review). ... The Blueprint previously embedded an inline 6-row table at this position; the table is removed at reconciliation cycle 1 because ADR-0065 Clause 1 forbids the Blueprint as the embedding location"},
+          {"artifact": "blueprint-v1.md", "section": "Executive summary (line 46)", "quote": "six skill-coverage decisions (per ADR-0065) (back-filled at Cycle-1 reconciliation per audit I-AA-004; see `synthesis.md` §Skill-Coverage Decisions)"},
+          {"artifact": "blueprint-v1.md", "section": "Update history 1.0.1 (line 32)", "quote": "inline 6-row Skill-Coverage Decisions table removed and replaced with a paragraph pointer to the canonical artifact in `synthesis.md` per ADR-0065 Clause 1, with back-fill landed in companion synth-synthesizer dispatch (I-AA-004)"}
+        ],
+        "notes": "Both halves resolved: (a) synth-synthesizer back-filled the canonical `## Skill-Coverage Decisions` section into synthesis.md at line 215 with all six rows present (concept | resolution type | covering skill | positive evidence), each resolving to (a) existing-skill consistent with the design-composer's per-concept rationale; (b) design-composer removed the inline 6-row table from Blueprint lines 343-352 and replaced with a paragraph pointer to synthesis.md (Blueprint lines 342-346). Blueprint Executive Summary phrasing updated from 'at Plan / Task-Decomposition time' to 'back-filled at Cycle-1 reconciliation' per the reconciler's instruction. Substance-heuristic compliance per ADR-0065 Clause 2 verified: each row has skill path + positive-evidence string. All six match the source content from the original Blueprint table. Substance is preserved during the relocation."
+      },
+      {
+        "prior_id": "I-AA-005",
+        "prior_severity": "MINOR",
+        "prior_summary": "Stale SA-12 reference in auditing-subagents/SKILL.md description",
+        "resolution_status": "deferred_as_planned",
+        "evidence": [
+          {"artifact": "reconciliation-log-r1.md", "section": "Deferral 1 (line 84)", "quote": "Defer to Plan-stage Phase D (FR-10 implementation) as a one-line task addition. ... The plan-author agent (next pipeline stage) will pick up this deferral via the dispatch JSON's deferrals block."}
+        ],
+        "notes": "Deferral honors the audit's own recommended_resolution. No change required at Blueprint stage. Re-audit confirms the deferral was recorded in the reconciliation log; plan-author will receive the deferral via dispatch JSON."
+      },
+      {
+        "prior_id": "I-AA-006",
+        "prior_severity": "MINOR",
+        "prior_summary": "codebase-analysis.json missing review-cross-artifact-auditor in components_inherited_verbatim.names[]",
+        "resolution_status": "resolved",
+        "evidence": [
+          {"artifact": "codebase-analysis.json", "section": "components_inherited_verbatim.names[] (line 45-61)", "quote": "Now includes 'review-cross-artifact-auditor' as the second entry, positioned after 'review-architecture-auditor' which is the natural sibling pairing"},
+          {"artifact": "codebase-analysis.json", "section": "components_inherited_verbatim.note (line 62)", "quote": "Update 2026-05-26 reconciliation cycle 1: review-cross-artifact-auditor added per audit I-AA-006 (canonical source of iteration-delta weights 10/3/1/0 used in the bridge table; absence was a forensic gap, not functional)"},
+          {"artifact": "codebase-analysis.json", "section": "update_history[].version 1.0.1 (line 73)", "quote": "components_inherited_verbatim.names[] gains 'review-cross-artifact-auditor' per audit I-AA-006"}
+        ],
+        "notes": "Resolved. Component list now reflects the canonical source of the iteration-delta weight numbers cited in the bridge table."
+      },
+      {
+        "prior_id": "I-AA-007",
+        "prior_severity": "INFO",
+        "prior_summary": "FR-1 design-realization audit would catch I-AA-001..I-AA-004 if FR-1 already existed",
+        "resolution_status": "deferred_as_planned",
+        "evidence": [
+          {"artifact": "reconciliation-log-r1.md", "section": "Deferral 2 (line 89)", "quote": "Surface in the pipeline run summary at packaging time as the dogfood validation evidence. The finalize-deliverable-packager agent (final pipeline stage) is instructed via the dispatch JSON's deferrals block to embed this finding in the run summary's 'Dogfood Validation' section."}
+        ],
+        "notes": "Pedagogical observation routed to packager. No code change. Deferral honors audit's own recommended_resolution."
+      }
+    ],
+    "summary": "Of 4 prior-cycle MAJOR findings, 3 are fully resolved (I-AA-001, I-AA-002, I-AA-004) and 1 is partially resolved (I-AA-003 — Blueprint and codebase-analysis.json corrected; synthesis.md left stale). Both MINORs resolved-or-deferred-as-planned (I-AA-005 deferred to plan-author per audit recommendation; I-AA-006 resolved). INFO I-AA-007 deferred to packager per audit recommendation. The partial-resolution on I-AA-003 re-surfaces as a new finding (I-AA-008) because the cross-artifact divergence between synthesis.md and the now-corrected Blueprint/codebase-analysis is exactly the failure-mode class R2a is designed to prevent."
+  },
+  "issues": [
+    {
+      "id": "I-AA-008",
+      "severity": "MAJOR",
+      "category": "synthesis_claim_verification_re_surfaced",
+      "summary": "Cycle-1 dispatch missed synthesis.md line 191 — bridge-consumer count remains '20 agents' while Blueprint (line 327) + codebase-analysis.json (blast_radius_new_confirmations[4]) now read '24 agents'",
+      "evidence": [
+        {"artifact": "synthesis.md", "section": "Bridge Consumers (line 189-191)", "quote": "### Bridge Consumers\n\n20 agents load KB-review-disciplines (per codebase-analysis blast_radius_new_confirmations[4]) — bridge propagates broadly with no separate propagation work."},
+        {"artifact": "blueprint-v1.md", "section": "Severity bridge content § Bridge consumers (line 327)", "quote": "24 agents load KB-review-disciplines (`execute-orchestrator`, `review-cross-artifact-auditor`, `intake-intent-clarifier`, `test-acceptance-author` added per cycle-1 reconciliation grep verification ...) "},
+        {"artifact": "codebase-analysis.json", "section": "blast_radius_new_confirmations[4].consumer_set_at_HEAD", "quote": "24 agents under .claude/agents/ load KB-review-disciplines: ... grep -l KB-review-disciplines .claude/agents/*.md | wc -l → 24"},
+        {"artifact": "reconciliation-log-r1.md", "section": "Dispatch 1 §3 — Locations to patch (lines 162-166)", "quote": "Patch three locations atomically: Blueprint line 326 ...; synthesis.md line 191 (Bridge Consumers): same correction. Update the inherited claim and enumerate the four newly-confirmed agents in the supporting prose; codebase-analysis.json blast_radius_new_confirmations[4].consumer_set_at_HEAD"},
+        {"artifact": "synthesis.md", "section": "Update History row 1.0.1 (line 274)", "quote": "Mentions only adding the Skill-Coverage Decisions section; does NOT record any bridge-consumer count correction."},
+        {"artifact": "grep re-verification at HEAD (cycle 2)", "section": "command", "quote": "grep -n '20 agents' synthesis.md → line 191 (one remaining hit); grep -n '24 agents' synthesis.md → no hits"}
+      ],
+      "analysis": "Cycle-1 dispatch 1 (design-composer; target artifacts: ADRs + Blueprint + codebase-analysis.json) and dispatch 2 (synth-synthesizer; target artifact: synthesis.md, scoped to back-filling the Skill-Coverage Decisions section) ran in parallel. The reconciliation log named synthesis.md as one of three atomic patch locations for I-AA-003, but dispatch 1's target-artifacts list did NOT include synthesis.md and dispatch 2's scope was limited to the Skill-Coverage Decisions back-fill. The bridge-consumer count correction fell between the two dispatches. Synthesis.md line 191 — the canonical narrative source that the Blueprint and codebase-analysis both cite — still claims '20 agents.' This is the same defect-class shape as the original I-AA-003: a documented derived count diverging from HEAD reality, with the divergence between an artifact and its derived consumers. Per FR-1's design-realization audit lens, the Blueprint references codebase-analysis (now 24); codebase-analysis references HEAD grep (now 24); synthesis.md claims 20 — three artifacts, two values. The exact cross-artifact-divergence the R2a thesis is designed to catch.",
+      "recommended_resolution": "Patch synthesis.md line 191 to read '24 agents load KB-review-disciplines (per codebase-analysis blast_radius_new_confirmations[4], grep-verified at cycle 1; the four newly-named agents — `execute-orchestrator`, `review-cross-artifact-auditor`, `intake-intent-clarifier`, `test-acceptance-author` — already load the KB so no propagation work is created by the correction)'. Add a one-line entry to synthesis.md Update History 1.0.1 (or, if a 1.0.2 bump is preferred for clean separation, add 1.0.2 with this correction). Editorial in-place edit per ADR-0005. Single dispatch to synth-synthesizer; ~5 minutes of effort. After patch: re-run `grep -n '20 agents' /workspaces/feature-pipeline/working/feature/pipeline-design-time-discipline-r1/synthesis.md` and confirm zero matches before declaring resolved."
+    }
+  ],
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 1,
+    "MINOR": 0,
+    "NIT": 0,
+    "INFO": 0
+  },
+  "verdict": "conditional_pass",
+  "verdict_rationale": "Three of four cycle-0 MAJOR findings (I-AA-001 ADR-0064/0065 location alignment, I-AA-002 ADR-0065 invocation-point correction, I-AA-004 synthesis.md dogfood back-fill + Blueprint inline-table removal) are fully resolved with clean editorial patches, version bumps to 1.0.1, and Update-History entries that cite the originating audit IDs. The cycle-1 reconciliation discipline was exercised cleanly across ADR-0064, ADR-0065, the Blueprint, codebase-analysis.json, and the synthesis.md Skill-Coverage Decisions section. However, I-AA-003 (the 20 → 24 bridge-consumer count correction) was patched in only two of the three required locations: the Blueprint (line 327) and codebase-analysis.json now read 24; synthesis.md line 191 still reads 20. The reconciliation log explicitly named synthesis.md as part of the atomic patch set, but the dispatch routing scoped synth-synthesizer's work to the Skill-Coverage Decisions back-fill only — the count correction in the Bridge Consumers paragraph fell into the gap between the two parallel dispatches. This is a focused, low-cost fix (one paragraph in synthesis.md, ~5 minutes), and the residual MAJOR is editorial-corrective in nature like all cycle-0 MAJORs — no architectural rework required. Recommend finalize-reconciler dispatch a small cycle-2 revision to synth-synthesizer (target: synthesis.md line 191 + Update History entry). No new BLOCKER introduced. No regressions in the patches that did land — version bumps consistent (1.0.1 across ADR-0064, ADR-0065, blueprint-v1, synthesis, codebase-analysis), Update History entries cite audit IDs, the editorial discipline under ADR-0005 was honored throughout.",
+  "convergence_state": {
+    "audit_round": 2,
+    "convergence_cap": 4,
+    "rounds_remaining": 2,
+    "halt_recommendation": false,
+    "convergence_assessment": "converging",
+    "convergence_evidence": "Cycle 0 surfaced 4 MAJOR + 2 MINOR + 1 INFO. Cycle 2 surfaces 1 MAJOR + 0 MINOR + 0 INFO. Severity-weighted count delta per iteration-delta math (10/3/1/0 weights): cycle 0 weight = 0*10 + 4*3 + 2*1 + 1*0 = 14; cycle 2 weight = 0*10 + 1*3 + 0*1 + 0*0 = 3. Weight resolved = 11 of 14 = 79% reduction. The single residual MAJOR is a slice of a prior MAJOR (I-AA-003's third location) rather than a new defect — confirming the cycle-1 dispatches were substantively correct in their resolutions, with one location overlooked due to dispatch-scope routing. Convergence cap not at risk: 2 rounds remain; the residual fix is single-location editorial. Halt not recommended."
+  },
+  "patch_quality_audit": {
+    "version_bumps_consistent": true,
+    "version_bumps_evidence": [
+      "blueprint-v1.md frontmatter version: 1.0.1 (line 3)",
+      "ADR-0064 frontmatter version: 1.0.1 (line 3)",
+      "ADR-0065 frontmatter version: 1.0.1 (line 3)",
+      "synthesis.md frontmatter version: 1.0.1 (line 3)",
+      "codebase-analysis.json update_history[].version: 1.0.1 (line 73)"
+    ],
+    "update_history_entries_present": true,
+    "update_history_entries_cite_audit_ids": true,
+    "update_history_entries_evidence": [
+      "blueprint-v1.md row 1.0.1 cites I-AA-003 + I-AA-004",
+      "ADR-0064 row 1.0.1 cites I-AA-001",
+      "ADR-0065 row 1.0.1 cites I-AA-002",
+      "synthesis.md row 1.0.1 cites I-AA-004 (but NOT I-AA-003 — gap matching I-AA-008)",
+      "codebase-analysis.json row 1.0.1 cites I-AA-003 + I-AA-006"
+    ],
+    "editorial_discipline_per_ADR_0005": "honored throughout — no supersession events; all patches are in-place corrections with append-only Update History entries.",
+    "no_new_blockers_introduced": true,
+    "no_architectural_regressions": true,
+    "spot_check_notes": "ADR-0064 Clause 3 quote (line 89) reads 'synthesis.md Skill-Coverage Decisions section' — correct after patch. Options Considered Option B (line 124) was a different reference and reads 'Wastes the FR-7 table's mechanical parseability ... synthesis.md Skill-Coverage Decisions section' — correct alignment after patch. ADR-0065 Clause 2 (line 81) and Related Information (line 167) both reference invocation 3 (Blueprint review) consistently with explicit cross-reference to ADR-0017's invocation enumeration. Blueprint Eat-own-dogfood section (lines 342-346) is a clean paragraph pointer to synthesis.md §Skill-Coverage Decisions; the previous inline 6-row table is removed. Synthesis.md §Skill-Coverage Decisions (lines 215-233) contains the canonical 6-row table with substance preserved from the original Blueprint table; all six rows resolve to (a) existing-skill with skill path + positive-evidence string per ADR-0065 Clause 2 substance heuristic."
+  },
+  "next_action": {
+    "dispatch_target": "synth-synthesizer",
+    "dispatch_scope": "single-issue I-AA-008: patch synthesis.md line 191 (Bridge Consumers paragraph) to read '24 agents load KB-review-disciplines' and enumerate the four newly-named agents in the supporting prose, consistent with the corrected text already in Blueprint line 327 and codebase-analysis.json blast_radius_new_confirmations[4]. Add an Update History entry citing audit I-AA-008.",
+    "expected_effort": "~5 minutes (single paragraph edit + Update History entry)",
+    "expected_cycle_2_audit_outcome": "verdict: pass (zero MAJOR/MINOR/INFO). The single residual MAJOR is single-location editorial; once patched, no convergence risk remains for plan-stage advancement.",
+    "alternative_path": "User-acceptable to defer I-AA-008 to plan-stage if the dispatch overhead exceeds value (the divergence is between an inherited narrative claim and the corrected derived count; no downstream consumer of synthesis.md narrative prose has been identified that loads the count). However, the strict-honor reading of the FR-1 dogfood signal recommends the patch."
+  }
+}

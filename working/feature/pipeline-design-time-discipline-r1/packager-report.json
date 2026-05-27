@@ -1,0 +1,166 @@
+{
+  "report_id": "packager-report-pipeline-design-time-discipline-r1",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "scope_class": "MINOR",
+  "scope_class_source": "intent-clarification.md frontmatter (scope_class: minor)",
+  "version_tag": null,
+  "run_type": "R2a follow-up (not a tagged release)",
+  "generated": "2026-05-26T19:25:00Z",
+  "generated_by": "finalize-deliverable-packager",
+  "spec_reference": ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md",
+  "verdict": "PASS",
+  "verdict_rationale": "All BLOCKER-tier required artifacts for MINOR scope are present at the expected paths. Both authored ADRs (0064, 0065) exist at the canonical adrs/ location. The empty research-notes/ directory is explicitly justified in research-plan.md (T-002 and T-003 inherited verbatim from parent run per the SPLIT-RECORD inheritance directive). One MINOR finding (stale checkpoint.json current_stage) and one INFO observation (lowercase scope_class in intent-clarification frontmatter) do not impede archive acceptance.",
+
+  "split_lineage": {
+    "parent_run": "pipeline-cross-artifact-discipline-r1",
+    "this_run_role": "R2a (design-time discipline half of the parent R2 split)",
+    "split_record_path": "working/feature/pipeline-cross-artifact-discipline-r1/SPLIT-RECORD.md",
+    "queued_followup": "pipeline-gate-validator-hardening-r1 (R2b — separate session)",
+    "inherited_adrs": ["ADR-0059", "ADR-0061", "ADR-0063"],
+    "adr_range_reserved": "0064-0069",
+    "note": "R2a is a deliberate follow-up to a Gate-4-terminated parent run. The SPLIT-RECORD is the authoritative prior-context source. Inherited artifacts (T-002, T-003 research-notes; parent codebase-analysis sections; five accepted ADRs from the parent's session) are referenced by path, not duplicated into this archive."
+  },
+
+  "artifacts_present": [
+    {"path": "working/feature/pipeline-design-time-discipline-r1/intent-clarification.md", "size_bytes": 18685, "category": "required"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/prd-v1.md", "size_bytes": 56660, "category": "required"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/research-plan.md", "size_bytes": 33970, "category": "required-by-stage-run"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/research-notes/", "size_bytes": 0, "category": "directory-justified-empty", "note": "T-002 + T-003 inherited from parent per research-plan.md IN-R2a-007 inheritance directive"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/codebase-analysis.json", "size_bytes": 45862, "category": "required-by-stage-run"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/codebase-analysis-report.md", "size_bytes": 13630, "category": "required-by-stage-run"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/synthesis.md", "size_bytes": 46673, "category": "required-by-stage-run"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/synthesis/01-claims.json", "size_bytes": 141356, "category": "synthesis-substrate"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/synthesis/02-graph.json", "size_bytes": 35548, "category": "synthesis-substrate"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/synthesis/02-graph-summary.md", "size_bytes": 9216, "category": "synthesis-substrate"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/synthesis/03-critique-inherited.json", "size_bytes": 41759, "category": "synthesis-substrate"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/synthesis/04-decision-frames.json", "size_bytes": 22002, "category": "synthesis-substrate"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/synthesis/05-implementation-strategies.json", "size_bytes": 69641, "category": "synthesis-substrate"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/cc-design.md", "size_bytes": 37801, "category": "required (activated layer: Claude Code)"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/cc-dependencies.json", "size_bytes": 21878, "category": "required (activated layer: Claude Code)"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/blueprint-v1.md", "size_bytes": 49336, "category": "required"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/architecture-audit-issues.json", "size_bytes": 22281, "category": "required (audit cycle 0)"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/architecture-audit-issues-r1.json", "size_bytes": 26426, "category": "audit cycle 2 (reconciliation cycle 1)"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/reconciliation-log-r1.md", "size_bytes": 28691, "category": "reconciliation-cycle-1"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/dispatch-r1.json", "size_bytes": 17398, "category": "reconciliation-cycle-1"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/plan-v1.md", "size_bytes": 42423, "category": "required"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/acceptance-tests.md", "size_bytes": 45566, "category": "required"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/phase-validators.md", "size_bytes": 41798, "category": "required"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/cross-artifact-audit-issues.json", "size_bytes": 17519, "category": "required (cross-artifact audit)"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/tasks.json", "size_bytes": 50945, "category": "required"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/checkpoint.json", "size_bytes": 1215, "category": "required"},
+    {"path": "working/feature/pipeline-design-time-discipline-r1/packager-report.json", "size_bytes": null, "category": "this-file"}
+  ],
+
+  "expected_artifact_set_for_MINOR": {
+    "required_present": [
+      "intent-clarification.md",
+      "prd-v1.md (highest N)",
+      "cc-design.md + cc-dependencies.json (activated layer)",
+      "blueprint-v1.md (highest N)",
+      "plan-v1.md (highest N)",
+      "acceptance-tests.md",
+      "phase-validators.md",
+      "packager-report.json"
+    ],
+    "conditional_present_justified": [
+      "research-plan.md, codebase-analysis.json, codebase-analysis-report.md, synthesis.md, synthesis/ — these stages ran (R2a inherited but also re-confirmed inheritance integrity; not skipped)",
+      "architecture-audit-issues.json + architecture-audit-issues-r1.json — Architecture Audit ran with one reconciliation cycle",
+      "cross-artifact-audit-issues.json — Cross-Artifact Audit ran (the parent run's split was triggered by Cross-Artifact Audit cycle-cap risk; R2a's reduced scope completed within cap)",
+      "tasks.json — Task Decomposition ran"
+    ]
+  },
+
+  "artifacts_missing_required": [],
+  "artifacts_missing_conditional_unjustified": [],
+  "artifacts_unexpected": [],
+
+  "adr_cross_location_findings": {
+    "blueprint_adrs_authored_this_run": ["ADR-0064", "ADR-0065"],
+    "blueprint_inherited_adrs": ["ADR-0059", "ADR-0061", "ADR-0063"],
+    "canonical_placement_check": {
+      "ADR-0064": {"path": "adrs/ADR-0064-agent-roster-impact-matrix-contract.md", "present": true, "size_bytes": 17526},
+      "ADR-0065": {"path": "adrs/ADR-0065-skill-coverage-decision-discipline.md", "present": true, "size_bytes": 17205},
+      "ADR-0059": {"path": "adrs/ADR-0059-adr-prescriptions-companion-file.md", "present": true, "inherited": true},
+      "ADR-0061": {"path": "adrs/ADR-0061-severity-vocabulary-bridge-table.md", "present": true, "inherited": true},
+      "ADR-0063": {"path": "adrs/ADR-0063-blocks-x-marker-grammar.md", "present": true, "inherited": true}
+    },
+    "stray_adr_files_in_feature_dir": [],
+    "verdict": "PASS — both authored ADRs at canonical adrs/ root per ADR-0036 single-location convention. No stray ADR files in working/feature/<slug>/. All three inherited ADRs present at canonical location for traceability."
+  },
+
+  "reviewer_findings": {
+    "invocation": {
+      "agent": "shared-document-reviewer",
+      "doc_type": "DeliverableArchive",
+      "target_path": "working/feature/pipeline-design-time-discipline-r1/",
+      "scope_class": "MINOR"
+    },
+    "structural_pass": true,
+    "structural_notes": "All MINOR-required artifacts present. Optional stages (Discovery, Synthesis, Cross-Artifact Audit, Task Decomposition) all executed and their artifacts present, exceeding the MINOR floor.",
+    "findings": [
+      {
+        "id": "I-DP-001",
+        "severity": "MINOR",
+        "category": "archive-metadata-staleness",
+        "location": "working/feature/pipeline-design-time-discipline-r1/checkpoint.json",
+        "description": "checkpoint.json reports current_stage: 'intent_clarification' with stage_status: 'pending' and empty gate_history / artifact_versions / activated_layers / execution_pipeline_state_transitions arrays. This snapshot dates to 2026-05-26T16:23:13Z (run start) and was never advanced as the run progressed through PRD, Discovery, Synthesis, per-layer Design, Blueprint, Architecture Audit, Reconciliation cycle 1, Plan, Acceptance Tests, Phase Validators, Cross-Artifact Audit, and Task Decomposition.",
+        "impact": "Audit-trail divergence: the checkpoint does not reflect the run's actual end state. Does not affect deliverable correctness, but undermines the checkpoint's role as run-state ground truth.",
+        "suggestion": "Backfill checkpoint.json with current_stage: 'deliverable_packaging', stage_status: 'in_progress' (or 'complete' once this report is signed off), populated gate_history and artifact_versions blocks. Track separately as a process-gap issue (the orchestrator's checkpoint-update wiring may be broken or skipped during this run)."
+      },
+      {
+        "id": "I-DP-002",
+        "severity": "INFO",
+        "category": "frontmatter-case",
+        "location": "working/feature/pipeline-design-time-discipline-r1/intent-clarification.md (line 7)",
+        "description": "intent-clarification.md frontmatter declares 'scope_class: minor' (lowercase). The deliverable-archive-spec.md uses uppercase 'MINOR' (and Blueprint-v1.md frontmatter correctly uses 'MINOR'). The validator accepted the lowercase form as equivalent given Blueprint's uppercase confirmation, but the canonical form is uppercase.",
+        "impact": "None for this run. Forward-compat risk if a future validator becomes case-sensitive.",
+        "suggestion": "Optional: normalize intent-clarification frontmatter to 'scope_class: MINOR' in a routine sweep. Not a Gate 6 blocker."
+      }
+    ]
+  },
+
+  "dogfood_validation_evidence": {
+    "issue_ref": "I-AA-007 (architecture-audit-issues-r1.json, §Deferral 2 in reconciliation-log-r1.md)",
+    "routing_basis": "reconciliation-log-r1.md §Deferral 2 explicitly routed dogfood validation evidence to the deliverable packager for run-summary recording.",
+    "claim_verbatim": "The architecture audit caught exactly the defect classes R2a's mechanisms (FR-1 design-realization audit; FR-6 agent-roster impact matrix; FR-7 skill-coverage decisions; FR-10 audit-rule discipline) are designed to prevent. Strong dogfood validation evidence for the feature's central thesis.",
+    "supporting_observations": [
+      "I-AA-001 / I-AA-002 (cycle 0): the audit caught ADR-0064 and ADR-0065 contract-precision defects in the very ADRs that codify the FR-6 / FR-7 contracts — the audit machinery exercised the contracts it was being asked to ratify.",
+      "I-AA-003 (bridge-consumer count 20→24 correction): exactly the design-realization-audit defect class FR-1 targets; the bridge content prescription was inconsistent with its declared consumer count, and the audit caught it.",
+      "I-AA-004 (Skill-Coverage Decisions back-fill): the missing artifact that ADR-0065 (the FR-7 codification) requires was itself missing from R2a's first-pass output; the FR-7-discipline audit caught its absence in the run authoring FR-7. Pure dogfood evidence.",
+      "I-AA-006 (codebase-analysis inconsistency): FR-1-class divergence between an artifact's content and a downstream-cited fact, surfaced and patched in-cycle."
+    ],
+    "synthesis": "R2a's reconciliation cycle 1 demonstrated four independent occurrences of the audit machinery catching defects belonging to the exact defect classes the R2a mechanisms were designed to prevent. This is strong evidence that (a) the audit dimensions FR-1/FR-6/FR-7/FR-10 prescribe are well-targeted, and (b) the discipline they impose is necessary even on the run that authors them. Recorded here per the reconciliation-log's deferral routing for Gate 6 surfacing.",
+    "implication_for_followup": "R2b inherits a feature whose central thesis has been exercised against its own producing pipeline and converged — strengthening the case that the gate/validator hardening half (R2b) is the natural completion arc rather than an over-engineering risk."
+  },
+
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 0,
+    "MINOR": 1,
+    "INFO": 1
+  },
+
+  "artifact_counts": {
+    "present_total": 27,
+    "missing_required": 0,
+    "missing_conditional_unjustified": 0,
+    "unexpected": 0
+  },
+
+  "gate_6_surfacing": {
+    "blocker_findings_to_escalate": [],
+    "major_findings_to_review": [],
+    "minor_findings_to_acknowledge": [
+      "I-DP-001 — checkpoint.json stale at run-start snapshot; does not reflect run progression. Process-gap issue to track outside this run."
+    ],
+    "informational_observations": [
+      "I-DP-002 — intent-clarification scope_class case (lowercase vs canonical uppercase)."
+    ],
+    "items_to_explicitly_record_in_run_summary": [
+      "Dogfood validation evidence per I-AA-007 routing (see dogfood_validation_evidence block above).",
+      "Split lineage from parent pipeline-cross-artifact-discipline-r1 (see split_lineage block above).",
+      "Two new ADRs authored at canonical adrs/ root: ADR-0064, ADR-0065. Three ADRs inherited unchanged: ADR-0059, ADR-0061, ADR-0063.",
+      "R2b followup queued as separate pipeline invocation (slug: pipeline-gate-validator-hardening-r1)."
+    ]
+  }
+}

@@ -1,0 +1,929 @@
+{
+  "schema_version": "1.0.0",
+  "pipeline_run_id": "pipeline-design-time-discipline-r1",
+  "generated_at": "2026-05-26T20:15:00Z",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "source_artifacts": {
+    "prd": "working/feature/pipeline-design-time-discipline-r1/prd-v1.md",
+    "prd_version": "1.0.0",
+    "blueprint": "working/feature/pipeline-design-time-discipline-r1/blueprint-v1.md",
+    "blueprint_version": "1.0.1",
+    "plan": "working/feature/pipeline-design-time-discipline-r1/plan-v1.md",
+    "plan_version": "1.0.0",
+    "acceptance_tests": "working/feature/pipeline-design-time-discipline-r1/acceptance-tests.md",
+    "acceptance_tests_version": "1.0.0",
+    "phase_validators": "working/feature/pipeline-design-time-discipline-r1/phase-validators.md",
+    "phase_validators_version": "1.0.0",
+    "codebase_analysis": "working/feature/pipeline-design-time-discipline-r1/codebase-analysis.json",
+    "codebase_analysis_version": "1.1.0"
+  },
+  "metadata": {
+    "feature_slug": "pipeline-design-time-discipline-r1",
+    "total_tasks": 31,
+    "total_phases": 10,
+    "total_edges": 38,
+    "single_layer": "Claude Code",
+    "inherited_adrs": ["ADR-0059", "ADR-0061", "ADR-0063"],
+    "new_adrs": ["ADR-0064", "ADR-0065"],
+    "parent_run": "pipeline-cross-artifact-discipline-r1",
+    "related_run": "pipeline-gate-validator-hardening-r1",
+    "parallelization_summary": {
+      "critical_path_length_phases": 5,
+      "critical_path_phases": ["Phase 0", "Phase 1", "Phase 5", "Phase 8", "Phase 9"],
+      "critical_path_tasks": ["T0.1", "T1.1", "T1.2", "T5.1", "T5.3", "T8.1", "T9.1", "T9.2", "T9.3"],
+      "max_parallel_tasks_at_any_tier": 6,
+      "phase_independence_notes": [
+        "Phase 2 (FR-8 Principle 9) is independent of Phase 1 (severity bridge) — both can dispatch concurrently after Phase 0.",
+        "Phase 3 (FR-9 Blocks-X) depends on Phase 1 bridge content for severity vocabulary but is independent of Phases 2/5/6.",
+        "Phase 4 (FR-1 Lens 4) depends on Phase 1 bridge content but is independent of Phases 2/3/5/6.",
+        "Phases 5 (FR-6) and 6 (FR-7) parallelize with each other after Phase 2's T2.2 lands (T2.2 → T5.3 is the only cross-phase tie into Phase 5).",
+        "Phase 6 (FR-7) is independent of Phases 1/2/3/4/5; can dispatch immediately after Phase 0.",
+        "Phase 7 (FR-10 SA-14) depends on Phases 1 + 5 (severity vocab + matrix template + predicate).",
+        "Phase 8 (eat-own-dogfood) depends on Phases 5 + 6 + 7 (T7.1 is needed by T8.1's L3 self-audit; T6.1+T6.3 by T8.2).",
+        "Phase 9 (rollout) depends on every prior phase."
+      ],
+      "tier_breakdown": {
+        "Tier-0_setup_parallel": ["T0.1", "T0.2", "T0.3"],
+        "Tier-1_post_setup_parallel": ["T1.1", "T2.1", "T3.2", "T5.1", "T5.2", "T6.1"],
+        "Tier-2_after_T1.1": ["T1.2", "T4.1", "T4.2"],
+        "Tier-3_phase3_serial_chain": ["T3.1", "T3.3", "T3.4"],
+        "Tier-4_after_T2.1_and_T5.1_T5.2": ["T2.2", "T5.3", "T6.2", "T6.3"],
+        "Tier-5_after_T1.1_T4.1_T4.2": ["T4.3"],
+        "Tier-6_after_T5.1_T5.3": ["T5.4"],
+        "Tier-7_after_T5.1_T5.2_T1.1_T3.2": ["T7.1"],
+        "Tier-8_after_T7.1": ["T7.2"],
+        "Tier-9_eat_own_dogfood": ["T8.1", "T8.2"],
+        "Tier-10_rollout_serial": ["T9.1", "T9.2", "T9.3"]
+      },
+      "candidate_parallel_clusters": [
+        {
+          "tier_label": "Post-Phase-0 fan-out",
+          "tasks": ["T1.1", "T2.1", "T3.2", "T5.1", "T5.2", "T6.1"],
+          "rationale": "Six tasks with no shared writers, only Phase-0 (T0.1/T0.2/T0.3) as predecessors. Maximum-parallelism tier in the run.",
+          "max_concurrency": 6
+        },
+        {
+          "tier_label": "Phase 4 fan-in trio",
+          "tasks": ["T4.1", "T4.2"],
+          "rationale": "Both depend on Phase 1 (T1.1 for T4.2; T0.1+T0.3 for T4.1). Disjoint target files (validate_adr_prescriptions.py vs architecture-audit.md).",
+          "max_concurrency": 2
+        },
+        {
+          "tier_label": "Phase 5+6 cross-phase parallel",
+          "tasks": ["T5.3", "T5.4", "T6.2", "T6.3"],
+          "rationale": "Phase 5 finishing tasks parallelize with Phase 6 finishing tasks once T2.2, T5.1, T5.2, T6.1 have landed.",
+          "max_concurrency": 4
+        }
+      ]
+    }
+  },
+  "tasks": [
+    {
+      "task_id": "T0.1",
+      "title": "Verify inherited ADRs are accepted and accessible",
+      "description": "Confirm adrs/ADR-0059, ADR-0061, ADR-0063 exist with status: accepted. No edits. Pre-condition for Phase 1 / Phase 4 / Phase 9 citation chains.",
+      "layer": "Claude Code",
+      "type": "setup-verification",
+      "phase": 0,
+      "plan_reference": "Plan §Phase 0 — Setup / T0.1",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": ["external dependency on parent run's deliverable archive"],
+      "target_files": [
+        "adrs/ADR-0059-adr-prescriptions-companion-file.md",
+        "adrs/ADR-0061-severity-vocabulary-bridge-table.md",
+        "adrs/ADR-0063-blocks-x-marker-grammar.md"
+      ],
+      "target_files_mode": "read-only",
+      "satisfies_ac": [],
+      "satisfies_ac_note": "Setup-only — pre-condition for FR-1 (T4.x), FR-9 (T3.x via ADR-0063), severity bridge content (T1.1)",
+      "per_task_skills": ["KB-documentation-criteria"],
+      "depends_on": [],
+      "parallelizable_with": ["T0.2", "T0.3"],
+      "verifies_acceptance_tests": [],
+      "gates": ["PV-0.C1"]
+    },
+    {
+      "task_id": "T0.2",
+      "title": "Snapshot agent / KB inventory baseline",
+      "description": "Capture ls .claude/agents/*.md | wc -l (expected 37 per codebase-analysis A-4) and pin to inventory-baseline.txt. Baseline consumed by T8.1 row-count target and FR-6 / FR-10 parity checks.",
+      "layer": "Claude Code",
+      "type": "setup-snapshot",
+      "phase": 0,
+      "plan_reference": "Plan §Phase 0 / T0.2",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": [],
+      "target_files": [
+        "working/feature/pipeline-design-time-discipline-r1/inventory-baseline.txt"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": [],
+      "satisfies_ac_note": "Setup; baseline consumed by AC-FR-6-b and AC-FR-10-b parity checks via T8.1",
+      "per_task_skills": [],
+      "depends_on": [],
+      "parallelizable_with": ["T0.1", "T0.3"],
+      "verifies_acceptance_tests": [],
+      "gates": ["PV-0.C2"]
+    },
+    {
+      "task_id": "T0.3",
+      "title": "Pre-check script-host directory existence",
+      "description": "Confirm .claude/skills/auditing-shared/scripts/ and .claude/skills/auditing-subagents/scripts/ exist (host four new scripts in later phases). No edits.",
+      "layer": "Claude Code",
+      "type": "setup-verification",
+      "phase": 0,
+      "plan_reference": "Plan §Phase 0 / T0.3",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": [],
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/",
+        ".claude/skills/auditing-subagents/scripts/"
+      ],
+      "target_files_mode": "read-only",
+      "satisfies_ac": [],
+      "per_task_skills": [],
+      "depends_on": [],
+      "parallelizable_with": ["T0.1", "T0.2"],
+      "verifies_acceptance_tests": [],
+      "gates": ["PV-0.C3"]
+    },
+    {
+      "task_id": "T1.1",
+      "title": "Author five-column severity bridge table in severity-taxonomy.md",
+      "description": "Author the canonical 5x5 bridge (BLOCKER/MAJOR/MINOR/NIT/INFO x auditor/reviewer/pv/non-monotonic-edges/iteration-delta-weight) plus Weight Preservation Note + Verdict-Compute weights table + Non-monotonic edges enumeration at .claude/skills/KB-review-disciplines/references/severity-taxonomy.md. D-R2a-6 substrate; consumed by FR-1/FR-9/FR-10 emitters.",
+      "layer": "Claude Code",
+      "type": "kb-content-authoring",
+      "phase": 1,
+      "plan_reference": "Plan §Phase 1 / T1.1",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["bridge content is consumed by 24 downstream agents per codebase-analysis blast_radius", "two distinct weight sets (verdict_compute -12/-5/-2/-0.5/0 + iteration-delta 10/3/1/0/0) must both appear without collapsing"],
+      "target_files": [
+        ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "satisfies_ac": ["AC-FR-1-a", "AC-FR-9-b", "AC-FR-10-a", "AC-NFR-8-a"],
+      "per_task_skills": ["KB-review-disciplines", "KB-documentation-criteria"],
+      "depends_on": ["T0.1"],
+      "parallelizable_with": ["T2.1", "T3.2", "T5.1", "T5.2", "T6.1"],
+      "verifies_acceptance_tests": ["AT-002"],
+      "gates": ["PV-1.C1", "PV-1.C2"]
+    },
+    {
+      "task_id": "T1.2",
+      "title": "Document NFR-8 four-field finding shape inline in severity-taxonomy.md",
+      "description": "Add NFR-8 four-field finding shape section (rule / target / divergence / next_action) co-located in the bridge host file per ADR-0061 + Blueprint §Severity bridge content. Additive section; consumed by FR-1/FR-9/FR-10 emitters.",
+      "layer": "Claude Code",
+      "type": "kb-content-authoring",
+      "phase": 1,
+      "plan_reference": "Plan §Phase 1 / T1.2",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": ["same file as T1.1 — sequential write ordering required"],
+      "target_files": [
+        ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "target_files_conflict_note": "Shares target with T1.1; resolved by sequential ordering (T1.1 → T1.2).",
+      "satisfies_ac": ["AC-NFR-8-a"],
+      "per_task_skills": ["KB-review-disciplines"],
+      "depends_on": ["T1.1"],
+      "parallelizable_with": [],
+      "verifies_acceptance_tests": ["AT-029", "AT-030", "AT-031", "AT-032"],
+      "gates": ["PV-1.C3"]
+    },
+    {
+      "task_id": "T2.1",
+      "title": "Replace Principle 9 leading sentence with active framing",
+      "description": "Verbatim sentence replacement at .claude/skills/KB-cc-design/references/principles.md:182 — defensive framing -> active framing requiring per-agent consideration recording. Existing body of Principle 9 retained verbatim.",
+      "layer": "Claude Code",
+      "type": "kb-content-edit",
+      "phase": 2,
+      "plan_reference": "Plan §Phase 2 / T2.1",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": ["concentrated 2-site edit; FR-8 substance lever"],
+      "target_files": [
+        ".claude/skills/KB-cc-design/references/principles.md"
+      ],
+      "target_files_mode": "modify-in-place",
+      "satisfies_ac": ["AC-FR-8-a"],
+      "per_task_skills": ["KB-cc-design"],
+      "depends_on": [],
+      "parallelizable_with": ["T1.1", "T3.2", "T5.1", "T5.2", "T6.1"],
+      "verifies_acceptance_tests": ["AT-016"],
+      "gates": ["PV-2.C1"]
+    },
+    {
+      "task_id": "T2.2",
+      "title": "Update design-claude-code.md cross-reference at line 56 with mutual citation",
+      "description": "Update verbatim citation at .claude/agents/design-claude-code.md:56 to match new active wording and add AC-FR-8-b mutual reference: 'the matrix-cell discipline (FR-6 §Per-cell discipline) is the substance test for the per-agent consideration this principle requires.'",
+      "layer": "Claude Code",
+      "type": "agent-prompt-edit",
+      "phase": 2,
+      "plan_reference": "Plan §Phase 2 / T2.2",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": ["bidirectional cross-reference must be coherent with both T2.1 (Principle 9) and T5.3 (matrix-cell discipline naming)"],
+      "target_files": [
+        ".claude/agents/design-claude-code.md"
+      ],
+      "target_files_mode": "modify-in-place",
+      "target_files_conflict_note": "Shares target with T5.3 (Phase 5); resolved by sequential ordering (T2.2 → T5.3). T5.3 also edits design-claude-code.md Phase 2 section.",
+      "satisfies_ac": ["AC-FR-8-b"],
+      "per_task_skills": ["KB-cc-design", "KB-documentation-criteria"],
+      "depends_on": ["T2.1"],
+      "parallelizable_with": [],
+      "verifies_acceptance_tests": ["AT-017"],
+      "gates": ["PV-2.C2", "PV-2.C3"]
+    },
+    {
+      "task_id": "T3.1",
+      "title": "Author parse_blocks_x_markers.py shared parser",
+      "description": "New shared parser at .claude/skills/auditing-shared/scripts/parse_blocks_x_markers.py implementing ADR-0063 canonical grammar (<!-- BLOCKS: <stage-slug>-completion -->). Single source of truth for the regex; consumed by orchestrator gate + future audit rules. Output schema: list of {stage, raw_line, file_path, line_no} records. Sibling smoke_test_parse_blocks_x_markers.py per existing convention.",
+      "layer": "Claude Code",
+      "type": "script-authoring",
+      "phase": 3,
+      "plan_reference": "Plan §Phase 3 / T3.1",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["new-file convention (no precedent parser in auditing-shared for marker patterns per codebase-analysis OI-R2a-3)", "regex must match em-dash payload separator (U+2014)"],
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/parse_blocks_x_markers.py",
+        ".claude/skills/auditing-shared/scripts/smoke_test_parse_blocks_x_markers.py"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": ["AC-FR-9-a", "AC-FR-9-c"],
+      "per_task_skills": ["auditing-shared"],
+      "depends_on": ["T0.3"],
+      "parallelizable_with": ["T1.1", "T2.1", "T3.2", "T5.1", "T5.2", "T6.1"],
+      "parallelizable_with_note": "T3.1 has only T0.3 as predecessor; the depends_on T0.1 in Plan diagram is an indirect ADR-0063 accessibility dependency (covered by T0.1's setup verification).",
+      "verifies_acceptance_tests": ["AT-018", "AT-019"],
+      "gates": ["PV-3.C1"]
+    },
+    {
+      "task_id": "T3.2",
+      "title": "Extend state-transitions-log-entry-template.md with four new transition names",
+      "description": "Document BLOCKS_X_RESOLVED, BLOCKS_X_DEFERRED_WITH_OI, BLOCKS_X_FALSE_POSITIVE, and TRIGGER_OVERRIDE (per ADR-0064) as valid transition_name values. Free-string per ADR-0044 v1; no schema evolution to log_state_transition.py.",
+      "layer": "Claude Code",
+      "type": "template-edit",
+      "phase": 3,
+      "plan_reference": "Plan §Phase 3 / T3.2",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": ["TRIGGER_OVERRIDE (FR-6 advisory predicate) co-lands here even though FR-6 lives in Phase 5 — cross-phase template touchpoint"],
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "satisfies_ac": ["AC-FR-9-c"],
+      "per_task_skills": ["KB-documentation-criteria"],
+      "depends_on": [],
+      "parallelizable_with": ["T1.1", "T2.1", "T3.1", "T5.1", "T5.2", "T6.1"],
+      "verifies_acceptance_tests": ["AT-021"],
+      "gates": ["PV-3.C2"]
+    },
+    {
+      "task_id": "T3.3",
+      "title": "Extend discovery-codebase-researcher.md with marker-emission procedure",
+      "description": "Procedure-text addition in .claude/agents/discovery-codebase-researcher.md: when a question whose answer is required before a named stage can complete is surfaced, emit a marker per ADR-0063 grammar in the discovery output. Agent frontmatter unchanged (Principle 9 dogfood compliance).",
+      "layer": "Claude Code",
+      "type": "agent-prompt-edit",
+      "phase": 3,
+      "plan_reference": "Plan §Phase 3 / T3.3",
+      "estimated_effort": "S",
+      "priority": "high",
+      "complexity_drivers": [],
+      "target_files": [
+        ".claude/agents/discovery-codebase-researcher.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "satisfies_ac": ["AC-FR-9-a"],
+      "per_task_skills": ["KB-codebase-research"],
+      "depends_on": ["T0.1"],
+      "parallelizable_with": ["T3.1", "T3.2"],
+      "verifies_acceptance_tests": [],
+      "gates": ["PV-3.C3"]
+    },
+    {
+      "task_id": "T3.4",
+      "title": "Add stage-transition gate logic to execute-orchestrator.md",
+      "description": "Procedure-text addition in .claude/agents/execute-orchestrator.md: at each stage-transition checkpoint, invoke parse_blocks_x_markers.py to enumerate unresolved markers in upstream outputs; refuse to mark the named stage complete until each marker has transitioned to RESOLVED / DEFERRED / FALSE_POSITIVE. Agent frontmatter unchanged.",
+      "layer": "Claude Code",
+      "type": "agent-prompt-edit",
+      "phase": 3,
+      "plan_reference": "Plan §Phase 3 / T3.4",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["orchestrator gate logic is the load-bearing gate-refusal mechanism for AC-FR-9-b"],
+      "target_files": [
+        ".claude/agents/execute-orchestrator.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "satisfies_ac": ["AC-FR-9-a", "AC-FR-9-b"],
+      "per_task_skills": [],
+      "depends_on": ["T3.1", "T3.2"],
+      "parallelizable_with": [],
+      "verifies_acceptance_tests": ["AT-020"],
+      "gates": ["PV-3.C4", "PV-3.C5", "PV-3.C6"]
+    },
+    {
+      "task_id": "T4.1",
+      "title": "Author validate_adr_prescriptions.py linter",
+      "description": "New linter at .claude/skills/auditing-shared/scripts/validate_adr_prescriptions.py that schema-validates ADR-0059 companion .prescriptions.yaml files. Verifies (a) companion file's adr_path/slug matches partner ADR, (b) declared target_path exists, (c) required assertion field present. Sibling smoke_test per existing convention.",
+      "layer": "Claude Code",
+      "type": "script-authoring",
+      "phase": 4,
+      "plan_reference": "Plan §Phase 4 / T4.1",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["YAML schema validation; no existing companion files in repo at R2a author time"],
+      "target_files": [
+        ".claude/skills/auditing-shared/scripts/validate_adr_prescriptions.py",
+        ".claude/skills/auditing-shared/scripts/smoke_test_validate_adr_prescriptions.py"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": ["AC-FR-1-c"],
+      "per_task_skills": ["auditing-shared"],
+      "depends_on": ["T0.1", "T0.3"],
+      "parallelizable_with": ["T4.2", "T1.2"],
+      "verifies_acceptance_tests": [],
+      "gates": ["PV-4.C1"]
+    },
+    {
+      "task_id": "T4.2",
+      "title": "Add Lens 4: Design Realization to architecture-audit.md",
+      "description": "New 'Lens 4: Design Realization' section in .claude/skills/KB-review-disciplines/references/architecture-audit.md alongside existing CoVe / Blast-Radius / Brief-Honor lenses. References inherited ADR-0059 companion-file convention; references severity bridge by name for emission vocabulary.",
+      "layer": "Claude Code",
+      "type": "kb-content-authoring",
+      "phase": 4,
+      "plan_reference": "Plan §Phase 4 / T4.2",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["Lens 4 must cite severity bridge by name (depends on T1.1 vocabulary)"],
+      "target_files": [
+        ".claude/skills/KB-review-disciplines/references/architecture-audit.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "satisfies_ac": ["AC-FR-1-c"],
+      "per_task_skills": ["KB-review-disciplines"],
+      "depends_on": ["T1.1"],
+      "parallelizable_with": ["T4.1", "T1.2"],
+      "verifies_acceptance_tests": ["AT-004"],
+      "gates": ["PV-4.C2"]
+    },
+    {
+      "task_id": "T4.3",
+      "title": "Extend review-architecture-auditor.md with design-realization audit phase",
+      "description": "Additive new procedure phase per cc-design §FR-1: inline phase (no Agent/Task tool per ADR-0045). For each ADR in the run's adrs/ set with a .prescriptions.yaml companion, compare prescription vs eventual file; emit BLOCKER on divergence per bridge vocabulary. No companions -> no-op (AC-FR-1-b).",
+      "layer": "Claude Code",
+      "type": "agent-prompt-edit",
+      "phase": 4,
+      "plan_reference": "Plan §Phase 4 / T4.3",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["inline phase per ADR-0045 (no sub-agent dispatch)", "NFR-1 5000 ms budget for up to 20 prescriptions", "NFR-8 four-field shape required on every emission"],
+      "target_files": [
+        ".claude/agents/review-architecture-auditor.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "satisfies_ac": ["AC-FR-1-a", "AC-FR-1-b", "AC-FR-1-c", "AC-NFR-1-a", "AC-NFR-8-a"],
+      "per_task_skills": ["KB-review-disciplines", "auditing-shared"],
+      "depends_on": ["T4.1", "T4.2", "T1.2"],
+      "parallelizable_with": [],
+      "verifies_acceptance_tests": ["AT-001", "AT-003", "AT-027", "AT-029"],
+      "gates": ["PV-4.C3", "PV-4.C4", "PV-4.C5", "PV-4.C6", "PV-4.C7"]
+    },
+    {
+      "task_id": "T5.1",
+      "title": "Author agent-roster-impact-matrix-template.md",
+      "description": "New canonical template at .claude/skills/KB-documentation-criteria/references/templates/agent-roster-impact-matrix-template.md per ADR-0064 Clause 2. Row schema: one per .claude/agents/*.md at authoring time. Cell schema: <value> — <positive-evidence-string>; five explicit dimensions (tools / skills / model / effort / prompt body). Headers + worked example row + 'no bare no-change' rule.",
+      "layer": "Claude Code",
+      "type": "template-authoring",
+      "phase": 5,
+      "plan_reference": "Plan §Phase 5 / T5.1",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["five-dimension explicit count (resolves IC OI-9)", "positive-evidence string discipline grounded in active Principle 9 framing"],
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/agent-roster-impact-matrix-template.md"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": ["AC-FR-6-a", "AC-FR-6-b", "AC-FR-6-d", "AC-NFR-9-a"],
+      "per_task_skills": ["KB-documentation-criteria"],
+      "depends_on": [],
+      "parallelizable_with": ["T1.1", "T2.1", "T3.2", "T5.2", "T6.1"],
+      "verifies_acceptance_tests": ["AT-009", "AT-011", "AT-033"],
+      "gates": ["PV-5.C1"]
+    },
+    {
+      "task_id": "T5.2",
+      "title": "Author check_feature_touch_predicate.py advisory predicate",
+      "description": "Advisory predicate at .claude/skills/auditing-subagents/scripts/check_feature_touch_predicate.py per ADR-0064 Clause 3. Deterministic for trigger conditions 1 (.claude/agents/*.md diff) and 2 (.mcp.json tool-surface diff); advisory annotation for conditions 3 and 4 (interpretive read of design / Skill-Coverage Decisions text). Override events emit transition_name: TRIGGER_OVERRIDE via existing log_state_transition.py.",
+      "layer": "Claude Code",
+      "type": "script-authoring",
+      "phase": 5,
+      "plan_reference": "Plan §Phase 5 / T5.2",
+      "estimated_effort": "L",
+      "priority": "critical",
+      "complexity_drivers": ["four trigger conditions with deterministic-vs-advisory branching", "TRIGGER_OVERRIDE state-transitions integration", "conditions 3/4 require interpretive read of design text — advisory branch by design (OI-R2a-1)"],
+      "target_files": [
+        ".claude/skills/auditing-subagents/scripts/check_feature_touch_predicate.py",
+        ".claude/skills/auditing-subagents/scripts/smoke_test_check_feature_touch_predicate.py"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": ["AC-FR-6-a", "AC-FR-6-c"],
+      "per_task_skills": ["auditing-subagents", "auditing-shared"],
+      "depends_on": ["T0.3", "T3.2"],
+      "depends_on_note": "T3.2 dependency: TRIGGER_OVERRIDE must be a documented transition_name before the predicate emits it. This is the cross-phase fan-in to Phase 3.",
+      "parallelizable_with": ["T1.1", "T2.1", "T3.1", "T5.1", "T6.1"],
+      "verifies_acceptance_tests": ["AT-005", "AT-006", "AT-007", "AT-008"],
+      "gates": ["PV-5.C2", "PV-5.C3"]
+    },
+    {
+      "task_id": "T5.3",
+      "title": "Extend design-claude-code.md Phase 2 with matrix-authoring procedure",
+      "description": "Per cc-design §FR-6: when feature-touch advisory predicate (T5.2) fires, design-cc MUST author working/feature/<slug>/agent-roster-impact-matrix.md before its stage can complete. Cross-reference active Principle 9 (T2.1/T2.2) by name. AC-FR-8-b mutual cross-reference lands here.",
+      "layer": "Claude Code",
+      "type": "agent-prompt-edit",
+      "phase": 5,
+      "plan_reference": "Plan §Phase 5 / T5.3",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["mutual cross-reference with T2.2 — both must cite each other coherently"],
+      "target_files": [
+        ".claude/agents/design-claude-code.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "target_files_conflict_note": "Shares target with T2.2; resolved by sequential ordering (T2.2 -> T5.3). T2.2 edits line 56 cross-reference; T5.3 extends Phase 2 procedure section.",
+      "satisfies_ac": ["AC-FR-6-a", "AC-FR-8-b"],
+      "per_task_skills": ["KB-cc-design", "KB-documentation-criteria"],
+      "depends_on": ["T2.2", "T5.1", "T5.2"],
+      "parallelizable_with": ["T5.4", "T6.2", "T6.3"],
+      "verifies_acceptance_tests": [],
+      "gates": ["PV-5.C4"]
+    },
+    {
+      "task_id": "T5.4",
+      "title": "Update recipe-feature-pipeline outputs table and Design Composition close gate",
+      "description": "Add matrix row to design-cc's outputs table in .claude/skills/recipe-feature-pipeline/SKILL.md; update Stage 7 (Design Composition close) gate description to refuse close if trigger fired and matrix is absent (per AC-FR-6-c).",
+      "layer": "Claude Code",
+      "type": "recipe-edit",
+      "phase": 5,
+      "plan_reference": "Plan §Phase 5 / T5.4",
+      "estimated_effort": "S",
+      "priority": "high",
+      "complexity_drivers": [],
+      "target_files": [
+        ".claude/skills/recipe-feature-pipeline/SKILL.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "satisfies_ac": ["AC-FR-6-c"],
+      "per_task_skills": ["recipe-feature-pipeline"],
+      "depends_on": ["T5.1", "T5.3"],
+      "parallelizable_with": ["T6.2", "T6.3"],
+      "verifies_acceptance_tests": ["AT-010"],
+      "gates": ["PV-5.C5", "PV-5.C6", "PV-5.C7", "PV-5.C8", "PV-5.C9", "PV-5.C10"]
+    },
+    {
+      "task_id": "T6.1",
+      "title": "Author skill-coverage-decisions-section-template.md",
+      "description": "New canonical sub-template at .claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section-template.md for the section embedded in synthesis.md. One row per new domain concept; columns: concept, decision (a/b/c), justification. (b) rows require W/H/A trifecta (structural mandate per ADR-0065); (a)/(c) rows require substance-heuristic justification (per D-8).",
+      "layer": "Claude Code",
+      "type": "template-authoring",
+      "phase": 6,
+      "plan_reference": "Plan §Phase 6 / T6.1",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["hybrid mandate-vs-substance discipline (ADR-0065 D-8) — structural mandate for (b), substance heuristic for (a)/(c)"],
+      "target_files": [
+        ".claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section-template.md"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": ["AC-FR-7-a", "AC-FR-7-b", "AC-FR-7-c", "AC-NFR-9-a"],
+      "per_task_skills": ["KB-documentation-criteria"],
+      "depends_on": [],
+      "parallelizable_with": ["T1.1", "T2.1", "T3.2", "T5.1", "T5.2"],
+      "verifies_acceptance_tests": ["AT-015", "AT-034"],
+      "gates": ["PV-6.C1"]
+    },
+    {
+      "task_id": "T6.2",
+      "title": "Extend synth-synthesizer.md with Skill-Coverage Decisions emission procedure",
+      "description": "Procedure-text addition in .claude/agents/synth-synthesizer.md: when synthesis identifies one or more new domain concepts, emit Skill-Coverage Decisions section in synthesis.md per the T6.1 template. Section-name references ADR-0065 Clause 1 (canonical embedding location).",
+      "layer": "Claude Code",
+      "type": "agent-prompt-edit",
+      "phase": 6,
+      "plan_reference": "Plan §Phase 6 / T6.2",
+      "estimated_effort": "S",
+      "priority": "high",
+      "complexity_drivers": [],
+      "target_files": [
+        ".claude/agents/synth-synthesizer.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "satisfies_ac": ["AC-FR-7-a"],
+      "per_task_skills": ["KB-documentation-criteria"],
+      "depends_on": ["T6.1"],
+      "parallelizable_with": ["T5.3", "T5.4", "T6.3"],
+      "verifies_acceptance_tests": ["AT-012"],
+      "gates": ["PV-6.C2", "PV-6.C4"]
+    },
+    {
+      "task_id": "T6.3",
+      "title": "Extend design-composer.md with substance-review procedure",
+      "description": "Procedure-text addition in .claude/agents/design-composer.md: at Blueprint composition, design-composer reads each Skill-Coverage Decisions row; blocks composition close if (b) row is missing W/H/A trifecta headings (structural mandate) or if (a)/(c) row's justification fails substance heuristic (per D-8). Substance heuristic = inherited D-8 framing.",
+      "layer": "Claude Code",
+      "type": "agent-prompt-edit",
+      "phase": 6,
+      "plan_reference": "Plan §Phase 6 / T6.3",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["substance heuristic is judgment-based per ADR-0065 D-8 framing — procedure documents the rubric, not a mechanical check"],
+      "target_files": [
+        ".claude/agents/design-composer.md"
+      ],
+      "target_files_mode": "modify-additive",
+      "satisfies_ac": ["AC-FR-7-b"],
+      "per_task_skills": ["KB-documentation-criteria", "KB-review-disciplines"],
+      "depends_on": ["T6.1"],
+      "parallelizable_with": ["T5.3", "T5.4", "T6.2"],
+      "verifies_acceptance_tests": ["AT-013", "AT-014"],
+      "gates": ["PV-6.C3", "PV-6.C5", "PV-6.C6", "PV-6.C7", "PV-6.C8"]
+    },
+    {
+      "task_id": "T7.1",
+      "title": "Author audit_feature_touch_coverage.py SA-14 script",
+      "description": "New script at .claude/skills/auditing-subagents/scripts/audit_feature_touch_coverage.py per cc-design §FR-10. Reads working/feature/<slug>/ for trigger evidence (consults T5.2 predicate output if present); checks for agent-roster-impact-matrix.md presence; checks row count equals current .claude/agents/*.md count; emits BLOCKER per AC-FR-10-a / AC-FR-10-b carrying NFR-8 four-field shape.",
+      "layer": "Claude Code",
+      "type": "script-authoring",
+      "phase": 7,
+      "plan_reference": "Plan §Phase 7 / T7.1",
+      "estimated_effort": "M",
+      "priority": "critical",
+      "complexity_drivers": ["first auditing-subagents predicate that reads from working/feature/<slug>/ (per codebase-analysis OI-R2a-5)", "no-op false-positive guard for no-trigger case (AC-FR-10-c) is load-bearing"],
+      "target_files": [
+        ".claude/skills/auditing-subagents/scripts/audit_feature_touch_coverage.py",
+        ".claude/skills/auditing-subagents/scripts/smoke_test_audit_feature_touch_coverage.py"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": ["AC-FR-10-a", "AC-FR-10-b", "AC-FR-10-c", "AC-NFR-8-a"],
+      "per_task_skills": ["auditing-subagents", "auditing-shared"],
+      "depends_on": ["T5.1", "T5.2", "T1.1", "T0.3"],
+      "parallelizable_with": [],
+      "verifies_acceptance_tests": ["AT-022", "AT-024", "AT-025", "AT-026", "AT-031"],
+      "gates": ["PV-7.C1", "PV-7.C4"]
+    },
+    {
+      "task_id": "T7.2",
+      "title": "Add SA-14 rule entry to auditing-subagents/SKILL.md (incl I-AA-005 fold-in)",
+      "description": "New rule entry SA-14 ('feature-touch-coverage') in .claude/skills/auditing-subagents/SKILL.md catalog. Includes I-AA-005 fold-in: correct any stale SA-NN count number in the SKILL.md description string to reflect SA-14 as the latest rule. Companion reference text under auditing-subagents/references/ documents the rule's predicate, severity, and remediation steps.",
+      "layer": "Claude Code",
+      "type": "skill-edit",
+      "phase": 7,
+      "plan_reference": "Plan §Phase 7 / T7.2",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": ["I-AA-005 (cycle-1 reconciliation minor) folded in here — SA-NN count must be consistent post-edit"],
+      "target_files": [
+        ".claude/skills/auditing-subagents/SKILL.md",
+        ".claude/skills/auditing-subagents/references/sa-14-feature-touch-coverage.md"
+      ],
+      "target_files_mode": "modify-additive-plus-create",
+      "satisfies_ac": ["AC-FR-10-a", "AC-FR-10-b"],
+      "per_task_skills": ["auditing-subagents"],
+      "depends_on": ["T7.1"],
+      "parallelizable_with": [],
+      "verifies_acceptance_tests": ["AT-023"],
+      "gates": ["PV-7.C2", "PV-7.C3"]
+    },
+    {
+      "task_id": "T8.1",
+      "title": "Author this run's agent-roster-impact-matrix.md (eat-own-dogfood)",
+      "description": "Author this run's own roster matrix per T5.1 template. Row count = baseline-pinned .claude/agents/*.md count from T0.2 (37). Five cells per row: tools / skills / model / effort / prompt body. Per-cell schema: <value> — <positive-evidence-string>. Six agents touched (review-architecture-auditor, design-claude-code, design-composer, synth-synthesizer, discovery-codebase-researcher, execute-orchestrator) carry concrete change values per Blueprint §Change impact map; other 31 carry 'no-change — <positive evidence string>' per active Principle 9 substance test. Exemplar: Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md. This task EXERCISES the contract being established by Phase 5 — by design.",
+      "layer": "Claude Code",
+      "type": "dogfood-deliverable-authoring",
+      "phase": 8,
+      "plan_reference": "Plan §Phase 8 / T8.1",
+      "estimated_effort": "L",
+      "priority": "critical",
+      "complexity_drivers": [
+        "37 rows × 5 cells = 185 cells; ~11 min wall-clock at NFR-7 linear-extrapolation rate",
+        "dogfood event — contract authored by Phase 5 self-applies on this run",
+        "depends on Phase 5 contract being operational (T5.1 template + T5.2 predicate + T5.3 procedure)"
+      ],
+      "target_files": [
+        "working/feature/pipeline-design-time-discipline-r1/agent-roster-impact-matrix.md"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": ["AC-FR-6-a", "AC-FR-6-b", "AC-FR-6-c", "AC-FR-6-d", "AC-NFR-7-a"],
+      "per_task_skills": ["KB-documentation-criteria", "KB-cc-design"],
+      "depends_on": ["T0.2", "T5.1", "T5.2", "T5.3"],
+      "depends_on_note": "Plan §Cross-Phase Dependency 4: 'Eat-own-dogfood matrix authoring (T8.1) ... consume the contracts realized in Phase 5'. T7.1 is NOT a hard dependency for authoring; T7.1 self-audit of this matrix happens at T9.1.",
+      "parallelizable_with": ["T8.2"],
+      "verifies_acceptance_tests": ["AT-028", "AT-035", "AT-036"],
+      "gates": ["PV-8.C1", "PV-8.C2", "PV-8.C6"]
+    },
+    {
+      "task_id": "T8.2",
+      "title": "Verify Skill-Coverage Decisions section in synthesis.md (back-filled cycle 1)",
+      "description": "Verification-only task per Blueprint §Eat-own-dogfood deliverables. Six skill-coverage decisions for this run's new domain concepts were back-filled into working/feature/pipeline-design-time-discipline-r1/synthesis.md v1.0.1+ during cycle-1 reconciliation per I-AA-004 + ADR-0065 Clause 1. This task confirms (a) section present, (b) six rows, (c) all six resolve to type (a) existing-skill, (d) each justification passes substance heuristic per D-8. Reads synthesis.md §Skill-Coverage Decisions section.",
+      "layer": "Claude Code",
+      "type": "dogfood-verification",
+      "phase": 8,
+      "plan_reference": "Plan §Phase 8 / T8.2",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": ["substance-heuristic check is reviewer-judgment per ADR-0065 D-8 — first exercise of the rubric"],
+      "target_files": [
+        "working/feature/pipeline-design-time-discipline-r1/synthesis.md"
+      ],
+      "target_files_mode": "read-only",
+      "satisfies_ac": ["AC-FR-7-a", "AC-FR-7-b"],
+      "per_task_skills": ["KB-documentation-criteria"],
+      "depends_on": ["T6.1", "T6.3"],
+      "depends_on_note": "T6.3 substance-heuristic procedure must exist for verification anchor.",
+      "parallelizable_with": ["T8.1"],
+      "verifies_acceptance_tests": ["AT-037", "AT-038"],
+      "gates": ["PV-8.C3", "PV-8.C4", "PV-8.C5"]
+    },
+    {
+      "task_id": "T9.1",
+      "title": "Run SA-14 audit against this run's working directory",
+      "description": "Execute audit_feature_touch_coverage.py (T7.1) against working/feature/pipeline-design-time-discipline-r1/. Expect no findings (matrix present + 37-row parity per T8.1). Records dogfood-validation evidence per I-AA-007.",
+      "layer": "Claude Code",
+      "type": "validator-execution",
+      "phase": 9,
+      "plan_reference": "Plan §Phase 9 / T9.1",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": ["closes I-AA-007 INFO entry; this is the contract-self-validation event"],
+      "target_files": [
+        "working/feature/pipeline-design-time-discipline-r1/audit-issues.json"
+      ],
+      "target_files_mode": "create-output-evidence",
+      "satisfies_ac": ["AC-FR-10-a", "AC-FR-10-b"],
+      "satisfies_ac_note": "Dogfood evidence path for FR-10 ACs.",
+      "per_task_skills": ["auditing-subagents"],
+      "depends_on": ["T7.1", "T7.2", "T8.1"],
+      "parallelizable_with": [],
+      "verifies_acceptance_tests": ["AT-035"],
+      "gates": ["PV-9.C1", "PV-9.C5"]
+    },
+    {
+      "task_id": "T9.2",
+      "title": "Author 'What changed for future feature authors' summary",
+      "description": "One-page summary referenced from deliverable archive. Names six mechanisms by FR number, two new ADRs (0064, 0065), populated severity bridge for R2b inheritance, and inherited three ADRs (0059, 0061, 0063).",
+      "layer": "Claude Code",
+      "type": "deliverable-authoring",
+      "phase": 9,
+      "plan_reference": "Plan §Phase 9 / T9.2",
+      "estimated_effort": "S",
+      "priority": "high",
+      "complexity_drivers": [],
+      "target_files": [
+        "working/feature/pipeline-design-time-discipline-r1/what-changed-for-future-authors.md"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": [],
+      "satisfies_ac_note": "PRD §Rollout Plan communication plan deliverable; no AC binding.",
+      "per_task_skills": ["KB-documentation-criteria"],
+      "depends_on": ["T9.1"],
+      "depends_on_note": "Plan states 'all prior phases'; modeled as T9.1 since T9.1 transitively depends on every prior phase.",
+      "parallelizable_with": [],
+      "verifies_acceptance_tests": [],
+      "gates": ["PV-9.C2"]
+    },
+    {
+      "task_id": "T9.3",
+      "title": "Record success-criteria evidence in run summary",
+      "description": "PRD §Success Criteria evidence collection: (a) presence of agent-roster-impact-matrix.md (T8.1), (b) skill-coverage decisions per new concept (T8.2), (c) eat-own-dogfood compliance (T9.1), (d) severity-taxonomy bridge published for R2b (T1.1/T1.2). Recorded in pipeline-run-summary per template. Seals deliverable archive per deliverable-archive-spec.md.",
+      "layer": "Claude Code",
+      "type": "deliverable-packaging",
+      "phase": 9,
+      "plan_reference": "Plan §Phase 9 / T9.3",
+      "estimated_effort": "S",
+      "priority": "critical",
+      "complexity_drivers": ["terminal task; PV-9 is the R2b-kickoff signal gate"],
+      "target_files": [
+        "working/feature/pipeline-design-time-discipline-r1/pipeline-run-summary.md",
+        "working/feature/pipeline-design-time-discipline-r1/deliverable-archive/"
+      ],
+      "target_files_mode": "create",
+      "satisfies_ac": [],
+      "satisfies_ac_note": "PRD §Success Criteria evidence; no individual AC binding.",
+      "per_task_skills": ["KB-documentation-criteria"],
+      "depends_on": ["T8.1", "T8.2", "T1.1", "T1.2", "T9.1", "T9.2"],
+      "parallelizable_with": [],
+      "verifies_acceptance_tests": [],
+      "gates": ["PV-9.C3", "PV-9.C4", "PV-9.C6"]
+    }
+  ],
+  "edges": [
+    {"from": "T0.1", "to": "T1.1", "kind": "setup_precondition"},
+    {"from": "T0.1", "to": "T3.3", "kind": "setup_precondition_adr0063"},
+    {"from": "T0.1", "to": "T4.1", "kind": "setup_precondition_adr0059"},
+    {"from": "T0.3", "to": "T3.1", "kind": "setup_script_host"},
+    {"from": "T0.3", "to": "T4.1", "kind": "setup_script_host"},
+    {"from": "T0.3", "to": "T5.2", "kind": "setup_script_host"},
+    {"from": "T0.3", "to": "T7.1", "kind": "setup_script_host"},
+    {"from": "T1.1", "to": "T1.2", "kind": "same_file_sequential", "shared_file": ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md"},
+    {"from": "T1.1", "to": "T4.2", "kind": "vocabulary_dependency"},
+    {"from": "T1.1", "to": "T7.1", "kind": "vocabulary_dependency"},
+    {"from": "T1.2", "to": "T4.3", "kind": "nfr8_shape_dependency"},
+    {"from": "T1.1", "to": "T3.4", "kind": "vocabulary_dependency_transitive", "note": "FR-9 emitter cites bridge vocabulary; transitively via T3.1 + T1.1"},
+    {"from": "T2.1", "to": "T2.2", "kind": "data_flow_cross_reference"},
+    {"from": "T2.2", "to": "T5.3", "kind": "mutual_cross_reference_and_same_file", "shared_file": ".claude/agents/design-claude-code.md"},
+    {"from": "T3.1", "to": "T3.4", "kind": "data_flow_parser_consumer"},
+    {"from": "T3.2", "to": "T3.4", "kind": "data_flow_transition_names"},
+    {"from": "T3.2", "to": "T5.2", "kind": "data_flow_trigger_override_transition_name"},
+    {"from": "T4.1", "to": "T4.3", "kind": "data_flow_validator_consumer"},
+    {"from": "T4.2", "to": "T4.3", "kind": "data_flow_kb_consumer"},
+    {"from": "T5.1", "to": "T5.3", "kind": "data_flow_template_consumer"},
+    {"from": "T5.2", "to": "T5.3", "kind": "data_flow_predicate_consumer"},
+    {"from": "T5.1", "to": "T5.4", "kind": "data_flow_recipe_reference"},
+    {"from": "T5.3", "to": "T5.4", "kind": "ordering_recipe_after_procedure"},
+    {"from": "T5.1", "to": "T7.1", "kind": "data_flow_row_count_reference"},
+    {"from": "T5.2", "to": "T7.1", "kind": "data_flow_trigger_evidence"},
+    {"from": "T6.1", "to": "T6.2", "kind": "data_flow_template_consumer"},
+    {"from": "T6.1", "to": "T6.3", "kind": "data_flow_template_consumer"},
+    {"from": "T7.1", "to": "T7.2", "kind": "data_flow_script_to_catalog"},
+    {"from": "T0.2", "to": "T8.1", "kind": "baseline_consumer"},
+    {"from": "T5.1", "to": "T8.1", "kind": "dogfood_template_consumer"},
+    {"from": "T5.2", "to": "T8.1", "kind": "dogfood_predicate_self_application"},
+    {"from": "T5.3", "to": "T8.1", "kind": "dogfood_procedure_self_application"},
+    {"from": "T6.1", "to": "T8.2", "kind": "dogfood_template_verifier"},
+    {"from": "T6.3", "to": "T8.2", "kind": "dogfood_substance_heuristic_anchor"},
+    {"from": "T7.1", "to": "T9.1", "kind": "audit_script_invocation"},
+    {"from": "T7.2", "to": "T9.1", "kind": "catalog_must_be_present"},
+    {"from": "T8.1", "to": "T9.1", "kind": "dogfood_input_to_audit"},
+    {"from": "T9.1", "to": "T9.2", "kind": "phase_predecessor"},
+    {"from": "T8.1", "to": "T9.3", "kind": "success_criteria_evidence"},
+    {"from": "T8.2", "to": "T9.3", "kind": "success_criteria_evidence"},
+    {"from": "T1.1", "to": "T9.3", "kind": "success_criteria_evidence_bridge"},
+    {"from": "T1.2", "to": "T9.3", "kind": "success_criteria_evidence_bridge"},
+    {"from": "T9.1", "to": "T9.3", "kind": "phase_predecessor"},
+    {"from": "T9.2", "to": "T9.3", "kind": "phase_predecessor"}
+  ],
+  "phases": [
+    {
+      "phase": 0,
+      "name": "Phase 0 — Setup",
+      "tasks": ["T0.1", "T0.2", "T0.3"],
+      "validator": "PV-0",
+      "all_parallel": true
+    },
+    {
+      "phase": 1,
+      "name": "Phase 1 — Severity bridge foundation (D-R2a-6)",
+      "tasks": ["T1.1", "T1.2"],
+      "validator": "PV-1",
+      "intra_phase_sequence": "T1.1 -> T1.2 (same file)"
+    },
+    {
+      "phase": 2,
+      "name": "Phase 2 — FR-8 Principle 9 active reframing",
+      "tasks": ["T2.1", "T2.2"],
+      "validator": "PV-2",
+      "intra_phase_sequence": "T2.1 -> T2.2",
+      "phase_parallelizes_with": ["Phase 1", "Phase 3", "Phase 6"]
+    },
+    {
+      "phase": 3,
+      "name": "Phase 3 — FR-9 Blocks-X marker mechanism",
+      "tasks": ["T3.1", "T3.2", "T3.3", "T3.4"],
+      "validator": "PV-3",
+      "intra_phase_parallel": ["T3.1", "T3.2", "T3.3"],
+      "intra_phase_serial_tail": ["T3.4"]
+    },
+    {
+      "phase": 4,
+      "name": "Phase 4 — FR-1 design-realization audit dimension",
+      "tasks": ["T4.1", "T4.2", "T4.3"],
+      "validator": "PV-4",
+      "intra_phase_parallel": ["T4.1", "T4.2"],
+      "intra_phase_serial_tail": ["T4.3"]
+    },
+    {
+      "phase": 5,
+      "name": "Phase 5 — FR-6 agent-roster matrix contract",
+      "tasks": ["T5.1", "T5.2", "T5.3", "T5.4"],
+      "validator": "PV-5",
+      "intra_phase_parallel": ["T5.1", "T5.2"],
+      "intra_phase_serial_tail": ["T5.3", "T5.4"]
+    },
+    {
+      "phase": 6,
+      "name": "Phase 6 — FR-7 skill-coverage discipline",
+      "tasks": ["T6.1", "T6.2", "T6.3"],
+      "validator": "PV-6",
+      "intra_phase_parallel_after_T6_1": ["T6.2", "T6.3"]
+    },
+    {
+      "phase": 7,
+      "name": "Phase 7 — FR-10 SA-14 audit-subagents rule",
+      "tasks": ["T7.1", "T7.2"],
+      "validator": "PV-7",
+      "intra_phase_sequence": "T7.1 -> T7.2"
+    },
+    {
+      "phase": 8,
+      "name": "Phase 8 — Eat-own-dogfood (this run's matrix + decisions)",
+      "tasks": ["T8.1", "T8.2"],
+      "validator": "PV-8",
+      "intra_phase_parallel": ["T8.1", "T8.2"]
+    },
+    {
+      "phase": 9,
+      "name": "Phase 9 — Rollout / deliverable packaging",
+      "tasks": ["T9.1", "T9.2", "T9.3"],
+      "validator": "PV-9",
+      "intra_phase_sequence": "T9.1 -> T9.2 -> T9.3"
+    }
+  ],
+  "target_file_conflict_audit": {
+    "audit_summary": "Pairwise scan of every task's target_files. Two same-file pairs detected; both resolved by sequential ordering inferred from data-flow + procedure semantics (not parallel writes).",
+    "conflicts": [
+      {
+        "file": ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md",
+        "tasks": ["T1.1", "T1.2"],
+        "resolution": "Sequential: T1.1 authors the bridge table; T1.2 appends the NFR-8 four-field shape section. Edge T1.1 -> T1.2 captures the ordering.",
+        "risk": "none"
+      },
+      {
+        "file": ".claude/agents/design-claude-code.md",
+        "tasks": ["T2.2", "T5.3"],
+        "resolution": "Sequential: T2.2 edits line ~56 cross-reference; T5.3 extends Phase 2 procedure section. Edge T2.2 -> T5.3 captures the ordering (also a mutual-cross-reference data flow).",
+        "risk": "low — distinct sections of the same file; coordinator must merge sequentially, not concurrently"
+      }
+    ],
+    "no_other_overlaps": true
+  },
+  "ac_to_task_traceability": {
+    "audit_summary": "Every AC mapped from Plan §Acceptance Test Cross-Reference table is represented by ≥1 task. No orphan ACs. Setup tasks (T0.x) have no AC bindings (Plan-acknowledged).",
+    "ac_coverage": {
+      "AC-FR-1-a": ["T1.1", "T4.3"],
+      "AC-FR-1-b": ["T4.3"],
+      "AC-FR-1-c": ["T4.1", "T4.2", "T4.3"],
+      "AC-FR-6-a": ["T5.1", "T5.2", "T5.3", "T8.1"],
+      "AC-FR-6-b": ["T5.1", "T8.1"],
+      "AC-FR-6-c": ["T5.2", "T5.4", "T8.1"],
+      "AC-FR-6-d": ["T5.1", "T8.1"],
+      "AC-FR-7-a": ["T6.1", "T6.2", "T8.2"],
+      "AC-FR-7-b": ["T6.1", "T6.3", "T8.2"],
+      "AC-FR-7-c": ["T6.1"],
+      "AC-FR-8-a": ["T2.1"],
+      "AC-FR-8-b": ["T2.2", "T5.3"],
+      "AC-FR-9-a": ["T3.1", "T3.3", "T3.4"],
+      "AC-FR-9-b": ["T3.4", "T1.1"],
+      "AC-FR-9-c": ["T3.1", "T3.2"],
+      "AC-FR-10-a": ["T7.1", "T7.2", "T9.1"],
+      "AC-FR-10-b": ["T7.1", "T7.2", "T9.1"],
+      "AC-FR-10-c": ["T7.1"],
+      "AC-NFR-1-a": ["T4.3"],
+      "AC-NFR-7-a": ["T8.1"],
+      "AC-NFR-8-a": ["T1.2", "T4.3", "T7.1"],
+      "AC-NFR-9-a": ["T5.1", "T6.1"]
+    }
+  },
+  "phase_totals": {
+    "Phase 0": {"tasks": 3, "effort_buckets": {"S": 3, "M": 0, "L": 0, "XL": 0}, "critical_path_contribution": "S"},
+    "Phase 1": {"tasks": 2, "effort_buckets": {"S": 1, "M": 1, "L": 0, "XL": 0}, "critical_path_contribution": "M+S"},
+    "Phase 2": {"tasks": 2, "effort_buckets": {"S": 2, "M": 0, "L": 0, "XL": 0}, "critical_path_contribution": "S+S"},
+    "Phase 3": {"tasks": 4, "effort_buckets": {"S": 2, "M": 2, "L": 0, "XL": 0}},
+    "Phase 4": {"tasks": 3, "effort_buckets": {"S": 0, "M": 3, "L": 0, "XL": 0}},
+    "Phase 5": {"tasks": 4, "effort_buckets": {"S": 1, "M": 2, "L": 1, "XL": 0}, "critical_path_contribution": "M+L+M (T5.1->T5.3 via T5.2)"},
+    "Phase 6": {"tasks": 3, "effort_buckets": {"S": 1, "M": 2, "L": 0, "XL": 0}},
+    "Phase 7": {"tasks": 2, "effort_buckets": {"S": 1, "M": 1, "L": 0, "XL": 0}},
+    "Phase 8": {"tasks": 2, "effort_buckets": {"S": 1, "M": 0, "L": 1, "XL": 0}, "critical_path_contribution": "L (T8.1)"},
+    "Phase 9": {"tasks": 3, "effort_buckets": {"S": 3, "M": 0, "L": 0, "XL": 0}, "critical_path_contribution": "S+S+S"}
+  },
+  "open_items_for_orchestrator": [
+    {
+      "id": "OI-Tasks-1",
+      "description": "T5.2 estimated L (advisory predicate with deterministic + advisory branches). Plan estimation methodology acknowledges this is the largest single-task in the run. No XL flag — keep as single task because deterministic and advisory branches share the same trigger-condition switch.",
+      "type": "estimation_note",
+      "blocks": false
+    },
+    {
+      "id": "OI-Tasks-2",
+      "description": "T8.1 estimated L (185 cells; ~11 min wall-clock). Single coherent deliverable that exercises the FR-6 contract — splitting would destroy the contract-self-validation event. Keep as single task.",
+      "type": "estimation_note",
+      "blocks": false
+    },
+    {
+      "id": "OI-Tasks-3",
+      "description": "Plan OP-Plan-2 (NFR-1 5000 ms benchmarking harness location) and OP-Plan-3 (Phase 8 wall-clock measurement methodology) carry forward from Plan. Routed to test-acceptance-author per Plan disposition; tasks.json honors the existing routing rather than re-opening.",
+      "type": "carried_forward_open_items",
+      "blocks": false
+    },
+    {
+      "id": "OI-Tasks-4",
+      "description": "T1.1 -> T1.2 and T2.2 -> T5.3 are same-file sequential edits. Downstream executor must NOT run these in parallel. Captured in target_file_conflict_audit and explicit edges.",
+      "type": "execution_advisory",
+      "blocks": false
+    }
+  ]
+}

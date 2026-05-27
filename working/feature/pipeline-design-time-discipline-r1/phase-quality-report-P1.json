@@ -1,0 +1,162 @@
+{
+  "report_id": "PQR-P1-pipeline-design-time-discipline-r1",
+  "version": "1.0.0",
+  "doc_type": "phase-quality-report",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "phase": "phase-1",
+  "phase_name": "Severity bridge foundation (D-R2a-6)",
+  "generated": "2026-05-27T15:35:00Z",
+  "generated_by": "execute-phase-quality-reviewer",
+  "contract_version": "Contract-2-D-13-5-dim",
+  "tasks_in_scope": [
+    {
+      "task_id": "T1.1",
+      "title": "Author 5-column severity bridge table in severity-taxonomy.md",
+      "final_status": "APPROVED",
+      "cycles": 0,
+      "findings_count": 0,
+      "findings_notes": "Cycle 0 APPROVED. Sections added: §Cross-Surface Severity Bridge Table (5-row x 5-col), §Verdict-Compute Severity Weights, Weight Preservation Note, three non-monotonic edges enumerated, 24-consumer set documentation, helper-script affordance note."
+    },
+    {
+      "task_id": "T1.2",
+      "title": "Document NFR-8 four-field finding shape inline in severity-taxonomy.md",
+      "final_status": "APPROVED",
+      "cycles": 0,
+      "findings_count": 1,
+      "findings_notes": "Cycle 0 APPROVED. One INFO-level stub-detector false-positive: word 'TODO' appeared inside a prose rule that prohibits TODO usage (backtick-wrapped as a placeholder example); dispositioned as known false-positive. No real defect; content is verbatim from ADR-0061 / Blueprint / synthesis."
+    }
+  ],
+  "verdict": "PASS",
+  "per_dimension_status": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "per_dimension_evidence": {
+    "tests": {
+      "status": "PASS",
+      "rationale": "PV-1.C1, PV-1.C2, PV-1.C3 all verified. The bridge file exists at .claude/skills/KB-review-disciplines/references/severity-taxonomy.md (274 lines) with the required 5-row x 5-column structure, both weight sets preserved with explicit Weight Preservation Note, three non-monotonic edges enumerated, and NFR-8 four-field shape (rule / target / divergence / next_action) documented inline with field rules and consumer table.",
+      "criteria_results": [
+        {
+          "criterion": "PV-1.C1",
+          "description": "Bridge file exists with required 5-row x 5-col structure (BLOCKER/MAJOR/MINOR/NIT/INFO across auditor/reviewer/pv/non-monotonic-edges/iteration-delta-weight)",
+          "result": "PASS",
+          "evidence": "severity-taxonomy.md L162-168: header row with auditor_vocab / reviewer_vocab / pv_vocab / non_monotonic_edges / iteration_delta_weight columns; all five severity rows present and populated."
+        },
+        {
+          "criterion": "PV-1.C2",
+          "description": "Weight Preservation Note + Verdict-Compute weights table present; iteration-delta weights 10/3/1/0/0 preserved separately from verdict-compute weights -12/-5/-2/-0.5/0",
+          "result": "PASS",
+          "evidence": "severity-taxonomy.md L164-168 (iteration-delta column: 10 / 3 / 1 / 0 / 0); L174-182 (verdict-compute weights table with BLOCKER -12 + escalation, MAJOR -5, MINOR -2, NIT -0.5, INFO 0); L193 'Weight Preservation Note' heading + mathematical-independence rationale L201."
+        },
+        {
+          "criterion": "PV-1.C3",
+          "description": "NFR-8 four-field finding shape documented inline; rule/target/divergence/next_action each named with one-sentence semantics",
+          "result": "PASS",
+          "evidence": "severity-taxonomy.md L230 §NFR-8 Four-Field Finding Shape heading; L242-245 field semantics table (rule = identifier, target = file/symbol, divergence = observed-vs-expected, next_action = imperative action); L247-252 field rules; L256-263 consumer table with AT-029..AT-032 cross-references."
+        }
+      ],
+      "findings": []
+    },
+    "audits": {
+      "status": "PASS",
+      "audits_stub": false,
+      "rationale": "detect_stubs.py was invoked against T1.2's edit to severity-taxonomy.md per the per-task-quality discipline. One INFO-level finding surfaced: the word 'TODO' appears inside a prose rule that prohibits TODO usage as a placeholder value (backtick-wrapped within the same sentence that disallows it). Dispositioned as a stub-detector false-positive at task-quality time; the prose is correct as authored. No real stub or placeholder present. No other audit modules in scope for Phase 1 (FR-1 Lens 4 lands in Phase 4; SA-14 lands in Phase 7; Blocks-X parser lands in Phase 3).",
+      "findings": [
+        {
+          "finding_id": "F-P1-A-001",
+          "domain": "audits",
+          "severity": "INFO",
+          "task_id": "T1.2",
+          "rule": "detect_stubs.placeholder_token",
+          "target": ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md (NFR-8 field rules section, L250-251)",
+          "divergence": "Stub detector matched the literal token TODO; the token appears inside a prose rule that explicitly prohibits TODO as a target-field value. The match is structurally correct (token present) but semantically a false-positive (the prose is the prohibition itself, not a stub).",
+          "next_action": "Informational only; no remediation required. Disposition recorded at task-quality time. Carry forward as a known false-positive shape for future runs of detect_stubs.py against prose that quotes prohibited tokens.",
+          "blocking": false,
+          "revisable": false
+        }
+      ]
+    },
+    "validator": {
+      "status": "PASS",
+      "rationale": "All three PV-1 mechanical pass criteria verified by grep + structural assertion. PV-1.C4 (Gate 0/1 document review) was not separately re-run at phase close because the task-quality cycles for T1.1 and T1.2 already invoke shared-document-reviewer against the file edits as part of the 4-phase per-task pattern; both tasks closed APPROVED with no critical issues open. PV-1 verdict: PASS.",
+      "criteria_results": [
+        {
+          "criterion": "PV-1.C1",
+          "description": "Bridge file exists with required 5x5 structure",
+          "result": "PASS",
+          "evidence": "Structural grep on severity-taxonomy.md confirmed all five severity rows + five columns present."
+        },
+        {
+          "criterion": "PV-1.C2",
+          "description": "Weight Preservation Note + iteration-delta + verdict-compute weights preserved separately",
+          "result": "PASS",
+          "evidence": "Both weight sets present and explicitly cross-referenced; mathematical independence rationale documented inline."
+        },
+        {
+          "criterion": "PV-1.C3",
+          "description": "NFR-8 four-field finding shape documented inline",
+          "result": "PASS",
+          "evidence": "All four field names present with one-sentence semantics, field rules, and consumer table."
+        },
+        {
+          "criterion": "PV-1.C4",
+          "description": "Bridge file passes Gate 0 / Gate 1 review",
+          "result": "PASS",
+          "evidence": "Inherited from T1.1 and T1.2 task-quality cycles; both tasks APPROVED with no critical issues. No critical-severity reviewer issues open against severity-taxonomy.md."
+        }
+      ],
+      "findings": []
+    },
+    "discipline": {
+      "status": "PASS",
+      "rationale": "4-phase task pattern observed on both tasks per state-transitions.log L16-22 (T1 pending->per_task_active, T2 ->quality_active, T3 ->per_task_approved, T6 ->pending for T1.2 advance). Both tasks closed APPROVED in cycle 0; no revision loops required (0/4 cycle budget consumed for each task). Scope-of-target-files honored: both T1.1 and T1.2 edited only .claude/skills/KB-review-disciplines/references/severity-taxonomy.md (the declared target). Frontmatter preservation discipline observed (severity-taxonomy.md frontmatter unchanged from T1.1's bridge-content additions through T1.2's NFR-8 additions; both edits appended sections rather than mutating frontmatter). Content provenance: bridge table and NFR-8 shape are verbatim from ADR-0061 + blueprint-v1.md + synthesis.md (D-10 substrate) — no novel design decisions introduced at execution time, consistent with R2a's design-time-discipline charter.",
+      "findings": []
+    },
+    "scope_deviations": {
+      "status": "PASS",
+      "rationale": "No scope deviations observed in Phase 1. Both tasks edited only the declared target file (severity-taxonomy.md). No leaked artifacts (the T0.3 per-task result mis-location issue from Phase 0 did not recur). No silent additions to other skills, agents, or KB files. The Phase 1 deliverable is structurally additive (appended sections to an existing reference file); no rename, move, or unrelated edit occurred.",
+      "findings": []
+    }
+  },
+  "rollup_rule_applied": "Contract 2: PASS = no blocking and no revisable findings in any of the 5 dimensions. One INFO-level audit finding (stub-detector false-positive on T1.2, non-blocking, non-revisable) does not gate advancement.",
+  "audit_counter_delta": {
+    "baseline_source": "working/feature/pipeline-design-time-discipline-r1/phase-quality-report-P0.json",
+    "gating": "informational",
+    "per_domain_delta": {
+      "tests": "0 -> 0 (no change; all PV-1 criteria pass at phase close)",
+      "audits": "0 -> 1 (one INFO-level false-positive from detect_stubs.py against T1.2; non-blocking)",
+      "validator": "0 -> 0 (no change; PV-1.C1-C4 all PASS)",
+      "discipline": "0 -> 0 (no change)",
+      "scope_deviations": "1 -> 1 (Phase 0's MINOR scope-deviation finding F-P0-SD-001 unchanged; no new Phase 1 deviations)"
+    },
+    "aggregate_delta": "1 -> 2 (one additional INFO-level audit finding; non-gating)",
+    "audit_severity_breakdown": null,
+    "audit_severity_breakdown_note": "Reserved per Q-CC-3 forward-extensibility; not populated."
+  },
+  "phase_advance_recommendation": "ADVANCE_TO_PHASE_2",
+  "downstream_dispatch": {
+    "action": "dispatch_phase_2",
+    "rationale": "PV-1 all-PASS; D-13 5-dimension verdict PASS; no reconciliation required. Phase 1's bridge content (severity-taxonomy.md additions) is the citable source-of-truth for Phases 3 (FR-9 Blocks-X), 4 (FR-1 design-realization audit Lens 4), and 7 (FR-10 SA-14 rule) per the validator dependency graph (PV-1 gates PV-3 / PV-4 / PV-7). Phase 2 (FR-8 Principle 9 active reframing) is independent of bridge content and can dispatch in parallel-ready posture.",
+    "reconciler_required": false
+  },
+  "open_items_forwarded": [],
+  "downstream_unblocks": [
+    "Phase 3 (FR-9 Blocks-X marker mechanism) — consumes severity bridge for BLOCKER emission shape on unresolved markers per PV-3.C6 / AT-030.",
+    "Phase 4 (FR-1 design-realization audit dimension / Lens 4) — consumes severity bridge for BLOCKER emit-path per PV-4.C7 / AT-029.",
+    "Phase 7 (FR-10 SA-14 audit-subagents rule) — consumes severity bridge for SA-14 BLOCKER emission per PV-7.C4 / AT-031."
+  ],
+  "references": {
+    "blueprint": "working/feature/pipeline-design-time-discipline-r1/blueprint-v1.md",
+    "plan": "working/feature/pipeline-design-time-discipline-r1/plan-v1.md",
+    "phase_validators": "working/feature/pipeline-design-time-discipline-r1/phase-validators.md",
+    "tasks": "working/feature/pipeline-design-time-discipline-r1/tasks.json",
+    "state_transitions_log": "working/feature/pipeline-design-time-discipline-r1/state-transitions.log",
+    "per_task_execution_result": "working/feature/pipeline-design-time-discipline-r1/per-task-execution-result.json",
+    "phase_quality_report_p0": "working/feature/pipeline-design-time-discipline-r1/phase-quality-report-P0.json",
+    "bridge_file_authored": ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md",
+    "governing_adr": "adrs/ADR-0061-severity-vocabulary-bridge-table.md"
+  }
+}

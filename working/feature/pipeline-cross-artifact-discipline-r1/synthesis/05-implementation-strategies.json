@@ -1,0 +1,881 @@
+{
+  "schema_version": "1.0.0",
+  "mode": "implementation-strategy",
+  "mode_note": "Per recipe-feature-pipeline orchestrator instruction, synth-substrate operates in implementation-strategy mode for this pipeline; the three-option enumeration hard exclusion in substrate-translation-knowledge SKILL.md does NOT apply. Option count is justified by genuine option space, not by quota. Straw-men dropped. Decisions whose PRD framing explicitly names a rejected branch (e.g., D-0001 OI-A1) enumerate the rejected branch so downstream design-composer sees why it was not chosen.",
+  "feature_slug": "pipeline-cross-artifact-discipline-r1",
+  "registry_version": "n/a (implementation-strategy mode; no substrate registry consulted — target substrate is claude_code throughout)",
+  "framer_lean_check": "For each decision the framer recorded a recommendation_strength (strong / moderate / weak / route-to-gate) and a preferred option in options_summary. This file's recommended_option is checked against that lean and any divergence is surfaced under recommendation_divergence at the end.",
+  "mappings": [
+    {
+      "decision_id": "D-0001",
+      "title": "OI-A1: Prescription extraction path for FR-1 design-realization audits",
+      "framer_lean": "companion-file (strong; externally_decided: true)",
+      "options": [
+        {
+          "name": "companion_file",
+          "description": "Sibling YAML/JSON file next to each ADR-*.md (e.g., ADR-0042.prescriptions.yaml) listing the ADR's machine-checkable predicates: invariants, must-hold-after-implementation assertions, file-pattern guards. The architecture auditor reads the companion as the canonical prescription source; ADR prose remains canonical for the decision narrative per ADR-0036 / ADR-0056. Companion file MUST NOT duplicate the decision; only its check-shaped predicates.",
+          "pros": [
+            "9/9 surveyed production systems use this shape (T-002 cross-source triple; C-0034-T002, C-0239, C-0246).",
+            "Avoids the documented 44.57% LLM misinterpretation rate on NLP-parse of decision prose (arXiv 2602.07609 via C-0239).",
+            "Predicates are reviewable in PR diff like any other artifact; cheap to lint with schema validation.",
+            "Decouples audit-tooling evolution from ADR-prose evolution — schema changes to predicates do not require ADR re-issuance."
+          ],
+          "cons": [
+            "Establishes a new repo convention; no *.yaml siblings to ADR-*.md exist today (C-0136). Authoring burden landed onto ADR authors at write time.",
+            "Risk of divergence: companion-file drifts from ADR prose. Mitigation: auditing-shared script that diffs the companion against the ADR's machine-checkable section and flags mismatch.",
+            "Legacy ADR backfill required — ADR-0001..ADR-0056 currently lack companions; either backfill incrementally or scope FR-1 audit to new ADRs only with a deprecation window."
+          ],
+          "evidence_anchors": ["C-0034-T002 (9/9 surveyed systems)", "C-0239 (arXiv 2602.07609; 44.57% misinterpret)", "C-0246 (Rosik 2011 'detection insufficient' framing)", "C-0136 (no *.yaml siblings today)", "C-0154 (Discovery does not pre-decide; routes for human resolution)"],
+          "preconditions": [
+            "Companion-file schema authored as part of FR-1 work (host: .claude/skills/KB-review-disciplines/architecture-audit.md or new auditing-shared reference).",
+            "ADR template extended with a 'See companion: <path>' pointer line (does not violate ADR-0056 because companion is reference, not carve-out).",
+            "Deprecation window for legacy ADRs documented in §O posture (event-triggered trigger: 'when an FR-1 audit hits an ADR without a companion')."
+          ],
+          "cost": {
+            "effort_weeks": 2,
+            "runtime_overhead": "none (YAML parse is ~ms)",
+            "maintenance_burden": "moderate (ADR authors must author companion at decision time; one-time backfill for high-value legacy ADRs)",
+            "irreversibility_cost": "moderate (companions exist in adrs/; removing requires retracting and migrating to NLP-parse — but companions are passive metadata, not load-bearing schemas)"
+          },
+          "verdict": "recommended"
+        },
+        {
+          "name": "nlp_parse_adr_prose",
+          "description": "Architecture auditor extracts prescriptions from ADR prose at audit time using LLM-based parsing. Operates on the canonical ADR body (no new file convention). Audit fidelity depends on prose conventions (ADR template adherence, sentence-form discipline).",
+          "pros": [
+            "No new convention; ADR template unchanged.",
+            "Inherits ADR-0036 (single canonical location) and ADR-0056 (no carve-outs) naturally — the canonical decision is what gets parsed."
+          ],
+          "cons": [
+            "Peer-reviewed misinterpretation rate of 44.57% on the exact category 'semantic/logical misinterpretation' (arXiv 2602.07609 via C-0239). Above NFR thresholds for any reasonable audit signal.",
+            "0/9 surveyed production systems use this shape (T-002).",
+            "Audit non-determinism: parsing the same ADR twice can yield different prescription sets — falsifies the audit's repeatability gate.",
+            "Single-sourced FP claim weakness (C-0239 not externally re-fetched in Critic sweep) is a small risk, but the qualitative argument 'NLP-parse of decision prose is fragile' is corroborated by Rosik 2011 (C-0246) and the 0/9 vendor convergence."
+          ],
+          "evidence_anchors": ["C-0137 (NLP path operates on canonical prose, inherits ADR-0036/0056)", "C-0239 (44.57% misinterpret rate)", "C-0034-T002 (0/9 surveyed)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 3,
+            "runtime_overhead": "significant (LLM call per audited ADR; auditor model time)",
+            "maintenance_burden": "high (every ADR template change risks parse regression; prompt tuning becomes infrastructure)",
+            "irreversibility_cost": "low (NLP-parse code can be replaced by companion-file reader without retraction)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Documented 44.57% misinterpret rate (C-0239) and 0/9 surveyed precedent (T-002) make this path uncompetitive. PRD-v2 OI-A1 explicitly named both branches, so this branch is enumerated for design-composer visibility per framer instruction."
+        },
+        {
+          "name": "hybrid_nlp_drafting_companion_canonical",
+          "description": "NLP-parse used at ADR draft time to surface a starter set of machine-checkable predicates; ADR author reviews and ratifies into companion-file. Audit reads the companion as canonical. NLP becomes an authoring assist; not an audit input.",
+          "pros": [
+            "Reduces companion-authoring burden (the dominant con of pure companion_file).",
+            "Lowers the legacy backfill cost: pass legacy ADRs through NLP-draft + author-review.",
+            "Audit canonicality remains the human-ratified companion, so the 44.57% misinterpret rate does NOT bleed into the audit signal."
+          ],
+          "cons": [
+            "Two-system maintenance burden: NLP draft tooling AND companion-file schema both need ongoing ownership.",
+            "Drift risk if authors over-trust the NLP-drafted starter set and under-review (anti-pattern: rubber-stamping).",
+            "Higher initial effort than pure companion_file."
+          ],
+          "evidence_anchors": ["C-0239 (NLP misinterpret rate isolated to drafting, not audit)", "C-0034-T002 (companion-canonical preserved)"],
+          "preconditions": ["Same as companion_file plus prompt template + author-review checklist."],
+          "cost": {
+            "effort_weeks": 4,
+            "runtime_overhead": "none at audit time; LLM call at draft time only",
+            "maintenance_burden": "moderate-high (two systems)",
+            "irreversibility_cost": "moderate"
+          },
+          "verdict": "viable_alternative",
+          "note": "Worth considering if the legacy-ADR backfill cost in companion_file proves too high in practice. Not recommended for the initial implementation — adds complexity for a problem (authoring burden) that does not exist until the backfill workload is observed. Defer to a future iteration if the ADR-author burden NFR is breached."
+        }
+      ],
+      "recommended_option": "companion_file",
+      "rationale": "9/9 surveyed precedent + peer-reviewed counter-evidence on the rejected branch + low blast radius. The hybrid is the natural escape hatch if authoring burden bites; not needed up-front. The rejected NLP-only path is enumerated solely because PRD-v2's OI-A1 wording explicitly named it.",
+      "loss_summary": ["pattern_fidelity: none (preserves the cross-source-validated pattern)", "static_typing: none (YAML schema is validatable)"],
+      "viable": true
+    },
+
+    {
+      "decision_id": "D-0002",
+      "title": "OI-A2: FR-3 PV-tier cross-file invariant authoring shape",
+      "framer_lean": "hybrid (denormalized declaration, centralized body) (strong; externally_decided: true)",
+      "options": [
+        {
+          "name": "hybrid_denormalized_declaration_centralized_body",
+          "description": "Each PV declares which invariants it owns/honors at the artifact (denormalized declaration: a YAML stanza or markdown table at the PV header). The invariant body — predicate logic, error message text, severity — lives in a central catalog (e.g., .claude/skills/KB-task-decomposition/cross-file-invariants.md). Declarations reference catalog entries by ID; catalog hosts the reusable predicates.",
+          "pros": [
+            "6/6 surveyed systems land here as the documented sweet spot (T-004; C-0367).",
+            "Shopify Packwerk retrospective (C-0350, C-0352, C-0365, C-0366) is the strongest available counter to fully-centralized — and it's preempted by this hybrid choice.",
+            "Locality at declaration site (PV authors see what they own); DRY at body site (one place to change the predicate).",
+            "Cross-file invariants by definition need cross-file coordination — central body is structurally appropriate."
+          ],
+          "cons": [
+            "Two-file coordination at edit time (declaration site + catalog).",
+            "Catalog grows monotonically; needs a deprecation discipline for invariants that fall out of use.",
+            "T-004's caveat: surveyed domain is code/data/API, not pipeline-document content (open question 1 of T-004). Transferability is a design judgment.",
+            "C-0366 'different teams' framing is T-004 author gloss (partially_verified)."
+          ],
+          "evidence_anchors": ["C-0367 (6/6 sweet spot)", "C-0350/C-0352/C-0365 (Packwerk migration retrospective)", "C-0368 (recommendation framing, transparent scope)", "C-0116 (FR-3 cluster)"],
+          "preconditions": ["Catalog host file authored (KB-task-decomposition/cross-file-invariants.md or sibling).", "Invariant-ID convention established (e.g., CFI-<NNN>).", "Test-phase-validator-author rubric (PV-author rubric host) consumes the catalog."],
+          "cost": {
+            "effort_weeks": 2,
+            "runtime_overhead": "none",
+            "maintenance_burden": "moderate (catalog grows; PV authors learn declare-then-reference idiom)",
+            "irreversibility_cost": "low-moderate (hybrid is composable: collapse to centralized by inlining declarations, or to denormalized by absorbing bodies into PVs)"
+          },
+          "verdict": "recommended"
+        },
+        {
+          "name": "denormalized_inline",
+          "description": "Each PV declares and defines its invariants in-line. No central catalog. Best locality; worst DRY.",
+          "pros": [
+            "Maximum locality — everything a PV reader needs is in the PV file.",
+            "No catalog dependency; no cross-file coordination at edit time.",
+            "ArchUnit-style: rule-with-test (T-002 caveat at C-0034-T002 line 149)."
+          ],
+          "cons": [
+            "Same invariant defined N times across N PVs → drift risk (cross-file invariants are by definition shared).",
+            "Severity / error-message text scattered — vocabulary divergence (see D-0010) worsens.",
+            "Catalog gives a single audit anchor; inline loses it."
+          ],
+          "evidence_anchors": ["C-0367 (denormalized is one extreme of the surveyed axis; no surveyed system is fully-extremed but Terraform and Bazel lean denormalized)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "high in steady state (drift)",
+            "irreversibility_cost": "moderate (extracting central bodies later is mechanical but PV-by-PV)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Cross-file invariants without a central body invite per-PV drift. The point of FR-3 (mechanism H9) is to enforce cross-file consistency — denormalized-inline structurally fights the goal."
+        },
+        {
+          "name": "centralized",
+          "description": "Single catalog file owns all invariants. PVs do not declare; the catalog declares which PVs each invariant applies to. PV files are silent about their invariant surface.",
+          "pros": [
+            "Maximum DRY — one place to look.",
+            "Easy global audit pass: read catalog, derive PV coverage."
+          ],
+          "cons": [
+            "Shopify Packwerk retrospective (C-0350, C-0352, C-0365): tried-centralized, walked back. Privacy checks removed in Packwerk v3.0 (C-0352).",
+            "PV authors lose locality: cannot read a PV file and know what invariants it owes without cross-referencing the catalog.",
+            "Catalog becomes a bottleneck artifact — every PV change risks a catalog edit by a different owner (C-0366 framing).",
+            "JSON Schema $defs is per-document, not cross-document (C-0367); the closest-to-centralized surveyed pattern stops short of fully-cross-document central."
+          ],
+          "evidence_anchors": ["C-0350/C-0352/C-0365 (Packwerk migration)", "C-0366 (T-004 author gloss; partially_verified)", "C-0367 (no surveyed system is fully-extremed)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 2,
+            "runtime_overhead": "none",
+            "maintenance_burden": "high (catalog becomes choke point per Packwerk lesson)",
+            "irreversibility_cost": "high (the explicit lesson of Packwerk is that walking back is costly)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Strongest available counter-example (Packwerk migration retrospective) goes through this exact path and walks back. Even with T-004's caveat about transferability, the negative signal is preserved across the analogical mapping."
+        }
+      ],
+      "recommended_option": "hybrid_denormalized_declaration_centralized_body",
+      "rationale": "6/6 surveyed sweet spot + the only documented migration retrospective in the corpus goes through centralized and walks back. The two rejected options are both surveyed extremes and both have explicit failure modes documented.",
+      "loss_summary": ["pattern_fidelity: none", "static_typing: none (catalog IDs validatable)"],
+      "viable": true
+    },
+
+    {
+      "decision_id": "D-0003",
+      "title": "OI-A3: Scope of auditing-skills reverse-check",
+      "framer_lean": "separate rule on auditing-skills (weak; externally_decided: false; low blast radius)",
+      "options": [
+        {
+          "name": "separate_rule_in_auditing_skills",
+          "description": "Author a new reverse-check rule inside .claude/skills/auditing-skills/ that mirrors FR-10's SA-13 (sub-agent → owning skill family back-reference) at the skill level (skill file → owning agent or recipe back-reference). One small rule file; one new audit dimension.",
+          "pros": [
+            "Separation of concerns: auditing-subagents covers agent-side reverse refs; auditing-skills covers skill-side. Each audit family stays internally coherent.",
+            "Low blast radius (one new rule file under one skill family).",
+            "Reversible — rule can be relaxed or removed if the audit gap doesn't materialize.",
+            "Makes the §O posture for FR-11 cleaner: each posture decision attaches to its own audit family without cross-family conditional logic."
+          ],
+          "cons": [
+            "Externally undecided — no T-001..T-004 corroborator; rests on internal Discovery reasoning only (C-0123, C-0131).",
+            "Two audit families end up with structurally-similar rules; if either evolves, manual sync risk."
+          ],
+          "evidence_anchors": ["C-0123 (FR-10 scope on auditing-subagents)", "C-0131 (reverse-check generalization)", "C-0091 (auditing-skills family carries its own conventions)"],
+          "preconditions": ["Rule wording mirrors SA-13 phrasing for cross-family symmetry."],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "low (two-way)"
+          },
+          "verdict": "recommended"
+        },
+        {
+          "name": "extend_fr10_scope_to_cover_auditing_skills",
+          "description": "FR-10's rule explicitly enumerates both auditing-subagents AND auditing-skills as in-scope surfaces. One rule, two surfaces.",
+          "pros": [
+            "Single rule definition; no cross-family sync risk.",
+            "Simpler PRD-level traceability."
+          ],
+          "cons": [
+            "Couples two audit families to one rule change cadence — if auditing-subagents evolves the SA-13 shape, auditing-skills inherits the change unintentionally.",
+            "FR-10 was scoped narrowly in PRD-v2; broadening here drifts from the framer's lean."
+          ],
+          "evidence_anchors": ["C-0123 (FR-10's current scope)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low-moderate (coupling)",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "viable_alternative",
+          "note": "Defensible if design-composer prefers minimum-surface-area FR scope. Not recommended because the framer's separation-of-concerns lean is the cleaner architectural choice and the cost delta is negligible."
+        },
+        {
+          "name": "defer",
+          "description": "Ship FR-10 alone for now; revisit auditing-skills reverse-check only if the audit gap is observed in practice. Document the deferral in §O posture (event-triggered: 'when an FR-10 audit miss surfaces a skill-side reverse-ref gap').",
+          "pros": [
+            "Lowest immediate cost.",
+            "Honest about the externally-undecided status (no T-corroborator).",
+            "Consistent with §O event-triggered posture for FR-11."
+          ],
+          "cons": [
+            "Leaves an asymmetric audit surface in the meantime.",
+            "Adds another deferral to the register, which competes with the goal of FR-11 (replace post-ship felt-utility with event-triggered triggers — adding deferrals can become its own ritual)."
+          ],
+          "evidence_anchors": ["C-0131"],
+          "preconditions": ["Deferral entry in Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md or a successor."],
+          "cost": {
+            "effort_weeks": 0.1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "minimal (a deferral entry)",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "viable_alternative",
+          "note": "Acceptable fallback if design-composer wants to compress FR scope. The framer's preference for the separate rule is grounded in symmetry, not urgency."
+        }
+      ],
+      "recommended_option": "separate_rule_in_auditing_skills",
+      "rationale": "Symmetric audit surfaces; low cost; reversible. The two viable alternatives are both defensible and cheap — design-composer can substitute either without re-architecting the rest of the feature.",
+      "loss_summary": ["none"],
+      "viable": true
+    },
+
+    {
+      "decision_id": "D-0004",
+      "title": "OI-A5: Blocks-X marker grammar",
+      "framer_lean": "structured marker / pragma (moderate; n=1 prior occurrence — establishment not reconciliation)",
+      "options": [
+        {
+          "name": "structured_html_comment_pragma",
+          "description": "Adopt a structured machine-parseable marker: `<!-- BLOCKS: <stage-slug>-completion -->` (or YAML token list inside) embedded in Discovery output. Single canonical shape, parsed by the gate/validator cluster.",
+          "pros": [
+            "n=1 prior occurrence means no grammar to honor — establishing a structured shape now costs nothing in compatibility.",
+            "HTML comments are invisible in rendered markdown but greppable from CI.",
+            "Structured shape supports multi-slug from day one ('BLOCKS: stage-a-completion, stage-b-completion').",
+            "Downstream consumers (FR-2 conformance schema, AC-FR-9-* assertions, FR-3 PV-tier invariants) inherit a stable wire format.",
+            "Easier mechanical evaluator for D-0005's predicate."
+          ],
+          "cons": [
+            "Diverges from the n=1 prose precedent ('Blocks <stage-slug>-completion.') — a tiny migration if the prior occurrence is retained anywhere.",
+            "Slight authoring overhead (Discovery output authors must use the pragma form).",
+            "Lock-in if downstream FR-2 ships before grammar revision."
+          ],
+          "evidence_anchors": ["C-0122 (n=1 precedent)", "C-0133 (downstream consumption surface)", "C-0150/C-0151/C-0152/C-0155 (devcontainer-mcp-provisioning-r1 precedent context)"],
+          "preconditions": ["Grammar spec hosted in .claude/skills/KB-documentation-criteria/ (or sibling).", "FR-2 conformance schema references the pragma form."],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "moderate (downstream consumers harden against the shape after FR-2 ships)"
+          },
+          "verdict": "recommended"
+        },
+        {
+          "name": "yaml_frontmatter_field",
+          "description": "Add a `blocks:` field to Discovery output frontmatter (YAML list of stage slugs). Pure structured data; no inline prose marker.",
+          "pros": [
+            "Strongest structured shape — list semantics native.",
+            "Trivially parseable by any YAML reader."
+          ],
+          "cons": [
+            "Discovery output is not currently frontmatter-bearing for this kind of metadata (would need a schema extension).",
+            "Less discoverable in prose review — readers skim body text, not frontmatter.",
+            "Most over-engineered relative to n=1 precedent.",
+            "Imposes frontmatter discipline on Discovery output authors who currently write free-form analysis prose."
+          ],
+          "evidence_anchors": ["C-0122 (single precedent has no frontmatter)"],
+          "preconditions": ["Discovery output frontmatter schema authored."],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "moderate (schema + discipline)",
+            "irreversibility_cost": "moderate"
+          },
+          "verdict": "viable_alternative",
+          "note": "Acceptable if design-composer prefers maximum structure; not recommended because it over-engineers relative to the n=1 baseline and the pragma form already supports multi-slug."
+        },
+        {
+          "name": "preserve_n1_prose_grammar_verbatim",
+          "description": "Adopt the existing n=1 prose grammar verbatim ('Blocks <stage-slug>-completion.') as canonical. Parser uses a regex.",
+          "pros": [
+            "Zero migration: the one existing occurrence is canonical.",
+            "Human-readable in prose context."
+          ],
+          "cons": [
+            "Single-slug only by construction — multi-stage blocks require parser ambiguity (multiple sentences? comma list?). Either way, regex grows.",
+            "Period-terminated kebab-case is a documentation-discipline rule expressed as natural language; brittle to grammar variation ('Blocks the stage-x-completion.' would fail).",
+            "Premature lock-in to a precedent of n=1 that itself was not designed as a grammar."
+          ],
+          "evidence_anchors": ["C-0122 (n=1)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.2,
+            "runtime_overhead": "none",
+            "maintenance_burden": "moderate (regex grows; brittleness)",
+            "irreversibility_cost": "high (downstream hardens against a fragile shape)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "n=1 is not a grammar — it's an occurrence. Honoring it verbatim ossifies a parser that was never designed. The structured pragma form preserves the readable intent (the `BLOCKS:` token is still skim-greppable) without the regex fragility."
+        }
+      ],
+      "recommended_option": "structured_html_comment_pragma",
+      "rationale": "n=1 prior occurrence is not a grammar to honor — it's a starting point. Structured pragma is greppable, multi-slug-ready, invisible in rendered output, and cheap. Frontmatter is over-engineered; verbatim prose lock-in is fragile.",
+      "loss_summary": ["pattern_fidelity: none"],
+      "viable": true
+    },
+
+    {
+      "decision_id": "D-0005",
+      "title": "OI-A6: Mechanical evaluator for FR-6 trigger conditions 3 and 4",
+      "framer_lean": "hybrid (predicate fires advisory; human ratifies) (moderate)",
+      "options": [
+        {
+          "name": "hybrid_advisory_predicate_with_human_ratification",
+          "description": "A mechanical predicate scans Blueprint's Skill-Coverage Decisions section for trigger-shaped tokens (e.g., 'new skill proposed', 'cross-skill impact noted') and surfaces an advisory annotation at the Design Composition gate. design-composer (human) ratifies whether the matrix is required. Predicate false-negatives surface as human override events logged to state-transitions.log.",
+          "pros": [
+            "Balances mechanical determinism with human judgment on interpretive triggers (3 and 4).",
+            "Couples cleanly with D-0008 (substance-not-presence heuristic) — the predicate looks for shape; the human checks substance.",
+            "Logs override events for retrospective: if the predicate's false-negative rate is high, it gets tightened; if low, it can be promoted to mandatory.",
+            "Cheap to ship; cheap to tune."
+          ],
+          "cons": [
+            "Two-system maintenance (predicate code + human-checklist).",
+            "Externally undecided — no T-001..T-004 corroborator on trigger-evaluation pattern.",
+            "Risk of the human ratification becoming a rubber stamp (anti-pattern), undermining the predicate's value."
+          ],
+          "evidence_anchors": ["C-0119/C-0120 (FR-6 / trigger structure)", "C-0046/C-0078/C-0079/C-0080 (Design Composition gate surface)"],
+          "preconditions": ["Predicate hosted in .claude/skills/auditing-subagents/ (mechanical evaluator host).", "design-claude-code.md procedure has a ratification step at Design Composition gate.", "state-transitions.log entry shape extended for override events (auditing-shared/log_state_transition.py)."],
+          "cost": {
+            "effort_weeks": 1.5,
+            "runtime_overhead": "minor (one grep + one human checkpoint)",
+            "maintenance_burden": "moderate (predicate tuning over time)",
+            "irreversibility_cost": "low (two-way reversible)"
+          },
+          "verdict": "recommended"
+        },
+        {
+          "name": "machine_checkable_predicate_only",
+          "description": "Pure mechanical predicate gates the matrix-mandatory check. Trigger 3 and 4 evaluated by token-pattern match in Blueprint's Skill-Coverage Decisions section. No human checkpoint.",
+          "pros": [
+            "Deterministic; auditable.",
+            "Fastest gate (no human-in-loop)."
+          ],
+          "cons": [
+            "Triggers 3 and 4 are interpretive — pattern-match brittleness yields false negatives ('cross-skill impact' phrased five different ways).",
+            "Conflicts with D-0008's substance-not-presence heuristic (the predicate checks presence of phrasing, not substance of intent).",
+            "Single point of failure: a missed trigger is silently un-audited."
+          ],
+          "evidence_anchors": ["C-0119/C-0120 (interpretive trigger nature)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "high (chasing false-negative phrasings indefinitely)",
+            "irreversibility_cost": "moderate (downstream hardening on predicate output)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Interpretive triggers do not survive predicate-only enforcement; the documented FR-7 anti-ritualism trade-off (T-003, C-0257) applies symmetrically here — checking phrasing is presence-not-substance."
+        },
+        {
+          "name": "human_in_loop_only_at_design_composition_gate",
+          "description": "design-composer (human) checks Blueprint's Skill-Coverage Decisions section at Design Composition gate; no mechanical evaluator. Trigger 3 and 4 are judgment calls every time.",
+          "pros": [
+            "Highest signal fidelity on interpretive triggers.",
+            "No false-negative chase; no maintenance burden on a predicate.",
+            "Coheres with FR-7's substance-not-presence framing (D-0008)."
+          ],
+          "cons": [
+            "Highest ritual cost — every Design Composition repeats the check.",
+            "No advisory annotation to focus attention; reviewer reads the whole section every time.",
+            "Inconsistent application across runs (reviewer-dependent)."
+          ],
+          "evidence_anchors": ["C-0046/C-0078/C-0079 (Design Composition gate is the human-checkpoint surface today)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "moderate (human time at every gate)",
+            "maintenance_burden": "low (no code to maintain)",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "viable_alternative",
+          "note": "Defensible if design-composer prefers zero-tool-debt. Not recommended because the advisory predicate is cheap and directly reduces reviewer cognitive load without claiming the predicate is authoritative."
+        }
+      ],
+      "recommended_option": "hybrid_advisory_predicate_with_human_ratification",
+      "rationale": "Predicate-only loses signal on interpretive triggers; human-only wastes reviewer attention on shape-checks the machine can pre-filter. The hybrid pairs cheap pre-screening with authoritative human ratification and logs overrides for tuning.",
+      "loss_summary": ["pattern_fidelity: none (substance-checking remains human)"],
+      "viable": true,
+      "cross_decision_dependency": "Couples to D-0008 (substance-not-presence heuristic for W/H/A trifecta). The predicate here must NOT score substance; it scores shape only."
+    },
+
+    {
+      "decision_id": "D-0006",
+      "title": "OI-A4 / Contingency Split: R1 single feature vs R2a/R2b split",
+      "framer_lean": "route-to-gate (design-composer decides at Gate 4)",
+      "decision_owner": "design-composer (Gate 4)",
+      "decision_class_note": "Framer marked this 'route-to-gate' — design-cc cannot ratify alone. This synth-substrate entry preserves both readings as admissible inputs to Gate 4 without recommending one.",
+      "options": [
+        {
+          "name": "orchestrators_currently_open_reading_6_ois",
+          "description": "Count only currently-open OIs (PRD-v2 OI-A1..OI-A6 = 6). Threshold of 12 (PRD §Contingency Split §1) is NOT tripped. Ship as R1 single feature.",
+          "pros": [
+            "Reflects the synthesis-stage view: IC OIs (8) are resolved upstream; PRD-v2 OIs (6) are the live count.",
+            "Avoids the one-way irreversibility cost of splitting (split downstream requires re-merging artifacts).",
+            "Coheres with orchestrator's current routing posture."
+          ],
+          "cons": [
+            "Disregards the codebase researcher's cumulative reading — IC OIs are cumulative inputs to the run, not closed-and-discarded.",
+            "If the threshold's intent is 'cumulative run-load', this reading under-counts."
+          ],
+          "evidence_anchors": ["C-0004 (cumulative 14 = 8 IC + 6 PRD-v2)", "C-0006 (mechanical-at-Gate-4 enforcement)", "C-0144 (PRD-v2 = 6)"],
+          "preconditions": ["design-composer at Gate 4 ratifies the 6-count reading as the operative one."],
+          "cost": {
+            "effort_weeks": 0,
+            "runtime_overhead": "n/a",
+            "maintenance_burden": "n/a",
+            "irreversibility_cost": "low (does not split; can split later if R2b cluster proves overloaded)"
+          },
+          "verdict": "preferred_absent_contradicting_evidence",
+          "framer_note": "Per framer instruction: orchestrator's reading prevails for this run absent contradicting evidence at Gate 4. Not 'recommended' in the design-cc sense because this is not a design-cc decision."
+        },
+        {
+          "name": "codebase_researchers_cumulative_reading_14_ois",
+          "description": "Count cumulative open items (8 IC + 6 PRD-v2 = 14). Threshold of 12 IS tripped mechanically per C-0004/C-0005/C-0145. Split into R2a (FR-1, FR-6, FR-7, FR-8, FR-9, FR-10) and R2b (FR-2, FR-3, FR-4, FR-5, FR-11) per mechanism-dependency clusters (C-0125, C-0126, C-0127).",
+          "pros": [
+            "Mechanical reading of the threshold text ('cumulative count of open items exceeds 12').",
+            "Cluster boundaries are evidence-grounded (C-0114, C-0116, C-0125, C-0126, C-0127 verified).",
+            "Conservative — splits early, before R1 grows unmanageable."
+          ],
+          "cons": [
+            "One-way decision — undoing requires re-merging downstream artifacts at high cost.",
+            "May be over-conservative if IC OIs are in fact closed-and-discarded.",
+            "Coordination cost of two parallel runs (R2a + R2b)."
+          ],
+          "evidence_anchors": ["C-0004 (verified 14 > 12)", "C-0005 (split-recommendation pre-fired)", "C-0114/C-0116/C-0125/C-0126/C-0127 (cluster membership verified)"],
+          "preconditions": ["design-composer at Gate 4 ratifies the cumulative reading.", "R2a/R2b cluster scopes formally adopted from the mechanism-dependency table."],
+          "cost": {
+            "effort_weeks": 0,
+            "runtime_overhead": "n/a",
+            "maintenance_burden": "n/a (decision-only; downstream cost is the split itself)",
+            "irreversibility_cost": "high (one-way per framer)"
+          },
+          "verdict": "alternative_admissible",
+          "framer_note": "Both readings are well-evidenced; this one is admissible if Gate 4 surfaces evidence (e.g., R1 design-time scope exceeds reviewer capacity) that contradicts the orchestrator's reading."
+        }
+      ],
+      "recommended_option": null,
+      "rationale": "Per framer's 'route-to-gate' status and per C-0006 ('design-composer must apply the threshold mechanically at Gate 4'). This synth-substrate entry preserves both readings; design-composer ratifies at Gate 4. Absent contradicting evidence, the orchestrator's 6-OI reading prevails per framer instruction.",
+      "loss_summary": ["n/a (decision-routing, not implementation choice)"],
+      "viable": true,
+      "deferred_to": "Gate 4 (design-composer)"
+    },
+
+    {
+      "decision_id": "D-0007",
+      "title": "FR-5: Four-stage drift-detection pipeline",
+      "framer_lean": "four-stage pipeline (RFC 8785 → baseline → RFC 6902 → severity catalog) (strong; externally_decided: true)",
+      "options": [
+        {
+          "name": "four_stage_pipeline",
+          "description": "Stage 1: RFC 8785 JSON Canonicalization Scheme (JCS) normalizes tools/list payloads. Stage 2: persisted canonical baseline (oasdiff change-fingerprint pattern; baseline-as-bytes). Stage 3: RFC 6902 JSON-Patch diff with identity-keyed array diff (tool name is unique per MCP spec). Stage 4: locally-enumerated severity catalog modeled on oasdiff (remove → BLOCKER per AC-FR-5-a; signature change → MAJOR per AC-FR-5-e; addition → MINOR per AC-FR-5-d; description/title/icon → INFO).",
+          "pros": [
+            "Strong cross-source triple (T-001): each stage grounded in an independent primary (RFC 8785, oasdiff fingerprint, RFC 6902, oasdiff catalog).",
+            "FP-suppression located where the evidence supports it: normalization (step 1) + catalog routing (step 4), not diff defaults (per C-0195 and openapi-diff Issue #673 cautionary tale).",
+            "Identity-keyed array diff is grounded in MCP spec — tools have unique names (E-0055).",
+            "Composable: each stage is replaceable without re-architecting the others."
+          ],
+          "cons": [
+            "<5% FP claim (NFR-4) is single-sourced (C-0201, C-0202); no primary measures the exact FP rate under these conditions. Mechanism is well-argued but the number is extrapolated.",
+            "Composition step (oasdiff catalog → MCP tools/list) is novel — single-sourced in T-001 but defensible because each underlying primitive is well-cited.",
+            "Pilot validation required at Phase Validator time to confirm <5% FP target."
+          ],
+          "evidence_anchors": ["C-0193 (four-stage verified)", "C-0194 (catalog mapping to AC-FR-5-a/d/e)", "C-0195 (FP-suppression locus)", "C-0201 (achievability — single-sourced, flagged)", "C-0202 (50-audit failure-mode warning — single-sourced, flagged)"],
+          "preconditions": [
+            "RFC 8785 JCS reference implementation selected (Python: e.g., rfc8785 package or in-tree pure-stdlib implementation).",
+            "Canonical baseline storage location (auditing-mcp/ subdir; one file per MCP server).",
+            "RFC 6902 JSON-Patch generator (jsonpatch library; identity-keyed array option configured for tools/list).",
+            "Severity catalog YAML hosted under auditing-mcp/references/ (or sibling).",
+            "Pilot run at Phase Validator time: 50 audits against stable upstreams; measure FP rate; refine catalog if >5%."
+          ],
+          "cost": {
+            "effort_weeks": 2.5,
+            "cost_breakdown": "JCS normalizer 0.5w (stdlib or one-line lib) + baseline storage + read/write 0.5w + RFC 6902 diff with identity-key config 0.5w + severity catalog authoring + integration 1w. Ongoing: catalog tuning as new MCP servers register.",
+            "runtime_overhead": "minor (4 sequential transforms on a ~10-100KB JSON payload per audit; sub-second)",
+            "maintenance_burden": "moderate (severity catalog evolves with MCP spec changes)",
+            "irreversibility_cost": "low (each stage replaceable independently)"
+          },
+          "verdict": "recommended"
+        },
+        {
+          "name": "naive_object_diff_with_heuristic_severity",
+          "description": "Direct object-diff over raw tools/list JSON; severity inferred at audit time by ad-hoc heuristics (e.g., key-name pattern matching).",
+          "pros": [
+            "Simplest possible implementation.",
+            "No baseline storage required."
+          ],
+          "cons": [
+            "openapi-diff Issue #673 is the documented cautionary tale — diff defaults miss real changes (C-0195).",
+            "Without normalization, formatting differences (key ordering, whitespace, number representation) become false positives — fails NFR-4 (<5% FP) on any realistic upstream.",
+            "Description-polishing and CDN-URL rewrites (C-0202) read as drift, not as INFO — naive heuristics will mis-route.",
+            "Heuristic severity is per-author per-audit — no auditable contract."
+          ],
+          "evidence_anchors": ["C-0195 (FP-suppression locus)", "C-0202 (description-polishing failure mode)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "minor",
+            "maintenance_burden": "high (chasing FPs indefinitely)",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "openapi-diff Issue #673 is the documented evidence that naive diff fails the exact use case. Cheap up front; expensive in steady-state."
+        },
+        {
+          "name": "vendor_tool_reuse_oasdiff_or_openapi_diff",
+          "description": "Adopt oasdiff or openapi-diff directly, configured for MCP tools/list.",
+          "pros": [
+            "Mature tools; battle-tested on OpenAPI surfaces.",
+            "No bespoke pipeline to author."
+          ],
+          "cons": [
+            "Neither tool natively understands the MCP tools/list schema — they target OpenAPI / Swagger.",
+            "Adapter layer (translate MCP tools/list → OpenAPI-shaped doc → vendor diff → translate severity back) is more code than the bespoke four-stage pipeline AND inherits vendor-tool quirks.",
+            "openapi-diff Issue #673 is the documented quirk; reusing it inherits it."
+          ],
+          "evidence_anchors": ["C-0193 (vendor tools as model, not adopt)", "C-0195 (Issue #673)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 3,
+            "runtime_overhead": "minor",
+            "maintenance_burden": "high (vendor-tool tracking + adapter)",
+            "irreversibility_cost": "moderate"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Vendor tools target a different schema; the adapter cost exceeds the bespoke-pipeline cost while inheriting the vendor's known failure modes. T-001 explicitly cites oasdiff as a model, not a target for adoption."
+        }
+      ],
+      "recommended_option": "four_stage_pipeline",
+      "rationale": "Strong cross-source triple; each stage well-cited; novel composition is defensible because each primitive is sound. Two rejected alternatives have documented failure modes (Issue #673; vendor-tool schema mismatch).",
+      "loss_summary": ["pattern_fidelity: none (each stage is the surveyed primitive)"],
+      "viable": true,
+      "open_sub_decision": "NFR-4 (<5% FP) measurement strategy. T-001 surfaces that no surveyed source publishes a quantitative benchmark; C-0201/C-0202 are single-sourced hypotheses. Recommend pilot run as hypothesis-validation at Phase Validator time — 50 audits against stable upstream MCP servers; refine catalog if measured FP > 5%."
+    },
+
+    {
+      "decision_id": "D-0008",
+      "title": "FR-7: W/H/A trifecta as substance vs mandate",
+      "framer_lean": "substance-as-rubric (strong; externally_decided: true)",
+      "options": [
+        {
+          "name": "substance_as_rubric_with_mandate_for_new_skill_proposals",
+          "description": "W/H/A is the substance reviewers check for (need-justification / scope-lifecycle hygiene / anti-pattern defenses per T-003's 3-category convergence). Reviewers apply a substance-not-presence heuristic: the trifecta is satisfied if the substance is present, regardless of whether three labelled headings exist. EXCEPTION: when a new skill is proposed, a structured W/H/A artifact is mandated (because new-skill proposals carry higher review cost and explicit shape lowers it). For all other concept introductions, the substance principle governs.",
+          "pros": [
+            "Preserves T-003's cross-platform-convergent substance without inheriting the novel-ritualism risk (C-0257 explicitly identifies the codification-as-mandate as the novel and risky move).",
+            "Reviewer cost is lowered exactly where it's highest (new-skill proposals are the most expensive review surface).",
+            "Substance heuristic aligns with how reviewers actually catch missing rationale — substance-checking, not heading-counting.",
+            "Coheres with D-0005's advisory-predicate design (machine checks shape; human checks substance)."
+          ],
+          "cons": [
+            "Substance heuristic is harder to mechanically evaluate — reviewer-dependent.",
+            "Drawing the new-skill-proposal boundary requires a clear definition (what counts as 'new'?).",
+            "Quantitative BFCL evidence (C-0293: 96% → 13-15%) is single-sourced and directional, not measured threshold for this pipeline."
+          ],
+          "evidence_anchors": ["C-0256 (3-category convergence across 6 platforms)", "C-0257 (codification-as-mandate is the novel move; ritualism risk)", "C-0283 (CrewAI minimal-tools principle)", "C-0291 (tool-proliferation universally documented)", "C-0293 (BFCL directional evidence)"],
+          "preconditions": [
+            "KB-cc-design hosts the W/H/A rubric + substance heuristic.",
+            "design-claude-code.md procedure references the rubric at skill-coverage decision time.",
+            "'New skill proposal' boundary defined (likely: 'creates a new directory under .claude/skills/')."
+          ],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "low (two-way)"
+          },
+          "verdict": "recommended"
+        },
+        {
+          "name": "mandate_as_artifact_universally",
+          "description": "Every skill-coverage decision MUST produce a structured W/H/A artifact with three labelled headings. Reviewer checks presence.",
+          "pros": [
+            "Maximum auditability — easy to gate (does the artifact exist? does it have three headings?).",
+            "Removes reviewer judgment on shape."
+          ],
+          "cons": [
+            "0/6 surveyed platforms mandate this (C-0257) — novel-ritualism risk explicitly identified by T-003.",
+            "Presence-not-substance: three filled headings can be empty of content and still pass the gate.",
+            "Drives authors toward ritualistic minimum-viable filings, undermining the actual goal (need-justification + scope hygiene + anti-pattern awareness)."
+          ],
+          "evidence_anchors": ["C-0257"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "minor",
+            "maintenance_burden": "moderate (ritualism creeps)",
+            "irreversibility_cost": "moderate (relaxing a mandate is harder than tightening a principle)"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "T-003 explicitly identifies the codification-as-mandate as the novel and risky move (anti-ritualism trade-off at C-0257 / T-003 line 177). 0/6 surveyed platforms mandate. The recommended hybrid captures the substance without the ritual."
+        },
+        {
+          "name": "principle_only_no_mandate",
+          "description": "W/H/A is a principle in KB-cc-design; reviewers apply substance heuristic to all skill-coverage decisions including new-skill proposals. No mandate anywhere.",
+          "pros": [
+            "Lightest authorial burden.",
+            "Maximum substance preservation (no ritual)."
+          ],
+          "cons": [
+            "Loses the audit anchor for new-skill proposals — the most expensive review surface gets the least structure.",
+            "Higher reviewer cognitive load on new-skill proposals where structure is most valuable.",
+            "Drift risk: principle without occasional structured artifact tends to fade in practice."
+          ],
+          "evidence_anchors": ["C-0257 (anti-ritualism trade-off)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "viable_alternative",
+          "note": "Defensible if design-composer wants zero structural artifacts. Not recommended because the new-skill-proposal carve-out is where structure pays for itself."
+        }
+      ],
+      "recommended_option": "substance_as_rubric_with_mandate_for_new_skill_proposals",
+      "rationale": "Preserves T-003 cross-source-convergent substance; respects the documented anti-ritualism trade-off; concentrates structural mandate where it has the highest review-cost ROI. Couples cleanly with D-0005's predicate-checks-shape / human-checks-substance split.",
+      "loss_summary": ["pattern_fidelity: none (substance preserved)"],
+      "viable": true,
+      "cross_decision_dependency": "Couples to D-0005 (the advisory predicate there scores shape, not substance)."
+    },
+
+    {
+      "decision_id": "D-0009",
+      "title": "FR-11 §O posture placement",
+      "framer_lean": "all-three-host placement (KB-cc-design + PV-author rubric + KB-documentation-criteria deferral conventions) (moderate)",
+      "design_composer_routing": "E-2 inclusion scope routes to design-composer per C-0153.",
+      "options": [
+        {
+          "name": "three_host_placement_kb_cc_design_plus_pv_author_rubric_plus_kb_documentation_criteria",
+          "description": "Place §O wording (event-triggered / honest-acceptance / concrete-machinery framings) in three host surfaces: (a) KB-cc-design — Principle 9 placement for cc-layer designers; (b) PV-author rubric in test-phase-validator-author — for PV authors who decide deferral framings; (c) KB-documentation-criteria — deferral conventions section so all discipline texts share the same posture grammar. Apply to discipline texts identified by §O.1 register (currently 5 rows: A-3, D-5, E-2, E-3, I-1) pending design-composer's E-2-inclusion scope decision.",
+          "pros": [
+            "Purely additive — zero 'post-ship' precedent in .claude/skills/ and .claude/agents/ today (per Discovery). No collision risk.",
+            "Three hosts cover three audiences (cc-layer designers, PV authors, discipline-text authors) without cross-host conditional logic.",
+            "Coheres with the FR-11 goal: replace post-ship felt-utility with event-triggered / honest-acceptance / concrete-machinery.",
+            "Each host owns its surface — clean ownership boundaries."
+          ],
+          "cons": [
+            "Three-host placement means three locations to keep coherent (sync risk).",
+            "E-2 inclusion is a separate sub-decision routed to design-composer (C-0153) — this option preempts neither inclusion nor exclusion.",
+            "Partially-verified count mismatch (C-0033: 4-row PRD AC-FR-11-c vs 5-row §O.1 register) means the exact discipline-text set depends on design-composer's ratification."
+          ],
+          "evidence_anchors": ["C-0033/C-0153 (4-vs-5 row count)", "C-0012/C-0014/C-0015/C-0016 (three replacement postures)", "C-0110/C-0113 (zero post-ship precedent in current skills/agents)", "C-0124/C-0126 (FR-11 cluster surface)"],
+          "preconditions": [
+            "design-composer ratifies E-2-inclusion scope (independent sub-decision per C-0153).",
+            "KB-cc-design Principle 9 wording authored.",
+            "PV-author rubric extended with the three postures.",
+            "KB-documentation-criteria deferral-conventions section added."
+          ],
+          "cost": {
+            "effort_weeks": 1.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low (sync risk is small because all three hosts cite the same posture vocabulary)",
+            "irreversibility_cost": "low (additive prose; removable without retraction)"
+          },
+          "verdict": "recommended"
+        },
+        {
+          "name": "kb_cc_design_only",
+          "description": "Place §O wording in KB-cc-design only. PV-author rubric and KB-documentation-criteria do not directly host the postures.",
+          "pros": [
+            "Lowest sync cost (one host).",
+            "Smallest blast radius."
+          ],
+          "cons": [
+            "PV authors and discipline-text authors must derive postures from a cc-design-skill they may not read.",
+            "Underuses the additive opportunity — there's no precedent to honor and no cost to broadening placement."
+          ],
+          "evidence_anchors": ["C-0110/C-0113 (zero post-ship precedent — additive)"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 0.5,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "viable_alternative",
+          "note": "Acceptable minimum-scope choice. Not recommended because broadening costs almost nothing and the additive opportunity is high."
+        },
+        {
+          "name": "kb_cc_design_plus_pv_author_rubric",
+          "description": "Two-host placement: KB-cc-design and PV-author rubric. Discipline-text authors derive postures via KB-cc-design or PV-author rubric (whichever they consult).",
+          "pros": [
+            "Covers the two primary author audiences (designers + PV authors).",
+            "Lower sync surface than three-host."
+          ],
+          "cons": [
+            "Discipline-text authors (Issues/, Issues/*/register.md) lose the dedicated reference in KB-documentation-criteria.",
+            "Minor coverage gap relative to three-host."
+          ],
+          "evidence_anchors": ["C-0033/C-0153"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 1,
+            "runtime_overhead": "none",
+            "maintenance_burden": "low",
+            "irreversibility_cost": "low"
+          },
+          "verdict": "viable_alternative",
+          "note": "Acceptable middle path. Not recommended because adding KB-documentation-criteria costs ~0.5w and meaningfully improves discipline-text-author guidance."
+        }
+      ],
+      "recommended_option": "three_host_placement_kb_cc_design_plus_pv_author_rubric_plus_kb_documentation_criteria",
+      "rationale": "Purely additive (zero post-ship prose currently in target surfaces); three-host covers three distinct audiences; sync risk is minimal because all hosts share the same posture vocabulary. The two-host and one-host alternatives are admissible if design-composer wants to compress scope.",
+      "loss_summary": ["pattern_fidelity: none (additive)"],
+      "viable": true,
+      "open_sub_decision": "E-2 inclusion in AC-FR-11-c scope (routes to design-composer per C-0153). This decision selects the placement strategy; the row set is design-composer's call."
+    },
+
+    {
+      "decision_id": "D-0010",
+      "title": "Severity vocabulary reconciliation across FR-1/FR-4/FR-5/FR-9/FR-10",
+      "framer_lean": "preserve trifecta with explicit bridge table (moderate)",
+      "decision_owner_note": "design-composer (cross-cuts layers); design-cc proposes for the cc layer.",
+      "options": [
+        {
+          "name": "preserve_trifecta_with_explicit_bridge_table",
+          "description": "Each surface keeps its current vocabulary (auditor BLOCKER/MAJOR/MINOR/NIT; reviewer critical/important/recommended; phase-validator blocking/warning/informational). A bridge table — authored by design-composer and hosted in KB-review-disciplines/severity-taxonomy.md (or auditing-shared/ as the cross-surface utility host) — documents the cross-vocabulary mapping with explicit notes on non-monotonic edges (e.g., BLOCKER → critical → blocking is monotonic; NIT → recommended is borderline).",
+          "pros": [
+            "Each vocabulary serves a different audience: auditor output drives tooling (numeric verdict scoring per auditing-cc-configs/scripts/verdict_compute.py); reviewer output drives humans; PV output drives gate decisions. Forcing convergence destroys audience-fit.",
+            "Bridge table is purely additive — no migration cost on existing audit outputs, reviewer outputs, or PV outputs.",
+            "Lowest migration cost: no skill family rewrites; no schema rewrites in audit-issues.json.",
+            "Externally undecided (no T-corroborator) means we should prefer the lowest-irreversibility option."
+          ],
+          "cons": [
+            "Three vocabularies stay in the repo; readers must consult the bridge to translate.",
+            "Risk of bridge becoming stale if any of the three vocabularies evolves independently.",
+            "Single-sourced support: claim C-0108 is the only direct claim on this; no T-001..T-004 corroborator.",
+            "Translator semantics are non-trivial (NIT vs recommended vs informational are not strictly equivalent)."
+          ],
+          "evidence_anchors": ["C-0094/C-0097/C-0098/C-0101 (auditor vocab)", "C-0095/C-0099 (reviewer vocab)", "C-0100/C-0103 (PV vocab)", "C-0102 (cross-vocab divergence)", "C-0108 (reconciliation claim)"],
+          "preconditions": [
+            "Bridge table host file authored (KB-review-disciplines/severity-taxonomy.md is the canonical-host candidate per framer).",
+            "auditing-shared utility (optional) to mechanically translate one vocab to another at audit-issues.json emission time.",
+            "design-composer ratifies the bridge (because it cross-cuts layers)."
+          ],
+          "cost": {
+            "effort_weeks": 1.5,
+            "runtime_overhead": "none (bridge is static reference)",
+            "maintenance_burden": "moderate (bridge stays in sync as any one vocabulary evolves)",
+            "irreversibility_cost": "low (additive; can be replaced by canonicalize-with-translator later if scope justifies)"
+          },
+          "verdict": "recommended"
+        },
+        {
+          "name": "canonicalize_with_translator",
+          "description": "Pick auditor BLOCKER/MAJOR/MINOR/NIT as canonical (most populous; widest in-repo footprint per the auditing-mcp / auditing-cc-configs / auditing-shared surfaces). Reviewer and PV vocabularies map to canonical via a documented translator (e.g., auditing-shared utility).",
+          "pros": [
+            "Single canonical vocabulary for tooling; downstream consumers (audit-issues.json schema, verdict_compute.py) target one set of values.",
+            "Translator is mechanical — once authored, the human cost is one-time."
+          ],
+          "cons": [
+            "Reviewer output and PV output must run through the translator at emission time — touches three skill families.",
+            "Translator semantics are non-trivial: BLOCKER → critical → blocking is monotonic only for the worst severities; NIT/recommended/informational are not strictly equivalent.",
+            "Migration cost touches KB-review-disciplines, test-phase-validator-author, shared-document-reviewer — wider blast radius than the bridge-table option.",
+            "Forces the reviewer audience (humans) to consume canonical vocabulary indirectly, which may obscure intent."
+          ],
+          "evidence_anchors": ["C-0094/C-0097/C-0098/C-0101 (auditor vocab is widest in-repo footprint)", "C-0102/C-0108 (divergence)"],
+          "preconditions": ["Translator hosted in auditing-shared.", "Three audit surfaces migrated to emit-via-translator."],
+          "cost": {
+            "effort_weeks": 4,
+            "runtime_overhead": "minor (translator invocation)",
+            "maintenance_burden": "moderate (translator owns the cross-vocab semantics)",
+            "irreversibility_cost": "high (one-way per framer — undoing means restoring three separate emission paths)"
+          },
+          "verdict": "viable_alternative",
+          "note": "Defensible if design-composer prioritises canonical tooling input over audience-fit. Not recommended because the irreversibility cost is high, the audience-fit cost is real (humans don't naturally read BLOCKER on review output), and the externally-undecided status counsels reversibility."
+        },
+        {
+          "name": "unify_one_vocabulary_across_all_surfaces",
+          "description": "Pick one vocabulary (whichever) and migrate auditor + reviewer + PV surfaces to it. Single canonical set; no bridge; no translator.",
+          "pros": [
+            "Maximum simplicity in steady state.",
+            "Single audit-issues.json schema; single severity column everywhere."
+          ],
+          "cons": [
+            "Highest migration cost: touches at minimum auditing-mcp, auditing-subagents, auditing-cc-configs, auditing-shared, KB-review-disciplines, test-phase-validator-author, shared-document-reviewer.",
+            "Destroys audience-fit: humans on review output and gate-decision PV authors lose vocabulary tailored to their use.",
+            "One-way per framer: high irreversibility cost.",
+            "Externally undecided (no T-corroborator); largest-blast-radius option has the weakest evidence."
+          ],
+          "evidence_anchors": ["C-0102/C-0108"],
+          "preconditions": [],
+          "cost": {
+            "effort_weeks": 6,
+            "runtime_overhead": "none in steady state",
+            "maintenance_burden": "low in steady state but high migration cost",
+            "irreversibility_cost": "very high"
+          },
+          "verdict": "rejected",
+          "rejection_rationale": "Highest cost; widest blast radius; weakest evidence; destroys audience-fit. Externally-undecided + one-way + tenant-blast-radius is the worst configuration for forcing convergence."
+        }
+      ],
+      "recommended_option": "preserve_trifecta_with_explicit_bridge_table",
+      "rationale": "Three vocabularies serve three different surfaces (tooling, humans, gates). Externally-undecided + one-way + tenant-blast-radius counsels the lowest-irreversibility option that still solves the cross-surface translation problem. Bridge table is additive; design-composer authors it. The two heavier options remain admissible if observed audit-output usage justifies the migration cost in a later iteration.",
+      "loss_summary": ["pattern_fidelity: none (each surface preserves its idiom)"],
+      "viable": true,
+      "deferred_to": "design-composer ratifies the bridge wording (cross-cuts layers); design-cc proposes the bridge for the cc layer."
+    }
+  ],
+
+  "summary": {
+    "total_options_enumerated": 28,
+    "per_decision_option_count": {
+      "D-0001": 3,
+      "D-0002": 3,
+      "D-0003": 3,
+      "D-0004": 3,
+      "D-0005": 3,
+      "D-0006": 2,
+      "D-0007": 3,
+      "D-0008": 3,
+      "D-0009": 3,
+      "D-0010": 3
+    },
+    "recommendation_divergence_from_framer_lean": [],
+    "recommendation_divergence_note": "All 10 recommended options match the framer's recorded lean. D-0006 is route-to-gate per framer; this entry preserves both readings and notes the orchestrator's 6-OI reading prevails absent contradicting evidence at Gate 4 (per framer instruction).",
+    "decisions_routed_to_gate_or_design_composer": [
+      "D-0006 (Contingency Split — design-composer at Gate 4)",
+      "D-0009 (E-2 inclusion sub-decision — design-composer ratifies row set)",
+      "D-0010 (cross-layer reconciliation — design-composer ratifies bridge wording)"
+    ],
+    "decisions_with_open_sub_decisions": [
+      "D-0007 (NFR-4 <5% FP measurement strategy — pilot at Phase Validator time)",
+      "D-0009 (E-2 inclusion scope)",
+      "D-0001 (legacy-ADR backfill window — hybrid_nlp_drafting_companion_canonical is the escape hatch if authoring burden bites)"
+    ],
+    "cross_decision_dependencies": [
+      "D-0005 ↔ D-0008: predicate scores shape; human scores substance.",
+      "D-0006 ↔ all R2a/R2b cluster decisions: if split, R2a (FR-1/6/7/8/9/10) and R2b (FR-2/3/4/5/11) implementations may sequence differently.",
+      "D-0010 ↔ FR-1/FR-4/FR-5/FR-9/FR-10: bridge table is consumed by all five findings-emitting FRs."
+    ]
+  }
+}

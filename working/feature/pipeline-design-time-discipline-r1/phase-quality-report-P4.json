@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "P4",
+  "phase_title": "FR-1 design-realization audit dimension",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "generated_at": "2026-05-27T00:00:00Z",
+  "verdict": "PASS",
+  "per_dimension_status": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "phase_validator_results": {
+    "PV-4.C1": {"status": "PASS", "evidence": "validate_adr_prescriptions.py linter exists; T4.1 APPROVED cycle 0"},
+    "PV-4.C2": {"status": "PASS", "evidence": "smoke test 5/5 pass; T4.1 APPROVED cycle 0"},
+    "PV-4.C3": {"status": "PASS", "evidence": "Lens 4 (Design Realization) added to architecture-audit.md; T4.2 APPROVED cycle 0; 8 assertion.kind values consistent with T4.1; severity bridge cited"},
+    "PV-4.C4": {"status": "PASS", "evidence": "review-architecture-auditor.md design-realization audit phase added (Phase 6); T4.3 APPROVED cycle 0"},
+    "PV-4.C5": {"status": "PASS", "evidence": "8 assertion.kind values consistent across T4.1 / T4.2 / T4.3"},
+    "PV-4.C6": {"status": "PASS", "evidence": "NFR-1 5000ms per-ADR budget called out in Phase 6 of review-architecture-auditor.md"},
+    "PV-4.C7": {"status": "PASS", "evidence": "NFR-8 four-field finding shape applied to all Lens 4 findings"}
+  },
+  "findings": [
+    {
+      "id": "I-PQ-P4-001",
+      "severity": "INFO",
+      "domain": "discipline",
+      "category": "cross_task_consistency_resolved",
+      "summary": "Apparent inconsistency between T3.3 (MCP init reverted) and T4.3 (MCP init accepted) is substantively justified, not a real inconsistency",
+      "evidence": [
+        {"artifact": ".claude/agents/review-architecture-auditor.md", "section": "## MCP initialization (REQUIRED) (lines 19-23)"},
+        {"artifact": ".claude/agents/design-claude-code.md", "section": "## MCP initialization (REQUIRED) (line 19)"},
+        {"artifact": ".claude/agents/design-cicd.md", "section": "## MCP initialization (REQUIRED) (line 17)"},
+        {"artifact": ".claude/agents/design-codespaces.md", "section": "## MCP initialization (REQUIRED) (line 17)"},
+        {"artifact": "adrs/ADR-0040-serena-narrowed-always-on.md", "section": "Decision (5-agent allowlist)"}
+      ],
+      "rationale": "ADR-0040 names exactly five agents that get `mcp__serena__*` plus, for review-architecture-auditor, `mcp__gitnexus__*`: review-architecture-auditor, design-cc (design-claude-code), design-cicd, design-codespaces, discovery-codebase-researcher. Three of those five (design-claude-code, design-cicd, design-codespaces) ALREADY carry the identical `## MCP initialization (REQUIRED)` section verbatim — committed in 6f46d14 (devcontainer-mcp-provisioning-r1 Phases 0-4). The section is therefore the established project-wide MCP init discipline for Serena+GitNexus-consuming agents, not a per-task ornament. review-architecture-auditor is the FOURTH such agent and it consumes BOTH MCPs (Serena + GitNexus), making the init section more load-bearing here than in any of the existing three. T4.3's quality handler reached the substantively correct decision. The apparent inconsistency with T3.3 evaporates once the discipline is recognized: discovery-codebase-researcher (the fifth agent) is the OUTLIER that still lacks the init section — T3.3 cycle-1 reverted it because it was out-of-scope FOR THAT TASK, not because the content was wrong. The reversion was a scope-discipline decision, not a content-discipline decision."
+    },
+    {
+      "id": "I-PQ-P4-002",
+      "severity": "MINOR",
+      "domain": "discipline",
+      "category": "open_item_for_future_run",
+      "summary": "discovery-codebase-researcher.md still lacks the MCP initialization section that the other four ADR-0040-named agents carry",
+      "evidence": [
+        {"artifact": ".claude/agents/discovery-codebase-researcher.md", "section": "(no `## MCP initialization (REQUIRED)` section present)"},
+        {"artifact": "adrs/ADR-0040-serena-narrowed-always-on.md", "section": "Decision (item 2 — five-agent list explicitly includes discovery-codebase-researcher)"}
+      ],
+      "rationale": "By the same substantive principle that justifies the section in review-architecture-auditor.md, the section is missing from discovery-codebase-researcher.md. This is an open item for a future feature run to address with proper scope-declaration (not in-scope for any Phase 4 task; correctly out-of-scope for T3.3 which only owned the FR-9 Blocks-X marker work). Recommended: log as OI for the next pipeline-discipline feature run.",
+      "next_action": "Open follow-up to add `## MCP initialization (REQUIRED)` to .claude/agents/discovery-codebase-researcher.md in a future feature run with that file declared in scope."
+    }
+  ],
+  "cross_task_consistency_decision": {
+    "issue": "T4.3 added `## MCP initialization (REQUIRED)` to review-architecture-auditor.md; T3.3 reverted the same addition from discovery-codebase-researcher.md",
+    "option_selected": "Option 3 — defer to broader principle determination; the addition in T4.3 is substantively defensible",
+    "reasoning": "Investigation revealed: (a) three of the five ADR-0040-named MCP-consumer agents (design-claude-code, design-cicd, design-codespaces) already carry the identical section, committed pre-T4.3 in 6f46d14; (b) review-architecture-auditor is the only agent in the project that consumes BOTH `mcp__serena__*` AND `mcp__gitnexus__*` (per its tools allowlist and ADR-0040's blast-radius-analysis rationale), making the init discipline strictly MORE load-bearing here than in the three design agents that already carry it; (c) T3.3's reversion was a SCOPE-DISCIPLINE decision (the section was outside T3.3's declared FR-9 Blocks-X scope on discovery-codebase-researcher.md), NOT a CONTENT-DISCIPLINE decision; (d) T4.3's declared scope on review-architecture-auditor.md included the Phase 6 design-realization audit, which directly invokes both `mcp__gitnexus__*` (blast-radius) and Bash subprocess on `auditing-shared/scripts/`, meaning the MCP init preconditions are causally necessary for the in-scope content to function correctly. The T4.3 handler's lenient interpretation is the substantively correct one because the MCP init is a precondition for the in-scope Phase 6 work it added; the T3.3 handler's strict interpretation was also correct because T3.3's in-scope FR-9 work did NOT depend on Serena/GitNexus init.",
+    "consistency_principle_applied": "Scope-deviation is judged by whether the additive content is (a) declared in task scope OR (b) a causal precondition for declared-in-scope content. T4.3 satisfies (b); T3.3 satisfied neither. Different verdicts are therefore consistent under a principled rule, not contradictory.",
+    "outcome": "Keep the MCP init section in review-architecture-auditor.md. Do not dispatch reconciliation. Phase 4 PASS.",
+    "follow_up_oi": "I-PQ-P4-002 — add the section to discovery-codebase-researcher.md in a future feature run for project-wide uniformity across the five ADR-0040-named MCP-consumer agents."
+  },
+  "audit_counter_delta": {
+    "schema_version": "1.0.0",
+    "gating": "informational",
+    "audit_severity_breakdown": null,
+    "baseline_reference": "phase-quality-report-P3 (or last available prior)",
+    "per_domain_deltas": {
+      "tests": "0 → 0 (no change)",
+      "audits": "0 → 0 (no change; coordinator stub treated per Q-CC-4)",
+      "validator": "0 → 0 (PV-4 all PASS)",
+      "discipline": "0 → 2 (added I-PQ-P4-001 INFO + I-PQ-P4-002 MINOR — both informational/follow-up; non-blocking)",
+      "scope_deviations": "0 → 0 (resolved at decision; not surfaced as open finding)"
+    },
+    "aggregate_delta": "0 → 2 (both non-blocking)",
+    "audits_stub": true,
+    "audits_stub_note": "Coordinator audit dimension treated as not-measured per Q-CC-4 stub-vs-real distinction; not silently counted as clean."
+  },
+  "rollup_rule_applied": "All 5 dimensions PASS (no blocker or revisable finding in any dimension); aggregate verdict PASS. Findings I-PQ-P4-001 (INFO) and I-PQ-P4-002 (MINOR) are non-blocking and do not affect the dimensional rollup.",
+  "next_action": "Advance to Phase 5. Log I-PQ-P4-002 as an open item for the next feature run that declares .claude/agents/discovery-codebase-researcher.md in scope."
+}

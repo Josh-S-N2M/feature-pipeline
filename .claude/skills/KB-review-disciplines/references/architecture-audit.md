@@ -95,7 +95,7 @@ Sampling strategy is recorded in the output JSON's `metadata` so the reviewer du
 
 1. **Identify "change targets"** — the components the Blueprint says it modifies. Source: Blueprint's Change Impact Map's `Change Target` field, and any component in Main Components whose subsection says "modified" or "replaced."
 
-2. **Query GitNexus** (primary) or `codebase-memory-mcp` (fallback per ADR-0007 v2.x) for the blast radius of each change target. Use the `analyze_impact` tool (GitNexus) or `trace_call_path` with `risk_labels` (codebase-memory-mcp).
+2. **Query serena** for the blast radius of each change target. Use `mcp__serena__find_referencing_symbols` against the target's identifier for the direct 1-hop reverse-dependency set; iterate per caller to discover 2- and 3-hop dependents. If serena is unavailable, fall back to Grep across the candidate import / call-site patterns and record the method as `manual`.
 
 3. **Compare** the returned impact set to what the Blueprint's Change Impact Map / Interface Change Matrix already covers.
 
@@ -114,9 +114,9 @@ A blast-radius item is "covered" when:
 
 Items the Blueprint doesn't mention at all → uncovered.
 
-### GitNexus / codebase-memory-mcp degradation
+### serena degradation
 
-If both MCPs are unavailable (Preflight should have caught this, but defense-in-depth), the auditor:
+If serena is unavailable (Preflight should have caught this, but defense-in-depth), the auditor:
 
 1. Records `metadata.blast_radius_method: "manual"` in output
 2. Performs a best-effort manual blast-radius using Grep/Glob on the change targets' symbols
@@ -172,7 +172,7 @@ Per the standard reviewer output protocol. Issue IDs use prefix `AA` (architectu
     "stage": 6,
     "auditor": "review-architecture-auditor",
     "blueprint_version": "vN",
-    "blast_radius_method": "gitnexus" | "codebase-memory-mcp" | "manual",
+    "blast_radius_method": "serena" | "manual",
     "cove_sample_rate": 0.7
   },
   "verdict": {"decision": "approved_with_conditions"},
@@ -198,3 +198,88 @@ Four-cycle hard cap. If issues persist at iteration 4, halt and surface to user.
 - the Cross-Artifact Audit pass — different discipline (CMC + diff-mode + convergence), different reviewer
 - ADR reviews mid-pipeline — `shared-document-reviewer` handles each ADR's Gate 0/1 per ADR-0017
 - **Annotation-level numeric consistency checks** (e.g., "(4) listed items but list contains 5", `total_tasks: N` vs. actual `#### T` count). These belong to `shared-document-reviewer`'s Gate 1 "Numeric internal consistency check" — not to the architecture auditor. The auditor's three lenses (CoVe / blast-radius / brief-honor) are substantive, not annotation-level. If an annotation-vs-enumeration mismatch surfaces during this audit, downgrade to `MINOR` and reference the Gate 1 check that should have caught it; do not spend the auditor's xhigh reasoning budget on counts.
+
+## Lens 4 — Design Realization (per ADR-0059)
+
+**Goal:** verify that when an ADR's companion `.prescriptions.yaml` declares a prescription, the eventual implementation artifact matches it. Catches the defect class where an ADR prescribes a concrete implementation detail and the codebase quietly diverges.
+
+### Purpose
+
+Each ADR with machine-checkable prescriptions ships a sibling companion file at `adrs/ADR-NNNN-<slug>.prescriptions.yaml` (per ADR-0059). Lens 4 closes the loop: for every prescription declared in a companion file, the auditor verifies the codebase state satisfies the declared assertion. Prescriptions that fail realization become audit findings; ADRs without a companion file are a no-op (AC-FR-1-b).
+
+### Inputs
+
+1. **Companion files** — `adrs/ADR-NNNN-<slug>.prescriptions.yaml`, one per ADR that contains machine-checkable prescriptions (cardinality 0..N across the run's ADR set). The companion is the canonical prescription source; ADR prose is the canonical decision narrative. Neither derives from the other.
+2. **Codebase state** — the repository files the prescriptions point to, accessed via `auditing-shared/scripts/validate_adr_prescriptions.py` (T4.1 deliverable). The validator handles schema validation, ADR-to-companion slug matching, and target-path existence checks before assertion evaluation.
+
+### Process
+
+1. **Enumerate companion files** in the run's ADR scope. If none are present, emit a no-op diagnostic and exit Lens 4 (AC-FR-1-b).
+2. **Schema-validate each companion** by invoking `validate_adr_prescriptions.py`. A schema-invalid companion produces a `MAJOR` finding before prescription evaluation begins; evaluation for that companion stops.
+3. **For each prescription entry** in a valid companion:
+   a. Identify the `assertion.kind` (one of the 8 enumerated kinds: `file_exists`, `file_not_exists`, `regex_present`, `regex_not_present`, `substring_present`, `substring_absent`, `jsonpath_equals`, `jsonpath_count` — per ADR-0059 §Neutral Consequences).
+   b. Evaluate the assertion against the codebase at the declared `target_path`.
+   c. If the assertion passes: record as verified (for traceability); no finding emitted.
+   d. If the assertion fails: emit a finding per the severity calibration below.
+4. **Aggregate findings** into the shared issues array with `"lens": "design_realization"` (parallel to `"cove"` / `"blast_radius"` / `"brief_honor"` in the output JSON).
+
+### Severity calibration (per severity-taxonomy.md §Cross-Surface Severity Bridge Table)
+
+| Failure mode | Severity | Notes |
+|---|---|---|
+| Missing prescribed file (`file_exists` assertion fails) | `BLOCKER` | The prescription names a `target_path` that must exist but does not. |
+| Schema mismatch on companion file | `MAJOR` | Companion YAML fails `validate_adr_prescriptions.py` schema check; prescriptions in that companion are unevaluated until the companion is corrected. |
+| Prescription drift — content/output mismatch (`regex_present`, `regex_not_present`, `substring_present`, `substring_absent`, `jsonpath_equals`, `jsonpath_count` assertion fails) | `MAJOR` | File exists but its content diverges from the declared assertion. Override: `BLOCKER` if the companion entry declares `severity_floor: BLOCKER`. |
+| `file_not_exists` assertion fails (prescribed removal not honored) | `MAJOR` | A file that was prescribed for removal still exists. |
+| Other deviations | `MINOR` or `INFO` | Per the companion entry's `enforcement` field; default `MINOR` when `enforcement` is unset. |
+
+### Output finding shape (per severity-taxonomy.md §NFR-8 Four-Field Finding Shape)
+
+Each Lens 4 finding carries exactly the four NFR-8 fields:
+
+| Field | Content |
+|---|---|
+| `rule` | `FR-1.design_realization.<kind>` — e.g., `FR-1.design_realization.file_missing`, `FR-1.design_realization.regex_mismatch`, `FR-1.design_realization.stale_reference`. The `<kind>` segment names the assertion kind that failed. |
+| `target` | The prescribed file path, symbol, or command named in the companion entry's `target_path`. |
+| `divergence` | Observed-vs-expected one-liner: what the codebase currently contains vs. what the prescription asserts. |
+| `next_action` | Imperative remediation step: e.g., "Create `<path>` per ADR-NNNN §Implementation Guidance" or "Remove stale reference to `<symbol>` in `<file>` — prescribed by ADR-NNNN." |
+
+The `lens` field in the output JSON is set to `"design_realization"` for all Lens 4 findings.
+
+### Canonical example
+
+ADR-0041 (install-mechanism-hybrid) prescribed the removal of the `mcp-openapi-schema` server; a six-server `.mcp.json` was the prescribed state as of 2026-05-24. After the removal, `.claude/skills/auditing-mcp/scripts/audit_op2_consumer_mapping.py` still referenced `mcp-openapi-schema` as a consumer of the `design-api` agent — a stale reference that no per-artifact gate caught.
+
+A Lens 4 audit with the companion `ADR-0041-install-mechanism-hybrid.prescriptions.yaml` catches this as:
+
+```json
+{
+  "id": "I-AA-NNN",
+  "severity": "important",
+  "lens": "design_realization",
+  "rule": "FR-1.design_realization.stale_reference",
+  "target": ".claude/skills/auditing-mcp/scripts/audit_op2_consumer_mapping.py",
+  "divergence": "File references mcp-openapi-schema as a live server consumer; ADR-0041 prescribed removal on 2026-05-24 — server is absent from .mcp.json.",
+  "next_action": "Remove mcp-openapi-schema from audit_op2_consumer_mapping.py consumer list; update any dependent mappings to reflect the six-server canonical set."
+}
+```
+
+This is the structural defect class Lens 4 exists to surface: ADR prescription diverges from implementation; the gap was silent until this lens ran.
+
+### No-op condition
+
+When no companion files exist in the run's ADR set, Lens 4 emits a single `INFO`-level diagnostic (`"rule": "FR-1.design_realization.no_companions"`) and exits. This is not a finding; it does not affect the verdict score.
+
+### Cross-references
+
+- **ADR-0059** — Companion-file schema; `assertion.kind` vocabulary; canonical placement rule; schema evolution policy.
+- **severity-taxonomy.md §Cross-Surface Severity Bridge Table** — severity vocabulary used above (`BLOCKER` / `MAJOR` / `MINOR` / `INFO`).
+- **severity-taxonomy.md §NFR-8 Four-Field Finding Shape** — the `rule` / `target` / `divergence` / `next_action` shape all Lens 4 findings conform to.
+- **`auditing-shared/scripts/validate_adr_prescriptions.py`** (T4.1) — schema validator invoked in step 2 of the process above.
+- **Companion-file schema in ADR-0059** — `assertion.kind` enumeration (8 kinds), `severity_floor` override field, `enforcement` field semantics.
+
+## Update History
+
+| Change | Date | Notes | Sources |
+|---|---|---|---|
+| Added §Lens 4 — Design Realization | 2026-05-27 | Additive: new audit lens for ADR prescription vs. implementation verification. Authored per ADR-0059 + pipeline-design-time-discipline-r1 (R2a) Plan §Phase 4 / T4.2 / AC-FR-1-c (gate PV-4.C3). | ADR-0059; cc-design.md §FR-1; severity-taxonomy.md §Bridge Table + §NFR-8 |

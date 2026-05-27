@@ -135,3 +135,71 @@ The voided entry retains `"void": true` + `"void_reason"` for audit; the replace
 ## Note on AC-FR-7-c floor coverage
 
 Per Blueprint § AC-FR-7 floor coverage Path B disposition (cross-referenced by ADR-0033 §Context per I-AA-606): the 5th floor item "frontmatter-validation report" is NOT a separately-templated artifact. It is satisfied by the script-output schema inline in `validate_pipeline_frontmatter.py` source. `state-transitions-log-entry` is a beyond-floor artifact per AC-FR-7-d permission.
+
+---
+
+## FR-9 Blocks-X marker transition names
+
+**Authoritative sources:** ADR-0063 (Blocks-X Marker Grammar Canonicalization) + FR-9 of `pipeline-design-time-discipline-r1`.
+
+FR-9 introduces three `transition_name` values that the orchestrator emits to `state-transitions.log` in response to Blocks-X marker lifecycle events. Per ADR-0044 v1, `transition_name` is a free-string field; these values land without schema evolution. The `context` field of the log entry carries the marker's stage slug and, where applicable, closure rationale.
+
+---
+
+### `BLOCKS_X_RESOLVED`
+
+**Semantics:** A previously emitted Blocks-X marker has been closed with an explicit rationale; the blocking condition is cleared and the named downstream stage may now proceed.
+
+**Which agent emits it:** `execute-orchestrator`, after the responsible agent (typically a Designer or Composer) provides the closure rationale confirming the blocking concern is satisfied.
+
+**Example entry:**
+
+```json
+{"timestamp":"2026-05-27T11:00:00Z","transition_name":"BLOCKS_X_RESOLVED","from_state":"design_blocked","to_state":"design_active","trigger":"blocking concern resolved with rationale by design-cc","task_id":null,"phase_id":"phase-2","cycle_counter":null,"artifact_paths_affected":["working/feature/<slug>/cc-design.md"],"invoking_agent":"execute-orchestrator","context":{"stage_slug":"design-cc-completion","additional_notes":"A-5 grammar question resolved in cc-design §FR-9 decision block"}}
+```
+
+---
+
+### `BLOCKS_X_DEFERRED_WITH_OI`
+
+**Semantics:** A Blocks-X marker was not fully resolved but was converted to an explicit Open Item (OI) that tracks the deferral; the downstream stage may proceed with the OI carried forward.
+
+**Which agent emits it:** `execute-orchestrator`, after the responsible agent registers a formal OI in the relevant design or blueprint document and links it back to the marker.
+
+**Example entry:**
+
+```json
+{"timestamp":"2026-05-27T11:30:00Z","transition_name":"BLOCKS_X_DEFERRED_WITH_OI","from_state":"design_blocked","to_state":"design_active","trigger":"Blocks-X marker deferred; OI registered in blueprint","task_id":null,"phase_id":"phase-2","cycle_counter":null,"artifact_paths_affected":["working/feature/<slug>/blueprint-v1.md"],"invoking_agent":"execute-orchestrator","context":{"stage_slug":"synthesis-completion","additional_notes":"OI-R2a-7 registered; downstream stage may proceed; OI must close before plan-authoring-completion"}}
+```
+
+---
+
+### `BLOCKS_X_FALSE_POSITIVE`
+
+**Semantics:** A Blocks-X marker was determined to be a false positive after review; the marker is withdrawn with rationale and the named downstream stage may proceed without a closure obligation.
+
+**Which agent emits it:** `execute-orchestrator`, after the responsible agent provides a written rationale explaining why the marker does not represent a genuine blocking dependency.
+
+**Example entry:**
+
+```json
+{"timestamp":"2026-05-27T12:00:00Z","transition_name":"BLOCKS_X_FALSE_POSITIVE","from_state":"design_blocked","to_state":"design_active","trigger":"Blocks-X marker withdrawn as false positive","task_id":null,"phase_id":"phase-2","cycle_counter":null,"artifact_paths_affected":["working/feature/<slug>/codebase-analysis-report.md"],"invoking_agent":"execute-orchestrator","context":{"stage_slug":"design-cc-completion","additional_notes":"marker was authored against an earlier draft assumption; design-cc confirmed no actual dependency"}}
+```
+
+---
+
+**Cross-references:**
+
+- ADR-0063 §Decision — canonical source for `BLOCKS_X_RESOLVED`, `BLOCKS_X_DEFERRED_WITH_OI`, `BLOCKS_X_FALSE_POSITIVE`; FR-9 of `pipeline-design-time-discipline-r1` is the feature requirement that introduces these three values.
+- ADR-0044 §v1 invariant — `transition_name` is free-string; no schema evolution required for these three values.
+- `.claude/skills/auditing-shared/scripts/parse_blocks_x_markers.py` — the canonical parser whose output drives the Blocks-X marker lifecycle.
+- ADR-0063 §Decision (above) — the canonical grammar spec for the `<!-- BLOCKS: <stage-slug>-completion -->` pragma; no separate grammar-spec file is maintained.
+
+---
+
+## History
+
+| Entry | Date | Author / Task | Notes |
+|---|---|---|---|
+| T3.2 / Phase 3 | 2026-05-27 | execute-task-code-producer (T3.2) | Added §FR-9 Blocks-X marker transition names per AC-FR-9-c; four new transition_name values documented. |
+| T3.2 / Phase 3 / cycle 1 | 2026-05-27 | execute-task-code-producer (T3.2) | Removed BLOCKS_X_EMITTED subsection per ADR-0063 audit (ADR-0063 §Decision reserves exactly three closure values); corrected section intro count from four to three. |

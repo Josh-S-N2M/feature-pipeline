@@ -1,0 +1,151 @@
+{
+  "schema_version": "1.0.0",
+  "audit_id": "arch-audit-pipeline-design-time-discipline-r1-R2a",
+  "audited_artifact": "blueprint-v1.md",
+  "audited_at": "2026-05-26T18:30:00Z",
+  "code_graph_used": "grep_plus_read",
+  "code_graph_used_note": "Substrate is markdown discipline artifacts (Blueprint, ADRs, KB skills) — grep + Read gives identical evidence quality at lower cost than symbolic LSP traversal, matching the parent's documented method choice in codebase-analysis.json (extraction_method_notes). GitNexus index pre-warmed but not load-bearing for prose-document audit.",
+  "checks_performed": [
+    "brief_honor_L3",
+    "decision_contradiction_inherited",
+    "decision_contradiction_new_ADRs",
+    "blast_radius",
+    "synthesis_claim_verification",
+    "cross_section_consistency",
+    "eat_own_dogfood_audit",
+    "design_realization_audit",
+    "open_item_handling",
+    "re_surfaced_verified_issue_check"
+  ],
+  "issues": [
+    {
+      "id": "I-AA-001",
+      "severity": "MAJOR",
+      "category": "decision_contradiction_between_new_ADRs",
+      "summary": "ADR-0064 and ADR-0065 contradict each other on Skill-Coverage Decisions section location (Blueprint vs synthesis.md)",
+      "evidence": [
+        {"artifact": "adrs/ADR-0064-agent-roster-impact-matrix-contract.md", "section": "Clause 3 (line 82)", "quote": "the predicate emits an advisory annotation by scanning the Blueprint's Skill-Coverage Decisions section for trigger-shaped tokens"},
+        {"artifact": "adrs/ADR-0065-skill-coverage-decision-discipline.md", "section": "Clause 1 (line 64)", "quote": "The Skill-Coverage Decisions section is embedded in the feature run's synthesis.md (not a standalone file, not in the Blueprint, not in cc-design.md)"},
+        {"artifact": "adrs/ADR-0065-skill-coverage-decision-discipline.md", "section": "Rationale strand 4 (line 97)", "quote": "The FR-6 advisory predicate (per ADR-0064 Clause 3) reads the Skill-Coverage Decisions section to evaluate trigger condition 4. Embedding in synthesis.md...ensures the table is available when the predicate fires."},
+        {"artifact": "blueprint-v1.md", "section": "Data flow line 160", "quote": "FR-6 advisory predicate evaluates trigger conditions 1-4 (per ADR-0064 Clause 3)"}
+      ],
+      "analysis": "ADR-0064 says the predicate scans the Blueprint's Skill-Coverage Decisions section; ADR-0065 says the section is embedded in synthesis.md and explicitly forbids embedding in the Blueprint. These two new ADRs were authored in the same run by the same composer and they contradict each other on a load-bearing implementation detail. The predicate's source-of-truth path is undefined — implementers will pick one or the other and the dogfood signal becomes ambiguous. ADR-0065's rationale strand 4 references ADR-0064 Clause 3 explicitly, indicating the contradiction is editorial drift rather than intentional divergence.",
+      "recommended_resolution": "Patch ADR-0064 Clause 3 (line 82) to read 'scanning the synthesis.md Skill-Coverage Decisions section' so it aligns with ADR-0065 Clause 1 (the load-bearing artifact-location decision). Optionally also update ADR-0064 Options Considered Option B (line 117) which has the same wording. This is an in-place edit per ADR-0005 (the contradiction is editorial, not a substantive supersession event)."
+    },
+    {
+      "id": "I-AA-002",
+      "severity": "MAJOR",
+      "category": "decision_contradiction_with_inherited_ADR",
+      "summary": "ADR-0065 cites a shared-document-reviewer invocation point that does not exist in ADR-0017",
+      "evidence": [
+        {"artifact": "adrs/ADR-0065-skill-coverage-decision-discipline.md", "section": "Clause 2 (line 74)", "quote": "Substance review (`shared-document-reviewer` invocation 2 on `synthesis.md`) is the human's responsibility for (a) and (c)."},
+        {"artifact": "adrs/ADR-0065-skill-coverage-decision-discipline.md", "section": "Related Information (line 160)", "quote": "ADR-0017 — `shared-document-reviewer` invocation 2 reviews `synthesis.md`"},
+        {"artifact": "adrs/ADR-0017-shared-document-reviewer-invocation-points.md", "section": "Implementation Guidance — invocation enumeration", "quote": "Invocation 2 — After PRD generation: shared-document-reviewer invoked with doc_type: PRD. Verdict feeds into PRD Approval Gate."},
+        {"artifact": "adrs/ADR-0017-shared-document-reviewer-invocation-points.md", "section": "Implementation Guidance — invocation enumeration", "quote": "None of the 5 invocation points review synthesis.md"}
+      ],
+      "analysis": "ADR-0065 places the FR-7 substance review for (a) existing-skill and (c) no-skill-warranted rows on 'shared-document-reviewer invocation 2 on synthesis.md'. ADR-0017 — which ADR-0065 inherits in its frontmatter (adrs_inherited: ADR-0017 v1.0.0) — defines exactly 5 invocation points: Intent Clarification, PRD, Blueprint (DesignDoc), Plan, ADR. Synthesis is NOT a reviewed document under ADR-0017. Invocation 2 specifically reviews the PRD. ADR-0065's contract for substance review therefore has no actual reviewer assigned: the named invocation does not exist, and no other ADR-0017 invocation reads synthesis.md. The FR-7 substance heuristic for (a) and (c) rows has nowhere to fire.",
+      "recommended_resolution": "Three resolution paths; design-composer should pick one and patch ADR-0065 in-place per ADR-0005 (editorial correction, not supersession): (1) Reassign substance review to invocation 3 (Blueprint review) — the design-composer reads synthesis.md when composing the Blueprint and can cross-validate (a)/(c) substance there, but the reviewer-side check would be at Blueprint review; (2) Extend ADR-0017's invocation list with a new sixth point (synthesis.md review) — heavier change, requires superseding ADR-0017; (3) Move FR-7 substance review responsibility to design-composer's Blueprint composition substance check (currently implicit), making explicit the composer-as-reviewer pattern. Path (1) is lowest-cost and consistent with the Blueprint's actual data flow."
+    },
+    {
+      "id": "I-AA-003",
+      "severity": "MAJOR",
+      "category": "synthesis_claim_verification",
+      "summary": "Bridge-consumer count of '20 agents load KB-review-disciplines' is undercount; actual count is 24",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "Severity bridge content § Bridge consumers (line 326)", "quote": "20 agents load KB-review-disciplines (per codebase-analysis blast_radius_new_confirmations[4]) — bridge propagates broadly with no separate propagation work."},
+        {"artifact": "synthesis.md", "section": "Bridge Consumers (line 191)", "quote": "20 agents load KB-review-disciplines (per codebase-analysis blast_radius_new_confirmations[4])"},
+        {"artifact": "codebase-analysis.json", "section": "blast_radius_new_confirmations[4].consumer_set_at_HEAD", "quote": "20 agents under .claude/agents/ load KB-review-disciplines: discovery-plan-author, finalize-reconciler, ... design-api"},
+        {"artifact": "grep verification at HEAD", "section": "command", "quote": "grep -l KB-review-disciplines /workspaces/feature-pipeline/.claude/agents/*.md | wc -l → 24"},
+        {"artifact": "grep verification at HEAD", "section": "agents missing from codebase-analysis list of 20", "quote": "execute-orchestrator, review-cross-artifact-auditor, intake-intent-clarifier, test-acceptance-author"}
+      ],
+      "analysis": "The codebase-analysis enumerated 20 specific agents; current HEAD has 24 agents referencing KB-review-disciplines. Four additional agents (execute-orchestrator, review-cross-artifact-auditor, intake-intent-clarifier, test-acceptance-author) are missing from the inherited count. The Blueprint and synthesis both propagate the undercount as 'no separate propagation work needed.' This is the exact failure shape FR-1's design-realization audit is designed to catch — a claim about a derived count diverging from current code state. The omission of review-cross-artifact-auditor is particularly notable because that agent's severity-weighted iteration-delta math (lines 93, 143-145 of its file) is one of the canonical bridge consumers whose 10/3/1/0 weights appear in the bridge table itself.",
+      "recommended_resolution": "Reconfirm the count by re-running grep at Blueprint composition time and updating the Blueprint line 326 + synthesis.md line 191 + codebase-analysis.json blast_radius_new_confirmations[4]. Update bridge-consumers list to enumerate all 24. The propagation claim ('no separate propagation work needed') remains correct directionally — the four missing agents already load the KB — but the documented surface should match HEAD."
+    },
+    {
+      "id": "I-AA-004",
+      "severity": "MAJOR",
+      "category": "eat_own_dogfood_gap",
+      "summary": "ADR-0065 Clause 3 mandates dogfood synthesis.md embedded section in this run, but synthesis.md does not contain a Skill-Coverage Decisions section",
+      "evidence": [
+        {"artifact": "adrs/ADR-0065-skill-coverage-decision-discipline.md", "section": "Clause 3 (line 76)", "quote": "Per Clause 1, the embedded section is authored in this run's synthesis.md with one decision row per concept, each resolving per the per-concept rationale in the Blueprint's Eat-Own-Dogfood section."},
+        {"artifact": "working/feature/pipeline-design-time-discipline-r1/synthesis.md", "section": "(absent)", "quote": "grep 'Skill-Coverage Decisions' synthesis.md → only references to the concept in narrative prose (lines 72, 76, 88, 118, 157); no embedded section header '## Skill-Coverage Decisions' with the 6 dogfood rows in template form."},
+        {"artifact": "blueprint-v1.md", "section": "Executive summary (line 45)", "quote": "R2a applies its own contracts to itself: this run produces an agent-roster-impact-matrix.md (per ADR-0064) and six skill-coverage decisions (per ADR-0065) at Plan / Task-Decomposition time, validating the contracts before they're imposed on future authors."},
+        {"artifact": "blueprint-v1.md", "section": "Eat-own-dogfood deliverables (line 341)", "quote": "Six FR-7 skill-coverage decisions embedded in working/feature/pipeline-design-time-discipline-r1/synthesis.md (per ADR-0065)."}
+      ],
+      "analysis": "The Blueprint contains the six skill-coverage decisions inline (Blueprint table lines 343-352), but ADR-0065 Clause 1 explicitly forbids the Blueprint as the embedding location ('not in the Blueprint'). The Blueprint then claims at line 341 that the six decisions are embedded in synthesis.md, but synthesis.md has no Skill-Coverage Decisions section in template form. The Blueprint also says at line 45 the dogfood deliverable lands 'at Plan / Task-Decomposition time' — deferring the obligation to a downstream stage. The combination is: (a) the Blueprint claims dogfood happens in synthesis.md, (b) the Blueprint itself embeds the table where ADR-0065 forbids, (c) the actual synthesis.md does not contain the section, (d) the Blueprint also defers the obligation to Plan time. This is the exact failure shape R2a is designed to prevent: a discipline that has somewhere to live but does not actually live there yet. Cross-references back to ADR-0065 Clause 3 imply the discipline should be observable in this run before downstream consumers can rely on it.",
+      "recommended_resolution": "Two paths: (1) Author the actual Skill-Coverage Decisions section in synthesis.md now (back-fill into the synthesis document; the synth-synthesizer agent is the canonical author per ADR-0065 line 138). The Blueprint table at lines 343-352 becomes the source content. This is the strictest dogfood interpretation. (2) Explicitly note in the Blueprint that the synthesis.md back-fill is a Plan-stage Phase G task — and pre-position the Blueprint table as a Plan-stage input. Path (1) is structurally cleaner because it makes the dogfood signal observable at Blueprint review time. The current state — Blueprint contains the table, synthesis.md does not — is the in-between state that produces an ambiguous dogfood signal."
+    },
+    {
+      "id": "I-AA-005",
+      "severity": "MINOR",
+      "category": "cross_section_consistency",
+      "summary": "Stale SA-12 reference in auditing-subagents/SKILL.md description vs SA-1..SA-13 catalog state at HEAD",
+      "evidence": [
+        {"artifact": ".claude/skills/auditing-subagents/SKILL.md", "section": "line 16", "quote": "Subagent anti-pattern reference catalog documenting what the SA-1 through SA-12 scanners detect"},
+        {"artifact": ".claude/skills/auditing-subagents/references/anti-patterns.md", "section": "line 5", "quote": "13 named subagent anti-patterns (SA-1 through SA-13)"},
+        {"artifact": ".claude/skills/auditing-subagents/references/subagent-spec.md", "section": "line 108", "quote": "SA-13, implemented by scripts/validate_subagent_frontmatter.py"},
+        {"artifact": "blueprint-v1.md", "section": "Multiple references", "quote": "FR-10 — auditing-subagents matrix-missing audit rule (new SA-14 entry)"},
+        {"artifact": "codebase-analysis.json", "section": "(Blueprint line 254)", "quote": "auditing-subagents catalog with SA-14...New rule entry per D-R2a-5 is additive to existing SA-1..SA-13 catalog"}
+      ],
+      "analysis": "This is a pre-existing stale doc in auditing-subagents/SKILL.md:16 (it says 'SA-1 through SA-12' but the catalog has reached SA-13 per anti-patterns.md:5 and subagent-spec.md:108). The Blueprint's choice of SA-14 as the new rule number is correct per the actual catalog ceiling. However, when FR-10 lands, the SKILL.md:16 stale description will become more visibly wrong (it will say 'SA-1 through SA-12' while SA-13 + SA-14 both exist). The Blueprint's change-impact-map enumerates auditing-subagents/SKILL.md as modified (line 204) for the SA-14 entry — but doesn't note the SA-12 → SA-14 description fix should ride along. This is an INFO-tier finding by strict scope but pre-loading the fix into FR-10's diff has zero marginal cost and prevents a fresh document drift moment.",
+      "recommended_resolution": "Add a one-line task to the Plan's Phase D (FR-10) to update auditing-subagents/SKILL.md:16 from 'SA-1 through SA-12' to 'SA-1 through SA-14' (covering the existing stale SA-13 reference plus the new SA-14). Pure-additive doc edit; zero risk."
+    },
+    {
+      "id": "I-AA-006",
+      "severity": "MINOR",
+      "category": "synthesis_claim_verification",
+      "summary": "Codebase-analysis component list omits review-cross-artifact-auditor which is a load-bearing bridge consumer",
+      "evidence": [
+        {"artifact": "codebase-analysis.json", "section": "components_inherited_verbatim.names[]", "quote": "review-architecture-auditor, KB-review-disciplines, auditing-shared, discovery-codebase-researcher, KB-codebase-research, recipe-feature-pipeline, design-cc (filename design-claude-code.md, frontmatter name design-cc), KB-cc-design, auditing-subagents, Issues/per-agent-design-evaluation-gap/, state-transitions-log-entry-template, test-phase-validator-author, KB-task-decomposition, agent-inventory, ADR-locus (canonical placement)"},
+        {"artifact": "blueprint-v1.md", "section": "Severity bridge content § Iteration-delta weights (line 314)", "quote": "Iteration-delta weights (10 / 3 / 1 / 0 / 0) drive the convergence / cap-tripping logic across iterations in the 4-cycle reconciliation cap (per KB-review-disciplines cross-artifact-audit)"},
+        {"artifact": "synthesis.md", "section": "Weight Preservation Note (line 181)", "quote": "Iteration-delta weights ({BLOCKER: 10, MAJOR: 3, MINOR: 1, INFO: 0}) drive severity-weighted count deltas across review iterations in review-cross-artifact-auditor.md:93."}
+      ],
+      "analysis": "review-cross-artifact-auditor is the canonical source of the iteration-delta-weight numbers (10/3/1/0) that appear in the bridge table. It is a primary consumer of the bridge. Yet it does not appear in codebase-analysis components_inherited_verbatim.names[]. This is a forensic gap, not a functional defect — the bridge content still references the file correctly. But it means a future cross-artifact-divergence audit may not pick up this consumer. Pairs with I-AA-003 (review-cross-artifact-auditor is one of the four agents missing from the 20-vs-24 KB-review-disciplines consumer count).",
+      "recommended_resolution": "Patch codebase-analysis.json to add review-cross-artifact-auditor to components_inherited_verbatim.names[]. Alternatively, this is downstream-readable from the source of the weight numbers and is captured in synthesis.md line 181 — no functional change required if the codebase-analysis is treated as a forensic record. Logging this here for the audit trail in case it surfaces again later."
+    },
+    {
+      "id": "I-AA-007",
+      "severity": "INFO",
+      "category": "design_realization_proactive",
+      "summary": "FR-1's design-realization audit would catch I-AA-001, I-AA-002, I-AA-003, I-AA-004 if FR-1 already existed",
+      "evidence": [
+        {"artifact": "blueprint-v1.md", "section": "Executive summary (line 41)", "quote": "R2a ships the design-time-discipline half of the parent run's split — six PRD mechanisms (FR-1, FR-6, FR-7, FR-8, FR-9, FR-10) that move per-agent design evaluation and ADR design-realization audit from aspiration to structural prevention."},
+        {"artifact": "blueprint-v1.md", "section": "Verification strategy (line 406)", "quote": "Eat-own-dogfood validation — at packaging time, the SA-14 audit fires against this run's own working directory."},
+        {"artifact": "adrs/ADR-0064", "section": "Consequences (line 133)", "quote": "The contract is dogfooded on its own run"}
+      ],
+      "analysis": "Pedagogical observation, not a defect-class finding. I-AA-001 (ADR-0064 vs ADR-0065 location contradiction) is exactly the shape of cross-artifact-relationship defect FR-1's design-realization audit catches between an ADR and the artifact it prescribes. I-AA-002 (ADR-0065 citing a non-existent ADR-0017 invocation point) is the shape of decision-vs-inherited-ADR contradiction the brief-honor lens catches. I-AA-003 (20 vs 24 KB-review-disciplines consumers) is the shape of consumer-count drift FR-10's SA-14 backstop catches in matrix form. I-AA-004 (synthesis.md vs Blueprint embedding mismatch) is the shape FR-7 + FR-1 jointly catch. This audit run has demonstrated, on the very Blueprint that defines these mechanisms, that the mechanisms catch defects this audit reviewer just caught manually. The dogfood signal is strong: R2a's mechanisms would have caught R2a's own defects had they been in place. Recommend recording this observation in the run summary or deliverable archive as the dogfood validation event the Blueprint refers to.",
+      "recommended_resolution": "No code change required. Recommend the orchestrator or finalize-deliverable-packager surface this finding in the pipeline run summary as the dogfood validation evidence per Blueprint §Risks line 419 ('applying the contract to its own definer is the validation event')."
+    }
+  ],
+  "summary": {
+    "BLOCKER": 0,
+    "MAJOR": 4,
+    "MINOR": 2,
+    "NIT": 0,
+    "INFO": 1
+  },
+  "verdict": "conditional_pass",
+  "verdict_rationale": "Zero BLOCKER findings — the Blueprint's architectural shape is sound: brief-honor is solid, inherited ADRs are cited not relitigated, blast-radius is well-mapped, the new ADRs are coherent in their decision substance, and the eat-own-dogfood discipline is committed. Four MAJOR findings concentrate on consistency between the two new sibling ADRs (I-AA-001 location contradiction; I-AA-002 invocation-point reference error) and on dogfood-signal completeness (I-AA-003 bridge consumer count drift; I-AA-004 synthesis.md back-fill gap). All four MAJOR findings are editorial / metadata corrections — not architectural redesign. Recommend finalize-reconciler dispatch revision for I-AA-001..I-AA-004 with in-place edits per ADR-0005 (none rise to supersession threshold). MINOR I-AA-005 and I-AA-006 can ride along in the same revision pass or land at Plan stage. INFO I-AA-007 is pedagogical — no edit, but surface to user as dogfood validation evidence.",
+  "prior_context_check": {
+    "applicable": false,
+    "reason": "First architecture audit on R2a Blueprint v1. No prior audit JSON to compare against. Parent run pipeline-cross-artifact-discipline-r1 inherited ADRs (0059, 0061, 0063) are cited not relitigated; no parent verified-but-unresolved issue is silently re-surfaced in this Blueprint."
+  },
+  "convergence_state": {
+    "audit_round": 1,
+    "convergence_cap": 4,
+    "rounds_remaining": 3,
+    "halt_recommendation": false
+  },
+  "brief_honor_assessment": {
+    "thesis": "the pipeline must verify relationships across artifacts, not just per-artifact correctness — cancels the structural defect-class behind r1's shipment and the recurrence risk every agent-surface feature inherits.",
+    "per_fr_honor_check": [
+      {"fr": "FR-1", "honored": true, "rationale": "Verifies ADR-prescription ↔ implementation file relationships; explicitly cross-artifact."},
+      {"fr": "FR-6", "honored": true, "rationale": "Verifies feature-diff ↔ agent-roster relationships across full inventory; the 28-agents-evaluated-by-absence defect is structurally precluded."},
+      {"fr": "FR-7", "honored": true, "rationale": "Verifies new-concept ↔ skill-coverage relationships; the 'concept introduced without skill home' defect is structurally surfaced."},
+      {"fr": "FR-8", "honored": true, "rationale": "Active framing makes the per-agent consideration explicit (visible relationship); the matrix it produces IS a cross-artifact deliverable."},
+      {"fr": "FR-9", "honored": true, "rationale": "Verifies discovery-output ↔ stage-transition relationships via Blocks-X markers; the silent-blocker defect is structurally caught."},
+      {"fr": "FR-10", "honored": true, "rationale": "Verifies matrix presence ↔ agent inventory parity at packaging time; backstop for FR-6."}
+    ],
+    "verdict": "All six R2a FRs substantively honor the cross-artifact-relationship-verification thesis. No drift from the brief."
+  }
+}

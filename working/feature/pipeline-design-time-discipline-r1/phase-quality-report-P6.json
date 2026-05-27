@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "P6",
+  "phase_title": "FR-7 skill-coverage discipline",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "generated_at": "2026-05-27T00:00:00Z",
+  "verdict": "PASS",
+  "per_dimension_status": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "phase_validator_results": {
+    "PV-6.C1": {
+      "status": "PASS",
+      "evidence": "skill-coverage-decisions-section-template.md exists at .claude/skills/KB-documentation-criteria/references/templates/ (260 lines, required structure present: per-decision row shape, NFR-8 four-field finding contract, type-(a)/type-(b) review-hybrid hooks per ADR-0065); T6.1 APPROVED."
+    },
+    "PV-6.C2": {
+      "status": "PASS",
+      "evidence": "synth-synthesizer.md Mode 1 compose-report contains the 5-step skill-coverage-decisions emission procedure (embedded in compose-report flow; prose anchor specifies position 'before Layer B validators, after Limitations streaming step'); T6.2 APPROVED. Physical placement after 'Final write' is a MINOR finding surfaced below (non-blocking; behaviorally correct via prose anchor)."
+    },
+    "PV-6.C3": {
+      "status": "PASS",
+      "evidence": "design-composer.md Phase 1b substance-review procedure added (3 steps; 2 MAJOR + 3 MINOR finding codes enumerated; NFR-8 four-field shape used for finding emission; type-(b) two-tier hybrid review per ADR-0065 with mechanical predicate first, substance check second); T6.3 APPROVED clean."
+    }
+  },
+  "findings": [
+    {
+      "id": "I-PQ-P6-001",
+      "severity": "INFO",
+      "domain": "audits",
+      "category": "pre_existing_validator_gap_carried_forward",
+      "summary": "validate_pipeline_frontmatter.py routes template files (template_for-bearing) into validate_skill_frontmatter — false-positive on T6.1 template; same pre-existing validator gap previously surfaced at T5.1 (I-PQ-P5-001); not introduced by Phase 6",
+      "evidence": [
+        {"artifact": ".claude/skills/auditing-skills/scripts/validate_pipeline_frontmatter.py", "section": "(template-routing branch — does not route template_for-bearing frontmatter to template-aware validator)"},
+        {"artifact": ".claude/skills/KB-documentation-criteria/references/templates/skill-coverage-decisions-section-template.md", "section": "frontmatter (uses canonical template convention: id/version/status/template_for/derived_from/generated_by)"},
+        {"artifact": "working/feature/pipeline-design-time-discipline-r1/phase-quality-report-P5.json", "section": "I-PQ-P5-001 (same gap, same template-convention frontmatter, same INFO disposition)"}
+      ],
+      "rationale": "Identical to I-PQ-P5-001 — T6.1's template uses the correct template-convention frontmatter per KB-documentation-criteria. The validator gap is the issue, not the template authoring. Surfaced as info-level, non-blocking, for a future validator-fix run. Now carried in the open-item ledger as a recurring pattern across template-authoring tasks."
+    },
+    {
+      "id": "I-PQ-P6-002",
+      "severity": "MINOR",
+      "domain": "discipline",
+      "category": "procedure_subsection_placement_drift",
+      "summary": "T6.2's synth-synthesizer.md skill-coverage-decisions emission sub-section sits physically after the '### Final write' subsection, but its prose anchor states it runs before '### Layer B validators' and after the Limitations streaming step — behaviorally correct via prose anchor, but physical placement is mis-ordered",
+      "evidence": [
+        {"artifact": ".claude/agents/synth-synthesizer.md", "section": "Mode 1 compose-report (skill-coverage-decisions emission sub-section position vs. '### Final write' vs. '### Layer B validators')"}
+      ],
+      "rationale": "Behavior is determined by the prose anchor ('runs before Layer B validators'), not the physical order of subsections — Claude Code agents follow declared flow language, not section sequence. So T6.2 is functionally correct. However, physical placement drift creates a tripping hazard for human reviewers and future maintenance edits. Non-blocking for Phase 6 (verdict PASS); deferred to a future maintenance pass that re-orders the sub-section to match its prose anchor.",
+      "next_action": "Log as open-item for next pipeline-discipline feature run that declares synth-synthesizer.md in scope: relocate skill-coverage-decisions emission sub-section to sit physically between Limitations streaming step and '### Layer B validators' subsection."
+    }
+  ],
+  "cross_task_consistency_decision": {
+    "issue": "None — all three T6.x tasks (T6.1, T6.2, T6.3) landed without cross-task inconsistency at Phase 6 close. The NFR-8 four-field finding contract is uniformly applied across T6.1's template and T6.3's design-composer procedure. The type-(a)/type-(b) review-hybrid distinction per ADR-0065 is consistently honored across the template and the substance-review procedure.",
+    "note_on_pv6_c2_placement": "The T6.2 placement-drift finding (I-PQ-P6-002 MINOR) is a single-task internal issue, not a cross-task inconsistency. The prose anchor in T6.2 still aligns with how T6.3's design-composer procedure references the emission timing.",
+    "outcome": "Phase 6 PASS. No reconciliation dispatched."
+  },
+  "audit_counter_delta": {
+    "schema_version": "1.0.0",
+    "gating": "informational",
+    "audit_severity_breakdown": null,
+    "baseline_reference": "phase-quality-report-P5",
+    "per_domain_deltas": {
+      "tests": "0 → 0 (no change; PV-6.C1/C2/C3 all PASS)",
+      "audits": "1 → 2 (added I-PQ-P6-001 INFO — same pre-existing validator gap as I-PQ-P5-001 carried forward as a new instance; detect_stubs.py clean)",
+      "validator": "0 → 0 (PV-6.C1/C2/C3 all PASS)",
+      "discipline": "4 → 5 (added I-PQ-P6-002 MINOR — T6.2 sub-section placement drift; carried forward I-PQ-P4-001, I-PQ-P4-002, I-PQ-P5-002, I-PQ-P5-003)",
+      "scope_deviations": "0 → 0 (none introduced by Phase 6; T6.1-T6.3 all stayed in declared scope: template authoring, synth-synthesizer emission step, design-composer Phase 1b)"
+    },
+    "aggregate_delta": "5 → 7 (added 1 INFO + 1 MINOR; both non-blocking)",
+    "audits_stub": true,
+    "audits_stub_note": "Coordinator audit dimension treated as not-measured per Q-CC-4 stub-vs-real distinction; detect_stubs.py clean is the positive signal, but the broader auditing-* coordinator is not yet invoked at phase-close. Not silently counted as clean."
+  },
+  "rollup_rule_applied": "All 5 dimensions PASS (no BLOCKER finding in any dimension; the single MINOR finding I-PQ-P6-002 is non-blocking per ADR-0017 severity taxonomy — MINOR is 'recommended' tier, no verdict effect by itself). PV-6.C1/C2/C3 all PASS. Findings I-PQ-P6-001 (INFO) and I-PQ-P6-002 (MINOR) are both non-blocking. Aggregate verdict: PASS.",
+  "next_action": "Advance to Phase 7 (FR-10 SA-14 cross-artifact-audit emitter — exercises the FR-6 matrix predicate authored in Phase 5 and the FR-7 skill-coverage discipline authored in Phase 6). Open items carried forward: I-PQ-P4-002 (discovery-codebase-researcher.md MCP init), I-PQ-P5-002 (PV-3.C2 TRIGGER_OVERRIDE enumeration fix), I-PQ-P6-002 (synth-synthesizer sub-section relocation). All deferred to future feature runs declaring the relevant files in scope. Phase 6 unblocks Phase 8 eat-own-dogfood (design-composer now has the substance-review procedure to review the 6 skill-coverage decisions emitted during this run)."
+}

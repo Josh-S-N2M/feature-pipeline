@@ -1,0 +1,1020 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "pipeline-cross-artifact-discipline-r1",
+  "entities": [
+    {
+      "id": "E-0001",
+      "name": "FR-1",
+      "type": "control",
+      "aliases": ["FR-1 (mechanism H3)", "H3", "design-realization audit", "design-realization audit dimension"],
+      "claims": ["C-0001", "C-0020", "C-0021", "C-0022", "C-0045", "C-0052", "C-0107", "C-0114", "C-0125", "C-0127", "C-0136", "C-0156"]
+    },
+    {
+      "id": "E-0002",
+      "name": "FR-2",
+      "type": "control",
+      "aliases": ["FR-2 (mechanism H6)", "H6", "protocol conformance subsection", "§Protocol Conformance"],
+      "claims": ["C-0024", "C-0025", "C-0055", "C-0076", "C-0115", "C-0126", "C-0127", "C-0157", "C-0158"]
+    },
+    {
+      "id": "E-0003",
+      "name": "FR-3",
+      "type": "control",
+      "aliases": ["FR-3 (mechanism H9)", "H9", "PV-tier cross-file invariants", "cross-file invariants"],
+      "claims": ["C-0011", "C-0037", "C-0103", "C-0109", "C-0116", "C-0124", "C-0126"]
+    },
+    {
+      "id": "E-0004",
+      "name": "FR-4",
+      "type": "control",
+      "aliases": ["FR-4 (mechanism H1)", "H1", "--with-mcp-reachability rename", "reachability rename"],
+      "claims": ["C-0030", "C-0031", "C-0032", "C-0057", "C-0069", "C-0117", "C-0126", "C-0127"]
+    },
+    {
+      "id": "E-0005",
+      "name": "FR-5",
+      "type": "control",
+      "aliases": ["FR-5 (mechanism H8)", "H8", "tool-surface drift detection", "drift detection"],
+      "claims": ["C-0030", "C-0032", "C-0118", "C-0126", "C-0127"]
+    },
+    {
+      "id": "E-0006",
+      "name": "FR-6",
+      "type": "control",
+      "aliases": ["FR-6 (mechanism B1)", "B1", "agent-roster-impact-matrix mandatory"],
+      "claims": ["C-0026", "C-0027", "C-0046", "C-0059", "C-0078", "C-0079", "C-0080", "C-0119", "C-0125"]
+    },
+    {
+      "id": "E-0007",
+      "name": "FR-7",
+      "type": "control",
+      "aliases": ["FR-7 (mechanism B3)", "B3", "skill-coverage decisions"],
+      "claims": ["C-0120", "C-0125", "C-0257"]
+    },
+    {
+      "id": "E-0008",
+      "name": "FR-8",
+      "type": "control",
+      "aliases": ["FR-8 (mechanism B2)", "B2", "Principle 9 active rewording", "KB-cc-design Principle 9 active"],
+      "claims": ["C-0028", "C-0070", "C-0121", "C-0125"]
+    },
+    {
+      "id": "E-0009",
+      "name": "FR-9",
+      "type": "control",
+      "aliases": ["FR-9 (mechanism B4)", "B4", "Blocks-X markers", "Blocks-X marker grammar"],
+      "claims": ["C-0007", "C-0008", "C-0009", "C-0060", "C-0082", "C-0104", "C-0122", "C-0125", "C-0127", "C-0133", "C-0150", "C-0151", "C-0152", "C-0155"]
+    },
+    {
+      "id": "E-0010",
+      "name": "FR-10",
+      "type": "control",
+      "aliases": ["FR-10 (mechanism B5)", "B5", "auditing-subagents feature-touch-coverage rule"],
+      "claims": ["C-0029", "C-0091", "C-0123", "C-0125"]
+    },
+    {
+      "id": "E-0011",
+      "name": "FR-11",
+      "type": "control",
+      "aliases": ["FR-11 (mechanism §O)", "§O posture", "post-ship replacement framings", "event-triggered/honest-acceptance/concrete-machinery"],
+      "claims": ["C-0012", "C-0014", "C-0015", "C-0016", "C-0033", "C-0110", "C-0113", "C-0124", "C-0126", "C-0153"]
+    },
+    {
+      "id": "E-0012",
+      "name": "OI-A1",
+      "type": "control",
+      "aliases": ["OI-A1 (machine-checkable companion vs NLP)", "open item A1", "companion-file vs NLP-parse"],
+      "claims": ["C-0114", "C-0129", "C-0135", "C-0136", "C-0137", "C-0144", "C-0145", "C-0154", "C-0156"]
+    },
+    {
+      "id": "E-0013",
+      "name": "OI-A2",
+      "type": "control",
+      "aliases": ["OI-A2 (denormalized vs centralized invariants)", "open item A2"],
+      "claims": ["C-0116", "C-0130", "C-0138", "C-0139", "C-0140", "C-0144", "C-0145"]
+    },
+    {
+      "id": "E-0014",
+      "name": "OI-A3",
+      "type": "control",
+      "aliases": ["OI-A3 (auditing-skills reverse-check)", "open item A3"],
+      "claims": ["C-0123", "C-0131", "C-0144", "C-0145"]
+    },
+    {
+      "id": "E-0015",
+      "name": "OI-A4",
+      "type": "control",
+      "aliases": ["OI-A4 (4-cycle reconciliation cap)", "open item A4", "Contingency Split threshold"],
+      "claims": ["C-0004", "C-0005", "C-0006", "C-0132", "C-0141", "C-0144", "C-0145", "C-0146", "C-0147", "C-0148", "C-0149"]
+    },
+    {
+      "id": "E-0016",
+      "name": "OI-A5",
+      "type": "control",
+      "aliases": ["OI-A5 (Blocks-X grammar)", "open item A5"],
+      "claims": ["C-0122", "C-0133", "C-0144", "C-0145", "C-0150", "C-0151", "C-0152", "C-0155"]
+    },
+    {
+      "id": "E-0017",
+      "name": "OI-A6",
+      "type": "control",
+      "aliases": ["OI-A6 (mechanical evaluator for FR-6 triggers 3+4)", "open item A6"],
+      "claims": ["C-0119", "C-0120", "C-0134", "C-0144", "C-0145"]
+    },
+    {
+      "id": "E-0018",
+      "name": "review-architecture-auditor",
+      "type": "role",
+      "aliases": ["architecture auditor agent", ".claude/agents/review-architecture-auditor.md"],
+      "claims": ["C-0021", "C-0048", "C-0054", "C-0061", "C-0085", "C-0094"]
+    },
+    {
+      "id": "E-0019",
+      "name": "design-cc",
+      "type": "role",
+      "aliases": ["design-claude-code", ".claude/agents/design-claude-code.md", "design-cc agent"],
+      "claims": ["C-0027", "C-0054", "C-0064", "C-0070", "C-0077", "C-0078"]
+    },
+    {
+      "id": "E-0020",
+      "name": "discovery-codebase-researcher",
+      "type": "role",
+      "aliases": [".claude/agents/discovery-codebase-researcher.md"],
+      "claims": ["C-0024"]
+    },
+    {
+      "id": "E-0021",
+      "name": "test-phase-validator-author",
+      "type": "role",
+      "aliases": ["PV-author", "PV-author agent", ".claude/agents/test-phase-validator-author.md", "PV-author rubric host"],
+      "claims": ["C-0010", "C-0037", "C-0038", "C-0066", "C-0100", "C-0109", "C-0138"]
+    },
+    {
+      "id": "E-0022",
+      "name": "design-composer",
+      "type": "role",
+      "aliases": ["design-composer agent"],
+      "claims": ["C-0006", "C-0054", "C-0079", "C-0085", "C-0108", "C-0128", "C-0148"]
+    },
+    {
+      "id": "E-0023",
+      "name": "review-cross-artifact-auditor",
+      "type": "role",
+      "aliases": ["cross-artifact auditor"],
+      "claims": ["C-0085", "C-0094", "C-0097", "C-0139"]
+    },
+    {
+      "id": "E-0024",
+      "name": "shared-document-reviewer",
+      "type": "role",
+      "aliases": ["shared-document-reviewer agent"],
+      "claims": ["C-0058", "C-0059", "C-0095", "C-0099"]
+    },
+    {
+      "id": "E-0025",
+      "name": "finalize-reconciler",
+      "type": "role",
+      "aliases": [],
+      "claims": ["C-0049"]
+    },
+    {
+      "id": "E-0026",
+      "name": "finalize-deliverable-packager",
+      "type": "role",
+      "aliases": [],
+      "claims": ["C-0050"]
+    },
+    {
+      "id": "E-0027",
+      "name": "finalize-task-decomposer",
+      "type": "role",
+      "aliases": [],
+      "claims": ["C-0054", "C-0085"]
+    },
+    {
+      "id": "E-0028",
+      "name": "synth-synthesizer",
+      "type": "role",
+      "aliases": [],
+      "claims": ["C-0085"]
+    },
+    {
+      "id": "E-0029",
+      "name": "plan-author",
+      "type": "role",
+      "aliases": [],
+      "claims": ["C-0054"]
+    },
+    {
+      "id": "E-0030",
+      "name": "test-acceptance-author",
+      "type": "role",
+      "aliases": [],
+      "claims": ["C-0054"]
+    },
+    {
+      "id": "E-0031",
+      "name": "auditing-mcp",
+      "type": "tool",
+      "aliases": [".claude/skills/auditing-mcp/", "auditing-mcp skill"],
+      "claims": ["C-0030", "C-0062", "C-0098"]
+    },
+    {
+      "id": "E-0032",
+      "name": "auditing-subagents",
+      "type": "tool",
+      "aliases": [".claude/skills/auditing-subagents/", "SA-13 audit"],
+      "claims": ["C-0029", "C-0091"]
+    },
+    {
+      "id": "E-0033",
+      "name": "auditing-cc-configs",
+      "type": "tool",
+      "aliases": [".claude/skills/auditing-cc-configs/", "verdict_compute.py"],
+      "claims": ["C-0031", "C-0101"]
+    },
+    {
+      "id": "E-0034",
+      "name": "auditing-shared",
+      "type": "tool",
+      "aliases": [".claude/skills/auditing-shared/"],
+      "claims": ["C-0023", "C-0094"]
+    },
+    {
+      "id": "E-0035",
+      "name": "KB-cc-design",
+      "type": "tool",
+      "aliases": [".claude/skills/KB-cc-design/", "KB-cc-design Principle 9", "principles.md"],
+      "claims": ["C-0028", "C-0065", "C-0070", "C-0085", "C-0090"]
+    },
+    {
+      "id": "E-0036",
+      "name": "KB-review-disciplines",
+      "type": "tool",
+      "aliases": [".claude/skills/KB-review-disciplines/", "architecture-audit.md", "severity-taxonomy.md"],
+      "claims": ["C-0022", "C-0095", "C-0099"]
+    },
+    {
+      "id": "E-0037",
+      "name": "KB-codebase-research",
+      "type": "tool",
+      "aliases": [".claude/skills/KB-codebase-research/"],
+      "claims": ["C-0025"]
+    },
+    {
+      "id": "E-0038",
+      "name": "KB-task-decomposition",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["C-0010", "C-0038", "C-0109"]
+    },
+    {
+      "id": "E-0039",
+      "name": "KB-documentation-criteria",
+      "type": "tool",
+      "aliases": ["state-transitions-log-entry-template"],
+      "claims": ["C-0036"]
+    },
+    {
+      "id": "E-0040",
+      "name": "recipe-feature-pipeline",
+      "type": "tool",
+      "aliases": [".claude/skills/recipe-feature-pipeline/SKILL.md", "13-stage state machine"],
+      "claims": ["C-0026", "C-0080"]
+    },
+    {
+      "id": "E-0041",
+      "name": "Principle 9",
+      "type": "standard",
+      "aliases": ["KB-cc-design Principle 9", "effort-tier discipline"],
+      "claims": ["C-0028", "C-0065", "C-0070", "C-0085", "C-0090", "C-0121"]
+    },
+    {
+      "id": "E-0042",
+      "name": "ADR-0017",
+      "type": "standard",
+      "aliases": ["shared-document-reviewer invocation policy"],
+      "claims": ["C-0058"]
+    },
+    {
+      "id": "E-0043",
+      "name": "ADR-0018",
+      "type": "standard",
+      "aliases": ["provenance discipline"],
+      "claims": ["C-0003", "C-0159"]
+    },
+    {
+      "id": "E-0044",
+      "name": "ADR-0036",
+      "type": "standard",
+      "aliases": ["single canonical location"],
+      "claims": ["C-0040", "C-0137"]
+    },
+    {
+      "id": "E-0045",
+      "name": "ADR-0054",
+      "type": "standard",
+      "aliases": [],
+      "claims": ["C-0040"]
+    },
+    {
+      "id": "E-0046",
+      "name": "ADR-0056",
+      "type": "standard",
+      "aliases": ["no carve-outs"],
+      "claims": ["C-0040", "C-0137"]
+    },
+    {
+      "id": "E-0047",
+      "name": "ADR-0038",
+      "type": "standard",
+      "aliases": [],
+      "claims": ["C-0159"]
+    },
+    {
+      "id": "E-0048",
+      "name": "ADR-0030",
+      "type": "standard",
+      "aliases": ["pedagogical sections discipline"],
+      "claims": ["C-0087"]
+    },
+    {
+      "id": "E-0049",
+      "name": "ADR-0042",
+      "type": "standard",
+      "aliases": ["skill family discipline"],
+      "claims": ["C-0087"]
+    },
+    {
+      "id": "E-0050",
+      "name": "architecture-audit-issues.json",
+      "type": "standard",
+      "aliases": ["audit-issues.json schema", "auditor-style findings schema"],
+      "claims": ["C-0048", "C-0049", "C-0050", "C-0051", "C-0052", "C-0053", "C-0072", "C-0073", "C-0074", "C-0094", "C-0114", "C-0127"]
+    },
+    {
+      "id": "E-0051",
+      "name": "codebase-analysis.json",
+      "type": "standard",
+      "aliases": ["codebase-analysis.json schema", "v1.1.0 schema"],
+      "claims": ["C-0025", "C-0054", "C-0055", "C-0063", "C-0075", "C-0076", "C-0159"]
+    },
+    {
+      "id": "E-0052",
+      "name": "state-transitions.log",
+      "type": "standard",
+      "aliases": ["state-transitions.log schema", "transition_name"],
+      "claims": ["C-0036", "C-0067", "C-0081", "C-0082"]
+    },
+    {
+      "id": "E-0053",
+      "name": ".mcp.json",
+      "type": "standard",
+      "aliases": [".mcp.json configuration"],
+      "claims": ["C-0019", "C-0032", "C-0041", "C-0117"]
+    },
+    {
+      "id": "E-0054",
+      "name": "agent-roster-impact-matrix.md",
+      "type": "standard",
+      "aliases": ["agent-roster-impact-matrix exemplar", "Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md"],
+      "claims": ["C-0018", "C-0078", "C-0079", "C-0080", "C-0111", "C-0119"]
+    },
+    {
+      "id": "E-0055",
+      "name": "MCP specification",
+      "type": "standard",
+      "aliases": ["MCP spec 2025-11-25", "MCP protocol"],
+      "claims": ["C-0187", "C-0188", "C-0189", "C-0190", "C-0192", "C-0200", "C-0204", "C-0205"]
+    },
+    {
+      "id": "E-0056",
+      "name": "MCP SEP-2549",
+      "type": "standard",
+      "aliases": ["TTL-for-list-results proposal"],
+      "claims": ["C-0191"]
+    },
+    {
+      "id": "E-0057",
+      "name": "mcp-openapi-schema",
+      "type": "service",
+      "aliases": ["seventh historical MCP server"],
+      "claims": ["C-0019", "C-0020", "C-0042", "C-0043", "C-0044", "C-0045", "C-0107"]
+    },
+    {
+      "id": "E-0058",
+      "name": "actionlint-mcp",
+      "type": "service",
+      "aliases": [],
+      "claims": ["C-0041"]
+    },
+    {
+      "id": "E-0059",
+      "name": "context7",
+      "type": "service",
+      "aliases": [],
+      "claims": ["C-0041"]
+    },
+    {
+      "id": "E-0060",
+      "name": "exa",
+      "type": "service",
+      "aliases": [],
+      "claims": ["C-0041"]
+    },
+    {
+      "id": "E-0061",
+      "name": "gitnexus",
+      "type": "service",
+      "aliases": [],
+      "claims": ["C-0041"]
+    },
+    {
+      "id": "E-0062",
+      "name": "serena",
+      "type": "service",
+      "aliases": [],
+      "claims": ["C-0041"]
+    },
+    {
+      "id": "E-0063",
+      "name": "terraform-mcp",
+      "type": "service",
+      "aliases": [],
+      "claims": ["C-0041"]
+    },
+    {
+      "id": "E-0064",
+      "name": "audit_op2_consumer_mapping.py",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["C-0020", "C-0044", "C-0045", "C-0107", "C-0156"]
+    },
+    {
+      "id": "E-0065",
+      "name": "audit_mcp.py",
+      "type": "tool",
+      "aliases": ["--with-runtime flag"],
+      "claims": ["C-0056", "C-0057"]
+    },
+    {
+      "id": "E-0066",
+      "name": "check_toxic_combinations.py",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["C-0056"]
+    },
+    {
+      "id": "E-0067",
+      "name": "Contingency Split",
+      "type": "control",
+      "aliases": ["Contingency Split threshold", "threshold of 12"],
+      "claims": ["C-0004", "C-0005", "C-0006", "C-0132", "C-0146", "C-0147", "C-0148", "C-0149"]
+    },
+    {
+      "id": "E-0068",
+      "name": "auditor severity vocabulary",
+      "type": "standard",
+      "aliases": ["BLOCKER/MAJOR/MINOR/INFO", "BLOCKER/MAJOR/MINOR/NIT"],
+      "claims": ["C-0094", "C-0097", "C-0098", "C-0101", "C-0102", "C-0108"]
+    },
+    {
+      "id": "E-0069",
+      "name": "reviewer severity vocabulary",
+      "type": "standard",
+      "aliases": ["critical/important/recommended"],
+      "claims": ["C-0095", "C-0099", "C-0108"]
+    },
+    {
+      "id": "E-0070",
+      "name": "phase-validator severity vocabulary",
+      "type": "standard",
+      "aliases": ["blocking/warning/informational"],
+      "claims": ["C-0100", "C-0103", "C-0108"]
+    },
+    {
+      "id": "E-0071",
+      "name": "Issues/cross-artifact-divergence-detection-gap",
+      "type": "standard",
+      "aliases": ["H1/H3/H6/H8/H9 source"],
+      "claims": ["C-0034"]
+    },
+    {
+      "id": "E-0072",
+      "name": "Issues/per-agent-design-evaluation-gap",
+      "type": "standard",
+      "aliases": ["B1..B5 source"],
+      "claims": ["C-0035", "C-0018"]
+    },
+    {
+      "id": "E-0073",
+      "name": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "type": "standard",
+      "aliases": ["§O.1 register", "AC-FR-11-c verbatim anchor"],
+      "claims": ["C-0012", "C-0033", "C-0110", "C-0153"]
+    },
+    {
+      "id": "E-0074",
+      "name": "Blocks-X precedent grammar",
+      "type": "pattern",
+      "aliases": ["Blocks <stage-slug>-completion.", "period-terminated kebab-case", "devcontainer-mcp-provisioning-r1 precedent"],
+      "claims": ["C-0007", "C-0009", "C-0104", "C-0106", "C-0150", "C-0152", "C-0155"]
+    },
+    {
+      "id": "E-0075",
+      "name": "companion-file path",
+      "type": "pattern",
+      "aliases": ["machine-checkable companion artifact", "policy-as-code", "spec-as-code"],
+      "claims": ["C-0135", "C-0136", "C-0154", "C-0206", "C-0207", "C-0210", "C-0211", "C-0212", "C-0213", "C-0214", "C-0228", "C-0232", "C-0235", "C-0250"]
+    },
+    {
+      "id": "E-0076",
+      "name": "NLP-parse path",
+      "type": "pattern",
+      "aliases": ["NLP-parsing of ADR prose"],
+      "claims": ["C-0137", "C-0154", "C-0207", "C-0214", "C-0237", "C-0238", "C-0239", "C-0240", "C-0241", "C-0242", "C-0243", "C-0252", "C-0253"]
+    },
+    {
+      "id": "E-0077",
+      "name": "Why/How/Anti-patterns trifecta",
+      "type": "pattern",
+      "aliases": ["W/H/A trifecta", "FR-7 trifecta"],
+      "claims": ["C-0256", "C-0257", "C-0297", "C-0299", "C-0301", "C-0302", "C-0303", "C-0304", "C-0305", "C-0306"]
+    },
+    {
+      "id": "E-0078",
+      "name": "four-stage drift-detection pipeline",
+      "type": "pattern",
+      "aliases": ["JCS normalize + baseline + RFC 6902 diff + severity catalog"],
+      "claims": ["C-0193", "C-0194", "C-0195", "C-0196", "C-0201", "C-0202"]
+    },
+    {
+      "id": "E-0079",
+      "name": "hybrid invariant model",
+      "type": "pattern",
+      "aliases": ["denormalized declaration centralized body", "denormalized authoring with centralized bodies"],
+      "claims": ["C-0311", "C-0312", "C-0359", "C-0360", "C-0361", "C-0362", "C-0363", "C-0367", "C-0368", "C-0369"]
+    },
+    {
+      "id": "E-0080",
+      "name": "progressive disclosure",
+      "type": "pattern",
+      "aliases": ["3-level skill disclosure", "load-on-demand"],
+      "claims": ["C-0261", "C-0296"]
+    },
+    {
+      "id": "E-0081",
+      "name": "tool-proliferation anti-pattern",
+      "type": "pattern",
+      "aliases": ["tool sprawl", "attention dilution", "context rot"],
+      "claims": ["C-0258", "C-0274", "C-0283", "C-0291", "C-0292", "C-0293", "C-0294", "C-0295"]
+    },
+    {
+      "id": "E-0082",
+      "name": "premature specialization anti-pattern",
+      "type": "pattern",
+      "aliases": [],
+      "claims": ["C-0273"]
+    },
+    {
+      "id": "E-0083",
+      "name": "Reflexion Modelling",
+      "type": "pattern",
+      "aliases": ["architecture-conformance reflexion"],
+      "claims": ["C-0245", "C-0246", "C-0247", "C-0248", "C-0249"]
+    },
+    {
+      "id": "E-0084",
+      "name": "oasdiff",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["C-0160", "C-0161", "C-0162", "C-0163", "C-0164", "C-0165", "C-0193", "C-0194", "C-0196"]
+    },
+    {
+      "id": "E-0085",
+      "name": "OpenAPITools/openapi-diff",
+      "type": "tool",
+      "aliases": ["openapi-diff"],
+      "claims": ["C-0160", "C-0166", "C-0167", "C-0168", "C-0169", "C-0170", "C-0199"]
+    },
+    {
+      "id": "E-0086",
+      "name": "Buf",
+      "type": "tool",
+      "aliases": ["Buf protobuf breaking-change detection"],
+      "claims": ["C-0160", "C-0171", "C-0172", "C-0173", "C-0174", "C-0196"]
+    },
+    {
+      "id": "E-0087",
+      "name": "Pact",
+      "type": "tool",
+      "aliases": ["Pact consumer-driven contract testing"],
+      "claims": ["C-0160", "C-0175", "C-0176", "C-0177", "C-0178", "C-0207", "C-0226", "C-0227"]
+    },
+    {
+      "id": "E-0088",
+      "name": "JSON Canonicalization Scheme",
+      "type": "standard",
+      "aliases": ["RFC 8785", "JCS"],
+      "claims": ["C-0160", "C-0179", "C-0180", "C-0181", "C-0182", "C-0193", "C-0195", "C-0201"]
+    },
+    {
+      "id": "E-0089",
+      "name": "RFC 6902",
+      "type": "standard",
+      "aliases": ["JSON Patch"],
+      "claims": ["C-0160", "C-0183", "C-0184", "C-0185", "C-0186", "C-0193", "C-0196"]
+    },
+    {
+      "id": "E-0090",
+      "name": "RFC 6901",
+      "type": "standard",
+      "aliases": ["JSON-Pointer"],
+      "claims": ["C-0183"]
+    },
+    {
+      "id": "E-0091",
+      "name": "OpenAPI",
+      "type": "standard",
+      "aliases": ["OpenAPI spec", "OpenAPI 3.x"],
+      "claims": ["C-0164", "C-0207", "C-0222", "C-0228", "C-0229", "C-0328", "C-0329", "C-0331", "C-0332"]
+    },
+    {
+      "id": "E-0092",
+      "name": "JSON Schema",
+      "type": "standard",
+      "aliases": ["JSON Schema 2020-12", "$defs", "$ref"],
+      "claims": ["C-0187", "C-0336", "C-0337", "C-0338", "C-0339"]
+    },
+    {
+      "id": "E-0093",
+      "name": "Nygard ADR template",
+      "type": "standard",
+      "aliases": ["ADR template", "Nygard 2011"],
+      "claims": ["C-0207", "C-0208", "C-0209"]
+    },
+    {
+      "id": "E-0094",
+      "name": "MADR",
+      "type": "standard",
+      "aliases": ["Structured MADR", "zircote/structured-madr"],
+      "claims": ["C-0207", "C-0216", "C-0217"]
+    },
+    {
+      "id": "E-0095",
+      "name": "Archgate",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["C-0207", "C-0210", "C-0214"]
+    },
+    {
+      "id": "E-0096",
+      "name": "kschlt/adr-kit",
+      "type": "tool",
+      "aliases": ["ADR Kit"],
+      "claims": ["C-0207", "C-0211", "C-0214"]
+    },
+    {
+      "id": "E-0097",
+      "name": "DECIDER",
+      "type": "tool",
+      "aliases": ["sventorben/decider"],
+      "claims": ["C-0207", "C-0212", "C-0214"]
+    },
+    {
+      "id": "E-0098",
+      "name": "rvdbreemen/adr-kit",
+      "type": "tool",
+      "aliases": ["adr-kit"],
+      "claims": ["C-0207", "C-0213", "C-0214"]
+    },
+    {
+      "id": "E-0099",
+      "name": "ArchUnit",
+      "type": "tool",
+      "aliases": ["TNG/ArchUnit"],
+      "claims": ["C-0207", "C-0218", "C-0219", "C-0220", "C-0221", "C-0251", "C-0340", "C-0341", "C-0342", "C-0343", "C-0345"]
+    },
+    {
+      "id": "E-0100",
+      "name": "Schemathesis",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["C-0207", "C-0229"]
+    },
+    {
+      "id": "E-0101",
+      "name": "Spectral",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["C-0207", "C-0230", "C-0231"]
+    },
+    {
+      "id": "E-0102",
+      "name": "Terraform Sentinel",
+      "type": "tool",
+      "aliases": ["HashiCorp Sentinel"],
+      "claims": ["C-0207", "C-0232", "C-0234", "C-0235"]
+    },
+    {
+      "id": "E-0103",
+      "name": "Open Policy Agent",
+      "type": "tool",
+      "aliases": ["OPA", "Conftest", "Rego"],
+      "claims": ["C-0207", "C-0232", "C-0233", "C-0235"]
+    },
+    {
+      "id": "E-0104",
+      "name": "Terraform",
+      "type": "tool",
+      "aliases": [],
+      "claims": ["C-0313", "C-0314", "C-0315", "C-0316", "C-0317", "C-0318", "C-0319", "C-0320"]
+    },
+    {
+      "id": "E-0105",
+      "name": "dbt",
+      "type": "tool",
+      "aliases": ["properties.yml"],
+      "claims": ["C-0321", "C-0322", "C-0323", "C-0324", "C-0325", "C-0326", "C-0327"]
+    },
+    {
+      "id": "E-0106",
+      "name": "Bazel",
+      "type": "tool",
+      "aliases": ["package_group"],
+      "claims": ["C-0346", "C-0347", "C-0348", "C-0349"]
+    },
+    {
+      "id": "E-0107",
+      "name": "Packwerk",
+      "type": "tool",
+      "aliases": ["Shopify Packwerk"],
+      "claims": ["C-0350", "C-0351", "C-0352", "C-0353", "C-0354", "C-0355", "C-0356", "C-0357", "C-0358", "C-0365", "C-0366"]
+    },
+    {
+      "id": "E-0108",
+      "name": "arXiv 2602.07609",
+      "type": "finding",
+      "aliases": ["LLM ADR compliance paper"],
+      "claims": ["C-0237", "C-0238", "C-0239", "C-0240", "C-0241", "C-0242", "C-0243"]
+    },
+    {
+      "id": "E-0109",
+      "name": "Rosik 2011",
+      "type": "finding",
+      "aliases": ["Rosik et al. 2011"],
+      "claims": ["C-0245", "C-0246", "C-0247", "C-0248"]
+    },
+    {
+      "id": "E-0110",
+      "name": "Berkeley Function Calling Leaderboard",
+      "type": "finding",
+      "aliases": ["BFCL"],
+      "claims": ["C-0293"]
+    },
+    {
+      "id": "E-0111",
+      "name": "Anthropic Agent Skills",
+      "type": "service",
+      "aliases": ["Agent Skills"],
+      "claims": ["C-0254", "C-0259", "C-0260", "C-0261", "C-0262", "C-0296"]
+    },
+    {
+      "id": "E-0112",
+      "name": "LangGraph",
+      "type": "service",
+      "aliases": ["LangChain", "LangGraph/LangChain"],
+      "claims": ["C-0254", "C-0269", "C-0270", "C-0271", "C-0296"]
+    },
+    {
+      "id": "E-0113",
+      "name": "OpenAI Agents SDK",
+      "type": "service",
+      "aliases": ["OpenAI Assistants", "OpenAI orchestration"],
+      "claims": ["C-0254", "C-0272", "C-0273", "C-0274", "C-0275", "C-0296"]
+    },
+    {
+      "id": "E-0114",
+      "name": "Microsoft Agent Framework",
+      "type": "service",
+      "aliases": ["MAF"],
+      "claims": ["C-0254", "C-0276", "C-0277", "C-0278", "C-0279", "C-0280", "C-0281"]
+    },
+    {
+      "id": "E-0115",
+      "name": "AutoGen",
+      "type": "service",
+      "aliases": [],
+      "claims": ["C-0276"]
+    },
+    {
+      "id": "E-0116",
+      "name": "CrewAI",
+      "type": "service",
+      "aliases": [],
+      "claims": ["C-0254", "C-0282", "C-0283", "C-0284", "C-0285", "C-0297"]
+    },
+    {
+      "id": "E-0117",
+      "name": "Semantic Kernel",
+      "type": "service",
+      "aliases": [],
+      "claims": ["C-0254", "C-0286", "C-0287", "C-0288", "C-0289", "C-0290"]
+    },
+    {
+      "id": "E-0118",
+      "name": "Perplexity production guidance",
+      "type": "service",
+      "aliases": ["Perplexity"],
+      "claims": ["C-0254", "C-0263", "C-0264", "C-0265", "C-0266", "C-0267", "C-0268", "C-0298", "C-0307"]
+    },
+    {
+      "id": "E-0119",
+      "name": "event-triggered framing",
+      "type": "pattern",
+      "aliases": ["§O event-triggered posture"],
+      "claims": ["C-0014", "C-0015", "C-0113", "C-0124"]
+    },
+    {
+      "id": "E-0120",
+      "name": "honest-acceptance framing",
+      "type": "pattern",
+      "aliases": ["§O honest-acceptance posture"],
+      "claims": ["C-0015", "C-0113", "C-0124"]
+    },
+    {
+      "id": "E-0121",
+      "name": "concrete-machinery framing",
+      "type": "pattern",
+      "aliases": ["§O concrete-machinery posture"],
+      "claims": ["C-0015", "C-0113", "C-0124"]
+    },
+    {
+      "id": "E-0122",
+      "name": "R2a cluster",
+      "type": "pattern",
+      "aliases": ["design-time cluster", "R2a split half"],
+      "claims": ["C-0114", "C-0119", "C-0120", "C-0121", "C-0122", "C-0123", "C-0125", "C-0127"]
+    },
+    {
+      "id": "E-0123",
+      "name": "R2b cluster",
+      "type": "pattern",
+      "aliases": ["gate/validator cluster", "R2b split half"],
+      "claims": ["C-0115", "C-0116", "C-0117", "C-0118", "C-0124", "C-0126", "C-0127"]
+    },
+    {
+      "id": "E-0124",
+      "name": "PV-author rubric",
+      "type": "standard",
+      "aliases": ["Phase 2 rubric"],
+      "claims": ["C-0010", "C-0038", "C-0066", "C-0109", "C-0138"]
+    }
+  ],
+  "edges": [
+    {"from": "E-0001", "to": "E-0018", "relation": "implements", "claim_ids": ["C-0021"]},
+    {"from": "E-0001", "to": "E-0036", "relation": "implements", "claim_ids": ["C-0022"]},
+    {"from": "E-0001", "to": "E-0050", "relation": "requires", "claim_ids": ["C-0052", "C-0114"]},
+    {"from": "E-0001", "to": "E-0012", "relation": "requires", "claim_ids": ["C-0114", "C-0129"]},
+    {"from": "E-0001", "to": "E-0057", "relation": "conflicts_with", "claim_ids": ["C-0020", "C-0045", "C-0107"]},
+    {"from": "E-0002", "to": "E-0020", "relation": "implements", "claim_ids": ["C-0024"]},
+    {"from": "E-0002", "to": "E-0037", "relation": "implements", "claim_ids": ["C-0025"]},
+    {"from": "E-0002", "to": "E-0051", "relation": "requires", "claim_ids": ["C-0055", "C-0076"]},
+    {"from": "E-0003", "to": "E-0021", "relation": "implements", "claim_ids": ["C-0037", "C-0109"]},
+    {"from": "E-0003", "to": "E-0124", "relation": "requires", "claim_ids": ["C-0109", "C-0138"]},
+    {"from": "E-0003", "to": "E-0013", "relation": "requires", "claim_ids": ["C-0116", "C-0130"]},
+    {"from": "E-0003", "to": "E-0070", "relation": "requires", "claim_ids": ["C-0103"]},
+    {"from": "E-0004", "to": "E-0031", "relation": "implements", "claim_ids": ["C-0030"]},
+    {"from": "E-0004", "to": "E-0033", "relation": "requires", "claim_ids": ["C-0031"]},
+    {"from": "E-0004", "to": "E-0053", "relation": "requires", "claim_ids": ["C-0032", "C-0117"]},
+    {"from": "E-0004", "to": "E-0065", "relation": "supersedes", "claim_ids": ["C-0056", "C-0057", "C-0069"]},
+    {"from": "E-0005", "to": "E-0031", "relation": "implements", "claim_ids": ["C-0030"]},
+    {"from": "E-0005", "to": "E-0053", "relation": "requires", "claim_ids": ["C-0032"]},
+    {"from": "E-0005", "to": "E-0078", "relation": "implements", "claim_ids": ["C-0193", "C-0194", "C-0195"]},
+    {"from": "E-0005", "to": "E-0004", "relation": "requires", "claim_ids": ["C-0117", "C-0118", "C-0126"]},
+    {"from": "E-0006", "to": "E-0019", "relation": "implements", "claim_ids": ["C-0027", "C-0078"]},
+    {"from": "E-0006", "to": "E-0054", "relation": "requires", "claim_ids": ["C-0078", "C-0079", "C-0080"]},
+    {"from": "E-0006", "to": "E-0024", "relation": "requires", "claim_ids": ["C-0059"]},
+    {"from": "E-0006", "to": "E-0040", "relation": "requires", "claim_ids": ["C-0080"]},
+    {"from": "E-0006", "to": "E-0017", "relation": "requires", "claim_ids": ["C-0119", "C-0134"]},
+    {"from": "E-0006", "to": "E-0008", "relation": "requires", "claim_ids": ["C-0119", "C-0121"]},
+    {"from": "E-0007", "to": "E-0017", "relation": "requires", "claim_ids": ["C-0120", "C-0134"]},
+    {"from": "E-0007", "to": "E-0077", "relation": "implements", "claim_ids": ["C-0257", "C-0299"]},
+    {"from": "E-0008", "to": "E-0035", "relation": "implements", "claim_ids": ["C-0028"]},
+    {"from": "E-0008", "to": "E-0041", "relation": "implements", "claim_ids": ["C-0028", "C-0121"]},
+    {"from": "E-0008", "to": "E-0006", "relation": "requires", "claim_ids": ["C-0121"]},
+    {"from": "E-0009", "to": "E-0052", "relation": "requires", "claim_ids": ["C-0036", "C-0082"]},
+    {"from": "E-0009", "to": "E-0074", "relation": "implements", "claim_ids": ["C-0009", "C-0106", "C-0152", "C-0155"]},
+    {"from": "E-0009", "to": "E-0016", "relation": "requires", "claim_ids": ["C-0122", "C-0133"]},
+    {"from": "E-0010", "to": "E-0032", "relation": "implements", "claim_ids": ["C-0029"]},
+    {"from": "E-0010", "to": "E-0014", "relation": "requires", "claim_ids": ["C-0123", "C-0131"]},
+    {"from": "E-0010", "to": "E-0006", "relation": "requires", "claim_ids": ["C-0123"]},
+    {"from": "E-0011", "to": "E-0073", "relation": "implements", "claim_ids": ["C-0033", "C-0153"]},
+    {"from": "E-0011", "to": "E-0119", "relation": "implements", "claim_ids": ["C-0124"]},
+    {"from": "E-0011", "to": "E-0120", "relation": "implements", "claim_ids": ["C-0124"]},
+    {"from": "E-0011", "to": "E-0121", "relation": "implements", "claim_ids": ["C-0124"]},
+    {"from": "E-0011", "to": "E-0003", "relation": "requires", "claim_ids": ["C-0124", "C-0126"]},
+    {"from": "E-0012", "to": "E-0075", "relation": "instance_of", "claim_ids": ["C-0136", "C-0154"]},
+    {"from": "E-0012", "to": "E-0076", "relation": "instance_of", "claim_ids": ["C-0137", "C-0154"]},
+    {"from": "E-0013", "to": "E-0079", "relation": "instance_of", "claim_ids": ["C-0367", "C-0368"]},
+    {"from": "E-0015", "to": "E-0067", "relation": "instance_of", "claim_ids": ["C-0132", "C-0146", "C-0147"]},
+    {"from": "E-0022", "to": "E-0067", "relation": "requires", "claim_ids": ["C-0006", "C-0148"]},
+    {"from": "E-0018", "to": "E-0050", "relation": "implements", "claim_ids": ["C-0048"]},
+    {"from": "E-0018", "to": "E-0068", "relation": "implements", "claim_ids": ["C-0094", "C-0097"]},
+    {"from": "E-0023", "to": "E-0068", "relation": "implements", "claim_ids": ["C-0094", "C-0097"]},
+    {"from": "E-0024", "to": "E-0069", "relation": "implements", "claim_ids": ["C-0095", "C-0099"]},
+    {"from": "E-0021", "to": "E-0070", "relation": "implements", "claim_ids": ["C-0100"]},
+    {"from": "E-0021", "to": "E-0124", "relation": "implements", "claim_ids": ["C-0010", "C-0109"]},
+    {"from": "E-0021", "to": "E-0038", "relation": "conflicts_with", "claim_ids": ["C-0010", "C-0038", "C-0109"]},
+    {"from": "E-0025", "to": "E-0050", "relation": "requires", "claim_ids": ["C-0049"]},
+    {"from": "E-0026", "to": "E-0050", "relation": "requires", "claim_ids": ["C-0050"]},
+    {"from": "E-0031", "to": "E-0068", "relation": "implements", "claim_ids": ["C-0098"]},
+    {"from": "E-0033", "to": "E-0068", "relation": "implements", "claim_ids": ["C-0101"]},
+    {"from": "E-0034", "to": "E-0068", "relation": "implements", "claim_ids": ["C-0023", "C-0094"]},
+    {"from": "E-0036", "to": "E-0069", "relation": "implements", "claim_ids": ["C-0095", "C-0099"]},
+    {"from": "E-0035", "to": "E-0041", "relation": "implements", "claim_ids": ["C-0028", "C-0070", "C-0090"]},
+    {"from": "E-0024", "to": "E-0042", "relation": "implements", "claim_ids": ["C-0058"]},
+    {"from": "E-0019", "to": "E-0041", "relation": "requires", "claim_ids": ["C-0085"]},
+    {"from": "E-0018", "to": "E-0041", "relation": "requires", "claim_ids": ["C-0085"]},
+    {"from": "E-0023", "to": "E-0041", "relation": "requires", "claim_ids": ["C-0085"]},
+    {"from": "E-0027", "to": "E-0041", "relation": "requires", "claim_ids": ["C-0085"]},
+    {"from": "E-0028", "to": "E-0041", "relation": "requires", "claim_ids": ["C-0085"]},
+    {"from": "E-0022", "to": "E-0041", "relation": "requires", "claim_ids": ["C-0085"]},
+    {"from": "E-0051", "to": "E-0043", "relation": "implements", "claim_ids": ["C-0003", "C-0159"]},
+    {"from": "E-0051", "to": "E-0047", "relation": "implements", "claim_ids": ["C-0159"]},
+    {"from": "E-0053", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0041", "C-0189"]},
+    {"from": "E-0057", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0042"]},
+    {"from": "E-0058", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0041"]},
+    {"from": "E-0059", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0041"]},
+    {"from": "E-0060", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0041"]},
+    {"from": "E-0061", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0041"]},
+    {"from": "E-0062", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0041"]},
+    {"from": "E-0063", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0041"]},
+    {"from": "E-0064", "to": "E-0057", "relation": "conflicts_with", "claim_ids": ["C-0044", "C-0107"]},
+    {"from": "E-0064", "to": "E-0001", "relation": "instance_of", "claim_ids": ["C-0045", "C-0107"]},
+    {"from": "E-0065", "to": "E-0066", "relation": "requires", "claim_ids": ["C-0056"]},
+    {"from": "E-0078", "to": "E-0088", "relation": "requires", "claim_ids": ["C-0193"]},
+    {"from": "E-0078", "to": "E-0089", "relation": "requires", "claim_ids": ["C-0193"]},
+    {"from": "E-0078", "to": "E-0084", "relation": "requires", "claim_ids": ["C-0193", "C-0194"]},
+    {"from": "E-0078", "to": "E-0055", "relation": "requires", "claim_ids": ["C-0193", "C-0200"]},
+    {"from": "E-0084", "to": "E-0091", "relation": "implements", "claim_ids": ["C-0161", "C-0164"]},
+    {"from": "E-0085", "to": "E-0091", "relation": "implements", "claim_ids": ["C-0166"]},
+    {"from": "E-0086", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0171"]},
+    {"from": "E-0087", "to": "E-0091", "relation": "implements", "claim_ids": ["C-0222"]},
+    {"from": "E-0089", "to": "E-0090", "relation": "requires", "claim_ids": ["C-0183"]},
+    {"from": "E-0091", "to": "E-0092", "relation": "implements", "claim_ids": ["C-0187"]},
+    {"from": "E-0056", "to": "E-0055", "relation": "implements", "claim_ids": ["C-0191"]},
+    {"from": "E-0093", "to": "E-0076", "relation": "instance_of", "claim_ids": ["C-0208", "C-0209"]},
+    {"from": "E-0094", "to": "E-0075", "relation": "instance_of", "claim_ids": ["C-0216"]},
+    {"from": "E-0095", "to": "E-0075", "relation": "instance_of", "claim_ids": ["C-0210", "C-0214"]},
+    {"from": "E-0096", "to": "E-0075", "relation": "instance_of", "claim_ids": ["C-0211", "C-0214"]},
+    {"from": "E-0097", "to": "E-0075", "relation": "instance_of", "claim_ids": ["C-0212", "C-0214"]},
+    {"from": "E-0098", "to": "E-0075", "relation": "instance_of", "claim_ids": ["C-0213", "C-0214"]},
+    {"from": "E-0099", "to": "E-0075", "relation": "instance_of", "claim_ids": ["C-0207", "C-0218", "C-0251"]},
+    {"from": "E-0100", "to": "E-0091", "relation": "requires", "claim_ids": ["C-0229"]},
+    {"from": "E-0101", "to": "E-0091", "relation": "requires", "claim_ids": ["C-0230"]},
+    {"from": "E-0102", "to": "E-0075", "relation": "instance_of", "claim_ids": ["C-0232", "C-0235"]},
+    {"from": "E-0103", "to": "E-0075", "relation": "instance_of", "claim_ids": ["C-0232", "C-0235"]},
+    {"from": "E-0104", "to": "E-0079", "relation": "instance_of", "claim_ids": ["C-0319", "C-0320"]},
+    {"from": "E-0105", "to": "E-0079", "relation": "instance_of", "claim_ids": ["C-0321", "C-0322"]},
+    {"from": "E-0106", "to": "E-0079", "relation": "instance_of", "claim_ids": ["C-0347"]},
+    {"from": "E-0099", "to": "E-0079", "relation": "instance_of", "claim_ids": ["C-0343"]},
+    {"from": "E-0091", "to": "E-0079", "relation": "instance_of", "claim_ids": ["C-0328", "C-0330", "C-0331"]},
+    {"from": "E-0092", "to": "E-0079", "relation": "instance_of", "claim_ids": ["C-0336", "C-0337"]},
+    {"from": "E-0107", "to": "E-0079", "relation": "conflicts_with", "claim_ids": ["C-0356", "C-0357", "C-0365", "C-0366"]},
+    {"from": "E-0111", "to": "E-0080", "relation": "implements", "claim_ids": ["C-0261", "C-0296"]},
+    {"from": "E-0113", "to": "E-0080", "relation": "implements", "claim_ids": ["C-0296"]},
+    {"from": "E-0112", "to": "E-0080", "relation": "implements", "claim_ids": ["C-0271", "C-0296"]},
+    {"from": "E-0111", "to": "E-0081", "relation": "conflicts_with", "claim_ids": ["C-0258", "C-0291"]},
+    {"from": "E-0113", "to": "E-0081", "relation": "conflicts_with", "claim_ids": ["C-0274", "C-0291"]},
+    {"from": "E-0116", "to": "E-0081", "relation": "conflicts_with", "claim_ids": ["C-0283"]},
+    {"from": "E-0117", "to": "E-0081", "relation": "conflicts_with", "claim_ids": ["C-0286"]},
+    {"from": "E-0118", "to": "E-0081", "relation": "conflicts_with", "claim_ids": ["C-0264", "C-0265", "C-0266"]},
+    {"from": "E-0113", "to": "E-0082", "relation": "conflicts_with", "claim_ids": ["C-0273"]},
+    {"from": "E-0116", "to": "E-0082", "relation": "conflicts_with", "claim_ids": ["C-0285"]},
+    {"from": "E-0114", "to": "E-0115", "relation": "supersedes", "claim_ids": ["C-0276"]},
+    {"from": "E-0083", "to": "E-0109", "relation": "instance_of", "claim_ids": ["C-0245", "C-0246"]},
+    {"from": "E-0072", "to": "E-0054", "relation": "requires", "claim_ids": ["C-0018", "C-0111"]},
+    {"from": "E-0071", "to": "E-0004", "relation": "requires", "claim_ids": ["C-0034"]},
+    {"from": "E-0071", "to": "E-0001", "relation": "requires", "claim_ids": ["C-0034"]},
+    {"from": "E-0071", "to": "E-0002", "relation": "requires", "claim_ids": ["C-0034"]},
+    {"from": "E-0071", "to": "E-0005", "relation": "requires", "claim_ids": ["C-0034"]},
+    {"from": "E-0071", "to": "E-0003", "relation": "requires", "claim_ids": ["C-0034"]},
+    {"from": "E-0072", "to": "E-0006", "relation": "requires", "claim_ids": ["C-0035"]},
+    {"from": "E-0072", "to": "E-0007", "relation": "requires", "claim_ids": ["C-0035"]},
+    {"from": "E-0072", "to": "E-0008", "relation": "requires", "claim_ids": ["C-0035"]},
+    {"from": "E-0072", "to": "E-0009", "relation": "requires", "claim_ids": ["C-0035"]},
+    {"from": "E-0072", "to": "E-0010", "relation": "requires", "claim_ids": ["C-0035"]},
+    {"from": "E-0001", "to": "E-0122", "relation": "instance_of", "claim_ids": ["C-0114", "C-0125"]},
+    {"from": "E-0006", "to": "E-0122", "relation": "instance_of", "claim_ids": ["C-0119", "C-0125"]},
+    {"from": "E-0007", "to": "E-0122", "relation": "instance_of", "claim_ids": ["C-0120", "C-0125"]},
+    {"from": "E-0008", "to": "E-0122", "relation": "instance_of", "claim_ids": ["C-0121", "C-0125"]},
+    {"from": "E-0009", "to": "E-0122", "relation": "instance_of", "claim_ids": ["C-0122", "C-0125"]},
+    {"from": "E-0010", "to": "E-0122", "relation": "instance_of", "claim_ids": ["C-0123", "C-0125"]},
+    {"from": "E-0002", "to": "E-0123", "relation": "instance_of", "claim_ids": ["C-0115", "C-0126"]},
+    {"from": "E-0003", "to": "E-0123", "relation": "instance_of", "claim_ids": ["C-0116", "C-0126"]},
+    {"from": "E-0004", "to": "E-0123", "relation": "instance_of", "claim_ids": ["C-0117", "C-0126"]},
+    {"from": "E-0005", "to": "E-0123", "relation": "instance_of", "claim_ids": ["C-0118", "C-0126"]},
+    {"from": "E-0011", "to": "E-0123", "relation": "instance_of", "claim_ids": ["C-0124", "C-0126"]}
+  ]
+}

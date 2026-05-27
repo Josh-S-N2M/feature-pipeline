@@ -1,0 +1,262 @@
+{
+  "schema_version": "1.0.0",
+  "feature_slug": "pipeline-cross-artifact-discipline-r1",
+  "run_scope": "broad (10 decisions aligned to PRD-v2 FRs + open OIs)",
+  "framer_notes": "Each decision carries a claude_code_layer_attachment field naming the agent/skill/KB file the decision attaches to — grounding design-cc's authoring per orchestrator instruction. Externally-pre-decided decisions still enumerate options (so design-composer's selection is visible) but mark the recommendation strongly. Confidence calibration per knowledge skill: verified+independent ⇒ 0.8; verified+vendor-only ⇒ 0.5; single_sourced ⇒ 0.5; partially_verified ⇒ 0.65.",
+  "decisions": [
+    {
+      "id": "D-0001",
+      "title": "OI-A1: Use a companion-file (machine-checkable) prescription extraction path for FR-1 design-realization audits — not NLP-parse of ADR prose",
+      "context": "FR-1 (mechanism H3, design-realization audit) requires the architecture auditor to extract authored prescriptions from ADRs and validate the realization. Two paths are on the table: (a) parse the ADR prose with NLP, or (b) read a machine-checkable companion artifact sibling to each ADR. Discovery confirms no *.yaml siblings to ADR-*.md exist in adrs/ today (C-0136), so companion-file is a new convention; NLP-parse path would operate on the canonical ADR prose body protected by ADR-0036 (single canonical location) and ADR-0056 (no carve-outs) (C-0137). External research T-002 surveyed 9 production systems (Nygard ADR, MADR, Archgate, kschlt adr-kit, DECIDER, rvdbreemen adr-kit, ArchUnit, Pact, OpenAPI/Schemathesis/Dredd, Spectral, Terraform Sentinel/OPA) — 9/9 use machine-checkable companion artifacts, and the peer-reviewed counterexample (arXiv 2602.07609) found LLM-based NLP-parse misinterprets 44.57% of the time. T-002 is the strongest cross-source triple in this run. Discovery does not pre-decide (C-0154) but external evidence tilts decisively toward companion-file.",
+      "claim_cluster_ids": ["C-0114", "C-0129", "C-0135", "C-0136", "C-0137", "C-0144", "C-0145", "C-0154", "C-0156", "C-0034", "C-0239", "C-0246"],
+      "class": "architectural",
+      "reversibility": "one_way",
+      "blast_radius": "tenant",
+      "wardley_stage": "product",
+      "rice": { "reach": 50, "impact": 2.0, "confidence": 0.8, "effort": 8 },
+      "options_summary": [
+        "Companion-file path (RECOMMENDED — 9/9 surveyed precedent, peer-reviewed NLP failure rate; sibling YAML/JSON spec next to each ADR with machine-checkable predicates)",
+        "NLP-parse path (operates on existing canonical ADR prose; no new convention but 44.57% misinterpret rate per arXiv 2602.07609; inherits ADR-0036/ADR-0056 constraints)",
+        "Hybrid (NLP-parse used only to surface drafts; companion-file is canonical for audit)"
+      ],
+      "risks": [
+        "Companion-file establishes a new repo convention — escape hatch needed if authoring-burden NFR is breached",
+        "ADR-0036 single-canonical-location and ADR-0056 no-carve-outs constrain how companion-file relates to canonical ADR (companion must not duplicate the decision; only its machine-checkable predicates)",
+        "Single-sourced FP claim: C-0239 (arXiv 2602.07609 not externally re-fetched in Critic sweep)",
+        "Transferability caveat: T-002's 9 surveyed systems are all code/spec domains, not pipeline-document content"
+      ],
+      "recommendation_strength": "strong",
+      "externally_decided": true,
+      "decision_owner": "design-cc",
+      "claude_code_layer_attachment": ".claude/agents/review-architecture-auditor.md (audit implementation) + adrs/ template guidance (companion-file shape)"
+    },
+    {
+      "id": "D-0002",
+      "title": "OI-A2: Adopt hybrid (denormalized declaration, centralized body) invariant authoring shape for FR-3 PV-tier cross-file invariants",
+      "context": "FR-3 (mechanism H9, PV-tier cross-file invariants) demands a catalog authoring shape. Three options: (a) denormalized (declare invariants at each artifact), (b) centralized (single catalog file, all invariants in one place), (c) hybrid (declare at artifact, body lifted into central catalog and referenced). External research T-004 surveyed 6 systems (Terraform, dbt, OpenAPI, JSON Schema, ArchUnit, Bazel) plus the Shopify Packwerk retrospective. T-004 finds the hybrid pattern is the documented sweet spot across every survey datapoint (C-0367) — and crucially, Shopify Packwerk's 'tried-centralized, walked back' retrospective (C-0350, C-0352, C-0365, C-0366) is the strongest available counterexample to a fully-centralized choice. T-004's recommendation framing (C-0368) is appropriately scoped: hybrid is the default; reserve centralized-only for genuinely reusable invariant bodies. Discovery does not pre-decide.",
+      "claim_cluster_ids": ["C-0116", "C-0130", "C-0138", "C-0139", "C-0140", "C-0144", "C-0145", "C-0350", "C-0352", "C-0365", "C-0366", "C-0367", "C-0368"],
+      "class": "architectural",
+      "reversibility": "one_way",
+      "blast_radius": "service",
+      "wardley_stage": "product",
+      "rice": { "reach": 30, "impact": 2.0, "confidence": 0.8, "effort": 6 },
+      "options_summary": [
+        "Hybrid: denormalized declaration at artifact, body in central catalog (RECOMMENDED — 6/6 surveyed sweet spot; Shopify Packwerk migration retrospective is strongest counter to full-central)",
+        "Denormalized: each artifact declares + defines its invariants in-line (best locality; worst DRY)",
+        "Centralized: all invariants in one catalog file, artifacts reference (best DRY; Packwerk-style walkback risk)"
+      ],
+      "risks": [
+        "Partially-verified claim: C-0366 (Packwerk 'different-teams' framing is T-004 author's gloss, defensible but not in retrospective verbatim)",
+        "Transferability caveat: T-004 surveyed code/data/API artifacts, NOT pipeline-document content (T-004 open question 1 acknowledges this directly)",
+        "Default-to-hybrid rubric: reserve centralized-only invariant bodies for genuinely reusable predicates; in-line if used once"
+      ],
+      "recommendation_strength": "strong",
+      "externally_decided": true,
+      "decision_owner": "design-cc",
+      "claude_code_layer_attachment": ".claude/agents/test-phase-validator-author.md (PV-author rubric host) + .claude/skills/KB-task-decomposition/ (where catalog body lives)"
+    },
+    {
+      "id": "D-0003",
+      "title": "OI-A3: Scope of auditing-skills reverse-check — extend FR-10 (auditing-subagents rule) or author a separate rule for auditing-skills",
+      "context": "FR-10 (mechanism B5) mandates a feature-touch-coverage rule on auditing-subagents (sub-agent file → owning skill family back-reference). The question for OI-A3 is whether the analogous reverse-check should live as a rule in auditing-skills as well, or whether FR-10's scope is sufficient. Externally-undecided: no T-001..T-004 finding speaks to this; the auditing-shared (E-0034) / auditing-mcp (E-0031) / auditing-cc-configs (E-0033) skill family carries its own conventions but Discovery has not surveyed analogous reverse-checks. Low blast radius — the change is one rule file under one skill family.",
+      "claim_cluster_ids": ["C-0123", "C-0131", "C-0144", "C-0145", "C-0029", "C-0091"],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": { "reach": 5, "impact": 1.0, "confidence": 0.5, "effort": 2 },
+      "options_summary": [
+        "Extend FR-10 scope to cover auditing-skills (one rule, two surfaces)",
+        "Author separate rule in auditing-skills/ (separation of concerns)",
+        "Defer — only FR-10 ships now; auditing-skills reverse-check added later if the audit gap is observed"
+      ],
+      "risks": [
+        "Externally undecided — no T-001..T-004 corroborator (Critic single-sourced from Discovery)",
+        "Low-blast component decision; reversible — but if deferred, document the deferral in §O posture",
+        "Sole supporting claim cluster is internal (C-0123, C-0131); no peer-review or vendor cross-corroboration"
+      ],
+      "recommendation_strength": "weak",
+      "externally_decided": false,
+      "decision_owner": "design-cc",
+      "claude_code_layer_attachment": ".claude/skills/auditing-subagents/ (SA-13) + .claude/skills/auditing-skills/ (potential new rule host)"
+    },
+    {
+      "id": "D-0004",
+      "title": "OI-A5: Establish Blocks-X marker grammar (period-terminated kebab-case `<stage-slug>-completion`) as a first-class precedent",
+      "context": "FR-9 (mechanism B4) requires Blocks-X markers to be emitted from Discovery output and consumed by the gate/validator cluster. Discovery surfaced n=1 prior occurrence of the grammar (devcontainer-mcp-provisioning-r1 precedent, E-0074: 'Blocks <stage-slug>-completion.'). With only one precedent, this is effectively a grammar-establishment decision rather than a reconciliation one. Externally-undecided. Low blast radius (single grammar specification); but downstream consumption by FR-2 conformance, FR-3 PV-tier invariants, and AC-FR-9-* makes the wire format mildly load-bearing.",
+      "claim_cluster_ids": ["C-0122", "C-0133", "C-0144", "C-0145", "C-0150", "C-0151", "C-0152", "C-0155", "C-0009", "C-0104", "C-0106"],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "service",
+      "wardley_stage": "genesis",
+      "rice": { "reach": 20, "impact": 1.0, "confidence": 0.65, "effort": 2 },
+      "options_summary": [
+        "Establish precedent grammar verbatim: 'Blocks <stage-slug>-completion.' (period-terminated kebab-case stage slugs)",
+        "Extend grammar: allow multiple slugs ('Blocks <slug>, <slug>-completion.') for multi-stage blocks",
+        "Reconcile to YAML-friendly token list (drop the period; lift to structured frontmatter)"
+      ],
+      "risks": [
+        "n=1 prior occurrence — establishment, not reconciliation; risk of premature lock-in",
+        "Downstream consumers (FR-2 conformance schema, AC-FR-9-* assertions) inherit the grammar — change cost rises after FR-2 ships",
+        "Externally undecided"
+      ],
+      "recommendation_strength": "moderate",
+      "externally_decided": false,
+      "decision_owner": "design-cc",
+      "claude_code_layer_attachment": ".claude/skills/KB-documentation-criteria/ (grammar spec) + .claude/skills/recipe-feature-pipeline/SKILL.md (stage slugs)"
+    },
+    {
+      "id": "D-0005",
+      "title": "OI-A6: Mechanical evaluator for FR-6 trigger conditions 3 and 4 — machine-checkable predicate vs human checkpoint vs hybrid",
+      "context": "FR-6 (mechanism B1) makes the agent-roster-impact-matrix mandatory at design time. Trigger conditions 3 and 4 are interpretive ('skill-coverage decision present', 'cross-skill impact'); the mechanical evaluator question is how to enforce them automatically. Externally-undecided — T-003 confirms the W/H/A trifecta content for FR-7 (the adjacent decision) but does not specify a trigger-evaluation algorithm. Options: (a) machine-checkable predicate over Blueprint's Skill-Coverage Decisions section, (b) explicit human-in-the-loop checkpoint at Design Composition gate, (c) hybrid (predicate fires advisory; human ratifies). The hybrid is the lower-risk middle path given the interpretive nature.",
+      "claim_cluster_ids": ["C-0119", "C-0120", "C-0134", "C-0144", "C-0145", "C-0026", "C-0027", "C-0046", "C-0078", "C-0079", "C-0080"],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "service",
+      "wardley_stage": "custom",
+      "rice": { "reach": 25, "impact": 1.5, "confidence": 0.5, "effort": 4 },
+      "options_summary": [
+        "Machine-checkable predicate over Blueprint's Skill-Coverage Decisions section (deterministic; risks false negatives on interpretive triggers)",
+        "Human-in-the-loop checkpoint at Design Composition gate (highest signal; ritual cost)",
+        "Hybrid: predicate fires advisory annotation; human ratifies at gate (RECOMMENDED — balances cost and signal)"
+      ],
+      "risks": [
+        "Externally undecided — no T-001..T-004 corroborator for trigger-evaluation pattern",
+        "Trigger 3 and 4 are interpretive; pure-mechanical risks brittle false negatives",
+        "Predicate-only path conflicts with FR-7's W/H/A substance-not-presence heuristic (D-0008)"
+      ],
+      "recommendation_strength": "moderate",
+      "externally_decided": false,
+      "decision_owner": "design-cc",
+      "claude_code_layer_attachment": ".claude/agents/design-claude-code.md (design-cc authoring) + .claude/skills/auditing-subagents/ (mechanical evaluator host)"
+    },
+    {
+      "id": "D-0006",
+      "title": "OI-A4 / Contingency Split: Single feature (R1) vs split (R2a design-time / R2b gate-validator) posture",
+      "context": "PRD §Contingency Split sets a threshold of 12 cumulative open items; if exceeded, the feature is split into R2a (design-time cluster: FR-1, FR-6, FR-7, FR-8, FR-9, FR-10) and R2b (gate/validator cluster: FR-2, FR-3, FR-4, FR-5, FR-11). Critic verified (C-0004, C-0145) the codebase researcher's expansive 14-OI count (8 IC + 6 PRD-v2) trips the threshold mechanically — but the orchestrator's currently-open count of 6 (only PRD-v2 OI-A1..OI-A6 unresolved) does not. Discovery recommendation: design-composer must apply the threshold mechanically at Gate 4 (C-0006, verbatim from source). The decision is genuinely ambiguous — both readings have evidence — and belongs to design-composer at Gate 4, NOT to design-cc. The framer surfaces the ambiguity and the mechanism-dependency table (R2a/R2b cluster membership per C-0114/C-0116/C-0125/C-0126/C-0127) as input.",
+      "claim_cluster_ids": ["C-0004", "C-0005", "C-0006", "C-0132", "C-0141", "C-0144", "C-0145", "C-0146", "C-0147", "C-0148", "C-0149", "C-0114", "C-0115", "C-0116", "C-0117", "C-0118", "C-0125", "C-0126", "C-0127"],
+      "class": "architectural",
+      "reversibility": "one_way",
+      "blast_radius": "tenant",
+      "wardley_stage": "custom",
+      "rice": { "reach": 40, "impact": 3.0, "confidence": 0.8, "effort": 12 },
+      "options_summary": [
+        "R1 single feature (orchestrator's 6-OI count; threshold not tripped)",
+        "R2a/R2b split per mechanism-dependency clusters (codebase-researcher's 14-OI count; threshold tripped mechanically)",
+        "Apply the threshold mechanically per C-0006 — Gate 4 design-composer decides"
+      ],
+      "risks": [
+        "Genuine ambiguity in count scope (8+6=14 cumulative vs 6 currently-open) — both readings well-evidenced",
+        "Split is one-way: undoing requires re-merging downstream artifacts; high cost",
+        "Decision belongs to design-composer at Gate 4, not design-cc — framer surfaces evidence and routes",
+        "Mechanism-dependency table verified (C-0114, C-0125, C-0126, C-0127) — clusters are not arbitrary"
+      ],
+      "recommendation_strength": "route-to-gate",
+      "externally_decided": false,
+      "decision_owner": "design-composer (Gate 4)",
+      "claude_code_layer_attachment": "N/A — design-composer scope, not design-cc; framer routes for transparency"
+    },
+    {
+      "id": "D-0007",
+      "title": "FR-5: Adopt the four-stage drift-detection pipeline (RFC 8785 JCS normalize → persisted canonical baseline → RFC 6902 JSON-Patch diff with identity-keyed array diff → locally-enumerated severity catalog modeled on oasdiff)",
+      "context": "FR-5 (mechanism H8, tool-surface drift detection) requires drift detection over MCP tools/list responses with NFR-4 target of <5% false-positive rate across 50 audits. External research T-001 produced a strong cross-source triple: each of the four stages is grounded in an independent primary (RFC 8785 for JCS normalization, oasdiff's change-fingerprint pattern for baseline-as-bytes, RFC 6902 for diff, oasdiff severity catalog as model). T-001 author argues the crucial FP-suppression move is normalization (step 1) and severity-catalog routing (step 4), not the diff algorithm itself (C-0195) — supported by the openapi-diff Issue #673 cautionary tale. The synthesis composition (oasdiff-style catalog applied to MCP tools/list) is novel but each underlying primitive is well-cited. Open sub-decision: NFR-4 <5% FP target measurement strategy — T-001 surfaces that no surveyed source publishes a quantitative benchmark; C-0201 / C-0202 are single-sourced hypotheses (not measured outcomes).",
+      "claim_cluster_ids": ["C-0030", "C-0032", "C-0118", "C-0126", "C-0127", "C-0193", "C-0194", "C-0195", "C-0201", "C-0202"],
+      "class": "architectural",
+      "reversibility": "one_way",
+      "blast_radius": "service",
+      "wardley_stage": "product",
+      "rice": { "reach": 30, "impact": 2.0, "confidence": 0.8, "effort": 8 },
+      "options_summary": [
+        "Four-stage pipeline: JCS → baseline-as-bytes → RFC 6902 diff (identity-keyed arrays) → local severity catalog (RECOMMENDED — strong cross-source triple)",
+        "Naive object-diff + heuristic severity (rejected — openapi-diff Issue #673 evidence; exceeds 5% FP on stable upstream)",
+        "Vendor wrapper (oasdiff direct or Buf protobuf — does not cover MCP tools/list schema)"
+      ],
+      "risks": [
+        "Single-sourced achievability claim: C-0201 (no primary quantifies <5% FP under these exact conditions; extrapolated mechanism)",
+        "Single-sourced warning: C-0202 (50-audit description-polishing/CDN-rewrite scenario hypothetical, not measured)",
+        "Composition step (oasdiff-style catalog → MCP tools/list) is single-sourced in T-001 but defensible",
+        "Open sub-decision: NFR-4 measurement strategy — recommend pilot run as hypothesis-validation at Phase Validator time"
+      ],
+      "recommendation_strength": "strong",
+      "externally_decided": true,
+      "decision_owner": "design-cc",
+      "claude_code_layer_attachment": ".claude/skills/auditing-mcp/ (drift detection implementation host) + .mcp.json (canonical input)"
+    },
+    {
+      "id": "D-0008",
+      "title": "FR-7: Frame the Why/How/Anti-patterns trifecta as substance to apply, not a mandatory artifact ritual — reviewers and authors apply substance-not-presence heuristic",
+      "context": "FR-7 (mechanism B3, skill-coverage decisions) requires a structured rationale for each skill-coverage decision. T-003 surveyed 6 platforms (Anthropic Agent Skills, LangGraph, OpenAI Agents SDK, Microsoft Agent Framework, CrewAI, Semantic Kernel) and found cross-platform convergence on three recurring categories: need-justification (Why), scope/lifecycle hygiene (How), anti-pattern defenses (Anti-patterns). The trifecta content is universal community substance (C-0256). The novel move is codifying it as a single mandated artifact authored at design time (C-0257) — no surveyed platform mandates this artifact shape. T-003 explicitly surfaces the anti-ritualism trade-off (line 177). The substance-vs-mandate distinction matters: reviewers and authors apply a substance-not-presence heuristic (the trifecta is satisfied if the substance is present, not because three labelled headings exist).",
+      "claim_cluster_ids": ["C-0120", "C-0125", "C-0256", "C-0257", "C-0283", "C-0291", "C-0293"],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "service",
+      "wardley_stage": "product",
+      "rice": { "reach": 25, "impact": 1.5, "confidence": 0.8, "effort": 4 },
+      "options_summary": [
+        "Substance-as-rubric: W/H/A is what reviewers check for; structured artifact optional (RECOMMENDED — preserves substance, avoids ritualism)",
+        "Mandate-as-artifact: three labelled headings required; reviewer checks presence (novel per T-003; ritualism risk)",
+        "Hybrid: artifact-template provided as default with substance-rubric as the auditable standard"
+      ],
+      "risks": [
+        "Single-sourced quantitative: C-0293 (BFCL 96%→13-15% cliff cited as directional, not measured threshold)",
+        "Mandate-as-artifact is novel — no surveyed platform precedent (anti-ritualism cost)",
+        "Substance heuristic is harder to mechanically evaluate — couples back to D-0005"
+      ],
+      "recommendation_strength": "strong",
+      "externally_decided": true,
+      "decision_owner": "design-cc",
+      "claude_code_layer_attachment": ".claude/skills/KB-cc-design/ (Principle 9 + W/H/A rubric host) + .claude/agents/design-claude-code.md (author-side)"
+    },
+    {
+      "id": "D-0009",
+      "title": "FR-11 §O posture: Place event-triggered / honest-acceptance / concrete-machinery framings in discipline texts where post-ship prose currently exists or is being added",
+      "context": "FR-11 (mechanism §O) replaces post-ship-felt-utility framings with three replacement postures: event-triggered (concrete review trigger), honest-acceptance (decision is final), concrete-machinery (mechanism is named). Codebase showed zero 'post-ship' prose in .claude/skills/ and .claude/agents/ today — this is purely additive prescription. The placement decision is which discipline texts get the §O wording: AC-FR-11-c currently enumerates four rows (E-3, A-3, D-5, I-1) but §O.1 register names five (adds E-2) (C-0033, C-0153 partially_verified — 5-row count confirmed directly; 4-row enumeration relies on codebase-analysis report's quotation of PRD AC-FR-11-c without direct PRD re-read). Sub-decision: should AC-FR-11-c be expanded to cover E-2? Discovery routes this to design-composer.",
+      "claim_cluster_ids": ["C-0012", "C-0014", "C-0015", "C-0016", "C-0033", "C-0110", "C-0113", "C-0124", "C-0126", "C-0153"],
+      "class": "implementation",
+      "reversibility": "two_way",
+      "blast_radius": "component",
+      "wardley_stage": "custom",
+      "rice": { "reach": 15, "impact": 1.0, "confidence": 0.65, "effort": 3 },
+      "options_summary": [
+        "Place §O wording on discipline texts identified by §O.1 register five-row set (A-3, D-5, E-2, E-3, I-1)",
+        "Place §O wording on AC-FR-11-c four-row set (E-3, A-3, D-5, I-1) — exclude E-2",
+        "Expand AC-FR-11-c to five rows (include E-2) and apply uniformly — routes to design-composer"
+      ],
+      "risks": [
+        "Partially-verified count mismatch: C-0033 (4-row enumeration not re-verified against PRD-v2 directly)",
+        "Open question explicitly routed to design-composer (C-0153) — design-cc proposes placement but design-composer ratifies scope",
+        "Zero 'post-ship' precedent in .claude/skills/ .claude/agents/ today — purely additive (low collision risk)"
+      ],
+      "recommendation_strength": "moderate",
+      "externally_decided": false,
+      "decision_owner": "design-cc (placement); design-composer (E-2 inclusion scope)",
+      "claude_code_layer_attachment": ".claude/skills/ and .claude/agents/ (discipline texts; specific files per §O.1 register rows) + Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md (anchor)"
+    },
+    {
+      "id": "D-0010",
+      "title": "Severity vocabulary reconciliation across FR-1 / FR-4 / FR-5 / FR-9 / FR-10 — three coexisting vocabularies must converge or be explicitly partitioned by audience",
+      "context": "Codebase researcher surfaced three coexisting severity vocabularies in the auditor/reviewer/validator surface: (a) auditor BLOCKER/MAJOR/MINOR/NIT (used by review-architecture-auditor, auditing-mcp, auditing-cc-configs, auditing-shared per C-0094/C-0097/C-0098/C-0101); (b) reviewer critical/important/recommended (used by shared-document-reviewer, KB-review-disciplines per C-0095/C-0099); (c) phase-validator blocking/warning/informational (used by test-phase-validator-author per C-0100/C-0103). FR-1/FR-4/FR-5/FR-9/FR-10 all emit findings consumed across these surfaces. Externally-undecided — T-001..T-004 do not address vocabulary reconciliation. Cluster graph: E-0068 (auditor), E-0069 (reviewer), E-0070 (phase-validator) all linked to C-0108 (vocabulary-reconciliation claim). Decision is reconciliation strategy: unify (one vocabulary across all surfaces, requires migration cost), partition (each surface keeps its vocabulary, document mapping table), or canonicalize (pick one as canonical, others map via documented translator).",
+      "claim_cluster_ids": ["C-0094", "C-0095", "C-0097", "C-0098", "C-0099", "C-0100", "C-0101", "C-0102", "C-0103", "C-0108"],
+      "class": "architectural",
+      "reversibility": "one_way",
+      "blast_radius": "tenant",
+      "wardley_stage": "custom",
+      "rice": { "reach": 40, "impact": 2.0, "confidence": 0.5, "effort": 10 },
+      "options_summary": [
+        "Unify: one vocabulary across auditor + reviewer + validator (highest discipline; highest migration cost)",
+        "Partition with mapping table: each surface keeps its vocabulary; explicit translation table maintained",
+        "Canonicalize: pick auditor BLOCKER/MAJOR/MINOR/NIT as canonical (most populous; widest in-repo footprint); others map via documented translator (RECOMMENDED middle path)"
+      ],
+      "risks": [
+        "Externally undecided — no T-001..T-004 corroborator (Critic single-sourced from codebase researcher)",
+        "Decision belongs to design-composer (cross-cuts multiple layer agents) — design-cc cannot ratify alone",
+        "Unify-option migration touches multiple skill families (auditing-mcp, auditing-subagents, auditing-cc-configs, auditing-shared, KB-review-disciplines) — high coordination cost",
+        "Canonicalize-option requires careful translator semantics (BLOCKER → critical → blocking is not strictly monotonic across all dimensions)"
+      ],
+      "recommendation_strength": "moderate",
+      "externally_decided": false,
+      "decision_owner": "design-composer (cross-cuts layers); design-cc proposes for the cc layer",
+      "claude_code_layer_attachment": ".claude/skills/KB-review-disciplines/severity-taxonomy.md (canonical host candidate) + .claude/skills/auditing-shared/ (translator host candidate)"
+    }
+  ]
+}

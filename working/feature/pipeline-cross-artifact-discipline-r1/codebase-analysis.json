@@ -1,0 +1,652 @@
+{
+  "schema_version": "1.1.0",
+  "pipeline_run_id": "pipeline-cross-artifact-discipline-r1",
+  "generated_at": "2026-05-26T13:30:00Z",
+  "extraction_method": "mixed",
+  "extraction_method_notes": "Grep + Read for textual surfaces (markdown skills, agent prompts, register, ADR-prescription texts) since the substrate is documentation-heavy. GitNexus / Serena MCP tools available but not exercised this run — the touch points are .md / .py / .json discipline artifacts whose semantics are not captured in symbol graphs; grep+sed gives identical evidence quality at lower cost. Recorded as 'mixed' to honor ADR-0018 provenance discipline.",
+  "scope": {
+    "repo": "Josh-S-N2M/feature-pipeline",
+    "branch": "main",
+    "commit": "8988be2a1236328699e581463e6caf49c8d96329",
+    "paths": [
+      ".claude/agents/",
+      ".claude/skills/",
+      ".claude/hooks/",
+      ".mcp.json",
+      ".devcontainer/",
+      "Issues/",
+      "adrs/",
+      "working/feature/"
+    ],
+    "layers": ["cc"]
+  },
+  "components": [
+    {
+      "name": "review-architecture-auditor",
+      "path": ".claude/agents/review-architecture-auditor.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-agent",
+      "entry_points": ["Architecture Audit stage (Stage 8 of recipe-feature-pipeline)"],
+      "dependencies": ["KB-review-disciplines", "KB-documentation-criteria", "mcp__gitnexus__*", "mcp__serena__*"],
+      "frontmatter": {
+        "model": "opus",
+        "effort": "xhigh",
+        "skills": ["KB-review-disciplines", "KB-documentation-criteria"],
+        "memory": "project"
+      },
+      "notes": "Renamed from synth-critic-1 per FR-9 (different feature run). Produces architecture-audit-issues.json. Severity vocabulary: BLOCKER / MAJOR / MINOR / INFO (see issues-JSON schema lines 120-155 of agent prompt). Audit dimensions today: brief_honor_L3, blast_radius, synthesis_claim_verification, cross_section_consistency. FR-1 attaches a fifth dimension 'design_realization' here (additive — the agent's procedure is Phase 1..6 today; FR-1's check fits as a new Phase). Per ADR-0045, the agent has no Agent / Task tool — no sub-agent spawn-out; FR-1's audit must run inline."
+    },
+    {
+      "name": "KB-review-disciplines",
+      "path": ".claude/skills/KB-review-disciplines/",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-skill",
+      "entry_points": ["loaded by review-architecture-auditor, review-cross-artifact-auditor, shared-document-reviewer"],
+      "dependencies": [],
+      "notes": "Six reference files: architecture-audit.md, cross-artifact-audit.md, gate-0-1-procedure.md, issue-lifecycle.md, prior-context-check.md, severity-taxonomy.md. The Architecture Audit discipline (architecture-audit.md) currently enumerates THREE lenses: CoVe (decision verification), Blast-Radius, Brief-Honor (per ADR-0009). FR-1's design-realization dimension would be a fourth lens or an extension of the brief-honor lens. severity-taxonomy.md emits a DIFFERENT vocabulary from the agent's issues-JSON schema: KB uses critical / important / recommended (with category dimension consistency/completeness/compliance/clarity/feasibility); the agent's schema uses BLOCKER / MAJOR / MINOR / INFO. This is a documented vocabulary divergence inside the codebase (see Known Issues)."
+    },
+    {
+      "name": "auditing-shared",
+      "path": ".claude/skills/auditing-shared/",
+      "layer": "cc",
+      "language": "python+markdown",
+      "framework": "claude-code-skill",
+      "entry_points": ["subprocess dispatched by auditing-cc-configs, auditing-mcp, auditing-skills, auditing-subagents, auditing-context-files"],
+      "dependencies": [],
+      "frontmatter": {
+        "user-invocable": false,
+        "allowed-tools": "Read, Grep, Glob, Bash(python3:*)"
+      },
+      "notes": "Library-only canonical home for cross-audit-family utilities (per ADR-0031, extended by ADR-0042). Hosts 10 helper scripts including validate_adr_placement.py (canonical helper per ADR-0036/0054), log_state_transition.py (state-transitions.log writer), validate_pipeline_frontmatter.py (doc_type / state validator), pedagogical_marker_check.py, scan_memory_secrets.py, run_phase_checks.py, check_pipeline_discipline.py, detect_stubs.py, smoke_test_auditing_shared.py. NO audit-issues.json schema definition is in this skill — the SKILL.md is 36 lines, lists only scripts/pedagogical_marker_check.py + scripts/scan_memory_secrets.py explicitly. The audit-issues.json schema is documented in the agent prompts (review-architecture-auditor.md lines 120-155 and review-cross-artifact-auditor.md), and the severity values + thresholds are also documented in auditing-cc-configs/scripts/verdict_compute.py (BLOCKER -12, MAJOR -5, MINOR -2, NIT -0.5, INFO 0)."
+    },
+    {
+      "name": "discovery-codebase-researcher",
+      "path": ".claude/agents/discovery-codebase-researcher.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-agent",
+      "entry_points": ["Discovery Research stage (Stage 4 of recipe-feature-pipeline)"],
+      "dependencies": ["KB-codebase-research", "mcp__gitnexus__*", "mcp__serena__*"],
+      "frontmatter": {
+        "model": "opus",
+        "effort": "high",
+        "skills": ["KB-codebase-research"]
+      },
+      "notes": "Produces codebase-analysis.json + codebase-analysis-report.md per ADR-0018 + ADR-0038 (v1.1.0 schema). Procedure has SIX phases today (Phase 1 bound, Phase 2 component inventory, Phase 3 dependency edges, Phase 4 blast-radius preview, Phase 5 conventions, Phase 6 known issues). FR-2's §Protocol Conformance subsection would be a seventh phase OR a sub-section inside Phase 5 (conventions). The agent does NOT today emit any 'Blocks <stage>' markers — FR-9 / OI-A5 grammar would be a new convention."
+    },
+    {
+      "name": "KB-codebase-research",
+      "path": ".claude/skills/KB-codebase-research/",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-skill",
+      "entry_points": ["loaded by discovery-codebase-researcher"],
+      "dependencies": [],
+      "notes": "Defines the codebase-analysis.json v1.1.0 schema (canonical) plus traversal patterns. SKILL.md is the complete reference (no references/ subdir at this stage — schema is inlined). Schema fields: schema_version, pipeline_run_id, generated_at, extraction_method, scope, components[], dependencies[], blast_radius[], conventions{}, known_issues[], open_questions_for_human[]. FR-2's §Protocol Conformance subsection would extend either the conventions{} sub-tree (new per-interface key) or as a new top-level array protocol_conformance[]. Per ADR-0018 + ADR-0038, schema extension is additive — no breaking change vector."
+    },
+    {
+      "name": "recipe-feature-pipeline",
+      "path": ".claude/skills/recipe-feature-pipeline/SKILL.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-skill (orchestrator)",
+      "entry_points": ["user-invocable: top-level pipeline orchestrator"],
+      "dependencies": ["28 sub-agents per the routing table"],
+      "notes": "13-stage state machine (v4.5.0+). Six human approval gates (Intent Confirmation, PRD Approval, Research Plan Approval, Blueprint Approval, Plan Approval, Final Approval). shared-document-reviewer invoked at 5 points per ADR-0017: after Intent Clarification, after PRD, after each per-layer Design (×K), after Design Composition, after Plan. FR-6's Design Composition block (mandatory agent-roster-impact-matrix.md) attaches at invocation 4 (after Design Composition) — Gate 0 structural check OR Gate 1 semantic check would refuse to mark stage complete. FR-9's Blocks-X gate attaches at every stage-transition checkpoint between Discovery and downstream stages. Per ADR-0027, cwd == repo-root precondition is enforced at Step 0."
+    },
+    {
+      "name": "design-cc (filename design-claude-code.md, frontmatter name design-cc)",
+      "path": ".claude/agents/design-claude-code.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-agent",
+      "entry_points": ["per-layer Design stage (Stage 6) when Claude Code layer is in scope"],
+      "dependencies": ["KB-cc-platform", "KB-cc-design", "KB-documentation-criteria", "KB-general-coding-principles", "KB-review-disciplines"],
+      "frontmatter": {
+        "model": "opus",
+        "effort": "high",
+        "skills": ["KB-cc-platform", "KB-cc-design", "KB-documentation-criteria", "KB-general-coding-principles", "KB-review-disciplines"]
+      },
+      "notes": "Path-A naming workaround: filename design-claude-code.md, frontmatter name design-cc (validator rejects names containing 'claude'). Produces cc-design.md + cc-dependencies.json. Phase 2 of its procedure (Author the CC Design subsection) already covers Subagent patterns including KB-cc-design Principle 9 — this is the explicit downstream consumer of FR-8's Principle 9 rewording. FR-6's mandatory agent-roster-impact-matrix.md attaches inside Phase 2 (Inventory of CC primitives being introduced or modified)."
+    },
+    {
+      "name": "KB-cc-design",
+      "path": ".claude/skills/KB-cc-design/",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-skill",
+      "entry_points": ["loaded by design-cc, design-cicd, design-codespaces (the three CC-family designers)"],
+      "dependencies": [],
+      "notes": "SKILL.md + references/principles.md + references/patterns-and-anti-patterns.md. principles.md contains 10 enumerated principles (lines 11-15 list them; Principle 9 starts at line 182). Principle 9 verbatim (line 182): 'Sub-agent reasoning configuration is intentional, not default'. The text is currently DEFENSIVE — it tells designers what to justify for new/modified subagents (model/effort/skills) but does NOT require recording the consideration for unchanged agents. FR-8 rewords to active framing. Principle 10 (added later) is 'Uniform rules over named exceptions' (ADR-0056). Cross-references to Principle 9 today: design-claude-code.md (line 56 cites it inline) — 1 cross-reference. No other agent or skill file cites 'Principle 9' verbatim (grep complete)."
+    },
+    {
+      "name": "auditing-subagents",
+      "path": ".claude/skills/auditing-subagents/",
+      "layer": "cc",
+      "language": "python+markdown",
+      "framework": "claude-code-skill",
+      "entry_points": ["auditing pass over .claude/agents/*.md"],
+      "dependencies": ["auditing-shared"],
+      "notes": "Eight references (agent-tool-grant-inventory.md, anti-patterns.md, common-failures.md, description-quality.md, manual-review-interim.md, memory-spec.md, safety-model.md, subagent-spec.md) + seven scripts (analyze_subagent.py, audit_subagent.py, check_subagent_memory.py, pedagogical_marker_check.py, scan_memory_secrets.py, scan_subagent_body.py, validate_subagent_frontmatter.py). FR-10's new feature-touch-coverage rule attaches as a new SA-NN check inside the discipline texts + an audit-rule script. The rule needs read access to the feature's working directory (working/feature/<slug>/) to determine if agent-surface was touched."
+    },
+    {
+      "name": "auditing-mcp",
+      "path": ".claude/skills/auditing-mcp/",
+      "layer": "cc",
+      "language": "python+markdown",
+      "framework": "claude-code-skill (graduated family)",
+      "entry_points": ["python3 scripts/audit_mcp.py <path> [--with-runtime]"],
+      "dependencies": ["auditing-shared", "MCP servers (in --with-runtime mode)"],
+      "frontmatter": {
+        "family": "auditing-mcp",
+        "allowed-tools": "Read Grep Glob Bash(python3 *)"
+      },
+      "notes": "Graduated family per ADR-0042. Runner audit_mcp.py orchestrates 13 sub-scripts: validate_mcp_config, scan_mcp_secrets, check_toxic_combinations, audit_op1..op10. --with-runtime semantics today (CRITICAL FOR FR-4): the flag is parsed at audit_mcp.py line 36 but ONLY forwarded to check_toxic_combinations.py (line 56-58). check_toxic_combinations.py --with-runtime spawns each server and queries tools/list to CATEGORIZE for toxic-combination detection (filesystem+web, etc.) — it does NOT verify the project's six servers are reachable or match per-agent allowlists. Per the MCP postmortem (Issues/cross-artifact-divergence-detection-gap/evidence/mcp-postmortem-2026-05-24/02-pipeline-trace.md DEF-08), this is exactly the misnaming FR-4 corrects. OP-1..OP-10 are enumerated as scripts audit_op1_env_block_coverage.py through audit_op10_argv_leakage.py. OP-9 (URL credential rejection) and OP-10 (argv leakage) anchor ADR-0039 credential indirection (NFR-6 redaction posture)."
+    },
+    {
+      "name": "auditing-cc-configs",
+      "path": ".claude/skills/auditing-cc-configs/",
+      "layer": "cc",
+      "language": "python+markdown",
+      "framework": "claude-code-skill (family coordinator)",
+      "entry_points": ["python3 scripts/audit_project.py <project-root> [--with-runtime] [--managed] [--json]"],
+      "dependencies": ["auditing-shared", "auditing-mcp", "auditing-hooks", "auditing-settings", "auditing-skills", "auditing-subagents", "auditing-context-files", "auditing-codespaces"],
+      "notes": "Family coordinator that forwards --with-runtime to auditing-mcp. audit_project.py line 247 forwards the flag verbatim. FR-4-d (legacy flag fails loudly) must coordinate the rename across BOTH skill bodies — audit_project.py must also reject --with-runtime and route to --with-mcp-reachability, or surface a clean error."
+    },
+    {
+      "name": ".mcp.json",
+      "path": ".mcp.json",
+      "layer": "cc",
+      "language": "json",
+      "framework": "claude-code-mcp-config",
+      "entry_points": ["loaded by Claude Code at session start"],
+      "dependencies": [],
+      "notes": "Six MCP server entries (post-2026-05-24 mcp-openapi-schema removal): actionlint-mcp (stdio), context7 (http), exa (http), gitnexus (stdio, npx), serena (stdio), terraform-mcp (stdio). FR-5's drift baseline is per-server tools/list output. KB-mcp-platform documents the six-server canonical state (SKILL.md line 16 + line 61 explicitly: 'six named MCP servers'). One audit script (audit_op2_consumer_mapping.py lines 11, 36) STILL references mcp-openapi-schema → design-api — stale-doc hazard FR-1's design-realization audit would catch if it ran today."
+    },
+    {
+      "name": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "path": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "issue-doctype:register",
+      "entry_points": ["the register IS the §O posture canonical source"],
+      "dependencies": [],
+      "notes": "245+ line register. §O.1 names FIVE rows with post-ship triggers (NOT four as the Research Plan estimated): A-3 (OI-6) [Serena 90-day kill], D-5 (Q-CS-2) [cold-cache 10-min trigger], E-2 [Serena felt-utility review], E-3 [Serena 90-day kill — duplicate target], I-1 [cold-cache 20-min prebuild mandate]. The Research Plan + PRD AC-FR-11-c name E-3, A-3, D-5, I-1 (omitting E-2) — Discovery surfaces E-2 as a fifth row warranting same treatment. §O.3 enumerates the three permitted framings verbatim: event-trigger / honest-acceptance / concrete-machinery. §O.5 records user direction at Gate 4 v3 — 'no changes to the feature scope. Blueprint v3 keeps the 90 days post-ship phrasing in OI-6 and the Risks-table cold-cache row verbatim. The pattern observation is captured here as the project's posture going forward; future features adopt it, this feature ships as-designed.' AC-FR-11-c verbatim-preservation testable by grep against this section."
+    },
+    {
+      "name": "Issues/cross-artifact-divergence-detection-gap/",
+      "path": "Issues/cross-artifact-divergence-detection-gap/",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "issue-doctype:analysis+proposal+evidence",
+      "entry_points": ["source for H1, H3, H6, H8, H9"],
+      "dependencies": [],
+      "notes": "Directory contains analysis.md, proposal.md, evidence/mcp-postmortem-2026-05-24/ (8 files including 01-error-log.json, 02-pipeline-trace.md, 03-hardening-recommendations.md, README.md). The hardening recommendations name DEF-08 explicitly: --with-runtime is misnamed (lines 25-26 of 03-hardening-recommendations.md). H1 in analysis.md line 239 names '--with-mcp-reachability audit flag + live handshake check'. The proposal.md line 90 lists '--with-mcp-reachability' as one of the named mechanisms."
+    },
+    {
+      "name": "Issues/per-agent-design-evaluation-gap/",
+      "path": "Issues/per-agent-design-evaluation-gap/",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "issue-doctype:analysis",
+      "entry_points": ["source for B1, B2, B3, B4, B5"],
+      "dependencies": [],
+      "notes": "Contains analysis.md + evidence/ which now HOSTS the agent-roster-impact-matrix.md (migrated per issue-capture-mechanism-r1 FR-9 from working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md). The matrix is the FR-6 reference exemplar — Discovery confirmed it currently lives at Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md (39602 bytes). The original location is GONE per the migration. This is a UPDATED FACT relative to the Research Plan, which still references the working/ path at line 275."
+    },
+    {
+      "name": "state-transitions-log-entry-template",
+      "path": ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "documentation-template",
+      "entry_points": ["consumed by execute-orchestrator (only writer) per ADR-0044"],
+      "dependencies": [],
+      "notes": "Per-entry JSONL schema (v1, per ADR-0044). Required fields: timestamp, transition_name (T0..T13), from_state, to_state, trigger, invoking_agent (always execute-orchestrator in v1). Optional: task_id, phase_id, cycle_counter, artifact_paths_affected, context, void, void_reason. Re-emission convention: -prime / -double-prime / -triple-prime suffixes. For FR-9, Blocks-X marker transitions COMPOSE with the existing schema — a new symbolic transition_name like 'BLOCKS-X-RESOLVED' / 'BLOCKS-X-DEFERRED' / 'BLOCKS-X-FALSEPOSITIVE' fits as a string value of transition_name (the field is currently '<symbolic-name-from-14-row-table>' string). No schema evolution required."
+    },
+    {
+      "name": "test-phase-validator-author",
+      "path": ".claude/agents/test-phase-validator-author.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-agent",
+      "entry_points": ["Phase Validator Authoring stage (Stage 10 of recipe-feature-pipeline)"],
+      "dependencies": ["KB-documentation-criteria", "KB-general-coding-principles", "KB-review-disciplines"],
+      "frontmatter": {
+        "model": "opus",
+        "effort": "high",
+        "skills": ["KB-documentation-criteria", "KB-general-coding-principles", "KB-review-disciplines"]
+      },
+      "notes": "This is the actual 'PV-author' the PRD/Research-Plan names. Produces phase-validators.md. NO dedicated 'PV-author rubric' file exists at .claude/skills/KB-task-decomposition/ — the rubric is inlined in this agent's Phase 2 (Per-phase validator entry has sections: Validator ID, Phase reference, Validator goal, Pass criteria, Acceptance tests, Operational checks, Severity rules [blocking / warning / informational], Failure response, Validator metadata). FR-3's cross-file invariant prompt attaches as a NEW required section in Phase 2 of this agent. The severity vocabulary HERE differs from the auditor agents: blocking / warning / informational, not BLOCKER / MAJOR / MINOR / INFO."
+    },
+    {
+      "name": "KB-task-decomposition",
+      "path": ".claude/skills/KB-task-decomposition/",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-skill",
+      "entry_points": ["loaded by finalize-task-decomposer ONLY"],
+      "dependencies": [],
+      "notes": "Per the SKILL.md line 24 ('This KB is loaded by finalize-task-decomposer (single sub-agent per pipeline run; sole consumer of this KB)'), this KB is NOT the home of the PV-author rubric — that is in the test-phase-validator-author agent body. The Research Plan IN-009 line 134 says 'PV-author rubric lives in .claude/skills/KB-task-decomposition/ (per ADR-0020)' — Discovery surfaces a CORRECTION: it does not. The rubric is in the agent prompt. FR-3 must attach inside .claude/agents/test-phase-validator-author.md and/or in KB-review-disciplines (since PV authors load that for severity discipline)."
+    },
+    {
+      "name": "agent-inventory",
+      "path": ".claude/agents/*.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "claude-code-agents",
+      "entry_points": ["37 agent files (CORRECTION: not 36 as PRD Background says)"],
+      "dependencies": [],
+      "notes": "EXACT INVENTORY at HEAD 8988be2 — 37 .md files: cc-critique.md, design-api.md, design-backend.md, design-cicd.md, design-claude-code.md, design-codespaces.md, design-composer.md, design-database.md, design-frontend.md, design-iac.md, design-query.md, discovery-codebase-researcher.md, discovery-external-researcher.md, discovery-plan-author.md, execute-finalize-reconciler.md, execute-orchestrator.md, execute-phase-quality-reviewer.md, execute-task-code-producer.md, execute-task-quality-handler.md, finalize-deliverable-packager.md, finalize-reconciler.md, finalize-task-decomposer.md, intake-intent-clarifier.md, intake-prd-author.md, issue-capture-author.md, plan-author.md, review-architecture-auditor.md, review-cross-artifact-auditor.md, shared-document-reviewer.md, synth-critic.md, synth-extractor.md, synth-framer.md, synth-grapher.md, synth-substrate.md, synth-synthesizer.md, test-acceptance-author.md, test-phase-validator-author.md. PRD Background says '8 of 36 agents' touched in the prior MCP run — current count is 37. FR-6 row-count AC (AC-FR-6-b: 'row count to equal the count of files matching .claude/agents/*.md at the time of authoring') makes this a moving target — the matrix is bound to authoring time, not 36 or 37 absolutely."
+    },
+    {
+      "name": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md (deferral conventions)",
+      "path": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "discipline-text-target-for-FR-11",
+      "entry_points": [],
+      "dependencies": [],
+      "notes": "Per FR-11 + PRD AC-FR-11-c, this register's §O.1 rows ARE NOT TO BE RETROACTIVELY EDITED. FR-11 attaches in the DISCIPLINE TEXTS (KB-cc-design, KB-task-decomposition, KB-documentation-criteria's disciplines/ subdir, intake-prd-author + design-composer agents that author deferrals). Discipline-text inventory (grep 'post-ship' in .claude/skills/ + .claude/agents/): the grep returned ZERO occurrences in .claude/ (only in working/feature/*-deferrals/). FR-11 establishes the posture going forward by INSERTING the three permitted framings into the discipline texts (none yet contain post-ship trigger language) — the change is additive prescription rather than negation of existing prose. This is a useful Discovery surprise: there's no existing 'post-ship' prose in the discipline texts to negate."
+    },
+    {
+      "name": "ADR-locus (canonical placement)",
+      "path": "adrs/",
+      "layer": "cc",
+      "language": "markdown",
+      "framework": "decision-records",
+      "entry_points": [],
+      "dependencies": ["validate_adr_placement.py (auditing-shared canonical helper)"],
+      "notes": "Per ADR-0036 + ADR-0054 + ADR-0056, ADRs live exclusively at adrs/ at repo root. No carve-outs (per ADR-0056). The canonical-helper validator validate_adr_placement.py enforces three surfaces (per ADR-0054). For FR-1's prescription-extractor: the locus is stable. ADR-0041 (install-mechanism-hybrid) is the canonical example of the design-realization gap FR-1 closes — it prescribes argv strings the eventual .mcp.json + postCreate.sh implementations diverged from. ADR-0040 (Serena narrowed allowlist) is the canonical example for FR-6 — its Known Unknowns row exemplifies the per-agent-design-evaluation-gap. ADRs are stable text; no companion-file convention exists yet (no *.yaml siblings in adrs/) — OI-A1 is genuinely undecided in the codebase."
+    }
+  ],
+  "dependencies": [
+    {"from": "review-architecture-auditor", "to": "KB-review-disciplines", "kind": "skill_load", "count": 1, "representative_files": [".claude/agents/review-architecture-auditor.md"], "confidence": "high"},
+    {"from": "review-architecture-auditor", "to": "codebase-analysis.json", "kind": "file_reference", "count": 1, "representative_files": [".claude/agents/review-architecture-auditor.md (Phase 1 step 6)"], "confidence": "high"},
+    {"from": "review-architecture-auditor", "to": "mcp__gitnexus__*", "kind": "mcp_call", "count": 1, "representative_files": [".claude/agents/review-architecture-auditor.md (Phase 3)"], "confidence": "high"},
+    {"from": "review-architecture-auditor", "to": "auditing-shared", "kind": "transitive_via_disciplines", "count": 0, "representative_files": [], "confidence": "low", "notes": "No direct call; severity vocab divergence (critical/important/recommended vs BLOCKER/MAJOR/MINOR/INFO) is a documented gap between the two surfaces."},
+    {"from": "discovery-codebase-researcher", "to": "KB-codebase-research", "kind": "skill_load", "count": 1, "representative_files": [".claude/agents/discovery-codebase-researcher.md"], "confidence": "high"},
+    {"from": "discovery-codebase-researcher", "to": ".mcp.json", "kind": "file_reference", "count": 1, "representative_files": [".claude/agents/discovery-codebase-researcher.md (At task start step 2)"], "confidence": "high"},
+    {"from": "design-cc", "to": "KB-cc-design", "kind": "skill_load", "count": 1, "representative_files": [".claude/agents/design-claude-code.md"], "confidence": "high"},
+    {"from": "design-cc", "to": "KB-cc-design Principle 9", "kind": "explicit_text_citation", "count": 1, "representative_files": [".claude/agents/design-claude-code.md:56"], "confidence": "high"},
+    {"from": "test-phase-validator-author", "to": "KB-review-disciplines", "kind": "skill_load", "count": 1, "representative_files": [".claude/agents/test-phase-validator-author.md"], "confidence": "high"},
+    {"from": "test-phase-validator-author", "to": "KB-documentation-criteria", "kind": "skill_load", "count": 1, "representative_files": [".claude/agents/test-phase-validator-author.md"], "confidence": "high"},
+    {"from": "auditing-mcp/scripts/audit_mcp.py", "to": "check_toxic_combinations.py", "kind": "subprocess_dispatch", "count": 1, "representative_files": [".claude/skills/auditing-mcp/scripts/audit_mcp.py (line 56-58)"], "confidence": "high", "notes": "ONLY consumer of --with-runtime today; this is the DEF-08 root cause."},
+    {"from": "auditing-cc-configs/scripts/audit_project.py", "to": "auditing-mcp/scripts/audit_mcp.py", "kind": "subprocess_dispatch_with_flag_forward", "count": 1, "representative_files": [".claude/skills/auditing-cc-configs/scripts/audit_project.py:247"], "confidence": "high", "notes": "Forwards --with-runtime verbatim. FR-4-d must coordinate the rename here too."},
+    {"from": "recipe-feature-pipeline", "to": "shared-document-reviewer", "kind": "invocation_5x", "count": 5, "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md (lines 77-90 invocation table)"], "confidence": "high"},
+    {"from": "recipe-feature-pipeline", "to": "discovery-codebase-researcher", "kind": "stage_dispatch", "count": 1, "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md"], "confidence": "high"},
+    {"from": "recipe-feature-pipeline", "to": "design-cc (when CC in scope)", "kind": "stage_dispatch_conditional", "count": 1, "representative_files": [".claude/skills/recipe-feature-pipeline/SKILL.md"], "confidence": "high"},
+    {"from": "execute-orchestrator", "to": "state-transitions.log", "kind": "log_write", "count": 1, "representative_files": [".claude/skills/auditing-shared/scripts/log_state_transition.py"], "confidence": "high", "notes": "Per ADR-0044 v1 invariant, execute-orchestrator is the only writer (logical owner)."},
+    {"from": "design-cc", "to": "codebase-analysis.json", "kind": "file_reference", "count": 1, "representative_files": [".claude/agents/design-claude-code.md (Phase 1)"], "confidence": "high"},
+    {"from": "design-composer", "to": "codebase-analysis.json", "kind": "file_reference", "count": 1, "representative_files": [".claude/agents/design-composer.md:42, :154, :159"], "confidence": "high"},
+    {"from": "plan-author", "to": "codebase-analysis.json", "kind": "file_reference", "count": 1, "representative_files": [".claude/agents/plan-author.md:38"], "confidence": "high"},
+    {"from": "finalize-task-decomposer", "to": "codebase-analysis.json", "kind": "file_reference", "count": 1, "representative_files": [".claude/agents/finalize-task-decomposer.md:35"], "confidence": "high"},
+    {"from": "design-frontend / design-backend / design-api / design-database / design-query / design-iac / design-cicd / design-codespaces", "to": "codebase-analysis.json", "kind": "file_reference", "count": 8, "representative_files": [".claude/agents/design-*.md (each cites codebase_analysis_path)"], "confidence": "high"}
+  ],
+  "blast_radius": [
+    {
+      "touch_point": "review-architecture-auditor (.claude/agents/review-architecture-auditor.md)",
+      "direct_dependents": ["recipe-feature-pipeline (stage 8 dispatch)", "finalize-reconciler (consumes architecture-audit-issues.json)"],
+      "transitive_dependents_3_hop": ["recipe-feature-pipeline", "finalize-reconciler", "design-composer (writes blueprint audited)", "review-cross-artifact-auditor (sibling auditor; non-replicating)", "finalize-deliverable-packager (consumes architecture-audit-issues.json archived state)"],
+      "test_files": [".claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py (architecture-audit-issues type registered in validate_pipeline_frontmatter)"],
+      "hop_tier_distribution": {"1": 2, "2": 2, "3": 1},
+      "schema_assumption_check": "audit-issues.json (architecture-audit-issues.json variant) schema: {schema_version, audit_id, audited_artifact, audited_at, code_graph_used, checks_performed[], issues[{id, severity, category, summary, evidence[], recommended_resolution}], summary{BLOCKER, MAJOR, MINOR, INFO}, verdict}. FR-1 adding a 'design_realization' value to checks_performed[] and a 'design_realization' value to issue.category is ADDITIVE — no breaking change for existing consumers. NFR-8's required fields (rule / target / divergence / next_action) are NOT currently in the schema — they need to be added as new sub-fields under issues[] (additive)."
+    },
+    {
+      "touch_point": "auditing-mcp --with-runtime flag (audit_mcp.py + check_toxic_combinations.py)",
+      "direct_dependents": [
+        ".claude/agents/cc-critique.md (line 45, 74)",
+        ".claude/skills/auditing-cc-configs/scripts/audit_project.py (lines 247, 407-408, 418, 433)",
+        ".claude/skills/auditing-cc-configs/SKILL.md (lines 42, 182)",
+        ".claude/skills/auditing-cc-configs/assets/audit-checklist.md (line 9)",
+        ".claude/skills/auditing-cc-configs/references/audit-rubric.md (line 125)",
+        ".claude/skills/auditing-cc-configs/references/common-failures.md (line 133)",
+        ".claude/skills/auditing-mcp/SKILL.md (lines 8, 37, 55, 79, 85)",
+        ".claude/skills/auditing-mcp/examples/good-mcp-annotated.md (lines 62, 73, 75)",
+        ".claude/skills/auditing-mcp/references/common-failures.md (line 53)",
+        ".claude/skills/auditing-mcp/references/toxic-combinations.md (lines 17, 59, 88)",
+        ".claude/skills/auditing-mcp/scripts/check_toxic_combinations.py (lines 9, 14, 113, 117)",
+        ".claude/skills/KB-mcp-platform/references/operator-runbook.md (line 87)",
+        ".claude/skills/KB-mcp-platform/references/mcp-events-jsonl.md (line 103)",
+        ".claude/skills/KB-mcp-platform/references/troubleshooting.md (line 109)"
+      ],
+      "transitive_dependents_3_hop": [
+        "All of the above plus: Issues/cross-artifact-divergence-detection-gap/evidence/mcp-postmortem-2026-05-24/* (15 lines documenting DEF-08; not consumers but documentary references)",
+        "working/feature/pipeline-cross-artifact-discipline-r1/research-plan.md (already updated for the rename)",
+        "working/feature/pipeline-cross-artifact-discipline-r1/prd-v1.md, prd-v2.md (rename documented)"
+      ],
+      "test_files": [],
+      "hop_tier_distribution": {"1": 14, "2": 3, "3": 0},
+      "schema_assumption_check": "FR-4-d (legacy flag fails loudly): 14 first-class call sites must be updated. cc-critique.md is an agent prompt that tells humans to use --with-runtime — this is a documentation update site. audit-cc-configs scripts must coordinate. The bulk (10+) are documentation references in skill bodies."
+    },
+    {
+      "touch_point": "discovery-codebase-researcher output schema (codebase-analysis.json)",
+      "direct_dependents": [
+        ".claude/agents/review-architecture-auditor.md (Phase 1.6)",
+        ".claude/agents/design-composer.md (lines 42, 154, 159)",
+        ".claude/agents/design-cc.md (Phase 1)",
+        ".claude/agents/design-frontend.md, design-backend.md, design-api.md, design-database.md, design-query.md, design-iac.md, design-cicd.md, design-codespaces.md (8 per-layer designers)",
+        ".claude/agents/plan-author.md (line 38, 57)",
+        ".claude/agents/test-acceptance-author.md (line 29, 87)",
+        ".claude/agents/finalize-task-decomposer.md (line 35)"
+      ],
+      "transitive_dependents_3_hop": [
+        "Same 12 agents, plus:",
+        ".claude/skills/auditing-shared/scripts/validate_pipeline_frontmatter.py (registers codebase-analysis as a valid doc_type)",
+        ".claude/skills/recipe-feature-pipeline/SKILL.md (outputs table)",
+        ".claude/skills/KB-documentation-criteria/references/deliverable-archive-spec.md (archives the JSON)"
+      ],
+      "hop_tier_distribution": {"1": 12, "2": 3, "3": 0},
+      "schema_assumption_check": "FR-2's §Protocol Conformance subsection is additive (new field in the canonical schema). None of the 12 downstream consumers index into a fixed-shape protocol_conformance[] today — they all consume components[], dependencies[], blast_radius[], conventions{}. Schema extension is structurally safe. Per ADR-0018 + ADR-0038, additive extensions preserve compat."
+    },
+    {
+      "touch_point": "design-cc deliverable set (cc-design.md + cc-dependencies.json)",
+      "direct_dependents": [
+        ".claude/agents/design-composer.md (consumes <layer>-design.md / <layer>-dependencies.json per Blueprint composition)",
+        ".claude/skills/recipe-feature-pipeline/SKILL.md (outputs table line 24)"
+      ],
+      "transitive_dependents_3_hop": [
+        "Same 2 plus: shared-document-reviewer (invocation 3 reviews per-layer Design outputs)",
+        "review-architecture-auditor (audits the composed Blueprint, which integrates cc-design)"
+      ],
+      "hop_tier_distribution": {"1": 2, "2": 2, "3": 0},
+      "schema_assumption_check": "FR-6 adds a THIRD mandatory artifact (agent-roster-impact-matrix.md) when trigger fires. design-composer's fan-in input list (currently <layer>-design.md + <layer>-dependencies.json) must accept the third file. recipe-feature-pipeline's outputs table needs a row. shared-document-reviewer invocation 3 should review the matrix as part of the design outputs. No breaking change for designers of non-CC layers since the matrix is conditional on trigger."
+    },
+    {
+      "touch_point": "KB-cc-design Principle 9 (references/principles.md:182)",
+      "direct_dependents": [
+        ".claude/skills/KB-cc-design/references/principles.md:15 (TOC entry)",
+        ".claude/agents/design-claude-code.md:56 (cites verbatim 'per KB-cc-design Principle 9')"
+      ],
+      "transitive_dependents_3_hop": [
+        "Same 2 plus: any future agent file that the design-cc author creates following Principle 9. Today: 0 indirect citations."
+      ],
+      "hop_tier_distribution": {"1": 2, "2": 0, "3": 0},
+      "schema_assumption_check": "Concentrated. FR-8's edit affects exactly 2 sites. Per ADR-0005 append-only supersession discipline, Principle 9 text is rewritten in place + a brief amendment note records the rewording (or a new Principle 11 supersedes 9, which the principles.md TOC has not done historically). Cross-reference per AC-FR-8-b: design-claude-code.md line 56 must update to match the new Principle 9 text AND to cite the FR-6 matrix discipline (mutual cross-reference)."
+    },
+    {
+      "touch_point": "PV-author rubric (test-phase-validator-author.md Phase 2)",
+      "direct_dependents": [
+        ".claude/agents/finalize-reconciler.md:33, :62 (re-invokes test-phase-validator-author on revision)",
+        ".claude/agents/plan-author.md:130 (downstream consumer)"
+      ],
+      "transitive_dependents_3_hop": [
+        "Same 2 plus: phase-validators.md (every prior feature run's output)",
+        "review-cross-artifact-auditor.md (consumes phase-validators.md)"
+      ],
+      "hop_tier_distribution": {"1": 2, "2": 2, "3": 0},
+      "schema_assumption_check": "FR-3's cross-file invariant prompt is added inside Phase 2 of test-phase-validator-author. The rubric is INLINED in the agent body (not in KB-task-decomposition as Research Plan IN-009 claimed). Discovery surfaces this correction explicitly."
+    },
+    {
+      "touch_point": "state-transitions.log schema (templates/state-transitions-log-entry-template.md)",
+      "direct_dependents": [
+        ".claude/agents/execute-orchestrator.md (logical owner / sole writer per ADR-0044 v1 invariant)",
+        ".claude/skills/auditing-shared/scripts/log_state_transition.py (the writer)"
+      ],
+      "transitive_dependents_3_hop": [
+        "Same 2 plus: every feature run's state-transitions.log (artifact instances)",
+        ".claude/skills/recipe-feature-pipeline/SKILL.md (cross-references the schema in execution_pipeline_state_transitions)"
+      ],
+      "hop_tier_distribution": {"1": 2, "2": 2, "3": 0},
+      "schema_assumption_check": "FR-9's Blocks-X marker transitions are RECORDED as state-transition entries. The transition_name field is a free string today (canonical T0..T13 + -prime suffixes). A new value like 'BLOCKS_X_RESOLVED' / 'BLOCKS_X_DEFERRED' / 'BLOCKS_X_FALSEPOSITIVE' fits the existing schema without evolution. No new event type needed."
+    }
+  ],
+  "conventions": {
+    "cc": {
+      "agent_file_frontmatter": "Required YAML frontmatter with: name (the slug), description (one paragraph), model (sonnet|opus|haiku|inherit), effort (low|medium|high|xhigh|max — opus-4.7-only for xhigh), tools (array of tool patterns including allowlist+denylist), skills (array of <name> referencing .claude/skills/<name>/SKILL.md), memory (project|user|managed), and occasionally user-invocable (boolean). 37 agents at HEAD; all use model:opus; effort distribution: 5 agents use xhigh (design-composer, review-architecture-auditor, review-cross-artifact-auditor, synth-synthesizer, finalize-task-decomposer per KB-cc-design Principle 9 worked example); the remainder use high. Filename convention: kebab-case per stage-or-domain prefix (intake-* / discovery-* / synth-* / design-* / review-* / execute-* / finalize-* / test-* / issue-* / cc-* / shared-* / plan-*).",
+      "skill_file_conventions": "SKILL.md at .claude/skills/<name>/SKILL.md. Required frontmatter: name, description, allowed-tools (string or array). Optional: family (per ADR-0042 graduated families), pedagogical_sections (per ADR-0030 with path + justification), user-invocable. references/ subdir holds discipline texts; scripts/ subdir holds runnable scripts; assets/ subdir holds templates/fixtures; examples/ subdir holds positive/negative fixtures. KB-* skills are knowledge-bases (loaded into context); auditing-* skills are runnable audit scaffolds; recipe-* skills are orchestrators.",
+      "KB_cross_reference_conventions": "Principles cross-reference each other by 'Principle N' (numbered), with the TOC listing all principles at the top of references/principles.md. Skills reference KBs from frontmatter `skills:` arrays (the SA-13 check enforces each entry resolves to an existing SKILL.md). Discipline texts cite ADRs with `ADR-NNNN` (4-digit zero-padded) typically inline or via 'per ADR-NNNN' parentheticals. Cross-references across .md files use relative paths (e.g., `references/principles.md`) — no inter-file anchor links observed.",
+      "audit_issues_finding_shape": "Two divergent conventions observed:\n- review-architecture-auditor.md (lines 120-155) and review-cross-artifact-auditor.md schema: {id, severity, category, summary, evidence[], recommended_resolution}. NFR-8 in the PRD prescribes adding {rule, target, divergence, next_action} — these are NOT in the current schema.\n- KB-review-disciplines/references/severity-taxonomy.md: same shape but uses three severity values (critical / important / recommended) plus a separate category dimension (consistency / completeness / compliance / clarity / feasibility) — a different vocabulary entirely. The reviewer discipline applies to shared-document-reviewer (Gate 0/1); the auditor agents emit BLOCKER/MAJOR/MINOR/INFO.\nNet: there are TWO finding-shape conventions in the codebase today (auditor-style and reviewer-style). The Research Plan's IN-002 calls this out; FR-1 / FR-4 / FR-5 / FR-9 / FR-10 all emit auditor-style severities per the PRD. The reviewer-style remains for shared-document-reviewer at Gate 0/1.",
+      "severity_string_convention": "Three severity surfaces in the codebase, each with its own vocabulary:\n1. **Auditor agents** (review-architecture-auditor, review-cross-artifact-auditor, auditing-mcp SKILL.md `Severity meanings (v2)`): BLOCKER / MAJOR / MINOR / NIT (auditing-mcp) and BLOCKER / MAJOR / MINOR / INFO (architecture/cross-artifact auditors). Slight divergence (NIT vs INFO).\n2. **shared-document-reviewer + KB-review-disciplines/severity-taxonomy.md**: critical / important / recommended. Score-based verdict mapping (consistency / completeness scores → verdict).\n3. **Phase Validators** (test-phase-validator-author, .claude/agents/test-phase-validator-author.md Phase 2 'Severity rules' section): blocking / warning / informational.\n\nverdict_compute.py (auditing-cc-configs) bridges 1↔point-deduction: BLOCKER -12, MAJOR -5, MINOR -2, NIT -0.5, INFO 0. PRD FR-1/4/5/9/10 explicitly emit BLOCKER and MAJOR per AC text — the auditor vocabulary is the operative one for those findings. The PRD's FR-3 (PV invariants) interacts with vocabulary 3.",
+      "Blocks_X_marker_grammar_OI_A5": "GREP RESULT: only ONE occurrence of 'Blocks <stage>' grammar across all working/feature/*/codebase-analysis*.md AND research-plan*.md, in working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis-report.md lines 198-202. The grammar there is `Blocks design-composition-completion.` / `Blocks design-cc-completion.` (period-terminated; the stage-name is hyphenated kebab-case suffixed with `-completion`). NO state-transition log entries match the Blocks-X grammar. NO agent prompts or skill bodies emit such markers. The grammar is APPRESENT-BUT-NEAR-ABSENT: it exists in exactly one prior feature run's discovery output and nowhere else. Per OI-A5 / A-5 assumption: the grammar is essentially absent in the broader corpus, so FR-9 establishes the canonical grammar rather than reconciling heterogeneity. Recommendation for Synthesis: treat the devcontainer-mcp-provisioning-r1 codebase-analysis-report.md syntax as the precedent (`Blocks <stage-slug>-completion.`) and standardize from there. The Research Plan's expectation of 'heterogeneous OR absent' should be recorded as 'effectively absent (n=1 prior occurrence)'."
+    }
+  },
+  "known_issues": [
+    {
+      "description": "Stale doc: KB-mcp-platform/SKILL.md still references 'seven servers' in places where it should say six (mostly historical narrative; current text is clear about six). audit_op2_consumer_mapping.py lines 11, 36 still map design-api → mcp__mcp-openapi-schema__* even though the server was removed 2026-05-24. This is exactly the design-realization gap FR-1 would catch: ADR-0041 + the postCreate.sh removal commit prescribe the six-server state; audit_op2_consumer_mapping.py diverges.",
+      "files": [".claude/skills/auditing-mcp/scripts/audit_op2_consumer_mapping.py:11", ".claude/skills/auditing-mcp/scripts/audit_op2_consumer_mapping.py:36", ".claude/skills/KB-mcp-platform/SKILL.md:16"],
+      "severity": "medium"
+    },
+    {
+      "description": "Severity-vocabulary divergence across the audit surface (3 distinct vocabularies for findings: auditor BLOCKER/MAJOR/MINOR/{NIT|INFO}, reviewer critical/important/recommended, phase-validator blocking/warning/informational). Documented in KB-review-disciplines and KB-cc-design but cross-surface consistency is not enforced. FR-1/4/5/9/10 emit auditor-style; FR-3 interacts with PV-style. design-composer must reconcile vocabulary at Blueprint time.",
+      "files": [".claude/skills/KB-review-disciplines/references/severity-taxonomy.md", ".claude/skills/auditing-mcp/SKILL.md (Severity meanings (v2))", ".claude/skills/auditing-cc-configs/scripts/verdict_compute.py:54-58", ".claude/agents/test-phase-validator-author.md (Phase 2 Severity rules)"],
+      "severity": "medium"
+    },
+    {
+      "description": "PV-author rubric is NOT in KB-task-decomposition (as Research Plan IN-009 line 134 stated). The rubric is INLINED in .claude/agents/test-phase-validator-author.md Phase 2. KB-task-decomposition's SKILL.md explicitly states it is consumed only by finalize-task-decomposer.",
+      "files": [".claude/agents/test-phase-validator-author.md (Phase 2)", ".claude/skills/KB-task-decomposition/SKILL.md:24"],
+      "severity": "low"
+    },
+    {
+      "description": "Research Plan IN-010 line 139 enumerates 'the four §O.1 rows (E-3, A-3, D-5, I-1)' — but §O.1 actually names FIVE rows: A-3, D-5, E-2, E-3, I-1. The fifth (E-2) is also a 'post-ship felt-utility review' row. PRD AC-FR-11-c verbatim-preservation requirement covers four rows; E-2 may need similar treatment in the verbatim-preservation discipline.",
+      "files": ["Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md (§O.1 table line 224-232)"],
+      "severity": "low"
+    },
+    {
+      "description": "Stale path reference in Research Plan: line 275 references 'working/feature/devcontainer-mcp-provisioning-r1/agent-roster-impact-matrix.md' — but issue-capture-mechanism-r1 FR-9 migrated it to 'Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md'. The original location is gone. FR-6 reference exemplar should cite the new location.",
+      "files": ["working/feature/pipeline-cross-artifact-discipline-r1/research-plan.md:275", "Issues/per-agent-design-evaluation-gap/evidence/agent-roster-impact-matrix.md (the actual current location, 39602 bytes)"],
+      "severity": "low"
+    },
+    {
+      "description": "PRD Background references '8 of 36 agents' (line 44, 100). Current agent count is 37 — the Background's 36 reflects a prior snapshot. FR-6 AC-FR-6-b is bound to authoring-time count (it's a moving target by design), so this is documentary drift rather than a structural defect.",
+      "files": ["working/feature/pipeline-cross-artifact-discipline-r1/prd-v2.md (line 44)", ".claude/agents/ (37 files at HEAD 8988be2)"],
+      "severity": "low"
+    },
+    {
+      "description": "Discipline texts (KB-cc-design, KB-task-decomposition, KB-documentation-criteria/references/disciplines, intake-prd-author.md, design-composer.md) contain ZERO occurrences of 'post-ship' / 'N days post-ship' trigger language today. FR-11 establishes the going-forward posture by ADDING the three permitted framings — there is no pre-existing prose to negate. This is structurally simpler than the PRD assumes.",
+      "files": [".claude/skills/KB-cc-design/", ".claude/skills/KB-task-decomposition/", ".claude/skills/KB-documentation-criteria/references/disciplines/", ".claude/agents/intake-prd-author.md", ".claude/agents/design-composer.md"],
+      "severity": "info"
+    }
+  ],
+  "open_questions_for_human": [
+    {
+      "question": "Should FR-11 also cover the fifth §O.1 row (E-2 'post-ship felt-utility review') in AC-FR-11-c's verbatim-preservation requirement, or accept the PRD's four-row enumeration as deliberate?",
+      "context": "Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md §O.1 lists FIVE rows (A-3, D-5, E-2, E-3, I-1); PRD AC-FR-11-c names four (E-3, A-3, D-5, I-1). E-2 has the same anti-pattern shape ('Felt-utility metric — only measurable post-ship'). Preserving four but not five leaves an inconsistency the next code change could exploit.",
+      "blocks": "design-composition-completion"
+    },
+    {
+      "question": "OI-A1 (machine-checkable companion file vs NLP parse): does the codebase have any precedent of *.yaml siblings next to *.md decision artifacts that FR-1's prescription-extractor could reuse?",
+      "context": "Discovery surveyed adrs/ and found ZERO *.yaml files alongside ADR-*.md. No companion-file convention exists today. Any choice in the OI-A1 resolution that selects the companion-file path is creating a NEW convention rather than extending an existing one. The NLP-parse path operates on the current ADR prose surface, which is stable (single canonical location per ADR-0036).",
+      "blocks": "design-composition-completion"
+    },
+    {
+      "question": "Should FR-9's Blocks-X grammar standardize on the precedent `Blocks <stage-slug>-completion.` (used in devcontainer-mcp-provisioning-r1's codebase-analysis-report.md) or invent a new canonical grammar?",
+      "context": "Only ONE prior occurrence of Blocks-X markers in the entire working/feature/ corpus, at devcontainer-mcp-provisioning-r1/codebase-analysis-report.md lines 198-202. The grammar there is period-terminated, with kebab-case stage names suffixed by `-completion`. OI-A5 / A-5 expected heterogeneity; the actual state is near-absence. Recommendation: adopt the precedent as canonical.",
+      "blocks": "design-cc-completion"
+    },
+    {
+      "question": "Should the FR-1 design-realization audit also catch stale-doc drift like the audit_op2_consumer_mapping.py reference to the removed mcp-openapi-schema server?",
+      "context": "audit_op2_consumer_mapping.py lines 11, 36 still map design-api → mcp__mcp-openapi-schema__* even after the 2026-05-24 removal. This is exactly the structural shape of the design-realization gap (ADR-0041 + removal commit prescribe six servers; this script maps seven). If FR-1's mechanism scans for argv strings only, it misses this — if it covers any structured server references, it catches it. The OI-A1 resolution likely determines coverage.",
+      "blocks": "design-composition-completion"
+    }
+  ],
+  "mechanism_dependency_table": [
+    {
+      "fr_id": "FR-1",
+      "mechanism_code": "H3",
+      "name": "Design-realization audit dimension on review-architecture-auditor",
+      "touched_files_1hop": [
+        ".claude/agents/review-architecture-auditor.md (Phase 4-or-new-Phase + procedure)",
+        ".claude/skills/KB-review-disciplines/references/architecture-audit.md (Lens 4 OR extended Brief-Honor Lens)",
+        ".claude/skills/KB-review-disciplines/references/severity-taxonomy.md (NFR-8 fields rule/target/divergence/next_action; severity coordination)"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-4 (review-architecture-auditor consumes auditing-mcp output for the design-realization audit when ADRs prescribe MCP server invocations — overlap at architecture-audit-issues.json schema)", "FR-5 (same overlap)", "FR-9 (Blocks-X marker grammar may participate in design-realization findings when prescriptions are unresolved)"],
+      "shared_OI_dependencies": ["OI-A1 (prescription-extraction mechanism — machine-checkable companion vs NLP)"],
+      "shared_gate_locations": ["Architecture Audit stage (Stage 8)", "review-architecture-auditor invocation"],
+      "split_membership_R2a_vs_R2b": "R2a (per PRD §Contingency Split — design-time half of H3 even though the audit fires post-design); the PRD explicitly notes 'Design Composition MAY relocate to R2b with rationale' — cross-cutting candidate"
+    },
+    {
+      "fr_id": "FR-2",
+      "mechanism_code": "H6",
+      "name": "§Protocol Conformance subsection in discovery-codebase-researcher output",
+      "touched_files_1hop": [
+        ".claude/agents/discovery-codebase-researcher.md (new procedure phase or sub-step)",
+        ".claude/skills/KB-codebase-research/SKILL.md (schema extension v1.1.x or v1.2.0)",
+        ".claude/skills/KB-codebase-research/SKILL.md (canonical output schema inlined here)"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-9 (Blocks-X marker grammar — Discovery output is where markers are emitted; OI-A5 evidence carries here)"],
+      "shared_OI_dependencies": [],
+      "shared_gate_locations": ["Discovery Research completion", "shared-document-reviewer invocation 3 onwards (downstream consumers read codebase-analysis.json)"],
+      "split_membership_R2a_vs_R2b": "R2b (gate/validator hardening — the §Protocol Conformance subsection is gate-time content for downstream auditors)"
+    },
+    {
+      "fr_id": "FR-3",
+      "mechanism_code": "H9",
+      "name": "PV-tier cross-file consistency invariant catalog",
+      "touched_files_1hop": [
+        ".claude/agents/test-phase-validator-author.md (Phase 2 new section 'Cross-File Invariants')",
+        "(conditional, depending on OI-A2 resolution) NEW FILE .claude/skills/KB-documentation-criteria/references/disciplines/cross-file-invariants.md OR (denormalized) inline in each phase validator template"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-2 (§Protocol Conformance findings during Discovery may become cross-file invariant assertions at PV time)", "FR-9 (Blocks-X markers may close at PV-tier invariant check)"],
+      "shared_OI_dependencies": ["OI-A2 (denormalized vs centralized invariant authoring shape)"],
+      "shared_gate_locations": ["Phase Validator Authoring stage (Stage 10)", "per-phase gate during execution"],
+      "split_membership_R2a_vs_R2b": "R2b (gate/validator hardening)"
+    },
+    {
+      "fr_id": "FR-4",
+      "mechanism_code": "H1",
+      "name": "Rename --with-runtime to --with-mcp-reachability + live handshake",
+      "touched_files_1hop": [
+        ".claude/skills/auditing-mcp/scripts/audit_mcp.py (flag rename, new reachability scaffold)",
+        ".claude/skills/auditing-mcp/scripts/check_toxic_combinations.py (current sole --with-runtime consumer)",
+        ".claude/skills/auditing-mcp/SKILL.md (Routing table dimension 10 + Runtime mode section)",
+        ".claude/skills/auditing-mcp/examples/good-mcp-annotated.md",
+        ".claude/skills/auditing-mcp/references/common-failures.md",
+        ".claude/skills/auditing-mcp/references/toxic-combinations.md",
+        ".claude/skills/auditing-cc-configs/scripts/audit_project.py (forwards flag)",
+        ".claude/skills/auditing-cc-configs/SKILL.md",
+        ".claude/skills/auditing-cc-configs/assets/audit-checklist.md",
+        ".claude/skills/auditing-cc-configs/references/audit-rubric.md",
+        ".claude/skills/auditing-cc-configs/references/common-failures.md",
+        ".claude/skills/KB-mcp-platform/references/operator-runbook.md",
+        ".claude/skills/KB-mcp-platform/references/mcp-events-jsonl.md",
+        ".claude/skills/KB-mcp-platform/references/troubleshooting.md",
+        ".claude/agents/cc-critique.md"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-5 (drift-detection rides on the same handshake)", "FR-1 (design-realization audit may verify .mcp.json matches ADR prescription via reachability)"],
+      "shared_OI_dependencies": [],
+      "shared_gate_locations": ["auditing-mcp runner invocation (any audit pass with --with-mcp-reachability)"],
+      "split_membership_R2a_vs_R2b": "R2b (gate/validator hardening; tightly coupled with FR-5)"
+    },
+    {
+      "fr_id": "FR-5",
+      "mechanism_code": "H8",
+      "name": "Live tool-surface drift detection",
+      "touched_files_1hop": [
+        ".claude/skills/auditing-mcp/scripts/audit_mcp.py (drift comparison after handshake)",
+        ".claude/skills/auditing-mcp/SKILL.md (drift dimension)",
+        "(new) baseline storage convention — likely .claude/skills/auditing-mcp/baselines/<server>.json OR cwd-local"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-4 (shares the handshake)"],
+      "shared_OI_dependencies": [],
+      "shared_gate_locations": ["same as FR-4"],
+      "split_membership_R2a_vs_R2b": "R2b (gate/validator hardening; bundled with FR-4)"
+    },
+    {
+      "fr_id": "FR-6",
+      "mechanism_code": "B1",
+      "name": "Mandatory agent-roster-impact-matrix.md artifact",
+      "touched_files_1hop": [
+        ".claude/agents/design-claude-code.md (design-cc) — new mandatory output",
+        ".claude/skills/recipe-feature-pipeline/SKILL.md (outputs table row + gate at Stage 7 / Design Composition close)",
+        ".claude/skills/KB-cc-design/references/principles.md (Principle 9 cross-reference per AC-FR-8-b)",
+        ".claude/skills/KB-documentation-criteria/references/templates/ (new template agent-roster-impact-matrix-template.md likely)"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-7 (skill-coverage decision may trigger FR-6 via trigger condition 4)", "FR-8 (Principle 9 cross-references the FR-6 cell discipline per AC-FR-8-b)", "FR-10 (backstop audit at packaging time)"],
+      "shared_OI_dependencies": ["OI-A6 (mechanical evaluator for trigger conditions 3 and 4)"],
+      "shared_gate_locations": ["Design Composition close (Stage 7)", "auditing-subagents pre-packaging gate (Stage 13)"],
+      "split_membership_R2a_vs_R2b": "R2a (design-time discipline)"
+    },
+    {
+      "fr_id": "FR-7",
+      "mechanism_code": "B3",
+      "name": "Skill-coverage check at Synthesis / Design",
+      "touched_files_1hop": [
+        ".claude/agents/synth-*.md (some subset — likely synth-synthesizer.md or synth-framer.md)",
+        ".claude/agents/design-composer.md (composition reads Skill-Coverage Decisions section)",
+        ".claude/skills/KB-documentation-criteria/references/templates/ (new section template for Skill-Coverage Decisions)"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-6 (trigger condition 4 fires when skill-coverage decision names an agent)", "FR-8 (Principle 9 affirms the skill-coverage discipline indirectly via active framing)"],
+      "shared_OI_dependencies": ["OI-A6 (mechanical evaluator)"],
+      "shared_gate_locations": ["Synthesis stage (Stage 5)", "Design Composition close (Stage 7)"],
+      "split_membership_R2a_vs_R2b": "R2a (design-time discipline)"
+    },
+    {
+      "fr_id": "FR-8",
+      "mechanism_code": "B2",
+      "name": "Strengthen KB-cc-design Principle 9 from defensive to active",
+      "touched_files_1hop": [
+        ".claude/skills/KB-cc-design/references/principles.md (Principle 9 at line 182; TOC line 15)",
+        ".claude/agents/design-claude-code.md (line 56 cross-reference)"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-6 (mutual cross-reference per AC-FR-8-b: Principle 9 cites FR-6 matrix discipline, design-cc cites updated Principle 9)"],
+      "shared_OI_dependencies": [],
+      "shared_gate_locations": ["KB-cc-design loading by design-cc"],
+      "split_membership_R2a_vs_R2b": "R2a (design-time discipline)"
+    },
+    {
+      "fr_id": "FR-9",
+      "mechanism_code": "B4",
+      "name": "Enforce Blocks-X markers as stage-transition gates",
+      "touched_files_1hop": [
+        ".claude/agents/execute-orchestrator.md (writes the gating logic + state-transition entries)",
+        ".claude/skills/recipe-feature-pipeline/SKILL.md (stage-transition checkpoint logic)",
+        ".claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md (new transition_name values BLOCKS_X_*)",
+        ".claude/agents/discovery-codebase-researcher.md (canonical Blocks-X emission grammar — if FR-2 §Protocol Conformance is where many markers naturally arise)"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-2 (Discovery output is the natural emission site)", "FR-1 (design-realization findings may emit Blocks-X markers for unresolved prescriptions)"],
+      "shared_OI_dependencies": ["OI-A5 (Blocks-X grammar)"],
+      "shared_gate_locations": ["every inter-stage checkpoint in recipe-feature-pipeline"],
+      "split_membership_R2a_vs_R2b": "R2a (design-time discipline)"
+    },
+    {
+      "fr_id": "FR-10",
+      "mechanism_code": "B5",
+      "name": "auditing-subagents feature-touch-coverage rule",
+      "touched_files_1hop": [
+        ".claude/skills/auditing-subagents/SKILL.md (new SA-NN rule)",
+        ".claude/skills/auditing-subagents/scripts/ (new script for the rule; e.g., audit_feature_touch_coverage.py)",
+        ".claude/skills/auditing-subagents/references/ (new discipline text or extension)"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-6 (backstops FR-6 at pre-packaging time; uses same trigger conditions)"],
+      "shared_OI_dependencies": ["OI-A3 (auditing-skills reverse-check — carried as Blueprint Open Question per PRD policy)"],
+      "shared_gate_locations": ["finalize-deliverable-packager pre-packaging audit pass"],
+      "split_membership_R2a_vs_R2b": "R2a (design-time discipline)"
+    },
+    {
+      "fr_id": "FR-11",
+      "mechanism_code": "§O",
+      "name": "Replace post-ship triggers with event/honest/concrete framings in discipline texts",
+      "touched_files_1hop": [
+        ".claude/skills/KB-cc-design/references/principles.md (additive section on deferral framings)",
+        ".claude/skills/KB-task-decomposition/SKILL.md (additive deferral-framing prompt for PV-tier deferrals)",
+        ".claude/skills/KB-documentation-criteria/references/disciplines/ (deferral / open-items convention text — current files: ears-acceptance-criteria.md, others)",
+        ".claude/agents/intake-prd-author.md (Undetermined Items section prompt)",
+        ".claude/agents/design-composer.md (Open Items prompt)"
+      ],
+      "shared_touch_points_with_other_FRs": ["FR-3 (PV-author rubric inherits deferral framings)"],
+      "shared_OI_dependencies": [],
+      "shared_gate_locations": ["any stage that authors a deferral / open-item"],
+      "split_membership_R2a_vs_R2b": "R2b (gate/validator hardening; affects multiple discipline texts but mostly additive)"
+    }
+  ],
+  "watch_item_evidence": {
+    "OI_A1_companion_file_convention_precedent": {
+      "summary": "NO existing companion-file convention in the codebase. The adrs/ directory contains only ADR-*.md files; no *.yaml siblings; no *.json siblings. Any FR-1 resolution choosing the companion-file path establishes a new convention rather than extending one.",
+      "evidence": ["adrs/ inventory: 56+ ADR-*.md files, zero *.yaml / *.json / *.toml siblings"]
+    },
+    "OI_A2_existing_cross_file_PV_checks": {
+      "summary": "NO existing cross-file consistency checks at PV-author tier. The test-phase-validator-author agent body specifies per-phase Pass criteria (individual assertions) but no current PV declares cross-file relationships explicitly. The closest precedent is review-cross-artifact-auditor.md (cross-artifact at audit time, not PV time).",
+      "evidence": [".claude/agents/test-phase-validator-author.md Phase 2 (Pass criteria are per-file/per-phase, not cross-file)", "working/feature/*/phase-validators.md prior outputs show per-criterion structure, no cross-file invariant sections"]
+    },
+    "OI_A4_OI_count_topology_in_recent_runs": {
+      "summary": "RECENT FEATURE RUN OI COUNTS (Undetermined Items section presence and OI checkbox count across PRDs at HEAD): adr-placement-mechanism-repair-r1 prd-v1: 4 OIs. audit-findings-remediation-r1 prd-v1: 0. audit-machinery-fixes-r1 prd-v1: 0. devcontainer-mcp-provisioning-r1 prd-v1..v3: 0. execute-orchestrator-dispatch-mechanism-repair-r1 prd-v1: 0. execution-pipeline-design-r1 prd-v1..v1.1.0: 0. frontend-design-knowledge-r1 prd-v1: 0. issue-capture-mechanism-r1 prd-v1: 0; prd-v2: 0. pipeline-cross-artifact-discipline-r1 prd-v1: 5; prd-v2: 6 (CURRENT RUN). pipeline-quickwins-hardening-r1 prd-v1: 0. pipeline-skill-design-fixes-r1 prd-v1: 0. CONCLUSION: most recent runs declare zero OIs at PRD time (OIs accumulate at later stages). The PRD's threshold of 12 (cumulative across IC carry-forwards + PRD OI-A* + Blueprint Open Questions) is calibrated against the empirical pattern: the IC of this run carries 8 OIs, the PRD-v2 adds 6 (OI-A1..A6); cumulative is 14 BEFORE Blueprint adds any. The cap at 12 has effectively already been crossed — Synthesis enters with 14 active OI surfaces. This is the SIGNAL that the PRD's Contingency Split threshold §1 invokes; design-composer must consider the split.",
+      "evidence": ["working/feature/pipeline-cross-artifact-discipline-r1/intent-clarification.md (OI-1..OI-8 = 8 items)", "working/feature/pipeline-cross-artifact-discipline-r1/prd-v2.md (OI-A1..A6 = 6 items)", "Cumulative going into Synthesis: 8 + 6 = 14 (already > 12 threshold)", "Most other recent runs declare 0 OI checkboxes at PRD time"]
+    },
+    "OI_A5_Blocks_X_grammar_survey": {
+      "summary": "EFFECTIVELY ABSENT. Grep of working/feature/*/codebase-analysis*.md AND working/feature/*/research-plan*.md found exactly ONE occurrence of 'Blocks <stage>' grammar: working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis-report.md lines 198-202. Grammar there: 'Blocks design-composition-completion.' / 'Blocks design-cc-completion.' (period-terminated, kebab-case stage slug suffixed with '-completion'). State-transition logs have ZERO such entries; agent prompts have ZERO; skill bodies have ZERO. The Research Plan's A-5 assumption was 'parseable mechanically' — Discovery surfaces that the grammar is effectively absent, so FR-9 ESTABLISHES the canonical grammar rather than reconciling heterogeneity.",
+      "evidence": ["working/feature/devcontainer-mcp-provisioning-r1/codebase-analysis-report.md:198-202 (the only n=1 prior occurrence)", "grep over working/feature/*/codebase-analysis*.md + */research-plan*.md returns only the above match"]
+    }
+  }
+}

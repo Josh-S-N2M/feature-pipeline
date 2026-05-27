@@ -1,6 +1,6 @@
 ---
 name: execute-orchestrator
-description: "(advisor; non-invocable per ADR-0044) Canonical state-machine reference for the execution-side dispatch loop. The parent recipe-feature-pipeline orchestrator (not this agent) directly dispatches the four execution-side specialists. This file documents the 12-substantive-state machine (plus 2 boundary states INIT/TERMINATED) that the parent orchestrator follows. Previously described as: invoke once per feature run after tasks.json is ratified, at the INIT → pending boundary transition; centralized owner of the execution-pipeline state machine; routes dispatch matrix outputs back to upstream agents; tracks per-task and phase-level cycle counters against ADR-0017's 4-cycle cap (symmetric application per D-12)."
+description: "Use when consulting the canonical state-machine reference for the execution-side dispatch loop. ADVISOR ONLY — non-invocable per ADR-0044. The parent recipe-feature-pipeline orchestrator (not this agent) directly dispatches the four execution-side specialists. This file documents the 12-substantive-state machine (plus 2 boundary states INIT/TERMINATED) that the parent orchestrator follows. Previously described as: invoke once per feature run after tasks.json is ratified, at the INIT → pending boundary transition; centralized owner of the execution-pipeline state machine; routes dispatch matrix outputs back to upstream agents; tracks per-task and phase-level cycle counters against ADR-0017's 4-cycle cap (symmetric application per D-12)."
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, Bash(python3:*)]
@@ -115,6 +115,77 @@ When either cycle counter (per-task or per-phase) exhausts 4 cycles without reso
 3. Surface the escalation to the user via AskUserQuestion or equivalent.
 4. Do NOT continue execution.
 
+## Blocks-X marker gate (FR-9 / AC-FR-9-a / AC-FR-9-b)
+
+At every stage-transition checkpoint where the parent orchestrator advances state, it MUST run the Blocks-X marker parser before completing the transition. The gate is most critical at T7, T8, T11, and T12; it MUST also run at T0 (boundary entry) to catch markers already present in upstream artifacts before any execution begins.
+
+### When the gate runs
+
+| Transition | Checkpoint description |
+|---|---|
+| T0 (boundary) | Before first per-task dispatch — scan upstream artifacts for any pre-existing markers |
+| T7 | per_task_approved → phase_quality_active (all tasks in phase approved) |
+| T8 | phase_quality_active → phase_complete (phase-quality-reviewer PASS) |
+| T11 | phase_complete → pending (next phase begins) |
+| T12 | phase_complete → pipeline_complete (last phase complete) |
+
+### What the gate does
+
+The parent orchestrator invokes `parse_blocks_x_markers.py` against all markdown artifacts in the current `working/feature/<slug>/` directory and the canonical `adrs/` directory:
+
+```bash
+python3 .claude/skills/auditing-shared/scripts/parse_blocks_x_markers.py <artifact-path>
+```
+
+The parser is invoked per file; the orchestrator iterates over relevant artifact paths and aggregates results. The exit code semantics govern the orchestrator's response:
+
+**Exit 2 — no markers found.** The gate passes transparently. No gate logic needed; the orchestrator advances normally.
+
+**Exit 0 — markers present, all well-formed.** The orchestrator MUST require explicit resolution for EACH marker before advancing past the gate. The orchestrator MUST NOT advance the state machine transition until every detected marker carries a logged closure transition. Resolution options (per ADR-0063 §Decision):
+
+1. **`BLOCKS_X_RESOLVED`** — marker closed with rationale; the blocking concern is satisfied.
+2. **`BLOCKS_X_DEFERRED_WITH_OI`** — marker converted to an explicit Open Item (OI); downstream stage may proceed; the OI must be tracked.
+3. **`BLOCKS_X_FALSE_POSITIVE`** — marker withdrawn with rationale; the blocking concern does not apply.
+
+**Exit 1 — malformed markers present.** The orchestrator HALTS. Malformed markers are a structural defect (BLOCKER severity — see §Severity calibration below). The orchestrator surfaces the malformed marker details to the user via AskUserQuestion or equivalent before any further transition.
+
+### Resolution logging
+
+For each detected marker requiring closure, the parent orchestrator MUST emit a state-transition entry to `state-transitions.log` using the canonical JSONL entry shape (per `state-transitions-log-entry-template.md`). The entry MUST use one of the three reserved `transition_name` values. The `context` field carries the marker's stage slug and the closure rationale in the form:
+
+```
+"context": {
+  "target_marker": "<stage-slug>-completion",
+  "additional_notes": "<closure-rationale-one-liner>"
+}
+```
+
+The `target_marker` field names the marker by its stage-slug (e.g., `"design-cc-completion"`). This field is required for all three Blocks-X closure transition names; its absence is a malformed log entry.
+
+Example resolution entry:
+
+```json
+{"timestamp":"<ISO-8601-UTC>","transition_name":"BLOCKS_X_RESOLVED","from_state":"phase_complete","to_state":"pipeline_complete","trigger":"Blocks-X marker resolved before T12 pipeline_complete advance","task_id":null,"phase_id":"<phase-id>","cycle_counter":null,"artifact_paths_affected":["working/feature/<slug>/<artifact>.md"],"invoking_agent":"execute-orchestrator","context":{"target_marker":"design-cc-completion","additional_notes":"blocking concern cleared; design decision confirmed in cc-design §FR-9 block"}}
+```
+
+### Severity calibration
+
+Per `KB-review-disciplines/references/severity-taxonomy.md` §Cross-Surface Severity Bridge Table and the FR-9 row therein:
+
+- **Unresolved markers crossing a phase boundary** — MAJOR severity. A marker present at a gate checkpoint that has not been given a closure transition before the orchestrator advances is an outright gate failure.
+- **Malformed markers** — BLOCKER severity. A marker that does not conform to the canonical grammar `<!-- BLOCKS: <stage-slug>-completion -->` is a structural defect that halts the pipeline.
+
+### Cross-references
+
+- **ADR-0063** (`adrs/ADR-0063-blocks-x-marker-grammar.md`) — canonical Blocks-X marker grammar; parser regex; three reserved `transition_name` values.
+- **`parse_blocks_x_markers.py`** (`.claude/skills/auditing-shared/scripts/parse_blocks_x_markers.py`) — canonical parser; exit codes 0/1/2.
+- **`state-transitions-log-entry-template.md`** (`.claude/skills/KB-documentation-criteria/references/templates/state-transitions-log-entry-template.md`) — canonical entry shape; `BLOCKS_X_RESOLVED`, `BLOCKS_X_DEFERRED_WITH_OI`, `BLOCKS_X_FALSE_POSITIVE` semantics and example entries.
+- **`severity-taxonomy.md`** (`.claude/skills/KB-review-disciplines/references/severity-taxonomy.md`) — §Cross-Surface Severity Bridge Table; FR-9 row.
+- **AC-FR-9-a** — orchestrator invokes parser at stage-transition checkpoints.
+- **AC-FR-9-b** — orchestrator requires resolution before advancing past a gate with detected markers.
+
+---
+
 ## Reading order on invocation
 
 The parent orchestrator MUST, at the start of an execution-phase run:
@@ -124,4 +195,5 @@ The parent orchestrator MUST, at the start of an execution-phase run:
 3. Read `acceptance-tests.md` for AC traceability.
 4. Read `blueprint-v5.md` Components 2-6 for downstream-agent contracts.
 5. Emit T0 transition to log.
-6. Begin per-task loop.
+6. Run Blocks-X marker gate at T0 checkpoint (scan upstream artifacts).
+7. Begin per-task loop.

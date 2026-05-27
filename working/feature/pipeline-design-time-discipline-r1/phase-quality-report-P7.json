@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0.0",
+  "phase": "P7",
+  "phase_title": "FR-10 SA-14 audit-subagents rule",
+  "feature_slug": "pipeline-design-time-discipline-r1",
+  "generated_at": "2026-05-27T00:00:00Z",
+  "verdict": "PASS",
+  "per_dimension_status": {
+    "tests": "PASS",
+    "audits": "PASS",
+    "validator": "PASS",
+    "discipline": "PASS",
+    "scope_deviations": "PASS"
+  },
+  "phase_validator_results": {
+    "PV-7.C1": {
+      "status": "PASS",
+      "evidence": "audit_feature_touch_coverage.py exists at .claude/skills/auditing-subagents/scripts/audit_feature_touch_coverage.py with full SA-14 executor; smoke test 5/5 PASS — (1) predicate-silent (matrix present, compliant), (2) matrix-compliant (positive signal), (3) matrix-missing → BLOCKER verdict emitted, (4) bare-no-change cell → MAJOR verdict emitted, (5) row-count mismatch → MAJOR verdict emitted. T7.1 APPROVED."
+    },
+    "PV-7.C2": {
+      "status": "PASS",
+      "evidence": "Script's verdict-classification logic confirmed via smoke test 5/5: matrix-missing emits severity=BLOCKER with category=matrix_missing; bare-no-change-cell and row-count-mismatch both emit severity=MAJOR. NFR-8 four-field finding contract honored (location/issue/expectation/disposition shape). T7.1 APPROVED includes the verdict-classification check."
+    },
+    "PV-7.C3": {
+      "status": "PASS",
+      "evidence": "SA-14 rule entry present in .claude/skills/auditing-subagents/SKILL.md with the 6-field summary table (rule-id / scope / mechanism / severity-on-violation / executor-script / cross-references). Entry references the new reference doc and folds into the existing rule catalog without disrupting prior rule numbering. T7.2 APPROVED."
+    },
+    "PV-7.C4": {
+      "status": "PASS",
+      "evidence": "Reference doc at .claude/skills/auditing-subagents/references/sa-14-feature-touch-coverage.md exists; 208 lines; 7 sections (rule statement / scope / executor mechanism / verdict classification / cross-references to FR-6 predicate + ADR-0065 / examples / failure-mode catalog). Frontmatter is rule-document compliant. T7.2 APPROVED."
+    }
+  },
+  "findings": [
+    {
+      "id": "I-PQ-P7-001",
+      "severity": "MINOR",
+      "domain": "discipline",
+      "category": "cosmetic_pedagogical_residual_deferred",
+      "summary": "One cosmetic I-AA-005 pedagogical-marker residual remains in .claude/skills/auditing-subagents/examples/good-subagent-annotated.md at line 89 (annotated-example narrative context, not a normative-instruction site). Producer explicitly deferred; orchestrator concurred — no gate impact since I-AA-005's normative-site closure criterion is satisfied (SKILL.md pedagogical_sections + anti-patterns.md Contents header both patched).",
+      "evidence": [
+        {"artifact": ".claude/skills/auditing-subagents/examples/good-subagent-annotated.md", "section": "line 89 (annotated-example body — non-normative pedagogical narrative)"},
+        {"artifact": ".claude/skills/auditing-subagents/SKILL.md", "section": "pedagogical_sections frontmatter (closed by T7.2 — normative)"},
+        {"artifact": ".claude/skills/auditing-subagents/anti-patterns.md", "section": "Contents header (closed by orchestrator single-line edit — normative)"}
+      ],
+      "rationale": "I-AA-005 is fully closed at all normative-instruction sites per its acceptance criterion. The remaining residual is in an annotated-example file — a pedagogical narrative context, not a rule-emission site. Non-blocking; logged for a future maintenance pass that touches good-subagent-annotated.md. Phase 7 verdict unaffected.",
+      "next_action": "Log as open-item for next pipeline-discipline feature run that declares auditing-subagents/examples/ in scope: patch line 89 of good-subagent-annotated.md to align with the normative-site pedagogical-marker convention used in SKILL.md."
+    },
+    {
+      "id": "I-PQ-P7-002",
+      "severity": "INFO",
+      "domain": "scope_deviations",
+      "category": "in_service_of_task_handler_accepted",
+      "summary": "Orchestrator made a single-line edit to anti-patterns.md Contents header during T7.2 to close one I-AA-005 residual the producer explicitly deferred. The handler (T7.2 acceptance evaluator) accepted this as in-service-of-the-task (T7.2 declared the SA-14 rule emission, and the anti-patterns.md Contents header is the canonical normative-site that the SA-14 rule entry cross-references). No scope-deviation gate-block.",
+      "evidence": [
+        {"artifact": ".claude/skills/auditing-subagents/anti-patterns.md", "section": "Contents header (orchestrator's single-line edit)"},
+        {"artifact": "working/feature/pipeline-design-time-discipline-r1/per-task-execution-result.md", "section": "T7.2 disposition — orchestrator-edit acceptance rationale"}
+      ],
+      "rationale": "Per ADR-0033 scope-deviation surfacing: orchestrator edits outside the producer's exact declared touch-set must be surfaced explicitly, not silently absorbed. Surfacing here as INFO with the handler's in-service-of-the-task acceptance recorded. No reconciliation required — the edit was unambiguously required for T7.2's normative completeness (the SA-14 cross-reference would have pointed at an unpatched site otherwise)."
+    }
+  ],
+  "cross_task_consistency_decision": {
+    "issue": "None — T7.1 (audit_feature_touch_coverage.py + smoke test) and T7.2 (SKILL.md rule entry + reference doc + I-AA-005 fold-in) are consistent in their treatment of the SA-14 verdict taxonomy (BLOCKER for matrix-missing; MAJOR for bare-no-change and row-count-mismatch). The script's classification matches the rule entry's documented severities. The reference doc's failure-mode catalog enumerates the same 3 violation classes the smoke test exercises.",
+    "note_on_executor_documentation_alignment": "T7.1's script and T7.2's reference doc co-evolve: the doc's failure-mode catalog is a 1:1 mapping to the smoke test's 5 cases (3 violation cases + 2 positive cases). This is the FR-10 acceptance criterion the SA-14 rule was designed to satisfy.",
+    "outcome": "Phase 7 PASS. No reconciliation dispatched."
+  },
+  "audit_counter_delta": {
+    "schema_version": "1.0.0",
+    "gating": "informational",
+    "audit_severity_breakdown": null,
+    "baseline_reference": "phase-quality-report-P6",
+    "per_domain_deltas": {
+      "tests": "0 → 0 (no change; PV-7.C1/C2/C3/C4 all PASS; T7.1 smoke 5/5)",
+      "audits": "2 → 2 (no new audit findings introduced by Phase 7; detect_stubs.py clean; I-AA-005 closed at normative sites per T7.2 acceptance)",
+      "validator": "0 → 0 (PV-7.C1/C2/C3/C4 all PASS)",
+      "discipline": "5 → 6 (added I-PQ-P7-001 MINOR — cosmetic pedagogical residual in good-subagent-annotated.md line 89; carried forward I-PQ-P4-001, I-PQ-P4-002, I-PQ-P5-002, I-PQ-P5-003, I-PQ-P6-002)",
+      "scope_deviations": "0 → 1 (added I-PQ-P7-002 INFO — orchestrator's single-line edit to anti-patterns.md Contents header during T7.2; handler-accepted as in-service-of-the-task)"
+    },
+    "aggregate_delta": "7 → 9 (added 1 MINOR + 1 INFO; both non-blocking)",
+    "audits_stub": true,
+    "audits_stub_note": "Coordinator audit dimension treated as not-measured per Q-CC-4 stub-vs-real distinction; detect_stubs.py clean is the positive signal, but the broader auditing-* coordinator is not yet invoked at phase-close. Not silently counted as clean."
+  },
+  "rollup_rule_applied": "All 5 dimensions PASS. No BLOCKER finding in any dimension. The two new findings are both non-blocking: I-PQ-P7-001 (MINOR — recommended tier per ADR-0017 severity taxonomy, no verdict effect by itself) and I-PQ-P7-002 (INFO — handler-accepted in-service-of-the-task scope deviation, surfaced explicitly per ADR-0033 but not gate-blocking). PV-7.C1/C2/C3/C4 all PASS. Aggregate verdict: PASS.",
+  "next_action": "Advance to Phase 8 (eat-own-dogfood: run the design-composer Phase 1b substance-review procedure authored in Phase 6 against this run's own skill-coverage decisions; run the SA-14 audit executor authored in Phase 7 against this run's R2a feature-touch matrix at packaging time). Open items carried forward to future feature runs: I-PQ-P4-002 (discovery-codebase-researcher.md MCP init), I-PQ-P5-002 (PV-3.C2 TRIGGER_OVERRIDE enumeration fix), I-PQ-P6-002 (synth-synthesizer sub-section relocation), I-PQ-P7-001 (good-subagent-annotated.md line 89 pedagogical-marker). Phase 7 unblocks Phase 9 packaging-time hard-gate firing of SA-14 against R2a's own deliverable matrix (advisory predicate FR-6/T5.2 and hard gate FR-10/Phase-7 now both in place; layered enforcement complete)."
+}
