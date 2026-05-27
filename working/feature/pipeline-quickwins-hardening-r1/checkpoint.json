@@ -2,8 +2,8 @@
   "run_id": "pipeline-quickwins-hardening-r1-20260525-221123",
   "feature_slug": "pipeline-quickwins-hardening-r1",
   "started_at": "2026-05-25T22:11:23Z",
-  "current_stage": "complete",
-  "stage_status": "passed",
+  "current_stage": "execution",
+  "stage_status": "awaiting_user_continuation_partial_phase_4",
   "gate_history": [
     {
       "gate": "intent_confirmation",
@@ -123,11 +123,863 @@
       "notes": "Pre-existing 5 BLOCKER findings on .claude/skills/synthesize/references/task-08-replication-corpus/final-output/adrs/ resolved by renaming ADR-NNN-*.md \u2192 adr-NNN-*.example.md per user direction (process from adr-placement-mechanism-repair-r1 + ADR-0056 no-carve-outs). README + report + smoke_test_auditing_shared.py cross-references updated. Validator now PASS / 0 findings."
     }
   ],
-  "execution_pipeline_state_transitions": [],
-  "execution_mode": null,
+  "execution_pipeline_state_transitions": [
+    {
+      "transition": "T0",
+      "from": "INIT",
+      "to": "pending",
+      "timestamp": "2026-05-26T03:00:00Z",
+      "trigger": "tasks.json ratified at Gate 6; execution dispatch activated by user direction",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T0.1",
+      "timestamp": "2026-05-26T03:05:00Z",
+      "trigger": "dispatch code-producer for T0.1",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T0.1",
+      "timestamp": "2026-05-26T03:10:00Z",
+      "trigger": "code-producer returned COMPLETED for T0.1",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T0.1",
+      "timestamp": "2026-05-26T03:12:00Z",
+      "trigger": "quality-handler returned APPROVED for T0.1",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T0.2",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "dispatch code-producer for T0.2",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T0.2",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "code-producer returned COMPLETED for T0.2",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T0.2",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "quality-handler returned APPROVED for T0.2",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T0.3",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "dispatch code-producer for T0.3",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T0.3",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "code-producer returned COMPLETED for T0.3",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T0.3",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "quality-handler returned APPROVED for T0.3",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T0.4",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "dispatch code-producer for T0.4",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T0.4",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "code-producer returned COMPLETED for T0.4",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T0.4",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "quality-handler returned APPROVED for T0.4",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T0.5",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "dispatch code-producer for T0.5",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T0.5",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "code-producer returned COMPLETED for T0.5",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T0.5",
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "quality-handler returned APPROVED for T0.5",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T7",
+      "from": "per_task_approved",
+      "to": "phase_quality_active",
+      "phase": 0,
+      "timestamp": "2026-05-26T03:30:00Z",
+      "trigger": "all Phase 0 tasks (T0.1..T0.5) APPROVED; dispatch phase-quality-reviewer",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T8",
+      "from": "phase_quality_active",
+      "to": "phase_complete",
+      "phase": 0,
+      "timestamp": "2026-05-26T03:40:00Z",
+      "trigger": "phase-quality-reviewer returned PASS for Phase 0",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T1.1",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "dispatch code-producer for T1.1",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T1.1",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "code-producer returned COMPLETED for T1.1",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T1.1",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "quality-handler returned APPROVED for T1.1",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T1.2",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "dispatch code-producer for T1.2",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T1.2",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "code-producer returned COMPLETED for T1.2",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T1.2",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "quality-handler returned APPROVED for T1.2",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T1.3",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "dispatch code-producer for T1.3",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T1.3",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "code-producer returned COMPLETED for T1.3",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T1.3",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "quality-handler returned APPROVED for T1.3",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T1.4",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "dispatch code-producer for T1.4",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T1.4",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "code-producer returned COMPLETED for T1.4",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T1.4",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "quality-handler returned APPROVED for T1.4",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T1.5",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "dispatch code-producer for T1.5",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T1.5",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "code-producer returned COMPLETED for T1.5",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T1.5",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "quality-handler returned APPROVED for T1.5",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T1.6",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "dispatch code-producer for T1.6",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T1.6",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "code-producer returned COMPLETED for T1.6",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T1.6",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "quality-handler returned APPROVED for T1.6",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T1.7",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "dispatch code-producer for T1.7",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T1.7",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "code-producer returned COMPLETED for T1.7",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T1.7",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "quality-handler returned APPROVED for T1.7",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T1.8",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "dispatch code-producer for T1.8",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T1.8",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "code-producer returned COMPLETED for T1.8",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T1.8",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "quality-handler returned APPROVED for T1.8",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T1.9",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "dispatch code-producer for T1.9",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T1.9",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "code-producer returned COMPLETED for T1.9",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T1.9",
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "quality-handler returned APPROVED for T1.9",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T7",
+      "from": "per_task_approved",
+      "to": "phase_quality_active",
+      "phase": 1,
+      "timestamp": "2026-05-26T05:00:00Z",
+      "trigger": "all Phase 1 tasks (T1.1..T1.9) APPROVED; dispatch phase-quality-reviewer",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T8",
+      "from": "phase_quality_active",
+      "to": "phase_complete",
+      "phase": 1,
+      "timestamp": "2026-05-26T05:30:00Z",
+      "trigger": "phase-quality-reviewer returned PASS for Phase 1",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T2.1",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T2.1",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T2.1",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T2.2",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T2.2",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T2.2",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T2.3",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T2.3",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T2.3",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T2.4",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T2.4",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T2.4",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T2.5",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T2.5",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T2.5",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T2.6",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T2.6",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T2.6",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T2.7",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T2.7",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T2.7",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T2.8",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T2.8",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T2.8",
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T7",
+      "from": "per_task_approved",
+      "to": "phase_quality_active",
+      "phase": 2,
+      "timestamp": "2026-05-26T06:30:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T8",
+      "from": "phase_quality_active",
+      "to": "phase_complete",
+      "phase": 2,
+      "timestamp": "2026-05-26T06:30:00Z",
+      "trigger": "phase-quality-reviewer returned PASS for Phase 2 (with MAJOR-deferred drift_detected follow-up)",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T3.1",
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T3.1",
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T3.1",
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T3.2",
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T3.2",
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T3.2",
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T3.3",
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T3.3",
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T3.3",
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T7",
+      "from": "per_task_approved",
+      "to": "phase_quality_active",
+      "phase": 3,
+      "timestamp": "2026-05-26T08:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T8",
+      "from": "phase_quality_active",
+      "to": "phase_complete",
+      "phase": 3,
+      "timestamp": "2026-05-26T08:15:00Z",
+      "trigger": "phase-quality-reviewer returned PASS for Phase 3 (with deferred-MAJOR drift_detected carry-forward)",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T4.1",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T4.1",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T4.1",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T4.2",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T4.2",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T4.2",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T4.5",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T4.5",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T4.5",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T1",
+      "from": "pending",
+      "to": "per_task_active",
+      "task_id": "T4.6",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T2",
+      "from": "per_task_active",
+      "to": "quality_active",
+      "task_id": "T4.6",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    },
+    {
+      "transition": "T3",
+      "from": "quality_active",
+      "to": "per_task_approved",
+      "task_id": "T4.6",
+      "timestamp": "2026-05-26T09:00:00Z",
+      "invoking_agent": "execute-orchestrator"
+    }
+  ],
+  "execution_mode": "specialist-dispatch",
   "execution_pipeline_cycle_counters": {
-    "per_task": {},
-    "per_phase": {}
+    "per_task": {
+      "T0.1": 0,
+      "T0.2": 0,
+      "T0.3": 0,
+      "T0.4": 0,
+      "T0.5": 0,
+      "T1.1": 0,
+      "T1.2": 0,
+      "T1.3": 0,
+      "T1.4": 0,
+      "T1.5": 0,
+      "T1.6": 0,
+      "T1.7": 0,
+      "T1.8": 0,
+      "T1.9": 0,
+      "T2.1": 0,
+      "T2.2": 0,
+      "T2.3": 0,
+      "T2.4": 0,
+      "T2.5": 0,
+      "T2.6": 0,
+      "T2.7": 0,
+      "T2.8": 0,
+      "T3.1": 0,
+      "T3.2": 0,
+      "T3.3": 0,
+      "T4.1": 0,
+      "T4.2": 0,
+      "T4.5": 0,
+      "T4.6": 0
+    },
+    "per_phase": {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0
+    }
   },
   "architecture_audit_history": [
     {
@@ -175,5 +1027,19 @@
       "output": "cross-artifact-audit-issues-r2.json"
     }
   ],
-  "completed_at": "2026-05-26T02:30:00Z"
+  "completed_at": "2026-05-26T02:30:00Z",
+  "phase_4_partial": {
+    "completed": [
+      "T4.1",
+      "T4.2",
+      "T4.5",
+      "T4.6"
+    ],
+    "pending": [
+      "T4.3",
+      "T4.4",
+      "T4.7"
+    ],
+    "note": "User opted to pause before the real-env smokes (T4.3, T4.4) and the PR-creation action (T4.7); Phase 4 quality reviewer NOT dispatched (premature; 3 tasks remain)."
+  }
 }

@@ -192,14 +192,14 @@ A third weaker tripwire (E-2 Serena felt-utility on markdown-heavy corpus) has n
 | E. ADR-0040 known-unknowns | 0 | 2 | 1 | 0 | 3 |
 | F. Research OQ resolved at Gate 4 | 0 | 0 | 0 | 2 | 2 |
 | G. Track B meta-features | 0 | 1 | 0 | 0 | 1 |
-| H. Verify-at-execution | 1 | 3 | 3 | 0 | 7 |
+| H. Verify-at-execution | 0 | 3 | 3 | 1 | 7 |
 | I. Risk-table | 0 | 2 | 1 | 0 | 3 |
 | J. Speculative deferrals | 0 | 0 | 2 | 0 | 2 |
-| **Total** | **1** | **12** | **24** | **3** | **40** |
+| **Total** | **0** | **12** | **24** | **4** | **40** |
 
 (Total > 25 because some rows appear in multiple cross-cut categories; the 25-distinct count is the unique-item count, not the row count above.)
 
-**The single HIGH forgetting-risk item is H-4 (GitNexus `GITNEXUS_SKIP_OPTIONAL_GRAMMARS` smoke-test).** Plan-author must wire the CI pre-install smoke-test verifying this env var still works on the pinned tag; without it, an upstream change to GitNexus could silently break the install path.
+**No HIGH forgetting-risk items remain.** H-4 (GitNexus `GITNEXUS_SKIP_OPTIONAL_GRAMMARS` smoke-test) was the single HIGH item; it was adopted by `pipeline-quickwins-hardening-r1` on 2026-05-25 and is now resolved.
 
 ---
 

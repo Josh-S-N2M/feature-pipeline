@@ -1,0 +1,2 @@
+{"event":"install_complete","timestamp":"2026-05-01T10:00:00Z","server":"serena","install_method":"uv-tool","version":"0.4.0","duration_ms":1200,"status":"ok"}
+{"event":"install_complete","timestamp":"2026-05-01T10:00:01Z","server":"gitnexus","install_method":"npm","version":"1.6.5","duration_ms":800,"status":"ok"}

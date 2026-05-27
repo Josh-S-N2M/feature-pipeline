@@ -1,0 +1,66 @@
+{
+  "_fixture_id": "pre-feature-checkpoint-with-workaround",
+  "_description": "Counter-fixture: same pre-feature checkpoint shape but with one stage explicitly carrying execution_mode == parent-driven-workaround. Models a checkpoint where a stage was recorded as falling back to the single-agent workaround. With scope_class == FULL, the FR-2 self-check MUST refuse and emit a structured diagnostic. This validates that the absence-default rule (absence == specialist-dispatch) is semantically distinct from an explicit parent-driven-workaround declaration.",
+  "_authored_for": "T4.6 — counter-fixture to demonstrate refusal path (AC-CC-2-g)",
+  "feature_slug": "example-pre-feature-workaround-r1",
+  "scope_class": "FULL",
+  "current_stage": "execution",
+  "stage_status": "awaiting_phase_continuation",
+  "gate_history": [
+    {
+      "gate": "intent_confirmation",
+      "decision": "approved",
+      "timestamp": "2026-04-11T10:00:00Z"
+    },
+    {
+      "gate": "prd_approval",
+      "decision": "approved",
+      "timestamp": "2026-04-11T11:00:00Z",
+      "prd_version": "0.1.0"
+    },
+    {
+      "gate": "blueprint_approval",
+      "decision": "approved",
+      "timestamp": "2026-04-11T13:00:00Z",
+      "blueprint_version": "v1"
+    },
+    {
+      "gate": "plan_approval",
+      "decision": "approved",
+      "timestamp": "2026-04-11T14:00:00Z",
+      "plan_version": "v1.0.0"
+    }
+  ],
+  "stages": [
+    {
+      "stage_name": "intent_clarification",
+      "status": "complete"
+    },
+    {
+      "stage_name": "prd_authoring",
+      "status": "complete",
+      "execution_mode": "parent-driven-workaround"
+    },
+    {
+      "stage_name": "research_planning",
+      "status": "complete"
+    },
+    {
+      "stage_name": "per_layer_design",
+      "status": "complete"
+    },
+    {
+      "stage_name": "design_composition",
+      "status": "complete"
+    },
+    {
+      "stage_name": "plan_authoring",
+      "status": "complete"
+    },
+    {
+      "stage_name": "execution",
+      "status": "in_progress"
+    }
+  ],
+  "_note": "Stage prd_authoring carries execution_mode == parent-driven-workaround explicitly. With scope_class == FULL, the FR-2 self-check must refuse. Compare with pre-feature-checkpoint.json: the difference between absence (maps to specialist-dispatch) and an explicit workaround declaration is what AC-CC-2-g is designed to confirm."
+}

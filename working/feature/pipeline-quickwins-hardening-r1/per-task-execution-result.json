@@ -1,0 +1,11 @@
+{
+  "task_id": "T4.4",
+  "status": "COMPLETED",
+  "files_modified": [],
+  "files_created": [
+    "working/feature/pipeline-quickwins-hardening-r1/smoke/end-to-end/smoke-report.md"
+  ],
+  "scope_deviations": [],
+  "phase_4_gate_passed": true,
+  "notes": "End-to-end smoke report written at working/feature/pipeline-quickwins-hardening-r1/smoke/end-to-end/smoke-report.md. Three mechanisms exercised live with both known-good and isolation-breakage evidence (FR-1, FR-2, FR-3). Determinism confirmed byte-clean for FR-1 and FR-3 via two successive selftest runs. NFR-9 backward compatibility confirmed: pass_clean.json and pass_with_minor.json both still pass FR-1. FR-4b, FR-4c, and FR-5 formally deferred with T2.5/T3.1/T3.2/T5.2/T5.3 cross-references per AC-X-1 discipline. All L1/L2/L3 verification criteria satisfied."
+}
