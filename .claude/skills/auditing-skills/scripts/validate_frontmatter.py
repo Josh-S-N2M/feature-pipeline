@@ -39,11 +39,26 @@ RECOGNIZED_FIELDS = {
     "mcp-servers", "permission-mode",
     # Audit-family marker convention (see auditing-cc-configs/references/pedagogical-marker-spec.md)
     "pedagogical_sections",
+    # `family:` is a project-local namespace marker used by audit skills and
+    # related KBs to group co-evolving skills (e.g. `family: kb-mcp`,
+    # `family: auditing-mcp`). It is silently ignored by Claude Code's
+    # skill loader; recognized here so the auditor doesn't flag it.
+    "family",
 }
 
-NAME_PATTERN = re.compile(r"^[a-z0-9-]+$")
+# Skill names: lowercase + digits + hyphens by Anthropic spec, with an
+# uppercase-prefix allowance for this project's `KB-*` namespace convention.
+NAME_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9-]*$")
 RESERVED_NAME_WORDS = ("anthropic", "claude")
-XML_TAG_PATTERN = re.compile(r"<[a-zA-Z/][^>]*>")
+# Match only injection-shaped HTML tags. Documentation placeholders like
+# `<topic-slug>` and `<doctype>` are not security risks; they're standard
+# template-variable notation in markdown prose. Restrict the pattern to
+# script/iframe/object/embed/svg-with-on-handler shapes that would actually
+# matter for prompt-injection.
+XML_TAG_PATTERN = re.compile(
+    r"<\s*(script|iframe|object|embed|style|link\s+rel=[\"']?import)\b",
+    re.IGNORECASE,
+)
 
 
 def split_frontmatter(text: str) -> tuple[str | None, str]:
