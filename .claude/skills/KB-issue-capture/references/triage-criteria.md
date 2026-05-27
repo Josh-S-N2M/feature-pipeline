@@ -1,5 +1,14 @@
 # Triage Criteria — Doctype Classification Rubric
 
+## Contents
+
+- Decision Tree
+- Three Doctype Definitions (discipline summary)
+- Worked Classification Examples
+- The Change-Doctype Escape Hatch
+- Cross-References
+
+
 Given a captured-issue topic hint, classify it into one of three doctypes:
 `issue-register` / `issue-analysis` / `issue-proposal`.
 

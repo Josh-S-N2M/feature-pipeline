@@ -60,7 +60,7 @@ Section completion checklist — check each box before this document leaves draf
 
 ## Background / Evidence
 
-[Describe what was observed. Cite concrete file:line evidence where available. Use numbered subsections (1.1, 1.2, …) when multiple independent evidence threads exist — see `Issues/analysis-per-agent-design-evaluation-gap.md` for a 7-subsection example, or keep flat paragraphs for simpler single-thread analyses (see `Issues/analysis-adr-placement-rootcause.md` §1 table). Both shapes are valid; choose based on the number of evidence sources.]
+[Describe what was observed. Cite concrete file:line evidence where available. Use numbered subsections (1.1, 1.2, …) when multiple independent evidence threads exist — see `Issues/per-agent-design-evaluation-gap/analysis.md` for a 7-subsection example, or keep flat paragraphs for simpler single-thread analyses (see `Issues/adr-placement-rootcause/analysis.md` §1 table). Both shapes are valid; choose based on the number of evidence sources.]
 
 ### 1. [Evidence thread or observation heading]
 

@@ -1,5 +1,14 @@
 # Non-Pollution Contract for Outside-Pipeline Issue Capture
 
+## Contents
+
+- The Invariant
+- The 4 NEVER Constraints (mirrored from issue-capture-author.md)
+- Five Project Firsts (per Blueprint v3)
+- Why This Discipline Matters (Pipeline-Isolation Rationale)
+- Cross-References
+
+
 ## The Invariant
 
 Outside-pipeline issue captures MUST write only to `Issues/<topic-slug>/<doctype>.md`.
@@ -100,17 +109,17 @@ is a structural invariant, not a style preference.
 
 ## Cross-References
 
-- **ADR-0051** (`working/feature/issue-capture-mechanism-r1/adrs/ADR-0051-per-issue-folder-model.md`)
+- **ADR-0051** (`adrs/ADR-0051-per-issue-folder-model.md`)
   — the per-issue folder model that defines `Issues/<topic-slug>/<doctype>.md` paths.
-- **ADR-0046** (`working/feature/issue-capture-mechanism-r1/adrs/ADR-0046-add-new-sibling-file-evolution.md`)
+- **ADR-0046** (`adrs/ADR-0046-add-new-sibling-file-evolution.md`)
   — sibling-file evolution with bidirectional cross-links; the non-pollution contract
   applies to the evolution transaction as well.
-- **ADR-0047** (`working/feature/issue-capture-mechanism-r1/adrs/ADR-0047-three-layer-enforcement.md`)
+- **ADR-0047** (`adrs/ADR-0047-three-layer-enforcement.md`)
   — the three-layer enforcement architecture; the audit trail for the five project firsts.
-- **ADR-0049** (`working/feature/issue-capture-mechanism-r1/adrs/ADR-0049-structural-vs-discipline-kb-split.md`)
+- **ADR-0049** (`adrs/ADR-0049-structural-vs-discipline-kb-split.md`)
   — why structural codification (templates, spec) lives in KB-documentation-criteria and
   this discipline content lives in KB-issue-capture.
-- **ADR-0050** (`working/feature/issue-capture-mechanism-r1/adrs/ADR-0050-5-state-issues-vocabulary.md`)
+- **ADR-0050** (`adrs/ADR-0050-5-state-issues-vocabulary.md`)
   — the 5-state lifecycle vocabulary and per-state companion fields.
 - **AC-FR-13-a/b** — the grep-testable zero-baseline acceptance criteria for the
   pipeline-isolation invariant. Encoded verbatim by `test-acceptance-author`.

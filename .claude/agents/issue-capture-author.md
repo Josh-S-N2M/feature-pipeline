@@ -1,6 +1,7 @@
 ---
 name: issue-capture-author
 description: |
+  Use when capturing an outside-pipeline issue via the `/capture-issue` slash command.
   Performs the triage + draft + approval-prompt + write workflow for outside-pipeline
   issue capture. Spawned by the `capture-issue` slash-command entry point via Task.
   Receives create-mode (positional topic-hint) or update-mode (--update <path>) args

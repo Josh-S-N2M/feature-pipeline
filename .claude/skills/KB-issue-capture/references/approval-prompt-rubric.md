@@ -1,5 +1,15 @@
 # Approval-Prompt Rubric — 4 AskUserQuestion Archetypes
 
+## Contents
+
+- Overview
+- Archetype 1 — Create-mode WHY/WHAT/WHERE
+- Archetype 2 — Update-mode OLD→NEW Preview
+- Archetype 3 — Filename-Collision Re-Prompt
+- Archetype 4 — Evolution-Transaction Preview
+- Cross-References
+
+
 This file documents the four `AskUserQuestion` archetypes used by `issue-capture-author`
 per Blueprint §Mechanism Designs D-03. The archetypes are not implementation code — they
 are the WHEN/WHAT/WHICH/WHAT pattern that governs when the agent asks the user and what

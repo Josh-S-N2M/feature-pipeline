@@ -89,7 +89,7 @@ Forgetting risk]
 [Links to sibling Issues/ files and the feature's canonical artifacts]
 ```
 
-The `devcontainer-mcp-provisioning-r1-deferrals/register.md` file has 15 sections
+The `Issues/devcontainer-mcp-provisioning-r1-deferrals/register.md` file has 15 sections
 (A through O), 25 distinct items, and a pattern-observation section (§O) that captures
 a project-wide posture on time-based deferral triggers.
 
@@ -189,7 +189,7 @@ Key fields:
 [Links to evidence artifacts, related analyses, ADRs, and evolution cross-links]
 ```
 
-The `adr-placement-rootcause/analysis.md` demonstrates a full analysis structure:
+The `Issues/adr-placement-rootcause/analysis.md` demonstrates a full analysis structure:
 §1 Background/Evidence (4 sub-sections on causal sites), Root Cause, Implications (4
 staleness mechanisms), Recommendations (two coherent end-states), and evolution
 cross-links (`escalated_to:` pointing at the sibling `proposal.md`).
@@ -283,7 +283,7 @@ Suggested gating considerations.]
 and any related Issues/ analyses]
 ```
 
-The `auditing-family-graduation-review/proposal.md` demonstrates a complete proposal:
+The `Issues/auditing-family-graduation-review/proposal.md` demonstrates a complete proposal:
 §1 captures the Gate-4 precedent decision (OI-2 Path A override), §2 provides a
 per-skill candidate table with three graduation criteria, §3 sizes the work per
 graduated skill, §4 defines the recommended scope for `auditing-family-structure-review-r1`,
