@@ -94,3 +94,14 @@
 {"transition": "T1", "from": "pending", "to": "per_task_active", "task_id": "T4.6", "timestamp": "2026-05-26T09:00:00Z", "invoking_agent": "execute-orchestrator"}
 {"transition": "T2", "from": "per_task_active", "to": "quality_active", "task_id": "T4.6", "timestamp": "2026-05-26T09:00:00Z", "invoking_agent": "execute-orchestrator"}
 {"transition": "T3", "from": "quality_active", "to": "per_task_approved", "task_id": "T4.6", "timestamp": "2026-05-26T09:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T1", "from": "pending", "to": "per_task_active", "task_id": "T4.3", "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T2", "from": "per_task_active", "to": "quality_active", "task_id": "T4.3", "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T3", "from": "quality_active", "to": "per_task_approved", "task_id": "T4.3", "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T1", "from": "pending", "to": "per_task_active", "task_id": "T4.4", "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T2", "from": "per_task_active", "to": "quality_active", "task_id": "T4.4", "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T3", "from": "quality_active", "to": "per_task_approved", "task_id": "T4.4", "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T1", "from": "pending", "to": "per_task_active", "task_id": "T4.7", "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T2", "from": "per_task_active", "to": "quality_active", "task_id": "T4.7", "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T3", "from": "quality_active", "to": "per_task_approved", "task_id": "T4.7", "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T7", "from": "per_task_approved", "to": "phase_quality_active", "phase": 4, "timestamp": "2026-05-26T10:00:00Z", "invoking_agent": "execute-orchestrator"}
+{"transition": "T8", "from": "phase_quality_active", "to": "phase_complete", "phase": 4, "timestamp": "2026-05-26T10:15:00Z", "trigger": "phase-quality-reviewer returned PASS for Phase 4 (with deferred-MAJOR drift_detected carry-forward)", "invoking_agent": "execute-orchestrator"}

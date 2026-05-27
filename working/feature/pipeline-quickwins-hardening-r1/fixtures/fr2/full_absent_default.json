@@ -1,0 +1,23 @@
+{
+  "_fixture_id": "full_absent_default",
+  "_description": "FULL scope, one stage has no execution_mode field (absent). Per ADR-0057 absence-default rule, absence == specialist-dispatch. Expected: self-check passes.",
+  "scope_class": "FULL",
+  "stages": [
+    {
+      "stage_name": "intent_clarification",
+      "checkpoint": {
+        "execution_mode": "specialist-dispatch"
+      }
+    },
+    {
+      "stage_name": "prd_authoring",
+      "checkpoint": {}
+    },
+    {
+      "stage_name": "task_decomposition",
+      "checkpoint": {
+        "execution_mode": "specialist-dispatch"
+      }
+    }
+  ]
+}

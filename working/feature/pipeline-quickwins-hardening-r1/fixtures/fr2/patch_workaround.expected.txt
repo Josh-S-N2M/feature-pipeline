@@ -1,0 +1,3 @@
+verdict: PASS
+reason: scope_class is PATCH; parent-driven-workaround stages are permitted for MINOR and PATCH scope. No refusal raised.
+diagnostic: none

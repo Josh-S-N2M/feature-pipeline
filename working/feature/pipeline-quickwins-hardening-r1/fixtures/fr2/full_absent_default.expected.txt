@@ -1,0 +1,3 @@
+verdict: PASS
+reason: scope_class is FULL but stage prd_authoring has no execution_mode field. Per ADR-0057 absence-default rule, absence is treated as specialist-dispatch. All effective execution_mode values are specialist-dispatch. No refusal raised.
+diagnostic: none

@@ -1,0 +1,3 @@
+verdict: PASS
+reason: scope_class is FULL and all stages have execution_mode == specialist-dispatch. No refusal raised.
+diagnostic: none
