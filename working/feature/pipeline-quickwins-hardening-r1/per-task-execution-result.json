@@ -1,11 +1,12 @@
 {
-  "task_id": "T4.4",
+  "task_id": "cross-task-patch-T7.1-parser-fix",
   "status": "COMPLETED",
-  "files_modified": [],
-  "files_created": [
-    "working/feature/pipeline-quickwins-hardening-r1/smoke/end-to-end/smoke-report.md"
+  "files_modified": [
+    ".claude/skills/auditing-subagents/scripts/audit_feature_touch_coverage.py",
+    ".claude/skills/auditing-subagents/scripts/smoke_test_audit_feature_touch_coverage.py"
   ],
+  "files_created": [],
   "scope_deviations": [],
   "phase_4_gate_passed": true,
-  "notes": "End-to-end smoke report written at working/feature/pipeline-quickwins-hardening-r1/smoke/end-to-end/smoke-report.md. Three mechanisms exercised live with both known-good and isolation-breakage evidence (FR-1, FR-2, FR-3). Determinism confirmed byte-clean for FR-1 and FR-3 via two successive selftest runs. NFR-9 backward compatibility confirmed: pass_clean.json and pass_with_minor.json both still pass FR-1. FR-4b, FR-4c, and FR-5 formally deferred with T2.5/T3.1/T3.2/T5.2/T5.3 cross-references per AC-X-1 discipline. All L1/L2/L3 verification criteria satisfied."
+  "notes": "Fixed _parse_markdown_table() defect in audit_feature_touch_coverage.py. Root cause: the original parser terminated on the first non-pipe line after entering table mode, causing it to read only the first (Trigger-Evidence Record) table in the T8.1 matrix file and never reach the canonical 37-row 5-column matrix. Fix replaces the single-table parser with a multi-table scanner (_collect_all_tables) that accumulates all pipe-line blocks, then identifies the canonical matrix by matching all five required column headers (tools, skills, model, effort, prompt body) via _is_canonical_matrix_table. Two new rule constants added: RULE_TABLE_NOT_FOUND (BLOCKER severity) and RULE_TABLE_AMBIGUOUS (MAJOR severity). The smoke test was extended with scenario F (multi-table markdown fixture reproducing the exact T8.1 regression pattern). Live SA-14 audit verdict: PASS (37 rows, 37 expected, 0 findings). All 6 smoke scenarios pass."
 }

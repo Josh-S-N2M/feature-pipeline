@@ -1,16 +1,11 @@
 {
-  "task_id": "T2.4",
-  "revision_cycle": 1,
+  "task_id": "T2.3",
   "status": "COMPLETED",
   "files_modified": [
-    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-adopted_at-adopted.md",
-    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-resolution_summary-complete.md",
-    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-superseded_by_issue_id-superseded.md",
-    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-wontfix_rationale-wontfix.md",
-    ".claude/skills/auditing-shared/scripts/test_fixtures/issue_doc_types/negative-missing-decided_at-wontfix.md"
+    ".devcontainer/postCreate.sh"
   ],
   "files_created": [],
   "scope_deviations": [],
   "phase_4_gate_passed": true,
-  "notes": "All 5 fixture id fields corrected to use underscore-containing topic slugs matching their synthetic paths (e.g. ANALYSIS-test-analysis-missing-adopted_at instead of the prior hyphenated form). Both proposal fixtures (resolution_summary and decided_at) also received proposes_future_feature additions to suppress the confounding advisory info finding. The T2.5 self-verification script confirms all 6 negative fixtures now produce exactly 1 blocker finding each with zero spurious id-vs-path mismatches."
+  "notes": "Added _fr4b_calibration_banner() function and its call site immediately after the _fr4a_check call and before install_gitnexus. The function implements three variants: NEVER RUN (events file absent or no calibration_result event for mechanism fr-4b-gitnexus-grammar-skip), STALE (most-recent event older than 14 days, with day count in message), and silent (within threshold). All steps use || true / graceful-degrade guards; jq absence silently degrades to no-output. The banner emits only to stderr and does not write any mcp-events.jsonl record (AC-X-4 compliant). L1 (bash -n) clean. L2 grep hits confirmed on both banner strings at correct file position (between _fr4a_check and install_gitnexus). L3 simulation of all three cases: (a) absent file produces NEVER RUN output; (b) stale event 30 days old produces STALE output with day count; (c) recent event 2 days old produces no output. All cases exit 0 and proceed to install_gitnexus without fail-close."
 }
