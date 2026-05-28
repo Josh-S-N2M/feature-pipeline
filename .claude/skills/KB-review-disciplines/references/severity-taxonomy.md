@@ -1,5 +1,7 @@
 # Severity Taxonomy
 
+> **Canonical source.** The audit severity vocabulary (BLOCKER / MAJOR / MINOR / NIT / INFO), their ordinals, score weights, and the reviewer↔audit bridge mapping are maintained in [`.claude/canonical/severity.yaml`](../../../canonical/severity.yaml) (loaded by `canonical.py`; per ADR-0068). This file is the prose companion — it carries the reviewer-side discipline (critical / important / recommended) and the narrative for *when* to use each value. If the two disagree on the value set, ordinals, or weights, the YAML wins. Per KB-cc-design Principle 11, do not duplicate the enumeration elsewhere without a reference back to the canonical source.
+
 ## Contents
 
 - The three values

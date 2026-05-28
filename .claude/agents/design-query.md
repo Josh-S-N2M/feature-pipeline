@@ -4,7 +4,7 @@ description: Authors the Query/Data Access Design subsection of the Blueprint du
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-query-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-query-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, ai-development-guide]
 memory: project
 ---
 

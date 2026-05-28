@@ -4,7 +4,7 @@ description: Authors the Claude Code / Project Filesystem Design subsection of t
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate, mcp__serena__*]
-skills: [KB-cc-platform, KB-cc-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-cc-platform, KB-cc-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, KB-mcp-platform, ai-development-guide, KB-mcp-design]
 memory: project
 ---
 

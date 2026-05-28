@@ -42,6 +42,12 @@ SKILL_PATHS = {
 CROSS_FILE_SCRIPT = FAMILY_ROOT / "auditing-cc-configs" / "scripts" / "cross_file_checks.py"
 VERDICT_SCRIPT = FAMILY_ROOT / "auditing-cc-configs" / "scripts" / "verdict_compute.py"
 
+# Canonical-drift checks (CANON-1 = Python constants; CANON-2 = documents).
+# Both live in auditing-shared and fold their findings into the cross-file
+# dimension so they contribute to the project verdict.
+CANON_CONST_DRIFT_SCRIPT = FAMILY_ROOT / "auditing-shared" / "scripts" / "audit_canonical_drift.py"
+CANON_DOC_DRIFT_SCRIPT = FAMILY_ROOT / "auditing-shared" / "scripts" / "audit_canonical_doc_drift.py"
+
 
 def run_script(path: Path, args: list[str], timeout: int = 60) -> dict:
     """Run an auditor script and return parsed JSON output (with error fallback)."""
@@ -268,6 +274,28 @@ def run_cross_file_checks(project_root: Path) -> list[dict]:
     return findings
 
 
+def run_canonical_drift_checks(project_root: Path) -> list[dict]:
+    """Run CANON-1 (Python-constant drift) and CANON-2 (document drift).
+
+    Both emit {"rule": ..., "findings": [...]}; their findings are normalized
+    into the cross-file finding shape so they contribute to the project verdict
+    alongside the cross_file_checks output.
+    """
+    findings: list[dict] = []
+    for script, rule in (
+        (CANON_CONST_DRIFT_SCRIPT, "CANON-1"),
+        (CANON_DOC_DRIFT_SCRIPT, "CANON-2"),
+    ):
+        r = run_script(script, [str(project_root)])
+        for f in r.get("findings", []):
+            f.setdefault("rule", rule)
+            f["audited_by"] = "canonical-drift"
+            f["primitive"] = f.get("rule", rule)
+            f.setdefault("message", f.get("what", ""))
+            findings.append(f)
+    return findings
+
+
 def compute_verdict(per_primitive: dict, cross_file: list[dict]) -> dict:
     """Call verdict_compute.py with aggregated findings."""
     all_per_primitive = []
@@ -435,6 +463,7 @@ def main() -> int:
     primitives = discover_primitives(project_root)
     per_primitive = audit_primitives(primitives, options)
     cross_file = run_cross_file_checks(project_root)
+    cross_file.extend(run_canonical_drift_checks(project_root))
     verdict = compute_verdict(per_primitive, cross_file)
 
     report_text = format_report(project_root, primitives, per_primitive,

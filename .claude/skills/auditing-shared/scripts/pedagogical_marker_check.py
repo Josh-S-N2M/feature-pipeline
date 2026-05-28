@@ -30,9 +30,17 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
+import sys as _sys
 
-# Severity order for one-notch demotion
-SEVERITY_ORDER = ["BLOCKER", "MAJOR", "MINOR", "NIT", "INFO"]
+# Canonical severity vocabulary (single source of truth).
+_here = Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        _sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import severity as _severity  # noqa: E402
+
+SEVERITY_ORDER = _severity.ORDER
 
 # Fence language that marks block-level pedagogical content
 PEDAGOGICAL_FENCE_LANG = "audit-example"

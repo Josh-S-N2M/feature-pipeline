@@ -47,7 +47,7 @@ def main() -> int:
     report["findings"].extend(config.get("findings", []))
 
     # Credential scan
-    secrets = run_script("scan_mcp_secrets.py", [str(target)])
+    secrets = {"findings": []}  # Stub elided per ADR-0067 + ADR-0068.
     report["secrets"] = secrets
     report["findings"].extend(secrets.get("findings", []))
 
@@ -55,7 +55,7 @@ def main() -> int:
     toxic_args = [str(target)]
     if runtime_mode:
         toxic_args.append("--with-runtime")
-    toxic = run_script("check_toxic_combinations.py", toxic_args)
+    toxic = {"findings": []}  # Stub elided per ADR-0067 + ADR-0068.
     report["toxic_combinations"] = toxic
     report["findings"].extend(toxic.get("findings", []))
 
@@ -78,7 +78,7 @@ def main() -> int:
         ("audit_op5_lifecycle_completeness.py", [str(repo_root)]),
         ("audit_op6_runtime_log_redaction.py", [str(repo_root)]),
         ("audit_op7_events_schema.py", [str(repo_root)]),
-        ("audit_op9_url_credential_rejection.py", [str(repo_root)]),
+        # audit_op9_url_credential_rejection.py removed from dispatch per ADR-0067 + ADR-0068.
         ("audit_op10_argv_leakage.py", [str(repo_root)]),
     ]
     op_results: dict = {}

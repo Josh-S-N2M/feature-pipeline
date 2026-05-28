@@ -227,8 +227,30 @@ The cost framing (preserved from the user's durable feedback that triggered ADR-
 
 **Cross-references.** ADR-0056 (the canonical statement); ADR-0036 (the precedent canonical-placement rule); ADR-0005 (the `adrs/superseded/` category that demonstrates the "structural category with uniform rule" pattern); ADR-0054 (canonical-helper three-surface enforcement — the integration shape that ADR-0056 is consistent with).
 
+## Principle 11: Shared vocabulary lives in `.claude/canonical/`, referenced never duplicated
+
+When a feature introduces or touches a **shared vocabulary** — any list of values consumed in more than one place (tool names, hook event names, severity levels, naming patterns, frontmatter fields, doc-type / state enums, skill-size thresholds, the audit-rule registry, the engineering domain layers) — that vocabulary has exactly one home: a YAML file under `.claude/canonical/`, loaded through `auditing-shared/scripts/canonical.py`. Every other location *references* the canonical source; none re-enumerates it.
+
+The triggering history: before ADR-0068, the same constants (`KNOWN_TOOLS`, `SEVERITY_ORDER`, `NAME_PATTERN`) were copied across audit scripts and three had silently drifted to divergent values. ADR-0069 extended the pattern to the engineering domain layers, which had lived as markdown prose duplicated verbatim across the PRD template, Blueprint template, and KB-documentation-criteria SKILL.md.
+
+The Designer's discipline:
+
+- **Introducing a new shared vocabulary?** Put it in a new `.claude/canonical/<name>.yaml`, add a typed accessor to `canonical.py`, register any drift rule in `audit-rules.yaml`, and document it in `.claude/canonical/README.md`. Do NOT define it as a Python constant in a script or as a list in a markdown doc.
+- **Consuming an existing canonical vocabulary?** Reference the canonical file by path (docs) or import the accessor (`from canonical import …` in scripts). Do NOT paste the enumeration inline.
+- **Need an inline view** (a functional mapping table, a worked example)? It is tolerated ONLY if it carries an explicit reference back to the canonical source — the CANON-2 audit treats a referenced inline enumeration as a derived view (INFO) and an unreferenced one as drift (MAJOR).
+- **A prose companion** (per-layer descriptions, boundary cases) may live in a KB reference file, but it is the companion to the YAML, not a second source — and it says so at the top.
+
+The test for "is this a shared vocabulary?": would two independent places need the same list, and would they break if the lists diverged? If yes, it is canonical-bound.
+
+**Drift enforcement.** Two audits run in the project audit: **CANON-1** (`audit_canonical_drift.py`) flags a Python audit script that redefines a watched constant locally; **CANON-2** (`audit_canonical_doc_drift.py`) flags a document that hard-codes a canonical vocabulary without referencing its source. Both fold into the project verdict's cross-file dimension.
+
+**Reviewer enforcement.** `shared-document-reviewer` at Gate 1 flags any document that enumerates a canonical vocabulary inline without a reference (see KB-review-disciplines gate-0-1-procedure "Canonical-source-reference check").
+
+**Cross-references.** ADR-0068 (the canonical-source pattern); ADR-0069 (engineering-domain-layers migration); `.claude/canonical/README.md` (the file index + consumption pattern); ADR-0031 (the `auditing-shared` canonical-helper home this builds on).
+
 ## Change Log
 
 | Version | Date | Change | AC |
 |---|---|---|---|
 | 1.1.0 | 2026-05-27 | Principle 9 leading sentence replaced: defensive framing ("the Designer makes each choice deliberately") → active framing requiring per-agent consideration to be recorded in `agent-roster-impact-matrix.md` even when the outcome is no change. ADR-0064 cross-reference added to Principle 9. (FR-8 / `pipeline-design-time-discipline-r1`) | AC-FR-8-a |
+| 1.2.0 | 2026-05-27 | Added Principle 11 (shared vocabulary lives in `.claude/canonical/`, referenced never duplicated). Codifies the ADR-0068 canonical-source pattern + ADR-0069 layer migration as design discipline; names CANON-1 / CANON-2 as the enforcement audits. | — |

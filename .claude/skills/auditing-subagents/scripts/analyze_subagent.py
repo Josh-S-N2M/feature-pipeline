@@ -55,15 +55,16 @@ TOOL_MENTIONS = re.compile(r"\b(Bash|Read|Write|Edit|Grep|Glob|WebFetch|WebSearc
 
 
 def split_frontmatter(text: str) -> tuple[str | None, str]:
-    if not text.startswith("---"):
-        return None, text
-    lines = text.split("\n")
-    if lines[0].strip() != "---":
-        return None, text
-    for i, line in enumerate(lines[1:], start=1):
-        if line.strip() == "---":
-            return "\n".join(lines[1:i]), "\n".join(lines[i + 1:])
-    return None, text
+    """Forwarder to canonical split_frontmatter (ADR-0068)."""
+    import sys as _sys
+    from pathlib import Path as _Path
+    _here = _Path(__file__).resolve()
+    for _p in _here.parents:
+        if (_p / ".claude" / "canonical").is_dir():
+            _sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+            break
+    from frontmatter import split_frontmatter as _shared
+    return _shared(text)
 
 
 def parse_tools_from_frontmatter(fm_text: str) -> list[str]:

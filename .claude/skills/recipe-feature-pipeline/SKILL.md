@@ -6,6 +6,8 @@ user-invocable: true
 
 # recipe-feature-pipeline Orchestrator
 
+> **Canonical source.** Where this orchestrator names pipeline **doc types** (intent-clarification, prd, blueprint, plan, acceptance-tests, phase-validators, tasks, …) or **scope classes** / **layers**, the authoritative enumerations live in `.claude/canonical/` — `doc-types.yaml` (`gated_doc_types`) and `engineering-domain-layers.yaml` (loaded by `canonical.py`; per ADR-0068 / ADR-0069). The names used below mirror those files — if they disagree, the YAML wins. Per KB-cc-design Principle 11, do not duplicate these enumerations without a reference back to the canonical source.
+
 ## Execution Contract
 
 **Inputs accepted from caller:**

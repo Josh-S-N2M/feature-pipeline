@@ -4,7 +4,7 @@ description: At the Architecture Audit stage (after shared-document-reviewer pas
 model: opus
 effort: xhigh
 tools: [Read, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git show:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(python3:*), Write, TaskCreate, TaskUpdate, mcp__serena__*]
-skills: [KB-review-disciplines, KB-documentation-criteria]
+skills: [KB-review-disciplines, KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

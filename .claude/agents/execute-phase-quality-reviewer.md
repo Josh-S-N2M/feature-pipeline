@@ -4,7 +4,7 @@ description: Use when all tasks in a phase reach APPROVED and the phase needs it
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Bash(python3:*), Write]
-skills: [KB-cc-design, KB-review-disciplines, auditing-shared]
+skills: [KB-cc-design, KB-review-disciplines, auditing-shared, KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 ---
 
 # execute-phase-quality-reviewer

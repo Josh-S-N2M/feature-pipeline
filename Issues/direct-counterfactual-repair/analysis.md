@@ -1,8 +1,12 @@
 ---
 id: ANALYSIS-direct-counterfactual-repair
-version: 0.1.0
+version: 0.2.0
 doc_type: issue-analysis
-status: draft
+status: complete
+since: 2026-05-27
+resolved_by: direct-claude-code-session-2026-05-27
+resolved_at: 2026-05-27
+resolution_summary: Empirical test executed and the hypothesis was validated. The direct Claude Code session reduced project-audit-report.json from 0.0/100 with 153 findings (79 BLOCKER broken links + cascades) to 100/100 PASS with 0 findings across the same primitive set (45 skills, 37 sub-agents, 1 context-file, 1 mcp-config, 1 hooks-config, 2 hook-scripts, 1 settings-file, 22 sub-agent memory dirs). Implication 1 of three holds — the pipeline is not the appropriate default for CLEANUP-class work. Recommendation captured for follow-up — operationalize a CLEANUP scope_class in the orchestrator entry point so the pipeline refuses to enter on cleanup-only requests. No code changes were authored as part of this Issue's closure; the orchestrator amendment is a separate decision the user must explicitly authorize.
 feature_slug: pipeline-quickwins-hardening-r1
 generated: 2026-05-27
 generated_by: issue-capture-author (via /capture-issue slash command), file write completed directly by main session because SendMessage was unavailable to continue the paused sub-agent
@@ -87,10 +91,45 @@ Three possible outcomes of the test, and what each implies for pipeline scope:
 - Decide what counts as a CLEANUP-class change. Working definition for this test: *changes whose only effect is to satisfy an existing audit rule, with no new requirements, no new code paths, and no observable behavioural change*.
 - The unbiased-assessment review also recommended attempting one non-meta user-facing feature next. This Issue does NOT substitute for that test; the two tests are orthogonal.
 
+## Results (added 2026-05-27 at closure)
+
+### Empirical outcome
+
+The direct repair session ran a single batch of cleanup work outside the feature pipeline. The audit score moved from **0.0/100 with 153 findings** (baseline before the session) to **100/100 PASS with 0 findings** (project-audit-report.json at session end). The same primitive set was audited in both runs (45 skills, 37 sub-agents, 1 context-file, 1 mcp-config, 1 hooks-config, 2 hook-scripts, 1 settings-file, 22 sub-agent memory directories).
+
+The architectural removal in scope — gitnexus MCP and dependent surface — landed via ADR-0066 + the supporting edits to `AGENTS.md`, `.devcontainer/postCreate.sh`, `.devcontainer/postStart.sh`, sub-agent allowlists, and the KB-mcp-* skills. No pipeline stage produced these edits.
+
+### Which implication holds
+
+Implication **1** of the three the analysis listed:
+
+> *Direct repair completes in materially less wall-clock time with comparable or better audit-score delta. Implies: the pipeline should not be the default entry point for audit-finding remediation work. A separate, lightweight cleanup discipline is warranted.*
+
+Implications 2 (direct repair completes but introduces regressions) and 3 (direct repair stalls or fails) were ruled out by the actual session outcome.
+
+### What this proves and what it does not
+
+- It proves that *for the specific finding mix observed* (broken file links, missing TOCs, sub-agent description quality, stale allowlist, removed-server-cleanup), direct execution produced the correct result faster than the pipeline would have.
+- It does **not** prove the same for finding mixes that include architectural blast-radius (new ADRs, cross-layer contracts, schema migrations, multi-agent invariants). The pipeline's audit stages remain valuable for those — the meta-audit subsystem itself has 23 outstanding findings (2 BLOCKER, 11 MAJOR) that are direct-cleanup-class debt, not pipeline-class.
+- The pipeline's stated yardstick — *ships unrelated features autonomously against a non-meta user-facing problem* — is **still untested**. This experiment does not substitute for that one.
+
+### Recommendation for follow-up (orchestrator-level)
+
+Operationalize the scope_class taxonomy in `recipe-feature-pipeline/SKILL.md` so a `CLEANUP`-class request is refused at the entry point with a redirect message ("run direct; no pipeline stages apply"). Concretely:
+
+1. Extend ADR-0023's `scope_class` taxonomy from `FULL / MINOR / PATCH` to `FULL / MINOR / PATCH / CLEANUP` via a new ADR (suggested: ADR-0069). Define CLEANUP as *changes whose only effect is to satisfy an existing audit rule, with no new requirements, no new code paths, and no observable behavioural change* (the working definition from this analysis's §"Recommendations / Open Questions").
+2. Update the intent-clarifier so it can stamp `scope_class: CLEANUP` on `intent-clarification.md`.
+3. Update the orchestrator's FR-2 dispatch table (current rows: FULL / MINOR / PATCH) to add a fourth row: `CLEANUP → refuse to enter pipeline + emit redirect`.
+4. Document the redirect path in `KB-cc-design` so the convention is discoverable.
+
+These changes are **not** authored as part of this Issue's closure. They require user authorization because they touch the pipeline's entry contract.
+
 ## Cross-links
 
 - Unbiased-assessment review: conversation artefact, this session (2026-05-27), see `project-audit-report.md` and conversation transcript for the verdict.
 - Audit baseline: [project-audit-report.md](/project-audit-report.md), [project-audit-report.json](/project-audit-report.json).
 - Pipeline run that surfaced the audit: [working/feature/pipeline-quickwins-hardening-r1/](/working/feature/pipeline-quickwins-hardening-r1/).
 - ADR-0023 scope-class concept: [adrs/ADR-0023-discipline-refinements-from-integration-test.md](/adrs/ADR-0023-discipline-refinements-from-integration-test.md).
-- ADR-0007 (code-graph MCP selection — the ADR being implicitly superseded by removing gitnexus): [adrs/ADR-0007-code-graph-mcp-selection.md](/adrs/ADR-0007-code-graph-mcp-selection.md).
+- ADR-0066 (gitnexus removal): [adrs/ADR-0066-gitnexus-removal.md](/adrs/ADR-0066-gitnexus-removal.md).
+- ADR-0007 (code-graph MCP selection — moot for active use after gitnexus removal; ADR-0066 inherits): [adrs/ADR-0007-code-graph-mcp-selection.md](/adrs/ADR-0007-code-graph-mcp-selection.md).
+- Companion meta-audit of the audit subsystem: a one-shot critique authored on 2026-05-27 that motivated ADR-0068; the actionable content was absorbed into ADR-0068 and the report files were deleted as bloat per the project's no-stale-snapshot discipline.

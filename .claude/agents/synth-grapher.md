@@ -4,7 +4,7 @@ description: Use when building the entity-and-relation graph from the merged cla
 model: opus
 effort: high
 tools: [Read, Write, TaskUpdate]
-skills: [entity-graph-knowledge]
+skills: [entity-graph-knowledge, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

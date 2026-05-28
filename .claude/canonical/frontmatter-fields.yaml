@@ -1,0 +1,86 @@
+# Recognized frontmatter fields by primitive type — single source of truth
+#
+# Each Claude Code primitive (skill, sub-agent, slash command) has its own
+# recognized frontmatter field set. Fields not in the recognized list are
+# silently dropped by the loader — the audit MINOR-flags unrecognized fields
+# so authors don't think they're configured when they aren't.
+
+version: 1.0.0
+last_updated: 2026-05-27
+authority: "ADR-0068"
+
+skill:
+  recognized:
+    - name
+    - description
+    - when_to_use
+    - argument-hint
+    - arguments
+    - disable-model-invocation
+    - user-invocable
+    - allowed-tools
+    - model
+    - effort
+    - context
+    - agent
+    - hooks
+    - paths
+    - shell
+    - mcp-servers
+    - permission-mode
+    - pedagogical_sections    # Audit-family marker convention
+    - family                  # Project-local namespace grouping
+
+subagent:
+  recognized:
+    - name
+    - description
+    - tools
+    - model
+    - effort
+    - context
+    - skills
+    - memory
+    - permissionMode
+    - hooks
+    - paths
+    - shell
+    - mcp-servers
+    - pedagogical_sections
+    - family
+
+slash_command:
+  recognized:
+    - name
+    - description
+    - argument-hint
+    - arguments
+    - disable-model-invocation
+    - allowed-tools
+    - model
+    - shell
+
+# Project-pipeline document frontmatter recognized by validate_pipeline_frontmatter.
+pipeline_doc_recognized:
+  - id
+  - title
+  - status
+  - version
+  - generated
+  - generated_by
+  - feature_slug
+  - supersedes
+  - superseded_by
+  - since
+  - decided_at
+  - adopted_at
+  - resolution_summary
+  - wontfix_rationale
+  - superseded_by_issue_id
+  - escalated_to
+  - escalates_from
+  - doc_type
+  - companion_artifacts
+  - scope
+  - mode
+  - proposes_future_feature

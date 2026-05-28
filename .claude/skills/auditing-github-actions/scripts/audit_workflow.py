@@ -49,7 +49,20 @@ except ImportError:
 # Findings
 # ─────────────────────────────────────────────────────────────────────
 
-SEVERITY_ORDER = {"BLOCKER": 0, "MAJOR": 1, "MINOR": 2, "INFO": 3}
+# Canonical severity vocabulary (single source of truth). The dict-shape
+# form lives here as a derived view; the canonical ORDER list lives at
+# .claude/canonical/severity.yaml. The github-actions auditor's pre-canonical
+# version was missing NIT entirely — this derivation closes that drift.
+import sys as _sys
+from pathlib import Path as _Path
+_here = _Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        _sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import severity as _severity  # noqa: E402
+
+SEVERITY_ORDER = {name: idx for idx, name in enumerate(_severity.ORDER)}
 
 
 @dataclass

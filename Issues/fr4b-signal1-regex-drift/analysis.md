@@ -1,9 +1,12 @@
 ---
 id: ANALYSIS-fr4b-signal1-regex-drift
-version: 0.1.0
+version: 0.2.0
 doc_type: issue-analysis
-status: open
+status: complete
 since: 2026-05-26
+resolved_by: gitnexus-removal-ADR-0066-2026-05-27
+resolved_at: 2026-05-27
+resolution_summary: Resolved by removal rather than repair. The 2026-05-27 gitnexus removal (ADR-0066) eliminated the only consumer of the FR-4b calibration mechanism. Path B3 of the three remediation paths the analysis enumerated — *drop the calibration mechanism entirely; recognize that the env var doesn't actually need verifying because nobody is using it* — is now the applied disposition by virtue of gitnexus's removal. The FR-4b script was never committed to disk and the FR-4c CI workflow was never authored (Phase 3 T3.2 did not land in the shipped quickwins deliverable); ADR-0058 (calibration_result event type) is superseded by ADR-0066; the `calibration_result` schema entry is removed from audit_op7_events_schema.py; the calibration_result documentation is removed from KB-mcp-platform/references/mcp-events-jsonl.md and KB-mcp-design/references/principles.md.
 feature_slug: pipeline-quickwins-hardening-r1
 generated: 2026-05-26
 generated_by: claude (main agent) — dogfood capture during pipeline-quickwins-hardening-r1 execution at Phase 2 → Phase 3 boundary
@@ -12,8 +15,28 @@ companion_artifacts:
   - working/feature/pipeline-quickwins-hardening-r1/research-notes/t-001-gitnexus-grammar-skip-contract.md
   - working/feature/pipeline-quickwins-hardening-r1/synthesis/04-decision-frames.json
   - working/feature/pipeline-quickwins-hardening-r1/codespaces-design.md
-  - .devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh
   - .claude/runtime/mcp-events.jsonl
+  - adrs/ADR-0066-gitnexus-removal.md
+  - adrs/ADR-0058-calibration-result-event-type-additive-extension.md
+---
+
+## Resolution (added 2026-05-27)
+
+The 2026-05-27 gitnexus removal (ADR-0066) made the entire FR-4b mechanism moot. Path B3 of the analysis's three remediation paths — drop the mechanism — is the applied disposition. The mechanism never had a non-gitnexus consumer; without gitnexus there is nothing to calibrate.
+
+Concrete cleanup performed at closure:
+
+- **ADR-0058** — status moved Accepted → Superseded by ADR-0066. The `calibration_result` event type was preserved for hypothetical future calibration mechanisms; the closed-enum discipline still applies if such a mechanism is ever introduced, but the existing schema and KB documentation are removed because they referenced the retired FR-4b path.
+- **`audit_op7_events_schema.py`** — `calibration_result` schema entry removed. If a future calibration mechanism is added, the schema entry is re-introduced via a new ADR.
+- **`KB-mcp-platform/references/mcp-events-jsonl.md`** — the `calibration_result` documentation section removed. Cross-references to ADR-0058 updated to note its superseded status.
+- **`KB-mcp-design/references/principles.md`** — the `calibration_result` bullet and the mechanism-namespace discriminator paragraph removed.
+- **`.devcontainer/scripts/calibrate-gitnexus-grammar-skip.sh`** — confirmed not present on disk (Phase 2 T2.4 never reached commit, or was removed during the gitnexus cleanup pass).
+- **FR-4c CI workflow** — confirmed not present in `.github/workflows/` (Phase 3 T3.2 did not land; `mcp-connectivity-smoke.yml` is FR-5, not FR-4c).
+- **`.claude/runtime/mcp-events.jsonl` line 21** — the one historical `calibration_result` event (the failed 2026-05-26 smoke) is left in place as append-only audit history per ADR-0037.
+- **Feature working dir artifacts** — `working/feature/pipeline-quickwins-hardening-r1/` retains its FR-4b artifacts (integration-smoke-fr4-end-to-end.md, T-001 research note, etc.) as historical record of the shipped feature run.
+
+The four open questions in the analysis ("which path?", "if Path A...", "if Path B...", "EBADENGINE warning") are subsumed by the removal: no path was selected because the consumer was eliminated; the EBADENGINE Node-version concern is no longer load-bearing because the gitnexus install is gone.
+
 ---
 
 # FR-4b Calibration Contract Diverges from the Install Path the Devcontainer Actually Uses

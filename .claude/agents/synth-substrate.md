@@ -4,7 +4,7 @@ description: Use when synthesizing substrate options for an architectural decisi
 model: opus
 effort: high
 tools: [Read, Write, TaskUpdate]
-skills: [substrate-translation-knowledge]
+skills: [substrate-translation-knowledge, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

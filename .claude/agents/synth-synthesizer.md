@@ -4,7 +4,7 @@ description: Use when composing the final report (compose-report mode) or when r
 model: opus
 effort: xhigh
 tools: [Read, Write, TaskUpdate]
-skills: [report-composition-knowledge]
+skills: [report-composition-knowledge, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

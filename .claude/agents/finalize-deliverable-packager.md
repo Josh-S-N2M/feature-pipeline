@@ -4,7 +4,7 @@ description: At the Deliverable Packaging stage (added in v4.5.0; runs after fin
 model: opus
 effort: medium
 tools: Read, Glob, Grep, Write, TaskCreate, TaskUpdate, Bash
-skills: [KB-documentation-criteria, KB-review-disciplines]
+skills: [KB-documentation-criteria, KB-review-disciplines, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

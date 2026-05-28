@@ -3,13 +3,21 @@
 audit_op7_events_schema.py — OP-7 mcp-events.jsonl schema conformance.
 
 Verifies each line in .claude/runtime/mcp-events.jsonl conforms to ADR-0037
-schema. Four event types:
+schema. Three active event types:
   - install_complete: {event, timestamp, server, install_method, version, duration_ms, status}
   - readiness_probe:  {event, timestamp, server, probe_method, latency_ms, status}
   - structured_failure: {event, timestamp, server, failure_layer, primary_degraded, fallback_invoked,
                          fallback_server, redaction_applied, message}
-  - calibration_result: {event, timestamp, server, mechanism, version, duration_ms, outcome,
-                         signals, note}   (ADR-0058; FR-4b emission)
+
+A fourth event type (`calibration_result`, ADR-0058) was added 2026-05-26 to
+carry FR-4b's GitNexus grammar-skip calibration outcomes. The 2026-05-27
+gitnexus removal (ADR-0066) eliminated its only consumer; ADR-0058 was
+superseded the same day and the schema entry removed. One historical
+calibration_result record remains in `.claude/runtime/mcp-events.jsonl`
+(2026-05-26 smoke); the auditor tolerates unknown event types (records that
+do not match any known schema are surfaced as INFO, not BLOCKER), so the
+historical record does not produce false-positive findings. If a future
+calibration mechanism is introduced, a new ADR reintroduces the schema entry.
 
 Each record MUST be valid JSON on its own line. Records may carry optional fields
 (e.g., redaction_applied annotation per OP-6).
@@ -26,23 +34,16 @@ REQUIRED_FIELDS = {
     "install_complete": {"event", "timestamp", "server", "install_method", "version", "status"},
     "readiness_probe": {"event", "timestamp", "server", "probe_method", "status"},
     "structured_failure": {"event", "timestamp", "server", "failure_layer", "message"},
-    # ADR-0058 calibration_result schema (the FR-4b gitnexus grammar-skip
-    # mechanism was retired with the 2026-05-27 gitnexus removal per ADR-0066;
-    # the schema is preserved for future calibration mechanisms).
-    "calibration_result": {
-        "event",
-        "timestamp",
-        "server",
-        "mechanism",
-        "version",
-        "duration_ms",
-        "outcome",
-        "signals",
-        "note",
-    },
 }
 
 VALID_EVENT_TYPES = set(REQUIRED_FIELDS.keys())
+
+# Retired event types — preserved as INFO-level tolerance so historical records
+# in the append-only log don't generate spurious MAJOR findings. Each entry maps
+# the event-type literal to the ADR that retired it.
+RETIRED_EVENT_TYPES = {
+    "calibration_result": "ADR-0058 superseded by ADR-0066 on 2026-05-27 (gitnexus removal)",
+}
 
 # Backward-compatible field aliases. Historical records (pre-schema-ratification)
 # used different field names that conveyed the same information. The auditor
@@ -112,6 +113,18 @@ def main() -> int:
             continue
 
         event = rec.get("event")
+        if event in RETIRED_EVENT_TYPES:
+            findings.append({
+                "rule": "OP-7",
+                "severity": "INFO",
+                "line": idx,
+                "event": event,
+                "message": (
+                    f"retired event type {event!r} tolerated as historical record: "
+                    f"{RETIRED_EVENT_TYPES[event]}"
+                ),
+            })
+            continue
         if event not in VALID_EVENT_TYPES:
             findings.append({
                 "rule": "OP-7",
@@ -131,21 +144,6 @@ def main() -> int:
                 "missing_fields": sorted(missing),
                 "message": f"record missing required fields for {event}",
             })
-
-        if event == "calibration_result" and not missing:
-            valid_outcomes = {"pass", "fail", "drift_detected"}
-            outcome_val = rec.get("outcome")
-            if outcome_val not in valid_outcomes:
-                findings.append({
-                    "rule": "OP-7",
-                    "severity": "MAJOR",
-                    "line": idx,
-                    "event": event,
-                    "message": (
-                        f"calibration_result outcome must be one of "
-                        f"{sorted(valid_outcomes)}, got: {outcome_val!r}"
-                    ),
-                })
 
     out = {
         "rule": "OP-7",

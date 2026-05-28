@@ -2,7 +2,7 @@
 name: shared-document-reviewer
 description: Use when reviewing documents for consistency and completeness. Reviews document consistency and completeness, providing approval decisions. Use PROACTIVELY after document creation, or when "document review/approval/check" is mentioned. Detects contradictions and rule violations with improvement suggestions.
 tools: Read, Grep, Glob, LS, Bash(git diff:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(python3:*), TaskCreate, TaskUpdate, WebSearch
-skills: KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines
+skills: [KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, ai-development-guide]
 model: opus
 effort: high
 ---

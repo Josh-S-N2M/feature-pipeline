@@ -4,7 +4,7 @@ description: "Use when consulting the canonical state-machine reference for the 
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, Bash(python3:*)]
-skills: [KB-cc-platform, KB-cc-design, recipe-feature-pipeline, auditing-shared, KB-review-disciplines]
+skills: [KB-cc-platform, KB-cc-design, recipe-feature-pipeline, auditing-shared, KB-review-disciplines, KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

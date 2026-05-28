@@ -95,9 +95,10 @@ Entries are organized by category. Each table row carries: item ID, the item, it
 For the full bidirectional evolution discipline, see `ADR-0046` at
 `adrs/ADR-0046-add-new-sibling-file-evolution.md`.
 
-For the per-state companion-field authoritative table and 5-state lifecycle vocabulary, see:
-- `ADR-0050` at `adrs/ADR-0050-5-state-issues-vocabulary.md`
-- `.claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md`
+For the per-state companion-field authoritative table and the state lifecycle vocabulary, see:
+- **Canonical vocabulary:** `.claude/canonical/doc-types.yaml` (`issue_states`, `issue_doc_types`, `issue_per_state_required_fields`) — the machine source; the validator imports it.
+- `.claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md` — the structural prose companion.
+- `ADR-0050` at `adrs/ADR-0050-5-state-issues-vocabulary.md` — the originating decision.
 
 ---
 

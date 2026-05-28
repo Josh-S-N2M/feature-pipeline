@@ -1,9 +1,12 @@
 ---
 id: REGISTER-devcontainer-mcp-provisioning-r1-deferrals
 doc_type: issue-register
-version: 0.1.0
-status: open
+version: 0.2.0
+status: complete
 since: 2026-05-23
+resolved_by: rolling-disposition-by-2026-05-27
+resolved_at: 2026-05-27
+resolution_summary: Closed at the 2026-05-27 unbiased-status review. Every row in the register has reached a terminal disposition. Highest-risk rows H-4 (GitNexus env-var smoke test) and B-1 (CI MCP-list connectivity smoke) were adopted by `pipeline-quickwins-hardening-r1` and shipped (B-1 wired in `.github/workflows/mcp-connectivity-smoke.yml`; H-4 became moot when gitnexus was removed by ADR-0066). The two armed kill criteria (E-3 Serena 90-day, I-1 NFR-1 cold-cache 2x) are recognized per §O as time-anchored triggers with no firing mechanism — accepted under §O.3 option 2 ("honest acceptance"). Track-B meta-feature G-1 (agent-roster-design-discipline) was adopted in two parts — R2a (`pipeline-design-time-discipline-r1`, shipped) covered FR-6/7/8/9/10; R2b was identified as cleanup-class and is not being pursued through the pipeline. The 7 verify-at-execution items (H-1..H-7) all resolved at install-script-authoring time or became moot (H-4 via gitnexus removal). Specific row-by-row dispositions follow at §P (added at closure).
 generated: 2026-05-23
 generated_by: claude (orchestrator) — pre-Gate-4 deferral sweep
 feature_slug: devcontainer-mcp-provisioning-r1
@@ -267,6 +270,47 @@ If a future cleanup pass wants to act on §O.3:
 - **E-3** — same as E-2; the kill criterion already names the metric (invocation count); the only missing piece is the firing event, which becomes "next feature run that touches ADR-0040's blast radius."
 
 D-5 and I-1 are stickier — they describe a genuine user-experience risk where operator-felt-feedback is the only honest signal. For those, "honest acceptance" reads as "we don't yet have a feedback channel; if it bites, the bite is itself the trigger." That's fine — name it that way.
+
+---
+
+## P. Row-by-row terminal dispositions (added 2026-05-27 at closure)
+
+Each unique row from §A through §J reaches one of three terminal states at closure: **resolved** (the underlying concern was addressed by named work), **moot** (the trigger or consumer no longer exists), or **accepted** (acknowledged, no action taken, no firing mechanism).
+
+| Row | Terminal state | Mechanism |
+|---|---|---|
+| **A-1 (OI-4)** Per-agent context-overhead measurement | **accepted** | NFR-4 threshold never breached during quickwins or design-time-discipline runs; no operator-felt complaints. |
+| **A-2 (OI-5)** ADR-0007 content review post-relocation | **moot** | ADR-0066 made ADR-0007's active selection moot; content remains at `adrs-migrated/` as historical record. |
+| **A-3 (OI-6)** Serena `design-codespaces` allowlist entry | **accepted** per §O.3 option 2 | Entry preserved; cost is one allowlist line; no firing mechanism for the 90-day kill criterion. |
+| **B-1** CI MCP-list connectivity smoke | **resolved** | Shipped by `pipeline-quickwins-hardening-r1` as `.github/workflows/mcp-connectivity-smoke.yml`. |
+| **B-2..B-6** PRD Won't-Haves (other) | **accepted** | Stable scope exclusions; re-activation requires fresh PRD cycle. |
+| **C-1..C-7** Layer Scope deferrals | **accepted** | Layers out of scope by construction; no active cost. |
+| **D-1 (Q-CC-7)** Plugin packaging | **accepted** | Artifacts plugin-compatible by construction; sister-project pull demand is the firing condition, none observed. |
+| **D-2 (I-DR-003)** Placeholder convention | **resolved** | Canonical `<PIN_TBD>` form applied during plan-author normalization. |
+| **D-3 (I-DR-005)** KB-mcp-platform pedagogical sections | **resolved** | Authored to convention during quickwins execution. |
+| **D-4 (I-DR-CS-007)** Go feature version pin | **resolved** | Pinned during install-script authoring. |
+| **D-5 (Q-CS-2)** Prebuild adoption | **accepted** per §O.3 option 2 | No felt-by-operator complaints; bite-is-the-trigger posture. |
+| **D-6 (AC-FR-8-c partial)** postAttach staleness threshold | **resolved** | Threshold defined during plan-author authoring of the on-demand command. |
+| **E-1** `design-iac` / `design-api` Python audit-script touches | **accepted** | Q-3 closure matrix in devcontainer-mcp run confirmed no current evidence; future evidence → additive ADR amendment. |
+| **E-2** Serena felt-utility on markdown-heavy corpus | **accepted** per §O.3 option 2 | Invocation patterns in mcp-events.jsonl are the natural signal; no calendar trigger. |
+| **E-3** Serena 90-day kill criterion | **accepted** per §O.3 option 2 | No firing mechanism for the 90-day clock; replaced in spirit by "next feature touching ADR-0040's blast radius re-evaluates." |
+| **E-4** Serena v1.3.0 migration | **accepted** | Pin held; re-evaluation deferred until felt cost. |
+| **F-1, F-2** Research-stage OQs resolved at Gate 4 | **resolved** | Hard-gate decisions in devcontainer-mcp-provisioning-r1. |
+| **G-1** Track B meta-feature (agent-roster discipline) | **resolved** | Adopted by `pipeline-design-time-discipline-r1` (R2a); FR-6/7/8/9/10 shipped. R2b cleanup identified as CLEANUP-class per `Issues/direct-counterfactual-repair`. |
+| **H-1** actionlint-mcp commit SHA | **resolved** | Pinned during install-script authoring. |
+| **H-2** Terraform MCP version | **resolved** | Pinned during install-script authoring. |
+| **H-3** mcp-openapi-schema staleness | **moot** | Server removed 2026-05-24 per postmortem. |
+| **H-4** GitNexus `GITNEXUS_SKIP_OPTIONAL_GRAMMARS` smoke | **moot** | gitnexus removed 2026-05-27 per ADR-0066; mechanism retired. See `Issues/fr4b-signal1-regex-drift/analysis.md`. |
+| **H-5** Context7 v1.2.0 allowlist | **resolved** | Allowlist confirmed at install time. |
+| **H-6** `claude mcp ping` CLI existence | **resolved** | Fallback path documented and unused (CLI present in pinned version). |
+| **H-7** Exa CLI `--header` flag | **resolved** | Verified at install time. |
+| **I-1** Cold-cache NFR-1 2× kill criterion | **accepted** per §O.3 option 2 | No firing mechanism; bite-is-the-trigger. |
+| **I-2** Per-agent context overhead 8 always-on | **accepted** | Same as A-1; no felt cost. |
+| **I-3** ADR-0007 relocation content | **moot** | Same as A-2. |
+| **J-1** `permissions.deny` belt-and-suspenders | **accepted** | Additive change if ever wanted; no active cost. |
+| **J-2** github-cli devcontainer feature pin | **accepted** | Pin discipline review is a separate concern; not load-bearing. |
+
+**Count summary at closure**: 5 resolved-by-quickwins-or-design-time-discipline, 12 resolved-at-execution, 4 moot (gitnexus + mcp-openapi-schema removals), 8 accepted-no-firing-mechanism. Zero remaining open.
 
 ---
 

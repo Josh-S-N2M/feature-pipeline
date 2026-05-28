@@ -4,7 +4,7 @@ description: Authors the Backend Design subsection of the Blueprint during per-l
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-backend-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-backend-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, ai-development-guide]
 memory: project
 ---
 

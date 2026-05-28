@@ -4,7 +4,7 @@ description: At the Reconciliation stage, consumes issues JSON from shared-docum
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-review-disciplines, KB-documentation-criteria]
+skills: [KB-review-disciplines, KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

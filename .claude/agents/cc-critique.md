@@ -14,6 +14,7 @@ tools: Read, Grep, Glob, Bash(python3 *), Bash(ls *), Bash(find *)
 model: opus
 effort: high
 permissionMode: default
+skills: [KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 ---
 
 # cc-critique — Claude Code configuration auditor

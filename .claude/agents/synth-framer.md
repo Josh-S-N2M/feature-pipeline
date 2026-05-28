@@ -4,7 +4,7 @@ description: Use when framing decisions from verified, graphed claims at the fra
 model: opus
 effort: high
 tools: [Read, Write, TaskUpdate]
-skills: [decision-framing-knowledge]
+skills: [decision-framing-knowledge, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

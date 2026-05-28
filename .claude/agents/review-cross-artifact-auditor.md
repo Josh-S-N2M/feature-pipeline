@@ -4,7 +4,7 @@ description: "At the Cross-Artifact Audit stage (after Architecture Audit, Plan 
 model: opus
 effort: xhigh
 tools: [Read, Glob, Grep, Bash(git diff:*), Bash(diff:*), Write, TaskCreate, TaskUpdate]
-skills: [KB-review-disciplines, KB-documentation-criteria]
+skills: [KB-review-disciplines, KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

@@ -3,7 +3,10 @@ id: ANALYSIS-per-agent-design-evaluation-gap
 doc_type: issue-analysis
 status: open
 since: 2026-05-23
-version: 0.1.0
+version: 0.2.0
+escalated_to: PROPOSAL-per-agent-design-evaluation-gap
+escalated_at: 2026-05-27
+escalation_note: A sibling `proposal.md` was authored 2026-05-27 that reshapes Track B from the procedural mechanisms R2a delivered (now shipped via `pipeline-design-time-discipline-r1`) to a substantive whole-inventory review of the 37 sub-agents and 45 skills. The proposal carries the actionable work; this analysis remains the root structural-gap statement. Analysis transitions to `complete` when the review proposed in `proposal.md` runs and its punch list is acted on.
 generated: 2026-05-23
 generated_by: claude (orchestrator) — manual analysis from feature artifacts
 feature_slug: devcontainer-mcp-provisioning-r1

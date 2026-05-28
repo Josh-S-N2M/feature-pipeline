@@ -1,6 +1,8 @@
 # Layer Taxonomy
 
-The canonical 9 engineering layers used by both the PRD's and the Blueprint's `### Layer Scope` section. This is the single source of truth — no other document in the pipeline defines a different layer list.
+The engineering layers used by both the PRD's and the Blueprint's `### Layer Scope` section.
+
+> **Canonical source.** The machine-readable enumeration lives in [`.claude/canonical/engineering-domain-layers.yaml`](../../../canonical/engineering-domain-layers.yaml) (loaded by `auditing-shared/scripts/canonical.py`; per ADR-0069). **That YAML is the single source of truth for the layer list, slugs, names, descriptions, and KB pairings.** This markdown file is its *prose companion* — it carries the discipline (why one taxonomy, per-layer disposition, boundary cases, cross-cutting notes) that does not fit cleanly in YAML. If the two ever disagree on the layer *list*, the YAML wins and this file is updated. The CANON-2 document-drift audit (`audit_canonical_doc_drift.py`) flags any other document that hard-codes the layer list without referencing the canonical source.
 
 ## Contents
 
@@ -85,7 +87,7 @@ Terraform/Pulumi/CDK/CloudFormation modules, state files, providers, backend con
 
 ## Layer Scope checkbox block (verbatim)
 
-This is the exact block to use in the PRD's `### Layer Scope` and the Blueprint's `### Layer Scope`. Both use it identically.
+This is the exact block to use in the PRD's `### Layer Scope` and the Blueprint's `### Layer Scope`. Both use it identically. **It is derived from [`engineering-domain-layers.yaml`](../../../canonical/engineering-domain-layers.yaml)** — the `canonical.layers.CHECKBOX_BLOCK` accessor regenerates it from canonical data. If you edit the YAML, regenerate this block; do not hand-edit it independently.
 
 ```markdown
 ### Layer Scope
@@ -159,3 +161,16 @@ If a feature seems to touch something outside these 9, the disposition is one of
 3. It belongs in Stakeholders / User Stories / NFRs / Product Policy in the PRD, not in Layer Scope.
 
 If after honest analysis the feature still seems to need a 10th layer, surface to user as a structural change before authoring. Do NOT silently add a new layer to the checkbox block.
+
+## Canonical-source discipline
+
+The **machine-readable single source of truth** is [`.claude/canonical/engineering-domain-layers.yaml`](../../../canonical/engineering-domain-layers.yaml). This markdown file is its prose companion. Every document the pipeline produces (PRD template, Blueprint template, PRD authoring discipline, design-composer agent, plan-author agent, reviewers) reaches back to the YAML (or to this companion, which points at the YAML) when it needs the layer list — none of them duplicate the enumeration in their own prose.
+
+If you are extending the taxonomy (adding a layer, renaming one, retiring one):
+
+1. Edit **`engineering-domain-layers.yaml`** first and bump its `version`.
+2. Update this prose companion to match (descriptions, boundary cases).
+3. Re-run the project audit (`python3 .claude/skills/auditing-cc-configs/scripts/audit_project.py .`). The **CANON-2** document-drift check (`audit_canonical_doc_drift.py`) surfaces any document that hard-codes the layer list without a reference back to canonical; fix those in the same change.
+4. The checkbox block below and the `canonical.layers.CHECKBOX_BLOCK` accessor are both derived from the YAML — keep this block in sync, or regenerate it from the accessor.
+
+Adding a layer is a substantive architectural decision and warrants an ADR before the edit lands in the YAML.

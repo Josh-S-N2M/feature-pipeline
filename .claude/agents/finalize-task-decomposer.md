@@ -4,7 +4,7 @@ description: At the Task Decomposition stage (the pipeline's terminal sub-agent 
 model: opus
 effort: xhigh
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-task-decomposition, KB-documentation-criteria]
+skills: [KB-task-decomposition, KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

@@ -4,7 +4,7 @@ description: Analyzes the existing codebase at the Discovery Research stage. Rea
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Bash(git diff:*), Bash(git log:*), Bash(git show:*), Bash(find:*), Bash(grep:*), Bash(rg:*), Bash(python3:*), Write, TaskCreate, TaskUpdate, mcp__serena__*]
-skills: [KB-codebase-research]
+skills: [KB-codebase-research, KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

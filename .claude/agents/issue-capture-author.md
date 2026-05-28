@@ -13,6 +13,7 @@ description: |
 tools: Read, Glob, Grep, Write, Edit, Bash(mkdir:*), AskUserQuestion
 model: sonnet
 permissionMode: default
+skills: [ai-development-guide, KB-general-coding-principles]
 ---
 
 # issue-capture-author
@@ -325,8 +326,10 @@ the agent dispatches HERE from Create-Mode Workflow §Step 2.
 - Read the file; confirm YAML frontmatter parses without error
 - Confirm `doc_type` is one of the 3 issue doctypes: `issue-register`, `issue-analysis`,
   `issue-proposal`
-- Confirm current `status` is in the 6-value vocabulary per spec §3 + ADR-0050:
+- Confirm current `status` is in the canonical state vocabulary:
   `draft | open | adopted | complete | superseded | wontfix-with-rationale`
+
+> **Canonical source.** The doc-type enum, the state vocabulary, and the per-state required fields are maintained in `.claude/canonical/doc-types.yaml` (`issue_doc_types`, `issue_states`, `issue_per_state_required_fields`); the validator imports them. The structural prose companion is `.claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md`. The enums quoted in this agent body mirror canonical — if they drift, the YAML wins (per KB-cc-design Principle 11).
 
 If any validation fails, use AskUserQuestion to clarify (show the validation failure to
 the user) or abort with a diagnostic message. NEVER proceed to Write on an invalid path.

@@ -4,7 +4,7 @@ description: Use when a phase-quality-report returns NEEDS_RECONCILIATION and fi
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write]
-skills: [KB-cc-design, KB-review-disciplines, auditing-shared]
+skills: [KB-cc-design, KB-review-disciplines, auditing-shared, KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

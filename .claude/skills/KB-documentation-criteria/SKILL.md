@@ -76,23 +76,15 @@ The body below is the router. Each substantive concern lives in `references/`.
 
 Each template defines the document's REQUIRED structural elements. `shared-document-reviewer`'s Gate 0 check uses these REQUIRED markers to determine whether a document passes structural review before quality assessment begins.
 
-## The 9-layer taxonomy (Layer Scope)
+## The engineering-layer taxonomy (Layer Scope)
 
-Both PRD and Blueprint use the same 9 engineering layers for their `### Layer Scope` section. No mapping table; no PRD-specific layer vocabulary.
+Both PRD and Blueprint use the same engineering-layer taxonomy for their `### Layer Scope` section. No mapping table; no PRD-specific layer vocabulary.
 
-1. **Claude Code / Project Filesystem** — CLAUDE.md, slash commands, hooks, skills, MCP configuration, project conventions
-2. **Frontend** — UI components, client state, routing, styling
-3. **Backend** — services, domain logic, background jobs, schedulers
-4. **API** — HTTP/GraphQL/RPC endpoints, contracts, versioning
-5. **Query / Data Access** — ORM models, repositories, query layer, caching
-6. **Database** — schema, migrations, indexes, constraints, seed data
-7. **CI/CD (GitHub Actions)** — workflows, jobs, reusable actions, environments, secrets
-8. **Infrastructure as Code** — Terraform/Pulumi/CDK/CloudFormation modules, state, providers
-9. **Dev Environment (Codespaces / Devcontainer)** — devcontainer.json, prebuilds, ports, lifecycle scripts
+**The machine-readable canonical layer list is maintained at [`.claude/canonical/engineering-domain-layers.yaml`](../../canonical/engineering-domain-layers.yaml)** (loaded by `auditing-shared/scripts/canonical.py`; per ADR-0069). Its prose companion — per-layer descriptions, boundary cases, disposition guidance — is [`references/layer-taxonomy.md`](references/layer-taxonomy.md). Every consumer of this SKILL (PRD authors, per-layer designers, design-composer, plan-author, reviewers) reads the layer list from the canonical YAML (or its companion, which mirrors it), not from this SKILL.md. If a layer is added, only the YAML and its companion change; downstream consumers pick up the change on next read.
+
+This SKILL.md intentionally does NOT enumerate the layers inline — duplicating the list here would create a drift surface that the CANON-2 audit (`audit_canonical_doc_drift.py`) flags. When authoring or reviewing, Read the canonical YAML or its prose companion.
 
 Product-surface concerns (end-user experience, release cadence, residency, etc.) live in the PRD's Stakeholders / User Stories / Non-Functional Requirements / Product Policy Decisions sections — NOT in Layer Scope. The PRD's Layer Scope answers the engineering question "which subsystems will this feature touch?" not the product question "whose experience does this affect?"
-
-Full layer descriptions and disposition guidance: `references/layer-taxonomy.md`.
 
 ## Frontmatter convention (all document types)
 

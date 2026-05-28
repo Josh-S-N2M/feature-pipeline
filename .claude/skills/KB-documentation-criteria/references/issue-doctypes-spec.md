@@ -17,11 +17,13 @@ generated_by: execute-task-code-producer
 
 # Issue Doctypes Structural Spec
 
-Canonical structural spec for outside-pipeline `Issues/<topic-slug>/<doctype>.md` files.
-This is the single source-of-truth consumed by:
+> **Canonical vocabulary source.** The issue **state vocabulary** (`draft`, `open`, `adopted`, `complete`, `superseded`, `wontfix`), the **doc-type enum** (`issue-register`, `issue-analysis`, `issue-proposal`), and the **per-state required fields** are maintained in [`.claude/canonical/doc-types.yaml`](../../../canonical/doc-types.yaml) (loaded by `canonical.py`; `validate_pipeline_frontmatter.py` imports `doc_types` from it directly — it does NOT read the enum from this file). This spec is the **structural** source-of-truth — the body shape, section requirements, cross-link fields, and evolution discipline. Where this spec and the YAML overlap on the *vocabulary*, the YAML wins; this spec carries the *shape*. Per KB-cc-design Principle 11, do not duplicate the state/doctype enums elsewhere without a reference back to the canonical source.
 
-- The validator extension (`validate_pipeline_frontmatter.py`) — Phase 2 T2.1 populates
-  `ISSUE_PER_STATE_REQUIRED_FIELDS` and related constants from this file.
+Structural spec for outside-pipeline `Issues/<topic-slug>/<doctype>.md` files,
+consumed by:
+
+- The validator extension (`validate_pipeline_frontmatter.py`) — imports the vocabulary
+  from canonical (`doc_types`); enforces the per-state required fields this spec documents.
 - The issue-capture-author agent body — reads this spec at runtime (Phase 4 T4.4b).
 - The three sibling templates (issue-register, issue-analysis, issue-proposal) — reference
   this spec for all structural assertions.

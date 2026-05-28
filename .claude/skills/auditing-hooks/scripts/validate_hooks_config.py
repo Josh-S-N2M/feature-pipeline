@@ -17,13 +17,16 @@ import re
 import sys
 from pathlib import Path
 
-# Case-sensitive set of valid event names. SessionEnd added 2026-05-27 to
-# match Claude Code's actual hook event surface (the auditor's list was stale).
-VALID_EVENTS = {
-    "SessionStart", "SessionEnd", "PreToolUse", "PostToolUse", "UserPromptSubmit",
-    "Stop", "SubagentStart", "SubagentStop", "Notification",
-    "PermissionRequest", "PreCompact", "PostCompact", "Error",
-}
+# Bootstrap import of the canonical accessor. Single source of truth for
+# valid hook event names lives at .claude/canonical/hook-events.yaml.
+_here = Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import hook_events as _hook_events  # noqa: E402
+
+VALID_EVENTS = _hook_events.VALID_EVENTS
 
 
 def check_matcher(matcher: str) -> list[str]:

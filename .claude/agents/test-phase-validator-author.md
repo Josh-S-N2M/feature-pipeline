@@ -4,7 +4,7 @@ description: "Authors `phase-validators.md` at the Phase Validator Authoring sta
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, ai-development-guide]
 memory: project
 ---
 

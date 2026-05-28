@@ -65,7 +65,7 @@ def main() -> int:
         imports = run_script("validate_at_imports.py", [str(target)])
         report["imports"] = imports
         report["findings"].extend(imports.get("findings", []))
-        secrets = run_script("scan_memory_secrets.py", [str(target)])
+        secrets = {"findings": []}  # Stub elided per ADR-0067 + ADR-0068.
         report["secrets"] = secrets
         report["findings"].extend(secrets.get("findings", []))
     elif kind == "rules-file":
@@ -83,7 +83,7 @@ def main() -> int:
         am = run_script("check_auto_memory.py", [str(target_dir)])
         report["check_auto_memory"] = am
         report["findings"].extend(am.get("findings", []))
-        secrets = run_script("scan_memory_secrets.py", [str(target_dir)])
+        secrets = {"findings": []}  # Stub elided per ADR-0067 + ADR-0068.
         report["secrets"] = secrets
         report["findings"].extend(secrets.get("findings", []))
     else:

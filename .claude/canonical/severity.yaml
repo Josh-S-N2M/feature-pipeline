@@ -1,0 +1,65 @@
+# Finding severity vocabulary — single source of truth
+#
+# The five severities the audit subsystem emits, plus their ordinal (for
+# sorting) and score weight (for verdict computation). All audit scripts
+# must use this vocabulary; before this file existed, three scripts had
+# divergent definitions (one was dict-shape, missing NIT entirely).
+
+version: 1.0.0
+last_updated: 2026-05-27
+authority: "ADR-0068"
+
+# The canonical ordering, most-severe to least-severe. List shape (not dict);
+# all audit scripts must use this exact order.
+order:
+  - BLOCKER
+  - MAJOR
+  - MINOR
+  - NIT
+  - INFO
+
+# Per-severity metadata.
+severities:
+  BLOCKER:
+    ordinal: 0
+    score_weight: -12
+    description: "Issue blocks acceptance. Architecturally wrong, contract violation, fundamentally infeasible."
+    verdict_band_floor: FAIL
+  MAJOR:
+    ordinal: 1
+    score_weight: -5
+    description: "Should be fixed before approval; degrades the score. Can be deferred only with explicit user approval."
+  MINOR:
+    ordinal: 2
+    score_weight: -1
+    description: "Improvement suggestion; non-blocking. Documents are approvable with MINOR issues outstanding."
+  NIT:
+    ordinal: 3
+    score_weight: -0.5
+    description: "Taste / subjective preference. No automatic score impact in most contexts."
+  INFO:
+    ordinal: 4
+    score_weight: 0
+    description: "Informational only. Not a finding in the deductive sense — surfaces context."
+
+# Verdict band thresholds (mapped from final score).
+# verdict_compute.verdict_from_score reads these.
+verdict_bands:
+  - threshold: 95
+    verdict: PASS
+  - threshold: 85
+    verdict: PASS-WITH-MINOR-FIXES
+  - threshold: 70
+    verdict: NEEDS-WORK
+  - threshold: 0
+    verdict: FAIL
+
+# Cross-surface bridge to reviewer vocabularies (see KB-review-disciplines).
+# This is the data version of the bridge table — for reference only; the
+# canonical bridge prose is at .claude/skills/KB-review-disciplines/references/severity-taxonomy.md
+bridge:
+  reviewer_critical: BLOCKER
+  reviewer_important: MAJOR
+  reviewer_recommended: MINOR
+  pv_blocking: BLOCKER
+  pv_warning: MAJOR

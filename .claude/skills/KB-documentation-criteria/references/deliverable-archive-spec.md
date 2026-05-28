@@ -1,5 +1,7 @@
 # Deliverable-archive spec
 
+> **Canonical source.** Where this spec names pipeline **doc types** (prd, blueprint, plan, etc.), the authoritative enumeration is [`.claude/canonical/doc-types.yaml`](../../../canonical/doc-types.yaml) (`gated_doc_types` / `analysis_doc_types`; loaded by `canonical.py`; per ADR-0068). The names here mirror that file — if they disagree, the YAML wins. Per KB-cc-design Principle 11, do not duplicate the doc-type enumeration without a reference back to the canonical source.
+
 A feature run's deliverable archive lives at `working/feature/<slug>/`. Different scope classes (per ADR-0023) execute different stages of the 13-stage pipeline; the expected-artifact set therefore varies by scope. This document specifies what artifacts each scope class must produce, what artifacts are conditional, and how the deliverable-archive validator (`shared-document-reviewer` invoked with `doc_type: DeliverableArchive`) checks the archive against this spec.
 
 ## Contents

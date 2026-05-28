@@ -4,7 +4,7 @@ description: Authors the API Design subsection of the Blueprint during per-layer
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-api-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-api-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, ai-development-guide]
 memory: project
 ---
 

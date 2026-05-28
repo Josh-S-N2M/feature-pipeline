@@ -51,14 +51,13 @@ Per ADR-0037, all MCP events emit to `.claude/runtime/mcp-events.jsonl`. Per ADR
 
 ### Event-type vocabulary (closed enum)
 
-The vocabulary of valid `event` field values in `mcp-events.jsonl` is closed at four values as of pipeline-quickwins-hardening-r1 (ADR-0058):
+The vocabulary of valid `event` field values in `mcp-events.jsonl` is closed at three values:
 
 - `install_complete` — server started and is ready (established by ADR-0037 v1.0.2).
 - `readiness_probe` — periodic or on-demand liveness check (established by ADR-0037 v1.0.2).
 - `structured_failure` — server encountered a reportable error (established by ADR-0037 v1.0.2).
-- `calibration_result` — outcome of a calibration pass, added by ADR-0058 with a canonical 9-field payload: `event`, `timestamp`, `server`, `mechanism`, `version`, `duration_ms`, `outcome`, `signals`, `note`.
 
-The `mechanism` field on `calibration_result` is the namespace discriminator for future calibration mechanisms. (The historical `fr-4b-gitnexus-grammar-skip` mechanism was retired with the 2026-05-27 gitnexus removal per ADR-0066.) Adding a fifth event type requires a follow-on ADR — the closed-enum discipline is intentional and must not be bypassed.
+A fourth event type (`calibration_result`) was added by ADR-0058 on 2026-05-26 for FR-4b's GitNexus grammar-skip calibration mechanism. ADR-0058 was **superseded by ADR-0066 on 2026-05-27** when gitnexus was removed; the schema entry was removed at supersession. The closed-enum discipline still applies: adding a new event type requires a new ADR.
 
 ## Principle 7 — Primary/fallback at project level; per-feature scope decides
 

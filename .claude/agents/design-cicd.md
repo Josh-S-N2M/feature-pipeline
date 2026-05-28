@@ -4,7 +4,7 @@ description: Authors the CI/CD Design subsection of the Blueprint during per-lay
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate, mcp__actionlint-mcp__lint_workflow, mcp__actionlint-mcp__check_all_workflows, mcp__serena__*]
-skills: [KB-github-actions-platform, KB-github-actions-design, auditing-github-actions, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-github-actions-platform, KB-github-actions-design, auditing-github-actions, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, KB-storybook-platform, ai-development-guide]
 memory: project
 ---
 

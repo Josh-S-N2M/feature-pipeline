@@ -1,0 +1,49 @@
+# Claude Code hook events — single source of truth
+#
+# Valid event names that may appear in `settings.json` hooks block.
+# Case-sensitive. Hook configs using event names not in this list silently
+# never fire — the HK-1 audit catches this.
+
+version: 1.0.0
+last_updated: 2026-05-27
+source: "Claude Code platform docs (canonical snapshot)"
+authority: "ADR-0068"
+
+events:
+  - name: SessionStart
+    description: Fires when a session opens / project is cd'd into.
+    cve_class: "CVE-2025-59536 (auto-executing on session open)"
+  - name: SessionEnd
+    description: Fires when a session ends (e.g., serena-style cleanup).
+  - name: PreToolUse
+    description: Fires before any tool call; may deny via exit 2.
+    requires_matcher: true
+  - name: PostToolUse
+    description: Fires after any tool call.
+    requires_matcher: true
+  - name: UserPromptSubmit
+    description: Fires when the user submits a prompt.
+  - name: Stop
+    description: Fires when the agent stops responding.
+  - name: SubagentStart
+    description: Fires when a subagent is spawned.
+  - name: SubagentStop
+    description: Fires when a subagent stops.
+  - name: Notification
+    description: Fires on notification events.
+  - name: PermissionRequest
+    description: Fires when Claude Code requests permission.
+  - name: PreCompact
+    description: Fires before automatic context compaction.
+  - name: PostCompact
+    description: Fires after automatic context compaction.
+  - name: Error
+    description: Fires on agent error.
+
+# Documented hook-context variables that hook commands may reference.
+# `validate_hooks_config.py` must expand these before checking script existence.
+context_variables:
+  - name: ${CLAUDE_PROJECT_DIR}
+    expansion: "parent of the .claude directory that owns settings_dir"
+  - name: ${HOME}
+    expansion: "user's home directory"

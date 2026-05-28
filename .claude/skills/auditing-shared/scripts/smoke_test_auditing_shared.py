@@ -3,15 +3,16 @@
 
 Exercises T1.1 (validate_pipeline_frontmatter.py), T1.2 (log_state_transition.py),
 T1.3 (detect_stubs.py), T1.4 (run_phase_checks.py), T1.5 (check_pipeline_discipline.py),
-and T1.6 (audit_codespaces.py) end-to-end against curated test fixtures.
+end-to-end against curated test fixtures. (Codespaces audit removed 2026-05-27.)
 
 Verifies:
 - Each script exits cleanly on `--help` (where applicable).
 - Each script emits valid JSON on stdout (where applicable).
 - The coordinator (run_phase_checks.py) correctly aggregates outputs into
   the 5-dimensional Contract 2 verdict.
-- Q-CC-4 stub-vs-real distinction: audits_stub field is True when only the
-  codespaces stub ran; False when real audits also ran.
+- Q-CC-4 stub-vs-real distinction: audits_stub field is a bool. Post the
+  2026-05-27 codespaces-audit removal, no stub auditor remains; the field is
+  preserved as stable API for any future stub-emitting auditor.
 
 Run as: `python3 .claude/skills/auditing-shared/scripts/smoke_test_auditing_shared.py`
 Exit code 0 = all scenarios pass; non-zero = failure with diagnostic on stderr.
@@ -40,7 +41,6 @@ SCRIPTS = {
     "stubs": ".claude/skills/auditing-shared/scripts/detect_stubs.py",
     "discipline": ".claude/skills/auditing-shared/scripts/check_pipeline_discipline.py",
     "coordinator": ".claude/skills/auditing-shared/scripts/run_phase_checks.py",
-    "codespaces_stub": ".claude/skills/auditing-codespaces/scripts/audit_codespaces.py",
     "adr_placement": ".claude/skills/auditing-shared/scripts/validate_adr_placement.py",
 }
 
@@ -82,25 +82,10 @@ def assert_in(name: str, needle, haystack):
 # -----------------------------------------------------------------------------
 def scenario_help() -> None:
     for name, path in SCRIPTS.items():
-        if name == "codespaces_stub":
-            continue  # no argparse on the trivial stub
         proc = run(["python3", path, "--help"])
         if proc.returncode != 0:
             raise SmokeFailure(f"{name} --help exited {proc.returncode}: {proc.stderr}")
         assert_in(f"{name} help banner", "usage:", proc.stdout)
-
-
-# -----------------------------------------------------------------------------
-# Scenario B — codespaces stub emits canonical {"stub": true, "findings": []}.
-# -----------------------------------------------------------------------------
-def scenario_codespaces_stub() -> None:
-    proc = run(["python3", SCRIPTS["codespaces_stub"]])
-    if proc.returncode != 0:
-        raise SmokeFailure(f"codespaces stub exited {proc.returncode}: {proc.stderr}")
-    data = json.loads(proc.stdout)
-    assert_eq("codespaces stub: stub field", data.get("stub"), True)
-    assert_eq("codespaces stub: findings", data.get("findings"), [])
-    assert_eq("codespaces stub: field set", set(data.keys()), {"stub", "findings"})
 
 
 # -----------------------------------------------------------------------------
@@ -626,7 +611,6 @@ def scenario_coordinator_dimensional_verdict() -> None:
 # -----------------------------------------------------------------------------
 SCENARIOS = [
     ("help banners", scenario_help),
-    ("codespaces stub canonical output", scenario_codespaces_stub),
     ("validator agent rules (I-AA-601)", scenario_validator_agent_rules),
     ("discipline check (clean + bad + normative)", scenario_discipline_check),
     ("detect_stubs (impl blocker + test major + false-positive suppression)", scenario_detect_stubs),

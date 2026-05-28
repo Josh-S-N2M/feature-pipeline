@@ -1,0 +1,55 @@
+# Naming conventions — single source of truth
+#
+# Regex patterns and reserved words for skill / sub-agent / doc names.
+# Before this file: two divergent NAME_PATTERN regexes — one allowed uppercase
+# (KB-* project convention), the other did not.
+
+version: 1.0.0
+last_updated: 2026-05-27
+authority: "ADR-0068"
+
+# Skill names — allows uppercase first character for this project's KB-*
+# namespace convention. Anthropic's generic spec is lowercase-only; this
+# project's local convention diverges intentionally.
+skill_name:
+  pattern: '^[A-Za-z][A-Za-z0-9-]*$'
+  description: "Letter (any case), then letters/digits/hyphens. Allows KB-, auditing-, recipe-, etc. prefixes."
+  max_length: 64
+  reserved_words:
+    - anthropic
+    - claude
+
+# Sub-agent names — lowercase-only per Anthropic spec.
+subagent_name:
+  pattern: '^[a-z0-9-]+$'
+  description: "Lowercase letters, digits, hyphens only."
+  max_length: 64
+  reserved_words:
+    - anthropic
+    - claude
+
+# Project-local namespace prefixes for skills. Audit checks `family:` field
+# against these.
+skill_namespaces:
+  - prefix: KB-
+    description: "Knowledge-base skill (reference content); higher line thresholds apply."
+  - prefix: auditing-
+    description: "Audit-subsystem skill."
+  - prefix: recipe-
+    description: "Orchestrator-style skill; higher line thresholds apply."
+  - prefix: synth-
+    description: "Synthesis-pipeline skill (mostly knowledge-* siblings)."
+  - prefix: design-
+    description: "Per-layer design skill (deprecated — these are sub-agents, not skills)."
+
+# Files that must exist with specific names.
+required_filenames:
+  - filename: SKILL.md
+    description: "Required at the root of every skill directory."
+
+# Forbidden patterns in markdown documentation prose.
+# (XML-style tags are now scoped to actual injection shapes per 2026-05-27.)
+xml_injection_pattern:
+  pattern: '<\s*(script|iframe|object|embed|style|link\s+rel=[\"'']?import)\b'
+  flags: IGNORECASE
+  description: "Match only injection-shaped HTML tags; do not match template placeholders like <topic-slug>."

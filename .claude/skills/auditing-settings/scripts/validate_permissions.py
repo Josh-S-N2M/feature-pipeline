@@ -18,16 +18,16 @@ import re
 import sys
 from pathlib import Path
 
-# Recognized tools. Includes the canonical Claude Code tool surface plus the
-# documented model-invocable additions (AskUserQuestion, TodoWrite, Skill,
-# ExitPlanMode, BashOutput, KillShell, etc.) per the current platform docs.
-KNOWN_TOOLS = {"Read", "Write", "Edit", "Bash", "Grep", "Glob",
-               "WebFetch", "WebSearch", "NotebookEdit", "Task",
-               "AskUserQuestion", "TodoWrite", "Skill", "ExitPlanMode",
-               "BashOutput", "KillShell", "ListMcpResources", "ReadMcpResource",
-               "SlashCommand", "Agent"}
+# Bootstrap import of the canonical accessor (single source of truth for
+# tool inventory, severity vocabulary, naming patterns, etc.). See
+# .claude/canonical/README.md and ADR-0068.
+_here = Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import tools as _tools  # noqa: E402
 
-# Rule shape: Tool, Tool(...), or just bare.
 # Tool name supports letters, digits, underscores, hyphens, and `*` so MCP
 # tool patterns (`mcp__<server>__*`, `mcp__<server>__<tool_name>`) and any
 # future tool naming that uses these characters validate cleanly.
@@ -67,21 +67,21 @@ def check_rule_syntax(rule: str, list_name: str, location: str) -> list[dict]:
         return findings
 
     # MCP tool patterns (`mcp__<server>__<tool>`, `mcp__<server>__*`) are
-    # generated per registered MCP server and aren't in the static KNOWN_TOOLS
+    # generated per registered MCP server and aren't in the static known-tools
     # set. They're valid Claude Code permission patterns; skip the
     # unknown-tool check for them.
-    is_mcp_tool = tool.startswith("mcp__")
+    is_mcp_tool = tool.startswith(_tools.MCP_TOOL_PREFIX)
 
-    if not is_mcp_tool and tool not in KNOWN_TOOLS:
+    if not is_mcp_tool and tool not in _tools.KNOWN_TOOLS:
         findings.append({
             "dimension": 3, "severity": "MINOR",
             "what": f"Permission rule references unknown tool '{tool}' (in '{list_name}').",
-            "fix": "Check spelling. Known: " + ", ".join(sorted(KNOWN_TOOLS)),
+            "fix": "Check spelling. Known: " + ", ".join(sorted(_tools.KNOWN_TOOLS)),
             "location": location, "where": location,
         })
 
     # ST-9: bare tool name (no parens)
-    if scope is None and tool in {"Bash", "Write", "Edit", "Read", "WebFetch", "Grep", "Glob", "NotebookEdit"}:
+    if scope is None and tool in _tools.BARE_EQUIVALENT_TO_WILDCARD:
         findings.append({
             "dimension": 3, "severity": "MAJOR",
             "what": f"Bare tool name '{tool}' in '{list_name}' is equivalent to '{tool}(*)'. (ST-9)",

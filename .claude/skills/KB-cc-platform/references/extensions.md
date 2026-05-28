@@ -1,5 +1,7 @@
 # Extensions reference
 
+> **Canonical source.** Where this reference lists hook **event names**, the authoritative enumeration is [`.claude/canonical/hook-events.yaml`](../../../canonical/hook-events.yaml) (loaded by `canonical.py`; per ADR-0068). The names here mirror that file — if they disagree, the YAML wins. Per KB-cc-design Principle 11, do not duplicate the event enumeration without a reference back to the canonical source.
+
 The seven extension primitives plus output styles. This is the load-bearing reference for designing, reviewing, and refactoring Claude Code setups.
 
 Each section follows the same structure: what it is, where it lives, when it loads, frontmatter schema, common patterns, pitfalls, and pointers to the official docs page for current detail.

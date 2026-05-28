@@ -4,7 +4,7 @@ description: Conducts the Intent Clarification stage at the start of a feature p
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, AskUserQuestion, TaskCreate, TaskUpdate]
-skills: [KB-documentation-criteria, KB-review-disciplines]
+skills: [KB-documentation-criteria, KB-review-disciplines, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

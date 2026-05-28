@@ -27,6 +27,8 @@ pedagogical_sections:
 
 Audits Claude Code hooks. A hook is a shell command Claude Code runs at specific lifecycle events: SessionStart, PreToolUse, PostToolUse, UserPromptSubmit, Stop, SubagentStop, Notification, PermissionRequest. Hooks are an additive feature — all configured hooks at any scope fire when the event triggers.
 
+> **Canonical source.** The authoritative hook **event-name** enumeration is [`.claude/canonical/hook-events.yaml`](../../canonical/hook-events.yaml) (loaded by `canonical.py`; the validators import it). The event names listed in this SKILL and in `references/hook-spec.md` mirror that file — if they disagree, the YAML wins. Per KB-cc-design Principle 11, do not duplicate the event enumeration without a reference back to the canonical source.
+
 This skill is part of the **auditing-cc-configs** family. Shared rubric, weights, thresholds, and triage live in the coordinator skill.
 
 It writes one file: an audit report. It does not modify the audited hooks or scripts.

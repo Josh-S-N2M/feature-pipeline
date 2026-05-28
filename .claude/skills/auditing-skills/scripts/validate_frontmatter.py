@@ -32,54 +32,25 @@ except ImportError:
     sys.exit(0)
 
 
-RECOGNIZED_FIELDS = {
-    "name", "description", "when_to_use", "argument-hint", "arguments",
-    "disable-model-invocation", "user-invocable", "allowed-tools",
-    "model", "effort", "context", "agent", "hooks", "paths", "shell",
-    "mcp-servers", "permission-mode",
-    # Audit-family marker convention (see auditing-cc-configs/references/pedagogical-marker-spec.md)
-    "pedagogical_sections",
-    # `family:` is a project-local namespace marker used by audit skills and
-    # related KBs to group co-evolving skills (e.g. `family: kb-mcp`,
-    # `family: auditing-mcp`). It is silently ignored by Claude Code's
-    # skill loader; recognized here so the auditor doesn't flag it.
-    "family",
-}
+# Bootstrap canonical accessor (single source of truth for names, fields, patterns).
+_here = Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import naming as _naming, frontmatter_fields as _ff  # noqa: E402
 
-# Skill names: lowercase + digits + hyphens by Anthropic spec, with an
-# uppercase-prefix allowance for this project's `KB-*` namespace convention.
-NAME_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9-]*$")
-RESERVED_NAME_WORDS = ("anthropic", "claude")
-# Match only injection-shaped HTML tags. Documentation placeholders like
-# `<topic-slug>` and `<doctype>` are not security risks; they're standard
-# template-variable notation in markdown prose. Restrict the pattern to
-# script/iframe/object/embed/svg-with-on-handler shapes that would actually
-# matter for prompt-injection.
-XML_TAG_PATTERN = re.compile(
-    r"<\s*(script|iframe|object|embed|style|link\s+rel=[\"']?import)\b",
-    re.IGNORECASE,
-)
+RECOGNIZED_FIELDS = _ff.SKILL_RECOGNIZED
+NAME_PATTERN = _naming.SKILL_NAME_PATTERN
+RESERVED_NAME_WORDS = tuple(_naming.RESERVED_WORDS)
+XML_TAG_PATTERN = _naming.XML_INJECTION_PATTERN
 
 
 def split_frontmatter(text: str) -> tuple[str | None, str]:
-    """Return (frontmatter_text, body_text). Frontmatter is None if missing/malformed."""
-    if not text.startswith("---"):
-        # Allow up to 3 leading whitespace chars to detect the bug
-        stripped = text.lstrip()
-        if stripped.startswith("---"):
-            return None, text  # Will be flagged: leading whitespace
-        return None, text
-
-    lines = text.split("\n")
-    if lines[0].strip() != "---":
-        return None, text
-
-    for i, line in enumerate(lines[1:], start=1):
-        if line.strip() == "---":
-            fm = "\n".join(lines[1:i])
-            body = "\n".join(lines[i + 1:])
-            return fm, body
-    return None, text  # No closing ---
+    """Forwarder to the canonical split_frontmatter in auditing-shared/.
+    Single source of truth per ADR-0068."""
+    from frontmatter import split_frontmatter as _shared
+    return _shared(text)  # No closing ---
 
 
 def main() -> int:

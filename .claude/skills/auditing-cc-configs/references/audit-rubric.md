@@ -1,5 +1,7 @@
 # Audit Rubric (shared across the auditing-cc-configs family)
 
+> **Canonical source.** The severity vocabulary (BLOCKER / MAJOR / MINOR / NIT / INFO), their score weights, and the verdict-band thresholds are maintained in [`.claude/canonical/severity.yaml`](../../../canonical/severity.yaml) (loaded by `canonical.py`; per ADR-0068). The weights and thresholds quoted below mirror that file — if they disagree, the YAML wins. Per KB-cc-design Principle 11, do not duplicate the severity enumeration without a reference back to the canonical source.
+
 The master scoring rules. Read this once at the start of an audit, then keep it open as you work through the dimensions.
 
 This rubric is shared across all seven skills in the family (auditing-cc-configs, auditing-skills, auditing-context-files, auditing-subagents, auditing-hooks, auditing-settings, auditing-mcp). Each sub-skill defines its own 10 dimensions appropriate to its primitive, but uses these severity weights and verdict thresholds.
@@ -44,7 +46,7 @@ Findings deduct from the dimension they apply to. **BLOCKER additionally applies
 |---|---|---|---|
 | **BLOCKER** | −12 (floors dim at 0) | −12 from total | Confirmed CRITICAL produces SECURITY-BLOCK regardless of score. |
 | **MAJOR** | −5 | none | Multiple MAJORs stack in dimension but cannot send it below 0. |
-| **MINOR** | −2 | none | Stack normally. |
+| **MINOR** | −1 | none | Stack normally. (Aligned to canonical `severity.yaml` score_weight; was −2 before the 2026-05-27 canonicalization.) |
 | **NIT** | −0.5 | none | Stack normally. |
 
 Each dimension cannot go below 0. Total score cannot go below 0.

@@ -4,7 +4,7 @@ description: Authors the Dev Environment (Codespaces / Devcontainer) Design subs
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate, mcp__serena__*]
-skills: [KB-codespaces-platform, KB-codespaces-design, auditing-codespaces, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-codespaces-platform, KB-codespaces-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, KB-mcp-platform, ai-development-guide, KB-mcp-design]
 memory: project
 ---
 

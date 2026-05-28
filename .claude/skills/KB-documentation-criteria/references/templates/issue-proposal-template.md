@@ -7,8 +7,10 @@ version: 0.1.0
 doc_type: issue-proposal
 # Canonical string per ADR-0052 / Q-BE-1. Do NOT use "proposal" (pre-rename value).
 status: draft
-# 5-state vocabulary (ADR-0050): draft | open | adopted | complete | superseded | wontfix-with-rationale
-# Per-state companion fields (full table in issue-doctypes-spec.md):
+# State vocabulary + per-state required fields canonical source: .claude/canonical/doc-types.yaml
+#   (issue_states, issue_per_state_required_fields). Lifecycle (ADR-0050):
+#   draft | open | adopted | complete | superseded | wontfix-with-rationale
+# Per-state companion fields (canonical in doc-types.yaml; prose in issue-doctypes-spec.md):
 #   draft               — no additional fields required
 #   open                — since: <ISO-8601 date>
 #   adopted             — since: <date>, adopted_by_feature_slug: <slug>, adopted_at: <date>

@@ -4,7 +4,7 @@ description: Use when execute-orchestrator dispatches a single task for code aut
 model: sonnet
 effort: medium
 tools: [Read, Glob, Grep, Write, Edit, Bash]
-skills: [ai-development-guide, KB-cc-design]
+skills: [ai-development-guide, KB-cc-design, KB-documentation-criteria, KB-general-coding-principles]
 ---
 
 # execute-task-code-producer

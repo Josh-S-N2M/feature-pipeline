@@ -1,0 +1,73 @@
+# Claude Code tool inventory — single source of truth
+#
+# The list of tools the Claude Code platform exposes that audit / validator
+# code may legitimately reference. Includes built-in tools, the documented
+# model-invocable additions, and the MCP-tool naming convention.
+#
+# When Claude Code adds a new tool, add it here, bump version, re-run audit.
+# Any inline `KNOWN_TOOLS = …` in audit scripts is a drift violation.
+
+version: 1.0.0
+last_updated: 2026-05-27
+source: "Claude Code platform docs (canonical snapshot)"
+authority: "ADR-0068"
+
+# Built-in tools — name-only references in permission rules and tool lists.
+built_in:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
+  - Task
+  - WebFetch
+  - WebSearch
+  - NotebookEdit
+
+# Model-invocable additions — documented Claude Code tools that scripts and
+# sub-agents may reference. Includes the recent additions surfaced during the
+# 2026-05-27 session (AskUserQuestion, TodoWrite, Skill, etc.).
+model_invocable:
+  - AskUserQuestion
+  - TodoWrite
+  - Skill
+  - ExitPlanMode
+  - BashOutput
+  - KillShell
+  - ListMcpResources
+  - ReadMcpResource
+  - SlashCommand
+  - Agent
+
+# MCP tool naming convention. Audit code that validates permission-rule syntax
+# and sub-agent `tools:` lists must accept `mcp__<server>__<tool>` and
+# `mcp__<server>__*` patterns. `<server>` must appear in `.mcp.json` mcpServers.
+mcp_tool_pattern:
+  prefix: mcp__
+  pattern: '^mcp__[A-Za-z][A-Za-z0-9_-]*__([A-Za-z][A-Za-z0-9_-]*|\*)$'
+  description: |
+    `mcp__<server>__<tool>` for specific tools; `mcp__<server>__*` for
+    whole-server allowlists. `<server>` must be a key in .mcp.json's mcpServers.
+
+# Tools that, when used bare (without scope parens), are equivalent to Tool(*).
+# Used by ST-9 (bare tool name) audit. Note: ST-9 is currently demoted in
+# non-managed mode per the 2026-05-27 session — see audit-rules.yaml.
+bare_equivalent_to_wildcard:
+  - Bash
+  - Write
+  - Edit
+  - Read
+  - WebFetch
+  - Grep
+  - Glob
+  - NotebookEdit
+
+# Tools considered "dangerous" for SA-3 audit (when subagent has both
+# permissionMode: bypassPermissions and these in its tools list).
+# Currently moot per ADR-0067; preserved for future re-enable.
+dangerous_tools:
+  - Bash
+  - Write
+  - Edit
+  - WebFetch

@@ -44,15 +44,9 @@ Section completion checklist — each box must be checked (including `N/A — ou
 
 Declare which layers this feature touches. Sections under Design, Security, Test Boundaries, and Verification corresponding to unchecked layers may be marked `N/A — out of scope` without further elaboration.
 
-- [ ] **Claude Code / Project Filesystem** — CLAUDE.md, slash commands, hooks, skills, MCP configuration, project conventions
-- [ ] **Frontend** — UI components, client state, routing, styling
-- [ ] **Backend** — services, domain logic, background jobs, schedulers
-- [ ] **API** — HTTP/GraphQL/RPC endpoints, contracts, versioning
-- [ ] **Query / Data Access** — ORM models, repositories, query layer, caching
-- [ ] **Database** — schema, migrations, indexes, constraints, seed data
-- [ ] **CI/CD (GitHub Actions)** — workflows, jobs, reusable actions, environments, secrets
-- [ ] **Infrastructure as Code** — Terraform/Pulumi/CDK/CloudFormation modules, state, providers
-- [ ] **Dev Environment (Codespaces / Devcontainer)** — devcontainer.json, prebuilds, ports, lifecycle scripts
+**Canonical source.** The layer enumeration is maintained in [`.claude/canonical/engineering-domain-layers.yaml`](../../../../canonical/engineering-domain-layers.yaml) (machine source) with the verbatim checkbox block mirrored in its prose companion [`../layer-taxonomy.md`](../layer-taxonomy.md). The Blueprint's Layer Scope MUST carry the PRD's Layer Scope verbatim (per layer-taxonomy.md §"Why a single taxonomy"). When filling in this template, **copy the checkbox block from the PRD this Blueprint accompanies** — both the PRD and this Blueprint source the same canonical list. This template intentionally omits the inline list to force the author to consult the canonical source or the paired PRD.
+
+<!-- Paste the Layer Scope checkbox block from the paired PRD here (or from layer-taxonomy.md if no PRD is paired). Carry the PRD's tick state forward verbatim. -->
 
 ### Referenced Specifications
 

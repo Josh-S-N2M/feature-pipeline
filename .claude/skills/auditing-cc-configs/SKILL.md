@@ -157,6 +157,8 @@ If a sub-skill is missing from the user's install, the coordinator skips that pr
 
 ## Verdict thresholds (v2 — tightened)
 
+> **Canonical source.** Severity weights and verdict bands are maintained in [`.claude/canonical/severity.yaml`](../../canonical/severity.yaml) (loaded by `canonical.py`; `verdict_compute.py` computes from it). The values below mirror that file — if they disagree, the YAML wins. Per KB-cc-design Principle 11, do not duplicate the severity enumeration without a reference back to canonical.
+
 | Score | Verdict |
 |---|---|
 | 95–100 | PASS |
@@ -166,7 +168,7 @@ If a sub-skill is missing from the user's install, the coordinator skips that pr
 | 0–49 | FAIL |
 | any | SECURITY-BLOCK (overrides) |
 
-Severity weights: BLOCKER −12, MAJOR −5, MINOR −2, NIT −0.5. Score floors at 0 per dimension. One BLOCKER drops a perfect score to 88 (PASS-WITH-MINOR-FIXES); two BLOCKERs to 76 (NEEDS-WORK); three to 64 (FAIL).
+Severity weights (per canonical): BLOCKER −12, MAJOR −5, MINOR −1, NIT −0.5, INFO 0. Score floors at 0 per dimension. One BLOCKER drops a perfect score to 88 (PASS-WITH-MINOR-FIXES); two BLOCKERs to 76 (NEEDS-WORK); three to 64 (FAIL).
 
 ## Severity meanings
 

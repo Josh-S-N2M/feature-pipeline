@@ -4,7 +4,7 @@ description: Use when verifying claims against cited sources via Chain-of-Verifi
 model: opus
 effort: high
 tools: [Read, Grep, Write, TaskUpdate]
-skills: [verification-knowledge]
+skills: [verification-knowledge, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

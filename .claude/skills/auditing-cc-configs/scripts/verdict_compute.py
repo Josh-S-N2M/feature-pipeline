@@ -48,23 +48,19 @@ Output JSON shape:
 import json
 import sys
 from typing import Any
+from pathlib import Path as _Path
 
-# v2 severity weights
-WEIGHTS = {
-    "BLOCKER": -12,
-    "MAJOR": -5,
-    "MINOR": -2,
-    "NIT": -0.5,
-    "INFO": 0,
-}
+# Bootstrap canonical accessor (single source of truth for severity weights + bands).
+_here = _Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import severity as _severity  # noqa: E402
 
-# v2 verdict thresholds
-VERDICT_THRESHOLDS = [
-    (95, "PASS"),
-    (85, "PASS-WITH-MINOR-FIXES"),
-    (70, "NEEDS-WORK"),
-    (0, "FAIL"),
-]
+# Derived views — canonical is severity.yaml.
+WEIGHTS = _severity.SCORE_WEIGHTS
+VERDICT_THRESHOLDS = [(t, v) for t, v in _severity.VERDICT_BANDS]
 
 # Each dimension starts at this value
 DIMENSION_START = 10

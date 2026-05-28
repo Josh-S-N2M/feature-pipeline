@@ -1,0 +1,115 @@
+# Engineering domain layers — single source of truth
+#
+# The canonical enumeration of the engineering layers used by the PRD's and
+# the Blueprint's `### Layer Scope` section, by the per-layer Design fan-out,
+# and by every downstream artifact that reasons about "which subsystem does
+# this feature touch."
+#
+# Before this file: the layer list was enumerated as prose in
+# .claude/skills/KB-documentation-criteria/references/layer-taxonomy.md and
+# duplicated verbatim in the PRD template, the Blueprint template, and the
+# KB-documentation-criteria SKILL.md. The markdown file remains the
+# human-readable companion (the "why", boundary cases, disposition guidance);
+# THIS file is the machine-readable source consumed by canonical.py and the
+# CANON-2 document-drift audit. See ADR-0068 (canonical-source pattern) and
+# the layer migration recorded in ADR-0069.
+#
+# Adding, renaming, or retiring a layer is a substantive architectural change:
+# bump `version`, record an ADR, edit ONLY this file, then re-run the project
+# audit to surface any consumer that still hard-codes the old list.
+
+version: 1.0.0
+last_updated: 2026-05-27
+authority: "ADR-0069"
+
+# Prose companion — full per-layer descriptions, boundary cases, cross-cutting
+# notes, and disposition guidance. This YAML carries the machine-readable
+# enumeration; the markdown carries the discipline.
+prose_companion: ".claude/skills/KB-documentation-criteria/references/layer-taxonomy.md"
+
+# The canonical ordering. This is the order used in the Layer Scope checkbox
+# block and in the Blueprint's `## Design` subsections. List shape; order is
+# load-bearing — do not reorder without an ADR.
+order:
+  - claude-code
+  - frontend
+  - backend
+  - api
+  - query
+  - database
+  - cicd
+  - iac
+  - codespaces
+
+# Per-layer metadata.
+#   id:            stable slug (used in code, checks, cross-references)
+#   name:          canonical display name (verbatim in the Layer Scope checkbox block)
+#   short:         one-line description (verbatim in the Layer Scope checkbox block)
+#   design_kbs:    the design-discipline KB skills a per-layer designer / the
+#                  composer loads when this layer is in scope
+#   platform_kbs:  the platform-fact KB skills (paired half), where one exists
+#   design_agent:  the per-layer design sub-agent that owns this layer
+layers:
+  claude-code:
+    name: "Claude Code / Project Filesystem"
+    short: "CLAUDE.md, slash commands, hooks, skills, MCP configuration, project conventions"
+    design_kbs: [KB-cc-design]
+    platform_kbs: [KB-cc-platform]
+    related_kbs: [KB-mcp-design, KB-mcp-platform]
+    design_agent: design-claude-code
+
+  frontend:
+    name: "Frontend"
+    short: "UI components, client state, routing, styling"
+    design_kbs: [KB-frontend-design, KB-ux-design, KB-visual-design, KB-design-system-design, KB-component-architecture-design]
+    platform_kbs: [KB-storybook-platform]
+    design_agent: design-frontend
+
+  backend:
+    name: "Backend"
+    short: "services, domain logic, background jobs, schedulers"
+    design_kbs: [KB-backend-design]
+    platform_kbs: []
+    design_agent: design-backend
+
+  api:
+    name: "API"
+    short: "HTTP/GraphQL/RPC endpoints, contracts, versioning"
+    design_kbs: [KB-api-design]
+    platform_kbs: []
+    design_agent: design-api
+
+  query:
+    name: "Query / Data Access"
+    short: "ORM models, repositories, query layer, caching"
+    design_kbs: [KB-query-design]
+    platform_kbs: []
+    design_agent: design-query
+
+  database:
+    name: "Database"
+    short: "schema, migrations, indexes, constraints, seed data"
+    design_kbs: [KB-database-design]
+    platform_kbs: []
+    design_agent: design-database
+
+  cicd:
+    name: "CI/CD (GitHub Actions)"
+    short: "workflows, jobs, reusable actions, environments, secrets"
+    design_kbs: [KB-github-actions-design]
+    platform_kbs: [KB-github-actions-platform]
+    design_agent: design-cicd
+
+  iac:
+    name: "Infrastructure as Code"
+    short: "Terraform/Pulumi/CDK/CloudFormation modules, state, providers"
+    design_kbs: [KB-iac-design]
+    platform_kbs: []
+    design_agent: design-iac
+
+  codespaces:
+    name: "Dev Environment (Codespaces / Devcontainer)"
+    short: "devcontainer.json, prebuilds, ports, lifecycle scripts"
+    design_kbs: [KB-codespaces-design]
+    platform_kbs: [KB-codespaces-platform]
+    design_agent: design-codespaces

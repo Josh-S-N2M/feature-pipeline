@@ -34,86 +34,39 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Bootstrap canonical accessor (single source of truth — see .claude/canonical/).
+_here = Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import doc_types as _dt, tools as _tools  # noqa: E402
 
-GATED_DOC_TYPES = {
-    "intent-clarification",
-    "prd",
-    "research-plan",
-    "blueprint",
-    "plan",
-}
-ANALYSIS_DOC_TYPES = {
-    "codebase-analysis",
-    "synthesis",
-    "architecture-audit-issues",
-    "cross-artifact-audit-issues",
-    "acceptance-tests",
-    "phase-validators",
-    "reconciliation-log",
-    "task-dag",
-    "per-task-execution-result",
-    "phase-quality-report",
-    "quality-reconciliation-log",
-    "state-transitions-log",
-    "pipeline-run-summary",
-    "architecture-audit-report",
-    "deliverable-archive-review",
-    # Per-layer designs use the suffix `-design` (e.g., claude-code-design,
-    # backend-design); handled below via suffix match.
-}
+GATED_DOC_TYPES = _dt.GATED_DOC_TYPES
+ANALYSIS_DOC_TYPES = _dt.ANALYSIS_DOC_TYPES
 ANALYSIS_DOC_TYPE_SUFFIXES = ("-design", "-report", "-log", "-issues", "-result", "-summary")
 
-GATED_STATES = {"draft", "accepted", "superseded", "rejected"}
-ANALYSIS_STATES = {"draft", "complete", "superseded"}
-ADR_STATES = {"proposed", "accepted", "superseded", "rejected"}
+GATED_STATES = _dt.GATED_STATES
+ANALYSIS_STATES = _dt.ANALYSIS_STATES
+ADR_STATES = _dt.ADR_STATES
 
-# ---- Issue artifact constants (Phase 2 T2.1; ADR-0052 + ADR-0050) ----
+# ---- Issue artifact constants (canonical: .claude/canonical/doc-types.yaml) ----
 
-# Per ADR-0052 + ADR-0050 §Decision §3: the three first-class issue doctypes.
-ISSUE_DOC_TYPES = {"issue-register", "issue-analysis", "issue-proposal"}
-
-# Per ADR-0050 §Decision §1: 5-state lifecycle vocabulary (6 dict keys including
-# the universal `draft` initial state per ADR-0032 per blueprint-v3 I-DR-BP-010).
-ISSUE_STATES = {
-    "draft", "open", "adopted", "complete",
-    "superseded", "wontfix-with-rationale",
-}
-
-# Per ADR-0050 §Decision §4 + blueprint-v3 D-05 Backend Per-State Companion Field
-# Authoritative Table. SOURCE-OF-TRUTH: issue-doctypes-spec.md §4.
-# Each entry maps a status value → tuple of additionally-required companion fields
-# (in addition to the 7 universal-required fields).
+ISSUE_DOC_TYPES = _dt.ISSUE_DOC_TYPES
+ISSUE_STATES = _dt.ISSUE_STATES   # canonical already includes legacy `wontfix-with-rationale` alias
+# Convert canonical's list-of-fields to a tuple-of-fields keyed by state.
 ISSUE_PER_STATE_REQUIRED_FIELDS = {
-    "draft": (),
-    "open": ("since",),
-    "adopted": ("since", "adopted_by_feature_slug", "adopted_at"),
-    "complete": ("since", "resolved_by", "resolved_at", "resolution_summary"),
-    "superseded": ("since", "superseded_by_issue_id", "superseded_at"),
-    "wontfix-with-rationale": ("since", "wontfix_rationale", "decided_at"),
+    state: tuple(_dt.ISSUE_PER_STATE_REQUIRED_FIELDS.get(state, []))
+    for state in _dt.ISSUE_STATES
 }
 
-# Per ADR-0051 §Decision §4 + I-AA-002 v3 outer-dispatch path-prefix skip.
-# Files matching these path-prefixes are excluded from validation (return [])
-# at the top of validate_pipeline_artifact. This handles evidence/ and updates/
-# subdirectories under Issues/<topic>/ which carry no doctype constraint.
-# IMPORTANT: T2.1 only DEFINES this constant; T2.2 wires it into the
-# validate_pipeline_artifact early-return.
 ISSUE_NON_VALIDATED_PATH_PREFIXES = (
     "Issues/*/evidence/",
     "Issues/*/updates/",
 )
 
-# Per I-AA-601: canonical effort enum.
-EFFORT_ENUM = {"low", "medium", "high", "xhigh", "max"}
-
-# Per I-AA-601: tool enum. Bash + Bash(<pat>:*) are both valid via prefix match.
-KNOWN_TOOLS = {
-    "Read", "Write", "Edit", "Glob", "Grep", "Bash", "WebSearch",
-    "WebFetch", "Agent", "Task", "TaskCreate", "TaskUpdate", "TaskGet",
-    "TaskList", "TaskOutput", "TaskStop", "AskUserQuestion",
-    "NotebookEdit", "ScheduleWakeup", "ExitPlanMode", "EnterPlanMode",
-    "Skill", "ToolSearch",
-}
+EFFORT_ENUM = _dt.EFFORT_ENUM
+KNOWN_TOOLS = _tools.KNOWN_TOOLS
 
 # Per I-AA-601: memory values must be in this enum if present.
 MEMORY_ENUM = {"user", "project", "local"}

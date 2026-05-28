@@ -220,8 +220,15 @@ def main() -> int:
                 rel = target
 
             if not resolved.exists():
+                # SK-broken-link severity tiering (ADR-0068).
+                # Broken refs in reference files (under references/) are MAJOR,
+                # not BLOCKER — the body of a SKILL.md is load-bearing for
+                # routing, but ref files are typically instructional and a
+                # broken pointer there is less severe.
+                rel_str = str(ref_file.relative_to(skill_dir))
+                severity = "MAJOR" if rel_str.startswith("references/") else "BLOCKER"
                 findings.append({
-                    "severity": "BLOCKER",
+                    "severity": severity,
                     "what": f"{ref_file.relative_to(skill_dir)} links to {target!r} (line {lineno}) but the file does not exist.",
                     "fix": "Either create the file or fix/remove the link.",
                 })

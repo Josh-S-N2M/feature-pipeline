@@ -2,6 +2,8 @@
 
 The rules that apply to every pipeline document (Intent Clarification, PRD, Blueprint, ADR, Plan) regardless of its type. Loaded by every authoring sub-agent and by `shared-document-reviewer`.
 
+> **Canonical vocabulary source.** The pipeline / analysis / ADR / issue **doc-type and state enums** are maintained in [`.claude/canonical/doc-types.yaml`](../../../canonical/doc-types.yaml) (loaded by `canonical.py`; per ADR-0068). Where this file names doc types or states, treat the YAML as authoritative; this file carries the *conventions* (frontmatter format, supersession discipline, traceability) that apply across those types. Per KB-cc-design Principle 11, do not duplicate the enums elsewhere without a reference back to the canonical source.
+
 ## Contents
 
 - Frontmatter format

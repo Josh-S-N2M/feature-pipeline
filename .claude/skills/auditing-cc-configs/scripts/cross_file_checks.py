@@ -808,25 +808,41 @@ def check_X9_subagent_skills_security_block(state: dict) -> list[dict]:
                 continue
 
             verdict = audit.get("verdict", "UNKNOWN")
-            if verdict == "SECURITY-BLOCK":
-                findings.append({
-                    "check": "X9",
-                    "dimension": 10, "severity": "BLOCKER",
-                    "what": f"Subagent {sub_file.name} preloads skill '{skill_ref}' which FAILS its own security audit (SECURITY-BLOCK). Per X9, this is a cross-file security finding.",
-                    "fix": f"Either fix the skill at {skill_path} to pass its security audit, or remove it from this subagent's preloaded skills.",
-                    "location": str(sub_file),
-                    "where": str(sub_file),
-                })
-            elif verdict in ("FAIL", "WARN") and audit.get("findings"):
-                findings.append({
-                    "check": "X9",
-                    "dimension": 10, "severity": "MAJOR",
-                    "what": f"Subagent {sub_file.name} preloads skill '{skill_ref}' whose audit verdict is {verdict} ({len(audit['findings'])} findings).",
-                    "fix": f"Review findings at {skill_path}; either remediate or accept the risk in a security-exemption note.",
-                    "location": str(sub_file),
-                    "where": str(sub_file),
-                })
-            # PASS verdict → no finding
+            # X9 severity-floor model (ADR-0068): only cascade when the child
+            # skill's audit verdict is FAIL or worse; then apply a severity
+            # floor (child BLOCKER → parent MAJOR; child MAJOR → parent MINOR;
+            # child MINOR or below → no parent finding). PASS-verdict children
+            # produce no cascade even if they have non-critical findings.
+            if verdict not in ("FAIL", "SECURITY-BLOCK", "NEEDS-WORK"):
+                continue
+            child_findings = audit.get("findings", [])
+            if not child_findings:
+                continue
+            severity_order = ["BLOCKER", "MAJOR", "MINOR", "NIT", "INFO"]
+            highest_child_sev = next(
+                (s for s in severity_order
+                 if any(f.get("severity") == s for f in child_findings)),
+                None
+            )
+            cascade_severity = {
+                "BLOCKER": "MAJOR",
+                "MAJOR": "MINOR",
+            }.get(highest_child_sev)
+            if cascade_severity is None:
+                continue
+            findings.append({
+                "check": "X9",
+                "dimension": 10, "severity": cascade_severity,
+                "what": (
+                    f"Subagent {sub_file.name} preloads skill '{skill_ref}' whose "
+                    f"audit verdict is {verdict} ({len(child_findings)} findings; "
+                    f"highest child severity {highest_child_sev}). "
+                    f"Cascade-floored to {cascade_severity} per ADR-0068."
+                ),
+                "fix": f"Review findings at {skill_path}; either remediate or accept.",
+                "location": str(sub_file),
+                "where": str(sub_file),
+            })
     return findings
 
 

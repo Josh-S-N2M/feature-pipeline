@@ -4,7 +4,7 @@ description: Use when execute-orchestrator needs a per-task quality verdict — 
 model: sonnet
 effort: medium
 tools: [Read, Glob, Grep, Bash]
-skills: [ai-development-guide, KB-cc-design, auditing-shared]
+skills: [ai-development-guide, KB-cc-design, auditing-shared, KB-documentation-criteria, KB-general-coding-principles]
 ---
 
 # execute-task-quality-handler

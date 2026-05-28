@@ -84,7 +84,6 @@ Each OP-rule is a discrete, scriptable invariant the auditor enforces. The table
 
 | Rule | Name / Title | Script | Reference doc | Severity on finding | Rationale |
 |---|---|---|---|---|---|
-| OP-11 | `.mcp.json` ↔ ADR-0041 invocation-form parity | `scripts/audit_op11_adr_parity.py` | `references/adr-parity.md` | BLOCKER | Preserve ADR-prescribed invocation forms in the live `.mcp.json`; deprecated rows annotated `[DEPRECATED INVOCATION FORM]` are skipped. |
 
 ## Critical: MCP servers run untrusted code
 

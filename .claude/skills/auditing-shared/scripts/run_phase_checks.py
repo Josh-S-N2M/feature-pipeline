@@ -9,7 +9,6 @@ Invokes in parallel:
   --layers arg)
 - auditing-cc-configs/scripts/audit_cc.py
 - auditing-github-actions/scripts/audit_workflow.py
-- auditing-codespaces/scripts/audit_codespaces.py
 - validate_pipeline_frontmatter.py
 - check_pipeline_discipline.py
 - validate_adr_placement.py (surface b per ADR-0054; --allowlist for
@@ -25,9 +24,11 @@ BLOCKER; revisable finding -> NEEDS_RECONCILIATION; all clean -> PASS.
 Per AC-FR-3-f: when a Layer Scope-activated layer has no test suite,
 emits a Level-5 finding ("plan-level gap"); does NOT silently pass.
 
-Per Q-CC-4 / ADR-0033 stub-vs-real surfacing: the audit_codespaces.py stub
-returns {"stub": true, "findings": []}; this script treats stub as
-"not measured" rather than "measured zero" in the dimensional verdict.
+Codespaces audit removed 2026-05-27: the auditing-codespaces stub was retired
+because the implementation never materialized and the stub-tolerance branch
+in the audits-dimension rollup added complexity without payoff. ADR-0033's
+stub-vs-real surfacing pattern remains valid as an abstract discipline but
+no longer has an active example in this codebase.
 """
 import argparse
 import concurrent.futures
@@ -43,7 +44,6 @@ VALIDATOR = SCRIPTS_DIR / "validate_pipeline_frontmatter.py"
 DISCIPLINE_CHECK = SCRIPTS_DIR / "check_pipeline_discipline.py"
 ADR_PLACEMENT_VALIDATOR = SCRIPTS_DIR / "validate_adr_placement.py"
 GHA_AUDIT = Path(".claude/skills/auditing-github-actions/scripts/audit_workflow.py")
-CODESPACES_AUDIT = Path(".claude/skills/auditing-codespaces/scripts/audit_codespaces.py")
 CC_AUDIT = Path(".claude/skills/auditing-cc-configs/scripts/audit_project.py")
 
 # Per ADR-0054 commitment 2: synthesize-skill output dirs are the only
@@ -161,9 +161,7 @@ def main() -> int:
     if DISCIPLINE_CHECK.exists() and artifact_paths:
         tasks.append(("discipline", ["python3", str(DISCIPLINE_CHECK)] + [str(p) for p in artifact_paths], None))
 
-    # Audits dimension — codespaces stub + GHA (if file present).
-    if CODESPACES_AUDIT.exists():
-        tasks.append(("audits:codespaces", ["python3", str(CODESPACES_AUDIT)], None))
+    # Audits dimension — GHA (if file present). Codespaces audit retired 2026-05-27.
     if GHA_AUDIT.exists():
         tasks.append(("audits:gha", ["python3", str(GHA_AUDIT)], None))
     # cc-audit is intentionally NOT auto-invoked here; recipe-feature-pipeline
@@ -257,7 +255,7 @@ def main() -> int:
     audits_findings: list[dict] = []
     audits_stub_count = 0
     audits_present_count = 0
-    for key in ("audits:codespaces", "audits:gha"):
+    for key in ("audits:gha",):
         r = dimension_results.get(key)
         if r is None:
             continue

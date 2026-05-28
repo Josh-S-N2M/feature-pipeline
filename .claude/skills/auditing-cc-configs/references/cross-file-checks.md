@@ -1,5 +1,7 @@
 # Cross-File Pair Checks
 
+> **Canonical source.** Severity values used by the checks below (BLOCKER / MAJOR / MINOR / NIT / INFO) come from [`.claude/canonical/severity.yaml`](../../../canonical/severity.yaml); the audit-rule IDs and their default severities live in [`.claude/canonical/audit-rules.yaml`](../../../canonical/audit-rules.yaml). Per KB-cc-design Principle 11, those vocabularies are referenced here, not redefined.
+
 ## Contents
 
 - The 24 checks: X1 through X24

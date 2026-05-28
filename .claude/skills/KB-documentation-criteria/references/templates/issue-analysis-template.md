@@ -98,7 +98,7 @@ Section completion checklist — check each box before this document leaves draf
 - Both fields are optional; add them only when the evolution event has occurred. Values must match the `<UPPERCASE-DOCTYPE>-<kebab-topic-slug>` ID format.
 
 **State vocabulary (per ADR-0050):**
-Full per-state required companion field table: `.claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md`. Five-state vocabulary: `draft → open → adopted | complete | superseded | wontfix-with-rationale`.
+Canonical machine source: `.claude/canonical/doc-types.yaml` (`issue_states` + `issue_per_state_required_fields`). Structural prose companion: `.claude/skills/KB-documentation-criteria/references/issue-doctypes-spec.md`. The lifecycle is `draft → open → adopted | complete | superseded | wontfix-with-rationale`; the YAML is authoritative if the prose drifts.
 
 **Related files:**
 - [Cite supporting evidence, related registers, proposals, or pipeline artifacts by path]

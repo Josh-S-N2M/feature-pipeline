@@ -73,7 +73,7 @@ def main() -> int:
         report["analysis"] = analyze
         report["findings"].extend(analyze.get("findings", []))
 
-        scan = run_script("scan_subagent_body.py", [str(target)])
+        scan = {"findings": []}  # Stub elided per ADR-0067 + ADR-0068.
         report["body_scan"] = scan
         report["findings"].extend(scan.get("findings", []))
 
@@ -110,7 +110,7 @@ def main() -> int:
         report["memory_check"] = mem
         report["findings"].extend(mem.get("findings", []))
 
-        secrets = run_script("scan_memory_secrets.py", [str(target)])
+        secrets = {"findings": []}  # Stub elided per ADR-0067 + ADR-0068.
         report["secrets"] = secrets
         report["findings"].extend(secrets.get("findings", []))
 

@@ -1,0 +1,49 @@
+# Per-skill-class size and complexity thresholds — single source of truth
+#
+# Different skill classes have different acceptable SKILL.md sizes.
+# Knowledge-base skills (KB-*) and orchestrator recipes (recipe-*) are
+# reference-heavy and need more space. Short routing skills are capped lower.
+
+version: 1.0.0
+last_updated: 2026-05-27
+authority: "ADR-0068"
+
+skill_md_line_thresholds:
+  default:
+    major: 500          # MAJOR finding at this line count
+    blocker: 1000       # BLOCKER finding at this line count
+    description: "Standard skills should stay short; the body is for routing, not for content."
+  KB-:                  # Knowledge bases — content-heavy by design
+    major: 1500
+    blocker: 3000
+    description: "KB-* skills are reference-heavy; higher thresholds reflect content-as-data nature."
+  recipe-:              # Orchestrator recipes
+    major: 1500
+    blocker: 3000
+    description: "Recipe orchestrators need to be self-contained; higher thresholds reflect orchestration completeness."
+
+# Reference-file (under references/) thresholds.
+reference_file_thresholds:
+  toc_required_above_lines: 200    # files >200 lines should have a TOC heading
+  major_above_lines: 1000          # files >1000 lines should be split
+
+# Description-field length caps.
+description_field:
+  warning_chars: 1024
+  combined_with_when_to_use_max: 1536
+
+# Implicit directories — files under these directory names are excluded from
+# orphan-detection (audit_skill.py).
+implicit_directories:
+  - __pycache__
+  - test_fixtures
+  - smoke_fixtures
+  - fixtures
+  - _corpus
+  - _data
+  - .pytest_cache
+  - node_modules
+
+implicit_file_suffixes:
+  - .pyc
+  - .pyo

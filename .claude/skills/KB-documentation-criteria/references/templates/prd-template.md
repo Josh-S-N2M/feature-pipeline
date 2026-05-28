@@ -40,19 +40,13 @@ Section completion checklist — each box must be checked (including `N/A — ou
 
 ### Layer Scope
 
-Declare which engineering layers this feature touches. The same 9-layer taxonomy is used by the PRD and the Blueprint — see `../layer-taxonomy.md` for full descriptions.
+Declare which engineering layers this feature touches.
+
+**Canonical source.** The layer enumeration is maintained in [`.claude/canonical/engineering-domain-layers.yaml`](../../../../canonical/engineering-domain-layers.yaml) (machine source) with the verbatim checkbox block mirrored in its prose companion [`../layer-taxonomy.md`](../layer-taxonomy.md) §"Layer Scope checkbox block (verbatim)". When filling in this template, **copy the checkbox block verbatim from the prose companion** — do not retype the layer list from memory or from a different artifact. If the canonical file lists 10 layers, the PRD has 10 checkboxes; if it lists 9, the PRD has 9. This template intentionally omits the inline list to force the author to consult the canonical source.
 
 Product-surface concerns (end-user experience, release cadence, residency, etc.) live in Stakeholders, User Stories, Non-Functional Requirements, and Product Policy Decisions — NOT in Layer Scope. Layer Scope answers the engineering question "which subsystems will this feature touch?" not the product question "whose experience does this affect?"
 
-- [ ] **Claude Code / Project Filesystem** — CLAUDE.md, slash commands, hooks, skills, MCP configuration, project conventions
-- [ ] **Frontend** — UI components, client state, routing, styling
-- [ ] **Backend** — services, domain logic, background jobs, schedulers
-- [ ] **API** — HTTP/GraphQL/RPC endpoints, contracts, versioning
-- [ ] **Query / Data Access** — ORM models, repositories, query layer, caching
-- [ ] **Database** — schema, migrations, indexes, constraints, seed data
-- [ ] **CI/CD (GitHub Actions)** — workflows, jobs, reusable actions, environments, secrets
-- [ ] **Infrastructure as Code** — Terraform/Pulumi/CDK/CloudFormation modules, state, providers
-- [ ] **Dev Environment (Codespaces / Devcontainer)** — devcontainer.json, prebuilds, ports, lifecycle scripts
+<!-- Paste the Layer Scope checkbox block from layer-taxonomy.md here, then tick the checkboxes for layers this feature touches. -->
 
 ## Stakeholders
 

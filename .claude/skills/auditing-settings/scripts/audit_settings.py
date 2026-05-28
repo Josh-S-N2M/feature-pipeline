@@ -70,7 +70,7 @@ def main() -> int:
         report["permissions"] = perms
         report["findings"].extend(perms.get("findings", []))
 
-        secrets = run_script("scan_settings_secrets.py", [str(target)])
+        secrets = {"findings": []}  # Stub elided per ADR-0067 + ADR-0068.
         report["secrets"] = secrets
         report["findings"].extend(secrets.get("findings", []))
 

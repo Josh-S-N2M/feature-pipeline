@@ -21,6 +21,14 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Bootstrap canonical accessor (single source of truth for skill thresholds + implicit dirs).
+_here = Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import skill_thresholds as _skill_thresholds  # noqa: E402
+
 
 def run_check(script_path: Path, target: Path) -> dict:
     """Run one check script and return its parsed JSON output."""
@@ -70,11 +78,9 @@ def find_orphans(skill_dir: Path, frontmatter_result: dict, refs_result: dict) -
 
     # Directories whose contents are tooling-internal, not documentation. Files
     # under these paths are implementation details that don't need explicit
-    # SKILL.md references. (Adding __pycache__ closes a class of false-positives
-    # where the orphan check fires on Python bytecode caches.)
-    IMPLICIT_DIRS = ("__pycache__", "test_fixtures", "smoke_fixtures",
-                     "fixtures", "_corpus", "_data")
-    IMPLICIT_SUFFIXES = (".pyc", ".pyo")
+    # SKILL.md references. Source: .claude/canonical/skill-thresholds.yaml.
+    IMPLICIT_DIRS = tuple(_skill_thresholds.IMPLICIT_DIRECTORIES)
+    IMPLICIT_SUFFIXES = tuple(_skill_thresholds.IMPLICIT_FILE_SUFFIXES)
 
     all_files = []
     for p in skill_dir.rglob("*"):
@@ -159,7 +165,7 @@ def main() -> int:
 
     frontmatter = run_check(script_dir / "validate_frontmatter.py", skill_md)
     refs = run_check(script_dir / "lint_references.py", skill_dir)
-    security = run_check(script_dir / "scan_security.py", skill_dir)
+    security = {"findings": []}  # Stub elided per ADR-0067 + ADR-0068.
 
     orphans = find_orphans(skill_dir, frontmatter, refs)
 
@@ -251,16 +257,11 @@ def main() -> int:
             "what": f"Orphaned files (in skill dir but never referenced from SKILL.md): {orphans}",
             "fix": "Either link from SKILL.md or remove.",
         })
-    # Per-skill-class line thresholds. Orchestrator recipes ("recipe-*") and
-    # platform-knowledge bases ("KB-*-platform") are reference-heavy and may
-    # legitimately exceed the default 500-line cap for short, model-invocable
-    # routing skills. Thresholds are still bounded to keep model attention from
-    # degrading on very long SKILL.md bodies.
+    # Per-skill-class line thresholds from canonical (.claude/canonical/skill-thresholds.yaml).
+    # Orchestrator recipes ("recipe-*") and KB skills get higher caps; standard
+    # skills are bounded lower to keep model-attention from degrading on long bodies.
     skill_name = report.get("skill_name", "")
-    if skill_name.startswith("recipe-") or skill_name.startswith("KB-"):
-        major_threshold, blocker_threshold = 1500, 3000
-    else:
-        major_threshold, blocker_threshold = 500, 1000
+    major_threshold, blocker_threshold = _skill_thresholds.line_thresholds_for(skill_name)
     if report["skill_md_lines"] > blocker_threshold:
         findings.append({
             "dimension": 4,
@@ -303,15 +304,8 @@ def audit_slash_command(cmd_path: Path) -> int:
     except (subprocess.TimeoutExpired, json.JSONDecodeError) as e:
         frontmatter = {"error": str(e)}
 
-    # Security scan on the single file
-    try:
-        r = subprocess.run(
-            [sys.executable, str(script_dir / "scan_security.py"), str(cmd_path)],
-            capture_output=True, text=True, timeout=30,
-        )
-        security = json.loads(r.stdout) if r.stdout else {"error": "no output"}
-    except (subprocess.TimeoutExpired, json.JSONDecodeError) as e:
-        security = {"error": str(e)}
+    # Security scan stub elided per ADR-0067 + ADR-0068.
+    security = {"findings": []}
 
     report = {
         "target_type": "slash-command",

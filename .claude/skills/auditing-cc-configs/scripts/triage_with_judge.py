@@ -34,8 +34,18 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
+import sys as _sys
+from pathlib import Path as _Path
 
-SEVERITY_ORDER = ["BLOCKER", "MAJOR", "MINOR", "NIT", "INFO"]
+# Canonical severity vocabulary (single source of truth).
+_here = _Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        _sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import severity as _severity  # noqa: E402
+
+SEVERITY_ORDER = _severity.ORDER
 
 
 def demote_one(sev: str) -> str:

@@ -4,7 +4,7 @@ description: Authors the Implementation Plan at the Plan Authoring stage. Reads 
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, ai-development-guide]
 memory: project
 ---
 

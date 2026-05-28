@@ -4,7 +4,7 @@ description: Authors the Research Plan at the Discovery Planning stage. Per ADR-
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-documentation-criteria, KB-review-disciplines]
+skills: [KB-documentation-criteria, KB-review-disciplines, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

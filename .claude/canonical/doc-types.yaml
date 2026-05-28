@@ -1,0 +1,102 @@
+# Document type and state vocabularies — single source of truth
+#
+# Captures the doc-type taxonomy used by the feature pipeline, ADRs, and the
+# Issues/ folder. Before this file: each vocabulary was duplicated across
+# multiple validators in validate_pipeline_frontmatter.py and elsewhere.
+
+version: 1.0.0
+last_updated: 2026-05-27
+authority: "ADR-0068"
+
+# Gated pipeline documents — Intent Clarification, PRD, Blueprint, etc.
+# These pass through human approval gates.
+gated_doc_types:
+  - intent-clarification
+  - prd
+  - blueprint
+  - plan
+  - acceptance-tests
+  - phase-validators
+  - tasks
+  - rationale-brief
+  - research-plan
+  - synthesis-report
+  - codebase-analysis
+  - design-subsection
+  - reconciliation-log
+
+gated_states:
+  - draft
+  - accepted
+  - superseded
+  - rejected
+
+# Analysis-class documents (output of audit / discovery / review).
+analysis_doc_types:
+  - cross-artifact-audit
+  - architecture-audit
+  - phase-quality-report
+  - packager-report
+  - state-transitions-log
+
+analysis_states:
+  - draft
+  - complete
+  - superseded
+
+# ADR (Architecture Decision Record) states.
+adr_states:
+  - proposed
+  - accepted
+  - superseded
+  - rejected
+
+# Issues/<topic>/<doctype>.md doc types and 5-state lifecycle (per ADR-0050).
+issue_doc_types:
+  - issue-register
+  - issue-analysis
+  - issue-proposal
+
+issue_states:
+  - draft
+  - open
+  - adopted
+  - complete
+  - superseded
+  - wontfix
+  - wontfix-with-rationale  # legacy alias for `wontfix` (pre-2026-05-27 vocabulary)
+
+# Per-state required fields for issue docs.
+issue_per_state_required_fields:
+  draft: []
+  open:
+    - since
+  adopted:
+    - since
+    - adopted_by_feature_slug
+    - adopted_at
+  complete:
+    - since
+    - resolved_by
+    - resolved_at
+    - resolution_summary
+  superseded:
+    - since
+    - superseded_by_issue_id
+    - superseded_at
+  wontfix:
+    - since
+    - wontfix_rationale
+    - decided_at
+  wontfix-with-rationale:  # legacy alias
+    - since
+    - wontfix_rationale
+    - decided_at
+
+# Effort enum (used in skill frontmatter).
+effort_levels:
+  - low
+  - medium
+  - high
+  - xhigh
+  - max

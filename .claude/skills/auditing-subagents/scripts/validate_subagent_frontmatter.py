@@ -35,11 +35,15 @@ except ImportError:
     sys.exit(0)
 
 
-RECOGNIZED_FIELDS = {
-    "name", "description", "tools", "model", "memory",
-    "permissionMode", "skills", "disallowedTools", "effort",
-    "pedagogical_sections",  # audit-family marker
-}
+# Bootstrap canonical accessor (single source of truth).
+_here = Path(__file__).resolve()
+for _p in _here.parents:
+    if (_p / ".claude" / "canonical").is_dir():
+        sys.path.insert(0, str(_p / ".claude" / "skills" / "auditing-shared" / "scripts"))
+        break
+from canonical import naming as _naming, frontmatter_fields as _ff  # noqa: E402
+
+RECOGNIZED_FIELDS = _ff.SUBAGENT_RECOGNIZED
 
 VALID_MODEL_ALIASES = {"sonnet", "opus", "haiku", "inherit"}
 # Full IDs also accepted — pattern match
@@ -48,19 +52,13 @@ FULL_MODEL_ID_RE = re.compile(r"^claude-[\w\-]+\d$")
 VALID_MEMORY_SCOPES = {"project", "local", "user"}
 VALID_PERMISSION_MODES = {"default", "acceptEdits", "bypassPermissions", "plan"}
 
-NAME_PATTERN = re.compile(r"^[a-z0-9-]+$")
+NAME_PATTERN = _naming.SUBAGENT_NAME_PATTERN
 
 
 def split_frontmatter(text: str) -> tuple[str | None, str]:
-    if not text.startswith("---"):
-        return None, text
-    lines = text.split("\n")
-    if lines[0].strip() != "---":
-        return None, text
-    for i, line in enumerate(lines[1:], start=1):
-        if line.strip() == "---":
-            return "\n".join(lines[1:i]), "\n".join(lines[i + 1:])
-    return None, text
+    """Forwarder to canonical split_frontmatter (ADR-0068)."""
+    from frontmatter import split_frontmatter as _shared
+    return _shared(text)
 
 
 def main() -> int:

@@ -4,7 +4,7 @@ description: Authors the integrated Blueprint at the Design Composition stage by
 model: opus
 effort: xhigh
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, KB-frontend-design, KB-ux-design, KB-visual-design, KB-design-system-design, KB-component-architecture-design, KB-backend-design, KB-api-design, KB-query-design, KB-database-design, KB-iac-design, KB-cc-platform, KB-cc-design, KB-github-actions-platform, KB-github-actions-design, KB-codespaces-platform, KB-codespaces-design]
+skills: [KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, KB-cc-platform, KB-cc-design, ai-development-guide]
 memory: project
 ---
 
@@ -24,15 +24,31 @@ You use **opus** (not sonnet) because cross-layer reconciliation requires the st
 
 Read in this order:
 
-1. `KB-documentation-criteria/SKILL.md` and `KB-documentation-criteria/references/templates/blueprint-template.md` — the canonical Blueprint structure you fill in.
-2. `KB-documentation-criteria/references/templates/adr-template.md` — for ADRs you author.
-3. `KB-documentation-criteria/references/disciplines/design-composition.md` (if it exists; if not, the composition discipline lives in the SKILL.md routing).
-4. `KB-review-disciplines/SKILL.md` and Gate 0/1 procedure — shared-document-reviewer will review your Blueprint.
-5. `KB-general-coding-principles/SKILL.md` — for compliance of any implementation samples in your Blueprint.
+1. The approved PRD's **Layer Scope** section — this is the canonical source of truth for which layers this feature activates. The Layer Scope drives every subsequent per-layer KB load decision.
+2. `KB-documentation-criteria/references/layer-taxonomy.md` — the canonical 9-layer registry. Always read this when the Layer Scope is ambiguous or contains layer names you do not immediately recognize.
+3. `KB-documentation-criteria/SKILL.md` and `KB-documentation-criteria/references/templates/blueprint-template.md` — the canonical Blueprint structure you fill in.
+4. `KB-documentation-criteria/references/templates/adr-template.md` — for ADRs you author.
+5. `KB-documentation-criteria/references/disciplines/design-composition.md` (if it exists; if not, the composition discipline lives in the SKILL.md routing).
+6. `KB-review-disciplines/SKILL.md` and Gate 0/1 procedure — shared-document-reviewer will review your Blueprint.
+7. `KB-general-coding-principles/SKILL.md` — for compliance of any implementation samples in your Blueprint.
 
-**Selective per-layer KB loading.** You have all per-layer KBs in your `skills:` frontmatter, but you do NOT need to read all of them on every run. Read a per-layer KB only when you're arbitrating a Q-`<LAYER>`-N from that layer (the per-layer designer already applied the KB; you reference it for the cross-layer trade-off).
+**Layer-Scope-conditional per-layer KB loading.** The per-layer KBs are NOT preloaded via your `skills:` frontmatter. For each layer activated by the PRD's Layer Scope, you Read the corresponding KB pair *only when needed* — i.e., when arbitrating a Q-`<LAYER>`-N from that layer or composing the cross-cutting section that references it. The mapping:
 
-**Storybook trigger.** Invoke `KB-storybook-platform` (model-invocable, NOT in the preloaded skills list) when arbitrating a frontend-layer concern that touches Storybook stories, addon configuration, MDX documentation, visual regression testing, or multi-package composition. Skip this KB otherwise.
+| Layer (per layer-taxonomy.md) | KBs to Read on demand |
+|---|---|
+| Frontend | `KB-frontend-design`, `KB-ux-design`, `KB-visual-design`, `KB-design-system-design`, `KB-component-architecture-design`. If the frontend touches Storybook, also `KB-storybook-platform`. |
+| Backend | `KB-backend-design` |
+| API | `KB-api-design` |
+| Query / Data Access | `KB-query-design` |
+| Database | `KB-database-design` |
+| IaC | `KB-iac-design` |
+| CI/CD (GitHub Actions) | `KB-github-actions-platform`, `KB-github-actions-design`. If Storybook + Chromatic is in scope, also `KB-storybook-platform`. |
+| Codespaces / Dev Environment | `KB-codespaces-platform`, `KB-codespaces-design`. If the codespace runs MCP servers (almost always true in this project), the MCP KBs in `KB-cc-platform` + `KB-cc-design` (already preloaded) cover the MCP design discipline. |
+| Claude Code / Project Filesystem | `KB-cc-platform`, `KB-cc-design` (already preloaded). |
+
+This discipline drops per-invocation context from ~14 preloaded KBs to ~3–5 KBs on the typical 2-3-layer feature run.
+
+**Canonical source.** The layer list AND the per-layer KB mapping above are derived from [`.claude/canonical/engineering-domain-layers.yaml`](../../canonical/engineering-domain-layers.yaml) (each layer entry carries its `design_kbs` / `platform_kbs`). That YAML is the machine-readable single source of truth; its prose companion is `.claude/skills/KB-documentation-criteria/references/layer-taxonomy.md`. The table above is a derived convenience view — if it ever disagrees with the YAML, the YAML wins. Do not invent layer names or KB mappings not present in the canonical file; the CANON-2 drift audit flags hard-coded layer lists that lack a canonical reference.
 
 ## Inputs (from orchestrator prompt)
 

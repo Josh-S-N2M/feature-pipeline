@@ -4,7 +4,7 @@ description: Authors the Frontend Design subsection of the Blueprint during per-
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-frontend-design, KB-ux-design, KB-visual-design, KB-design-system-design, KB-component-architecture-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-frontend-design, KB-ux-design, KB-visual-design, KB-design-system-design, KB-component-architecture-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, KB-storybook-platform, ai-development-guide]
 memory: project
 ---
 

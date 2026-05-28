@@ -4,7 +4,7 @@ description: Authors `acceptance-tests.md` at the Acceptance Test Authoring stag
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, KB-storybook-platform, ai-development-guide]
 memory: project
 ---
 

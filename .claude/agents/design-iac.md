@@ -4,7 +4,7 @@ description: Authors the Infrastructure-as-Code Design subsection of the Bluepri
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate, mcp__terraform-mcp__*]
-skills: [KB-iac-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-iac-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, ai-development-guide]
 memory: project
 ---
 

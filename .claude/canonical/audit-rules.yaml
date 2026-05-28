@@ -1,0 +1,256 @@
+# Audit rule registry + disabled-rule registry — single source of truth
+#
+# Every audit rule emitted by the audit subsystem should appear here:
+#   - id: the rule code (e.g., SA-3, ST-9, OP-7)
+#   - description: short summary
+#   - owner_script: the script that emits the finding
+#   - default_severity: BLOCKER / MAJOR / MINOR / NIT / INFO
+#   - status: active / disabled
+#   - disabled_by: ADR ID if status is disabled
+#   - disabled_reason: short rationale
+#
+# This registry serves two purposes:
+#   1. Visibility — readers can enumerate disabled rules without diffing 11 files.
+#   2. Drift detection — a future audit can compare the rules actually emitted
+#      against this registry and surface unregistered emissions or
+#      registered-but-not-emitted rules.
+
+version: 1.0.0
+last_updated: 2026-05-27
+authority: "ADR-0068"
+
+rules:
+
+  # ===== Skill audit (auditing-skills) =====
+  - id: SK-broken-link
+    description: "SKILL.md or a reference file links to a file that doesn't exist."
+    owner_script: ".claude/skills/auditing-skills/scripts/lint_references.py"
+    default_severity: BLOCKER
+    status: active
+    severity_tiering:
+      skill_md_body: BLOCKER
+      references_dir: MAJOR
+      anti_pattern_catalog: MINOR
+  - id: SK-missing-TOC
+    description: "Reference file > threshold lines has no TOC heading near the top."
+    owner_script: ".claude/skills/auditing-skills/scripts/lint_references.py"
+    default_severity: MINOR
+    status: active
+  - id: SK-frontmatter-name-invalid
+    description: "Skill name contains characters other than the allowed set."
+    owner_script: ".claude/skills/auditing-skills/scripts/validate_frontmatter.py"
+    default_severity: BLOCKER
+    status: active
+
+  # ===== Sub-agent audit (auditing-subagents) =====
+  - id: SA-2
+    description: "Sub-agent description has no triggering language (no 'use when', etc.)."
+    owner_script: ".claude/skills/auditing-subagents/scripts/validate_subagent_frontmatter.py"
+    default_severity: MAJOR
+    status: active
+  - id: SA-3
+    description: "Sub-agent has wildcard shell tool (Bash or Bash(*))."
+    owner_script: ".claude/skills/auditing-subagents/scripts/validate_subagent_frontmatter.py"
+    default_severity: MAJOR
+    status: disabled
+    disabled_by: ADR-0067
+    disabled_reason: "Pattern-based check on single-developer project produced false positives on intentional broad-Bash posture."
+  - id: SA-4
+    description: "Sub-agent body contains prompt-injection patterns or bypass-approval instructions."
+    owner_script: ".claude/skills/auditing-subagents/scripts/scan_subagent_body.py"
+    default_severity: BLOCKER
+    status: disabled
+    disabled_by: ADR-0067
+    disabled_reason: "Pattern-matcher could not distinguish documented anti-pattern from real injection."
+  - id: SA-14
+    description: "feature-touch-coverage matrix completeness check."
+    owner_script: ".claude/skills/auditing-subagents/scripts/audit_feature_touch_coverage.py"
+    default_severity: BLOCKER
+    status: active
+
+  # ===== Settings / permissions (auditing-settings) =====
+  - id: ST-3
+    description: "Permissive allow rule (Bash(*))."
+    owner_script: ".claude/skills/auditing-settings/scripts/validate_permissions.py"
+    default_severity: MAJOR
+    status: active
+    gated_to: managed-mode
+    gating_reason: "Single-developer non-managed projects intentionally allow broad Bash."
+  - id: ST-7
+    description: "Permissive allow rule (WebFetch(*))."
+    owner_script: ".claude/skills/auditing-settings/scripts/validate_permissions.py"
+    default_severity: MAJOR
+    status: active
+    gated_to: managed-mode
+    gating_reason: "Same as ST-3 reasoning."
+  - id: ST-8
+    description: "Output-style body contains safety-override pattern."
+    owner_script: ".claude/skills/auditing-settings/scripts/validate_output_styles.py"
+    default_severity: BLOCKER
+    status: disabled
+    disabled_by: ADR-0067
+    disabled_reason: "Security-flavored check; project's threat model does not require it."
+  - id: ST-9
+    description: "Permission rule is a bare tool name (equivalent to Tool(*))."
+    owner_script: ".claude/skills/auditing-settings/scripts/validate_permissions.py"
+    default_severity: MAJOR
+    status: active
+
+  # ===== Hook audit (auditing-hooks) =====
+  - id: HK-1
+    description: "Hook config references an unknown event name (will silently never fire)."
+    owner_script: ".claude/skills/auditing-hooks/scripts/validate_hooks_config.py"
+    default_severity: BLOCKER
+    status: active
+  - id: HK-5
+    description: "Hook command references a script path that does not exist."
+    owner_script: ".claude/skills/auditing-hooks/scripts/validate_hooks_config.py"
+    default_severity: BLOCKER
+    status: active
+    aliases: [X1]
+    note: "Cross-file emits X1 for the same condition; HK-5 is the per-primitive emitter."
+
+  # ===== Cross-file (auditing-cc-configs) =====
+  - id: X1
+    description: "Hook command references a script path that does not exist (cross-file emission)."
+    owner_script: ".claude/skills/auditing-cc-configs/scripts/cross_file_checks.py"
+    default_severity: BLOCKER
+    status: active
+    note: "Same condition as HK-5; cross-file version is the canonical signal because it knows the project root."
+  - id: X9
+    description: "Sub-agent preloads a skill whose audit verdict is FAIL/WARN."
+    owner_script: ".claude/skills/auditing-cc-configs/scripts/cross_file_checks.py"
+    default_severity_mapping:
+      child_BLOCKER: MAJOR
+      child_MAJOR: MINOR
+      child_MINOR: drop
+    status: active
+    note: "Severity-floor model added 2026-05-27 to kill 1-to-N noise amplification."
+  - id: X15
+    description: "Hook command uses ${HOME} or absolute home path (breaks for teammates)."
+    owner_script: ".claude/skills/auditing-cc-configs/scripts/cross_file_checks.py"
+    default_severity: MAJOR
+    status: active
+
+  # ===== MCP audit (auditing-mcp) =====
+  - id: OP-1
+    description: "Env block coverage — every env var used in MCP config must be declared."
+    owner_script: ".claude/skills/auditing-mcp/scripts/audit_op1_env_block_coverage.py"
+    default_severity: MAJOR
+    status: active
+  - id: OP-2
+    description: "Consumer mapping — agents that reference mcp__<server>__* must match canonical map."
+    owner_script: ".claude/skills/auditing-mcp/scripts/audit_op2_consumer_mapping.py"
+    default_severity: MAJOR
+    status: active
+  - id: OP-3
+    description: "Zero-MCP invariant — sub-agents that should not load MCP tools."
+    owner_script: ".claude/skills/auditing-mcp/scripts/audit_op3_zero_mcp_invariant.py"
+    default_severity: MAJOR
+    status: active
+  - id: OP-4
+    description: "Primary/fallback prose preservation in code-graph fallback documentation."
+    owner_script: ".claude/skills/auditing-mcp/scripts/audit_op4_primary_fallback_prose.py"
+    default_severity: MAJOR
+    status: active
+  - id: OP-7
+    description: "mcp-events.jsonl schema conformance."
+    owner_script: ".claude/skills/auditing-mcp/scripts/audit_op7_events_schema.py"
+    default_severity: MAJOR
+    status: active
+  - id: OP-9
+    description: "URL-credential rejection pattern in MCP configs."
+    owner_script: ".claude/skills/auditing-mcp/scripts/audit_op9_url_credential_rejection.py"
+    default_severity: BLOCKER
+    status: disabled
+    disabled_by: ADR-0067
+    disabled_reason: "Security-flavored; project's threat model does not require it."
+  - id: OP-11
+    description: "ADR-0041 parity check between .mcp.json and ADR-prescribed server list."
+    owner_script: ".claude/skills/auditing-mcp/scripts/audit_op11_adr_parity.py"
+    default_severity: MAJOR
+    status: removed
+    removed_by: ADR-0068
+    removed_reason: "Script existed and was advertised by SKILL.md but was never wired into the audit_mcp.py dispatch loop. Removed rather than wired because the project no longer needs the ADR-0041 parity check after the 2026-05-24 mcp-openapi-schema removal stabilized the canonical 5-server set."
+  - id: MC-3
+    description: "MCP package not in known-publishers list (provenance advisory)."
+    owner_script: ".claude/skills/auditing-mcp/scripts/validate_mcp_config.py"
+    default_severity: MINOR
+    status: active
+  - id: MC-4
+    description: "MCP server command is a download-and-execute pattern."
+    owner_script: ".claude/skills/auditing-mcp/scripts/validate_mcp_config.py"
+    default_severity: BLOCKER
+    status: disabled
+    disabled_by: ADR-0067
+    disabled_reason: "Security-flavored."
+
+  # ===== Auto-memory / sub-agent memory =====
+  - id: AM-MAX_LINES
+    description: "Memory file exceeds line cap."
+    owner_script: ".claude/skills/auditing-shared/scripts/check_memory_thresholds.py"
+    default_severity: MAJOR
+    status: active
+
+# ----- Drift-detection meta-rules -----
+# Two surfaces: CANON-1 catches Python constants; CANON-2 catches documents.
+# Both are dispatched by audit_project.py (run_canonical_drift_checks) and
+# fold their findings into the project-level cross-file dimension.
+
+# CANON-1 — surfaces when an audit script defines a constant locally that
+# should live in canonical/.
+drift_detection_rule:
+  id: CANON-1
+  description: "Audit script defines a constant that should be in .claude/canonical/."
+  owner_script: ".claude/skills/auditing-shared/scripts/audit_canonical_drift.py"
+  default_severity: BLOCKER
+  status: active
+  watched_constant_names:
+    - KNOWN_TOOLS
+    - VALID_EVENTS
+    - SEVERITY_ORDER
+    - NAME_PATTERN
+    - RECOGNIZED_FIELDS
+    - GATED_DOC_TYPES
+    - ISSUE_DOC_TYPES
+    - ISSUE_STATES
+    - GATED_STATES
+    - ANALYSIS_STATES
+    - ADR_STATES
+    - EFFORT_ENUM
+  # KNOWN_FIELDS intentionally excluded: it's settings.json-schema-internal
+  # (mcpServers, permissions, hooks, etc.) — a different concept from tool
+  # / event / frontmatter-field vocabularies. Not a canonical concern.
+
+# CANON-2 — surfaces when a markdown document hard-codes a canonical
+# vocabulary inline instead of referencing its canonical source. Currently
+# watches the engineering-domain-layers vocabulary (per ADR-0069); structured
+# so additional vocabularies (severity names, doc-type names) are a few lines.
+document_drift_detection_rule:
+  id: CANON-2
+  description: "Document hard-codes a canonical vocabulary inline with no reference to the canonical source."
+  owner_script: ".claude/skills/auditing-shared/scripts/audit_canonical_doc_drift.py"
+  default_severity: MAJOR
+  status: active
+  # Each vocabulary is watched at a 'near-complete enumeration' threshold so the
+  # rule fires on specs/templates/rubrics that redefine a whole vocabulary, not
+  # on teaching docs that mention a few members. Thresholds live in the script.
+  watched_vocabularies:
+    - engineering-domain-layers   # min_match 6/9
+    - severity                    # min_match 5/5
+    - issue-states                # min_match 6/6 distinct lifecycle states
+    - hook-events                 # min_match 9/13
+    - gated-doc-types             # min_match 9/13
+  exemptions:
+    - "the canonical source file itself"
+    - "the declared prose companion"
+    - "any document that references the canonical source path (treated as a derived view → INFO)"
+  excluded_trees:
+    - working/
+    - Issues/
+    - adrs/
+    - output/
+    - agent-memory/
+  excluded_filenames:
+    - project-audit-report.md        # generated each run
+    - pipeline-validation-analysis.md # generated analysis artifact

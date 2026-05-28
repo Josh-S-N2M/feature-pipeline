@@ -120,7 +120,10 @@ is a structural invariant, not a style preference.
   — why structural codification (templates, spec) lives in KB-documentation-criteria and
   this discipline content lives in KB-issue-capture.
 - **ADR-0050** (`adrs/ADR-0050-5-state-issues-vocabulary.md`)
-  — the 5-state lifecycle vocabulary and per-state companion fields.
+  — the state lifecycle vocabulary and per-state companion fields. The canonical machine source
+  for the state and doc-type enums is `.claude/canonical/doc-types.yaml` (`issue_states`,
+  `issue_doc_types`, `issue_per_state_required_fields`); this contract references it, never
+  redefines it (per KB-cc-design Principle 11).
 - **AC-FR-13-a/b** — the grep-testable zero-baseline acceptance criteria for the
   pipeline-isolation invariant. Encoded verbatim by `test-acceptance-author`.
 - **Evidence (cross-artifact divergence)**: `Issues/per-agent-design-evaluation-gap/analysis.md`

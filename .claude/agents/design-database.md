@@ -4,7 +4,7 @@ description: Authors the Database Design subsection of the Blueprint during per-
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskCreate, TaskUpdate]
-skills: [KB-database-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines]
+skills: [KB-database-design, KB-documentation-criteria, KB-general-coding-principles, KB-review-disciplines, ai-development-guide]
 memory: project
 ---
 

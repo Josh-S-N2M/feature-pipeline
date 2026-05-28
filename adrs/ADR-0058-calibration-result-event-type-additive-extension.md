@@ -1,10 +1,13 @@
 ---
 id: ADR-0058
-version: 1.0.0
-status: Accepted
+version: 1.1.0
+status: Superseded
 generated: 2026-05-26
 generated_by: design-composer
 supersedes: []
+superseded_by: ADR-0066
+superseded_at: 2026-05-27
+supersession_rationale: The only consumer of the `calibration_result` event type was FR-4b's GitNexus grammar-skip calibration mechanism. ADR-0066 removed gitnexus from the active server inventory on 2026-05-27, eliminating that consumer. The Issues/fr4b-signal1-regex-drift/analysis.md analysis (status complete 2026-05-27) records Path B3 — drop the mechanism — as the applied disposition. The `calibration_result` schema entry has been removed from audit_op7_events_schema.py and its documentation removed from KB-mcp-platform/references/mcp-events-jsonl.md and KB-mcp-design/references/principles.md. If a future calibration mechanism is introduced, a new ADR reintroduces the event type with its own consumer and mechanism-namespace discriminator.
 adrs_inherited:
   - ADR-0037
   - ADR-0005
@@ -14,7 +17,7 @@ applies_to:
   - KB-mcp-design/references/principles.md (schema home; future amendment)
   - KB-mcp-platform/references/mcp-events-jsonl.md (usage documentation; future amendment)
 template_format: per KB-documentation-criteria ADR template v1.0
-change_summary: Additive extension of ADR-0037's mcp-events.jsonl event-type vocabulary to admit a fourth event type, `calibration_result`, written by FR-4b's GitNexus grammar-skip behavioral calibration script. The three pre-existing event types (`install_complete`, `readiness_probe`, `structured_failure`) are preserved verbatim; consumers that filter on unknown types continue to ignore the new type per ADR-0037's forward-compatibility posture. Pre-finalization reconciliation (2026-05-26 cycle 1 of pipeline-quickwins-hardening-r1 Architecture Audit): event-type triad corrected from `primary_degraded / readiness_probe / structured_failure` to `install_complete / readiness_probe / structured_failure` (inherited prose error from ADR-0037 v1.0.0 / v1.0.1, since corrected in ADR-0037 v1.0.2); OP-6 → OP-7 label corrected for schema-validation rule references throughout (OP-6 audits credential redaction; OP-7 is the schema-validation rule).
+change_summary: Additive extension of ADR-0037's mcp-events.jsonl event-type vocabulary to admit a fourth event type, `calibration_result`, written by FR-4b's GitNexus grammar-skip behavioral calibration script. **Superseded by ADR-0066 on 2026-05-27** — the gitnexus removal eliminated the sole consumer of this event type; the schema entry and KB documentation have been removed. The historical event recorded in `.claude/runtime/mcp-events.jsonl` line 21 (the 2026-05-26 smoke that returned `drift_detected`) is left in place as append-only audit history per ADR-0037. The three pre-existing event types (`install_complete`, `readiness_probe`, `structured_failure`) remain operative.
 ---
 
 # ADR-0058: `calibration_result` Event Type — Additive Extension to `mcp-events.jsonl` Vocabulary
@@ -34,7 +37,9 @@ change_summary: Additive extension of ADR-0037's mcp-events.jsonl event-type voc
 
 ## Status
 
-Accepted — 2026-05-26
+**Superseded — 2026-05-27** by [ADR-0066 (gitnexus removal)](ADR-0066-gitnexus-removal.md).
+
+Originally Accepted 2026-05-26. Superseded one day later when ADR-0066 removed the only consumer (FR-4b's GitNexus grammar-skip calibration). The schema entry and KB documentation for `calibration_result` were removed at supersession; the event type is no longer part of the active mcp-events.jsonl vocabulary. The historical record (one event in `.claude/runtime/mcp-events.jsonl` from the 2026-05-26 smoke) is preserved per ADR-0037's append-only discipline. See [Issues/fr4b-signal1-regex-drift/analysis.md](../Issues/fr4b-signal1-regex-drift/analysis.md) for the supersession rationale.
 
 ## Context
 

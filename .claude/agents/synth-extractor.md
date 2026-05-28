@@ -4,7 +4,7 @@ description: Extracts atomic, source-cited claims from a single source document.
 model: opus
 effort: high
 tools: [Read, Glob, Grep, Write, TaskUpdate]
-skills: [claim-extraction-knowledge]
+skills: [claim-extraction-knowledge, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

@@ -1,9 +1,11 @@
 ---
 id: PROPOSAL-auditing-family-graduation-review
 doc_type: issue-proposal
-status: open
+status: wontfix-with-rationale
 since: 2026-05-23
-version: 0.1.0
+decided_at: 2026-05-27
+wontfix_rationale: User declined to pursue further graduations during the 2026-05-27 unbiased-status review. Reasoning that stuck — the only sibling with a strong case for graduation (`auditing-mcp`) was graduated in `devcontainer-mcp-provisioning-r1`; `auditing-github-actions` and `auditing-codespaces` already sit outside the `auditing-cc-configs` family list. Three siblings the analysis labelled "Weak — stays in family" (auditing-skills, auditing-context-files, auditing-subagents, auditing-settings) do not warrant the structural-churn cost. The one ambiguous case (`auditing-hooks`) carries a security-distinct failure domain but has no active cross-feature reuse evidence; if such evidence surfaces later (e.g. a hook-only audit invocation outside the coordinator), a new Issue captures it then. The two "already distant" cases (`auditing-github-actions` formal confirmation, `auditing-codespaces` stub-fill placement) are best handled when the stub-fill itself is scheduled. No active cost, no forcing function — close.
+version: 0.2.0
 generated: 2026-05-23
 generated_by: claude (orchestrator) — captured from Gate-4 decision in devcontainer-mcp-provisioning-r1
 feature_slug: devcontainer-mcp-provisioning-r1

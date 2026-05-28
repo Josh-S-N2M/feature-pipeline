@@ -4,7 +4,7 @@ description: "Researches one external topic at the Discovery Research stage. Per
 model: opus
 effort: high
 tools: [Read, Glob, Grep, WebSearch, WebFetch, Write, TaskCreate, TaskUpdate, mcp__context7__resolve-library-id, mcp__context7__query-docs, mcp__exa__web_search_exa, mcp__exa__company_research_exa, mcp__exa__crawling_exa]
-skills: [KB-documentation-criteria]
+skills: [KB-documentation-criteria, ai-development-guide, KB-general-coding-principles]
 memory: project
 ---
 

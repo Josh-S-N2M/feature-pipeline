@@ -102,24 +102,9 @@ Fields:
 - `redaction_applied`: boolean — true if the helper redacted any credential-shaped values from this record's substrate
 - `message`: one-line human-readable summary
 
-### `calibration_result`
+### Retired: `calibration_result`
 
-Emitted by calibration mechanisms (per ADR-0058, the additive extension to ADR-0037 v1.0.2). Schema preserved for future calibration mechanisms; the historical FR-4b gitnexus-grammar-skip mechanism is retired with the 2026-05-27 gitnexus removal (ADR-0066).
-
-```jsonl
-{"event": "calibration_result", "timestamp": "2026-05-26T08:15:00Z", "server": "<server>", "mechanism": "<mechanism-namespace>", "version": "<version-under-test>", "duration_ms": 3210, "outcome": "pass", "signals": {"signal_1_name": "pass", "signal_2_name": "pass"}, "note": "..."}
-```
-
-Fields:
-- `event`: literal `calibration_result`
-- `timestamp`: ISO 8601 UTC
-- `server`: server being calibrated
-- `mechanism`: namespace discriminator — distinguishes multiple calibration sources in the same event surface; consumers filtering on `signals.*` sub-fields should check `mechanism:` first.
-- `version`: server version or tag string under test
-- `duration_ms`: elapsed time for the calibration run
-- `outcome`: `pass` | `fail` | `drift_detected`
-- `signals`: map of per-mechanism signal names to `pass` | `fail` | `skipped`; keys are mechanism-specific (discriminated by `mechanism:`)
-- `note`: one-line human-readable summary; includes a remedial hint on `fail` or `drift_detected`
+A fourth event type, `calibration_result`, was added by ADR-0058 on 2026-05-26 to carry FR-4b's GitNexus grammar-skip calibration outcomes. ADR-0058 was **superseded by ADR-0066 on 2026-05-27** when the gitnexus removal eliminated the only consumer. The schema entry has been removed from `audit_op7_events_schema.py`; the auditor tolerates the single historical `calibration_result` record (line 21 of `mcp-events.jsonl`, the 2026-05-26 smoke) as an INFO-level "retired event type" finding rather than a MAJOR "unknown event type" finding. If a future calibration mechanism is introduced, a new ADR re-introduces the event type with its own canonical payload.
 
 ## Bootstrap semantics
 
@@ -133,8 +118,8 @@ Per ADR-0037 Implementation Guidance, the bootstrap produces **five `readiness_p
 
 ## Cross-references
 
-- **ADR-0037** — full schema + bootstrap semantics; establishes the three pre-existing event types.
-- **ADR-0058** — additive extension adding the fourth event type (`calibration_result`); canonical payload shape and `mechanism:` discriminator discipline.
+- **ADR-0037** — full schema + bootstrap semantics; establishes the three active event types.
+- **ADR-0058** — *Superseded by ADR-0066 on 2026-05-27.* Originally added a fourth event type (`calibration_result`) for FR-4b; the schema entry was removed when gitnexus was retired.
 - **ADR-0039** — credential redaction discipline.
 - **ADR-0007 v2.2.0** — code-graph fallback policy (superseded for active selection by ADR-0066; the documented fallback to Read/Grep/Glob + serena remains the canonical posture).
 - **ADR-0066** — gitnexus removal (2026-05-27); the `primary_degraded` field becomes inactive (preserved for future primary/fallback registrations).

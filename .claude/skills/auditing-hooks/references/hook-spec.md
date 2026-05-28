@@ -1,5 +1,7 @@
 # Hook Specification
 
+> **Canonical source.** The valid hook event names and documented context variables are maintained in [`.claude/canonical/hook-events.yaml`](../../../canonical/hook-events.yaml) (loaded by `canonical.py`; per ADR-0068). This file is the prose companion — it carries the configuration shape, exit-code protocol, and authoring discipline. If the event list disagrees, the YAML wins. Per KB-cc-design Principle 11, do not duplicate the event enumeration elsewhere without a reference back to the canonical source.
+
 ## Contents
 
 - The 12 event names (case-sensitive)

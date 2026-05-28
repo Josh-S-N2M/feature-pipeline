@@ -2,8 +2,8 @@
   "run_id": "pipeline-quickwins-hardening-r1-20260525-221123",
   "feature_slug": "pipeline-quickwins-hardening-r1",
   "started_at": "2026-05-25T22:11:23Z",
-  "current_stage": "execution",
-  "stage_status": "awaiting_user_for_phase_5_rollout",
+  "current_stage": "complete",
+  "stage_status": "phase_5_abandoned_by_user_2026-05-27",
   "gate_history": [
     {
       "gate": "intent_confirmation",
@@ -46,6 +46,12 @@
       "user_notes": "Approved after applying two packager advisory fixes: intent-clarification frontmatter now declares scope_class: MINOR explicitly; blueprint-diff-v2.patch (273KB working artifact for cross-artifact auditor diff-mode input) removed from deliverable archive.",
       "tasks_dag": "tasks.json (36 tasks, 56 edges, critical path 12)",
       "packager_verdict": "PASS (0 BLOCKER, 0 MAJOR, 2 MINOR advisories addressed before approval, 4 INFO)"
+    },
+    {
+      "gate": "phase_5_rollout",
+      "decision": "abandoned",
+      "timestamp": "2026-05-27T00:00:00Z",
+      "user_notes": "Phase 5 (rollout: post-merge banner-retirement workflow run + observability) abandoned by user direction during 2026-05-27 unbiased-status review. The shipped feature (Phases 0-4) covers the load-bearing FRs; the post-merge banner-retirement workflow is non-essential and adds operational complexity without proven value. Re-open only if a related issue surfaces."
     }
   ],
   "artifact_versions": {
