@@ -59,6 +59,8 @@ These files are version-controlled. To update:
 | `skill-thresholds.yaml` | Per-skill-class size and TOC thresholds |
 | `audit-rules.yaml` | Rule registry; which rules are disabled and why |
 | `engineering-domain-layers.yaml` | The engineering layers used by Layer Scope + per-layer Design (prose companion: `KB-documentation-criteria/references/layer-taxonomy.md`) |
+| `technology-boundaries.yaml` | Machine-checkable half of the architecture's technology boundaries (TB1–TB11) — the boundary screen + fitness-function binding (prose companion: `governed-pipeline-architecture.md` Appendix F) |
+| `evaluation-rubric.yaml` | Weighted, calibrated rubric for the `technology-evaluation` workflow — profiles + criteria + anchors (prose companion: `.claude/workflows/technology-evaluation.DESIGN.md`) |
 
 ## Authority
 

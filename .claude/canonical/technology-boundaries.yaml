@@ -1,0 +1,200 @@
+# Technology boundaries — single source of truth (machine-checkable half)
+#
+# The architecture's binding constraints on technology selection. Each boundary
+# is tech-agnostic (names no vendor) yet bounds which technologies the plan may
+# adopt: a technology that violates a boundary is out-of-bounds BEFORE it is
+# researched.
+#
+# SOURCE-OF-TRUTH SPLIT (keeps the architecture authoritative):
+#   - The architecture's Appendix F owns the CONSTRAINT STATEMENT and its
+#     LITMUS — the what/why (decision D-TB-1).
+#   - THIS file owns the machine-checkable SCREEN and the FITNESS-FUNCTION
+#     binding — the how-checked.
+#   The two are joined by boundary id (TB1..TB11). The WS-0 drift sentinel
+#   enforces the join: every TB in Appendix F has an entry here and vice versa;
+#   each `constraint` summary matches the Appendix-F row; every non-null
+#   `fitness_function` names a check that exists.
+#
+# CONSUMED BY (both read this one file, so evaluation and CI cannot drift):
+#   - the `technology-evaluation` workflow's boundary-screen phase
+#   - the WS-0 technology-boundary fitness functions (CI)
+# Accessors (`boundaries()`, `boundary(id)`) are a WS-0 addition to
+# canonical.py; until then consumers read this YAML directly (no inline copy of
+# the values — canonical-compliant in spirit).
+#
+# Adding a boundary is a substantive architectural change: author it in
+# Appendix F AND add its entry here in the same commit, bump `version`, and
+# (when the freeze lifts) record the ADR.
+
+version: 1.3.0
+last_updated: 2026-05-30
+authority: "governed-pipeline-architecture.md Appendix F + decisions D-TB-1, D-OBS-2 (ADR pending freeze-lift)"
+# v1.1.0 (2026-05-29): TB11 narrowed to OTel-only ingest — artifact lineage moves
+#   to the freshness gate's in-git derived_from graph, no OpenLineage backend (D-OBS-2).
+# v1.2.0 (2026-05-29): TB1 corrected + reframed — the real default machine is
+#   4-core/16 GB (not 8 GB; verified vs GitHub machine-types docs) and footprint is a
+#   TUNABLE cost dial (resizable to 64–128 GB). Single-container + no-docker-compose
+#   stay hard structural rules; footprint-over-default is a flagged cost, not an
+#   elimination. fitness_function renamed ff_tb1_single_container_no_compose.
+# v1.3.0 (2026-05-30): TB9 scope-fix — it governs the PIPELINE's own artifacts/record,
+#   NOT a backend service's internal cache format (every trace backend uses a binary
+#   store; that is a replayable cache, not our record). Closes the pilot mis-application
+#   that unfairly eliminated Parseable on internal Parquet. on_uncertainty: keep.
+
+# Prose companion — the authoritative constraint statements, the litmus for
+# what qualifies as a boundary, and the four mechanisms by which a boundary
+# binds. This YAML carries the machine-readable screen; the architecture
+# carries the discipline.
+prose_companion: "governed-pipeline-architecture.md#appendix-f"
+
+# The litmus a constraint must pass to be a boundary (vs a plan-level choice):
+# reversing it is expensive AND its effect is structural or cross-cutting.
+# A choice swappable behind a stable interface at low blast radius is NOT a
+# boundary — it belongs in the plan.
+
+# check_type vocabulary:
+#   mechanical — a deterministic predicate over an observable fact; authored as
+#                a CI fitness function and CALLED by the screen (not re-prompted)
+#   judgment   — needs an agent to read and reason
+#   mixed      — part mechanical, part judgment (see `signal`)
+# on_uncertainty vocabulary:
+#   eliminate  — if in-bounds cannot be confirmed from evidence, drop the
+#                candidate and record the uncertainty (the rule for hard
+#                boundaries — better to drop a usable tool than score an
+#                out-of-bounds one)
+#   keep       — soft boundary; flag but do not eliminate
+# applies_to vocabulary: services | libraries | orchestration | all
+#   (a boundary only screens candidates of a matching decision kind)
+
+boundaries:
+  TB1:
+    constraint: "Single-container, no-docker-compose dev environment. The pipeline runs in one GitHub Codespace/devcontainer; the DEFAULT machine is 4-core / 16 GB / 32 GB (the smallest tier satisfying the devcontainer's 4-core minimum — the hostRequirements memory floor of 8 GB is a loose minimum, NOT the provisioned size; there is no 4-core/8 GB machine). Footprint is a TUNABLE COST DIAL: a candidate may justify resizing up to 16-core/64 GB or 32-core/128 GB at proportional $/hr. STRUCTURAL rules are hard (one container; no docker-compose / k8s / multi-node); a footprint above the default is a FLAGGED COST, not an auto-elimination."
+    rules_out: "multi-node clusters; docker-compose / k8s-required services (structural — fails at any machine size); a footprint exceeding the largest single machine (32-core / 128 GB)"
+    rules_in: "single-container pip/binary tools; a heavier single-container tool is in-bounds if the larger machine it needs is justified and its cost is flagged"
+    evidenced_in: "§30; devcontainer.json (hostRequirements are minimums); GitHub Codespaces machine-types docs"
+    applies_to: [services, all]
+    screen:
+      check_type: mechanical
+      signal: "install method — a REQUIRED docker-compose.yml / k8s manifest / multi-node is a hard fail (eliminate). Footprint vs the 16 GB default — if higher, FLAG the machine tier + $/hr cost; do NOT eliminate on size alone unless it exceeds the largest tier."
+      on_uncertainty: eliminate   # structural (compose / multi-node) only; footprint-over-default is a cost flag, never an elimination
+      fitness_function: "ff_tb1_single_container_no_compose"
+
+  TB2:
+    constraint: "Git is the system-of-record for durable state — anything that must survive rebuild is committed; the runtime dir is ephemeral"
+    rules_out: "tech assuming an external persistent datastore as the durable record"
+    rules_in: "file / git state; mounted volumes are cache only"
+    evidenced_in: "§30 durability table; .gitignore"
+    applies_to: [services, all]
+    screen:
+      check_type: mechanical
+      signal: "architecture docs; whether an external datastore is required for the durable record"
+      on_uncertainty: eliminate
+      fitness_function: "ff_tb2_git_system_of_record"
+
+  TB3:
+    constraint: "No mandatory runtime dependency on an external/cloud service — the pipeline completes with backends down"
+    rules_out: "SaaS-only on the critical path"
+    rules_in: "self-hostable, opt-in services"
+    evidenced_in: "§18 (never depends on the backend being up)"
+    applies_to: [services, all]
+    screen:
+      check_type: mechanical
+      signal: "self-host docs; license / offering page (SaaS-only?)"
+      on_uncertainty: eliminate
+      fitness_function: "ff_tb3_no_mandatory_external_service"
+
+  TB4:
+    constraint: "Deterministic gates only — enforcement is deterministic code; LLM judgment is reserved for reviewer agents, never mechanical gates"
+    rules_out: "LLM-as-validator for checkable rules"
+    rules_in: "code validators"
+    evidenced_in: "§5, §8 (the litmus)"
+    applies_to: [orchestration]
+    screen:
+      check_type: judgment
+      signal: "does the candidate propose LLM judgment where a deterministic check is possible?"
+      on_uncertainty: eliminate
+      fitness_function: null  # design-time judgment; no mechanical predicate
+
+  TB5:
+    constraint: "Single source of truth; no embedded rule copies — tools and validators read rules from canonical (CANON-1)"
+    rules_out: "tech that ships its own divergent copy of vocabularies/schemas"
+    rules_in: "canonical-reading code"
+    evidenced_in: "§6; canonical.py; CANON-1"
+    applies_to: [libraries]
+    screen:
+      check_type: mechanical
+      signal: "does the tool require its own embedded copy of rules/vocab it can't read from canonical?"
+      on_uncertainty: eliminate
+      fitness_function: "ff_tb5_no_embedded_rule_copy"
+
+  TB6:
+    constraint: "File-path-reference handoff; stateless actors — inter-stage state passes as file paths"
+    rules_out: "orchestration requiring shared in-memory / sticky-session state"
+    rules_in: "file-based handoff"
+    evidenced_in: "§10"
+    applies_to: [orchestration]
+    screen:
+      check_type: judgment
+      signal: "execution model — does it require shared in-memory or sticky-session state across stages?"
+      on_uncertainty: eliminate
+      fitness_function: null  # architectural read of the execution model
+
+  TB7:
+    constraint: "Single dispatcher; no agent-spawns-agent — orchestration must preserve the sole-dispatcher topology"
+    rules_out: "orchestration tech that breaks sole-dispatch (ADR-0045)"
+    rules_in: "single-dispatcher orchestration"
+    evidenced_in: "§10; ADR-0045"
+    applies_to: [orchestration]
+    screen:
+      check_type: judgment
+      signal: "does the orchestration model require an agent to spawn sub-agents?"
+      on_uncertainty: eliminate
+      fitness_function: null  # architectural read of the topology
+
+  TB8:
+    constraint: "Python validation library, subprocess-dispatched — validators are Python 3.x invoked via python3"
+    rules_out: "validators requiring a runtime not in the container"
+    rules_in: "Python 3.x"
+    evidenced_in: "§6; auditing-shared"
+    applies_to: [libraries]
+    screen:
+      check_type: mechanical
+      signal: "implementation language / required runtime"
+      on_uncertainty: eliminate
+      fitness_function: "ff_tb8_python_runtime"
+
+  TB9:
+    constraint: "Text-first, diffable formats — Markdown + YAML frontmatter for artifacts, JSON / JSON-Schema for contracts, JSONL for events, Mermaid for diagrams. SCOPE: this governs the formats the PIPELINE authors and treats as its record — NOT a backend service's internal on-disk storage. Every trace backend persists to some binary/columnar store (Badger, Parquet, etc.); that is a downstream cache replayable from the JSONL-of-record, and TB9 does not screen it. TB9 bites only when a candidate's PROPRIETARY format would become one of OUR durable artifacts."
+    rules_out: "binary / proprietary formats for the pipeline's OWN artifacts/record (NOT a backend's internal cache)"
+    rules_in: "text-first, diffable formats for pipeline artifacts; a backend whose internal store is binary is fine as long as our record stays JSONL-in-git"
+    evidenced_in: "artifact templates; run-events; Appendix E"
+    applies_to: [all]
+    screen:
+      check_type: mechanical
+      signal: "does the candidate force a binary/proprietary format on the PIPELINE'S OWN artifacts/record? (a backend's internal cache format is NOT screened — it is a replayable cache, not our record)"
+      on_uncertainty: keep   # do NOT eliminate a backend for its internal storage format; flag only if it would own one of our durable artifacts
+      fitness_function: "ff_tb9_text_first_artifacts"
+
+  TB10:
+    constraint: "Credential indirection only — secrets via env-block / Codespaces Secrets; never in config argv, URL, or committed files"
+    rules_out: "tech requiring inline credentials"
+    rules_in: "env / secret-store credential indirection"
+    evidenced_in: "§30; ADR-0039 (MCP discipline)"
+    applies_to: [services, all]
+    screen:
+      check_type: mechanical
+      signal: "config / auth docs — does it force inline credentials with no env / secret-store path?"
+      on_uncertainty: eliminate
+      fitness_function: "ff_tb10_credential_indirection"
+
+  TB11:
+    constraint: "Observability is OTel-shaped, self-hosted, JSONL-of-record, with no immutable/WORM requirement — the backend ingests the OpenTelemetry standard, self-hostable single-container, never on the critical path. Artifact lineage is the freshness gate's in-git derived_from graph (Part IV), NOT an ingested OpenLineage backend (decision D-OBS-2)."
+    rules_out: "SaaS-only observability, multi-service stacks, mandatory WORM/retention, a separate lineage backend"
+    rules_in: "OTel-shaped, self-hostable single-container observability"
+    evidenced_in: "§15–§18; D-OBS-2"
+    applies_to: [services]
+    screen:
+      check_type: mixed  # OTLP ingest is mechanical; "off the critical path" is judgment
+      signal: "OTLP support matrix (mechanical); integration model — can the pipeline complete with it down? (judgment). OpenLineage ingestion is NOT required — do not screen on it."
+      on_uncertainty: eliminate
+      fitness_function: "ff_tb11_standard_shape_self_hosted"

@@ -1,0 +1,173 @@
+# Technology-evaluation scoring rubric — single source of truth
+#
+# The weighted, calibrated rubric the `technology-evaluation` workflow's Score
+# phase applies to the candidates that SURVIVE the boundary screen
+# (technology-boundaries.yaml). Boundary fit is a prerequisite gate, never a
+# scored criterion — only survivors reach this rubric.
+#
+# Discipline (reviewer-gate, decision D-RG-1): anchored levels, calibrated,
+# chain-of-thought BEFORE the score, abstain allowed — not a vibe number.
+# Anchors exist so two scorers (or two re-runs) land on the same number.
+#
+# CONSUMED BY: the `technology-evaluation` workflow Score phase. The accessor
+# `rubric(profile)` is a WS-0 addition to canonical.py; until then the workflow
+# reads this YAML directly (no inline copy of the weights — canonical-compliant
+# in spirit).
+#
+# The active profile is human-set and encodes what the project values. The
+# weights/anchors are STILL TO BE RE-CONFIRMED against the deferred
+# selection-methodology research (DESIGN §9) before they are treated as final.
+
+version: 1.2.0
+last_updated: 2026-05-29
+authority: "technology-evaluation.DESIGN.md §6 + decision D-RG-1 + methodology-research.OUTPUT.md (ADR pending freeze-lift)"
+# v1.1.0 (2026-05-29): standard_shape criterion narrowed to OTel-only (OpenLineage
+#   dropped per D-OBS-2 — lineage is the freshness gate's job, not the backend's).
+# v1.2.0 (2026-05-29): methodology-research hardening — capability_fit re-anchored to
+#   score against our written question list (not general breadth); reversibility weight
+#   made door-type-aware (decision_class_modifiers); added decision_rules (lock-weights,
+#   sensitivity test, too-close-to-call band, evidence-anchored scoring).
+
+# Prose companion — the rationale for each criterion, the profile reasoning,
+# and the worked observability-backend example.
+prose_companion: ".claude/workflows/technology-evaluation.DESIGN.md"
+
+# The active emphasis. Switching profiles is a deliberate change of what the
+# project optimizes for — bump `version` and note why.
+active_profile: hedge-moving-target
+
+# Scoring scale (per criterion). Abstain routes a criterion to a note rather
+# than a guessed number. Weighted score = sum(level * weight) / 3, normalized
+# to 100. Levels are anchored per criterion below.
+scale:
+  "0": "fails the intent"
+  "1": "partial / with caveats"
+  "2": "meets it cleanly"
+  "3": "clearly best-in-class"
+abstain: allowed
+
+# Scoring-process rules (methodology research, 2026-05-29). These guard the
+# documented failure modes of weighted-scoring matrices.
+decision_rules:
+  lock_weights_before_scoring: true   # weights are set in Frame, before any option data is seen (anti weight-gaming)
+  score_against_evidence: true        # score against the written question list / facts, NOT vendor feature breadth
+  sensitivity_test:                   # false-precision guard
+    method: "shift the top-weighted criterion ±10%; if the ranking flips, the result is not robust — report it"
+  too_close_to_call_band: 10          # if the top-two normalized-score gap is < this many points, the call goes to JUDGMENT, not the number
+
+# Decision-class weight modifiers (methodology research Q2: reversibility's weight
+# should track reversibility stakes). Applied AFTER the active profile is chosen;
+# net-zero so weights still sum to 100. Reversibility "decays" — a two-way door
+# becomes one-way as data/consumers accumulate; re-judge door-type on each re-run.
+decision_class_modifiers:
+  "two-way door":   # reversal is cheap and usually uniform across survivors → spend the weight on fit
+    reversibility: -6
+    capability_fit: +6
+  "one-way door":   # exit cost can outrank raw capability → weight reversibility up
+    reversibility: +6
+    capability_fit: -6
+
+# Named weight sets. Every profile's weights MUST sum to 100 (the WS-0 drift
+# sentinel checks this). Criterion ids match the `criteria` block below.
+profiles:
+  hedge-moving-target:
+    description: "Lead with the levers that protect us when the landscape shifts — trajectory + reversibility — while keeping operability and standard-shape high. The chosen default."
+    weights:
+      maturity_trajectory: 22
+      standard_shape: 18
+      reversibility: 18
+      operability: 16
+      capability_fit: 12
+      durability_fit: 6
+      licensing_cost: 5
+      docs_support: 3
+  lean-container:
+    description: "Operability and durability dominate — the single-container budget and simple ops are the binding reality past the boundary line."
+    weights:
+      operability: 24
+      standard_shape: 18
+      maturity_trajectory: 16
+      reversibility: 12
+      durability_fit: 12
+      capability_fit: 10
+      licensing_cost: 5
+      docs_support: 3
+  capability-first:
+    description: "Capability fit leads — the tool must answer our actual questions out of the box, even at the cost of a leaner footprint."
+    weights:
+      capability_fit: 24
+      standard_shape: 20
+      operability: 16
+      maturity_trajectory: 14
+      reversibility: 12
+      durability_fit: 6
+      licensing_cost: 5
+      docs_support: 3
+
+# Per-criterion definition + calibration anchors (0..3). `why` is the rationale;
+# `anchors` are the level definitions that keep scoring reproducible.
+criteria:
+  maturity_trajectory:
+    name: "Maturity & trajectory"
+    why: "Release cadence, maintainer health, adoption, not abandoned. The recency axis — verified in the workflow's Verify phase. The lead lever: it hedges the moving target."
+    anchors:
+      "0": "abandoned / pre-release churn"
+      "1": "young or visibly slowing"
+      "2": "active, steady releases, real adoption"
+      "3": "broad adoption + strong momentum + healthy maintainers"
+  standard_shape:
+    name: "Standard-shape conformance"
+    why: "How natively it ingests the OpenTelemetry standard (OTLP + GenAI semconv). Low conformance = lock-in + churn. OpenLineage ingestion is NOT part of this criterion — artifact lineage is the freshness gate's in-git derived_from graph, not a backend concern (D-OBS-2)."
+    anchors:
+      "0": "proprietary format only"
+      "1": "OTLP ingest, but custom semconv mapping needed"
+      "2": "ingests OTLP + OTel GenAI semconv natively"
+      "3": "native OTel GenAI semconv (stable-shape) with broad signal coverage (traces/metrics/logs)"
+  reversibility:
+    name: "Reversibility / lock-in"
+    why: "Can we swap it behind the stable JSONL-of-record? Proprietary schema or open? One-way vs two-way door. NOTE: reversibility decays — a two-way door becomes one-way as data/consumers/teams accumulate; judge by the reversal-to-implementation cost ratio, not first impressions. Its WEIGHT is door-type-aware (see decision_class_modifiers)."
+    anchors:
+      "0": "proprietary store + schema, hard exit"
+      "1": "swappable with migration effort"
+      "2": "swappable behind our JSONL-of-record, open schema"
+      "3": "fully standard, drop-in, zero migration"
+  operability:
+    name: "Operability in one ephemeral container"
+    why: "Single-process / pip / binary, modest footprint, simple start. The TB1 reality past the pass/fail line."
+    anchors:
+      "0": "needs compose / multi-service (normally already screened out by TB1)"
+      "1": "single container but heavy (>4 GB) or fiddly"
+      "2": "single container, modest, simple start"
+      "3": "lightweight single binary / pip, trivial start"
+  capability_fit:
+    name: "Capability fit"
+    why: "Does it answer OUR written questions — gate pass/fail counts, judge stability, cycle-time-over-runs, trace=run/span=step — scored against THAT list, NOT general feature breadth. A broad general-purpose tool that does not answer these scores LOW; a narrow tool purpose-built for these scores HIGH. (Evidence-anchored, per the methodology research: score against the written eval set, not vendor feature lists.)"
+    anchors:
+      "0": "does not answer our questions"
+      "1": "answers a few of our questions; real gaps"
+      "2": "answers most of our questions (gate results, cycle-time, run/step model) with light custom work"
+      "3": "answers all of our questions natively / out-of-the-box"
+  durability_fit:
+    name: "Durability-model fit"
+    why: "Local persistent store on a mounted volume; no external sink required."
+    anchors:
+      "0": "no local persistence"
+      "1": "local store, awkward on a volume"
+      "2": "local store on a mounted volume, cleanly"
+      "3": "that + easy backup / compaction"
+  licensing_cost:
+    name: "Licensing / cost"
+    why: "OSS license, no seat cost, no rug-pull risk."
+    anchors:
+      "0": "restrictive / seat-cost / rug-pull risk"
+      "1": "OSS with caveats (e.g. SSPL)"
+      "2": "permissive OSS, no seat cost"
+      "3": "permissive + foundation-governed"
+  docs_support:
+    name: "Docs & support"
+    why: "Onboarding docs, issue responsiveness."
+    anchors:
+      "0": "sparse"
+      "1": "basic"
+      "2": "solid docs + responsive issues"
+      "3": "excellent docs + active community"
