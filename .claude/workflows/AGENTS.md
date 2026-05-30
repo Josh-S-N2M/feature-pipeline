@@ -4,6 +4,8 @@ This directory holds the project's **dynamic-workflow** scripts and this manual.
 
 **How to run one.** Invoke the Workflow tool with `{name: "<name>", args: {...}}`, or as a `/<name>` slash command. Watch/▸ manage with `/workflows`. Runs are background + report findings; **report-only workflows write nothing** (safe under a write-freeze); **build-time workflows write code** (run only after the freeze lifts).
 
+**When to reach for which.** This file is the *reference* (what each workflow is). For *how they chain into real work by role* — the use-case flows (decide a technology, evolve the design, get build-ready, …) — see [`USE-CASES.md`](USE-CASES.md).
+
 **Keep the portfolio small.** Proliferation is an anti-pattern (a workflow can spawn dozens of agents and burn tokens). Before adding one, give it a sharp *solves / does-not-solve* boundary — and check the "What is NOT a workflow" list below.
 
 ## Tool availability in the workflow-agent context (verified by probe)
@@ -32,6 +34,8 @@ A workflow-spawned agent reaches session MCP tools via ToolSearch (load-on-deman
 | 4 | `parallel-authoring.js` | build-time | ❌ writes code | author independent code units in parallel, each verified |
 | 5 | `migration-parallel-run.js` | build-time | ❌ runs migration | per-pipeline parallel-run diff + cutover-readiness (thin) |
 | 6 | `technology-evaluation.js` | design-time | ✅ report-only | boundary-screen → score → verify a technology choice; drafts a decision record (spec: `technology-evaluation.DESIGN.md`) |
+| 7 | `design-review.js` | design-time | ✅ report-only | is the design *sound*? — FULL FORENSIC sweep of every Part/rule/anti-pattern + correctness red-team + scoped credential check + schedulability; emits a coverage matrix |
+| 8 | `compliance-audit.js` | design-time | ✅ report-only | does the *code* match the design? — whole-repo conformance scan → proposed refactor tasks |
 
 ---
 
@@ -86,6 +90,27 @@ A workflow-spawned agent reaches session MCP tools via ToolSearch (load-on-deman
 - **When used / not.** Used: when a provisional choice needs deciding, or its trigger fires. Not: mid-design brainstorming (that's conversation); a reversible low-blast-radius pick.
 - **Canonical it reads.** `technology-boundaries.yaml` (the screen + fitness-function binding) and `evaluation-rubric.yaml` (profiles + criteria + anchors). Accessors in `canonical.py` are a WS-0 follow-on; until then agents Read the YAML directly (no inline copy — canonical-compliant in spirit).
 - **Args.** `{decision:{role, plan_home, incumbent, prior_candidates?}, profile?, candidate_seeds?, max_candidates?, max_verify?, today?}`. Defaults to the observability-backend pilot.
+
+## 7. `design-review` — is the design *sound*?
+
+- **Why.** `document-critique` checks the docs are *internally consistent*; it explicitly does **not** check whether the design is *correct, safe, or buildable*. That left three risk classes with no home: design correctness (race/double-apply in the replay/idempotency model), credential leakage, and schedulability (critical path, producer-after-consumer ordering).
+- **Problem it solves.** A substantive soundness review: an adversarial **red-team** of the load-bearing mechanisms (each skeptic tries to *break* one), a **scoped credential** check, and a **schedulability** pass over the workstream DAG.
+- **Scope guardrail (load-bearing).** The credential check is **credentials-only, major-issues-only** — a secret in argv/URL/committed file/log/run-event-JSONL/MCP-config, or a credential not routed through env/Secrets indirection. It explicitly does **NOT** flag missing zero-trust, RBAC, encryption-at-rest, rotation, compliance frameworks, or threat models beyond credential leakage. *This is a private, experimental project; over-engineering security is itself a defect because it breaks our ability to iterate.* The constraint is baked into the workflow prompt so it can't drift.
+- **What it does NOT solve.** It does not certify (flashlight, not autopilot — surfaces candidates for a human to adjudicate), does not check *consistency* (that's #2), and does not check *code-vs-design* (that's #8).
+- **How.** Map (mechanisms + credential surfaces + DAG) → Probe (`parallel`: one breaker per mechanism + one per surface + a scheduler) → Verify (default "the design handles it" unless a concrete break holds) → Synthesize (prioritised candidate-defect list + schedulability summary).
+- **When used / not.** Used: after #2 passes, before building. Not: as a consistency check; not on code (that's #8).
+- **Args.** `{arch, plan}` (default to the repo-root docs).
+
+## 8. `compliance-audit` — does the *code* match the design?
+
+- **Why.** Once the architecture is settled, the existing repo has drifted from it — code/config that predates or violates the boundaries and decisions. Nothing flagged that.
+- **Problem it solves.** A whole-repo conformance scan: derive a checklist from the architecture (boundaries TB1–11 + load-bearing decisions + structural rules), audit the actual code against each, and **propose refactor tasks** to fold into the plan.
+- **What it does NOT solve.** It checks *conformance to THIS architecture*, not generic Claude Code config quality (that's the `auditing-*` skills) — they complement. It is **report-only**: it *proposes* refactor tasks; it never edits the code or the plan (human folds them in).
+- **How.** Scope (checklist + areas) → Audit (`parallel`: one agent per rule, file:line evidence) → Verify (default "actually compliant" unless confirmed) → Synthesize (prioritised violations → sized refactor tasks).
+- **When used / not.** Used: **after** #2 and #7 pass — auditing code against an inconsistent or unsound design just propagates the problem. Not: before the design is settled.
+- **Args.** `{arch, plan, root}` (defaults to the repo-root docs + `.`).
+
+**The three review workflows, in order:** #2 `document-critique` (is it *consistent*?) → #7 `design-review` (is it *sound*?) → #8 `compliance-audit` (does the *code* match it?). Each gates the next — there's no point auditing code against a design that isn't yet sound.
 
 ---
 

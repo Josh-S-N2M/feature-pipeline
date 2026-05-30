@@ -33,10 +33,10 @@ Every workstream deliverable below names its **change target** (existing path) w
 
 | Class | Decisions | Plan home |
 |---|---|---|
-| **Adopted by reference** (architectural what/why) | D1–D4, D6, D7, D8, D9, D10, D11, D12, D14, D16-core, D-DOM-1..4, D-KN-1..4, D-TB-1, D-PF-1, D-OBS-1, D-OBS-2, D-RG-1, D-DR-1, D-TOOL-1, D-IL-1, D-HO-1 (D5 is the *rejected* auto-re-derive option — not implemented) | the workstream that builds each (mapped per-workstream below) |
+| **Adopted by reference** (architectural what/why) | D1–D4, D6, D7, D8, D9, D10, D11, D12, D14, D16-core, D-DOM-1..4, D-KN-1..4, D-TB-1, D-PF-1, D-OBS-1, D-OBS-2, D-RG-1, D-DR-1, D-TOOL-1, D-IL-1, D-HO-1, D-ORCH-1 (D5 is the *rejected* auto-re-derive option — not implemented) | the workstream that builds each (mapped per-workstream below) |
 | **Owned** (implementation how / vendor / mechanics) | D13 (backend product choice), D15 (Strangler-Fig), D17 (durability mechanics), D18 (Dockerfile-install), plus the D9/D16 implementation riders | WS-1, WS-4, close-out |
 
-**Decision → workstream map:** D1–D4/D6/D7/D14/D16/D-RG-1 → WS-1; D-DOM-1..4/D-TOOL-1 → WS-2; D-KN-1..4 → WS-3; D9/D10/D13/D17/D18/D-OBS-1/D-OBS-2/D-DR-1 → WS-4; D-TB-1/D-PF-1 → WS-0 fitness functions; D8/D11/D12/D-IL-1/D-HO-1 → close-out.
+**Decision → workstream map:** D1–D4/D6/D7/D14/D15/D16/D-RG-1/D-ORCH-1/D-DR-1 → WS-1 (D-DR-1 recovery mechanism; the minimal run-event emitter it replays is built in WS-0 and extended in WS-4); D-DOM-1..4/D-TOOL-1 → WS-2; D-KN-1..4 → WS-3; D9/D10/D13/D17/D18/D-OBS-1/D-OBS-2 → WS-4; D-TB-1/D-PF-1 → WS-0 fitness functions; D8/D11/D12/D-IL-1/D-HO-1 → close-out.
 
 **Technology choices — the observability backend is now decided; others remain open.** The backend (D13) was decided **2026-05-30 via the `technology-evaluation` workflow: GreptimeDB** (a near-tie with Jaeger, resolved on "keep the door open to metrics/logs"); the draft decision record is at `.claude/workflows/technology-evaluation.RERUN-OUTPUT.md`, ADR pending freeze-lift. The architecture states the role agnostically (self-hostable single-container OTel backend with a durable local store); the plan names GreptimeDB as the realization, with its watch-items (young/single-vendor; HTTP-only trace ingest — fine for our HTTP POST export; verify durable-local persistence at build) carried below. Other owned choices (e.g. the RFC-8785 lib) stay concrete but revisable.
 
@@ -92,7 +92,7 @@ flowchart TD
     WS0["WS-0 — Substrate Foundation<br/>corpus + parallel-run harness + single drift sentinel + CI + gate-mode + fitness functions"]
     WS1["WS-1 — Document Reliability<br/>contracts → validators+gates → pipeline manifest → freshness → early-cutoff spike → orchestrator"]
     WS2["WS-2 — Domain Extensibility<br/>domain BOM registry → conformance+orphan check → scaffold → teardown"]
-    WS3["WS-3 — Knowledge Governance<br/>ADR index → memory bi-temporal supersession → context-file DRY"]
+    WS3["WS-3 — Knowledge Governance<br/>ADR index + decision graph (MCP) → memory bi-temporal supersession → context-file DRY"]
     WS4["WS-4 — Observability<br/>build once (schema+emitter+backend) → package as the first domain via the WS-2 scaffold"]
     CC["Close-out — multi-pipeline migration + single warn→enforce flip + run-pinning + discipline skill"]
     WS0 --> WS1
@@ -123,6 +123,7 @@ flowchart TD
 | Parallel-run diff skeleton (for WS-1 orchestrator) | **new** `auditing-shared/scripts/parallel_run_diff.py` |
 | Warn/enforce gate-mode helper | **new** `gate_mode.py` (emit-but-don't-block in `warn`) |
 | Drift-sentinel skeleton | extend the existing drift audit (`audit_canonical_drift.py` family) into the shared sentinel both gate families register into |
+| **Minimal run-event emitter** (recovery-journal substrate) | **new** `emit_run_event.py` — appends minimal `run.*`/`stage.*`/`gate.result` events to `.claude/runtime/run-<id>.jsonl`. This is the orchestrator's cross-restart **recovery journal** (D-DR-1, replayed by WS-1f); WS-4a later **extends** it into the full OTel observability surface. Built early because the orchestrator (WS-1f) consumes it for recovery — producer-before-consumer. |
 | **Technology-boundary fitness functions** | **new** CI checks enforcing the architecture's TB-set (e.g. "no devcontainer service requires docker-compose," "no validator imports a non-Python runtime," "no secret in `.mcp.json` argv/URL") |
 | **Routing classifier (canonical)** | **new** a canonical home for the mechanical-vs-semantic *routing* axis — distinct from `severity.yaml` (severity and routing are orthogonal). Either a `routing.yaml` or a `routing_class` field, read by the R7/A10 triage. Closes the §29 gap where routing was wrongly attributed to `severity.yaml`. (Built post-freeze.) |
 | CI job | **new** `.github/workflows/pipeline-validators.yml` — runs smoke tests + corpus + sentinel + fitness functions; starts green (`.github/workflows/` exists, one workflow present) |
@@ -134,7 +135,7 @@ flowchart TD
 
 ### WS-1 — Document Reliability (the within-a-run level)
 
-**Goal:** deterministic gates around the document handoffs, plus freshness, the hybrid orchestrator, and the hardened semantic reviewer gate. **Implements** D1–D4, D6, D7, D14, D16, D-RG-1, R1–R13, R20 (D5 is the *rejected* auto-re-derive option — not implemented).
+**Goal:** deterministic gates around the document handoffs, plus freshness, the hybrid orchestrator (on Dynamic Workflows), crash-recovery, and the hardened semantic reviewer gate. **Implements** D1–D4, D6, D7, D14, D15, D16, D-RG-1, D-ORCH-1, D-DR-1, R1–R13, R20, R21 (D5 is the *rejected* auto-re-derive option — not implemented).
 
 **WS-1a — Contracts (templates, schemas, structured boundaries).**
 
@@ -165,6 +166,8 @@ flowchart TD
 | Manifest JSON Schema + validator | **new** `pipelines.schema.json` + `validate_manifest.py` (fail-fast on malformed topology) |
 | Contract-completeness check | **new** `validate_manifest_completeness.py` — every gated doc-type has a contract + wired validator; every static edge has a gate. Registers into the WS-0 sentinel. |
 
+**Implements** D2 (the pipeline manifest as the canonical keystone).
+
 **WS-1d — Freshness gate (structured-field digest, whole-descendant invalidation).** Implements D3, D6, D7, D16, R11.
 
 | Deliverable | Path / action |
@@ -182,11 +185,12 @@ flowchart TD
 - **In-bounds vs TB4 (deterministic gates only):** freshness stays a deterministic gate — the optional LLM judge may *only suppress* an invalidation it is confident is immaterial, the default is always invalidate-on-uncertainty, and every suppression is logged. So the LLM sits *beside* the gate as a suppressor, never *as* the gate; the TB4 boundary holds.
 - **Implement (only if decide passes):** `validate_freshness.py` consumes section-level edges; reverse-closure walks the finer graph; the judge-suppressor is opt-in per edge and logged.
 
-**WS-1f — Manifest-driven orchestrator (HYBRID) via Strangler Fig.** Implements D2, D14, D15.
+**WS-1f — Orchestration on Claude Code Dynamic Workflows (HYBRID) via Strangler Fig.** Implements D2, D14, D15, D-ORCH-1, and the D-DR-1 durability complement.
 
 | Deliverable | Path / action |
 |---|---|
-| Generic manifest loop | **new** coordinator that reads `pipelines.yaml` for stages/edges/gates; runs **beside** the prose orchestrator (facade routes to one or the other) |
+| Per-segment workflow scripts + coordinator | **new** Dynamic-Workflow scripts (one per **human-gated segment** — a gate can't live inside a script) that read `pipelines.yaml` for stages/edges/gates and route on typed state; a thin **coordinator** sequences the segments across the six human gates and persists state in the run-event log (D-ORCH-1). Runs **beside** the prose orchestrator (facade routes to one or the other) |
+| Recovery via the run-event log (D-DR-1) | the engine's resume is **session-local** (lost on restart/rebuild), so cross-restart recovery uses the **WS-0 minimal run-event log**: on restart the coordinator **replays** completed `stage.complete`/`gate.result` boundaries rather than re-executing; side-effecting actors carry coordinator-derived idempotency keys (`{run}:{stage}`); human approvals are durable boundary events so an interrupted approval replays to its wait point (R21) |
 | Hybrid boundary | static skeleton + gates from the manifest; **dynamic edges** (reconciliation re-entry, conditional routing) stay typed state-conditional code — do **not** over-declare |
 | Parallel-run cutover | run both on the same replay; `parallel_run_diff.py` diffs decisions; cut over only on match |
 | Remove static prose | **edit** `recipe-feature-pipeline/SKILL.md` — delete the prose stage/gate table (the current single source of pipeline topology) once parallel-run matches; dynamic routing code remains |
@@ -207,7 +211,7 @@ flowchart TD
 
 ### WS-2 — Domain Extensibility (the across-compositions level)
 
-**Goal:** make adding/removing a domain predictable and uniform. **Implements** D-DOM-1..4, R14–R16, R22–R23, D-TOOL-1. Validation backbone: the conformance check run against the live repo.
+**Goal:** make adding/removing a domain predictable and uniform. **Implements** D-DOM-1, D-DOM-2, D-DOM-3, D-DOM-4, R14–R16, R22–R23, D-TOOL-1. Validation backbone: the conformance check run against the live repo.
 
 | Deliverable | Path / action |
 |---|---|
@@ -218,7 +222,7 @@ flowchart TD
 | Registry-driven auditor dispatch | **edit** `auditing-cc-configs/scripts/audit_project.py:34-41` — replace the hard-coded `SKILL_PATHS` dict with registry-derived dispatch (parity-test against the old dict before removing it) |
 | Add-a-domain scaffold | **new** script/procedure + skeletons that emit the standard bundle (`KB-<slug>-platform`, `KB-<slug>-design`, `auditing-<slug>` or `none` rationale, `design-<slug>` or `folded_into`) **and** the registry entry atomically |
 | Teardown reconciliation | **new** script: read `install_sites`, enumerate every part (KBs, auditor, designer, MCP entry, hooks, **user-scope** skills/hooks), remove, drop the registry entry, run the orphan check as the completion gate. Dry-run-first; user-scope deletes need explicit approval (home-dir guardrail). |
-| Tool registry + startup health probe (D-TOOL-1) | **extend** the existing canonical tool *vocabulary* (`.claude/canonical/tools.yaml`) into an **operational registry** — add per-agent assignment, role-permission scope, context budget, load+init (incl. serena `activate_project`), and read/write class (the vocabulary stays; the lifecycle fields are new, in `tools.yaml` or a sibling `tool-registry.yaml` if it grows too large) + a startup availability/health probe per agent-context (generalize the `mcp-availability-probe`); tool add/update/remove reuses the teardown reconciliation above; tool-use spans feed observability |
+| Tool registry + startup health probe (D-TOOL-1) | **extend** the existing canonical tool *vocabulary* (`.claude/canonical/tools.yaml`) into an **operational registry** — add per-agent assignment, role-permission scope, context budget, load+init (incl. serena `activate_project`), and read/write class (the vocabulary stays; the lifecycle fields are new, in `tools.yaml` or a sibling `tool-registry.yaml` if it grows too large) + a startup availability/health probe per agent-context (generalize the existing `.devcontainer/lib/mcp-ping.sh` + `mcp-auth-probe.sh`); tool add/update/remove reuses the teardown reconciliation above; tool-use spans feed observability |
 | Domain freshness + auditor-sync (D-DOM-4) | **new** `authoritative_sources` field on the BOM (digest/date) + a periodic `research-and-verify`-driven staleness check (bi-temporal flag) + an auditor-sync check asserting each auditor's rules match its current KB. Runs in the improvement-loop batch (close-out / Part V), not per-run |
 
 **Validation:** conformance check (a) flags domains whose `auditor` is absent without a `none` rationale, (b) reports **zero orphans**, (c) registry-driven dispatch invokes exactly the auditors the old dict did; teardown dry-run reconstructs the gitnexus removal *from a registry entry* and would have enumerated the user-scope `~/.claude/skills/gitnexus-*` + hook (the part the manual removal missed); scaffold→conformance-passes→teardown→clean round-trips on a throwaway domain. **Size:** L · **Risk:** medium (warn first; teardown dry-run-first).
@@ -227,11 +231,13 @@ flowchart TD
 
 ### WS-3 — Knowledge Governance (the across-time level) — closes the Part VII gap
 
-**Goal:** govern durable knowledge — decisions, memory, context files — so it stays navigable, fresh, and non-conflicting. **Implements** D-KN-1..4, R17–R19 (Part VII — previously had no plan home).
+**Goal:** govern durable knowledge — decisions, memory, context files — so it stays navigable, fresh, and non-conflicting, with an **AI-queryable decision graph** derived from ADR frontmatter. **Implements** D-KN-1, D-KN-2, D-KN-3, D-KN-4, R17–R19 (Part VII — previously had no plan home).
 
 | Deliverable | Path / action |
 |---|---|
-| **Decision-log index** | **new** generated `adrs/INDEX.md` (or equivalent) listing every ADR with status, title, tags, links — produced from the folder, with a CI drift check; a **status-filtered "current decisions" view** so the live set stays small. |
+| **Decision-log index** (human entry) | **new** generated `adrs/INDEX.md` (or equivalent) listing every ADR with status, title, tags, links — produced from the folder, with a CI drift check; a **status-filtered "current decisions" view** so the live set stays small. |
+| **Decision graph + typed MCP surface** (agent entry — D-KN-2) | **new** a graph **derived from committed ADR frontmatter + canonical** (nodes = decisions; edges = `supersedes`/`depends_on`/`constrains`/`conflicts_with`) — *authored edges, no LLM extraction*; built into a **file/SQLite** form (no graph DB — ~68 ADRs sit far below the ~10⁵-edge threshold), exposed via a **typed MCP server** with parameterized queries (not raw Cypher/NL-to-query), context-budget-disciplined. Registers as a tool (D-TOOL-1) / cross-cutting domain. Reference patterns: `dg`, `mcp-adr` (young — proof-of-pattern, not deps). |
+| **Bi-temporal supersession + cross-link-integrity validator** (D-KN-3) | **new** supersession **invalidates** an edge (`invalid_at`), never deletes — "true now" and "believed at T" both queryable; a **validator** (not just a schema) enforces two-way `supersedes`/`superseded_by` links + supersession resolution, registered in the WS-0 sentinel. |
 | ADR hygiene | **edit**: normalize status casing (`Accepted`/`accepted`); relocate the 2 live-but-`Superseded` ADRs (ADR-0018, ADR-0058) to `superseded/` or demote them in the index; enforce two-way `supersedes`/`superseded_by` links |
 | **Memory freshness + conflict check** | **new** check in the WS-0 sentinel: memory entries (agent-memory + auto-memory) carry a written-at field (and, where apt, a validity window); flag entries contradicting current canonical or a superseding ADR (anchor-to-canonical); flag past-validity entries. Lifecycle: **detect → resolve (invalidate-not-delete, keep lineage) → prune** (dedup/decay/consolidate). |
 | **Context-file DRY check** | **new** check: no rule duplicated across memory/context levels (additive precedence has no override); as `AGENTS.md`/`CLAUDE.md` nears the ~200-line budget, move conditional rules into path-scoped `.claude/rules/` rather than enlarging the always-on file |
@@ -242,17 +248,16 @@ flowchart TD
 
 ### WS-4 — Observability (build once, package once)
 
-**Goal:** make runs measurable, then *package* observability as the first domain through the WS-2 scaffold — proving the scaffold on a real case and resolving the prior double-handling. **Implements** D9, D10, D13, D17, D18, D-OBS-1, D-OBS-2, D-DR-1, R13, R21.
+**Goal:** make runs measurable, then *package* observability as the first domain through the WS-2 scaffold — proving the scaffold on a real case and resolving the prior double-handling. **Implements** D9, D10, D13, D17, D18, D-OBS-1, D-OBS-2, R13. (D-DR-1's recovery mechanism is WS-1f; WS-4a *extends* the minimal run-event emitter built in WS-0.)
 
 **WS-4a — Build the run-event surface.**
 
 | Deliverable | Path / action |
 |---|---|
-| Event schema | **new** `.claude/canonical/run-events.yaml` — `run.*`, `stage.*`, `gate.result`, `freshness.stale`, `cycle.*`, **`tool.use`** (per-tool span), plus a `judge_stability` field on `gate.result` (WS-1g); OTel-aligned (run-lifecycle vocabulary borrowed from OpenLineage; the lineage *data* is the freshness `derived_from` graph, not emitted to a lineage backend — D-OBS-2) |
-| Emitter | **edit/extend** `log_state_transition.py` → `emit_run_event.py` (append to `.claude/runtime/run-<id>.jsonl`) |
+| Event schema (extend WS-0) | **edit/extend** the minimal WS-0 base into `.claude/canonical/run-events.yaml` — add `freshness.stale`, `cycle.*`, **`tool.use`** (per-tool span), and a `judge_stability` field on `gate.result` (WS-1g) on top of the WS-0 `run.*`/`stage.*`/`gate.result` events; OTel-aligned (run-lifecycle vocabulary borrowed from OpenLineage; the lineage *data* is the freshness `derived_from` graph, not emitted to a lineage backend — D-OBS-2) |
+| Emitter (extend WS-0) | **edit/extend** the WS-0 `emit_run_event.py` with the richer event set; same `.claude/runtime/run-<id>.jsonl` target |
 | Emit wiring | orchestrator + gates call the emitter at each stage/gate boundary |
 | **Two-level capture (D-OBS-1)** | the **coordinator** emits stage-boundary events; the **runtime** captures per-actor / per-tool spans nested under the active stage (trace = run, span = step; actors stay stateless — the runtime instruments them, they do not self-report). Tool-use spans (D-TOOL-1) land here: which agent used which tool, latency, failure |
-| **Recovery journal (D-DR-1)** | the same JSONL **doubles as the crash-recovery journal** — *no separate engine*. On restart, completed `stage.complete` / `gate.result` boundaries **replay from the log** rather than re-execute; actors with external side effects carry a **coordinator-derived idempotency key** (`{run}:{stage}`); human approvals are written as **durable** boundary events so an interrupted approval replays to its wait point (R21). Keep credentials/PII out of the plaintext log (TB10); bound it (compact/rotate) |
 | Projection | fold JSONL into the existing `pipeline-run-summary-template.md`; commit the run-summary to the deliverable archive (durable human record) |
 | OTLP bridge | **Primary:** **new** `export_run_to_otlp.py` (SDK-free POST to `:4318/v1/traces`). *Optional:* OTel Collector `filelog`→`otlp_json` (alpha — prefer the script). Namespace skew (`gen_ai.*` vs OpenInference) is normalized at the backend (add a `genainormalizer` Collector step only if sources mix namespaces). |
 | Self-hosted backend + durable store | **GreptimeDB (single container) installed in the Dockerfile** (prebuild-captured, per the shellcheck precedent at `Dockerfile:15` / `postCreate.sh:24-27`), **started opt-in** via `scripts/obs-up.sh` — not docker-compose, not `postStart`. Point GreptimeDB's data directory (`--data-home`, confirm at build) at a **mounted persistent volume** (a *cache* — replayable from the JSONL record, so loss is acceptable). **Validate early** at build: the single binary/container runs without compose, OTLP/HTTP trace ingest works (GreptimeDB trace ingest is HTTP-only — fine for our SDK-free HTTP POST export), and the data dir persists across rebuild. Keep opt-in. |
@@ -297,6 +302,8 @@ flowchart TD
 | **Early-cutoff (WS-1e) is a frontier with no settled answer** | Spike-gated with measured accept/reject criteria; WS-1d whole-descendant invalidation is the always-correct fallback — correctness never depends on the spike |
 | Validator false-positive halts the live pipeline | Warn-then-enforce; per-gate enforce flip is instantly revertable |
 | Orchestrator migration breaks runs (WS-1f) | Strangler Fig (prose path stays until proven) + parallel-run diffing + schema-validated manifest + dynamic routing kept as code |
+| Dynamic Workflows is research-preview + token-heavy | Decompose into bounded per-gate segments; the run-event log is the always-available record (D-DR-1) if a run is interrupted; the prose path stays until parallel-run proves the workflow path; treat the engine as the dispatcher only, not the durability layer |
+| Decision graph over-engineered into heavyweight GraphRAG / a graph DB | Derive from authored frontmatter (no LLM extraction); file/SQLite, no graph DB below ~10⁵ edges; typed MCP queries only; start with the generated index and add graph queries only where flat lookup fails structurally |
 | OTel GenAI semconv churn (experimental) | JSONL stays the system of record; pin the semconv opt-in; add-not-rewrite; the backend ingests additively |
 | GreptimeDB is young (1.0) + single-vendor | Two-way door — the backend is a replayable cache behind the JSONL-of-record; swap = re-point OTLP export + re-stand a container. Re-eval trigger watches release cadence + GenAI-semconv stabilization. HTTP-only trace ingest is fine for our SDK-free HTTP POST. |
 | RFC-8785 lib low-maturity (single maintainer, v0.1.4) | Pin exactly or vendor the reference impl; canonicalization test vector in the corpus |
