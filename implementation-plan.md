@@ -299,6 +299,27 @@ flowchart TD
 
 ---
 
+### Brownfield refactor backlog (from the compliance-audit, 2026-05-30)
+
+The `compliance-audit` workflow mapped the current code against this hardened design (30 rules, 14 verified violations; full report at `.claude/workflows/compliance-audit.OUTPUT.md`). **Most violations are the code not yet matching the *target* design — i.e. exactly what the workstreams build** — so the backlog largely *sharpens* existing deliverables with the precise file:line to change. Three items are genuinely new; **T5 is a shipped bug worth fixing the moment the freeze lifts** (it silently disables a core gate). The code refactors themselves are build-phase (post-freeze); this backlog is the plan record.
+
+| # | Refactor | File:line target | Home | Status |
+|---|---|---|---|---|
+| **T5** ⚑ | **Pre-build quick fix** — the phase-quality independence gate is **inert**: the orchestrator passes `phase-quality-result.json` but the reviewer emits `phase-quality-report.json`, so the self-approval gate (R4) never fires | `recipe-feature-pipeline/SKILL.md:497` | **pre-build** | NEW |
+| T2 | Validators crash on a clean rebuild — `canonical.py` imports PyYAML, never installed | `canonical.py:47,77`; `.devcontainer/Dockerfile:9-19`; **new** `requirements.txt` (pin `PyYAML`) | WS-0 (TB8) | NEW |
+| T4 | finalize-reconciler passes cycle state via shared `memory:project` (sticky-session, leaks across runs) — move to a `checkpoint_path` file | `execute-finalize-reconciler.md:24,78` | WS-1 (TB6) | NEW |
+| T1 | Domain registry has no `auditor` field *(blocker)* — add `auditor:` (named or `none`+rationale) per layer | `engineering-domain-layers.yaml:52-116` | WS-2 (D-DOM-2) | planned ✓ |
+| T3 | Fitness functions named but unbuilt — implement `ff_tb*` or `null`+rationale per boundary | `technology-boundaries.yaml` (8 names) | WS-0 (D-TB-1) | planned ✓ |
+| T6 | Cross-artifact reviewer is ordinal, no abstain — convert to per-criterion binary + abstain, **preserving the 4-cycle loop-back** | `review-cross-artifact-auditor.md:148,154-157` + `reviewer-rubric.yaml` | WS-1g (D-RG-1/R20) | planned ✓ |
+| T9 | Tool probe reachability-only/out-of-session — add in-session SessionStart init+verify | `postStart.sh:48-74` + `settings.json` SessionStart hook | WS-2 (D-TOOL-1/R22) | planned ✓ |
+| T7 | ADR supersession links broken (ADR-0066↔0058 asymmetric; ADR-0018 misfiled) | `adrs/ADR-0066:7`, `ADR-0058`, `ADR-0018:3` | WS-3 (D-KN-3) | planned ✓ |
+| T8 | Commit-authorship rule duplicated across memory levels | `AGENTS.md:70-93` + `feedback_no_overwrite_others_work.md` | WS-3 (D-KN-4) | planned ✓ |
+| T10 | ADR status casing not normalized (45 `Accepted` / 14 `accepted` / free-text) | all `adrs/*.md` | WS-3 (D-KN-3) | planned ✓ |
+
+**Completeness gaps the audit could not reach (added as plan validation items):** (a) the *other two* reviewer gates (`shared-document-reviewer`, `review-architecture-auditor`) likely share T6's ordinal/no-abstain defect — WS-1g must sweep all three, not just the cross-artifact auditor; (b) a **repo-wide** ADR cross-link-integrity check does not exist — it is the proper tool for T7/T10 and is the WS-3 cross-link-integrity validator's job; (c) per-boundary **fitness-function mechanizability** (a real CI check vs `null`+judgment) is a human call WS-0 makes as it implements each; (d) validator *behavioral* correctness (not just import-reproducibility) is exercised by the WS-0 corpus regression, not by this audit.
+
+---
+
 ## 6. Risks & mitigations
 
 | Risk | Mitigation |

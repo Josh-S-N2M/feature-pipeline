@@ -13,7 +13,13 @@
 #   The two are joined by boundary id (TB1..TB11). The WS-0 drift sentinel
 #   enforces the join: every TB in Appendix F has an entry here and vice versa;
 #   each `constraint` summary matches the Appendix-F row; every non-null
-#   `fitness_function` names a check that exists.
+#   `fitness_function` names a check that exists **once WS-0 is built**.
+#   STATUS: the `ff_tb*` names are FORWARD REFERENCES to WS-0 deliverables (the
+#   fitness-function layer is plan WS-0 — not yet implemented). The "names a
+#   check that exists" invariant becomes enforceable when WS-0 lands; until then
+#   these are the contract WS-0 must satisfy. (A per-boundary call remains: some
+#   TBs may warrant `fitness_function: null` + judgment rather than a CI check —
+#   decide that as WS-0 implements each, mirroring TB4/TB6/TB7 which are null today.)
 #
 # CONSUMED BY (both read this one file, so evaluation and CI cannot drift):
 #   - the `technology-evaluation` workflow's boundary-screen phase
