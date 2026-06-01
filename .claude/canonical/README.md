@@ -61,6 +61,7 @@ These files are version-controlled. To update:
 | `engineering-domain-layers.yaml` | The engineering layers used by Layer Scope + per-layer Design (prose companion: `KB-documentation-criteria/references/layer-taxonomy.md`) |
 | `technology-boundaries.yaml` | Machine-checkable half of the architecture's technology boundaries (TB1–TB11) — the boundary screen + fitness-function binding (prose companion: `governed-pipeline-architecture.md` Appendix F) |
 | `evaluation-rubric.yaml` | Weighted, calibrated rubric for the `technology-evaluation` workflow — profiles + criteria + anchors (prose companion: `.claude/workflows/technology-evaluation.DESIGN.md`) |
+| `failure-modes.yaml` | Failure-modes catalog (D-FM-1) — per rule/anti-pattern, failure modes + detection mechanisms; the "how we catch the bad" half of the rule set (prose companion: `governed-pipeline-architecture.md` Part VIII) |
 
 ## Authority
 

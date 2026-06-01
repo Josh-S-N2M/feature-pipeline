@@ -318,6 +318,26 @@ The `compliance-audit` workflow mapped the current code against this hardened de
 
 **Completeness gaps the audit could not reach (added as plan validation items):** (a) the *other two* reviewer gates (`shared-document-reviewer`, `review-architecture-auditor`) likely share T6's ordinal/no-abstain defect — WS-1g must sweep all three, not just the cross-artifact auditor; (b) a **repo-wide** ADR cross-link-integrity check does not exist — it is the proper tool for T7/T10 and is the WS-3 cross-link-integrity validator's job; (c) per-boundary **fitness-function mechanizability** (a real CI check vs `null`+judgment) is a human call WS-0 makes as it implements each; (d) validator *behavioral* correctness (not just import-reproducibility) is exercised by the WS-0 corpus regression, not by this audit.
 
+### Rule-completeness additions (from the failure-mode-catalog completeness review, 2026-05-30)
+
+The completeness review found 16 coverage gaps and catalogued failure modes (`.claude/canonical/failure-modes.yaml`, D-FM-1). The gaps are now **new rules R25–R40 + anti-patterns A25–A29 + decisions D-KN-5 / D-FM-1** in the architecture; each needs a workstream home for its *detection* mechanism (the rule says what good looks like; the workstream builds how it's caught):
+
+| New rule(s) | Concern | Workstream home |
+|---|---|---|
+| R28, D-KN-5 | **KB↔agent↔context governance** (registry + declared/loaded/used) | **WS-2** — the tool registry extends to a *knowledge* registry (the R22→R28 analogue); load/use via namespaced run-event attributes (WS-4a) |
+| R29, A27 | every pipeline a tiered manifest entry on the one substrate | **WS-1c** (manifest) + **close-out** (migrate all pipelines) |
+| R26, A25 | validators carry TP/TN fixtures + are gated | **WS-0** (every validator a gated artifact) |
+| R25, A29 | untrusted content is data, not instructions | **WS-1** (boundary-gate discipline) |
+| R30 | secret/PII scan gates commit/package | **WS-0** (CI gate) |
+| R31 | tool provenance pin + degradation contract | **WS-2** (tool registry) |
+| R37, D-FM-1 | log integrity/backpressure; failure-modes catalog → sentinel detections | **WS-0** (emitter + sentinel) |
+| R32, R39 | scoped lock + semantic reconcile on shared canonical | **WS-0 / WS-1f** (coordinator) |
+| R34, R36 | per-tier cost budget; trusted clock | **WS-4a** (run-events) / **WS-1d** (freshness) |
+| R27, R40, A26, A28 | destructive-op guardrails; deny-by-default; toxic-combo audit | **close-out** (enforce flip) + **WS-2** (tool conformance) |
+| R33, R35, R38 | compatibility window; human-gate identity; rollback semantics | **close-out** (the human-oversight + improvement-loop capstone) |
+
+A re-run of `failure-mode-catalog` over the **expanded** rule set (R1–R40 / A1–A29) populates the full catalog (this run covered R1–R24 / A1–A24); its structured output is written directly to `failure-modes.yaml`. The KB-registry design (R28/D-KN-5) and the pipeline-migration feasibility (R29) are the next two design pieces.
+
 ---
 
 ## 6. Risks & mitigations
